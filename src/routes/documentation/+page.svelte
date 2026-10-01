@@ -546,13 +546,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               To save your project, press the Save button at the top of the
               page. The project is saved right away, in your browser (or, if
               you’re signed in, to your account), and from then on your changes
-              save automatically. The icon beside the project’s name shows where
-              it’s saved: a cloud for your account, or a screen for this browser
-              only. Press it, or Project, for details. To get the project’s URL,
-              press Project, then Copy Link. If you want to share your project
-              or open it in a different browser, make sure to save the URL in a
-              place you can find it again later. You can also use the following
-              keyboard shortcut to save your project:
+              save automatically, so the Save button goes away. Instead, the
+              icon on the Project button shows where it’s saved: a cloud for
+              your account, or a screen for this browser only. Press Project for
+              details. To get the project’s URL, press Project, then Copy Link.
+              If you want to share your project or open it in a different
+              browser, make sure to save the URL in a place you can find it
+              again later. You can also use the following keyboard shortcut to
+              save your project:
             </p>
             <figure class="">
               <table>

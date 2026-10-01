@@ -174,7 +174,10 @@ test.describe('My Projects', () => {
     await expect(
       page.getByText('Saved in this browser. Changes now save automatically.'),
     ).toBeVisible();
-    await expect(page.getByTestId('save-button')).toHaveAccessibleName(
+    // Saving by itself now, Save gives way to the Project button's icon
+    await expect(page.getByTestId('save-button')).toHaveCount(0);
+    await expect(page.getByTestId('project-button')).toHaveAttribute(
+      'data-save-status',
       'Saved in this browser',
     );
 
@@ -208,9 +211,9 @@ test.describe('My Projects', () => {
     await title.press('Enter');
     await expect(title).toHaveValue('Austin Gift');
 
-    // Saved, the icon beside the name opens the Project menu, which says
-    // where; with the name in the top bar, the menu doesn't repeat it
-    await page.getByTestId('save-button').click();
+    // The Project menu says where; with the name in the top bar, it doesn't
+    // repeat it
+    await page.getByTestId('project-button').click();
     await expect(menu.getByTestId('autosave-status')).toHaveText(
       'Saved in this browser',
     );

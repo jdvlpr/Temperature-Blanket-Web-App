@@ -13,27 +13,18 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Save, in the top bar: saves right away (see saveProject), and shows the
-state. Once saved, a project saves by itself, so it's a status (Saved,
-Saving…, Not saved); a problem opens the Project menu. Green means saved, and
-the icon says where: a cloud for the account, a screen for this browser only.
-Beside the project's name (wider screens), saved is just the icon there, like
-Google Docs' cloud icon; either way, clicking it when saved opens the Project
-menu, which says where it's saved. -->
+<!-- Save, in the top bar: saves right away (see saveProject). Only until the
+project saves by itself: then the Project button's icon shows the save state
+(see ProjectMenuButton). Beside the project's name on wider screens. -->
 
 <script lang="ts">
-  import { openProjectMenu } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { autosave } from '$lib/storage/autosave.svelte';
   import { saveProject } from '$lib/utils/save-project.svelte';
   import {
     BookmarkCheckIcon,
     BookmarkIcon,
-    CloudAlertIcon,
-    CloudCheckIcon,
     LoaderCircleIcon,
-    MonitorCheckIcon,
-    MonitorXIcon,
   } from '@lucide/svelte';
 
   let { beside }: { beside?: 'title' } = $props();
@@ -41,56 +32,26 @@ menu, which says where it's saved. -->
   let busy = $state(false);
 
   const status = $derived.by(() => {
-    if (autosave.on) {
-      if (autosave.state === 'error' || autosave.state === 'conflict')
-        return 'problem';
-      if (autosave.state === 'saved') return 'saved';
-      return 'saving';
-    }
     if (busy) return 'saving';
     // Another account's project, here signed out: Save as before
-    if (autosave.stored) return project.status.saved ? 'kept' : 'changed';
+    if (autosave.stored) return project.status.saved ? 'saved' : 'changed';
     return 'new';
   });
 
-  const where = $derived(
-    autosave.account ? 'to your account' : 'in this browser',
-  );
-
   const label = $derived(
-    {
-      problem: 'Not saved',
-      saved: 'Saved',
-      saving: 'Saving…',
-      kept: 'Saved',
-      changed: 'Save',
-      new: 'Save',
-    }[status],
+    { saving: 'Saving…', saved: 'Saved', changed: 'Save', new: 'Save' }[status],
   );
 
   const title = $derived(
     {
-      problem: 'Not saved: see the Project menu',
-      saved: `Saved ${where}`,
       saving: 'Saving…',
-      kept: 'Saved in this browser',
+      saved: 'Saved in this browser',
       changed: 'Save changes [Cmd ⌘]+[s] or [Ctrl]+[s]',
       new: 'Save Project [Cmd ⌘]+[s] or [Ctrl]+[s]',
     }[status],
   );
 
-  /** Nothing to save: saved, or saving */
-  const statusOnly = $derived(
-    beside === 'title' &&
-      (status === 'saved' || status === 'kept' || status === 'saving'),
-  );
-
   async function save() {
-    // Saved, it saves by itself: the Project menu says where
-    if (status === 'saved') {
-      openProjectMenu();
-      return;
-    }
     busy = true;
     try {
       await saveProject();
@@ -101,44 +62,18 @@ menu, which says where it's saved. -->
 </script>
 
 {#snippet icon()}
-  {#if status === 'problem'}
-    {#if autosave.account}
-      <CloudAlertIcon class="text-error-700-300" />
-    {:else}
-      <MonitorXIcon class="text-error-700-300" />
-    {/if}
-  {:else if status === 'saving'}
+  {#if status === 'saving'}
     <LoaderCircleIcon class="animate-spin opacity-70" />
   {:else if status === 'saved'}
-    {#key autosave.account}
-      <span class="saved-pop flex">
-        {#if autosave.account}
-          <CloudCheckIcon class="text-success-700-300" />
-        {:else}
-          <MonitorCheckIcon class="text-success-700-300" />
-        {/if}
-      </span>
-    {/key}
-  {:else if status === 'kept'}
     <BookmarkCheckIcon class="text-success-700-300" />
   {:else}
     <BookmarkIcon />
   {/if}
 {/snippet}
 
-{#if statusOnly && status === 'saved'}
-  <!-- The Project menu says where it's saved -->
-  <button
-    type="button"
-    class="hover:preset-tonal-surface rounded-base flex size-8 shrink-0 items-center justify-center [&_svg]:size-5"
-    aria-label="Saved {where}"
-    title="Saved {where}"
-    onclick={() => openProjectMenu()}
-    data-testid="save-button"
-  >
-    {@render icon()}
-  </button>
-{:else if statusOnly}
+{#if autosave.on}
+  <!-- Saves by itself: the Project button shows how it's going -->
+{:else if beside === 'title' && status !== 'new' && status !== 'changed'}
   <span
     role="img"
     aria-label={label}
@@ -169,21 +104,3 @@ menu, which says where it's saved. -->
     {/if}
   </button>
 {/if}
-
-<style>
-  /* Saved: the check lands with a little pop, once per save */
-  .saved-pop {
-    animation: saved-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  @keyframes saved-pop {
-    from {
-      transform: scale(0.6);
-      opacity: 0;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .saved-pop {
-      animation: none;
-    }
-  }
-</style>

@@ -28,13 +28,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
+  import ProjectMenuButton from '$lib/components/buttons/ProjectMenuButton.svelte';
   import SaveButton from '$lib/components/buttons/SaveButton.svelte';
   import ProjectTitle from '$lib/components/ProjectTitle.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import {
     dialog,
     isDesktop,
-    openProjectMenu,
     pageSections,
     toast,
   } from '$lib/state/page-state.svelte';
@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { loadProjectFromURL } from '$lib/utils/load-project-utils.svelte';
   import { upToDate } from '$lib/utils/other-utils';
   import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
-  import { EllipsisVerticalIcon, RedoIcon, UndoIcon } from '@lucide/svelte';
+  import { RedoIcon, UndoIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
 
   let debounceTimer: number;
@@ -231,15 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <button
-      aria-label="Project Options"
-      title="Project Options"
-      class="btn hover:preset-tonal-surface gap-1"
-      onclick={() => openProjectMenu()}
-    >
-      <EllipsisVerticalIcon />
-      <span>Project</span>
-    </button>
+    <ProjectMenuButton />
   {/snippet}
 
   {#snippet main()}

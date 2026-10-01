@@ -569,12 +569,9 @@ async function saveFromMenu(page: Page) {
   await expect(page.getByText('Saved to your account.')).toBeVisible();
 }
 
-/** The auto-save state the icon beside the project's name shows */
+/** The auto-save state the Project button's icon shows */
 async function saveState(page: Page) {
-  const label = await page
-    .getByTestId('save-button')
-    .getAttribute('aria-label');
-  return label?.trim();
+  return page.getByTestId('project-button').getAttribute('data-save-status');
 }
 
 test.describe('Auto-save', () => {
@@ -622,11 +619,9 @@ test.describe('Auto-save', () => {
     expect(after?.rev).toBe(before?.rev);
     expect(after?.updatedAt).toBe(before?.updatedAt);
 
-    // Nor is opening the Project menu (which hides the rest of the page from
-    // assistive tech while open, so the label is read directly)
+    // Nor is opening the Project menu
     await openMenu(laptop);
-    await expect(laptop.getByTestId('save-button')).toHaveAttribute(
-      'aria-label',
+    await expect(laptop.getByTestId('autosave-status')).toHaveText(
       'Saved to your account',
     );
     await laptop.waitForTimeout(2000);

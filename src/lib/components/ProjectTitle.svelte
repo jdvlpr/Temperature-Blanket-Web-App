@@ -17,7 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 the Project menu). It's a text field styled as the title, as in Google Docs:
 click to rename in place; Enter or clicking away keeps the name, Escape puts
 it back. Not saved yet, clicking it saves the project first, since naming it
-means keeping it. Save (or whether it's saved) is beside it. -->
+means keeping it. Save is beside it until the project saves by itself; then
+the Project button shows the save state. -->
 
 <script lang="ts">
   import SaveButton from '$lib/components/buttons/SaveButton.svelte';
