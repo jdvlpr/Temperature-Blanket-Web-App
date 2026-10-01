@@ -250,7 +250,7 @@ export const sendToProjectGallery = async (
       message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
       if (response.linked)
         message +=
-          '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from your Account page.</p>';
+          '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from My Projects.</p>';
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();

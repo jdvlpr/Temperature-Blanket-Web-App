@@ -181,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <p class="text-sm italic">
         {#if fromAccount}
-          You can remove it later from your Account page.
+          You can remove it later from My Projects.
         {:else}
           This action can't be undone.
         {/if}
