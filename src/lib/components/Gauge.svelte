@@ -280,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#each colorSources as source (source.value)}
               <Menu.Item
                 value={source.value}
-                class="hover:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal"
+                class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
               >
                 <source.icon class="shrink-0" />
                 <div class="flex min-w-0 flex-col text-left">

@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Left-aligned: the text fills the row, so a short one (CSV) lines up with
   // the long ones rather than sitting in the middle
   const ITEM =
-    'hover:bg-surface-200-800 flex h-auto items-center justify-start gap-2 text-left whitespace-pre-wrap';
+    'data-highlighted:bg-surface-200-800 flex h-auto items-center justify-start gap-2 text-left whitespace-pre-wrap data-highlighted:text-inherit';
 </script>
 
 <Menu
