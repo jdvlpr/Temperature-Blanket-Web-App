@@ -110,6 +110,8 @@ export class ImagePaletteState {
   #engine: ImagePaletteEngine | null = null;
   #nextId = 1;
   #loadId = 0;
+  #paletteRequest = 0;
+  #destroyed = false;
   #previewTimer: ReturnType<typeof setTimeout> | undefined;
   #resolveReady!: () => void;
   #ready = new Promise<void>((resolve) => (this.#resolveReady = resolve));
@@ -131,6 +133,7 @@ export class ImagePaletteState {
   /** Load yarn data and start the engine. Call once the modal is mounted. */
   async init() {
     await ensureYarnData();
+    if (this.#destroyed) return;
     if (defaultYarn.value) {
       const details = stringToBrandAndYarnDetails(defaultYarn.value);
       this.selectedBrandId = details.brandId ?? undefined;
@@ -138,6 +141,7 @@ export class ImagePaletteState {
     }
     this.#engine = createImagePaletteEngine();
     await this.#updateColorways();
+    if (this.#destroyed) return;
     this.yarnReady = true;
     this.#resolveReady();
 
@@ -149,6 +153,7 @@ export class ImagePaletteState {
 
   /** Keep the photo and palette for next time, and stop the worker */
   destroy() {
+    this.#destroyed = true;
     clearTimeout(this.#previewTimer);
     if (this.pixels)
       session = {
@@ -247,7 +252,7 @@ export class ImagePaletteState {
       return;
     }
     // A newer image was requested while this one loaded
-    if (id !== this.#loadId) return;
+    if (id !== this.#loadId || this.#destroyed) return;
 
     const scale = Math.min(
       1,
@@ -264,7 +269,7 @@ export class ImagePaletteState {
     const pixels = ctx.getImageData(0, 0, width, height);
 
     await this.#engine!.setImage({ data: pixels.data, width, height });
-    if (id !== this.#loadId) return;
+    if (id !== this.#loadId || this.#destroyed) return;
     this.pixels = pixels;
     this.previewPixels = null;
     this.line = null;
@@ -295,6 +300,7 @@ export class ImagePaletteState {
       width: saved.pixels.width,
       height: saved.pixels.height,
     });
+    if (this.#destroyed) return;
     this.pixels = saved.pixels;
     this.points = saved.points;
     this.#nextId = Math.max(0, ...saved.points.map((point) => point.id)) + 1;
@@ -322,27 +328,14 @@ export class ImagePaletteState {
     if (this.targetCount < 2) this.targetCount = 2;
     const count = Math.max(this.targetCount, locked.length);
     this.working = true;
-    const picked = await this.#engine.autoPalette({
+    const result = await this.#requestColors({
       count: count - locked.length,
-      style: this.style,
-      fixed: this.#labsOf(locked),
-      exact: this.mode === 'exact',
+      fixed: locked,
     });
     this.working = false;
-
-    const fresh = picked.map(({ candidate, lab, x, y }) => {
-      const sourceHex = this.#sample(x, y) ?? oklabToHex(lab);
-      return this.#makePoint({
-        x,
-        y,
-        sourceHex: this.mode === 'exact' ? oklabToHex(lab) : sourceHex,
-        yarn:
-          candidate >= 0
-            ? this.#withDelta(this.#index[candidate].colorway, sourceHex)
-            : null,
-      });
-    });
-    this.#setPoints(this.#sorted([...locked, ...fresh]));
+    if (!result) return;
+    this.#setPoints(this.#sorted([...locked, ...result.points]));
+    this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
   }
 
@@ -363,24 +356,13 @@ export class ImagePaletteState {
     }
     this.targetCount = count;
     if (count === this.points.length || !this.#engine || !this.pixels) return;
-    const picked = await this.#engine.autoPalette({
+    const result = await this.#requestColors({
       count: count - this.points.length,
-      style: this.style,
-      fixed: this.#labsOf(this.points),
-      exact: this.mode === 'exact',
+      fixed: this.points,
     });
+    if (!result) return;
     const points = [...this.points];
-    for (const { candidate, lab, x, y } of picked) {
-      const sourceHex = this.#sample(x, y) ?? oklabToHex(lab);
-      const point = this.#makePoint({
-        x,
-        y,
-        sourceHex: this.mode === 'exact' ? oklabToHex(lab) : sourceHex,
-        yarn:
-          candidate >= 0
-            ? this.#withDelta(this.#index[candidate].colorway, sourceHex)
-            : null,
-      });
+    for (const point of result.points) {
       // Slot each new color where it fits the gradient best
       const at = bestInsertionIndex(
         points.map((n) => hexToOklab(this.colorOf(n))),
@@ -389,7 +371,50 @@ export class ImagePaletteState {
       points.splice(at, 0, point);
     }
     this.#setPoints(points);
+    this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
+  }
+
+  /**
+   * Ask the engine for colors that best cover the image alongside `fixed`.
+   * Returns null if a newer request replaced this one. Yarn picks are read
+   * against the colorways the engine had when the request was sent, since
+   * the yarn filter can change while it works.
+   */
+  async #requestColors({
+    count,
+    fixed,
+  }: {
+    count: number;
+    fixed: PalettePoint[];
+  }): Promise<{ points: PalettePoint[]; index: ColorwayIndex } | null> {
+    const request = ++this.#paletteRequest;
+    const index = this.#index;
+    const picked = await this.#engine!.autoPalette({
+      count,
+      style: this.style,
+      fixed: this.#labsOf(fixed),
+      exact: this.mode === 'exact',
+    });
+    if (request !== this.#paletteRequest || this.#destroyed) return null;
+    const points = picked.map(({ candidate, lab, x, y }) => {
+      // Exact colors and yarn matches both use the photo's color at the marker
+      const sourceHex = this.#sample(x, y) ?? oklabToHex(lab);
+      const colorway = candidate >= 0 ? index[candidate]?.colorway : undefined;
+      return this.#makePoint({
+        x,
+        y,
+        sourceHex,
+        yarn: colorway ? this.#withDelta(colorway, sourceHex) : null,
+      });
+    });
+    return { points, index };
+  }
+
+  /** Re-match colors to the yarn if the filter changed while they were chosen */
+  #rematchIfFilterChanged(index: ColorwayIndex) {
+    if (index !== this.#index && this.#index.length)
+      this.#rematch({ onlyMissing: false });
   }
 
   async setStyle(style: PaletteStyle) {

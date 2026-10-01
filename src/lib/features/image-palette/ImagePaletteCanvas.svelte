@@ -209,150 +209,156 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div
-  bind:this={frame}
-  class="relative mx-auto select-none"
-  style="aspect-ratio: {ratio}; width: min(100%, calc(65vh * {ratio}));"
-  role="group"
-  aria-label="Photo with color markers"
-  onpointermove={onMove}
-  onpointerup={onUp}
-  onpointercancel={onUp}
-  onpointerleave={(e) => {
-    if (e.pointerType === 'mouse') hover = null;
-  }}
->
-  <canvas
-    bind:this={imageCanvas}
-    class="rounded-container absolute inset-0 h-full w-full"
-    class:invisible={!palette.hasImage}
-  ></canvas>
-  {#if palette.showYarnPreview && palette.previewPixels}
-    <canvas
-      bind:this={previewCanvas}
-      class="rounded-container absolute inset-0 h-full w-full"
-    ></canvas>
-  {/if}
-
-  <!-- Picking surface: tap or click to add a color, drag to draw a line -->
+<!-- Side gutters on small screens leave room to scroll past the photo,
+which otherwise takes every touch -->
+<div class="px-10 sm:px-0">
   <div
-    class={[
-      'absolute inset-0 touch-none',
-      palette.hasImage && !palette.loading && 'cursor-crosshair',
-    ]}
-    role="presentation"
-    onpointerdown={onSurfaceDown}
-  ></div>
-
-  <svg
-    class="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-    viewBox="0 0 100 100"
-    preserveAspectRatio="none"
-    aria-hidden="true"
+    bind:this={frame}
+    class="relative mx-auto w-[min(100%,calc(50vh*var(--ratio)))] select-none sm:w-[min(100%,calc(65vh*var(--ratio)))]"
+    style="aspect-ratio: {ratio}; --ratio: {ratio};"
+    role="group"
+    aria-label="Photo with color markers"
+    onpointermove={onMove}
+    onpointerup={onUp}
+    onpointercancel={onUp}
+    onpointerleave={(e) => {
+      if (e.pointerType === 'mouse') hover = null;
+    }}
   >
-    {#if shownLine}
-      <line
-        x1={shownLine.from.x * 100}
-        y1={shownLine.from.y * 100}
-        x2={shownLine.to.x * 100}
-        y2={shownLine.to.y * 100}
-        stroke="white"
-        stroke-width="4"
-        vector-effect="non-scaling-stroke"
-        stroke-linecap="round"
-      />
-      <line
-        x1={shownLine.from.x * 100}
-        y1={shownLine.from.y * 100}
-        x2={shownLine.to.x * 100}
-        y2={shownLine.to.y * 100}
-        stroke="black"
-        stroke-width="2"
-        stroke-dasharray="6 4"
-        vector-effect="non-scaling-stroke"
-      />
-    {/if}
-  </svg>
-
-  {#each linePreview as dot, i (i)}
-    <span
-      class="pointer-events-none absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-black/60"
-      style="left:{dot.x * 100}%;top:{dot.y * 100}%"
-    ></span>
-  {/each}
-
-  {#if drag?.kind !== 'line'}
-    {#each palette.points as point, i (point.id)}
-      {@const color = palette.colorOf(point)}
-      {@const text = getTextColor(color)}
-      {@const active = palette.selectedId === point.id}
-      <button
-        type="button"
-        class={[
-          'absolute z-10 flex size-7 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full border-2 text-xs font-bold shadow-[0_0_0_1px_rgb(0_0_0/0.5),0_2px_6px_rgb(0_0_0/0.4)] transition-transform',
-          active && 'ring-primary-500 z-20 scale-125 ring-4',
-          !active && palette.hoveredId === point.id && 'scale-125',
-          point.locked ? 'cursor-pointer' : 'cursor-grab',
-        ]}
-        style="left:{point.x * 100}%;top:{point.y *
-          100}%;background:{color};color:{text};border-color:{text}"
-        aria-label={describe(point, i)}
-        aria-pressed={active}
-        onpointerdown={(e) => onMarkerDown(e, point)}
-        onpointerenter={() => (palette.hoveredId = point.id)}
-        onpointerleave={() => (palette.hoveredId = null)}
-        onfocus={() => (palette.selectedId = point.id)}
-        onkeydown={(e) => onMarkerKey(e, point)}
-      >
-        {#if point.locked}
-          <LockIcon class="size-3" />
-        {:else}
-          {i + 1}
-        {/if}
-      </button>
-    {/each}
-  {/if}
-
-  {#if drag && pointer}
-    <!-- Magnifier above the finger, or below it near the top edge -->
-    <div
-      class="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white shadow-xl"
-      style="left:{pointer.px}px;top:{pointer.py +
-        (pointer.py < LOUPE_SIZE + 20 ? 1 : -1) *
-          (LOUPE_SIZE / 2 + 32)}px;width:{LOUPE_SIZE}px;height:{LOUPE_SIZE}px"
-    >
-      <canvas bind:this={loupeCanvas} width={LOUPE_SIZE} height={LOUPE_SIZE}
+    <canvas
+      bind:this={imageCanvas}
+      class="rounded-container absolute inset-0 h-full w-full"
+      class:invisible={!palette.hasImage}
+    ></canvas>
+    {#if palette.showYarnPreview && palette.previewPixels}
+      <canvas
+        bind:this={previewCanvas}
+        class="rounded-container absolute inset-0 h-full w-full"
       ></canvas>
-      <span
-        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_0_1px_black]"
-      ></span>
-    </div>
-  {/if}
+    {/if}
 
-  {#if hover && !drag}
+    <!-- Picking surface: tap or click to add a color, drag to draw a line -->
     <div
-      class="rounded-container pointer-events-none absolute z-30 flex max-w-[200px] items-center gap-2 p-2 text-xs shadow-lg"
-      style="left:{hover.px + 16}px;top:{hover.py + 16}px;background:{hover.yarn
-        ?.hex ?? hover.hex};color:{getTextColor(hover.yarn?.hex ?? hover.hex)}"
+      class={[
+        'absolute inset-0 touch-none',
+        palette.hasImage && !palette.loading && 'cursor-crosshair',
+      ]}
+      role="presentation"
+      onpointerdown={onSurfaceDown}
+    ></div>
+
+    <svg
+      class="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
     >
-      {#if hover.yarn}
-        <span class="flex flex-col">
-          <span>{hover.yarn.brandName} - {hover.yarn.yarnName}</span>
-          <span class="font-bold">{hover.yarn.name}</span>
-          <span>{Math.floor(100 - (hover.yarn.delta ?? 0))}% Match</span>
-        </span>
-      {:else}
-        <span class="font-bold">{hover.hex}</span>
+      {#if shownLine}
+        <line
+          x1={shownLine.from.x * 100}
+          y1={shownLine.from.y * 100}
+          x2={shownLine.to.x * 100}
+          y2={shownLine.to.y * 100}
+          stroke="white"
+          stroke-width="4"
+          vector-effect="non-scaling-stroke"
+          stroke-linecap="round"
+        />
+        <line
+          x1={shownLine.from.x * 100}
+          y1={shownLine.from.y * 100}
+          x2={shownLine.to.x * 100}
+          y2={shownLine.to.y * 100}
+          stroke="black"
+          stroke-width="2"
+          stroke-dasharray="6 4"
+          vector-effect="non-scaling-stroke"
+        />
       {/if}
-    </div>
-  {/if}
+    </svg>
 
-  {#if palette.loading}
-    <div
-      class="rounded-container bg-surface-50/70 dark:bg-surface-950/70 absolute inset-0 z-40 flex flex-col items-center justify-center"
-    >
-      <Spinner />
-      <p class="my-2">Loading Image...</p>
-    </div>
-  {/if}
+    {#each linePreview as dot, i (i)}
+      <span
+        class="pointer-events-none absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-black/60"
+        style="left:{dot.x * 100}%;top:{dot.y * 100}%"
+      ></span>
+    {/each}
+
+    {#if drag?.kind !== 'line'}
+      {#each palette.points as point, i (point.id)}
+        {@const color = palette.colorOf(point)}
+        {@const text = getTextColor(color)}
+        {@const active = palette.selectedId === point.id}
+        <button
+          type="button"
+          class={[
+            'absolute z-10 flex size-7 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full border-2 text-xs font-bold shadow-[0_0_0_1px_rgb(0_0_0/0.5),0_2px_6px_rgb(0_0_0/0.4)] transition-transform',
+            active && 'ring-primary-500 z-20 scale-125 ring-4',
+            !active && palette.hoveredId === point.id && 'scale-125',
+            point.locked ? 'cursor-pointer' : 'cursor-grab',
+          ]}
+          style="left:{point.x * 100}%;top:{point.y *
+            100}%;background:{color};color:{text};border-color:{text}"
+          aria-label={describe(point, i)}
+          aria-pressed={active}
+          onpointerdown={(e) => onMarkerDown(e, point)}
+          onpointerenter={() => (palette.hoveredId = point.id)}
+          onpointerleave={() => (palette.hoveredId = null)}
+          onfocus={() => (palette.selectedId = point.id)}
+          onkeydown={(e) => onMarkerKey(e, point)}
+        >
+          {#if point.locked}
+            <LockIcon class="size-3" />
+          {:else}
+            {i + 1}
+          {/if}
+        </button>
+      {/each}
+    {/if}
+
+    {#if drag && pointer}
+      <!-- Magnifier above the finger, or below it near the top edge -->
+      <div
+        class="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white shadow-xl"
+        style="left:{pointer.px}px;top:{pointer.py +
+          (pointer.py < LOUPE_SIZE + 20 ? 1 : -1) *
+            (LOUPE_SIZE / 2 + 32)}px;width:{LOUPE_SIZE}px;height:{LOUPE_SIZE}px"
+      >
+        <canvas bind:this={loupeCanvas} width={LOUPE_SIZE} height={LOUPE_SIZE}
+        ></canvas>
+        <span
+          class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_0_1px_black]"
+        ></span>
+      </div>
+    {/if}
+
+    {#if hover && !drag}
+      <div
+        class="rounded-container pointer-events-none absolute z-30 flex max-w-[200px] items-center gap-2 p-2 text-xs shadow-lg"
+        style="left:{hover.px + 16}px;top:{hover.py + 16}px;background:{hover
+          .yarn?.hex ?? hover.hex};color:{getTextColor(
+          hover.yarn?.hex ?? hover.hex,
+        )}"
+      >
+        {#if hover.yarn}
+          <span class="flex flex-col">
+            <span>{hover.yarn.brandName} - {hover.yarn.yarnName}</span>
+            <span class="font-bold">{hover.yarn.name}</span>
+            <span>{Math.floor(100 - (hover.yarn.delta ?? 0))}% Match</span>
+          </span>
+        {:else}
+          <span class="font-bold">{hover.hex}</span>
+        {/if}
+      </div>
+    {/if}
+
+    {#if palette.loading}
+      <div
+        class="rounded-container bg-surface-50/70 dark:bg-surface-950/70 absolute inset-0 z-40 flex flex-col items-center justify-center"
+      >
+        <Spinner />
+        <p class="my-2">Loading Image...</p>
+      </div>
+    {/if}
+  </div>
 </div>
