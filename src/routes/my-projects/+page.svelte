@@ -120,7 +120,12 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
       <section class="flex flex-col gap-2" aria-labelledby="projects">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 id="projects" class="h3">My Projects</h2>
-          <a href={resolve('/')} class="btn hover:preset-tonal-surface">
+          <!-- A full load: the project open before stays loaded otherwise -->
+          <a
+            href={resolve('/')}
+            class="btn hover:preset-tonal-surface"
+            data-sveltekit-reload
+          >
             <PlusIcon />
             New Project
           </a>
