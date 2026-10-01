@@ -218,6 +218,10 @@ button to it. -->
       </p>
       <!-- Signed out: their account's projects are a sign-in away -->
       {#if __ACCOUNTS_ENABLED__ && !account.summary?.id}
+        <p class="mt-2 text-sm opacity-70">
+          Have an account? Sign in to open your saved projects and yarn palettes
+          from any device.
+        </p>
         <a
           href={resolve('/account')}
           class="btn preset-tonal-primary self-start"
