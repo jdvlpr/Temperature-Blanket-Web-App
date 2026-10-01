@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -18,23 +18,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
-  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { getSortedPalette } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
-  import type { Color } from '$lib/types/yarn-types';
+  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
   import {
     ArrowDownWideNarrowIcon,
-    ExternalLinkIcon,
-    ShuffleIcon,
+    ShuffleIcon
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
-  import HelpIcon from '../buttons/HelpIcon.svelte';
 
   let { numberOfColors, updateGauge } = $props();
 
@@ -150,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<div class="px-4 pt-8">
+<div class="px-4 pt-8 pb-2 sm:pb-4">
   <div class="grid w-full grid-cols-12 items-end justify-center gap-4">
     <div
       class="order-1 col-span-full w-full md:col-span-9"
