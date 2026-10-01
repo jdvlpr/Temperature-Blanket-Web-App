@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   index: [] as {
     id: string;
     sync?: { ownerUserId: string; updatedAt?: number };
+    updatedAt?: number;
   }[],
   save: vi.fn(async () => null),
 }));
@@ -21,6 +22,8 @@ vi.mock('$lib/accounts/summary.svelte', () => ({
   account: { summary: { id: 'u1' } },
 }));
 vi.mock('$lib/storage/projects.svelte', () => ({
+  lastSavedAt: (i: (typeof state.index)[number]) =>
+    i.sync?.updatedAt ?? i.updatedAt ?? null,
   ProjectStorage: {
     syncOwner: () => state.owner,
     getIndex: async () => state.index,
@@ -108,8 +111,8 @@ describe('autosave', () => {
     expect(state.save).toHaveBeenCalledTimes(1);
   });
 
-  it('leaves new projects and projects only in this browser alone', async () => {
-    state.index = [{ id: 'p1' }];
+  it('leaves new projects alone', async () => {
+    state.index = [];
     edit('a');
     await Promise.resolve();
     vi.useFakeTimers();
@@ -117,12 +120,33 @@ describe('autosave', () => {
     await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
     expect(autosave.on).toBe(false);
     expect(state.save).not.toHaveBeenCalled();
+  });
 
-    resetAutosave();
-    state.index = [];
+  it('saves projects only in this browser there, never to the account', async () => {
+    state.index = [{ id: 'p1' }];
+    await open();
+    expect(autosave.account).toBe(false);
+    vi.useFakeTimers();
+    edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS);
+    expect(state.save).toHaveBeenCalledTimes(1);
+    expect(state.save).toHaveBeenCalledWith({ toAccount: false });
+    expect(autosave.state).toBe('saved');
+  });
+
+  it('a project in the account saves to it', async () => {
+    await open();
+    expect(autosave.account).toBe(true);
+  });
+
+  it('another account’s project waits for Save', async () => {
+    state.index = [{ id: 'p1', sync: { ownerUserId: 'u2' } }];
     edit('a');
+    await Promise.resolve();
+    vi.useFakeTimers();
     edit('b');
     await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
+    expect(autosave.on).toBe(false);
     expect(state.save).not.toHaveBeenCalled();
   });
 
@@ -140,14 +164,39 @@ describe('autosave', () => {
     expect(state.save).toHaveBeenCalledTimes(1);
   });
 
-  it('not signed in: nothing saves', async () => {
+  it('not signed in: projects in this browser still save there', async () => {
     state.owner = null;
-    edit('a');
-    await Promise.resolve();
+    state.index = [{ id: 'p1' }];
+    await open();
+    vi.useFakeTimers();
+    edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS);
+    expect(state.save).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops rather than overwrite what another tab saved', async () => {
+    state.index = [{ id: 'p1', updatedAt: 1 }];
+    await open();
+    // The other tab saves
+    state.index = [{ id: 'p1', updatedAt: 2 }];
     vi.useFakeTimers();
     edit('b');
     await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
     expect(state.save).not.toHaveBeenCalled();
+    expect(autosave.state).toBe('conflict');
+  });
+
+  it('adding it to the account is not mistaken for another device', async () => {
+    state.index = [{ id: 'p1', updatedAt: 1 }];
+    await open();
+    state.index = [
+      { id: 'p1', updatedAt: 1, sync: { ownerUserId: 'u1', updatedAt: 9 } },
+    ];
+    vi.useFakeTimers();
+    edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS);
+    expect(state.save).toHaveBeenCalledTimes(1);
+    expect(autosave.state).toBe('saved');
   });
 
   it('stops rather than overwrite a newer version from another device', async () => {

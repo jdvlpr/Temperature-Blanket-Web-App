@@ -56,9 +56,11 @@ export async function saveProject() {
   }
 
   toast.trigger({
-    message: autosave.on
-      ? 'Saved to your account. Changes now save by themselves.'
-      : 'Saved in this browser',
+    message: !autosave.on
+      ? 'Saved'
+      : autosave.account
+        ? 'Saved to your account. Changes now save by themselves.'
+        : 'Saved in this browser. Changes now save by themselves.',
     category: 'success',
     // A new project: naming it is the likely next step. Wider screens show
     // its name in the top bar to click instead.

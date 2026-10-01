@@ -39,7 +39,14 @@ export type StoredProjectIndexItem = {
   };
   /** Present once the project belongs to an account (see $lib/sync) */
   sync?: ProjectSyncState;
+  /** When it was last saved or renamed in this browser (ms), for a project
+  that isn't in an account. Missing on projects saved by older versions. */
+  updatedAt?: number;
 };
+
+/** When a saved project last changed, as far as this browser knows */
+export const lastSavedAt = (item: StoredProjectIndexItem): number | null =>
+  item.sync?.updatedAt ?? item.updatedAt ?? null;
 
 export const MAX_SAVED_PROJECT_NAME_LENGTH = 100;
 
@@ -76,10 +83,11 @@ export type StoredProject = {
 
 /**
  * When a project last changed, for sorting: its last edit on any device once it
- * belongs to an account, otherwise when it was saved (IDs are save times).
+ * belongs to an account, otherwise its last save here (IDs are first save
+ * times, for projects saved before that was kept).
  */
 function lastChanged(item: StoredProjectIndexItem): number {
-  return item.sync?.updatedAt ?? (Number(item.id) || 0);
+  return lastSavedAt(item) ?? (Number(item.id) || 0);
 }
 
 /** Most recently changed first; newer saves first when that's unknown. */
@@ -180,9 +188,12 @@ export class ProjectStorage {
   static async save({
     id,
     localProject,
+    toAccount = true,
   }: {
     id?: string | null;
     localProject?: StoredProject | null;
+    /** false: it stays where it is, only in this browser if it is now */
+    toAccount?: boolean;
   } = {}): Promise<StoredProjectIndexItem | null> {
     if (!browser) return null;
 
@@ -218,7 +229,8 @@ export class ProjectStorage {
       const existing = index[existingIndex]?.sync;
 
       // Signed in: the project is the account's, and has changes to upload
-      const owner = this.syncOwner() ?? existing?.ownerUserId;
+      const owner =
+        (toAccount ? this.syncOwner() : null) ?? existing?.ownerUserId;
       const sync: ProjectSyncState | undefined = owner
         ? {
             ownerUserId: owner,
@@ -232,6 +244,7 @@ export class ProjectStorage {
         : undefined;
 
       const item = indexItemFor(_id, _project, sync);
+      if (!sync) item.updatedAt = Date.now();
       if (existingIndex > -1) index[existingIndex] = item;
       else index.push(item);
       await this.setIndex(index);
@@ -291,8 +304,13 @@ export class ProjectStorage {
   static syncOwner = (): string | null =>
     __ACCOUNTS_ENABLED__ ? (account.summary?.id ?? null) : null;
 
-  /** The saved project this page opened, and when it was last changed */
-  static opened: { id: string; updatedAt: number | null } | null = null;
+  /** The saved project this page opened, when it was last changed, and
+  whether it was the account's then */
+  static opened: {
+    id: string;
+    updatedAt: number | null;
+    synced: boolean;
+  } | null = null;
 
   /** Called after a save or removal, to schedule a sync. Set by $lib/sync. */
   static onChange: (() => void) | undefined;
@@ -391,6 +409,7 @@ export class ProjectStorage {
       item.meta = trimmed ? { ...meta, name: trimmed } : meta;
       if (item.sync)
         item.sync = { ...item.sync, dirty: true, updatedAt: Date.now() };
+      else item.updatedAt = Date.now();
       await this.setIndex(index);
     });
     this.onChange?.();
@@ -646,12 +665,13 @@ export class ProjectStorage {
     const id = pageURL.searchParams.get('project');
     if (!id) return;
 
-    // Which saved version this page opens, so autosave can tell when a sync
-    // brings in a newer one from another device
+    // Which saved version this page opens, so autosave can tell when another
+    // tab saves over it, or a sync brings in one from another device
     const indexItem = (await this.getIndex()).find((i) => i.id === id);
     ProjectStorage.opened = {
       id,
-      updatedAt: indexItem?.sync?.updatedAt ?? null,
+      updatedAt: indexItem ? lastSavedAt(indexItem) : null,
+      synced: Boolean(indexItem?.sync),
     };
 
     const matchedProject = await ProjectStorage.getById(id);

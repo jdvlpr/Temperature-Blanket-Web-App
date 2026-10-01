@@ -569,12 +569,12 @@ async function saveFromMenu(page: Page) {
   await expect(page.getByText('Saved to your account.')).toBeVisible();
 }
 
-/** The auto-save state the Project menu shows, then closes it. */
+/** The auto-save state the icon beside the project's name shows */
 async function saveState(page: Page) {
-  await openMenu(page);
-  const text = await page.getByTestId('autosave-status').innerText();
-  await page.keyboard.press('Escape');
-  return text.trim();
+  const label = await page
+    .getByTestId('save-button')
+    .getAttribute('aria-label');
+  return label?.trim();
 }
 
 test.describe('Auto-save', () => {
@@ -624,7 +624,7 @@ test.describe('Auto-save', () => {
 
     // Nor is opening the Project menu
     await openMenu(laptop);
-    await expect(laptop.getByTestId('autosave-status')).toHaveText(
+    await expect(laptop.getByTestId('save-button')).toHaveAccessibleName(
       'Saved to your account',
     );
     await laptop.waitForTimeout(2000);
@@ -684,7 +684,9 @@ test.describe('Auto-save', () => {
     await laptop.waitForTimeout(10_000);
     await laptop.getByTestId('account-button').click();
     await expect(
-      laptop.getByText('This project was changed on another device'),
+      laptop.getByText(
+        'This project was changed in another tab or on another device',
+      ),
     ).toBeVisible();
     await laptop.keyboard.press('Escape');
     expect(await saveState(laptop)).toBe('Not saved');
@@ -722,8 +724,8 @@ test.describe('Auto-save', () => {
 
     expect(await savedIndex(laptop)).toEqual([]);
     await openMenu(laptop);
+    // Wider screens: the top bar says it isn't saved, not the menu
     await expect(laptop.getByTestId('autosave-status')).toHaveCount(0);
-    await expect(laptop.getByText('Not saved yet')).toBeVisible();
     await laptop.keyboard.press('Escape');
     await expect(laptop.getByTestId('save-button')).toHaveAccessibleName(
       'Save',

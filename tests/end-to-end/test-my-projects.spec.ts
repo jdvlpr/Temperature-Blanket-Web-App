@@ -171,8 +171,12 @@ test.describe('My Projects', () => {
 
     // Save is in the top bar: it saves right away
     await page.getByTestId('save-button').click();
-    await expect(page.getByText('Saved in this browser')).toBeVisible();
-    await expect(page.getByTestId('save-button')).toHaveAccessibleName('Saved');
+    await expect(
+      page.getByText('Saved in this browser. Changes now save by themselves.'),
+    ).toBeVisible();
+    await expect(page.getByTestId('save-button')).toHaveAccessibleName(
+      'Saved in this browser',
+    );
 
     // Its name is in the top bar too, as a field: rename it there
     const title = page.getByTestId('top-bar-project-name');
@@ -207,16 +211,23 @@ test.describe('My Projects', () => {
     // Saved, the icon beside the name says where
     await page.getByTestId('save-button').click();
     await expect(
-      page.getByText('Press Save after making changes'),
+      page.getByText('Changes save by themselves, but only here'),
     ).toBeVisible();
     // Opening moves the focus into it
     await expect(page.getByRole('dialog')).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(
-      page.getByText('Press Save after making changes'),
+      page.getByText('Changes save by themselves, but only here'),
     ).toBeHidden();
 
-    // ...and renames it again from the menu's project card
+    // With the name in the top bar, the menu doesn't repeat it
+    await page.getByRole('button', { name: 'Project Options' }).click();
+    await expect(menu.getByRole('button', { name: /^Download/ })).toBeVisible();
+    await expect(menu.getByTestId('project-name')).toHaveCount(0);
+    await page.keyboard.press('Escape');
+
+    // On a phone, it renames it from the menu's project card
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.getByRole('button', { name: 'Project Options' }).click();
     await menu.getByRole('button', { name: 'Rename Austin Gift' }).click();
     await menu.getByLabel('Project name').fill('Austin Blanket');

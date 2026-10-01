@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
+  import { beforeNavigate } from '$app/navigation';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -39,7 +40,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { autosave, saveCopy } from '$lib/storage/autosave.svelte';
+  import {
+    autosave,
+    changedElsewhereMessage,
+    saveCopy,
+    saveNow,
+  } from '$lib/storage/autosave.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
   import {
     loadFromHistory,
@@ -75,14 +81,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (locations.allValid) project.status.wasLoaded = true;
   }
 
-  // Another device changed the open project: say so once, since changes here
-  // stop saving rather than overwrite it
+  // Leaving for another page of the site: a change waiting to save saves now
+  beforeNavigate(() => void saveNow());
+
+  // Another tab or device changed the open project: say so once, since
+  // changes here stop saving rather than overwrite it
   $effect(() => {
     if (autosave.state !== 'conflict') return;
     untrack(() =>
       toast.trigger({
-        message:
-          'This project was changed on another device, so changes here aren’t being saved. Save them as a copy, or reload to get the latest version.',
+        message: `${changedElsewhereMessage()} Save them as a copy, or reload to get the latest version.`,
         category: 'warning',
         autohide: false,
         action: {

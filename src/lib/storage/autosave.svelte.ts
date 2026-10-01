@@ -13,17 +13,20 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Saves changes to a project that's already in the signed-in account, a moment
-// after editing stops; the save then syncs. New projects wait for the first
-// Save, so trying things out doesn't fill the account, and projects only in
-// this browser are never added to the account without asking.
+// Saves changes to a saved project a moment after editing stops: in the
+// signed-in account, where the save then syncs, or in this browser. New
+// projects wait for the first Save, so trying things out doesn't fill the list,
+// and projects only in this browser are never added to the account without
+// asking (see addOpenProjectToAccount).
 
 import { replaceState } from '$app/navigation';
 import { account } from '$lib/accounts/summary.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import {
+  lastSavedAt,
   MAX_SAVED_PROJECT_NAME_LENGTH,
   ProjectStorage,
+  type StoredProjectIndexItem,
 } from '$lib/storage/projects.svelte';
 import { sync } from '$lib/sync/status.svelte';
 import { newProjectId } from '$lib/utils/project-id-utils';
@@ -36,18 +39,21 @@ export const MAX_WAIT_MS = 60_000;
 export const autosave: {
   /** Whether changes to the open project save by themselves */
   on: boolean;
-  /** `conflict`: another device changed it since it opened here, so saving
-  stops rather than overwrite that change */
+  /** Whether they save to the signed-in account; otherwise to this browser */
+  account: boolean;
+  /** `conflict`: another tab or device changed it since it opened here, so
+  saving stops rather than overwrite that change */
   state: 'saved' | 'waiting' | 'saving' | 'error' | 'conflict';
   /** Whether the open project is saved at all (in this browser or the account) */
   stored: boolean;
-} = $state({ on: false, state: 'saved', stored: false });
+} = $state({ on: false, account: false, state: 'saved', stored: false });
 
 /** The project as last opened or saved, to tell a real change from none */
 let baseline: string | null = null;
 let baselineId: string | null = null;
-/** When the stored copy was last changed, as this page knows it */
-let knownUpdatedAt: number | null = null;
+/** When the stored copy was last changed, and whether it was the account's
+then, as this page knows it */
+let known: Stamp | null = null;
 let weatherEdited = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
 let waitingSince = 0;
@@ -68,28 +74,52 @@ export async function storedItem() {
   return (await ProjectStorage.getIndex()).find((i) => i.id === id);
 }
 
-/** Whether the open project is saved, and the signed-in account's. */
-async function isAccountProject(): Promise<boolean> {
+type Stamp = { at: number | null; synced: boolean };
+const stampOf = (item: StoredProjectIndexItem): Stamp => ({
+  at: lastSavedAt(item),
+  synced: Boolean(item.sync),
+});
+
+/**
+ * Where changes to the open project save by themselves: the signed-in
+ * account's, or only in this browser. Null when it isn't saved, or is another
+ * account's, which Save adds to this one.
+ */
+async function savesTo(): Promise<'account' | 'browser' | null> {
+  if (!openProjectId()) return null;
+  const item = await storedItem();
+  if (!item) return null;
+  if (!item.sync) return 'browser';
   // The signed-in account, when accounts are on
   const userId = ProjectStorage.syncOwner();
-  if (!userId || !sync.active || !openProjectId()) return false;
-  return (await storedItem())?.sync?.ownerUserId === userId;
+  return userId && sync.active && item.sync.ownerUserId === userId
+    ? 'account'
+    : null;
 }
 
 /**
- * Whether a sync brought in another device's version since this page opened
- * or last saved. Only a save here or a download changes `updatedAt`.
+ * Whether another tab saved over the open project, or a sync brought in
+ * another device's version, since this page opened or last saved. Only a save
+ * or rename here, or a download, changes when it last changed.
  */
 async function changedElsewhere(): Promise<boolean> {
-  // A rename here changes `updatedAt` too
+  // A rename here changes it too
   if (renaming) await renaming;
-  const updatedAt = (await storedItem())?.sync?.updatedAt ?? null;
-  return knownUpdatedAt !== null && updatedAt !== knownUpdatedAt;
+  const item = await storedItem();
+  const now = item ? stampOf(item) : null;
+  // Added to the account or left it since: that's where it starts from now
+  if (!known || !now || known.synced !== now.synced) {
+    known = now;
+    return false;
+  }
+  return known.at !== null && now.at !== known.at;
 }
 
 async function refresh() {
+  const where = await savesTo();
   autosave.stored = Boolean(openProjectId() && (await storedItem()));
-  autosave.on = await isAccountProject();
+  autosave.on = where !== null;
+  autosave.account = where === 'account';
   if (!autosave.on) {
     // Saved in this browser and unchanged since
     if (autosave.stored && project.url.href === baseline && !weatherEdited)
@@ -106,7 +136,8 @@ async function refresh() {
 }
 
 async function rememberStored() {
-  knownUpdatedAt = (await storedItem())?.sync?.updatedAt ?? null;
+  const item = await storedItem();
+  known = item ? stampOf(item) : null;
 }
 
 /** A project opened, or another one did */
@@ -120,7 +151,7 @@ function opened(href: string) {
   // The version the page loaded, recorded before a sync could replace it
   const loaded = ProjectStorage.opened;
   if (loaded && loaded.id === baselineId) {
-    knownUpdatedAt = loaded.updatedAt;
+    known = { at: loaded.updatedAt, synced: loaded.synced };
     void refresh();
   } else void rememberStored().then(refresh);
 }
@@ -155,6 +186,12 @@ export function projectChanged({ weather = false } = {}) {
   );
 }
 
+/** Why changes stopped saving, once another tab or device changed it */
+export const changedElsewhereMessage = () =>
+  `This project was changed ${
+    autosave.account ? 'in another tab or on another device' : 'in another tab'
+  }, so changes here aren’t being saved.`;
+
 /** Saves a waiting change now, if there is one. */
 export async function saveNow() {
   clearTimeout(timer);
@@ -162,7 +199,7 @@ export async function saveNow() {
   if (autosave.state !== 'waiting') return;
   saving = (async () => {
     waitingSince = 0;
-    if (!(await isAccountProject())) {
+    if (!(await savesTo())) {
       autosave.on = false;
       return;
     }
@@ -177,7 +214,8 @@ export async function saveNow() {
       // As Save does: the address bar holds the saved project
       // eslint-disable-next-line svelte/no-navigation-without-resolve
       replaceState(new URL(href), '');
-      await ProjectStorage.save();
+      // Where it is: one only in this browser stays there
+      await ProjectStorage.save({ toAccount: false });
       await rememberStored();
       baseline = href;
       weatherEdited = false;
@@ -227,9 +265,25 @@ export async function projectSaved() {
 }
 
 /**
+ * Adds the open project, saved only in this browser, to the signed-in account,
+ * where it syncs and keeps saving by itself.
+ */
+export async function addOpenProjectToAccount() {
+  const id = openProjectId();
+  const userId = ProjectStorage.syncOwner();
+  if (!id || !userId) return;
+  // Waiting changes go in first, so what's added is what's here
+  await saveNow();
+  const { addToAccount } = await import('$lib/sync/sync.svelte');
+  await addToAccount(userId, [id]);
+  await rememberStored();
+  await refresh();
+}
+
+/**
  * Saves the open project, as the Save button does: through autosave when it's
- * already on (never over another device's newer version), otherwise as a
- * first save, which signed in also adds it to the account. Returns the stored
+ * already on (never over another tab's or device's newer version), otherwise
+ * as a first save, which signed in also adds it to the account. Returns the stored
  * project, or null when it couldn't be saved.
  */
 export async function saveOpenProject() {
@@ -284,9 +338,11 @@ export async function saveCopy() {
 }
 
 if (typeof document !== 'undefined') {
-  // Leaving the tab: save now, so the change can sync before the tab sleeps
+  // Leaving the tab: save now, so the change can sync before the tab sleeps.
+  // Coming back: another tab may have saved over it meanwhile.
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') void saveNow();
+    else if (baseline !== null) void refresh();
   });
 
   // Signing in or out, sync starting after the project opened, or a sync
@@ -306,12 +362,13 @@ export function resetAutosave() {
   clearTimeout(timer);
   baseline = null;
   baselineId = null;
-  knownUpdatedAt = null;
+  known = null;
   weatherEdited = false;
   waitingSince = 0;
   saving = null;
   renaming = null;
   autosave.on = false;
+  autosave.account = false;
   autosave.state = 'saved';
   autosave.stored = false;
 }

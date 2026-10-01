@@ -14,12 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Save, in the top bar: saves right away (see saveProject), and shows the
-state. Projects in the account save by themselves, so for them it's a status
-(Saved, Saving…, Not saved); a problem opens the Project menu. Beside the
-project's name (wider screens), saved is just an icon there, which opens a
-popover saying where it's saved, like Google Docs' cloud icon. -->
+state. Once saved, a project saves by itself, so it's a status (Saved,
+Saving…, Not saved); a problem opens the Project menu. Green means saved, and
+the icon says where: a cloud for the account, a screen for this browser only.
+Beside the project's name (wider screens), saved is just the icon there, which
+opens a popover saying where it's saved, like Google Docs' cloud icon. -->
 
 <script lang="ts">
+  import SaveStatus from '$lib/components/SaveStatus.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { project } from '$lib/state/project-state.svelte';
   import { autosave } from '$lib/storage/autosave.svelte';
@@ -30,6 +32,8 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
     CloudAlertIcon,
     CloudCheckIcon,
     LoaderCircleIcon,
+    MonitorCheckIcon,
+    MonitorXIcon,
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
 
@@ -41,20 +45,25 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
     if (autosave.on) {
       if (autosave.state === 'error' || autosave.state === 'conflict')
         return 'problem';
-      if (autosave.state === 'saved') return 'synced';
+      if (autosave.state === 'saved') return 'saved';
       return 'saving';
     }
     if (busy) return 'saving';
-    if (autosave.stored) return project.status.saved ? 'saved' : 'changed';
+    // Another account's project, here signed out: Save as before
+    if (autosave.stored) return project.status.saved ? 'kept' : 'changed';
     return 'new';
   });
+
+  const where = $derived(
+    autosave.account ? 'to your account' : 'in this browser',
+  );
 
   const label = $derived(
     {
       problem: 'Not saved',
-      synced: 'Saved',
-      saving: 'Saving…',
       saved: 'Saved',
+      saving: 'Saving…',
+      kept: 'Saved',
       changed: 'Save',
       new: 'Save',
     }[status],
@@ -63,9 +72,9 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
   const title = $derived(
     {
       problem: 'Not saved: see the Project menu',
-      synced: 'Saved to your account. Changes save by themselves.',
+      saved: `Saved ${where}. Changes save by themselves.`,
       saving: 'Saving…',
-      saved: 'Saved in this browser',
+      kept: 'Saved in this browser',
       changed: 'Save changes [Cmd ⌘]+[s] or [Ctrl]+[s]',
       new: 'Save Project [Cmd ⌘]+[s] or [Ctrl]+[s]',
     }[status],
@@ -74,7 +83,7 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
   /** Nothing to save: saved, or saving */
   const statusOnly = $derived(
     beside === 'title' &&
-      (status === 'saved' || status === 'synced' || status === 'saving'),
+      (status === 'saved' || status === 'kept' || status === 'saving'),
   );
 
   async function save() {
@@ -89,23 +98,36 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
 
 {#snippet icon()}
   {#if status === 'problem'}
-    <CloudAlertIcon class="text-error-700-300" />
-  {:else if status === 'synced'}
-    <CloudCheckIcon class="text-success-700-300" />
+    {#if autosave.account}
+      <CloudAlertIcon class="text-error-700-300" />
+    {:else}
+      <MonitorXIcon class="text-error-700-300" />
+    {/if}
   {:else if status === 'saving'}
     <LoaderCircleIcon class="animate-spin opacity-70" />
   {:else if status === 'saved'}
+    {#key autosave.account}
+      <span class="saved-pop flex">
+        {#if autosave.account}
+          <CloudCheckIcon class="text-success-700-300" />
+        {:else}
+          <MonitorCheckIcon class="text-success-700-300" />
+        {/if}
+      </span>
+    {/key}
+  {:else if status === 'kept'}
     <BookmarkCheckIcon class="text-success-700-300" />
   {:else}
     <BookmarkIcon />
   {/if}
 {/snippet}
 
-{#if statusOnly && status !== 'saving'}
+{#if statusOnly && status === 'saved'}
   <Popover positioning={{ placement: 'bottom' }}>
     <Popover.Trigger
-      class="hover:preset-tonal-surface rounded-base flex size-8 shrink-0 items-center justify-center [&>svg]:size-5"
-      aria-label={label}
+      class="hover:preset-tonal-surface rounded-base flex size-8 shrink-0 items-center justify-center [&_svg]:size-5"
+      aria-label="Saved {where}"
+      title="Saved {where}"
       data-testid="save-button"
     >
       {@render icon()}
@@ -118,29 +140,8 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
           {#snippet element(attributes)}
             {#if !attributes.hidden}
               <div {...attributes} transition:safeSlide>
-                <Popover.Description class="flex flex-col gap-2 text-sm">
-                  <p class="flex items-center gap-2 font-bold">
-                    {#if status === 'synced'}
-                      <CloudCheckIcon
-                        class="text-success-700-300 size-4 shrink-0"
-                      />
-                      Saved to your account
-                    {:else}
-                      <BookmarkCheckIcon
-                        class="text-success-700-300 size-4 shrink-0"
-                      />
-                      Saved in this browser
-                    {/if}
-                  </p>
-                  <p class="opacity-70">
-                    {#if status === 'synced'}
-                      Changes save by themselves, and show up on your other
-                      devices.
-                    {:else}
-                      Press Save after making changes. It could be lost if this
-                      browser’s site data is cleared.
-                    {/if}
-                  </p>
+                <Popover.Description>
+                  <SaveStatus />
                 </Popover.Description>
                 <Popover.Arrow
                   class="-z-10"
@@ -160,7 +161,7 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
     role="img"
     aria-label={label}
     {title}
-    class="flex size-8 shrink-0 items-center justify-center [&>svg]:size-5"
+    class="flex size-8 shrink-0 items-center justify-center [&_svg]:size-5"
     data-testid="save-button"
   >
     {@render icon()}
@@ -186,3 +187,21 @@ popover saying where it's saved, like Google Docs' cloud icon. -->
     {/if}
   </button>
 {/if}
+
+<style>
+  /* Saved: the check lands with a little pop, once per save */
+  .saved-pop {
+    animation: saved-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes saved-pop {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .saved-pop {
+      animation: none;
+    }
+  }
+</style>
