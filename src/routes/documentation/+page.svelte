@@ -1948,8 +1948,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To download your color charts and weather data as a PDF file,
-              press the Project Menu, press the Download/Export button, then
-              press the Color Charts and Weather Data (PDF) button.
+              press Project at the top of the page, press Download / Export,
+              then press PDF and choose what to include. It’s also in the
+              Download / Export button below the weather data.
             </p>
           </section>
           <section
@@ -1958,9 +1959,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Download Weather Data (CSV)</h3>
             <p>
-              To download a CSV file with your project’s weather data, press the
-              Project Menu, press Download/Export button, then press Weather
-              Data (CSV).
+              To download a CSV file with your project’s weather data, press
+              Project at the top of the page, press Download / Export, then
+              press CSV. It’s also in the Download / Export button below the
+              weather data.
             </p>
           </section>
           <section
@@ -1969,9 +1971,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Download Preview Image (PNG)</h3>
             <p>
-              To download a PNG file of your project’s preview image, press the
-              Project Menu, press Download/Export button, then press Preview
-              Image (PNG).
+              To download a PNG file of your project’s preview image, press
+              Project at the top of the page, press Download / Export, then
+              press PNG. Or press Download PNG below the preview.
             </p>
           </section>
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="credits">

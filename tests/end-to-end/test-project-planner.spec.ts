@@ -98,7 +98,7 @@ test.describe('Project Planner', () => {
     await page.getByRole('button', { name: 'Preview' }).nth(1).click();
     await expect(page.getByRole('button', { name: 'Calendar' })).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Download Image (PNG)' }),
+      page.getByRole('button', { name: 'Download PNG' }),
     ).toBeVisible();
   });
 

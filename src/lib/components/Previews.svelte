@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import { drawerState } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
   import {
     previews,
     previewWeatherTargets,
@@ -53,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="preset-tonal-surface card p-2 md:p-4 md:shadow-lg mt-4">
+<div class="preset-tonal-surface card mt-4 p-2 md:p-4 md:shadow-lg">
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">
@@ -93,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           class="btn hover:preset-tonal-surface"
-          title="Download PNG"
+          title="Download the preview image (PNG)"
           onclick={() => {
             const active = previews.active;
             if (!active?.width || !active?.height || !active?.svg) return;
@@ -101,24 +100,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <ImageIcon />
-          Download Image (PNG)
+          Download PNG
         </button>
 
+        <!-- Links to the gallery page instead once it's sent -->
         <SendToGalleryButton isPrimary={true} />
-
-        {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-          <div class="flex w-full flex-col justify-center gap-1">
-            <p>View this project's gallery page:</p>
-            <p>
-              <a
-                href={project.gallery.href}
-                target="_blank"
-                class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
-                rel="noreferrer">{project.gallery.title}</a
-              >
-            </p>
-          </div>
-        {/if}
       </div>
     {/if}
   </div>
