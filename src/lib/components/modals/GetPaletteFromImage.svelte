@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -30,6 +30,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils/yarn-utils';
   import { getTextColor } from '$lib/utils/color-utils';
   import {
+    colorwayKey,
+    findClosestColorway,
+    indexColorways,
+    matchUniqueColorways,
+    sampleAverageHex,
+    type ColorwayIndex,
+    type MatchedColor,
+  } from '$lib/utils/image-palette-utils';
+  import {
     CameraIcon,
     RefreshCcwIcon,
     Trash2Icon,
@@ -37,13 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import { onMount, tick } from 'svelte';
+  import type ColorThiefType from 'getimagepalette';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
-
-  type MatchedColor = Color & { delta?: number };
 
   interface Props {
     updateGauge: (params: {
@@ -55,357 +63,356 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { updateGauge, numberOfColors }: Props = $props();
 
-  let debounceTimer: number | undefined;
-  const debounce = (callback: () => void, time: number) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
+  // Large photos are drawn at most this many pixels wide or tall. Phone photos
+  // can be 12-48 megapixels, which is slow to sample and wastes memory.
+  const MAX_IMAGE_DIMENSION = 1200;
 
-  let coords = $state({ x: 0, y: 0 });
+  let ColorThief: typeof ColorThiefType | undefined;
+  // Pixels of the drawn image, read once per image so picking a color doesn't
+  // need to read back from the canvas
+  let pixels: ImageData | undefined;
+  // A copy of the image for the palette extractor, which ignores near-white
+  // pixels, so those are nudged just under its cutoff to keep whites in play
+  let paletteSource:
+    | (HTMLCanvasElement & { naturalWidth: number; naturalHeight: number })
+    | undefined;
+  let colorwayIndex: ColorwayIndex = [];
+  let loadId = 0;
+  let hoverFrame = 0;
+  let lastPointer: { clientX: number; clientY: number } | null = null;
+
   let canvas: HTMLCanvasElement | undefined = $state();
-  let ctx: CanvasRenderingContext2D | null = $state(null);
-  let matchingYarnColors: MatchedColor[] = $state([]);
-  let rect: DOMRect | undefined;
-  let img: HTMLImageElement | undefined = $state();
-  let cursorColor: MatchedColor = $state({});
-  let cursorX: number | undefined, cursorY: number | undefined;
+  let canvasWrap: HTMLDivElement | undefined = $state();
   let input: HTMLInputElement | undefined = $state();
-  let showCursor = $state<boolean | null>(null);
-  let ColorThief: new () => {
-    getPalette: (
-      img: HTMLImageElement,
-      colorCount: number,
-    ) => [number, number, number][];
-  };
+  let hasImage = $state(false);
   let loading = $state(true);
+  let yarnReady = $state(false);
+  let draggingFile = $state(false);
+  let matchingYarnColors: MatchedColor[] = $state([]);
+  let cursorColor: MatchedColor = $state({});
+  let coords = $state({ x: 0, y: 0 });
+  let showCursor = $state(false);
+  let cursorInside = $state(false);
+  let popCursor = $state(false);
   let selectedBrandId: string | undefined = $state();
   let selectedYarnId: string | undefined = $state();
   let selectedYarnWeightId: string | undefined = $state();
-  let colorways: Color[] = $state(getColorways({}));
-  let hoverDiv: HTMLDivElement | undefined = $state();
-  let colorHoverDiv: HTMLDivElement | undefined = $state();
-  let hoverName: HTMLParagraphElement | undefined = $state();
   let key = $state(false);
   let numberOfColorsKey = $state(false);
-
   let warningMessage = $state<string | null>(null);
-
-  let containerElement: HTMLDivElement | null = $state(null);
+  let errorMessage = $state<string | null>(null);
+  let infoMessage = $state<string | null>(null);
 
   onMount(async () => {
-    await ensureYarnData();
-    colorways = getColorways({
-      selectedBrandId,
-      selectedYarnId,
-      selectedYarnWeightId,
-    });
-
-    const ct =
-      await import('../../../../node_modules/getimagepalette/dist/color-thief.mjs');
-    ColorThief = ct.default;
-
     if (numberOfColors > MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
       numberOfColors = MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES;
     if (numberOfColors < 2) numberOfColors = 2;
 
-    img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.onload = () => {
-      if (!canvas || !img) return;
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      ctx = canvas.getContext('2d', {
-        willReadFrequently: true,
-      });
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0);
-      matchingYarnColors = getMatchingYarnColors({
-        img,
-        numberOfColors,
-      });
-      loading = false;
-    };
-    img.src = `https://picsum.photos/720/480?random=${Math.floor(Math.random() * 100)}`;
-
+    await ensureYarnData();
     if (defaultYarn.value) {
       const details = stringToBrandAndYarnDetails(defaultYarn.value);
       selectedBrandId = details.brandId ?? undefined;
       selectedYarnId = details.yarnId ?? undefined;
-      colorways = getColorways({
-        selectedBrandId,
-        selectedYarnId,
-      });
     }
+    updateColorways();
+    yarnReady = true;
+
+    ColorThief = (await import('getimagepalette')).default;
+
+    await getRandomImage();
   });
 
-  function getColor(x: number, y: number): Color['hex'] {
-    if (!ctx) return '#000000';
-    let data = ctx.getImageData(x, y, 1, 1).data;
-    return chroma(data[0], data[1], data[2]).hex() as Color['hex'];
+  function updateColorways() {
+    colorwayIndex = indexColorways(
+      getColorways({ selectedBrandId, selectedYarnId, selectedYarnWeightId }),
+    );
   }
 
-  function addColor(e: MouseEvent) {
-    if (
-      !canvas ||
-      matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES
-    )
-      return;
-    tick().then(() => {
-      // Allows for animation
-      if (colorHoverDiv) {
-        colorHoverDiv?.classList.add('scale-0');
-        setTimeout(() => {
-          colorHoverDiv?.classList.remove('scale-0');
-        }, 70); // time in milliseconds
-      }
-    });
-    rect = canvas.getBoundingClientRect();
-    let ratio = rect.width / canvas.width;
-    let x = (e.clientX - rect.left) / ratio;
-    let y = (e.clientY - rect.top) / ratio;
-    let color: MatchedColor = {
-      hex: getColor(x, y),
-    };
-    handelAddColor({ color });
-  }
-
-  function addColorTouch(e: TouchEvent) {
-    if (
-      !canvas ||
-      matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES
-    )
-      return;
-    rect = canvas.getBoundingClientRect();
-    let x = cursorX ?? 0;
-    let y = cursorY ?? 0;
-    if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) return;
-    let color: MatchedColor = {
-      hex: getColor(x, y),
-    };
-    handelAddColor({ color });
-  }
-
-  function handelAddColor({ color }: { color: MatchedColor }) {
-    const match = getBestMatch({ color });
-    match.id = new Date().getTime();
-    match.locked = false;
-    matchingYarnColors.push(match);
-    numberOfColors = matchingYarnColors.length;
-  }
-
-  function showColor(e: MouseEvent) {
-    if (!ctx || !canvas) return;
-    debounce(() => {
-      if (!canvas) return;
-      rect = canvas.getBoundingClientRect();
-      let ratio = rect.width / canvas.width;
-      let x = (e.clientX - rect.left) / ratio;
-      let y = (e.clientY - rect.top) / ratio;
-      let color: MatchedColor = {
-        hex: getColor(x, y),
-      };
-      cursorColor = getBestMatch({ color });
-      coords = {
-        x: e.pageX - rect.left,
-        y: e.pageY - rect.top - window.scrollY,
-      };
-    }, 0);
-  }
-
-  function showColorTouch(e: TouchEvent) {
-    if (!ctx || !canvas) return;
-    debounce(() => {
-      if (!canvas) return;
-      if (hoverName && hoverName.classList?.contains('hidden'))
-        hoverName.classList.remove('hidden');
-      rect = canvas.getBoundingClientRect();
-      let ratio = rect.width / canvas.width;
-      let x = (e.touches[0].clientX - rect.left) / ratio;
-      let y = (e.touches[0].clientY - rect.top) / ratio;
-      cursorX = x;
-      cursorY = y;
-      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
-        cursorColor = { hex: '#ffffff00' };
-        hoverName?.classList.add('hidden');
-        return;
-      }
-      let color: MatchedColor = {
-        hex: getColor(x, y),
-      };
-      cursorColor = getBestMatch({ color });
-      coords = {
-        x: e.touches[0].pageX - rect.left,
-        y: e.touches[0].pageY - rect.top - window.scrollY,
-      };
-    }, 0);
-  }
-
-  function handleImageChange(e: Event) {
-    const target = e.target as HTMLInputElement;
-    if (!canvas || !target.files) return;
-    var reader = new FileReader();
-    reader.onload = (event) => {
-      if (!canvas) return;
-      const context = canvas.getContext('2d');
-      context?.clearRect(0, 0, canvas.width, canvas.height);
-      img = new Image();
-      img.crossOrigin = 'Anonymous';
-      img.onload = () => {
-        if (!canvas || !img) return;
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        ctx = canvas.getContext('2d', {
-          willReadFrequently: true,
-        });
-        if (!ctx) return;
-        ctx.drawImage(img, 0, 0);
-        matchingYarnColors = getMatchingYarnColors({
-          img,
-          numberOfColors,
-        });
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(target.files[0]);
+  function setColors(colors: MatchedColor[]) {
+    matchingYarnColors = colors;
+    numberOfColors = colors.length;
     key = !key;
   }
 
-  function getPalette({
-    img,
-    numberOfColors,
-  }: {
-    img: HTMLImageElement;
-    numberOfColors: number;
-  }): MatchedColor[] {
-    const colorThief = new ColorThief();
-    const palette = colorThief.getPalette(img, numberOfColors);
-    return palette.map((n, i) => {
-      return {
-        hex: chroma(n[0], n[1], n[2]).hex() as Color['hex'],
-        id: i,
-      };
-    });
+  async function loadImage(src: string, failMessage: string) {
+    const id = ++loadId;
+    loading = true;
+    errorMessage = null;
+    infoMessage = null;
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.src = src;
+    try {
+      await image.decode();
+    } catch {
+      if (id !== loadId) return;
+      // Keep showing the previous image, if there was one
+      errorMessage = failMessage;
+      loading = false;
+      return;
+    }
+    // A newer image was requested while this one loaded
+    if (id !== loadId) return;
+    drawImage(image);
+    loading = false;
+    autoPalette({ count: numberOfColors });
   }
 
-  function getMatchingYarnColors({
-    img,
-    numberOfColors,
-  }: {
-    img: HTMLImageElement;
-    numberOfColors: number;
-  }): MatchedColor[] {
-    let _yarnColors: MatchedColor[] = [];
+  function drawImage(image: HTMLImageElement) {
+    if (!canvas) return;
+    const scale = Math.min(
+      1,
+      MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight),
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
 
-    let index = 0;
-    let skip = 0;
-    const colors = getPalette({ img, numberOfColors });
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+    ctx.drawImage(image, 0, 0, width, height);
+    pixels = ctx.getImageData(0, 0, width, height);
 
-    while (_yarnColors.length < numberOfColors) {
-      const _anyColor = colors[index];
-      const _color = getBestMatch({
-        color: _anyColor,
-        index: skip,
-      });
-      const id = `${_color.brandId}${_color.yarnId}${_color.name}${_color.hex}`;
-      const isDuplicate = _yarnColors
-        .map((n) => `${n.brandId}${n.yarnId}${n.name}${n.hex}`)
-        .includes(id);
-      if (!isDuplicate || skip >= colorways.length) {
-        _yarnColors.push(_color);
-        index++;
-        skip = 0;
-      } else {
-        skip++;
+    const data = new Uint8ClampedArray(pixels.data);
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i] > 250 && data[i + 1] > 250 && data[i + 2] > 250) {
+        data[i] = data[i + 1] = data[i + 2] = 250;
       }
     }
-
-    let lockedIndexes: number[] = [];
-
-    matchingYarnColors?.forEach((n, i) => {
-      if (n.locked) lockedIndexes.push(i);
+    const source = document.createElement('canvas');
+    source.width = width;
+    source.height = height;
+    source
+      .getContext('2d')
+      ?.putImageData(new ImageData(data, width, height), 0, 0);
+    paletteSource = Object.assign(source, {
+      naturalWidth: width,
+      naturalHeight: height,
     });
 
-    _yarnColors = _yarnColors.map((color, index) => {
-      if (lockedIndexes.includes(index)) {
-        color = matchingYarnColors[index];
-        color.locked = true;
-      } else {
-        color.locked = false;
-      }
-      return color;
-    });
-
-    return _yarnColors;
+    hasImage = true;
   }
 
-  function getBestMatch({
-    color,
-    index = 0,
-  }: {
-    color: MatchedColor;
-    index?: number;
-  }): MatchedColor {
-    const sortedColorways = colorways
-      .map((n) => ({
-        ...n,
-        delta: chroma.deltaE(color.hex ?? '#ffffff', n.hex ?? '#ffffff'),
-      }))
-      .sort((a, b) => a.delta - b.delta);
-    if (index >= sortedColorways.length)
-      return sortedColorways[sortedColorways.length - 1];
-    return sortedColorways[index];
-  }
-
-  function onYarnFilterChange() {
-    colorways = getColorways({
-      selectedBrandId,
-      selectedYarnId,
-      selectedYarnWeightId,
-    });
-    if (!img) return;
-    matchingYarnColors = getMatchingYarnColors({
-      img,
-      numberOfColors,
-    });
-    key = !key;
+  async function loadFile(file: File | undefined) {
+    if (!file) return;
+    const isHeic =
+      /image\/hei[cf]/.test(file.type) || /\.hei[cf]$/i.test(file.name);
+    if (!file.type.startsWith('image/') && !isHeic) {
+      errorMessage = "That file isn't an image. Try a JPG, PNG, or WebP file.";
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    await loadImage(
+      url,
+      isHeic
+        ? "This browser can't open HEIC photos. Try a JPG or PNG, or a screenshot of the photo."
+        : "Couldn't open that image. Try a JPG, PNG, or WebP file.",
+    );
+    URL.revokeObjectURL(url);
   }
 
   function getRandomImage() {
-    if (!canvas) return;
-    const context = canvas.getContext('2d');
-    context?.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.style.display = 'none';
-    loading = true;
-    img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.onload = () => {
-      if (!canvas || !img) return;
-      canvas.style.display = 'inline';
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      ctx = canvas.getContext('2d', {
-        willReadFrequently: true,
-      });
-      if (!ctx) return;
-      ctx.drawImage(img, 0, 0);
-      loading = false;
-      matchingYarnColors = getMatchingYarnColors({
-        img,
-        numberOfColors,
-      });
+    return loadImage(
+      `https://picsum.photos/720/480?random=${Date.now()}`,
+      "Couldn't load a random image. Check your connection and try again.",
+    );
+  }
+
+  /** Colors in the image, most common first */
+  function getImageHexes(count: number): string[] {
+    if (!ColorThief || !paletteSource) return [];
+    const palette = new ColorThief().getPalette(
+      paletteSource,
+      Math.min(Math.max(count, 2), MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES),
+    );
+    return palette?.map(([r, g, b]) => chroma(r, g, b).hex()) ?? [];
+  }
+
+  /** Replace unlocked colors with the image's most common colors */
+  function autoPalette({ count }: { count: number }) {
+    if (!hasImage) return;
+    if (!colorwayIndex.length) {
+      warningMessage = 'No colorways match the selected yarn.';
+      return;
+    }
+    count = Math.max(
+      count,
+      matchingYarnColors.findLastIndex((color) => color.locked) + 1,
+    );
+    const locked = matchingYarnColors
+      .slice(0, count)
+      .map((color) => (color.locked ? color : null));
+    const lockedColors = locked.filter((color) => color !== null);
+    const fresh = matchUniqueColorways({
+      hexes: getImageHexes(count),
+      count: count - lockedColors.length,
+      index: colorwayIndex,
+      exclude: new Set(lockedColors.map(colorwayKey)),
+    });
+
+    const colors: MatchedColor[] = [];
+    for (let i = 0; i < count; i++) {
+      const color = locked[i] ?? fresh.shift();
+      if (color) colors.push(locked[i] ? color : { ...color, locked: false });
+    }
+    if (colors.length < count) {
+      infoMessage = `This image only has ${colors.length} distinct ${colors.length === 1 ? 'color' : 'colors'}.`;
+    }
+    setColors(colors);
+  }
+
+  /** Add colors to the end, favoring image colors not already in the palette */
+  function addAutoColors(count: number) {
+    const fresh = matchUniqueColorways({
+      hexes: getImageHexes(matchingYarnColors.length + count),
+      count,
+      index: colorwayIndex,
+      exclude: new Set(matchingYarnColors.map(colorwayKey)),
+    });
+    if (fresh.length < count) {
+      infoMessage = `This image only has ${matchingYarnColors.length + fresh.length} distinct colors.`;
+    }
+    setColors([
+      ...$state.snapshot(matchingYarnColors),
+      ...fresh.map((color) => ({ ...color, locked: false })),
+    ]);
+  }
+
+  function onYarnFilterChange() {
+    updateColorways();
+    if (!hasImage) return;
+    if (!matchingYarnColors.length) {
+      autoPalette({ count: numberOfColors });
+      return;
+    }
+    if (!colorwayIndex.length) {
+      warningMessage = 'No colorways match the selected yarn.';
+      return;
+    }
+    // Re-match the colors picked from the image against the new yarn, rather
+    // than replacing them
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- local, not state
+    const used = new Set(
+      matchingYarnColors.filter((color) => color.locked).map(colorwayKey),
+    );
+    setColors(
+      matchingYarnColors.map((color) => {
+        if (color.locked || !color.sourceHex) return color;
+        const match = findClosestColorway({
+          hex: color.sourceHex,
+          index: colorwayIndex,
+          exclude: used,
+        });
+        if (!match) return color;
+        used.add(colorwayKey(match));
+        return { ...match, locked: false };
+      }),
+    );
+  }
+
+  function toImagePoint(clientX: number, clientY: number) {
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    const x = ((clientX - rect.left) * canvas.width) / rect.width;
+    const y = ((clientY - rect.top) * canvas.height) / rect.height;
+    if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) return null;
+    return { x, y };
+  }
+
+  function sampleAt(clientX: number, clientY: number): string | null {
+    const point = toImagePoint(clientX, clientY);
+    if (!point || !pixels) return null;
+    return sampleAverageHex({
+      data: pixels.data,
+      width: pixels.width,
+      height: pixels.height,
+      ...point,
+    });
+  }
+
+  function queueHover(e: PointerEvent) {
+    lastPointer = { clientX: e.clientX, clientY: e.clientY };
+    if (hoverFrame) return;
+    hoverFrame = requestAnimationFrame(() => {
+      hoverFrame = 0;
+      updateHover();
+    });
+  }
+
+  function updateHover() {
+    if (!lastPointer || !canvasWrap) return;
+    const hex = sampleAt(lastPointer.clientX, lastPointer.clientY);
+    cursorInside = !!hex;
+    if (!hex) return;
+    cursorColor = findClosestColorway({ hex, index: colorwayIndex }) ?? { hex };
+    const rect = canvasWrap.getBoundingClientRect();
+    coords = {
+      x: lastPointer.clientX - rect.left,
+      y: lastPointer.clientY - rect.top,
     };
-    img.src = `https://picsum.photos/720/480?random=${Math.floor(Math.random() * 100)}`;
+  }
+
+  function addColorAt(clientX: number, clientY: number) {
+    if (matchingYarnColors.length >= MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
+      return;
+    const hex = sampleAt(clientX, clientY);
+    if (!hex) return;
+    const match = findClosestColorway({ hex, index: colorwayIndex });
+    if (!match) return;
+    popCursor = true;
+    setTimeout(() => (popCursor = false), 70);
+    matchingYarnColors.push({ ...match, locked: false });
+    numberOfColors = matchingYarnColors.length;
+  }
+
+  function onPaste(e: ClipboardEvent) {
+    const file = Array.from(e.clipboardData?.files ?? []).find((n) =>
+      n.type.startsWith('image/'),
+    );
+    if (!file) return;
+    e.preventDefault();
+    loadFile(file);
   }
 </script>
 
-<div class="p-2" bind:this={containerElement}>
+<svelte:window onpaste={onPaste} />
+
+<div
+  class={[
+    'rounded-container p-2',
+    draggingFile && 'outline-primary-500 outline-2 outline-dashed',
+  ]}
+  role="region"
+  aria-label="Get colors from an image"
+  ondragover={(e) => {
+    if (!e.dataTransfer?.types.includes('Files')) return;
+    e.preventDefault();
+    draggingFile = true;
+  }}
+  ondragleave={(e) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node))
+      draggingFile = false;
+  }}
+  ondrop={(e) => {
+    if (!e.dataTransfer?.files.length) return;
+    e.preventDefault();
+    draggingFile = false;
+    loadFile(e.dataTransfer.files[0]);
+  }}
+>
   <div class="flex justify-center">
     <input
       type="file"
       accept="image/*"
       hidden
       bind:this={input}
-      onchange={handleImageChange}
+      onchange={(e) => {
+        const target = e.currentTarget;
+        loadFile(target.files?.[0]);
+        // Allow choosing the same file again
+        target.value = '';
+      }}
     />
     <button class="btn hover:preset-tonal-surface" onclick={getRandomImage}>
       <RefreshCcwIcon />
@@ -413,16 +420,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
     <button
       class="btn hover:preset-tonal-surface"
-      onclick={() => {
-        if (typeof input !== 'undefined') input.click();
-      }}
+      onclick={() => input?.click()}
     >
       <CameraIcon />
       Choose Image
     </button>
   </div>
 
-  {#if !loading}
+  {#if errorMessage}
+    <p class="text-error-700-300 my-2 text-center" role="alert">
+      {errorMessage}
+    </p>
+  {/if}
+
+  {#if yarnReady}
     <div
       class="no-scroll my-2 grid w-full grid-cols-12 items-end justify-center gap-4"
     >
@@ -460,18 +471,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="my-2 text-sm" class:hidden={!ctx || loading}>
-    Touch-and-drag or click on the image to choose colors.
+  <p class="my-2 text-sm" class:hidden={!hasImage || loading}>
+    Click or touch-and-drag on the image to choose colors. You can also drop or
+    paste an image here.
   </p>
 
   <div
-    class="relative mx-12 mb-2 flex flex-col items-center sm:mx-16 lg:mx-44"
-    class:hidden={!ctx}
+    bind:this={canvasWrap}
+    class="relative mx-12 mb-2 flex flex-col items-center sm:mx-16"
+    class:hidden={!hasImage || loading}
   >
-    {#if showCursor === false}
-      <div bind:this={hoverDiv} in:fade>
+    {#if showCursor && cursorInside}
+      <div in:fade>
         <p
-          bind:this={hoverName}
           class="rounded-container pointer-events-none absolute z-10 box-border flex max-w-[180px] min-w-[140px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center p-2 shadow-lg"
           style="left:{coords.x}px;top:{coords.y -
             70}px;background:{cursorColor.hex};color:{getTextColor(
@@ -492,8 +504,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </p>
         <div
-          bind:this={colorHoverDiv}
           class="rounded-container pointer-events-none absolute box-border h-10 w-10 -translate-x-1/2 -translate-y-1/2 shadow-lg transition-transform"
+          class:scale-0={popCursor}
           style="left:{coords.x}px;top:{coords.y}px;background:{cursorColor.hex};border:2px solid {getTextColor(
             cursorColor.hex ?? '#ffffff',
           )}"
@@ -502,46 +514,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
     <canvas
       bind:this={canvas}
-      class="h-full w-full cursor-crosshair select-none"
-      onmousedown={(e) => {
-        if (e.cancelable) e.preventDefault();
-        addColor(e);
-      }}
-      onmousemove={(e) => {
-        if (e.cancelable) e.preventDefault();
-        showColor(e);
-      }}
-      ontouchmove={(e) => {
-        showColorTouch(e);
-      }}
-      onmouseenter={(e) => {
-        if (e.cancelable) e.preventDefault();
-        showColor(e);
-        showCursor = false;
-      }}
-      ontouchstart={(e) => {
-        if (e.cancelable) e.preventDefault();
-        if (containerElement?.parentElement)
-          containerElement.parentElement.style.overflowY = 'hidden';
-        showColorTouch(e);
-        showCursor = false;
-      }}
-      onmouseleave={(e) => {
+      class="block h-auto max-h-[65vh] w-auto max-w-full cursor-crosshair touch-none select-none"
+      aria-label="The chosen image. Click or touch it to pick colors, or use Auto Palette."
+      onpointerdown={(e) => {
         if (e.cancelable) e.preventDefault();
         showCursor = true;
+        queueHover(e);
+        if (e.pointerType === 'mouse') {
+          if (e.button !== 0) return;
+          addColorAt(e.clientX, e.clientY);
+        } else {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }
       }}
-      ontouchend={(e) => {
-        if (e.cancelable) e.preventDefault();
-        if (containerElement?.parentElement)
-          containerElement.parentElement.style.overflowY = '';
-        addColorTouch(e);
+      onpointermove={(e) => {
+        if (e.pointerType !== 'mouse' && !e.buttons) return;
         showCursor = true;
+        queueHover(e);
+      }}
+      onpointerup={(e) => {
+        if (e.pointerType === 'mouse') return;
+        addColorAt(e.clientX, e.clientY);
+        showCursor = false;
+      }}
+      onpointercancel={() => (showCursor = false)}
+      onpointerleave={(e) => {
+        if (e.pointerType === 'mouse') showCursor = false;
       }}
     ></canvas>
   </div>
 
-  {#if matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES && !loading}
+  {#if matchingYarnColors.length >= MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES && !loading}
     <p class="text-error-400">Maximum number of colors selected.</p>
+  {/if}
+
+  {#if infoMessage && !loading}
+    <p class="my-2 text-center text-sm">{infoMessage}</p>
   {/if}
 
   {#if loading}
@@ -549,7 +557,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Spinner />
       <p class="my-2">Loading Image...</p>
     </div>
-  {:else}
+  {:else if hasImage}
     <div class="mt-4 mb-2 flex flex-wrap items-center justify-center gap-2">
       {#key numberOfColorsKey}
         <SelectNumberOfColors
@@ -558,7 +566,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           allowZero={true}
           onchange={(e) => {
             if (e.cancelable) e.preventDefault();
-            if (!img) return;
 
             const value = parseInt((e.target as HTMLInputElement).value);
             const lastLockedIndex = matchingYarnColors.findLastIndex(
@@ -571,30 +578,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               return;
             }
 
-            numberOfColors = value;
-
-            if (numberOfColors < matchingYarnColors.length) {
-              matchingYarnColors.length = numberOfColors;
-            } else {
-              const _yarnColors = getMatchingYarnColors({
-                img,
-                numberOfColors,
-              });
-
-              const newColors = _yarnColors
-                .slice(matchingYarnColors.length)
-                .map((color, i) => {
-                  return {
-                    ...color,
-                    id: i + matchingYarnColors.length,
-                  };
-                });
-              matchingYarnColors = [
-                ...$state.snapshot(matchingYarnColors),
-                ...newColors,
-              ];
+            infoMessage = null;
+            if (value < matchingYarnColors.length) {
+              setColors(matchingYarnColors.slice(0, value));
+            } else if (value > matchingYarnColors.length) {
+              addAutoColors(value - matchingYarnColors.length);
             }
-            key = !key;
+            numberOfColorsKey = !numberOfColorsKey;
           }}
         />
       {/key}
@@ -615,13 +605,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal-surface"
         onclick={() => {
-          if (!img) return;
-          if (numberOfColors < 2) numberOfColors = 2;
-          matchingYarnColors = getMatchingYarnColors({
-            img,
-            numberOfColors,
-          });
-          key = !key;
+          infoMessage = null;
+          autoPalette({ count: Math.max(numberOfColors, 2) });
         }}
       >
         <WandSparklesIcon />
@@ -631,11 +616,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal-surface"
         onclick={() => {
-          matchingYarnColors = matchingYarnColors.filter(
-            (color) => color.locked,
-          );
-          if (matchingYarnColors.length)
-            numberOfColors = matchingYarnColors.length;
+          infoMessage = null;
+          setColors(matchingYarnColors.filter((color) => color.locked));
+          numberOfColorsKey = !numberOfColorsKey;
         }}
       >
         <Trash2Icon />
@@ -645,11 +628,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <p class="text-surface-700-300 my-2 text-center text-sm">
-    Random images from <a
+    Random photos from <a
       href="https://unsplash.com"
       class="link"
       target="_blank"
-      rel="nofollower noreferrer">unsplash.com</a
+      rel="nofollow noreferrer">Unsplash</a
+    >
+    via
+    <a
+      href="https://picsum.photos"
+      class="link"
+      target="_blank"
+      rel="nofollow noreferrer">Lorem Picsum</a
     >. All images are processed on your device.
   </p>
 </div>
@@ -672,14 +662,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
     <SaveAndCloseButtons
-      disabled={!ctx || loading || !matchingYarnColors.length}
+      disabled={!hasImage || loading || !matchingYarnColors.length}
       onSave={() => {
         updateGauge({
-          _colors: $state.snapshot(matchingYarnColors).map((n) => {
-            delete n.id;
-            delete n.locked;
-            return n;
-          }),
+          _colors: $state
+            .snapshot(matchingYarnColors)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .map(({ id, locked, delta, sourceHex, ...color }) => color),
         });
         dialog.close();
       }}

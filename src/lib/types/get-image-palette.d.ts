@@ -13,13 +13,20 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The `getimagepalette` package ships no types and is imported by its built
-// file path directly (see GetPaletteFromImage.svelte), so declare its shape here.
-declare module '*/color-thief.mjs' {
+// The `getimagepalette` package (a Color Thief fork) ships no types, so
+// declare the part GetPaletteFromImage.svelte uses.
+declare module 'getimagepalette' {
   export default class ColorThief {
+    /**
+     * Reads `naturalWidth`/`naturalHeight` and draws the source to a canvas,
+     * so a canvas works if those properties are set on it. Returns fewer
+     * colors than requested for simple images, and null if no pixels qualify
+     * (it skips near-white and mostly transparent pixels).
+     */
     getPalette(
-      img: HTMLImageElement,
+      img: CanvasImageSource & { naturalWidth: number; naturalHeight: number },
       colorCount: number,
-    ): [number, number, number][];
+      quality?: number,
+    ): [number, number, number][] | null;
   }
 }
