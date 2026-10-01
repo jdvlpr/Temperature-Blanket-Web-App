@@ -65,6 +65,9 @@ type Session = {
   mode: PaletteMode;
   style: PaletteStyle;
   line: { from: Point; to: Point } | null;
+  brandId?: string;
+  yarnId?: string;
+  yarnWeightId?: string;
 };
 
 // The last photo and palette, so closing and reopening the modal during a
@@ -154,6 +157,9 @@ export class ImagePaletteState {
         mode: this.mode,
         style: this.style,
         line: $state.snapshot(this.line),
+        brandId: this.selectedBrandId,
+        yarnId: this.selectedYarnId,
+        yarnWeightId: this.selectedYarnWeightId,
       };
     this.#engine?.destroy();
   }
@@ -260,6 +266,7 @@ export class ImagePaletteState {
     await this.#engine!.setImage({ data: pixels.data, width, height });
     if (id !== this.#loadId) return;
     this.pixels = pixels;
+    this.previewPixels = null;
     this.line = null;
 
     // Locked colors stay, moved to where they best appear in the new image
@@ -279,6 +286,10 @@ export class ImagePaletteState {
     this.mode = saved.mode;
     this.style = saved.style;
     this.line = saved.line;
+    this.selectedBrandId = saved.brandId;
+    this.selectedYarnId = saved.yarnId;
+    this.selectedYarnWeightId = saved.yarnWeightId;
+    await this.#updateColorways();
     await this.#engine!.setImage({
       data: saved.pixels.data,
       width: saved.pixels.width,
@@ -307,6 +318,8 @@ export class ImagePaletteState {
     this.infoMessage = null;
     this.line = null;
     const locked = this.points.filter((point) => point.locked);
+    // After clearing every color, start again from two
+    if (this.targetCount < 2) this.targetCount = 2;
     const count = Math.max(this.targetCount, locked.length);
     this.working = true;
     const picked = await this.#engine.autoPalette({
