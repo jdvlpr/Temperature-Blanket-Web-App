@@ -17,6 +17,7 @@ import {
 } from '$lib/utils/date-utils';
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { projectCreatedAtTime } from '$lib/utils/project-id-utils';
+import { cleanName } from '$lib/utils/string-utils';
 import type {
   AccountSyncState,
   LocalStore,
@@ -114,7 +115,9 @@ const indexItemFor = (
     date: project.date,
     href: project.href,
     title: project.title || '',
-    ...(project.name && { name: project.name }),
+    ...(cleanName(project.name, MAX_SAVED_PROJECT_NAME_LENGTH) && {
+      name: cleanName(project.name, MAX_SAVED_PROJECT_NAME_LENGTH),
+    }),
     isCustomWeatherData: project.isCustomWeatherData || false,
   },
   ...(sync && { sync }),
@@ -371,7 +374,7 @@ export class ProjectStorage {
    * an account has a change to upload, so the name reaches its other devices.
    */
   static async rename(id: string, name: string): Promise<void> {
-    const trimmed = name.trim().slice(0, MAX_SAVED_PROJECT_NAME_LENGTH);
+    const trimmed = cleanName(name, MAX_SAVED_PROJECT_NAME_LENGTH);
     await withIndexLock(async () => {
       const stored = await this.getById(id);
       if (!stored) return;

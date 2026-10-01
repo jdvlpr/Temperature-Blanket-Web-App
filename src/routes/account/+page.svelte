@@ -33,19 +33,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
   import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
   import DisplayName from '$lib/components/account/DisplayName.svelte';
+  import GalleryNameSetting from '$lib/components/account/GalleryNameSetting.svelte';
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
-  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
-  import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
-  import { sync } from '$lib/sync/status.svelte';
   import { getGalleryPages } from '$lib/accounts/gallery';
-  import { ProjectStorage, savedProjects } from '$lib/storage/projects.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import {
     ChevronRightIcon,
-    CloudIcon,
     DownloadIcon,
-    FolderOpenIcon,
     LoaderCircleIcon,
     LogOutIcon,
     MonitorSmartphoneIcon,
@@ -64,21 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let errorMessage = $state('');
   // For the delete-account question
   let galleryPageCount = $state(0);
-  let projectCount = $state<number | null>(null);
 
-  // The projects and gallery pages themselves are on My Projects
-  $effect(() => {
-    if (status !== 'signed-in' || !user) return;
-    const userId = user.id;
-    void sync.version;
-    void savedProjects.version;
-    ProjectStorage.getIndex().then(
-      (index) =>
-        (projectCount = index.filter(
-          (item) => item.sync?.ownerUserId === userId,
-        ).length),
-    );
-  });
   $effect(() => {
     if (status !== 'signed-in') return;
     getGalleryPages().then(
@@ -185,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Account">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="mx-auto flex w-full max-w-(--breakpoint-md) flex-col pb-8">
@@ -223,6 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   rememberAccountSummary(user);
                 }}
               />
+              <GalleryNameSetting name={user.name} />
               <ChangeEmail
                 email={user.email}
                 onchanged={(newEmail) => {
@@ -231,43 +212,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   rememberAccountSummary(user);
                 }}
               />
-            </div>
-          </section>
-
-          <section class="flex flex-col gap-2" aria-labelledby="projects">
-            <h3 id="projects" class="px-2 text-sm font-bold opacity-70">
-              Projects
-            </h3>
-            <div class={CARD}>
-              <div class="flex items-start gap-3 px-4 py-3">
-                <CloudIcon class="mt-0.5 shrink-0 opacity-70" />
-                <div class="flex flex-col gap-1">
-                  <p class="font-bold">Saved projects sync to your account</p>
-                  <p class="text-sm opacity-70">
-                    Save a project in the Project Planner and open it on any
-                    device where you’re signed in.
-                  </p>
-                  {#if sync.active}
-                    <SyncStatus class="opacity-80" />
-                  {/if}
-                  <AddToAccountButton class="mt-1" />
-                </div>
-              </div>
-              <a href={resolve('/my-projects')} class={ROW}>
-                <FolderOpenIcon class="shrink-0 opacity-70" />
-                <span class="flex flex-1 flex-col">
-                  <span>My Projects</span>
-                  <span class="text-sm opacity-70">
-                    {#if projectCount !== null}
-                      {projectCount}
-                      {pluralize('project', projectCount)} in your account
-                    {:else}
-                      Your projects and gallery pages
-                    {/if}
-                  </span>
-                </span>
-                <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
-              </a>
             </div>
           </section>
 

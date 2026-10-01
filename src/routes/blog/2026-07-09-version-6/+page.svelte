@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Version 6 Update: Improved Sun Position Accuracy">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">

@@ -31,16 +31,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Signed in with publishing from accounts on: the page is linked to the account
   let fromAccount = $state(false);
+  // Whether the account shows its name, which is set on the Account page
   let showName = $state(false);
-  let savedShowName = false;
-  let ownerName = $derived(account.summary?.name?.trim() ?? '');
+  let serverName = $state<string | null>(null);
+  let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
 
   onMount(async () => {
     if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
     const { getGalleryPages } = await import('$lib/accounts/gallery');
     const gallery = await getGalleryPages();
     if (!gallery?.publishing) return;
-    savedShowName = showName = gallery.settings.showName;
+    showName = gallery.settings.showName;
+    if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
   });
 
@@ -53,11 +55,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Published from the account, it's kept there too, next to its gallery page
       const { saveOpenProject } = await import('$lib/storage/autosave.svelte');
       await saveOpenProject();
-    }
-    if (fromAccount && showName !== savedShowName) {
-      const { updateGallerySettings } = await import('$lib/accounts/gallery');
-      // Unsaved, the page just goes out with the account's previous choice
-      await updateGallerySettings({ showName }).catch(() => {});
     }
     message = {
       text: "<p class='font-bold text-xl my-4 text-center'>Sending Project...</p><p class='italic'>This could take up to a few minutes. Please don't navigate away.</p>",
@@ -114,7 +111,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               target="_blank"
               class="link">Project Gallery</a
             >.{#if fromAccount && showName && ownerName}
-              Your display name, {ownerName}, will be shown on it.
+              It will say “By {ownerName}”, linking to your public page of
+              gallery projects.
             {:else}
               No personal information will be sent.
             {/if}
@@ -122,10 +120,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if fromAccount}
             <p>
               • It will be linked to your account, so you can remove it later
-              from your <a
-                href={resolve('/account')}
+              from <a
+                href={resolve('/my-projects')}
                 target="_blank"
-                class="link">Account page</a
+                class="link">My Projects</a
               >.
             </p>
           {/if}
@@ -139,22 +137,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>• Gallery pages are subject to change.</p>
         </div>
         {#if fromAccount}
-          <label class="flex items-center gap-2 text-left">
-            <input
-              type="checkbox"
-              class="checkbox"
-              bind:checked={showName}
-              disabled={!ownerName}
-            />
-            <span>
-              Show my name on my gallery pages
-              {#if !ownerName}
-                <span class="block text-sm opacity-70"
-                  >Add a display name on your Account page first</span
-                >
-              {/if}
-            </span>
-          </label>
+          <p class="text-left text-sm opacity-80">
+            {#if showName && ownerName}
+              To hide your name or change it,
+            {:else}
+              To show your name on your gallery pages,
+            {/if}
+            go to your
+            <a href={resolve('/account')} target="_blank" class="link"
+              >Account page <ExternalLinkIcon class="inline size-3" /></a
+            >.
+          </p>
         {/if}
       </div>
       <div

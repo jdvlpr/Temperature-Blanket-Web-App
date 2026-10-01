@@ -18,6 +18,7 @@
 // has to decompress or parse the project.
 
 import { SYNC_HEADERS, type PaletteInput } from '$lib/sync/protocol';
+import { cleanName } from '$lib/utils/string-utils';
 import {
   MAX_PALETTE_CODE_LENGTH,
   MAX_PALETTE_NAME_LENGTH,
@@ -93,7 +94,7 @@ export function parseSaveHeaders(headers: Headers): Parsed<SaveHeaders> {
   } catch {
     return invalid('Invalid title');
   }
-  if (title.length > MAX_TITLE_LENGTH) title = title.slice(0, MAX_TITLE_LENGTH);
+  title = cleanName(title, MAX_TITLE_LENGTH);
 
   const contentHash = headers.get(SYNC_HEADERS.contentHash) ?? '';
   if (!/^[0-9a-f]{64}$/.test(contentHash))
@@ -135,7 +136,7 @@ export function parsePaletteInput(body: unknown): Parsed<PaletteInput> {
   return {
     ok: true,
     value: {
-      name: name.trim().slice(0, MAX_PALETTE_NAME_LENGTH),
+      name: cleanName(name, MAX_PALETTE_NAME_LENGTH),
       code,
       createdAt,
       updatedAt,

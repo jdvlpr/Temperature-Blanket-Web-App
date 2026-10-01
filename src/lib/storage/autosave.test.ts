@@ -130,7 +130,7 @@ describe('autosave', () => {
     state.index = [];
     edit('a');
     await Promise.resolve();
-    // The Save dialog stores it in the account
+    // Save stores it in the account
     state.index = [{ id: 'p1', sync: { ownerUserId: 'u1' } }];
     projectSaved();
     await vi.waitFor(() => expect(autosave.on).toBe(true));

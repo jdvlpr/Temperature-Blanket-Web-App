@@ -14,15 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Gallery pages published from this account, on the My Projects page: whether
-they show the account's name, and removing them. Hidden until the account has a
-page or publishing from accounts is on. -->
+they show the account's name (changed on the Account page), and removing them.
+Hidden until the account has a page or publishing from accounts is on. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
   import {
     getGalleryPages,
     removeGalleryPage,
-    updateGallerySettings,
     type GalleryPage,
   } from '$lib/accounts/gallery';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
@@ -74,18 +73,6 @@ page or publishing from accounts is on. -->
 
   onMount(load);
 
-  async function saveShowName() {
-    errorMessage = '';
-    try {
-      const settings = await updateGallerySettings({ showName });
-      showName = settings.showName;
-      publicId = settings.publicId;
-    } catch {
-      showName = !showName;
-      errorMessage = 'That setting couldn’t be saved. Try again.';
-    }
-  }
-
   async function remove(postId: number) {
     busy = true;
     errorMessage = '';
@@ -106,31 +93,27 @@ page or publishing from accounts is on. -->
 
 {#if loaded && (pages.length || publishing)}
   <section class="flex flex-col gap-2" aria-labelledby="gallery-pages">
-    <h2 id="gallery-pages" class="h3">Gallery Pages</h2>
+    <h2 id="gallery-pages" class="h3">My Public Gallery Pages</h2>
+    <p class="text-sm opacity-70">
+      Projects you add to the public Project Gallery while signed in. Anyone can
+      see these pages.
+    </p>
     <div class={cardClass}>
-      <label class="flex items-start gap-3 px-4 py-3">
-        <input
-          type="checkbox"
-          class="checkbox mt-1 shrink-0"
-          bind:checked={showName}
-          onchange={saveShowName}
-          disabled={!hasName && !showName}
-        />
-        <span class="flex flex-col gap-1">
-          <span class="font-bold">Show my name on my gallery pages</span>
-          <span class="text-sm opacity-70">
-            {#if hasName}
-              Pages you publish while signed in will say “By {currentName}”,
-              linking to a page that lists them all.
-            {:else}
-              First add a display name on <a
-                href={resolve('/account')}
-                class="link">your account page</a
-              >.
-            {/if}
-          </span>
+      <div
+        class="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-sm"
+        data-testid="gallery-name-status"
+      >
+        <span>
+          {#if showName && hasName}
+            Your pages say “By {currentName}”.
+          {:else}
+            Your pages don’t show your name.
+          {/if}
         </span>
-      </label>
+        <a href={resolve('/account')} class="link"
+          >Change on your Account page</a
+        >
+      </div>
       {#if showName && hasName && publicId}
         <a
           href={resolve('/gallery/by/[ownerId]', { ownerId: publicId })}
@@ -139,7 +122,7 @@ page or publishing from accounts is on. -->
           data-testid="gallery-owner-page"
         >
           <UserRoundIcon class="shrink-0 opacity-70" />
-          <span class="flex-1">Your Gallery profile page</span>
+          <span class="flex-1">Your public gallery page</span>
           <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
         </a>
       {/if}

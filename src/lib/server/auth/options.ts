@@ -18,6 +18,7 @@
 
 import type { BetterAuthOptions } from 'better-auth';
 import { emailOTP } from 'better-auth/plugins/email-otp';
+import { cleanName } from '../../utils/clean-name';
 
 export type SignInCodePurpose =
   'sign-in' | 'email-verification' | 'forget-password' | 'change-email';
@@ -46,6 +47,7 @@ export type AuthConfig = {
 
 export const AUTH_BASE_PATH = '/api/auth';
 export const SESSION_EXPIRES_DAYS = 60;
+export const MAX_DISPLAY_NAME_LENGTH = 80;
 
 const DAY = 24 * 60 * 60;
 
@@ -114,6 +116,31 @@ export function buildAuthOptions(config: AuthConfig) {
         // Before the user row goes, so a failure here leaves nothing orphaned
         beforeDelete: async (user) => {
           await config.deleteUserData?.(user.id);
+        },
+      },
+    },
+    // Display names (typed, or from Google) are stored cleaned, like project
+    // and palette names
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => ({
+            data: {
+              ...user,
+              name: cleanName(user.name, MAX_DISPLAY_NAME_LENGTH),
+            },
+          }),
+        },
+        update: {
+          before: async (user) => ({
+            data:
+              typeof user.name === 'string'
+                ? {
+                    ...user,
+                    name: cleanName(user.name, MAX_DISPLAY_NAME_LENGTH),
+                  }
+                : user,
+          }),
         },
       },
     },

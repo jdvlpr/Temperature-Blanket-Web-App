@@ -21,6 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details?: string;
     detailsTextSize?: string;
     onchange?: (e: Event) => void;
+    /** Leaves off the card background and border, for use inside a card */
+    bare?: boolean;
   }
 
   let {
@@ -30,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details = '',
     detailsTextSize = 'text-sm',
     onchange,
+    bare = false,
   }: Props = $props();
 
   let hasDetails = $derived(details !== '');
@@ -39,7 +42,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label
   for="{uid}-checkbox"
   class={[
-    'bg-surface-100 dark:bg-surface-900 rounded-container flex w-full justify-between gap-4 px-4 py-2 border border-gray-300 dark:border-gray-700',
+    'flex w-full justify-between gap-4 px-4',
+    bare
+      ? 'py-3'
+      : 'bg-surface-100 dark:bg-surface-900 rounded-container py-2 border border-gray-300 dark:border-gray-700',
     !disabled && 'cursor-pointer',
   ]}
 >

@@ -25,7 +25,8 @@ import { allowCodeRequest } from './code-request-limit';
 import { emailChangedNotice, signInCodeEmail } from './emails';
 import { withSignedInHint } from './hint-cookie';
 import { deleteUserProjectData } from '$lib/server/sync/store';
-import { buildAuthOptions } from './options';
+import { cleanName } from '$lib/utils/string-utils';
+import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
 import { readAuthSettings } from './settings';
 
 type Auth = ReturnType<typeof createAuth>;
@@ -75,8 +76,6 @@ function createAuth(
 
 // One instance per isolate: creating it is too costly to repeat on every request
 let cached: { key: string; auth: Auth } | undefined;
-
-const MAX_DISPLAY_NAME_LENGTH = 80;
 
 /** The shared auth instance, or a 404 (accounts off) or 503 (misconfigured) Response. */
 function authFor(platform: App.Platform | undefined): Auth | Response {
@@ -137,7 +136,7 @@ export async function handleAuthRequest(
       const body = await jsonBody(event.request);
       if (
         typeof body?.name === 'string' &&
-        body.name.trim().length > MAX_DISPLAY_NAME_LENGTH
+        cleanName(body.name, Infinity).length > MAX_DISPLAY_NAME_LENGTH
       )
         return json(
           { code: 'NAME_TOO_LONG', message: 'Display name is too long' },

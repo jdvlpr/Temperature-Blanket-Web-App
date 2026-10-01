@@ -125,7 +125,6 @@ async function saveProject(
   return id;
 }
 
-/** Opens the Project Planner's list of saved projects (shown when there are any). */
 /** Edits a saved project, as saving it again in the Project Planner would. */
 async function editProject(page: Page, id: string, title: string) {
   await page.evaluate(
@@ -161,20 +160,12 @@ async function editProject(page: Page, id: string, title: string) {
   );
 }
 
+/** Opens My Projects, which lists saved projects with how each is synced. */
 async function openSavedProjects(page: Page, { empty = false } = {}) {
-  await page.goto('/');
-  // Retried: a click before the page finishes loading does nothing
-  await expect(async () => {
-    await page.getByRole('button', { name: 'Project Options' }).click();
-    await expect(
-      page
-        .getByRole('dialog')
-        .getByRole('heading', { name: 'Project', exact: true }),
-    ).toBeVisible({ timeout: 1000 });
-  }).toPass();
+  await page.goto('/my-projects');
   if (!empty)
     await expect(
-      page.getByRole('heading', { name: 'Saved Projects' }),
+      page.getByRole('heading', { name: 'My Projects', exact: true }),
     ).toBeVisible();
 }
 
@@ -298,7 +289,7 @@ test.describe('Sync in the browser', () => {
 
     await phone.goto('/my-projects');
     await expect(
-      phone.getByRole('heading', { name: 'Projects', exact: true }),
+      phone.getByRole('heading', { name: 'My Projects', exact: true }),
     ).toBeVisible();
     await expect(phone.getByRole('button', { name: /^Trash/ })).toHaveCount(0);
   });
@@ -377,7 +368,6 @@ test.describe('Sync in the browser', () => {
 
     // Everything synced: no question, and the project leaves the laptop
     await laptop.goto('/account');
-    await expect(laptop.getByText('1 project in your account')).toBeVisible();
     await laptop.getByRole('button', { name: 'Sign out', exact: true }).click();
     await expect(laptop.getByText('You’re not signed in.')).toBeVisible();
     await expect(laptop.getByRole('dialog')).toHaveCount(0);
@@ -573,15 +563,10 @@ async function openMenu(page: Page) {
   }).toPass();
 }
 
-/** Saves from the Project menu, as someone does the first time. */
+/** Saves from the top bar, as someone does the first time. */
 async function saveFromMenu(page: Page) {
-  await openMenu(page);
-  await page
-    .getByRole('dialog')
-    .getByRole('button', { name: 'Save', exact: true })
-    .click();
-  await expect(page.getByText('Saved to Your Account')).toBeVisible();
-  await page.keyboard.press('Escape');
+  await page.getByTestId('save-button').click();
+  await expect(page.getByText('Saved to your account.')).toBeVisible();
 }
 
 /** The auto-save state the Project menu shows, then closes it. */
@@ -602,7 +587,7 @@ test.describe('Auto-save', () => {
     await signIn(laptop, laptop.request, email);
     await buildProject(laptop);
     await saveFromMenu(laptop);
-    expect(await saveState(laptop)).toBe('Saved');
+    expect(await saveState(laptop)).toBe('Saved to your account');
     const id = openProjectId(laptop);
 
     // An edit, and no Save: once saved, the address bar holds the edited project
@@ -614,7 +599,7 @@ test.describe('Auto-save', () => {
         return item?.sync?.dirty === false && item.meta.href === laptop.url();
       })
       .toBe(true);
-    expect(await saveState(laptop)).toBe('Saved');
+    expect(await saveState(laptop)).toBe('Saved to your account');
 
     // The other device gets the edited project
     await signIn(phone, phone.request, email);
@@ -631,25 +616,26 @@ test.describe('Auto-save', () => {
     await expect(
       laptop.getByText('Loaded project and weather data'),
     ).toBeVisible();
-    await expect.poll(() => saveState(laptop)).toBe('Saved');
+    await expect.poll(() => saveState(laptop)).toBe('Saved to your account');
     await laptop.waitForTimeout(4000);
     const after = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;
     expect(after?.rev).toBe(before?.rev);
     expect(after?.updatedAt).toBe(before?.updatedAt);
 
-    // Nor is opening the Save dialog to get the link
+    // Nor is opening the Project menu
     await openMenu(laptop);
-    await laptop.getByTestId('autosave-status').click();
-    await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
+    await expect(laptop.getByTestId('autosave-status')).toHaveText(
+      'Saved to your account',
+    );
     await laptop.waitForTimeout(2000);
     expect((await savedIndex(laptop)).find((i) => i.id === id)!.sync).toEqual(
       after,
     );
 
-    // A copy from the Save dialog leaves the original as it was
+    // A copy from the Project menu leaves the original as it was
     await laptop
       .getByRole('dialog')
-      .getByRole('button', { name: 'Save a copy' })
+      .getByRole('button', { name: 'Save a Copy' })
       .click();
     await expect(laptop.getByText('Saved a copy.')).toBeVisible();
     const copyId = openProjectId(laptop);
@@ -721,7 +707,7 @@ test.describe('Auto-save', () => {
     await choosePattern(laptop, 'Chevrons');
     await expect(laptop).not.toHaveURL(/clnr=/);
     await expect(laptop).toHaveURL(new RegExp(`project=${copyId}`));
-    expect(await saveState(laptop)).toBe('Saved');
+    expect(await saveState(laptop)).toBe('Saved to your account');
   });
 
   test('a new project isn’t saved until someone saves it', async ({
@@ -737,10 +723,10 @@ test.describe('Auto-save', () => {
     expect(await savedIndex(laptop)).toEqual([]);
     await openMenu(laptop);
     await expect(laptop.getByTestId('autosave-status')).toHaveCount(0);
-    await expect(
-      laptop
-        .getByRole('dialog')
-        .getByRole('button', { name: 'Save', exact: true }),
-    ).toBeVisible();
+    await expect(laptop.getByText('Not saved yet')).toBeVisible();
+    await laptop.keyboard.press('Escape');
+    await expect(laptop.getByTestId('save-button')).toHaveAccessibleName(
+      'Save',
+    );
   });
 });

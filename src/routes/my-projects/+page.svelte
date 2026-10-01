@@ -83,7 +83,7 @@ the account; palettes and the Trash stay in this browser. -->
 
 <AppShell pageName="My Projects">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
@@ -91,9 +91,8 @@ the account; palettes and the Trash stay in this browser. -->
     >
       <p class="text-surface-700-300 text-center text-sm">
         {#if synced}
-          Your projects are saved to your account and show up on every device
-          where you're signed in. Yarn palettes and the Trash are stored in this
-          browser only.
+          Your projects, yarn palettes, and Trash are saved to your account and
+          show up on every device where you're signed in.
         {:else}
           Your saved projects and yarn palettes are stored in this browser, so
           they won't show up on other devices. If this browser's site data is
@@ -103,7 +102,7 @@ the account; palettes and the Trash stay in this browser. -->
 
       <section class="flex flex-col gap-2" aria-labelledby="projects">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="projects" class="h3">Projects</h2>
+          <h2 id="projects" class="h3">My Projects</h2>
           <a href={resolve('/')} class="btn hover:preset-tonal-surface">
             <PlusIcon />
             New Project
@@ -116,7 +115,7 @@ the account; palettes and the Trash stay in this browser. -->
 
       <section class="flex flex-col gap-2" aria-labelledby="palettes">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="palettes" class="h3">Yarn Palettes</h2>
+          <h2 id="palettes" class="h3">My Yarn Palettes</h2>
           <a href={resolve('/yarn')} class="btn hover:preset-tonal-surface">
             <PlusIcon />
             Create a Palette

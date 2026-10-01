@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Accounts (Beta)">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -82,10 +82,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Sign in, no password needed</p>
             <p>
-              Press the person icon in the top right corner to sign in. You can sign
-              in with your email address, and I'll email you a 6-digit code to enter.
-              There's no password to make up or remember. You can also sign in with
-              Google.
+              Press the person icon in the top right corner to sign in. You can
+              sign in with your email address, and I'll email you a 6-digit code
+              to enter. There's no password to make up or remember. You can also
+              sign in with Google.
             </p>
 
             <p class="font-bold">Your projects on every device</p>

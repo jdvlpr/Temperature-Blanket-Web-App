@@ -83,10 +83,10 @@ test.describe('Gallery pages from accounts', () => {
     // Nothing published and publishing off: no gallery section on My Projects
     await page.goto('/my-projects');
     await expect(
-      page.getByRole('heading', { name: 'Projects', exact: true }),
+      page.getByRole('heading', { name: 'My Projects', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Gallery Pages' }),
+      page.getByRole('heading', { name: 'My Public Gallery Pages' }),
     ).toHaveCount(0);
   });
 
@@ -105,17 +105,28 @@ test.describe('Gallery pages from accounts', () => {
 
     await page.goto('/my-projects');
     await expect(
-      page.getByRole('heading', { name: 'Gallery Pages' }),
+      page.getByRole('heading', { name: 'My Public Gallery Pages' }),
     ).toBeVisible();
     const pages = page.getByRole('list', { name: 'Your gallery pages' });
     await expect(
       pages.getByRole('link', { name: /Ottawa from 2025 to 2026/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
 
-    // Without a display name, the name setting waits for one
+    // The name setting itself is on the Account page, linked from here
+    await expect(page.getByTestId('gallery-name-status')).toContainText(
+      'Your pages don’t show your name.',
+    );
+    await page
+      .getByRole('link', { name: 'Change on your Account page' })
+      .click();
+    await expect(page).toHaveURL(/\/account$/);
+    await page.getByText('Show my name on my gallery pages').click();
     await expect(
-      page.getByRole('checkbox', { name: /Show my name/ }),
-    ).toBeDisabled();
+      page.getByText('Add a display name above to show it.'),
+    ).toBeVisible();
+    await page.getByLabel('Display name', { exact: true }).fill('Ada Lovelace');
+    await page.getByRole('button', { name: 'Save name' }).click();
+    await expect(page.getByTestId('gallery-owner-page')).toBeVisible();
 
     await page.goto('/account');
     await page.getByRole('button', { name: 'Delete account' }).click();

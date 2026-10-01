@@ -39,7 +39,9 @@ export const autosave: {
   /** `conflict`: another device changed it since it opened here, so saving
   stops rather than overwrite that change */
   state: 'saved' | 'waiting' | 'saving' | 'error' | 'conflict';
-} = $state({ on: false, state: 'saved' });
+  /** Whether the open project is saved at all (in this browser or the account) */
+  stored: boolean;
+} = $state({ on: false, state: 'saved', stored: false });
 
 /** The project as last opened or saved, to tell a real change from none */
 let baseline: string | null = null;
@@ -59,7 +61,8 @@ function openProjectId(): string | null {
   }
 }
 
-async function storedItem() {
+/** The open project as saved in this browser, if it is */
+export async function storedItem() {
   const id = openProjectId();
   return (await ProjectStorage.getIndex()).find((i) => i.id === id);
 }
@@ -82,8 +85,14 @@ async function changedElsewhere(): Promise<boolean> {
 }
 
 async function refresh() {
+  autosave.stored = Boolean(openProjectId() && (await storedItem()));
   autosave.on = await isAccountProject();
-  if (!autosave.on) return;
+  if (!autosave.on) {
+    // Saved in this browser and unchanged since
+    if (autosave.stored && project.url.href === baseline && !weatherEdited)
+      project.status.saved = true;
+    return;
+  }
   if (await changedElsewhere()) {
     clearTimeout(timer);
     autosave.state = 'conflict';
@@ -129,10 +138,8 @@ export function projectChanged({ weather = false } = {}) {
     // Back to how it was saved, as with Undo
     clearTimeout(timer);
     waitingSince = 0;
-    if (autosave.on) {
-      autosave.state = 'saved';
-      project.status.saved = true;
-    }
+    if (autosave.on) autosave.state = 'saved';
+    if (autosave.on || autosave.stored) project.status.saved = true;
     return;
   }
   if (!autosave.on) return;
@@ -164,7 +171,7 @@ export async function saveNow() {
     autosave.state = 'saving';
     const href = project.url.href;
     try {
-      // As the Save dialog does: the address bar holds the saved project
+      // As Save does: the address bar holds the saved project
       // eslint-disable-next-line svelte/no-navigation-without-resolve
       replaceState(new URL(href), '');
       await ProjectStorage.save();
@@ -185,7 +192,7 @@ export async function saveNow() {
   saving = null;
 }
 
-/** After a Save from the Save dialog: that's now the saved project. */
+/** After pressing Save: that's now the saved project. */
 export async function projectSaved() {
   baseline = project.url.href;
   baselineId = openProjectId();
@@ -198,7 +205,7 @@ export async function projectSaved() {
 }
 
 /**
- * Saves the open project, as the Save dialog does: through autosave when it's
+ * Saves the open project, as the Save button does: through autosave when it's
  * already on (never over another device's newer version), otherwise as a
  * first save, which signed in also adds it to the account. Returns the stored
  * project, or null when it couldn't be saved.
@@ -283,4 +290,5 @@ export function resetAutosave() {
   saving = null;
   autosave.on = false;
   autosave.state = 'saved';
+  autosave.stored = false;
 }

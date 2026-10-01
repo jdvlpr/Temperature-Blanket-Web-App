@@ -19,9 +19,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { previews } from '$lib/state/preview-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { ArrowLeftIcon } from '@lucide/svelte';
   import { fly } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
+
+  // The Project menu: a panel that slides in from the right
+  const side = $derived(dialog.options.placement === 'side');
 </script>
 
 <Dialog
@@ -30,23 +34,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
   initialFocusEl={undefined}
 >
   <Portal>
+    <!-- Blurred behind, as with the site menu's drawer; the side panel also
+    fades in, and slides in from the right (the site menu comes from the left) -->
     <Dialog.Backdrop
-      class="bg-surface-50-950/50 fixed inset-0 z-60 backdrop-blur-md"
+      class={[
+        'bg-surface-50-950/50 fixed inset-0 z-60 backdrop-blur-md',
+        side &&
+          'opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0',
+      ]}
     />
     <Dialog.Positioner
-      class="fixed inset-0 z-60 flex items-center justify-center"
+      class={[
+        'fixed inset-0 z-60 flex items-center justify-center',
+        side && 'items-stretch justify-end',
+      ]}
     >
       <Dialog.Content
-        class="card bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto shadow-xl max-sm:min-w-screen lg:max-h-[80svh] {dialog
-          .options.size === 'large'
-          ? 'max-w-(--breakpoint-lg)'
-          : dialog.options.size === 'medium'
-            ? 'max-w-(--breakpoint-md)'
-            : 'max-w-(--breakpoint-sm)'}"
+        class={[
+          'bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto max-sm:min-w-screen',
+          side
+            ? 'h-dvh w-full translate-x-full opacity-0 transition transition-discrete sm:w-md data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:translate-x-full starting:data-[state=open]:opacity-0'
+            : 'card shadow-xl lg:max-h-[80svh]',
+          dialog.options.size === 'large'
+            ? 'max-w-(--breakpoint-lg)'
+            : dialog.options.size === 'medium'
+              ? 'max-w-(--breakpoint-md)'
+              : 'max-w-(--breakpoint-sm)',
+        ]}
       >
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} in:fly={{ y: 50, duration: 400 }}>
+            <div
+              {...attributes}
+              in:fly={side ? { duration: 0 } : { y: 50, duration: 400 }}
+            >
+              {#if dialog.type === 'component' && dialog.previous}
+                <button
+                  type="button"
+                  class="btn btn-sm hover:preset-tonal-surface sticky top-2 z-10 float-left ml-2"
+                  onclick={dialog.back}
+                >
+                  <ArrowLeftIcon class="size-4" />
+                  Back
+                </button>
+              {/if}
               {#if dialog.type === 'component'}
                 {#if dialog.options.showCloseButton}
                   <Dialog.CloseTrigger

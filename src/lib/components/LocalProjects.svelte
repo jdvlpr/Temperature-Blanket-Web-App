@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if projects?.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
       {#if !onMyProjectsPage}
-        <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
+        <h2 class="mb-1 text-sm font-bold opacity-70">Recent Projects</h2>
       {/if}
       {#if signedIn && sync.active}
         <SyncStatus class="text-surface-700-300 mb-2" />

@@ -18,7 +18,6 @@ import type { Component } from 'svelte';
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
@@ -29,6 +28,15 @@ import { tick } from 'svelte';
 type DialogOptions = {
   showCloseButton?: boolean;
   size?: 'small' | 'medium' | 'large';
+  /** `side`: a panel on the right on large screens, as the Project menu */
+  placement?: 'center' | 'side';
+  /** Dialogs opened from this one get a Back button to it */
+  returnable?: boolean;
+};
+
+type DialogComponent = {
+  ref: Component<any> | null;
+  props: Record<string, any> | null;
 };
 class DialogClass {
   #defaultOptions: DialogOptions = {
@@ -51,13 +59,16 @@ class DialogClass {
     size: 'small',
   });
 
-  contentComponent = $state<{
-    ref: Component<any> | null;
-    props: Record<string, any> | null;
-  }>({
+  contentComponent = $state<DialogComponent>({
     ref: null,
     props: null,
   });
+
+  /** The returnable dialog this one was opened from, for its Back button */
+  previous = $state<{
+    component: DialogComponent;
+    options: DialogOptions;
+  } | null>(null);
 
   trigger = async ({
     type,
@@ -74,6 +85,15 @@ class DialogClass {
     component?: any;
     options?: DialogOptions;
   }) => {
+    // Opened from a returnable dialog (like the Project menu): remember it
+    this.previous =
+      type === 'component' &&
+      this.opened &&
+      this.type === 'component' &&
+      this.options.returnable
+        ? { component: this.contentComponent, options: this.options }
+        : null;
+
     // close the dialog
     this.close();
 
@@ -103,9 +123,33 @@ class DialogClass {
   close = () => {
     this.opened = false;
   };
+
+  /** Back to the dialog this one was opened from */
+  back = () => {
+    const previous = this.previous;
+    if (!previous) return;
+    this.previous = null;
+    this.type = 'component';
+    this.contentComponent = previous.component;
+    this.options = previous.options;
+    this.opened = true;
+  };
 }
 
 export const dialog = new DialogClass();
+
+/** Asks the Project menu to open with its name field, once (not on Back) */
+export const projectMenu = $state({ renameNext: false });
+
+/** The Project menu: a side panel, and dialogs opened from it can go back to it */
+export function openProjectMenu({ rename = false } = {}) {
+  projectMenu.renameNext = rename;
+  dialog.trigger({
+    type: 'component',
+    component: { ref: Menu },
+    options: { placement: 'side', returnable: true },
+  });
+}
 
 export interface ToastSettings {
   /** Provide the toast message. Supports HTML. */
@@ -473,10 +517,7 @@ export const handleKeyDown = (ev: KeyboardEvent) => {
         });
         break;
       case '.':
-        dialog.trigger({
-          type: 'component',
-          component: { ref: Menu },
-        });
+        openProjectMenu();
         break;
       case 'u':
         project.toggleUnits();
@@ -499,10 +540,9 @@ export const handleKeyDown = (ev: KeyboardEvent) => {
           loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
-        dialog.trigger({
-          type: 'component',
-          component: { ref: SaveProjectModal },
-        });
+        void import('$lib/utils/save-project.svelte').then(({ saveProject }) =>
+          saveProject(),
+        );
       }
       // Check for section navigation shortcuts
       switch (ev.key) {

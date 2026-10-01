@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Dialog.Trigger>
           <Portal>
             <Dialog.Backdrop
-              class="bg-surface-50-950/50 fixed inset-0 z-50 opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0"
+              class="bg-surface-50-950/50 fixed inset-0 z-50 opacity-0 backdrop-blur-md transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0"
             />
             <Dialog.Positioner class="fixed inset-0 z-50 flex justify-start">
               <Dialog.Content

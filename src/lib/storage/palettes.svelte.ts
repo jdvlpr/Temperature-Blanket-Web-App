@@ -3,6 +3,7 @@ import { account } from '$lib/accounts/summary.svelte';
 import type { PaletteRecord } from '$lib/sync/protocol';
 import { get, update } from 'idb-keyval';
 import { trashCutoff } from './trash';
+import { cleanName } from '$lib/utils/string-utils';
 
 /** Present once the palette belongs to an account (see $lib/sync) */
 export type PaletteSyncState = {
@@ -33,8 +34,8 @@ export type SavedPalette = {
 const SAVED_PALETTES_KEY = 'saved_palettes';
 export const MAX_SAVED_PALETTE_NAME_LENGTH = 100;
 
-const cleanName = (name: string | undefined): string =>
-  (name ?? '').trim().slice(0, MAX_SAVED_PALETTE_NAME_LENGTH);
+const cleanPaletteName = (name: unknown): string =>
+  cleanName(name, MAX_SAVED_PALETTE_NAME_LENGTH);
 
 const newId = (): string => {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
@@ -129,7 +130,7 @@ export class PaletteStorage {
       const now = Date.now();
       const palette: SavedPalette = {
         id: newId(),
-        name: cleanName(name),
+        name: cleanPaletteName(name),
         code,
         createdAt: now,
         updatedAt: now,
@@ -144,7 +145,7 @@ export class PaletteStorage {
   }
 
   static async rename(id: string, name: string): Promise<void> {
-    await this.change(id, (p) => ({ ...p, name: cleanName(name) }));
+    await this.change(id, (p) => ({ ...p, name: cleanPaletteName(name) }));
   }
 
   static async remove(id: string): Promise<void> {
@@ -360,7 +361,7 @@ export class PaletteStorage {
 
 const fromRecord = (record: PaletteRecord, userId: string): SavedPalette => ({
   id: record.id,
-  name: record.name,
+  name: cleanPaletteName(record.name),
   code: record.code,
   createdAt: record.createdAt,
   updatedAt: record.updatedAt,

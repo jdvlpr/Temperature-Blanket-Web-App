@@ -149,14 +149,10 @@ test.describe('Project Planner', () => {
     await expect(page.locator('#select-pattern-type')).toHaveValue('clnr');
 
     // 2. Save -- this is the app's own mechanism for writing the current project
-    // state into a shareable URL (SaveProjectModal calls replaceState on mount).
-    await page.getByRole('button', { name: 'Project Options' }).click();
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Save', exact: true })
-      .click();
+    // state into a shareable URL (saving calls replaceState).
+    await page.getByTestId('save-button').click();
     await expect(
-      page.getByText(/Saved Locally|problem saving your project/),
+      page.getByText(/Saved in this browser|problem saving your project/),
     ).toBeVisible();
     const savedUrl = page.url();
     expect(savedUrl).toContain('#');

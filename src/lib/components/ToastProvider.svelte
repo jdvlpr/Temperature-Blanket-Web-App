@@ -2,7 +2,12 @@
   import { run } from 'svelte/legacy';
   import { flip } from 'svelte/animate';
   import { toast } from '$lib/state/page-state.svelte';
-  import { CircleAlertIcon, CircleCheckIcon, InfoIcon } from '@lucide/svelte';
+  import {
+    CircleAlertIcon,
+    CircleCheckIcon,
+    InfoIcon,
+    TriangleAlertIcon,
+  } from '@lucide/svelte';
   import { fade } from 'svelte/transition';
 
   // Props
@@ -181,6 +186,7 @@
               t.category === 'success' && 'preset-filled-success-100-900',
               t.category === 'error' && 'preset-filled-error-50-950',
               t.category === 'info' && 'preset-filled-secondary-100-900',
+              t.category === 'warning' && 'preset-filled-warning-100-900',
               !t.category && (t.background || background),
               t.classes,
             ]}
@@ -200,6 +206,11 @@
             {:else if t.category === 'error'}
               <div class="flex items-center justify-between gap-4 text-base">
                 <CircleAlertIcon class="inline" />
+                {@html t.message}
+              </div>
+            {:else if t.category === 'warning'}
+              <div class="flex items-center justify-between gap-4 text-base">
+                <TriangleAlertIcon class="inline shrink-0" />
                 {@html t.message}
               </div>
             {:else if t.category === 'info'}

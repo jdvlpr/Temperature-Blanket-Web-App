@@ -161,29 +161,39 @@ test.describe('My Projects', () => {
     await page.getByRole('button', { name: 'Search', exact: true }).click();
     await expect(page.getByText('°C / mm °F / in')).toBeVisible();
 
-    // Save is in the Project menu
-    await page.getByRole('button', { name: 'Project Options' }).click();
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Save', exact: true })
-      .click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('Saved Locally')).toBeVisible();
-    await dialog.getByLabel('Name (optional)').fill('Austin Gift');
-    await dialog.getByRole('button', { name: 'Save Name' }).click();
-    await expect(page.getByText('Name saved')).toBeVisible();
-    await page.keyboard.press('Escape');
-
-    // The Project menu lists it by name, without a delete button
+    // Before saving, the Project menu has no rename
     await page.getByRole('button', { name: 'Project Options' }).click();
     const menu = page.getByRole('dialog');
-    await expect(menu.getByRole('link', { name: 'Austin Gift' })).toBeVisible();
-    await expect(menu.getByRole('button', { name: /^Delete / })).toHaveCount(0);
+    await expect(
+      menu.getByRole('button', { name: /Rename|Name this/ }),
+    ).toHaveCount(0);
+    await page.keyboard.press('Escape');
+
+    // Save is in the top bar: it saves right away, and offers to name it
+    await page.getByTestId('save-button').click();
+    await expect(page.getByText('Saved in this browser')).toBeVisible();
+    await expect(page.getByTestId('save-button')).toHaveAccessibleName('Saved');
+    await page.getByRole('button', { name: 'Name it' }).click();
+    await menu.getByLabel('Project name').fill('Austin Gift');
+    await menu.getByLabel('Project name').press('Enter');
+    await expect(page.getByText('Project renamed')).toBeVisible();
+
+    // ...and renames it again from the menu's project card
+    await menu.getByRole('button', { name: 'Rename Austin Gift' }).click();
+    await menu.getByLabel('Project name').fill('Austin Blanket');
+    await menu.getByLabel('Project name').press('Enter');
+    await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
+    await expect(menu.getByText('Saved in this browser')).toBeVisible();
+
+    // Keyboard Shortcuts, opened from the menu, goes back to it
+    await menu.getByRole('button', { name: 'Keyboard Shortcuts' }).click();
+    await menu.getByRole('button', { name: 'Back' }).click();
+    await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
     await page.keyboard.press('Escape');
 
     // Opened from My Projects, it loads with its saved weather
     await page.goto('/my-projects');
-    await page.getByRole('link', { name: 'Austin Gift' }).click();
+    await page.getByRole('link', { name: 'Austin Blanket' }).click();
     await expect(
       page.getByText('Loaded project and weather data'),
     ).toBeVisible();

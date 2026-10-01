@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import DataSourcesCredits from '$lib/components/DataSourcesCredits.svelte';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -350,13 +351,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Download Preview Image (PNG)</a
         >
       </li>
+      <li class="toc-list-item block">
+        <a href="#credits" class="toc-anchor opacity-60 hover:opacity-100"
+          >Data Sources & Credits</a
+        >
+      </li>
     </ul>
   </nav>
 {/snippet}
 
 <AppShell pageName="Documentation">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex">
+    <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
     <div class="sm:hidden">
@@ -538,12 +544,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
             <p>
               To save your project, press the Save button at the top of the
-              page. The project will be saved in your browser, and the project’s
-              URL will be shown. Press Copy URL to copy the URL to your
-              clipboard. If you want to share your project or open it in a
-              different browser, make sure to save the URL in a place you can
-              find it again later. You can also use the following keyboard
-              shortcut to save your project:
+              page. The project is saved in your browser right away (or, if
+              you’re signed in, to your account, where later changes save by
+              themselves). To get the project’s URL, press Project, then Copy
+              Link. If you want to share your project or open it in a different
+              browser, make sure to save the URL in a place you can find it
+              again later. You can also use the following keyboard shortcut to
+              save your project:
             </p>
             <figure class="">
               <table>
@@ -590,10 +597,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               On My Projects, use the pencil button to name a project (you can
-              also name it when you save it), or the trash button to move it to
-              the Trash. Deleted projects and palettes stay in the Trash for 30
-              days, so you can restore them. Press Trash at the bottom of My
-              Projects to restore them or delete them for good.
+              also name the open project in the Project menu, or above the
+              Project Planner), or the trash button to move it to the Trash.
+              Deleted projects and palettes stay in the Trash for 30 days, so
+              you can restore them. Press Trash at the bottom of My Projects to
+              restore them or delete them for good.
             </p>
             <p>
               You can also open any project by pasting the project’s URL in your
@@ -607,10 +615,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Change Units</h3>
             <p>
-              To change your project’s units between metric and imperial, from
-              the top bar select °C / mm or °F / in. On smaller screens, press
-              the Project Menu, then choose your Units selection. On the Project
-              Planner you can also use the following keyboard shortcut:
+              To change your project’s units between metric and imperial, select
+              °C / mm or °F / in above the weather data in the Weather section.
+              On the Project Planner you can also use the following keyboard
+              shortcut:
             </p>
             <figure class="">
               <table>
@@ -835,7 +843,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               Temperature-blanket.com provides several options from where to get
               weather data. To change the weather source settings, press the
-              Weather Source button in the Weather tab or Project Menu.
+              Weather Source button above the weather data in the Weather
+              section.
             </p>
             <ul class="flex flex-col gap-4">
               <li class="flex flex-col gap-1">
@@ -1964,6 +1973,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Project Menu, press Download/Export button, then press Preview
               Image (PNG).
             </p>
+          </section>
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="credits">
+            Data Sources & Credits
+          </h2>
+          <section
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+          >
+            <DataSourcesCredits />
           </section>
         </div>
         <div
