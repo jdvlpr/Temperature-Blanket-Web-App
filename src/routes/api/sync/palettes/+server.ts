@@ -13,9 +13,14 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Saving one palette to the account (see $lib/sync/protocol). Palettes come
-// back to devices in the changes feed.
+// Saving palettes to the account, up to MAX_PALETTES_PER_UPLOAD a request (see
+// $lib/sync/protocol). Each gets its own result, so one bad palette doesn't
+// hold up the rest. Palettes come back to devices in the changes feed.
 
+import {
+  MAX_PALETTES_PER_UPLOAD,
+  type PaletteUploadResult,
+} from '$lib/sync/protocol';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -29,28 +34,43 @@ export const PUT: RequestHandler = async (event) => {
 
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;
-  if (!isProjectId(event.params.id))
-    return syncError(400, 'INVALID_REQUEST', 'Invalid palette ID');
 
-  const input = parsePaletteInput(await event.request.json().catch(() => null));
-  if (!input.ok) return syncError(input.status, input.code, input.message);
-
-  const result = await store.savePalette(
-    sync.db,
-    sync.userId,
-    event.params.id,
-    input.value,
-  );
-  if (result.status === 'quota')
+  const body = await event.request.json().catch(() => null);
+  const palettes: unknown[] = Array.isArray(body?.palettes)
+    ? body.palettes
+    : [];
+  if (!palettes.length || palettes.length > MAX_PALETTES_PER_UPLOAD)
     return syncError(
-      413,
-      'QUOTA_EXCEEDED',
-      `Accounts can sync up to ${store.MAX_PALETTES_PER_USER} palettes`,
+      400,
+      'INVALID_REQUEST',
+      `Send 1 to ${MAX_PALETTES_PER_UPLOAD} palettes`,
     );
+
+  const results: PaletteUploadResult[] = [];
+  for (const item of palettes) {
+    const id = (item as { id?: unknown })?.id;
+    if (typeof id !== 'string' || !isProjectId(id)) continue;
+    const input = parsePaletteInput(item);
+    if (!input.ok) {
+      results.push({ id, error: 'INVALID_REQUEST' });
+      continue;
+    }
+    const result = await store.savePalette(
+      sync.db,
+      sync.userId,
+      id,
+      input.value,
+    );
+    results.push(
+      result.status === 'quota'
+        ? { id, error: 'QUOTA_EXCEEDED' }
+        : { id, palette: result.palette, applied: result.status === 'saved' },
+    );
+  }
 
   cleanUpAfterWrite(sync);
   return Response.json(
-    { palette: result.palette, applied: result.status === 'saved' },
+    { results },
     { headers: { 'Cache-Control': 'no-store' } },
   );
 };

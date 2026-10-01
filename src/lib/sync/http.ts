@@ -22,7 +22,7 @@ import {
   SYNC_HEADERS,
   SYNC_SCHEMA_VERSION,
   type ChangesResponse,
-  type PaletteRecord,
+  type PaletteUploadResult,
   type ProjectMeta,
   type SyncErrorCode,
 } from './protocol';
@@ -146,17 +146,14 @@ export function createHttpSyncServer(
       if (!response.ok) throw await errorFrom(response);
     },
 
-    async uploadPalette(id, palette) {
-      const response = await request(`/palettes/${encodeURIComponent(id)}`, {
+    async uploadPalettes(palettes) {
+      const response = await request('/palettes', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(palette),
+        body: JSON.stringify({ palettes }),
       });
       if (!response.ok) throw await errorFrom(response);
-      return (await response.json()) as {
-        palette: PaletteRecord;
-        applied: boolean;
-      };
+      return (await response.json()).results as PaletteUploadResult[];
     },
   };
 }

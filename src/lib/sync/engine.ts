@@ -27,11 +27,13 @@ import type { SavedPalette } from '$lib/storage/palettes.svelte';
 import type { StoredProject } from '$lib/storage/projects.svelte';
 import type {
   ChangesResponse,
-  PaletteInput,
   PaletteRecord,
+  PaletteUpload,
+  PaletteUploadResult,
   ProjectMeta,
   SyncErrorCode,
 } from './protocol';
+import { MAX_PALETTES_PER_UPLOAD } from './protocol';
 import type { Seen } from './seen';
 
 /** Sync bookkeeping kept with each saved project on this device. */
@@ -126,10 +128,7 @@ export interface SyncServer {
   remove(id: string, baseRev: number): Promise<DeleteOutcome>;
   /** Deletes a project's copy in the account's Trash for good */
   purgeTrashed?(id: string): Promise<void>;
-  uploadPalette?(
-    id: string,
-    palette: PaletteInput,
-  ): Promise<{ palette: PaletteRecord; applied: boolean }>;
+  uploadPalettes?(palettes: PaletteUpload[]): Promise<PaletteUploadResult[]>;
 }
 
 /** A failed request. Anything but the codes below stops the whole pass. */
@@ -221,7 +220,7 @@ export async function syncAccount(
     failed: [],
     palettesFailed: [],
   };
-  const palettes = server.uploadPalette ? options.palettes : undefined;
+  const palettes = server.uploadPalettes ? options.palettes : undefined;
 
   let state = await local.accountState(userId);
   const saveState = async (next: AccountSyncState) => {
@@ -479,32 +478,48 @@ export async function syncAccount(
     }
   }
 
-  // 4. Palettes changed here. One that fails doesn't stop the others; it tries
-  //    again on the next pass.
-  if (palettes)
-    for (const palette of await palettes.list()) {
-      if (palette.sync?.ownerUserId !== userId || !palette.sync.dirty) continue;
+  // 4. Palettes changed here, together. One that fails doesn't stop the
+  //    others; it tries again on the next pass.
+  if (palettes) {
+    const changed = (await palettes.list()).filter(
+      (p) => p.sync?.ownerUserId === userId && p.sync.dirty,
+    );
+    for (let i = 0; i < changed.length; i += MAX_PALETTES_PER_UPLOAD) {
+      const batch = changed.slice(i, i + MAX_PALETTES_PER_UPLOAD);
+      let results: PaletteUploadResult[];
       try {
-        const result = await server.uploadPalette!(palette.id, {
-          name: palette.name,
-          code: palette.code,
-          createdAt: palette.createdAt,
-          updatedAt: palette.updatedAt,
-          deletedAt: palette.deletedAt ?? null,
-          purged: palette.purged === true,
-        });
-        await palettes.settle(
-          userId,
-          palette.updatedAt,
-          result.palette,
-          result.applied,
+        results = await server.uploadPalettes!(
+          batch.map((p) => ({
+            id: p.id,
+            name: p.name,
+            code: p.code,
+            createdAt: p.createdAt,
+            updatedAt: p.updatedAt,
+            deletedAt: p.deletedAt ?? null,
+            purged: p.purged === true,
+          })),
         );
       } catch (e) {
         if (e instanceof SyncHttpError && (e.status === 0 || e.status === 401))
           throw e;
-        report.palettesFailed!.push(palette.id);
+        report.palettesFailed!.push(...batch.map((p) => p.id));
+        continue;
+      }
+      const sent = new Map(batch.map((p) => [p.id, p.updatedAt]));
+      for (const result of results) {
+        const sentUpdatedAt = sent.get(result.id);
+        if (sentUpdatedAt === undefined) continue;
+        if ('error' in result) report.palettesFailed!.push(result.id);
+        else
+          await palettes.settle(
+            userId,
+            sentUpdatedAt,
+            result.palette,
+            result.applied,
+          );
       }
     }
+  }
 
   return report;
 }

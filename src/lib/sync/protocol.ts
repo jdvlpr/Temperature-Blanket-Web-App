@@ -23,7 +23,7 @@
 //   DELETE /api/sync/trash                       deletes everything in it for good
 //   GET    /api/sync/trash/{id}                  a trashed project's gzipped JSON
 //   DELETE /api/sync/trash/{id}                  deletes one for good
-//   PUT    /api/sync/palettes/{id}               PaletteInput → { palette, applied }
+//   PUT    /api/sync/palettes                    { palettes: PaletteUpload[] } → { results }
 //
 // A save or delete based on an outdated revision gets 409 { code: 'CONFLICT', current }.
 // A deleted project stays in the Trash (with its data) for TRASH_DAYS; restoring
@@ -76,6 +76,15 @@ export type PaletteRecord = {
 };
 
 export type PaletteInput = Omit<PaletteRecord, 'id' | 'rev'>;
+
+/** Palettes go up together, up to MAX_PALETTES_PER_UPLOAD a request */
+export type PaletteUpload = PaletteInput & { id: string };
+export const MAX_PALETTES_PER_UPLOAD = 100;
+
+/** Per palette: the account's copy afterwards, or why it couldn't be saved */
+export type PaletteUploadResult =
+  | { id: string; palette: PaletteRecord; applied: boolean }
+  | { id: string; error: SyncErrorCode };
 
 /** A deleted project the account still keeps (the Trash). */
 export type TrashedProjectMeta = {

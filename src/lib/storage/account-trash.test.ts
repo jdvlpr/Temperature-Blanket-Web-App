@@ -8,6 +8,7 @@ const trashed = (
   id: string,
   deletedAt: number,
   owner?: string,
+  rev: number | null = 1,
 ): TrashedProject => ({
   item: {
     id,
@@ -20,7 +21,7 @@ const trashed = (
     ...(owner && {
       sync: {
         ownerUserId: owner,
-        rev: 1,
+        rev,
         dirty: false,
         updatedAt: 0,
         lastSyncedAt: 0,
@@ -46,6 +47,7 @@ describe('mergeProjectTrash', () => {
     const { entries, stale } = mergeProjectTrash(
       [trashed('both', 100, 'u1'), trashed('guest', 300)],
       {
+        userId: 'u1',
         items: [onAccount('both', 100), onAccount('elsewhere', 200)],
         fetchedAt: 1000,
         pendingAtFetch: new Set(),
@@ -66,7 +68,7 @@ describe('mergeProjectTrash', () => {
   it('drops a local copy the account restored or deleted for good elsewhere', () => {
     const { entries, stale } = mergeProjectTrash(
       [trashed('gone', 100, 'u1')],
-      { items: [], fetchedAt: 1000, pendingAtFetch: new Set() },
+      { userId: 'u1', items: [], fetchedAt: 1000, pendingAtFetch: new Set() },
       new Set(),
     );
     expect(entries).toEqual([]);
@@ -75,6 +77,7 @@ describe('mergeProjectTrash', () => {
 
   it('keeps a local copy whose deletion hasn’t reached the account, or was on its way when fetched', () => {
     const account = {
+      userId: 'u1',
       items: [],
       fetchedAt: 1000,
       pendingAtFetch: new Set(['sent']),
@@ -93,6 +96,21 @@ describe('mergeProjectTrash', () => {
       'sent',
       'waiting',
     ]);
+    expect(stale).toEqual([]);
+  });
+
+  it('keeps an account project that never reached the account', () => {
+    const { entries, stale } = mergeProjectTrash(
+      [trashed('never-uploaded', 100, 'u1', null)],
+      {
+        userId: 'u1',
+        items: [],
+        fetchedAt: 1000,
+        pendingAtFetch: new Set(),
+      },
+      new Set(),
+    );
+    expect(entries.map((e) => e.id)).toEqual(['never-uploaded']);
     expect(stale).toEqual([]);
   });
 

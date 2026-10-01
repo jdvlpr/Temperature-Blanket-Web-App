@@ -32,6 +32,8 @@ import {
 
 /** The account's Trash as last fetched, or null when signed out or unreachable */
 export type AccountTrashList = {
+  /** The account it's from */
+  userId: string;
   items: TrashedProjectMeta[];
   fetchedAt: number;
   /** Deletions still waiting to reach the account when the list was fetched */
@@ -73,9 +75,11 @@ export function mergeProjectTrash(
   for (const trashed of local) {
     const { id } = trashed.item;
     const mine = trashed.item.sync;
+    // Only a project the account had (it was uploaded) can leave its Trash
     if (
       account &&
       mine &&
+      mine.rev !== null &&
       !onAccount.has(id) &&
       !pendingNow.has(id) &&
       !account.pendingAtFetch.has(id) &&
@@ -127,6 +131,7 @@ export async function refreshAccountTrash(): Promise<void> {
     });
     accountTrash.list = response.ok
       ? {
+          userId: owner,
           items: (await response.json()).projects,
           fetchedAt,
           pendingAtFetch,
@@ -142,21 +147,25 @@ export async function loadProjectTrash(): Promise<ProjectTrashEntry[]> {
   const local = await ProjectStorage.getTrash();
   const owner = ProjectStorage.syncOwner();
   const pendingNow = owner ? await pendingDeletes(owner) : new Set<string>();
-  const { entries, stale } = mergeProjectTrash(
-    local,
-    owner ? accountTrash.list : null,
-    pendingNow,
-  );
+  // A list fetched for someone who has since signed out doesn't count
+  const list =
+    owner && accountTrash.list?.userId === owner ? accountTrash.list : null;
+  const { entries, stale } = mergeProjectTrash(local, list, pendingNow);
   for (const id of stale) await ProjectStorage.deleteForever(id);
   return entries;
 }
 
-// A project from the account's Trash, downloaded once to show and to restore
+// A project from the account's Trash, downloaded once to show and to restore.
+// By revision: deleted again after changes elsewhere, it's a new download.
 const downloads = new Map<string, Promise<StoredProject | null>>();
 
 /** A project in the account's Trash, as saved; null if it's gone. */
-export function trashedProject(id: string): Promise<StoredProject | null> {
-  let download = downloads.get(id);
+export function trashedProject(
+  id: string,
+  rev: number,
+): Promise<StoredProject | null> {
+  const key = `${id}:${rev}`;
+  let download = downloads.get(key);
   if (!download) {
     download = (async () => {
       try {
@@ -176,9 +185,9 @@ export function trashedProject(id: string): Promise<StoredProject | null> {
         return null;
       }
     })();
-    downloads.set(id, download);
+    downloads.set(key, download);
     // A failure can be tried again
-    download.then((p) => p || downloads.delete(id));
+    download.then((p) => p || downloads.delete(key));
   }
   return download;
 }
@@ -193,7 +202,7 @@ export async function restoreTrashEntry(entry: ProjectTrashEntry) {
     await ProjectStorage.restoreFromTrash(entry.id);
   } else if (entry.account) {
     const owner = ProjectStorage.syncOwner();
-    const project = await trashedProject(entry.id);
+    const project = await trashedProject(entry.id, entry.account.rev);
     if (!owner || !project) throw new Error('Not in the Trash');
     const sync: ProjectSyncState = {
       ownerUserId: owner,
@@ -213,12 +222,11 @@ export async function restoreTrashEntry(entry: ProjectTrashEntry) {
  * hasn't reached the account yet, the account's copy goes once it does.
  */
 export async function deleteTrashEntryForever(entry: ProjectTrashEntry) {
+  const mine = entry.local?.item.sync;
   if (entry.account) await purge(entry.id);
-  else if (entry.local?.item.sync)
-    await ProjectStorage.queuePurge(
-      entry.local.item.sync.ownerUserId,
-      entry.id,
-    );
+  // The account had it, but its deletion hasn't reached the account yet
+  else if (mine && mine.rev !== null)
+    await ProjectStorage.queuePurge(mine.ownerUserId, entry.id);
   if (entry.local) await ProjectStorage.deleteForever(entry.id);
   dropFromAccountList([entry.id]);
 }
@@ -226,12 +234,11 @@ export async function deleteTrashEntryForever(entry: ProjectTrashEntry) {
 /** Empties the Trash's projects, here and in the account, in one request. */
 export async function emptyProjectTrash(entries: ProjectTrashEntry[]) {
   if (entries.some((e) => e.account)) await purge(null);
-  for (const entry of entries)
-    if (!entry.account && entry.local?.item.sync)
-      await ProjectStorage.queuePurge(
-        entry.local.item.sync.ownerUserId,
-        entry.id,
-      );
+  for (const entry of entries) {
+    const mine = entry.local?.item.sync;
+    if (!entry.account && mine && mine.rev !== null)
+      await ProjectStorage.queuePurge(mine.ownerUserId, entry.id);
+  }
   await ProjectStorage.emptyTrash();
   dropFromAccountList(entries.map((e) => e.id));
 }

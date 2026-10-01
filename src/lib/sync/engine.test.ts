@@ -587,13 +587,15 @@ describe('syncAccount: palettes and the Trash', () => {
               ),
             };
           },
-          uploadPalette: async (id, input) => {
-            uploads.push(id);
-            return {
-              palette: { ...record(id, 9), ...input },
-              applied: true,
-            };
-          },
+          uploadPalettes: async (batch) =>
+            batch.map(({ id, ...input }) => {
+              uploads.push(id);
+              return {
+                id,
+                palette: { ...record(id, 9), ...input },
+                applied: true,
+              };
+            }),
           ...overrides,
         },
         { origin: device.origin, sha256, palettes },
@@ -611,7 +613,7 @@ describe('syncAccount: palettes and the Trash', () => {
     expect(calls).toEqual([]);
   });
 
-  it('uploads palettes changed here, and one failing doesn’t stop the rest', async () => {
+  it('uploads palettes changed here in one request, and one failing doesn’t stop the rest', async () => {
     const { local, calls, uploads, sync } = setup();
     const palette = (id: string, owner = 'u1', dirty = true): SavedPalette => ({
       id,
@@ -628,11 +630,13 @@ describe('syncAccount: palettes and the Trash', () => {
       palette('theirs', 'u2'),
     );
     const report = await sync({
-      uploadPalette: async (id, input) => {
-        uploads.push(id);
-        if (id === 'bad') throw new SyncHttpError(500, undefined, 'Oops');
-        return { palette: { ...record(id, 9), ...input }, applied: true };
-      },
+      uploadPalettes: async (batch) =>
+        batch.map(({ id, ...input }) => {
+          uploads.push(id);
+          return id === 'bad'
+            ? { id, error: 'INVALID_REQUEST' as const }
+            : { id, palette: { ...record(id, 9), ...input }, applied: true };
+        }),
     });
     expect(uploads).toEqual(['bad', 'good']);
     expect(calls).toEqual(['settle good 7 true']);

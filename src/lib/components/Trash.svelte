@@ -109,10 +109,17 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 
   $effect(() => {
     for (const project of trashedProjects)
-      if (!project.local && !(project.id in downloadedHrefs))
-        trashedProject(project.id).then((p) => {
+      if (
+        project.account &&
+        !project.local &&
+        !(project.id in downloadedHrefs)
+      ) {
+        // Marked first, so a sync pass meanwhile doesn't download it again
+        downloadedHrefs[project.id] = '';
+        trashedProject(project.id, project.account.rev).then((p) => {
           if (p) downloadedHrefs[project.id] = p.href;
         });
+      }
   });
 
   async function run(action: () => Promise<void>, errorMessage: string) {
