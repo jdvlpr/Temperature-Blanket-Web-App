@@ -23,6 +23,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { account } from '$lib/accounts/summary.svelte';
+  import { getGalleryPages } from '$lib/accounts/gallery';
   import { sync } from '$lib/sync/status.svelte';
   import GalleryPages from '$lib/components/account/GalleryPages.svelte';
   import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
@@ -49,6 +50,20 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
   );
   // Signed in with sync on: projects are kept in the account
   const synced = $derived(signedIn && sync.active);
+
+  // Palettes can be shared only while publishing from accounts is on
+  let canShare = $state(false);
+  $effect(() => {
+    if (!signedIn) {
+      canShare = false;
+      return;
+    }
+    let current = true;
+    getGalleryPages().then((gallery) => {
+      if (current) canShare = Boolean(gallery?.publishing);
+    });
+    return () => (current = false);
+  });
 
   // The account's Trash once when the page opens (and again in the dialog),
   // not on every change: requests are shared by everyone on the free plan
@@ -127,7 +142,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
             <AddToAccountButton kind="palettes" />
           {/if}
           <SavedPalettes
-            onshare={signedIn
+            onshare={canShare
               ? (props) =>
                   dialog.trigger({
                     type: 'component',
