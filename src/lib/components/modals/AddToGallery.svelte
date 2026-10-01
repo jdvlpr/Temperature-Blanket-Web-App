@@ -82,7 +82,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="w-full p-4 text-center">
+<!-- Columns by its own width: one in the Project menu's panel, three in a
+wider dialog -->
+<div class="@container w-full p-4 pt-2 text-center">
   {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
     <div class="card preset-filled-surface-100-900 mt-4 p-4 text-center">
       <p class="my-2">
@@ -96,9 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     </div>
   {/if}
-  <div class="grid max-w-(--breakpoint-sm) grid-cols-1 gap-4 sm:grid-cols-3">
+  <div class="grid max-w-(--breakpoint-sm) grid-cols-1 gap-4 @lg:grid-cols-3">
     {#if !message}
-      <div class="col-span-full flex flex-col gap-2 sm:col-span-2">
+      <div class="col-span-full flex flex-col gap-2 @lg:col-span-2">
         <p class="text-left text-lg font-bold">
           Do you understand and agree to the following terms and conditions?
         </p>
@@ -151,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       </div>
       <div
-        class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 sm:col-span-1"
+        class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 @lg:col-span-1"
       >
         <span class="line-clamp-4 font-bold">{locations.projectTitle}</span>
         {#if previews.active}

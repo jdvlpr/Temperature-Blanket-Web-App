@@ -100,12 +100,13 @@ class DialogClass {
     options?: DialogOptions;
   }) => {
     // Opened from a returnable dialog (like the Project menu): opens in its
-    // place, which Back returns to
+    // place, which Back returns to. Not a wide one, which needs the room.
     const fromReturnable =
       type === 'component' &&
       this.opened &&
       this.type === 'component' &&
-      Boolean(this.options.returnable);
+      Boolean(this.options.returnable) &&
+      (options?.size ?? 'small') === 'small';
     if (fromReturnable) {
       this.stack.push({
         component: this.contentComponent,
@@ -180,6 +181,8 @@ export const projectMenu = $state({ renameNext: false, exportOpen: false });
 
 /** The Project menu: a side panel, and dialogs opened from it can go back to it */
 export function openProjectMenu({ rename = false } = {}) {
+  // Already showing: nothing to open
+  if (dialog.opened && dialog.contentComponent.ref === Menu) return;
   projectMenu.renameNext = rename;
   projectMenu.exportOpen = false;
   dialog.trigger({
