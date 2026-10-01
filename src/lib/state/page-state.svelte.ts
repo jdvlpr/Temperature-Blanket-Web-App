@@ -30,14 +30,24 @@ type DialogOptions = {
   size?: 'small' | 'medium' | 'large';
   /** `side`: a panel on the right on large screens, as the Project menu */
   placement?: 'center' | 'side';
-  /** Dialogs opened from this one get a Back button to it */
+  /** Dialogs opened from this one open in its place, with a Back button to it */
   returnable?: boolean;
+  /** Shown in the dialog's header, beside its Back and Close buttons */
+  title?: string;
 };
 
 type DialogComponent = {
   ref: Component<any> | null;
   props: Record<string, any> | null;
 };
+
+/** A dialog that another was opened from, to go back to */
+type DialogView = {
+  component: DialogComponent;
+  options: DialogOptions;
+  scrollTop: number;
+};
+
 class DialogClass {
   #defaultOptions: DialogOptions = {
     showCloseButton: true,
@@ -46,7 +56,7 @@ class DialogClass {
 
   opened = $state(false);
 
-  type = $state<'component' | 'confirm' | 'choose-weather-params' | null>(null);
+  type = $state<'component' | 'confirm' | null>(null);
 
   title = $state<string | null>('');
 
@@ -64,11 +74,15 @@ class DialogClass {
     props: null,
   });
 
-  /** The returnable dialog this one was opened from, for its Back button */
-  previous = $state<{
-    component: DialogComponent;
-    options: DialogOptions;
-  } | null>(null);
+  /** The returnable dialogs this one was opened from, for its Back button */
+  stack = $state<DialogView[]>([]);
+
+  /** Which way the last change of view went, for its slide */
+  direction = $state<'forward' | 'back' | 'none'>('none');
+
+  /** The dialog's scrolling element (set by DialogProvider), so Back returns
+   * to the same place */
+  scrollElement: HTMLElement | null = null;
 
   trigger = async ({
     type,
@@ -78,21 +92,38 @@ class DialogClass {
     body,
     response,
   }: {
-    type: 'component' | 'confirm' | 'choose-weather-params';
+    type: 'component' | 'confirm';
     title?: string | null;
     body?: string | null;
     response?: any;
     component?: any;
     options?: DialogOptions;
   }) => {
-    // Opened from a returnable dialog (like the Project menu): remember it
-    this.previous =
+    // Opened from a returnable dialog (like the Project menu): opens in its
+    // place, which Back returns to
+    const fromReturnable =
       type === 'component' &&
       this.opened &&
       this.type === 'component' &&
-      this.options.returnable
-        ? { component: this.contentComponent, options: this.options }
-        : null;
+      Boolean(this.options.returnable);
+    if (fromReturnable) {
+      this.stack.push({
+        component: this.contentComponent,
+        options: this.options,
+        scrollTop: this.scrollElement?.scrollTop ?? 0,
+      });
+    } else {
+      this.stack = [];
+    }
+    this.direction = fromReturnable ? 'forward' : 'none';
+
+    // Every dialog starts from the defaults, so nothing carries over from
+    // the last one, except a panel's placement for what opens in it
+    this.options = {
+      ...this.#defaultOptions,
+      ...(fromReturnable && { placement: this.options.placement }),
+      ...options,
+    };
 
     // close the dialog
     this.close();
@@ -107,10 +138,6 @@ class DialogClass {
         ref,
         props,
       };
-
-      this.options = { ...this.#defaultOptions, ...options };
-    } else if (type === 'choose-weather-params') {
-      this.response = response || null;
     } else if (type === 'confirm') {
       this.title = title || null;
       this.body = body || null;
@@ -118,6 +145,8 @@ class DialogClass {
     }
     // Open the modal
     this.opened = true;
+    if (fromReturnable)
+      tick().then(() => this.scrollElement?.scrollTo({ top: 0 }));
   };
 
   close = () => {
@@ -126,28 +155,37 @@ class DialogClass {
 
   /** Back to the dialog this one was opened from */
   back = () => {
-    const previous = this.previous;
-    if (!previous) return;
-    this.previous = null;
+    const view = this.stack.pop();
+    if (!view) return;
+    this.direction = 'back';
     this.type = 'component';
-    this.contentComponent = previous.component;
-    this.options = previous.options;
+    this.contentComponent = view.component;
+    this.options = view.options;
     this.opened = true;
+    tick().then(() => this.scrollElement?.scrollTo({ top: view.scrollTop }));
+  };
+
+  /** Cancel: back to the dialog this one was opened from, or else close */
+  dismiss = () => {
+    if (this.stack.length) this.back();
+    else this.close();
   };
 }
 
 export const dialog = new DialogClass();
 
-/** Asks the Project menu to open with its name field, once (not on Back) */
-export const projectMenu = $state({ renameNext: false });
+/** Asks the Project menu to open with its name field, once (not on Back);
+ * and whether its Download / Export list is open, which Back keeps */
+export const projectMenu = $state({ renameNext: false, exportOpen: false });
 
 /** The Project menu: a side panel, and dialogs opened from it can go back to it */
 export function openProjectMenu({ rename = false } = {}) {
   projectMenu.renameNext = rename;
+  projectMenu.exportOpen = false;
   dialog.trigger({
     type: 'component',
     component: { ref: Menu },
-    options: { placement: 'side', returnable: true },
+    options: { placement: 'side', returnable: true, title: 'Project' },
   });
 }
 
@@ -514,6 +552,7 @@ export const handleKeyDown = (ev: KeyboardEvent) => {
         dialog.trigger({
           type: 'component',
           component: { ref: KeyboardShortcuts },
+          options: { title: 'Keyboard Shortcuts' },
         });
         break;
       case '.':

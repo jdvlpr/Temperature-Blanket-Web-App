@@ -18,6 +18,7 @@ they show the account's name (changed on the Account page), and removing them.
 Hidden until the account has a page or publishing from accounts is on. -->
 
 <script lang="ts">
+  import { ROW_FOCUS } from '$lib/constants/class-constants';
   import { resolve } from '$app/paths';
   import {
     GALLERY_PAGES_CHANGED,
@@ -59,8 +60,7 @@ Hidden until the account has a page or publishing from accounts is on. -->
   let currentName = $derived(serverName ?? name);
   let hasName = $derived(Boolean(currentName.trim()));
 
-  const ROW_LINK =
-    'hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors';
+  const ROW_LINK = `hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors ${ROW_FOCUS}`;
 
   async function load() {
     const gallery = await getGalleryPages();

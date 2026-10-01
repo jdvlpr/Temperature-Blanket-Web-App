@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronDownIcon,
     DownloadIcon,
     FilePlusIcon,
+    FileTextIcon,
     ImageIcon,
     TableIcon,
   } from '@lucide/svelte';
@@ -35,9 +36,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuList = ['pdf', 'csv', 'png', 'google-sheet'],
     buttonText = 'Download/Export',
   } = $props();
+
+  // Actions run from the Menu, not a <button> inside each item: Enter and
+  // Space click the item element itself, which a nested button never sees
+  /** @type {Record<string, () => unknown>} */
+  const actions = {
+    pdf: downloadPDF,
+    csv: downloadWeatherCSV,
+    preview: () => {
+      const active = previews.active;
+      if (!active?.width || !active?.height || !active?.svg) return;
+      downloadPreviewPNG(active.width, active.height, active.svg);
+    },
+    'google-sheet': () => {
+      dialog.trigger({
+        type: 'component',
+        component: {
+          ref: ExportToGoogleSheetModal,
+        },
+        options: { title: 'Create Google Sheet' },
+      });
+    },
+  };
+
+  const ITEM =
+    'hover:preset-tonal-surface flex h-auto items-center gap-2 text-left whitespace-pre-wrap';
 </script>
 
-<Menu positioning={{ placement: 'top' }} class="m-0 p-0">
+<Menu
+  positioning={{ placement: 'top' }}
+  class="m-0 p-0"
+  onSelect={(details) => actions[details.value]?.()}
+>
   <Menu.Trigger class="btn hover:preset-tonal-surface w-fit">
     <DownloadIcon />
     <span class="flex items-center gap-1"
@@ -48,79 +78,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Menu.Positioner>
       <Menu.Content class="bg-surface-100-900 z-9999">
         {#if menuList.includes('pdf')}
-          <Menu.Item value="pdf" class="hover:preset-tonal-surface">
-            <button
-              class="flex items-center gap-2 text-left whitespace-pre-wrap"
-              onclick={downloadPDF}
-              title="Download PDF File"
-            >
-              <DownloadIcon />
-              <div class="flex flex-col">
-                <p>Download PDF</p>
-                <p class="text-surface-700-300 text-xs">
-                  Gauges & Weather Data
-                </p>
-              </div>
-            </button>
+          <Menu.Item value="pdf" class={ITEM} title="Download PDF File">
+            <FileTextIcon />
+            <div class="flex flex-col">
+              <p>Download PDF</p>
+              <p class="text-surface-700-300 text-xs">Gauges & Weather Data</p>
+            </div>
           </Menu.Item>
         {/if}
         {#if menuList.includes('csv')}
-          <Menu.Item value="csv" class="hover:preset-tonal-surface">
-            <button
-              class="flex items-center gap-2 text-left whitespace-pre-wrap"
-              onclick={downloadWeatherCSV}
-              title="Download CSV File"
-            >
-              <TableIcon />
-              <div class="flex flex-col">
-                <p>Download CSV</p>
-                <p class="text-surface-700-300 text-xs">Weather Data</p>
-              </div>
-            </button>
+          <Menu.Item value="csv" class={ITEM} title="Download CSV File">
+            <TableIcon />
+            <div class="flex flex-col">
+              <p>Download CSV</p>
+              <p class="text-surface-700-300 text-xs">Weather Data</p>
+            </div>
           </Menu.Item>
         {/if}
         {#if previews.active?.previewComponent && menuList.includes('png')}
-          <Menu.Item value="preview" class="hover:preset-tonal-surface">
-            <button
-              class="flex h-auto items-center gap-2 text-left whitespace-pre-wrap"
-              title="Download PNG File"
-              onclick={() => {
-                const active = previews.active;
-                if (!active?.width || !active?.height || !active?.svg) return;
-                downloadPreviewPNG(active.width, active.height, active.svg);
-              }}
-            >
-              <ImageIcon />
-              <div class="flex flex-col">
-                <p>Download PNG</p>
-                <p class="text-surface-700-300 text-xs">Preview Image</p>
-              </div>
-            </button>
+          <Menu.Item value="preview" class={ITEM} title="Download PNG File">
+            <ImageIcon />
+            <div class="flex flex-col">
+              <p>Download PNG</p>
+              <p class="text-surface-700-300 text-xs">Preview Image</p>
+            </div>
           </Menu.Item>
         {/if}
         {#if menuList.includes('google-sheet')}
           <Menu.Separator />
-          <Menu.Item value="google-sheet" class="hover:preset-tonal-surface">
-            <button
-              class="flex items-center gap-2 text-left whitespace-pre-wrap"
-              onclick={() => {
-                dialog.trigger({
-                  type: 'component',
-                  component: {
-                    ref: ExportToGoogleSheetModal,
-                  },
-                });
-              }}
-              title="Create Google Sheet"
-            >
-              <FilePlusIcon />
-              <div class="flex flex-col">
-                <p>Create Google Sheet</p>
-                <p class="text-surface-700-300 text-xs">
-                  Gauges & Weather Data
-                </p>
-              </div>
-            </button>
+          <Menu.Item
+            value="google-sheet"
+            class={ITEM}
+            title="Create Google Sheet"
+          >
+            <FilePlusIcon />
+            <div class="flex flex-col">
+              <p>Create Google Sheet</p>
+              <p class="text-surface-700-300 text-xs">Gauges & Weather Data</p>
+            </div>
           </Menu.Item>
         {/if}
       </Menu.Content>

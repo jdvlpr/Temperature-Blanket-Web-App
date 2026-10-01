@@ -169,16 +169,55 @@ test.describe('My Projects', () => {
     ).toHaveCount(0);
     await page.keyboard.press('Escape');
 
-    // Save is in the top bar: it saves right away, and offers to name it
+    // Save is in the top bar: it saves right away
     await page.getByTestId('save-button').click();
     await expect(page.getByText('Saved in this browser')).toBeVisible();
     await expect(page.getByTestId('save-button')).toHaveAccessibleName('Saved');
-    await page.getByRole('button', { name: 'Name it' }).click();
-    await menu.getByLabel('Project name').fill('Austin Gift');
-    await menu.getByLabel('Project name').press('Enter');
+
+    // Its name is in the top bar too, as a field: rename it there
+    const title = page.getByTestId('top-bar-project-name');
+    await title.click();
+    // Not named yet, its location title is there to edit
+    await expect(title).toHaveValue(/Austin/);
+    await title.fill('Austin Gift');
+    await title.press('Enter');
     await expect(page.getByText('Project renamed')).toBeVisible();
+    await expect(title).toHaveValue('Austin Gift');
+    await expect(title).not.toBeFocused();
+
+    // Escape puts the name back
+    await title.click();
+    await title.fill('Not this');
+    await title.press('Escape');
+    await expect(title).toHaveValue('Austin Gift');
+
+    // Clicking away keeps it
+    await title.click();
+    await title.fill('Austin Gift 2025');
+    await page
+      .getByText('Average Temperature', { exact: true })
+      .first()
+      .click();
+    await expect(title).not.toBeFocused();
+    await title.click();
+    await title.fill('Austin Gift');
+    await title.press('Enter');
+    await expect(title).toHaveValue('Austin Gift');
+
+    // Saved, the icon beside the name says where
+    await page.getByTestId('save-button').click();
+    await expect(
+      page.getByText('Press Save after making changes'),
+    ).toBeVisible();
+    // Opening moves the focus into it
+    await expect(page.getByRole('dialog')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(
+      page.getByText('Press Save after making changes'),
+    ).toBeHidden();
 
     // ...and renames it again from the menu's project card
+    await page.getByRole('button', { name: 'Project Options' }).click();
     await menu.getByRole('button', { name: 'Rename Austin Gift' }).click();
     await menu.getByLabel('Project name').fill('Austin Blanket');
     await menu.getByLabel('Project name').press('Enter');

@@ -22,10 +22,9 @@ syncs like any other change. -->
   import { projectMenu, toast } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
-  import { storedItem } from '$lib/storage/autosave.svelte';
+  import { renameOpenProject, storedItem } from '$lib/storage/autosave.svelte';
   import {
     MAX_SAVED_PROJECT_NAME_LENGTH,
-    ProjectStorage,
     savedProjects,
   } from '$lib/storage/projects.svelte';
   import { CheckIcon, PencilIcon, XIcon } from '@lucide/svelte';
@@ -57,7 +56,7 @@ syncs like any other change. -->
     if (!id) return;
     editing = false;
     try {
-      await ProjectStorage.rename(id, name);
+      await renameOpenProject(name);
       savedName = name.trim();
       toast.trigger({
         message: savedName ? 'Project renamed' : 'Name removed',
@@ -117,7 +116,7 @@ syncs like any other change. -->
       class="text-lg leading-tight font-bold break-words"
       data-testid="project-name"
     >
-      {savedName || locations.projectTitle || 'New Project'}
+      {savedName || locations.projectTitle || 'Untitled Project'}
     </p>
     {#if id}
       <button

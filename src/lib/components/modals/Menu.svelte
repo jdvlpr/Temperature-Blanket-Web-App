@@ -16,9 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- The Project menu, about the open project only: a card with its name, save
 state and colors; a list of what to do with it; a few recent projects; a line
 of help links. Save itself is in the top bar. A side panel on large screens
-(see openProjectMenu), and dialogs opened from here have a Back button. -->
+(see openProjectMenu); dialogs opened from here open in the panel, with a Back
+button to it. -->
 
 <script lang="ts">
+  import { LIST_ENDS, ROW_FOCUS } from '$lib/constants/class-constants';
   import { browser } from '$app/environment';
   import { resolve } from '$app/paths';
   import { account } from '$lib/accounts/summary.svelte';
@@ -26,7 +28,7 @@ of help links. Save itself is in the top bar. A side panel on large screens
   import ExportToGoogleSheetModal from '$lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { locations } from '$lib/state/location-state.svelte';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { dialog, projectMenu, toast } from '$lib/state/page-state.svelte';
   import { previews } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -68,8 +70,7 @@ of help links. Save itself is in the top bar. A side panel on large screens
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
 
-  const ROW =
-    'hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors';
+  const ROW = `hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;
   const LINK = 'hover:underline opacity-80 hover:opacity-100';
 
   const hasWeather = $derived(weather.data.length > 0);
@@ -88,10 +89,13 @@ of help links. Save itself is in the top bar. A side panel on large screens
     hasProject ? getColorsFromInput({ string: project.url.href }) || [] : [],
   );
 
-  let exportOpen = $state(false);
-
-  const open = (ref: unknown) =>
-    dialog.trigger({ type: 'component', component: { ref } });
+  // Opens in the panel, in place of the menu, with Back to it
+  const open = (ref: unknown, title: string) =>
+    dialog.trigger({
+      type: 'component',
+      component: { ref },
+      options: { title },
+    });
 
   async function copyLink() {
     try {
@@ -141,19 +145,12 @@ of help links. Save itself is in the top bar. A side panel on large screens
   });
 </script>
 
-<!-- The heading shares the first line with the dialog's Close (and Back)
-buttons, which float there -->
-<h2
-  id="project-menu-heading"
-  class="px-4 pt-2 text-sm leading-10 font-bold opacity-70"
->
-  Project
-</h2>
-<div class="flex w-full flex-col gap-6 p-4 pt-0 text-left">
+<!-- Its title, Project, is in the dialog's header -->
+<div class="flex w-full flex-col gap-6 p-4 pt-2 text-left">
   <!-- This project -->
   <section
     class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-2 p-4"
-    aria-labelledby="project-menu-heading"
+    aria-label="This project"
   >
     <RenameProject />
 
@@ -199,6 +196,10 @@ buttons, which float there -->
       </p>
     {:else if hasProject}
       <p class="text-sm opacity-70">Not saved yet</p>
+    {:else if !hasWeather}
+      <p class="text-sm opacity-70">
+        Choose a location and get its weather data to start a project.
+      </p>
     {/if}
 
     {#if autosave.on && autosave.state === 'conflict'}
@@ -233,29 +234,31 @@ buttons, which float there -->
     {/if}
   </section>
 
-  <!-- What to do with it -->
-  <section aria-label="Project actions">
-    <ul
-      class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden"
-    >
-      <li>
-        <button type="button" class={ROW} onclick={copyLink}>
-          <LinkIcon class="shrink-0 opacity-70" />
-          <span class="flex flex-1 flex-col">
-            <span>Copy Link</span>
-            <span class="text-xs opacity-70"
-              >Share it or bookmark it, with all its settings</span
-            >
-          </span>
-        </button>
-      </li>
-      {#if hasWeather}
+  <!-- What to do with it: nothing until there's a project -->
+  {#if hasWeather}
+    <section aria-label="Project actions">
+      <ul
+        class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS}"
+      >
+        {#if hasProject}
+          <li>
+            <button type="button" class={ROW} onclick={copyLink}>
+              <LinkIcon class="shrink-0 opacity-70" />
+              <span class="flex flex-1 flex-col">
+                <span>Copy Link</span>
+                <span class="text-xs opacity-70"
+                  >Share it or bookmark it, with all its settings</span
+                >
+              </span>
+            </button>
+          </li>
+        {/if}
         <li>
           <button
             type="button"
             class={ROW}
-            aria-expanded={exportOpen}
-            onclick={() => (exportOpen = !exportOpen)}
+            aria-expanded={projectMenu.exportOpen}
+            onclick={() => (projectMenu.exportOpen = !projectMenu.exportOpen)}
           >
             <DownloadIcon class="shrink-0 opacity-70" />
             <span class="flex flex-1 flex-col">
@@ -267,29 +270,40 @@ buttons, which float there -->
             <ChevronDownIcon
               class={[
                 'size-4 shrink-0 opacity-50 transition-transform',
-                exportOpen && 'rotate-180',
+                projectMenu.exportOpen && 'rotate-180',
               ]}
             />
           </button>
-          {#if exportOpen}
+          {#if projectMenu.exportOpen}
             <ul class="flex flex-col pb-2 pl-8" in:safeSlide>
               <li>
                 <button type="button" class={ROW} onclick={downloadPDF}>
                   <FileTextIcon class="size-4 shrink-0 opacity-70" />
-                  <span class="flex-1">PDF: Gauges & Weather Data</span>
+                  <span class="flex flex-1 flex-col">
+                    <span>Download PDF</span>
+                    <span class="text-xs opacity-70">Gauges & Weather Data</span
+                    >
+                  </span>
+                  <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
                 </button>
               </li>
               <li>
                 <button type="button" class={ROW} onclick={downloadWeatherCSV}>
                   <TableIcon class="size-4 shrink-0 opacity-70" />
-                  <span class="flex-1">CSV: Weather Data</span>
+                  <span class="flex flex-1 flex-col">
+                    <span>Download CSV</span>
+                    <span class="text-xs opacity-70">Weather Data</span>
+                  </span>
                 </button>
               </li>
               {#if previews.active?.previewComponent}
                 <li>
                   <button type="button" class={ROW} onclick={downloadPNG}>
                     <ImageIcon class="size-4 shrink-0 opacity-70" />
-                    <span class="flex-1">PNG: Preview Image</span>
+                    <span class="flex flex-1 flex-col">
+                      <span>Download PNG</span>
+                      <span class="text-xs opacity-70">Preview Image</span>
+                    </span>
                   </button>
                 </li>
               {/if}
@@ -297,11 +311,16 @@ buttons, which float there -->
                 <button
                   type="button"
                   class={ROW}
-                  onclick={() => open(ExportToGoogleSheetModal)}
+                  onclick={() =>
+                    open(ExportToGoogleSheetModal, 'Create Google Sheet')}
                 >
                   <FilePlusIcon class="size-4 shrink-0 opacity-70" />
-                  <span class="flex-1">Google Sheet: Gauges & Weather Data</span
-                  >
+                  <span class="flex flex-1 flex-col">
+                    <span>Create Google Sheet</span>
+                    <span class="text-xs opacity-70">Gauges & Weather Data</span
+                    >
+                  </span>
+                  <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
                 </button>
               </li>
             </ul>
@@ -329,7 +348,7 @@ buttons, which float there -->
             <button
               type="button"
               class={ROW}
-              onclick={() => open(AddToGallery)}
+              onclick={() => open(AddToGallery, 'Send to Project Gallery')}
             >
               <SendIcon class="shrink-0 opacity-70" />
               <span class="flex flex-1 flex-col">
@@ -342,34 +361,39 @@ buttons, which float there -->
             </button>
           {/if}
         </li>
-      {/if}
-      {#if hasProject}
+        {#if hasProject}
+          <li>
+            <button
+              type="button"
+              class={ROW}
+              title="Save these settings as a new project, and leave this one as it is"
+              onclick={copyProject}
+            >
+              <CopyPlusIcon class="shrink-0 opacity-70" />
+              <span class="flex flex-1 flex-col">
+                <span>Save a Copy</span>
+                <span class="text-xs opacity-70"
+                  >A new project from this one, which stays as it is</span
+                >
+              </span>
+            </button>
+          </li>
+        {/if}
         <li>
-          <button
-            type="button"
-            class={ROW}
-            title="Save these settings as a new project, and leave this one as it is"
-            onclick={copyProject}
-          >
-            <CopyPlusIcon class="shrink-0 opacity-70" />
+          <a href={resolve('/')} target="_blank" class={ROW}>
+            <PlusIcon class="shrink-0 opacity-70" />
             <span class="flex flex-1 flex-col">
-              <span>Save a Copy</span>
+              <span>Start Another Project</span>
               <span class="text-xs opacity-70"
-                >A new project from this one, which stays as it is</span
+                >In a new tab, leaving this one open</span
               >
             </span>
-          </button>
+            <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+          </a>
         </li>
-      {/if}
-      <li>
-        <a href={resolve('/')} target="_blank" class={ROW}>
-          <PlusIcon class="shrink-0 opacity-70" />
-          <span class="flex-1">New Project</span>
-          <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
-        </a>
-      </li>
-    </ul>
-  </section>
+      </ul>
+    </section>
+  {/if}
 
   <!-- A few recent projects; My Projects has them all -->
   {#if recentTotal}
@@ -378,7 +402,7 @@ buttons, which float there -->
         Recent Projects
       </h2>
       <ul
-        class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden"
+        class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS}"
       >
         {#each recent as item (item.id)}
           <li>
@@ -422,12 +446,18 @@ buttons, which float there -->
     class="border-surface-200-800 flex flex-wrap gap-x-4 gap-y-1 border-t pt-4 text-sm"
     aria-label="Help"
   >
-    <button type="button" class={LINK} onclick={() => open(GettingStarted)}
+    <button
+      type="button"
+      class={LINK}
+      onclick={() => open(GettingStarted, 'Getting Started')}
       >Getting Started</button
     >
     <a href={resolve('/documentation')} class={LINK}>Documentation</a>
     <a href={resolve('/faq')} class={LINK}>FAQ</a>
-    <button type="button" class={LINK} onclick={() => open(KeyboardShortcuts)}
+    <button
+      type="button"
+      class={LINK}
+      onclick={() => open(KeyboardShortcuts, 'Keyboard Shortcuts')}
       >Keyboard Shortcuts</button
     >
     <a href={resolve('/contact')} class={LINK}>Contact</a>

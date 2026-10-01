@@ -18,6 +18,7 @@ account's details, sync and sign out; otherwise it's a way to sign in. Nothing
 when accounts are off. -->
 
 <script lang="ts">
+  import { ROW_FOCUS } from '$lib/constants/class-constants';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { account, loadAccountSummary } from '$lib/accounts/summary.svelte';
@@ -37,8 +38,7 @@ when accounts are off. -->
 
   const BUTTON =
     'hover:preset-tonal-surface inline-flex size-10 shrink-0 items-center justify-center rounded-full';
-  const ROW =
-    'hover:preset-tonal-surface flex w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50';
+  const ROW = `hover:preset-tonal-surface flex w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50 ${ROW_FOCUS}`;
 
   let open = $state(false);
   let busy = $state(false);
@@ -123,7 +123,10 @@ when accounts are off. -->
                     </div>
                   {/if}
 
-                  <div class="flex flex-col">
+                  <!-- The last row rounds its bottom corners like the card -->
+                  <div
+                    class="[&>:last-child]:rounded-b-container flex flex-col"
+                  >
                     {#if !onAccountPage}
                       <a
                         href={resolve('/account')}

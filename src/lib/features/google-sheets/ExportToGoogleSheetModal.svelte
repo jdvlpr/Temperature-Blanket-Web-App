@@ -113,9 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 p-4">
-  <h2 class="h2">Create Google Sheet</h2>
-
+<div class="flex flex-col gap-4 p-4 pt-2">
   <div class="flex flex-col gap-1">
     <h3 class="font-semibold">Weather Data</h3>
     <div class="flex flex-col gap-1">
@@ -242,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex justify-center gap-2">
     <button
       class="btn hover:preset-tonal-surface"
-      onclick={() => dialog.close()}
+      onclick={dialog.dismiss}
       disabled={isExporting}
     >
       <XIcon />

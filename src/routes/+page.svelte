@@ -28,9 +28,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import SaveButton from '$lib/components/buttons/SaveButton.svelte';
+  import ProjectTitle from '$lib/components/ProjectTitle.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import {
     dialog,
+    isDesktop,
     openProjectMenu,
     pageSections,
     toast,
@@ -164,13 +166,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex">
+    <div class="hidden shrink-0 lg:inline-flex">
       <AppLogo />
     </div>
-    <div class="flex flex-1 justify-between gap-2 sm:justify-end">
+    <div class="flex min-w-0 flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length}
+        <!-- The project's name and whether it's saved, in the space wider
+        screens have spare -->
+        {#if isDesktop.current}
+          <div class="flex min-w-0 flex-1 items-center gap-0.5 lg:ml-2">
+            <ProjectTitle />
+          </div>
+        {/if}
         <!-- One row: icon buttons on smaller screens, never wrapping -->
-        <div class="mx-auto flex shrink-0 sm:mx-0 gap-2">
+        <div class="mx-auto flex shrink-0 gap-2 sm:mx-0">
           <button
             aria-label="Undo"
             class="max-md:btn-icon md:btn hover:preset-tonal-surface"
@@ -207,7 +216,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="inline-block max-md:hidden">Redo</span>
           </button>
 
-          <SaveButton />
+          {#if !isDesktop.current}
+            <SaveButton />
+          {/if}
         </div>
       {/if}
     </div>
@@ -227,7 +238,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="mx-auto pb-18 text-center" id="main-page">
       <div
         id="page-section-location"
-        class="mx-auto scroll-mt-[76px] max-w-(--breakpoint-md)"
+        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="w-full px-2 py-4">
@@ -254,7 +265,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 px-2 md:p-4 md:shadow-lg mx-auto"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mx-auto mb-2 px-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>

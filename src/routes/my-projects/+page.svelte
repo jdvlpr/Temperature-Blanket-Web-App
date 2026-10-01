@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 and the Trash sync to the account, and palettes can be shared to the gallery. -->
 
 <script>
+  import { LIST_ENDS } from '$lib/constants/class-constants';
   import { browser } from '$app/environment';
   import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$env/static/public';
@@ -157,7 +158,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
       {#if browser && signedIn}
         <GalleryPages
           name={account.summary?.name ?? ''}
-          cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden"
+          cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS}"
         />
       {/if}
 

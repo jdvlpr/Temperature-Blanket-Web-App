@@ -18,6 +18,7 @@ and device, after signing in, and again whenever someone asks to add projects
 (`later`). Saved palettes go along unless someone chooses otherwise. -->
 
 <script lang="ts">
+  import { ROW_FOCUS } from '$lib/constants/class-constants';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import {
@@ -59,8 +60,9 @@ and device, after signing in, and again whenever someone asks to add projects
     projects = index.filter((item) => ids.includes(item.id)).reverse();
   });
 
-  const ROW =
-    'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50';
+  // The first and last rows round their own outer corners, so the first row's
+  // fill fits inside the list's border
+  const ROW = `flex w-full items-start gap-3 px-4 py-3 text-left transition-colors first:rounded-t-container last:rounded-b-container disabled:opacity-50 ${ROW_FOCUS}`;
   const ICON = 'mt-0.5 size-5 shrink-0';
   const DETAIL = 'block text-sm opacity-75';
 
@@ -159,7 +161,7 @@ and device, after signing in, and again whenever someone asks to add projects
     class="bg-surface-50 dark:bg-surface-950 sticky bottom-0 -mx-4 -mb-4 px-4 pt-2 pb-4"
   >
     <div
-      class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y overflow-hidden border"
+      class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y border"
     >
       <button
         type="button"
@@ -185,10 +187,7 @@ and device, after signing in, and again whenever someone asks to add projects
               Add all {ids.length + paletteIds.length}
             {/if}
           </span>
-          <span class={DETAIL}>
-            Saved to your account and kept up to date on every device where you
-            sign in.
-          </span>
+          <span class={DETAIL}> Synced to every device you sign in on. </span>
         </span>
       </button>
 
@@ -222,8 +221,7 @@ and device, after signing in, and again whenever someone asks to add projects
         <span class="flex-1">
           <span class="block font-bold">{later ? 'Cancel' : 'Not now'}</span>
           <span class={DETAIL}>
-            They stay only in this browser. You can add them any time from My
-            Projects or your Account page.
+            They stay in this browser. Add them later from My Projects.
           </span>
         </span>
       </button>

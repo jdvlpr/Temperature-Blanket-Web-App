@@ -14,18 +14,37 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
-  import { fly } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
+  import { prefersReducedMotion } from 'svelte/motion';
+  import { fade, fly } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
 
   // The Project menu: a panel that slides in from the right
   const side = $derived(dialog.options.placement === 'side');
+
+  // A titled dialog, or one opened from another, has a header bar
+  const hasHeader = $derived(
+    Boolean(dialog.options.title) || dialog.stack.length > 0,
+  );
+
+  // Moving between views of a dialog: a short slide, forward from the right
+  // and back from the left. Nothing for a dialog opening by itself.
+  const reduceMotion = $derived(prefersReducedMotion.current);
+  const moving = $derived(dialog.direction !== 'none' && !reduceMotion);
+  const viewFly = $derived(
+    moving
+      ? {
+          x: dialog.direction === 'back' ? -32 : 32,
+          duration: 220,
+          easing: cubicOut,
+        }
+      : { duration: 0 },
+  );
+  const viewFade = $derived({ duration: moving ? 180 : 0 });
 </script>
 
 <Dialog
@@ -53,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class={[
           'bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto max-sm:min-w-screen',
           side
-            ? 'h-dvh w-full translate-x-full opacity-0 transition transition-discrete sm:w-md data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:translate-x-full starting:data-[state=open]:opacity-0'
+            ? 'h-dvh w-full translate-x-full opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 sm:w-md starting:data-[state=open]:translate-x-full starting:data-[state=open]:opacity-0'
             : 'card shadow-xl lg:max-h-[80svh]',
           dialog.options.size === 'large'
             ? 'max-w-(--breakpoint-lg)'
@@ -66,142 +85,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if !attributes.hidden}
             <div
               {...attributes}
+              bind:this={dialog.scrollElement}
               in:fly={side ? { duration: 0 } : { y: 50, duration: 400 }}
             >
-              {#if dialog.type === 'component' && dialog.previous}
-                <button
-                  type="button"
-                  class="btn btn-sm hover:preset-tonal-surface sticky top-2 z-10 float-left ml-2"
-                  onclick={dialog.back}
-                >
-                  <ArrowLeftIcon class="size-4" />
-                  Back
-                </button>
-              {/if}
               {#if dialog.type === 'component'}
-                {#if dialog.options.showCloseButton}
-                  <Dialog.CloseTrigger
-                    class="sticky top-2 z-10 float-right mr-2"
+                {#if hasHeader}
+                  <!-- One header for every titled dialog: Back, title, Close -->
+                  <header
+                    class="bg-surface-50 dark:bg-surface-950 sticky top-0 z-10 mb-0 flex min-h-14 items-center gap-1 px-2 py-2"
                   >
-                    <CloseButton
-                      onClose={() => {
-                        dialog.close();
-                      }}
-                    />
-                  </Dialog.CloseTrigger>
+                    {#if dialog.stack.length}
+                      <button
+                        type="button"
+                        class="btn-icon hover:preset-tonal-surface"
+                        aria-label="Back"
+                        title="Back"
+                        onclick={dialog.back}
+                        in:fade={{ duration: reduceMotion ? 0 : 150 }}
+                      >
+                        <ArrowLeftIcon />
+                      </button>
+                    {/if}
+                    {#key dialog.options.title}
+                      <Dialog.Title
+                        class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
+                      >
+                        <span class="block truncate" in:fade={viewFade}
+                          >{dialog.options.title ?? ''}</span
+                        >
+                      </Dialog.Title>
+                    {/key}
+                    {#if dialog.options.showCloseButton}
+                      <CloseButton onClose={dialog.close} />
+                    {/if}
+                  </header>
+                {:else if dialog.options.showCloseButton}
+                  <div class="sticky top-2 z-10 float-right mr-2">
+                    <CloseButton onClose={dialog.close} />
+                  </div>
                 {/if}
 
                 {#if dialog.contentComponent.ref}
                   {#key dialog.contentComponent.ref}
-                    <dialog.contentComponent.ref
-                      {...dialog.contentComponent.props ?? {}}
-                    />
+                    <!-- Opened from the panel, or back to it: slides in from
+                    the way it went -->
+                    <div in:fly={viewFly}>
+                      <dialog.contentComponent.ref
+                        {...dialog.contentComponent.props ?? {}}
+                      />
+                    </div>
                   {/key}
                 {/if}
-              {:else if dialog.type === 'choose-weather-params'}
-                <div
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label={dialog.title ?? ''}
-                  class="flex flex-col gap-4 p-4"
-                >
-                  <h2 class="h2">Download PDF</h2>
-
-                  <div class="flex flex-col gap-1">
-                    <p class="font-bold">Weather Data</p>
-                    <div class="flex flex-col gap-1">
-                      {#each allGaugesAttributes as { targets }}
-                        {#each targets as { id, label }}
-                          <label class="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              name="id"
-                              class="checkbox"
-                              value={id}
-                              bind:group={weather.pdfOptions.weatherDataParams}
-                            />
-
-                            <p>{label}</p>
-                          </label>
-                        {/each}
-                      {/each}
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col gap-1">
-                    <div class="flex flex-col">
-                      <p class="font-bold">Gauges</p>
-                      <p class="text-surface-700-300 text-xs">
-                        Colors & Ranges
-                      </p>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                      {#each gauges.allCreated as { id, label }}
-                        <label class="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            name="id"
-                            class="checkbox"
-                            value={id}
-                            bind:group={weather.pdfOptions.gauges}
-                          />
-                          <p>{label}</p>
-                        </label>
-                      {/each}
-                    </div>
-                  </div>
-
-                  {#if weather.pdfOptions.gauges.length > 0}
-                    <div class="flex flex-col gap-1">
-                      <p class="font-bold">Gauge Options</p>
-                      <div class="flex flex-col gap-1">
-                        <label class="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            name="showDaysInRange"
-                            class="checkbox"
-                            bind:checked={weather.pdfOptions.showDaysInRange}
-                          />
-                          <p class="">Show number of days in ranges</p>
-                        </label>
-                      </div>
-                    </div>
-                  {/if}
-
-                  {#if previews.extraColors.length > 0}
-                    <div class="flex flex-col gap-1">
-                      <div class="flex flex-col">
-                        <p class="font-bold">Additional Colors</p>
-                        <p class="text-surface-700-300 text-xs">
-                          Accent & border colors used in the preview
-                        </p>
-                      </div>
-                      <label class="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          name="additionalColors"
-                          class="checkbox"
-                          bind:checked={weather.pdfOptions.additionalColors}
-                        />
-                        <p>Include additional colors page</p>
-                      </label>
-                    </div>
-                  {/if}
-
-                  <Dialog.CloseTrigger>
-                    <SaveAndCloseButtons
-                      saveText="Download"
-                      onSave={() => {
-                        dialog.response(true);
-                        dialog.close();
-                      }}
-                      onClose={() => {
-                        dialog.response(false);
-                        dialog.close();
-                      }}
-                    />
-                  </Dialog.CloseTrigger>
-                </div>
               {:else if dialog.type === 'confirm'}
                 <div
                   role="dialog"
@@ -215,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if dialog.body}
                     <p>{dialog.body}</p>
                   {/if}
-                  <Dialog.CloseTrigger>
+                  <div>
                     <SaveAndCloseButtons
                       saveText="Yes"
                       onSave={() => {
@@ -227,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         dialog.close();
                       }}
                     />
-                  </Dialog.CloseTrigger>
+                  </div>
                 </div>
               {/if}
             </div>

@@ -52,6 +52,7 @@ let weatherEdited = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
 let waitingSince = 0;
 let saving: Promise<void> | null = null;
+let renaming: Promise<void> | null = null;
 
 function openProjectId(): string | null {
   try {
@@ -80,6 +81,8 @@ async function isAccountProject(): Promise<boolean> {
  * or last saved. Only a save here or a download changes `updatedAt`.
  */
 async function changedElsewhere(): Promise<boolean> {
+  // A rename here changes `updatedAt` too
+  if (renaming) await renaming;
   const updatedAt = (await storedItem())?.sync?.updatedAt ?? null;
   return knownUpdatedAt !== null && updatedAt !== knownUpdatedAt;
 }
@@ -192,6 +195,25 @@ export async function saveNow() {
   saving = null;
 }
 
+/**
+ * Names the open project, or clears its name with an empty string. Its new
+ * `updatedAt` is this page's own change, not another device's.
+ */
+export async function renameOpenProject(name: string) {
+  const id = openProjectId();
+  if (!id) return;
+  const done = (async () => {
+    await ProjectStorage.rename(id, name);
+    await rememberStored();
+  })();
+  renaming = done;
+  try {
+    await done;
+  } finally {
+    if (renaming === done) renaming = null;
+  }
+}
+
 /** After pressing Save: that's now the saved project. */
 export async function projectSaved() {
   baseline = project.url.href;
@@ -288,6 +310,7 @@ export function resetAutosave() {
   weatherEdited = false;
   waitingSince = 0;
   saving = null;
+  renaming = null;
   autosave.on = false;
   autosave.state = 'saved';
   autosave.stored = false;

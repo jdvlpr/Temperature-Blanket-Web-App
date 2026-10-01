@@ -14,9 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import pdfExtraColors from '$lib/features/pdf/sections/extra-colors.svelte';
-import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
-import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
+import PdfOptions from '$lib/components/modals/PdfOptions.svelte';
 import {
   allGaugesAttributes,
   gauges,
@@ -54,31 +52,12 @@ export const getProjectParametersFromURLHash = (
     }, {});
 };
 
-export const downloadPDF = async () => {
+/** Asks what to put in the PDF, then downloads it */
+export const downloadPDF = () => {
   dialog.trigger({
-    type: 'choose-weather-params',
-    response: async (response: boolean) => {
-      if (response) {
-        await import('jspdf')
-          .then((module) => {
-            const JsPDF = module.default;
-            const doc = new JsPDF();
-            const totalPages =
-              pdfGauges.pages() +
-              pdfExtraColors.pages() +
-              pdfWeatherData.pages();
-            pdfGauges.create(doc, totalPages);
-            pdfExtraColors.create(doc, totalPages);
-            pdfWeatherData.create(doc, totalPages);
-            // Remove blank first page, ugly hack
-            doc.deletePage(1);
-            doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      }
-    },
+    type: 'component',
+    component: { ref: PdfOptions },
+    options: { title: 'Download PDF' },
   });
 };
 

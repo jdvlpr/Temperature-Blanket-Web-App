@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { LIST_ENDS, ROW_FOCUS } from '$lib/constants/class-constants';
   import { resolve } from '$app/paths';
   import {
     accountErrorMessage,
@@ -46,10 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
-  const CARD =
-    'bg-surface-50-950 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden shadow-lg';
-  const ROW =
-    'hover:preset-tonal-surface flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50';
+  const CARD = `bg-surface-50-950 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden shadow-lg ${LIST_ENDS}`;
+  const ROW = `hover:preset-tonal-surface flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50 ${ROW_FOCUS}`;
 
   let status: 'loading' | 'signed-in' | 'signed-out' | 'deleted' | 'error' =
     $state('loading');
