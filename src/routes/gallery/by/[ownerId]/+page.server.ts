@@ -18,7 +18,10 @@
 // that's been removed there.
 
 import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-import type { GalleryProjectNode } from '$lib/utils/gallery-utils';
+import type {
+  GalleryProjectNode,
+  GallerySharedPaletteNode,
+} from '$lib/utils/gallery-utils';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -30,6 +33,11 @@ const MAX_PAGES = 100;
 export type OwnerProject = Pick<
   GalleryProjectNode,
   'databaseId' | 'locations' | 'featuredImage'
+>;
+
+export type OwnerPalette = Pick<
+  GallerySharedPaletteNode,
+  'databaseId' | 'title' | 'yarnUrls'
 >;
 
 export const load: PageServerLoad = async (event) => {
@@ -46,12 +54,16 @@ export const load: PageServerLoad = async (event) => {
   const owner = await ownerPage(env.DB, event.params.ownerId);
   if (!owner) error(404, 'Not found');
 
-  return {
-    name: owner.name,
-    projects: owner.postIds.length
-      ? await fetchProjects(owner.postIds.slice(0, MAX_PAGES))
-      : [],
-  };
+  // Each list is asked for only when it has IDs: an empty `in` matches everything
+  const [projects, palettes] = await Promise.all([
+    owner.postIds.length
+      ? fetchProjects(owner.postIds.slice(0, MAX_PAGES))
+      : ([] as OwnerProject[]),
+    owner.paletteIds.length
+      ? fetchPalettes(owner.paletteIds.slice(0, MAX_PAGES))
+      : ([] as OwnerPalette[]),
+  ]);
+  return { name: owner.name, projects, palettes };
 };
 
 /** The gallery's published projects among these IDs, newest first; null if it can't be reached. */
@@ -84,6 +96,31 @@ async function fetchProjects(ids: number[]): Promise<OwnerProject[] | null> {
       : null;
   } catch (e) {
     console.error('Could not load owner gallery pages', e);
+    return null;
+  }
+}
+
+/** The gallery's shared palettes among these IDs, newest first; null if it can't be reached. */
+async function fetchPalettes(ids: number[]): Promise<OwnerPalette[] | null> {
+  try {
+    const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `query OWNER_PALETTES($ids: [ID]) {
+          palettes(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
+            nodes { databaseId title yarnUrls }
+          }
+        }`,
+        variables: { ids },
+      }),
+    });
+    const result = await response.json();
+    return response.ok && Array.isArray(result?.data?.palettes?.nodes)
+      ? result.data.palettes.nodes
+      : null;
+  } catch (e) {
+    console.error('Could not load owner palettes', e);
     return null;
   }
 }

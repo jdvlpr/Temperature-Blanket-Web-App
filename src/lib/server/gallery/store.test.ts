@@ -116,6 +116,7 @@ describe('gallery store', () => {
     expect(await ownerPage(d1, publicId!)).toEqual({
       name: 'Ada Lovelace',
       postIds: [11, 10],
+      paletteIds: [],
     });
     expect(await ownerPage(d1, 'AAAAAAAAAAAA')).toBeNull();
     await updateSettings(d1, 'u1', { showName: false });

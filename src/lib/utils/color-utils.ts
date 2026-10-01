@@ -28,7 +28,7 @@ import {
   getTitleFromLocationsMeta,
 } from '$lib/utils/project-utils.svelte';
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
-import { pluralize } from '$lib/utils/string-utils';
+import { escapeHtml, pluralize } from '$lib/utils/string-utils';
 import { getBrands } from '$lib/data/yarns/colorways.svelte';
 import chroma from 'chroma-js';
 
@@ -651,7 +651,15 @@ export const getSortedPalette = ({
   }
 };
 
+type GallerySharedPaletteSummary = {
+  __typename: 'Palette';
+  title: string;
+  yarnUrls: string;
+  databaseId: string | number;
+};
+
 type GalleryProjectSummary = {
+  __typename?: 'Project';
   projectUrl: string;
   yarnUrls: string;
   locations: string;
@@ -660,7 +668,8 @@ type GalleryProjectSummary = {
 
 export type GalleryPalette = {
   colors: Color[];
-  projectId: string | number;
+  /** The project it came from; null for a palette shared on its own */
+  projectId: string | number | null;
   schemeName: string;
 };
 
@@ -670,7 +679,8 @@ export const getPalettesFromProjects = ({
   selectedYarnId = '',
   palettesContainOnlyFilteredYarn = false,
 }: {
-  projects: GalleryProjectSummary[];
+  /** Projects, and palettes shared on their own */
+  projects: (GalleryProjectSummary | GallerySharedPaletteSummary)[];
   selectedBrandId?: string;
   selectedYarnId?: string;
   palettesContainOnlyFilteredYarn?: boolean;
@@ -678,9 +688,14 @@ export const getPalettesFromProjects = ({
   if (!projects.length) return [];
   let _palettes: GalleryPalette[] = [];
   projects.forEach((project) => {
-    const params = getProjectParametersFromURLHash(
-      new URL(project.projectUrl).hash.substring(1),
-    );
+    const sharedPalette = project.__typename === 'Palette' ? project : null;
+    const params = sharedPalette
+      ? null
+      : getProjectParametersFromURLHash(
+          new URL((project as GalleryProjectSummary).projectUrl).hash.substring(
+            1,
+          ),
+        );
 
     (JSON.parse(project.yarnUrls) as string[]).forEach((yarn_url, i) => {
       const isNotPresetScheme = allGaugesAttributes.every(
@@ -732,7 +747,6 @@ export const getPalettesFromProjects = ({
         hasSelectedBrandAndYarn &&
         colors
       ) {
-        const title = getTitleFromLocationsMeta(project.locations);
         let schemeName =
           "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
         schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
@@ -751,15 +765,20 @@ export const getPalettesFromProjects = ({
         }
         schemeName += '</p>'; // end line-clamp-1
 
-        schemeName += `<a href="/gallery/${
-          project.databaseId
-        }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+        // A shared palette has a name and no project page: the card itself
+        // opens it in the Yarn Palette Creator
+        if (sharedPalette)
+          schemeName += `<span class="line-clamp-1 font-semibold">${escapeHtml(sharedPalette.title)}</span>`;
+        else
+          schemeName += `<a href="/gallery/${
+            project.databaseId
+          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+<span class="whitespace-pre-wrap">${getTitleFromLocationsMeta((project as GalleryProjectSummary).locations)} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
         schemeName += '</div>';
 
         _palettes.push({
           colors,
-          projectId: project.databaseId,
+          projectId: sharedPalette ? null : project.databaseId,
           schemeName,
         });
       }

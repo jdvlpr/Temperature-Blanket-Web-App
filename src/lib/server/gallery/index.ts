@@ -20,9 +20,11 @@ import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$env/static/private'
 import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
 import { requireAccount } from '$lib/server/auth';
 import { PROJECT_ID_PATTERN } from '$lib/server/sync/store';
+import { cleanName } from '$lib/utils/string-utils';
 import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import {
+  countPalettesSince,
   forgetPost,
   getSettings,
   listPosts,
@@ -32,6 +34,13 @@ import {
 import { galleryApi, type GalleryApi } from './wordpress';
 
 const MAX_TITLE_LENGTH = 200;
+/** The plugin's limit too (TEMPBLANKET_PALETTE_MAX_TITLE_LENGTH) */
+export const MAX_PALETTE_TITLE_LENGTH = 80;
+/** Palettes are quick to make, so sharing them has a daily limit per account */
+export const PALETTES_PER_DAY = 20;
+const DAY = 24 * 60 * 60 * 1000;
+const MAX_PALETTE_LINK_LENGTH = 8000;
+const SAVED_PALETTE_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
 /** The WordPress gallery, reached with the shared key. */
 export function defaultGalleryApi(): GalleryApi {
@@ -135,6 +144,75 @@ export async function publishFromAccount(
       projectId,
       title,
       publishedAt: now,
+    });
+    return json({ ...response, linked: true });
+  }
+  return json(response);
+}
+
+/** A Yarn Palette Creator link on this site (`origin`), or null. */
+export function paletteLink(value: unknown, origin: string): string | null {
+  if (typeof value !== 'string' || value.length > MAX_PALETTE_LINK_LENGTH)
+    return null;
+  try {
+    const url = new URL(value);
+    return url.origin === origin && url.pathname === '/yarn' && url.search
+      ? url.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Shares a saved palette to the gallery as this user, from
+ * { paletteId, title, yarnUrl }. Accounts only: WordPress's palette route
+ * needs the owner. Its answers (400, 409 already shared, 500) come back with
+ * status 200, as for projects, adding `linked: true` once recorded.
+ */
+export async function publishPaletteFromAccount(
+  gallery: GalleryContext,
+  body: unknown,
+  origin: string,
+  now = Date.now(),
+): Promise<Response> {
+  const input = (body ?? {}) as Record<string, unknown>;
+  const title = cleanName(input.title, MAX_PALETTE_TITLE_LENGTH);
+  const yarnUrl = paletteLink(input.yarnUrl, origin);
+  if (!title || !yarnUrl)
+    return galleryError(
+      400,
+      'INVALID_REQUEST',
+      'A palette needs a name and a Yarn Palette Creator link',
+    );
+  const paletteId =
+    typeof input.paletteId === 'string' &&
+    SAVED_PALETTE_ID.test(input.paletteId)
+      ? input.paletteId
+      : '';
+
+  if (
+    (await countPalettesSince(gallery.db, gallery.userId, now - DAY)) >=
+    PALETTES_PER_DAY
+  )
+    return galleryError(
+      429,
+      'TOO_MANY_PALETTES',
+      `You can share up to ${PALETTES_PER_DAY} palettes a day`,
+    );
+
+  const response = await gallery.api.publishPalette(
+    { title, yarn_url: yarnUrl },
+    gallery.userId,
+  );
+  if (Number(response.code) === 200 && typeof response.id === 'number') {
+    await recordPost(gallery.db, gallery.userId, {
+      postId: response.id,
+      projectId: paletteId,
+      title,
+      publishedAt: now,
+      kind: 'palette',
+      link: yarnUrl,
     });
     return json({ ...response, linked: true });
   }

@@ -36,6 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CheckIcon,
     PencilIcon,
+    Share2Icon,
     Trash2Icon,
     Undo2Icon,
     XIcon,
@@ -44,10 +45,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
   // (the My Projects page), each palette is a link to the Yarn Palette Creator
+  // With onshare (My Projects, signed in), each palette can be shared to the gallery
   let {
     updateGauge,
+    onshare,
   }: {
     updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
+    onshare?: (share: {
+      paletteId: string;
+      colors: Color[];
+      name: string;
+    }) => void;
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -252,6 +260,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <PencilIcon />
               </button>
+              {#if onshare}
+                <button
+                  type="button"
+                  class="btn-icon hover:preset-tonal-surface"
+                  title="Share to the Gallery"
+                  aria-label="Share {label} to the gallery"
+                  onclick={() =>
+                    onshare({ paletteId: palette.id, colors, name: label })}
+                >
+                  <Share2Icon />
+                </button>
+              {/if}
               <button
                 type="button"
                 class="btn-icon hover:preset-tonal-surface"

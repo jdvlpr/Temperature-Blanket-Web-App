@@ -18,11 +18,18 @@
 
 import type { D1Database } from '@cloudflare/workers-types';
 
+export type GalleryPostKind = 'project' | 'palette';
+
 export type GalleryPost = {
   postId: number;
+  /** The saved project's ID, or for a palette the saved palette's */
   projectId: string;
   title: string;
   publishedAt: number;
+  /** Since migration 0007; older rows are projects */
+  kind?: GalleryPostKind;
+  /** A palette's Yarn Palette Creator link */
+  link?: string | null;
 };
 
 export type GallerySettings = {
@@ -44,10 +51,18 @@ export async function recordPost(
 ) {
   await db
     .prepare(
-      `insert or ignore into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
-       values (?, ?, ?, ?, ?)`,
+      `insert or ignore into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt", "kind", "link")
+       values (?, ?, ?, ?, ?, ?, ?)`,
     )
-    .bind(post.postId, userId, post.projectId, post.title, post.publishedAt)
+    .bind(
+      post.postId,
+      userId,
+      post.projectId,
+      post.title,
+      post.publishedAt,
+      post.kind ?? 'project',
+      post.link ?? null,
+    )
     .run();
 }
 
@@ -58,7 +73,7 @@ export async function listPosts(
 ): Promise<GalleryPost[]> {
   const { results } = await db
     .prepare(
-      `select "postId", "projectId", "title", "publishedAt" from "galleryPost"
+      `select "postId", "projectId", "title", "publishedAt", "kind", "link" from "galleryPost"
        where "userId" = ? order by "publishedAt" desc`,
     )
     .bind(userId)
@@ -79,6 +94,22 @@ export async function ownsPost(
     .bind(postId, userId)
     .first();
   return row !== null;
+}
+
+/** How many palettes the user has shared since this time (a daily limit). */
+export async function countPalettesSince(
+  db: D1Database,
+  userId: string,
+  since: number,
+): Promise<number> {
+  const row = await db
+    .prepare(
+      `select count(*) as "count" from "galleryPost"
+       where "userId" = ? and "kind" = 'palette' and "publishedAt" >= ?`,
+    )
+    .bind(userId, since)
+    .first<{ count: number }>();
+  return row?.count ?? 0;
 }
 
 export async function forgetPost(
@@ -198,11 +229,15 @@ export async function ownerForPost(
   return row ? { name: row.name.trim(), publicId: row.publicId } : null;
 }
 
-/** An owner's page: their name and gallery pages, newest first, or null. */
+/** An owner's page: their name and gallery pages (projects and palettes), newest first, or null. */
 export async function ownerPage(
   db: D1Database,
   publicId: string,
-): Promise<{ name: string; postIds: number[] } | null> {
+): Promise<{
+  name: string;
+  postIds: number[];
+  paletteIds: number[];
+} | null> {
   const owner = await db
     .prepare(
       `select "user"."id" as "userId", "user"."name" as "name" from "galleryOwner"
@@ -213,5 +248,11 @@ export async function ownerPage(
     .first<{ userId: string; name: string }>();
   if (!owner) return null;
   const posts = await listPosts(db, owner.userId);
-  return { name: owner.name.trim(), postIds: posts.map((p) => p.postId) };
+  const ids = (kind: GalleryPostKind) =>
+    posts.filter((p) => (p.kind ?? 'project') === kind).map((p) => p.postId);
+  return {
+    name: owner.name.trim(),
+    postIds: ids('project'),
+    paletteIds: ids('palette'),
+  };
 }

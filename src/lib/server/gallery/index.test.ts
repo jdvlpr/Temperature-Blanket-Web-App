@@ -1,8 +1,11 @@
 import { createTestD1 } from '$lib/server/test-d1';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  paletteLink,
+  PALETTES_PER_DAY,
   projectIdFromLink,
   publishFromAccount,
+  publishPaletteFromAccount,
   releaseGalleryPosts,
   type GalleryContext,
 } from './index';
@@ -99,6 +102,8 @@ describe('publishFromAccount', () => {
         projectId: 'p1',
         title: 'Somewhere from 2025 to 2026',
         publishedAt: 1234,
+        kind: 'project',
+        link: null,
       },
     ]);
   });
@@ -217,5 +222,100 @@ describe('galleryApi.trash', () => {
     expect(await api.trash(1, 'u1')).toBe('ok');
     expect(await api.trash(1, 'u1')).toBe('gone');
     await expect(api.trash(1, 'u1')).rejects.toThrow();
+  });
+});
+
+describe('sharing a palette', () => {
+  const origin = 'https://temperature-blanket.com';
+  const link = `${origin}/yarn?s=ff0000abc-def&v=6`;
+
+  it("only takes this site's Yarn Palette Creator links", () => {
+    expect(paletteLink(link, origin)).toBe(link);
+    expect(paletteLink(`${origin}/yarn`, origin)).toBeNull();
+    expect(paletteLink(`${origin}/gallery?s=x`, origin)).toBeNull();
+    expect(paletteLink('https://evil.example/yarn?s=x', origin)).toBeNull();
+    expect(paletteLink('javascript:alert(1)', origin)).toBeNull();
+    expect(paletteLink(42, origin)).toBeNull();
+  });
+
+  it('sends a cleaned name as the user and records the palette', async () => {
+    const { d1, gallery, calls } = await setup(() =>
+      answered({ code: 200, message: 'Success!', id: 91, title: 'Autumn' }),
+    );
+    const response = await publishPaletteFromAccount(
+      gallery,
+      { paletteId: 'pal-1', title: ' Autumn\u202e ', yarnUrl: link },
+      origin,
+      1000,
+    );
+    expect(await response.json()).toMatchObject({ id: 91, linked: true });
+    expect(calls[0].url).toBe(
+      'https://wp.example/wp-json/tbgalleryapi/v1/palette',
+    );
+    expect(calls[0].headers['Project-Owner-Id']).toBe('u1');
+    expect(JSON.parse(calls[0].body)).toEqual({
+      title: 'Autumn',
+      yarn_url: link,
+    });
+    expect(await listPosts(d1, 'u1')).toEqual([
+      {
+        postId: 91,
+        projectId: 'pal-1',
+        title: 'Autumn',
+        publishedAt: 1000,
+        kind: 'palette',
+        link,
+      },
+    ]);
+  });
+
+  it('refuses a missing name or link before calling WordPress', async () => {
+    const { gallery, calls } = await setup(() => answered({ code: 200 }));
+    for (const body of [
+      { title: '  ', yarnUrl: link },
+      { title: 'Autumn', yarnUrl: 'https://evil.example/yarn?s=x' },
+    ]) {
+      const response = await publishPaletteFromAccount(gallery, body, origin);
+      expect(response.status).toBe(400);
+    }
+    expect(calls).toHaveLength(0);
+  });
+
+  it('passes WordPress answers through and records nothing', async () => {
+    const { d1, gallery } = await setup(() =>
+      answered(
+        { code: 409, message: 'This palette is already in the gallery.' },
+        409,
+      ),
+    );
+    const response = await publishPaletteFromAccount(
+      gallery,
+      { title: 'Autumn', yarnUrl: link },
+      origin,
+    );
+    expect(await response.json()).toMatchObject({ code: 409 });
+    expect(await listPosts(d1, 'u1')).toEqual([]);
+  });
+
+  it('allows a limited number a day', async () => {
+    const { d1, gallery, calls } = await setup(() => answered({ code: 200 }));
+    const now = 10 * 24 * 60 * 60 * 1000;
+    for (let i = 0; i < PALETTES_PER_DAY; i++)
+      await recordPost(d1, 'u1', {
+        postId: 500 + i,
+        projectId: '',
+        title: 'P',
+        publishedAt: now - 60_000,
+        kind: 'palette',
+        link,
+      });
+    const response = await publishPaletteFromAccount(
+      gallery,
+      { title: 'One more', yarnUrl: link },
+      origin,
+      now,
+    );
+    expect(response.status).toBe(429);
+    expect(calls).toHaveLength(0);
   });
 });

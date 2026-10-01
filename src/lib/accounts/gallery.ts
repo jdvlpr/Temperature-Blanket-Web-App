@@ -17,10 +17,17 @@
 
 export type GalleryPage = {
   postId: number;
+  /** The saved project, or for a palette the saved palette */
   projectId: string;
   title: string;
   publishedAt: number;
+  kind?: 'project' | 'palette';
+  /** A palette's Yarn Palette Creator link */
+  link?: string | null;
 };
+
+/** Fired on window when the account's gallery pages change, so lists reload. */
+export const GALLERY_PAGES_CHANGED = 'tb:gallery-pages-changed';
 
 export type GallerySettings = {
   showName: boolean;
@@ -88,4 +95,46 @@ export async function publishFromAccount(
   if (response.ok)
     return { status: 'answered', response: await response.json() };
   return { status: 'fallback' };
+}
+
+export type SharePaletteResult =
+  { status: 'shared' } | { status: 'error'; message: string };
+
+/** Shares a saved palette to the gallery as the signed-in user. */
+export async function sharePalette(palette: {
+  paletteId: string;
+  title: string;
+  yarnUrl: string;
+}): Promise<SharePaletteResult> {
+  let response: Response;
+  try {
+    response = await fetch(`${PATH}/palettes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(palette),
+    });
+  } catch {
+    return {
+      status: 'error',
+      message: 'Check your connection and try again.',
+    };
+  }
+  const data = await response.json().catch(() => null);
+  if (response.status === 401)
+    return { status: 'error', message: 'Sign in again, then try again.' };
+  if (response.status === 503)
+    return {
+      status: 'error',
+      message: 'Sharing to the gallery is paused right now. Try again later.',
+    };
+  if (!response.ok || Number(data?.code) !== 200)
+    return {
+      status: 'error',
+      message:
+        typeof data?.message === 'string' && data.message
+          ? data.message
+          : 'The palette couldn’t be shared. Try again later.',
+    };
+  window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+  return { status: 'shared' };
 }

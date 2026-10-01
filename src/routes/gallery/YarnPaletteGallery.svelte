@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { PopularProject } from '$lib/utils/gallery-utils';
   import {
     fetchPopularProjects,
-    fetchProjects,
+    fetchPaletteGallery,
     recordPageView,
   } from '$lib/utils/gallery-utils';
   import type { GalleryPalette } from '$lib/utils/color-utils';
@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     if (!yarnPaletteGalleryState.projects.length) {
       loading = true;
-      let results = await fetchProjects({
+      let results = await fetchPaletteGallery({
         first,
         after: endCursor,
         search: yarnPaletteGalleryState.search,
@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         brandId: yarnPaletteGalleryState.filteredBrandId,
         yarnId: yarnPaletteGalleryState.filteredYarnId,
       });
-      let results = await fetchProjects({
+      let results = await fetchPaletteGallery({
         search: yarnPaletteGalleryState.search,
         order: yarnPaletteGalleryState.orderBy,
         yarn: yarnSearch,
@@ -271,7 +271,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             onclick={async () => {
               yarnPageState.gauge.colors = colors;
-              await recordPageView(projectId);
+              if (projectId) await recordPageView(projectId);
             }}
             href="/yarn"
             class="flex w-full flex-col gap-y-1 text-left"
@@ -291,7 +291,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-surface-700-300 text-xl font-semibold">
           All Yarn Palettes
         </p>
-        <p class="text-sm">Palettes from all user-created projects</p>
+        <p class="text-sm">
+          Palettes from user-created projects, and palettes people shared
+        </p>
       </div>
       <div class="grid w-full grid-cols-12 items-end gap-4">
         <div class="col-span-12 w-full md:col-span-5">
@@ -327,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <div class="label col-span-12 w-full md:col-span-3">
-          <span class="label-text"> Search Projects </span>
+          <span class="label-text"> Search </span>
           <div class="input-group grid-cols-[auto_1fr_auto]">
             <span class="ig-cell"><EarthIcon /></span>
             <input
@@ -376,7 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a
           onclick={async () => {
             yarnPageState.gauge.colors = colors;
-            await recordPageView(projectId);
+            if (projectId) await recordPageView(projectId);
           }}
           href="/yarn"
           class="flex w-full flex-col gap-y-1 text-left"
@@ -401,7 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               brandId: yarnPaletteGalleryState.filteredBrandId,
               yarnId: yarnPaletteGalleryState.filteredYarnId,
             });
-            let results = await fetchProjects({
+            let results = await fetchPaletteGallery({
               first,
               after: endCursor,
               search: yarnPaletteGalleryState.search,

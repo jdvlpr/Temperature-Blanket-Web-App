@@ -13,13 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Gallery pages published from this account, on the My Projects page: whether
+<!-- Gallery pages and palettes published from this account, on the My Projects page: whether
 they show the account's name (changed on the Account page), and removing them.
 Hidden until the account has a page or publishing from accounts is on. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
   import {
+    GALLERY_PAGES_CHANGED,
     getGalleryPages,
     removeGalleryPage,
     type GalleryPage,
@@ -29,6 +30,7 @@ Hidden until the account has a page or publishing from accounts is on. -->
     ExternalLinkIcon,
     ImageIcon,
     LoaderCircleIcon,
+    PaletteIcon,
     Trash2Icon,
     UserRoundIcon,
   } from '@lucide/svelte';
@@ -71,7 +73,26 @@ Hidden until the account has a page or publishing from accounts is on. -->
     loaded = true;
   }
 
-  onMount(load);
+  onMount(() => {
+    load();
+    // A palette shared from this page shows up without a reload
+    window.addEventListener(GALLERY_PAGES_CHANGED, load);
+    return () => window.removeEventListener(GALLERY_PAGES_CHANGED, load);
+  });
+
+  const isPalette = (page: GalleryPage) => page.kind === 'palette';
+
+  /** Where a row links: the project's gallery page, or the palette's Yarn Palette Creator link on this site. */
+  function pageHref(page: GalleryPage) {
+    if (!isPalette(page))
+      return resolve('/gallery/[id]', { id: String(page.postId) });
+    try {
+      const url = new URL(page.link ?? '');
+      return `${url.pathname}${url.search}`;
+    } catch {
+      return `${resolve('/gallery')}?view=yarn-palettes`;
+    }
+  }
 
   async function remove(postId: number) {
     busy = true;
@@ -95,8 +116,8 @@ Hidden until the account has a page or publishing from accounts is on. -->
   <section class="flex flex-col gap-2" aria-labelledby="gallery-pages">
     <h2 id="gallery-pages" class="h3">My Public Gallery Pages</h2>
     <p class="text-sm opacity-70">
-      Projects you add to the public Project Gallery while signed in. Anyone can
-      see these pages.
+      Projects and palettes you add to the public gallery while signed in.
+      Anyone can see them.
     </p>
     <div class={cardClass}>
       <div
@@ -132,17 +153,23 @@ Hidden until the account has a page or publishing from accounts is on. -->
           {#each pages as page (page.postId)}
             <li class="flex flex-col gap-2 px-4 py-3">
               <div class="flex items-center gap-3">
-                <ImageIcon class="shrink-0 opacity-70" />
+                {#if isPalette(page)}
+                  <PaletteIcon class="shrink-0 opacity-70" />
+                {:else}
+                  <ImageIcon class="shrink-0 opacity-70" />
+                {/if}
                 <div class="flex min-w-0 flex-1 flex-col">
+                  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
                   <a
-                    href={resolve('/gallery/[id]', { id: String(page.postId) })}
+                    href={pageHref(page)}
                     target="_blank"
                     class="link line-clamp-2 break-words"
                     >{page.title}
                     <ExternalLinkIcon class="inline size-4" /></a
                   >
                   <span class="text-sm opacity-70"
-                    >Published {publishedOn(page.publishedAt)}</span
+                    >{isPalette(page) ? 'Palette, shared' : 'Published'}
+                    {publishedOn(page.publishedAt)}</span
                   >
                 </div>
                 {#if confirming !== page.postId}
@@ -159,8 +186,13 @@ Hidden until the account has a page or publishing from accounts is on. -->
               {#if confirming === page.postId}
                 <div class="flex flex-col gap-2" in:safeSlide>
                   <p class="text-sm">
-                    Remove this page from the gallery? It also comes off the
-                    globe. Your project stays saved.
+                    {#if isPalette(page)}
+                      Remove this palette from the gallery? Your saved palette
+                      stays.
+                    {:else}
+                      Remove this page from the gallery? It also comes off the
+                      globe. Your project stays saved.
+                    {/if}
                   </p>
                   <div class="flex flex-wrap gap-2">
                     <button
@@ -185,8 +217,8 @@ Hidden until the account has a page or publishing from accounts is on. -->
         </ul>
       {:else}
         <p class="px-4 py-3 text-sm opacity-70">
-          Projects you add to the gallery while signed in show up here, so you
-          can remove them later.
+          Projects and palettes you add to the gallery while signed in show up
+          here, so you can remove them later.
         </p>
       {/if}
       {#if errorMessage}

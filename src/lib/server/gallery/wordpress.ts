@@ -54,8 +54,17 @@ export function galleryApi({ baseUrl, key, fetch }: GalleryApiConfig) {
       return response.json();
     },
 
+    /** Shares a palette ({ title, yarn_url }) as this owner; accounts only. */
+    async publishPalette(
+      payload: { title: string; yarn_url: string },
+      ownerId: string,
+    ): Promise<PublishResponse> {
+      const response = await post('/palette', JSON.stringify(payload), ownerId);
+      return response.json();
+    },
+
     /**
-     * Moves the owner's page to the trash. 'gone' when WordPress has no such page
+     * Moves the owner's page (a project or a palette) to the trash. 'gone' when WordPress has no such page
      * for this owner (already removed by hand, say), so the app can forget it.
      */
     async trash(postId: number, ownerId: string): Promise<'ok' | 'gone'> {

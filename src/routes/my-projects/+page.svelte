@@ -13,8 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Everything someone has saved, in one place. Signed in, projects sync to
-the account; palettes and the Trash stay in this browser. -->
+<!-- Everything someone has saved, in one place. Signed in, projects, palettes
+and the Trash sync to the account, and palettes can be shared to the gallery. -->
 
 <script>
   import { browser } from '$app/environment';
@@ -28,6 +28,7 @@ the account; palettes and the Trash stay in this browser. -->
   import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import SavedPalettes from '$lib/components/SavedPalettes.svelte';
+  import SharePalette from '$lib/components/modals/SharePalette.svelte';
   import Trash from '$lib/components/Trash.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { savedPalettes } from '$lib/storage/palettes.svelte';
@@ -125,7 +126,15 @@ the account; palettes and the Trash stay in this browser. -->
           {#if synced}
             <AddToAccountButton kind="palettes" />
           {/if}
-          <SavedPalettes />
+          <SavedPalettes
+            onshare={signedIn
+              ? (props) =>
+                  dialog.trigger({
+                    type: 'component',
+                    component: { ref: SharePalette, props },
+                  })
+              : undefined}
+          />
         {/if}
       </section>
 
