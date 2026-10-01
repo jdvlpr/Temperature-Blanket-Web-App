@@ -54,6 +54,7 @@ button to it. -->
     ExternalLinkIcon,
     FolderOpenIcon,
     LinkIcon,
+    LogInIcon,
     MonitorIcon,
     MonitorXIcon,
     PlusIcon,
@@ -215,6 +216,17 @@ button to it. -->
       <p class="text-sm opacity-70">
         Choose a location and get its weather data to start a project.
       </p>
+      <!-- Signed out: their account's projects are a sign-in away -->
+      {#if __ACCOUNTS_ENABLED__ && !account.summary?.id}
+        <a
+          href={resolve('/account')}
+          class="btn preset-tonal-primary self-start"
+          data-testid="menu-sign-in"
+        >
+          <LogInIcon />
+          Sign In
+        </a>
+      {/if}
     {/if}
 
     {#if problem && autosave.state === 'conflict'}
