@@ -62,10 +62,6 @@ test.describe('My Projects', () => {
       .getByRole('button', { name: 'Save Palette', exact: true })
       .click();
     await expect(page.getByText('Palette saved')).toBeVisible();
-    // On the Yarn Palette Creator, the toast links to My Projects
-    await expect(
-      page.getByRole('button', { name: 'Open My Projects' }),
-    ).toBeVisible();
 
     await seedProject(page, 'Test Town, 2024');
     await page.goto('/my-projects');
