@@ -352,14 +352,13 @@ button to it. -->
           </li>
         {/each}
         <li>
-          <a href={resolve('/my-projects')} target="_blank" class={ROW}>
+          <a href={resolve('/my-projects')} class={ROW}>
             <FolderOpenIcon class="shrink-0 opacity-70" />
             <span class="flex-1"
               >{recentTotal > recent.length
                 ? `All ${recentTotal} Projects`
                 : 'My Projects'}</span
             >
-            <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
           </a>
         </li>
       </ul>

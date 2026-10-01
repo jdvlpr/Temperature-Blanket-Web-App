@@ -23,8 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { svgToPNG } from '$lib/utils/preview-utils.svelte';
   import { account } from '$lib/accounts/summary.svelte';
   import { ExternalLinkIcon } from '@lucide/svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { onMount } from 'svelte';
   import StickyPart from './StickyPart.svelte';
+
+  // In the Project menu's narrow panel: one column, not three
+  const inPanel = $derived(dialog.options.placement === 'side');
 
   let submitting = $state(false),
     message = $state<{ text: string; icon: 'spinner' | 'none' } | undefined>();
@@ -82,9 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<!-- Columns by its own width: one in the Project menu's panel, three in a
-wider dialog -->
-<div class="@container w-full p-4 pt-2 text-center">
+<div class="w-full p-4 pt-2 text-center">
   {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
     <div class="card preset-filled-surface-100-900 mt-4 p-4 text-center">
       <p class="my-2">
@@ -98,9 +100,17 @@ wider dialog -->
       </p>
     </div>
   {/if}
-  <div class="grid max-w-(--breakpoint-sm) grid-cols-1 gap-4 @lg:grid-cols-3">
+  <div
+    class="grid max-w-(--breakpoint-sm) grid-cols-1 gap-4 {inPanel
+      ? ''
+      : 'sm:grid-cols-3'}"
+  >
     {#if !message}
-      <div class="col-span-full flex flex-col gap-2 @lg:col-span-2">
+      <div
+        class="col-span-full flex flex-col gap-2 {inPanel
+          ? ''
+          : 'sm:col-span-2'}"
+      >
         <p class="text-left text-lg font-bold">
           Do you understand and agree to the following terms and conditions?
         </p>
@@ -153,7 +163,9 @@ wider dialog -->
         {/if}
       </div>
       <div
-        class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 @lg:col-span-1"
+        class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 {inPanel
+          ? ''
+          : 'sm:col-span-1'}"
       >
         <span class="line-clamp-4 font-bold">{locations.projectTitle}</span>
         {#if previews.active}

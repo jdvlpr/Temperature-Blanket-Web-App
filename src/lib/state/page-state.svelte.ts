@@ -193,6 +193,8 @@ export function openProjectMenu({ rename = false } = {}) {
   // Already showing: nothing to open
   if (dialog.opened && dialog.contentComponent.ref === Menu) return;
   projectMenu.renameNext = rename;
+  // Fresh, not on top of a screen it opened
+  dialog.close();
   dialog.trigger({
     type: 'component',
     component: { ref: Menu },
