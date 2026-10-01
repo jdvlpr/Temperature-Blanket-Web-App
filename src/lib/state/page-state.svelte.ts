@@ -146,8 +146,15 @@ class DialogClass {
     }
     // Open the modal
     this.opened = true;
+    // A new screen in the panel: from its top, with the focus on Back (the
+    // button that opened it is gone)
     if (fromReturnable)
-      tick().then(() => this.scrollElement?.scrollTo({ top: 0 }));
+      tick().then(() => {
+        this.scrollElement?.scrollTo({ top: 0 });
+        this.scrollElement
+          ?.querySelector<HTMLElement>('[data-dialog-back]')
+          ?.focus({ preventScroll: true });
+      });
   };
 
   close = () => {
@@ -163,7 +170,10 @@ class DialogClass {
     this.contentComponent = view.component;
     this.options = view.options;
     this.opened = true;
-    tick().then(() => this.scrollElement?.scrollTo({ top: view.scrollTop }));
+    tick().then(() => {
+      this.scrollElement?.scrollTo({ top: view.scrollTop });
+      this.scrollElement?.focus({ preventScroll: true });
+    });
   };
 
   /** Cancel: back to the dialog this one was opened from, or else close */
@@ -175,16 +185,14 @@ class DialogClass {
 
 export const dialog = new DialogClass();
 
-/** Asks the Project menu to open with its name field, once (not on Back);
- * and whether its Download / Export list is open, which Back keeps */
-export const projectMenu = $state({ renameNext: false, exportOpen: false });
+/** Asks the Project menu to open with its name field, once (not on Back) */
+export const projectMenu = $state({ renameNext: false });
 
 /** The Project menu: a side panel, and dialogs opened from it can go back to it */
 export function openProjectMenu({ rename = false } = {}) {
   // Already showing: nothing to open
   if (dialog.opened && dialog.contentComponent.ref === Menu) return;
   projectMenu.renameNext = rename;
-  projectMenu.exportOpen = false;
   dialog.trigger({
     type: 'component',
     component: { ref: Menu },

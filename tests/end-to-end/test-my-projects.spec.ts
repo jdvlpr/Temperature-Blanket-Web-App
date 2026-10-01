@@ -228,6 +228,23 @@ test.describe('My Projects', () => {
     await menu.getByRole('button', { name: 'Keyboard Shortcuts' }).click();
     await menu.getByRole('button', { name: 'Back' }).click();
     await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
+
+    // Download / Export is a screen of its own, and PDF one over that: Cancel
+    // and Back step back out to the menu
+    await menu.getByRole('button', { name: /Download \/ Export/ }).click();
+    await expect(
+      menu.getByRole('heading', { name: 'Download / Export' }),
+    ).toBeVisible();
+    await menu.getByRole('button', { name: /^PDF/ }).click();
+    await expect(
+      menu.getByRole('heading', { name: 'Download PDF' }),
+    ).toBeVisible();
+    await menu.getByText('Cancel').click();
+    await expect(
+      menu.getByRole('heading', { name: 'Download / Export' }),
+    ).toBeVisible();
+    await menu.getByRole('button', { name: 'Back' }).click();
+    await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
     await page.keyboard.press('Escape');
 
     // Opened from My Projects, it loads with its saved weather

@@ -20,16 +20,13 @@ of help links. Save itself is in the top bar. A side panel on large screens
 button to it. -->
 
 <script lang="ts">
-  import { LIST_ENDS, ROW_FOCUS } from '$lib/constants/class-constants';
+  import { PANEL_LIST, PANEL_ROW } from '$lib/constants/class-constants';
   import { browser } from '$app/environment';
   import { resolve } from '$app/paths';
   import { account } from '$lib/accounts/summary.svelte';
   import RenameProject from '$lib/components/RenameProject.svelte';
-  import ExportToGoogleSheetModal from '$lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { locations } from '$lib/state/location-state.svelte';
-  import { dialog, projectMenu, toast } from '$lib/state/page-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { autosave, saveCopy } from '$lib/storage/autosave.svelte';
@@ -40,38 +37,30 @@ button to it. -->
   } from '$lib/storage/projects.svelte';
   import { sync } from '$lib/sync/status.svelte';
   import { getColorsFromInput } from '$lib/utils/color-utils';
-  import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
   import {
-    downloadPDF,
-    downloadWeatherCSV,
-  } from '$lib/utils/project-utils.svelte';
-  import {
-    ChevronDownIcon,
     ChevronRightIcon,
     CloudAlertIcon,
     CloudCheckIcon,
     CopyPlusIcon,
     DownloadIcon,
     ExternalLinkIcon,
-    FilePlusIcon,
-    FileTextIcon,
     FolderOpenIcon,
-    ImageIcon,
     LinkIcon,
     LoaderCircleIcon,
     MonitorIcon,
     PlusIcon,
     RefreshCwIcon,
     SendIcon,
-    TableIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import AddToGallery from './AddToGallery.svelte';
+  import ExportOptions from './ExportOptions.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
 
-  const ROW = `hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;
+  const ROW = PANEL_ROW;
   const LINK = 'hover:underline opacity-80 hover:opacity-100';
+  const LINK_ICON = 'inline size-3 opacity-60';
 
   const hasWeather = $derived(weather.data.length > 0);
   const hasProject = $derived(hasWeather && locations.allValid);
@@ -89,12 +78,13 @@ button to it. -->
     hasProject ? getColorsFromInput({ string: project.url.href }) || [] : [],
   );
 
-  // Opens in the panel, in place of the menu, with Back to it
-  const open = (ref: unknown, title: string) =>
+  // Opens in the panel, in place of the menu, with Back to it; a returnable
+  // screen opens what's chosen on it in its place too
+  const open = (ref: unknown, title: string, returnable = false) =>
     dialog.trigger({
       type: 'component',
       component: { ref },
-      options: { title },
+      options: { title, returnable },
     });
 
   async function copyLink() {
@@ -121,12 +111,6 @@ button to it. -->
       console.warn("Can't save a copy", { e });
       toast.trigger({ message: 'Unable to save a copy', category: 'error' });
     }
-  }
-
-  function downloadPNG() {
-    const active = previews.active;
-    if (!active?.width || !active?.height || !active?.svg) return;
-    downloadPreviewPNG(active.width, active.height, active.svg);
   }
 
   // A few recent projects, not counting this one
@@ -237,9 +221,7 @@ button to it. -->
   <!-- What to do with it: nothing until there's a project -->
   {#if hasWeather}
     <section aria-label="Project actions">
-      <ul
-        class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS}"
-      >
+      <ul class={PANEL_LIST}>
         {#if hasProject}
           <li>
             <button type="button" class={ROW} onclick={copyLink}>
@@ -257,8 +239,7 @@ button to it. -->
           <button
             type="button"
             class={ROW}
-            aria-expanded={projectMenu.exportOpen}
-            onclick={() => (projectMenu.exportOpen = !projectMenu.exportOpen)}
+            onclick={() => open(ExportOptions, 'Download / Export', true)}
           >
             <DownloadIcon class="shrink-0 opacity-70" />
             <span class="flex flex-1 flex-col">
@@ -267,68 +248,12 @@ button to it. -->
                 >PDF, CSV, PNG or Google Sheets</span
               >
             </span>
-            <ChevronDownIcon
-              class={[
-                'size-4 shrink-0 opacity-50 transition-transform',
-                projectMenu.exportOpen && 'rotate-180',
-              ]}
-            />
+            <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
           </button>
-          {#if projectMenu.exportOpen}
-            <ul class="flex flex-col pb-2 pl-8" in:safeSlide>
-              <li>
-                <button type="button" class={ROW} onclick={downloadPDF}>
-                  <FileTextIcon class="size-4 shrink-0 opacity-70" />
-                  <span class="flex flex-1 flex-col">
-                    <span>Download PDF</span>
-                    <span class="text-xs opacity-70">Gauges & Weather Data</span
-                    >
-                  </span>
-                  <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
-                </button>
-              </li>
-              <li>
-                <button type="button" class={ROW} onclick={downloadWeatherCSV}>
-                  <TableIcon class="size-4 shrink-0 opacity-70" />
-                  <span class="flex flex-1 flex-col">
-                    <span>Download CSV</span>
-                    <span class="text-xs opacity-70">Weather Data</span>
-                  </span>
-                </button>
-              </li>
-              {#if previews.active?.previewComponent}
-                <li>
-                  <button type="button" class={ROW} onclick={downloadPNG}>
-                    <ImageIcon class="size-4 shrink-0 opacity-70" />
-                    <span class="flex flex-1 flex-col">
-                      <span>Download PNG</span>
-                      <span class="text-xs opacity-70">Preview Image</span>
-                    </span>
-                  </button>
-                </li>
-              {/if}
-              <li>
-                <button
-                  type="button"
-                  class={ROW}
-                  onclick={() =>
-                    open(ExportToGoogleSheetModal, 'Create Google Sheet')}
-                >
-                  <FilePlusIcon class="size-4 shrink-0 opacity-70" />
-                  <span class="flex flex-1 flex-col">
-                    <span>Create Google Sheet</span>
-                    <span class="text-xs opacity-70">Gauges & Weather Data</span
-                    >
-                  </span>
-                  <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
-                </button>
-              </li>
-            </ul>
-          {/if}
         </li>
         <li>
           {#if hasGalleryPage}
-            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the gallery page's own address -->
+            <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
             <a
               href={project.gallery.href}
               target="_blank"
@@ -344,6 +269,7 @@ button to it. -->
               </span>
               <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
             </a>
+            <!-- eslint-enable svelte/no-navigation-without-resolve -->
           {:else}
             <button
               type="button"
@@ -401,12 +327,10 @@ button to it. -->
       <h2 id="recent-projects" class="text-sm font-bold opacity-70">
         Recent Projects
       </h2>
-      <ul
-        class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS}"
-      >
+      <ul class={PANEL_LIST}>
         {#each recent as item (item.id)}
           <li>
-            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the saved project's address -->
+            <!-- eslint-disable svelte/no-navigation-without-resolve -- the saved project's address -->
             <a
               href={item.meta.href}
               target="_blank"
@@ -424,17 +348,18 @@ button to it. -->
               </span>
               <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
             </a>
+            <!-- eslint-enable svelte/no-navigation-without-resolve -->
           </li>
         {/each}
         <li>
-          <a href={resolve('/my-projects')} class={ROW}>
+          <a href={resolve('/my-projects')} target="_blank" class={ROW}>
             <FolderOpenIcon class="shrink-0 opacity-70" />
             <span class="flex-1"
               >{recentTotal > recent.length
                 ? `All ${recentTotal} Projects`
                 : 'My Projects'}</span
             >
-            <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
+            <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
           </a>
         </li>
       </ul>
@@ -452,17 +377,23 @@ button to it. -->
       onclick={() => open(GettingStarted, 'Getting Started')}
       >Getting Started</button
     >
-    <a href={resolve('/documentation')} class={LINK}>Documentation</a>
-    <a href={resolve('/faq')} class={LINK}>FAQ</a>
+    <a href={resolve('/documentation')} target="_blank" class={LINK}
+      >Documentation <ExternalLinkIcon class={LINK_ICON} /></a
+    >
+    <a href={resolve('/faq')} target="_blank" class={LINK}
+      >FAQ <ExternalLinkIcon class={LINK_ICON} /></a
+    >
     <button
       type="button"
       class={LINK}
       onclick={() => open(KeyboardShortcuts, 'Keyboard Shortcuts')}
       >Keyboard Shortcuts</button
     >
-    <a href={resolve('/contact')} class={LINK}>Contact</a>
-    <a href="{resolve('/documentation')}#credits" class={LINK}
-      >Data Sources & Credits</a
+    <a href={resolve('/contact')} target="_blank" class={LINK}
+      >Contact <ExternalLinkIcon class={LINK_ICON} /></a
+    >
+    <a href="{resolve('/documentation')}#credits" target="_blank" class={LINK}
+      >Data Sources & Credits <ExternalLinkIcon class={LINK_ICON} /></a
     >
   </nav>
 </div>

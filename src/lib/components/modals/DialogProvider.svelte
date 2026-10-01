@@ -100,6 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         class="btn-icon hover:preset-tonal-surface"
                         aria-label="Back"
                         title="Back"
+                        data-dialog-back
                         onclick={dialog.back}
                         in:fade={{ duration: reduceMotion ? 0 : 150 }}
                       >
@@ -110,9 +111,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <Dialog.Title
                         class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
                       >
-                        <span class="block truncate" in:fade={viewFade}
-                          >{dialog.options.title ?? ''}</span
-                        >
+                        {#snippet element(attributes)}
+                          <h2 {...attributes}>
+                            <span class="block truncate" in:fade={viewFade}
+                              >{dialog.options.title ?? ''}</span
+                            >
+                          </h2>
+                        {/snippet}
                       </Dialog.Title>
                     {/key}
                     {#if dialog.options.showCloseButton}
