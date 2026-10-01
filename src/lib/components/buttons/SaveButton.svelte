@@ -65,7 +65,7 @@ project saves by itself: then the Project button's icon shows the save state
   {#if status === 'saving'}
     <LoaderCircleIcon class="animate-spin opacity-70" />
   {:else if status === 'saved'}
-    <BookmarkCheckIcon class="text-success-700-300" />
+    <BookmarkCheckIcon />
   {:else}
     <BookmarkIcon />
   {/if}

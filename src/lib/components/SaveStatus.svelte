@@ -66,10 +66,10 @@ Project menu. -->
       <LoaderCircleIcon class="size-4 shrink-0 animate-spin opacity-70" />
       Saving…
     {:else if autosave.account}
-      <CloudCheckIcon class="text-success-700-300 size-4 shrink-0" />
+      <CloudCheckIcon class="size-4 shrink-0" />
       Saved to your account
     {:else}
-      <MonitorCheckIcon class="text-success-700-300 size-4 shrink-0" />
+      <MonitorCheckIcon class="size-4 shrink-0" />
       Saved in this browser
     {/if}
   </p>

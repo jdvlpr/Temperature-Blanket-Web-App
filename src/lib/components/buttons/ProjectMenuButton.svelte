@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Project, in the top bar: opens the Project menu. Once the project saves by
 itself (and Save is gone), its icon is the save state, like Google Docs' cloud:
-green when saved, a cloud for the account or a screen for this browser only;
-dimmed while a change waits to save, with a little pop when it lands; red for
-a problem, which the menu explains. -->
+a cloud for the account or a screen for this browser only, in the text color,
+since saved is the usual state; dimmed while a change waits to save, with a
+little pop when it lands; red only for a problem, which the menu explains. -->
 
 <script lang="ts">
   import { openProjectMenu } from '$lib/state/page-state.svelte';
@@ -77,9 +77,9 @@ a problem, which the menu explains. -->
         class:opacity-50={!saved}
       >
         {#if autosave.account}
-          <CloudCheckIcon class="text-success-700-300" />
+          <CloudCheckIcon />
         {:else}
-          <MonitorCheckIcon class="text-success-700-300" />
+          <MonitorCheckIcon />
         {/if}
       </span>
     {/key}
