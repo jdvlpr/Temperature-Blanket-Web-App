@@ -15,6 +15,7 @@
 
 import type { Color } from '$lib/types/yarn-types';
 import chroma from 'chroma-js';
+import { hexToOklab } from './color-space';
 
 export type Lab = [number, number, number];
 
@@ -131,92 +132,39 @@ export function findClosestColorway({
   };
 }
 
-/**
- * Match image colors to colorways without repeating a colorway. Image colors
- * whose closest colorway is already used are tried last (with their next
- * closest unused colorway), so new colorways favor colors not yet represented.
- */
-export function matchUniqueColorways({
-  hexes,
-  count,
+/** The `count` closest colorways to a hex color, closest first */
+export function closestColorways({
+  hex,
   index,
-  exclude = new Set(),
+  count,
 }: {
-  hexes: string[];
-  count: number;
+  hex: string;
   index: ColorwayIndex;
-  exclude?: Set<string>;
+  count: number;
 }): MatchedColor[] {
-  const used = new Set(exclude);
-  const matches: MatchedColor[] = [];
-  const deferred: string[] = [];
-
-  for (const hex of hexes) {
-    if (matches.length >= count) break;
-    const closest = findClosestColorway({ hex, index });
-    if (!closest) return matches;
-    const key = colorwayKey(closest);
-    if (used.has(key)) {
-      deferred.push(hex);
-      continue;
-    }
-    used.add(key);
-    matches.push(closest);
+  const lab = chroma(hex).lab() as Lab;
+  const best: { item: ColorwayIndex[number]; delta: number }[] = [];
+  for (const item of index) {
+    const delta = deltaE2000(lab, item.lab);
+    if (best.length === count && delta >= best[best.length - 1].delta) continue;
+    // Skip colorways that look identical to one already listed
+    if (best.some((n) => n.item.colorway.hex === item.colorway.hex)) continue;
+    best.push({ item, delta });
+    best.sort((a, b) => a.delta - b.delta);
+    if (best.length > count) best.pop();
   }
-
-  for (const hex of deferred) {
-    if (matches.length >= count) break;
-    const match = findClosestColorway({ hex, index, exclude: used });
-    if (!match) break;
-    used.add(colorwayKey(match));
-    matches.push(match);
-  }
-
-  return matches;
+  return best.map(({ item, delta }) => ({
+    ...item.colorway,
+    delta,
+    sourceHex: hex,
+  }));
 }
 
-/**
- * Average the pixels in a square around (x, y) of RGBA image data, which gives
- * a truer color than a single pixel for textured or noisy photos.
- */
-export function sampleAverageHex({
-  data,
-  width,
-  height,
-  x,
-  y,
-  radius = 2,
-}: {
-  data: Uint8ClampedArray;
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-  radius?: number;
-}): string | null {
-  const cx = Math.floor(x);
-  const cy = Math.floor(y);
-  if (cx < 0 || cy < 0 || cx >= width || cy >= height) return null;
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  let n = 0;
-  for (
-    let py = Math.max(0, cy - radius);
-    py <= Math.min(height - 1, cy + radius);
-    py++
-  ) {
-    for (
-      let px = Math.max(0, cx - radius);
-      px <= Math.min(width - 1, cx + radius);
-      px++
-    ) {
-      const i = (py * width + px) * 4;
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-      n++;
-    }
-  }
-  return chroma(r / n, g / n, b / n).hex();
+/** Colorways as OKLab triples, in index order, for choosing palettes */
+export function colorwayOklabs(index: ColorwayIndex): Float32Array {
+  const labs = new Float32Array(index.length * 3);
+  index.forEach((item, i) => {
+    labs.set(hexToOklab(item.colorway.hex ?? '#ffffff'), i * 3);
+  });
+  return labs;
 }

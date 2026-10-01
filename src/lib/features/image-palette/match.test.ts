@@ -5,10 +5,11 @@ import {
   deltaE2000,
   findClosestColorway,
   indexColorways,
-  matchUniqueColorways,
-  sampleAverageHex,
+  closestColorways,
+  colorwayOklabs,
   type Lab,
-} from './image-palette-utils';
+} from './match';
+import { hexToOklab } from './color-space';
 
 const colorway = (hex: string, name: string): Color =>
   ({ hex, name, brandId: 'b', yarnId: 'y' }) as Color;
@@ -71,52 +72,33 @@ describe('findClosestColorway', () => {
   });
 });
 
-describe('matchUniqueColorways', () => {
-  it('never repeats a colorway', () => {
-    const matches = matchUniqueColorways({
-      hexes: ['#ff0000', '#fe0000', '#0000ff'],
-      count: 3,
-      index,
-    });
-    expect(matches.map((n) => n.name)).toEqual(['Red', 'Blue', 'Brick']);
+describe('closestColorways', () => {
+  it('lists the closest colorways first, without repeats', () => {
+    const matches = closestColorways({ hex: '#ff0000', index, count: 3 });
+    expect(matches.map((n) => n.name)).toEqual(['Red', 'Brick', 'White']);
   });
 
-  it('returns fewer matches when given fewer image colors', () => {
+  it('skips colorways with the same hex as one already listed', () => {
+    const withDuplicate = indexColorways([
+      colorway('#ff0000', 'Red'),
+      { ...colorway('#ff0000', 'Red Too'), brandId: 'other' },
+      colorway('#0000ff', 'Blue'),
+    ]);
     expect(
-      matchUniqueColorways({ hexes: ['#ff0000'], count: 5, index }),
-    ).toHaveLength(1);
-  });
-
-  it('avoids excluded colorways', () => {
-    const matches = matchUniqueColorways({
-      hexes: ['#ff0000'],
-      count: 1,
-      index,
-      exclude: new Set([index[0].key]),
-    });
-    expect(matches[0].name).toBe('Brick');
+      closestColorways({ hex: '#ff0000', index: withDuplicate, count: 2 }).map(
+        (n) => n.name,
+      ),
+    ).toEqual(['Red', 'Blue']);
   });
 });
 
-describe('sampleAverageHex', () => {
-  // 2x1 image: a black pixel and a white pixel
-  const data = new Uint8ClampedArray([0, 0, 0, 255, 255, 255, 255, 255]);
-
-  it('averages the surrounding pixels', () => {
-    expect(
-      sampleAverageHex({ data, width: 2, height: 1, x: 0, y: 0, radius: 1 }),
-    ).toBe(chroma(127.5, 127.5, 127.5).hex());
-  });
-
-  it('samples a single pixel with radius 0', () => {
-    expect(
-      sampleAverageHex({ data, width: 2, height: 1, x: 1.7, y: 0, radius: 0 }),
-    ).toBe('#ffffff');
-  });
-
-  it('returns null outside the image', () => {
-    expect(
-      sampleAverageHex({ data, width: 2, height: 1, x: 2, y: 0 }),
-    ).toBeNull();
+describe('colorwayOklabs', () => {
+  it('lists OKLab triples in index order', () => {
+    const labs = colorwayOklabs(index);
+    expect(labs).toHaveLength(index.length * 3);
+    const blue = hexToOklab('#0000ff');
+    expect(labs[6]).toBeCloseTo(blue[0], 5);
+    expect(labs[7]).toBeCloseTo(blue[1], 5);
+    expect(labs[8]).toBeCloseTo(blue[2], 5);
   });
 });
