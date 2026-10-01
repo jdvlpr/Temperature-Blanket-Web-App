@@ -80,6 +80,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loadId = 0;
   let hoverFrame = 0;
   let lastPointer: { clientX: number; clientY: number } | null = null;
+  // Resolves once yarn data and the palette extractor are loaded, so an image
+  // chosen, dropped, or pasted before then waits instead of matching nothing
+  let resolveReady: () => void;
+  const ready = new Promise<void>((resolve) => (resolveReady = resolve));
 
   let canvas: HTMLCanvasElement | undefined = $state();
   let canvasWrap: HTMLDivElement | undefined = $state();
@@ -118,8 +122,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnReady = true;
 
     ColorThief = (await import('getimagepalette')).default;
+    resolveReady();
 
-    await getRandomImage();
+    // Skip the random image if one was already chosen
+    if (loadId === 0) await getRandomImage();
   });
 
   function updateColorways() {
@@ -144,6 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     image.src = src;
     try {
       await image.decode();
+      await ready;
     } catch {
       if (id !== loadId) return;
       // Keep showing the previous image, if there was one
@@ -376,7 +383,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<svelte:window onpaste={onPaste} />
+<!-- Stop the browser opening a dropped image that misses the drop area -->
+<svelte:window
+  onpaste={onPaste}
+  ondragover={(e) => {
+    if (e.dataTransfer?.types.includes('Files')) e.preventDefault();
+  }}
+  ondrop={(e) => {
+    if (e.dataTransfer?.types.includes('Files')) e.preventDefault();
+  }}
+/>
 
 <div
   class={[
