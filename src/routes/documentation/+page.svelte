@@ -589,6 +589,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a href="#saved-palettes" class="link">saved palettes</a>.
             </p>
             <p>
+              On My Projects, use the pencil button to name a project (you can
+              also name it when you save it), or the trash button to move it to
+              the Trash. Deleted projects and palettes stay in the Trash for 30
+              days, so you can restore them. Press Trash at the bottom of My
+              Projects to restore them or delete them for good.
+            </p>
+            <p>
               You can also open any project by pasting the project’s URL in your
               browser’s address bar and opening the webpage. Press Search, and
               the project settings and weather data will be loaded.
@@ -1575,7 +1582,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               To use a saved palette, press Get Colors, then Browse Palettes,
               then choose the Saved category. Use the pencil button to rename a
-              palette, or the trash button to delete it.
+              palette, or the trash button to move it to the Trash.
             </p>
             <p>
               You can also see all your saved palettes on the
