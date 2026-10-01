@@ -18,6 +18,10 @@ vi.mock('idb-keyval', () => ({
     vi_mockStore.data.delete(key);
     return Promise.resolve();
   }),
+  update: vi.fn((key: string, updater: (old: any) => any) => {
+    vi_mockStore.data.set(key, updater(vi_mockStore.data.get(key)));
+    return Promise.resolve();
+  }),
 }));
 
 vi.mock('$app/environment', () => ({
@@ -61,6 +65,7 @@ vi.mock('$lib/utils/date-utils', () => ({
   dateToISO8601String: vi.fn((d) => d.toISOString().split('T')[0]),
   stringToDate: vi.fn((s) => new Date(s)),
   numberOfDays: vi.fn(() => 1),
+  formatDateTime: vi.fn(() => '1/1/2026 at 12:00 PM'),
 }));
 
 const saved: StoredProject = {
@@ -155,5 +160,107 @@ describe('ProjectStorage with sync', () => {
     expect(
       (await ProjectStorage.getProjectsForDisplay()).map((i) => i.id),
     ).toEqual(['theirs', 'mine', 'guest']);
+  });
+
+  describe('names and the Trash', () => {
+    /** Saved while signed in as u1, and uploaded as revision 3 */
+    async function syncedProject(id: string) {
+      owner = 'u1';
+      await ProjectStorage.save({ id, localProject: saved });
+      await ProjectStorage.updateSyncStates((item) =>
+        item.id === id ? { ...item.sync!, rev: 3, dirty: false } : 'unchanged',
+      );
+    }
+
+    it('renaming an account’s project gives it a change to upload', async () => {
+      await syncedProject('1');
+      const onChange = vi.fn();
+      ProjectStorage.onChange = onChange;
+
+      await ProjectStorage.rename('1', 'Gift Blanket');
+
+      const [item] = await ProjectStorage.getIndex();
+      expect(item.meta.name).toBe('Gift Blanket');
+      expect(item.sync).toMatchObject({ rev: 3, dirty: true });
+      expect((await ProjectStorage.getById('1'))?.name).toBe('Gift Blanket');
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    it('undo before the deletion reaches the server calls it off', async () => {
+      await syncedProject('1');
+      await ProjectStorage.moveToTrash('1');
+      expect(
+        (await ProjectStorage.accountSyncState('u1')).pendingDeletes,
+      ).toEqual([{ id: '1', baseRev: 3 }]);
+
+      await ProjectStorage.restoreFromTrash('1');
+
+      expect(
+        (await ProjectStorage.accountSyncState('u1')).pendingDeletes,
+      ).toEqual([]);
+      const [item] = await ProjectStorage.getIndex();
+      // Changed, so a deletion that already reached the server is uploaded over
+      expect(item.sync).toMatchObject({ ownerUserId: 'u1', dirty: true });
+      expect(await ProjectStorage.getTrash()).toEqual([]);
+    });
+
+    it('restores a project as changed after its deletion reached the server', async () => {
+      await syncedProject('1');
+      await ProjectStorage.moveToTrash('1');
+      // The sync sent the deletion
+      await ProjectStorage.setAccountSyncState('u1', {
+        since: 4,
+        pendingDeletes: [],
+      });
+
+      await ProjectStorage.restoreFromTrash('1');
+
+      const [item] = await ProjectStorage.getIndex();
+      expect(item.sync).toMatchObject({ rev: 3, dirty: true });
+    });
+
+    it("keeps another account's projects out of the Trash while signed in", async () => {
+      await syncedProject('mine');
+      await ProjectStorage.moveToTrash('mine');
+      owner = null;
+      await ProjectStorage.save({ id: 'guest', localProject: saved });
+      await ProjectStorage.moveToTrash('guest');
+
+      owner = 'u2';
+      expect((await ProjectStorage.getTrash()).map((t) => t.item.id)).toEqual([
+        'guest',
+      ]);
+      // Emptying it leaves the other account's alone
+      await ProjectStorage.emptyTrash();
+      owner = 'u1';
+      expect((await ProjectStorage.getTrash()).map((t) => t.item.id)).toEqual([
+        'mine',
+      ]);
+    });
+
+    it("restores another account's project to this browser only", async () => {
+      await syncedProject('1');
+      await ProjectStorage.moveToTrash('1');
+      owner = null;
+
+      await ProjectStorage.restoreFromTrash('1');
+
+      expect((await ProjectStorage.getIndex())[0].sync).toBeUndefined();
+    });
+
+    it("signing out removes the account's projects from the Trash; deleting the account keeps them", async () => {
+      await syncedProject('1');
+      await syncedProject('2');
+      await ProjectStorage.moveToTrash('1');
+      await ProjectStorage.leaveAccountTrash('u1', false);
+      expect(await ProjectStorage.getTrash()).toEqual([]);
+
+      await ProjectStorage.moveToTrash('2');
+      await ProjectStorage.leaveAccountTrash('u1', true);
+      owner = null;
+      const [kept] = await ProjectStorage.getTrash();
+      expect(kept.item.id).toBe('2');
+      expect(kept.item.sync).toBeUndefined();
+    });
   });
 });

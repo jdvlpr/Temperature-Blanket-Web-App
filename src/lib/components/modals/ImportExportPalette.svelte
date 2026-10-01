@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { version } from '$app/environment';
   import { PUBLIC_COOLORS_LINK } from '$env/static/public';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -22,11 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import {
-    colorsToCode,
-    colorsToYarnDetails,
-    getColorsFromInput,
-  } from '$lib/utils/color-utils';
+  import { getColorsFromInput, getYarnPageURL } from '$lib/utils/color-utils';
   import { generatePaletteImage } from '$lib/utils/yarn-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
@@ -35,13 +32,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ClipboardCopyIcon,
     CodeIcon,
     DownloadIcon,
-    FileCodeIcon,
     ImageIcon,
+    LinkIcon,
   } from '@lucide/svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
-  let { colors, updateGauge } = $props();
+  let {
+    colors = [],
+    updateGauge,
+    mode = 'export',
+  }: {
+    colors?: Color[];
+    updateGauge?: (update: { _colors: Color[] }) => void;
+    /** 'export' shares the current palette; 'import' pastes colors in */
+    mode?: 'export' | 'import';
+  } = $props();
 
   let inputValue = $state('');
 
@@ -63,13 +68,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isExpanded = $state(false);
 
-  let segmentValue = $state('export');
-  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'palette', 'colorway'
+  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'colorway', 'link'
 
   let previewImageUrl = $derived(
-    colors
+    mode === 'export' && colors.length
       ? generatePaletteImage({
-          colors,
+          colors: colors.filter(
+            (color): color is Color & { hex: string } => !!color.hex,
+          ),
           includeColorway: includeColorwayInImage,
           includeHex: includeHexInImage,
           includeBrand: includeBrandInImage,
@@ -79,10 +85,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : null,
   );
 
-  let paletteCode = $derived(
-    `${colorsToCode(colors, {
-      includePrefixes: true,
-    })}${colorsToYarnDetails({ colors }) ? 'yarn:' + colorsToYarnDetails({ colors }) : ''}`,
+  let paletteLink = $derived(
+    getYarnPageURL({ colors, origin: window.location.origin, version }),
   );
 
   let palette = $derived(colors.map((n: Color) => n?.hex));
@@ -159,30 +163,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <div class="mx-auto mb-4 flex w-fit flex-col gap-1 text-left">
-    <SegmentedControl
-      value={segmentValue}
-      onValueChange={(e) => {
-        if (e.value) segmentValue = e.value;
-      }}
-    >
-      <SegmentedControl.Control
-        class="bg-surface-200 dark:bg-surface-800 mx-auto"
-      >
-        <SegmentedControl.Indicator />
-        <SegmentedControl.Item value={'export'}
-          ><SegmentedControl.ItemText>Export</SegmentedControl.ItemText>
-          <SegmentedControl.ItemHiddenInput /></SegmentedControl.Item
-        >
-        <SegmentedControl.Item value={'import'}>
-          <SegmentedControl.ItemText>Import</SegmentedControl.ItemText>
-          <SegmentedControl.ItemHiddenInput />
-        </SegmentedControl.Item>
-      </SegmentedControl.Control>
-    </SegmentedControl>
-  </div>
+  <h2 class="h3 mb-4 px-8 text-center">
+    {mode === 'import' ? 'Paste Colors or Code' : 'Export Palette'}
+  </h2>
 
-  {#if segmentValue === 'import'}
+  {#if mode === 'import'}
     <label for="palette-code" class="label">
       <span class="label-text"
         >Enter HTML colors, a palette code, or a project URL</span
@@ -225,15 +210,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <pre class="pre select-all">#FF0000 #FFA500 #ADD8E6</pre>
             <pre class="pre select-all">red, FFA500, #ADD8E6</pre>
           </div>
-          <p>• A palette code from this web app</p>
+          <p>
+            • A palette link, saved project URL, or yarn search result URL from
+            this web app
+          </p>
+          <p>• A palette code from this web app (from older versions)</p>
           <div class="my-2 ml-2 flex flex-wrap gap-2">
             <pre
               class="pre break-all select-all">palette:40004bae8bbdf7f7f780c58100441b</pre>
           </div>
-          <p>
-            • The URL of a saved project or yarn search result from this web
-            app.
-          </p>
           <p>
             • The URL of a palette from <a
               href={PUBLIC_COOLORS_LINK}
@@ -256,7 +241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto my-4 inline-block w-full">
           <SaveAndCloseButtons
             onSave={() => {
-              updateGauge({ _colors: inputColors });
+              updateGauge?.({ _colors: inputColors });
               dialog.close();
             }}
             disabled={!inputColors.length}
@@ -314,16 +299,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </button>
 
-        <!-- Palette Code Button -->
+        <!-- Link Button (replaces the old Palette Code; pasting old codes still works) -->
         <button
           class="card hover:preset-tonal-surface p-4 text-left"
-          onclick={() => (selectedExportType = 'palette')}
+          onclick={() => (selectedExportType = 'link')}
         >
           <div class="flex items-center gap-2">
-            <FileCodeIcon />
+            <LinkIcon />
             <div>
-              <p class="text-lg font-bold">Palette Code</p>
-              <p class="text-xs">Share between palettes on this site</p>
+              <p class="text-lg font-bold">Link</p>
+              <p class="text-xs">
+                Share it, or paste it into another palette on this site
+              </p>
             </div>
           </div>
         </button>
@@ -475,25 +462,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <!-- Palette Code Section -->
-      {#if selectedExportType === 'palette' && paletteCode}
+      <!-- Link Section -->
+      {#if selectedExportType === 'link' && paletteLink}
         <div class="my-4 flex w-full flex-wrap items-start gap-4">
           <p class="text-sm">
-            Copy this Palette Code, then import it into another palette on this
-            site.
+            Anyone with this link can open the palette in the Yarn Palette
+            Creator. To use it in another palette, press Get Colors, then Paste
+            Colors or Code, and paste the link.
           </p>
           <div class="w-full">
             <p
               class="card preset-tonal-primary w-full p-4 break-all select-all"
             >
-              {paletteCode}
+              {paletteLink}
             </p>
 
             <button
               class="btn hover:preset-tonal-surface mt-4"
               onclick={() => {
                 try {
-                  window.navigator.clipboard.writeText(paletteCode);
+                  window.navigator.clipboard.writeText(paletteLink);
                   toast.trigger({
                     message: 'Copied',
                     category: 'success',
@@ -507,7 +495,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }}
             >
               <ClipboardCopyIcon />
-              Copy Palette Code
+              Copy Link
             </button>
           </div>
         </div>

@@ -11,6 +11,7 @@ import type {
 } from '$lib/types/weather-types';
 import {
   dateToISO8601String,
+  formatDateTime,
   numberOfDays,
   stringToDate,
 } from '$lib/utils/date-utils';
@@ -22,7 +23,8 @@ import type {
   ProjectSyncState,
 } from '$lib/sync/engine';
 import { unchangedSince } from '$lib/sync/seen';
-import { del, get, set } from 'idb-keyval';
+import { del, get, set, update } from 'idb-keyval';
+import { trashCutoff } from './trash';
 
 export type StoredProjectIndexItem = {
   id: string;
@@ -30,13 +32,36 @@ export type StoredProjectIndexItem = {
     date: string;
     href: string;
     title: string;
+    /** The name someone gave the project; when empty, show the title */
+    name?: string;
     isCustomWeatherData: boolean;
   };
   /** Present once the project belongs to an account (see $lib/sync) */
   sync?: ProjectSyncState;
 };
 
+export const MAX_SAVED_PROJECT_NAME_LENGTH = 100;
+
+/**
+ * A project moved to the Trash: the whole project, so it can be put back. Kept
+ * apart from projects_index, so nothing that reads the saved projects sees it.
+ */
+export type TrashedProject = {
+  item: StoredProjectIndexItem;
+  project: StoredProject;
+  /** Its place in projects_index, to put it back there */
+  position: number;
+  /** When it was moved to the Trash (ms) */
+  deletedAt: number;
+};
+
+/** Bumped on every change, so lists showing saved projects can reload */
+export const savedProjects = $state({ version: 0 });
+const changed = () => savedProjects.version++;
+
 export type StoredProject = {
+  /** The name someone gave the project, kept across saves; the title (from its locations) is the fallback */
+  name?: string;
   /** When the project was first created (ISO 8601, UTC). Missing on projects saved by older versions; use projectCreatedAtTime() to fall back to a legacy timestamp ID. */
   createdAt?: string;
   date: string;
@@ -66,6 +91,7 @@ export function sortByRecent(
 const PROJECTS_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
 const SYNC_ACCOUNT_PREFIX = 'sync_account_';
+const PROJECTS_TRASH_KEY = 'projects_trash';
 
 // Index updates read, change and write the whole index, so they take turns,
 // across tabs too where the browser supports it.
@@ -88,6 +114,7 @@ const indexItemFor = (
     date: project.date,
     href: project.href,
     title: project.title || '',
+    ...(project.name && { name: project.name }),
     isCustomWeatherData: project.isCustomWeatherData || false,
   },
   ...(sync && { sync }),
@@ -127,6 +154,7 @@ export class ProjectStorage {
       throw new Error('IndexedDB is not available');
     }
     await set(PROJECTS_INDEX_KEY, index);
+    changed();
   }
 
   /**
@@ -162,7 +190,13 @@ export class ProjectStorage {
     const _id = id || new URL(project.url.href).searchParams.get('project');
     if (!_id) return null;
 
-    const _project = localProject || this.project();
+    let _project = localProject || this.project();
+
+    // Re-saving from the planner keeps the name given on My Projects
+    if (_project.name === undefined) {
+      const name = (await this.getById(_id))?.name;
+      if (name) _project = { ..._project, name };
+    }
 
     // The data and the index change together, so a sync can't land in between
     const indexItem = await withIndexLock(async () => {
@@ -333,6 +367,179 @@ export class ProjectStorage {
   }
 
   /**
+   * Name a saved project, or clear its name with an empty string. A project in
+   * an account has a change to upload, so the name reaches its other devices.
+   */
+  static async rename(id: string, name: string): Promise<void> {
+    const trimmed = name.trim().slice(0, MAX_SAVED_PROJECT_NAME_LENGTH);
+    await withIndexLock(async () => {
+      const stored = await this.getById(id);
+      if (!stored) return;
+      const { name: _, ...rest } = stored;
+      await set(
+        `${PROJECT_PREFIX}${id}`,
+        trimmed ? { ...rest, name: trimmed } : rest,
+      );
+
+      const index = await this.getIndex();
+      const item = index.find((i) => i.id === id);
+      if (!item) return;
+      const { name: __, ...meta } = item.meta;
+      item.meta = trimmed ? { ...meta, name: trimmed } : meta;
+      if (item.sync)
+        item.sync = { ...item.sync, dirty: true, updatedAt: Date.now() };
+      await this.setIndex(index);
+    });
+    this.onChange?.();
+  }
+
+  /**
+   * Put back a project that was just removed, at its old place in the list.
+   * In an account, the deletion is called off if it hasn't reached the server
+   * yet, and the project is uploaded again either way: once a deletion has
+   * reached the server, the sync uploads over it.
+   */
+  static async restore({
+    item,
+    project: stored,
+    position,
+  }: {
+    item: StoredProjectIndexItem;
+    project: StoredProject;
+    position: number;
+  }): Promise<void> {
+    if (!this.isAvailable()) throw new Error('IndexedDB is not available');
+    let restored = item;
+    const sync = item.sync;
+    if (sync) {
+      if (sync.ownerUserId === this.syncOwner()) {
+        restored = { ...item, sync: { ...sync, dirty: true, error: null } };
+        const state = await this.accountSyncState(sync.ownerUserId);
+        if (state.pendingDeletes.some((p) => p.id === item.id))
+          await this.setAccountSyncState(sync.ownerUserId, {
+            ...state,
+            pendingDeletes: state.pendingDeletes.filter(
+              (p) => p.id !== item.id,
+            ),
+          });
+      } else {
+        // Its account isn't signed in here: it comes back to this browser only
+        const { sync: _, ...rest } = item;
+        restored = rest;
+      }
+    }
+    await withIndexLock(async () => {
+      await set(`${PROJECT_PREFIX}${item.id}`, stored);
+      const index = (await this.getIndex()).filter((i) => i.id !== item.id);
+      index.splice(Math.min(position, index.length), 0, restored);
+      await this.setIndex(index);
+    });
+    this.onChange?.();
+  }
+
+  /**
+   * Move a saved project to the Trash. In an account this deletes it there too
+   * (and so from the account's other devices); Restore uploads it again.
+   */
+  static async moveToTrash(id: string): Promise<void> {
+    const index = await this.getIndex();
+    const position = index.findIndex((i) => i.id === id);
+    const stored = await this.getById(id);
+    if (position === -1) return;
+    // A list entry whose project data is missing: nothing to keep, just remove it
+    if (!stored) return this.removeById(id);
+    const trashed: TrashedProject = {
+      item: index[position],
+      project: stored,
+      position,
+      deletedAt: Date.now(),
+    };
+    // Into the Trash first, so a failure part way never loses the project
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) => [
+      ...trash.filter((t) => t.item.id !== id),
+      trashed,
+    ]);
+    await this.removeById(id);
+  }
+
+  /**
+   * Projects in the Trash, most recently deleted first. Ones older than
+   * TRASH_DAYS (see ./trash) are deleted for good on the way. While someone is
+   * signed in, another account's projects stay hidden, as in the list.
+   */
+  static async getTrash(): Promise<TrashedProject[]> {
+    if (!this.isAvailable()) return [];
+    const trash = (await get<TrashedProject[]>(PROJECTS_TRASH_KEY)) || [];
+    const cutoff = trashCutoff();
+    if (trash.some((t) => t.deletedAt < cutoff)) {
+      await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (current = []) =>
+        current.filter((t) => t.deletedAt >= cutoff),
+      );
+    }
+    const owner = this.syncOwner();
+    return trash
+      .filter((t) => t.deletedAt >= cutoff)
+      .filter(
+        ({ item }) => !owner || !item.sync || item.sync.ownerUserId === owner,
+      )
+      .sort((a, b) => b.deletedAt - a.deletedAt);
+  }
+
+  /**
+   * Put a project from the Trash back where it was
+   */
+  static async restoreFromTrash(id: string): Promise<void> {
+    const trash = (await get<TrashedProject[]>(PROJECTS_TRASH_KEY)) || [];
+    const trashed = trash.find((t) => t.item.id === id);
+    if (!trashed) return;
+    // Saved again since (opened from its link): keep that newer copy
+    if (!(await this.getById(id))) await this.restore(trashed);
+    await this.deleteForever(id);
+  }
+
+  /**
+   * Delete a project in the Trash for good
+   */
+  static async deleteForever(id: string): Promise<void> {
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
+      trash.filter((t) => t.item.id !== id),
+    );
+    changed();
+  }
+
+  /**
+   * Delete every project in the Trash for good (only the signed-in account's
+   * and this browser's, while someone is signed in)
+   */
+  static async emptyTrash(): Promise<void> {
+    const owner = this.syncOwner();
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
+      owner
+        ? trash.filter(
+            ({ item }) => item.sync && item.sync.ownerUserId !== owner,
+          )
+        : [],
+    );
+    changed();
+  }
+
+  /**
+   * When an account leaves this browser: its projects in the Trash go too, or,
+   * with `keep`, stay as this browser's own
+   */
+  static async leaveAccountTrash(userId: string, keep: boolean) {
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
+      trash.flatMap((t) => {
+        if (t.item.sync?.ownerUserId !== userId) return [t];
+        if (!keep) return [];
+        const { sync: _, ...item } = t.item;
+        return [{ ...t, item }];
+      }),
+    );
+    changed();
+  }
+
+  /**
    * Get project index item by its HREF
    */
   static async getIndexItemByHref(
@@ -481,11 +688,7 @@ export class ProjectStorage {
    * Creates a project object to store the current project in local storage.
    */
   private static project = (): StoredProject => {
-    const _date = new Date();
-    const date =
-      _date.toLocaleDateString(undefined, { timeZone: 'UTC' }) +
-      ' at ' +
-      _date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const date = formatDateTime(new Date());
 
     const isCustomWeatherData = weather.isUserEdited || false;
     const _title = locations.projectTitle || '';

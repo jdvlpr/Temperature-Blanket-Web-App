@@ -251,13 +251,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
       </li>
       <li class="toc-list-item ml-4 block">
+        <a
+          href="#saved-palettes"
+          class="toc-anchor opacity-60 hover:opacity-100">Saved Palettes</a
+        >
+      </li>
+      <li class="toc-list-item ml-4 block">
         <a href="#image-palette" class="toc-anchor opacity-60 hover:opacity-100"
           >Image Palette</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
         <a href="#importexport" class="toc-anchor opacity-60 hover:opacity-100"
-          >Import/Export</a
+          >Export and Paste Colors</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
@@ -576,9 +582,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Open Project</h3>
             <p>
-              Recently saved projects are stored in your browser’s local
-              storage. Open the menu and select a project to load it’s settings
-              and weather data.
+              Saved projects are stored in your browser. To open one, go to My
+              Projects in the site menu, or press Project in the Project
+              Planner, and select a project to load its settings and weather
+              data. My Projects also lists your
+              <a href="#saved-palettes" class="link">saved palettes</a>.
+            </p>
+            <p>
+              On My Projects, use the pencil button to name a project (you can
+              also name it when you save it), or the trash button to move it to
+              the Trash. Deleted projects and palettes stay in the Trash for 30
+              days, so you can restore them. Press Trash at the bottom of My
+              Projects to restore them or delete them for good.
             </p>
             <p>
               You can also open any project by pasting the project’s URL in your
@@ -1516,11 +1531,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To browse collection of preset colors to use in your project,
-              press Browse Palettes. Then select a Category and change the
-              filters to see different color combinations. Select the palette to
-              use it in your project. The categories are as follows:
+              press Get Colors, then Browse Palettes. Then select a Category and
+              change the filters to see different color combinations. Select the
+              palette to use it in your project. The categories are as follows:
             </p>
             <ul class="ml-4 flex flex-col gap-2">
+              <li>
+                <span class="font-bold">Saved</span> – Palettes you saved in this
+                browser
+              </li>
               <li>
                 <span class="font-bold">Gallery</span> – All user-made color palettes
               </li>
@@ -1549,14 +1568,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
           </section>
           <section
+            id="saved-palettes"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+          >
+            <h3 class="text-xl font-bold">Saved Palettes</h3>
+
+            <p>
+              To keep a palette to use again later, press Save Palette under the
+              palette. You can give it a name, or leave the name empty to use
+              its yarn and number of colors. Saved palettes are stored in this
+              browser.
+            </p>
+            <p>
+              To use a saved palette, press Get Colors, then Browse Palettes,
+              then choose the Saved category. Use the pencil button to rename a
+              palette, or the trash button to move it to the Trash.
+            </p>
+            <p>
+              You can also see all your saved palettes on the
+              <a href="/my-projects" class="link">My Projects</a> page, and open any
+              of them in the Yarn Palette Creator.
+            </p>
+          </section>
+          <section
             id="image-palette"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
             <h3 class="text-xl font-bold">Image Palette</h3>
 
             <p>
-              To create a palette of colors from an image, press the Image
-              Palette button. Use a random image (from <a
+              To create a palette of colors from an image, press Get Colors,
+              then From an Image. Use a random image (from <a
                 class="link"
                 rel="noreferrer noopener"
                 href="http://hunsplash.com"
@@ -1570,17 +1612,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="importexport"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold">Export/Import</h3>
+            <h3 class="text-xl font-bold">Export and Paste Colors</h3>
 
             <p>
-              To export a color palette as HTML color codes or yarn names, press
-              Export/Import, then press Copy for whichever format you want.
-              Share or paste the copied text somewhere you can find it later.
+              To export a color palette as HTML color codes, an image, yarn
+              names, or a link, press Export, then choose a format and press
+              Copy or Download. Share or paste the copied text somewhere you can
+              find it later.
             </p>
             <p>
-              To import a color palette, press Export/Import, press the Import
-              button, then type color names or paste a valid code or URL. When
-              you're finished, press Save.
+              To paste colors into a palette, press Get Colors, then Paste
+              Colors or Code, then type color names or paste a valid code or
+              URL. When you're finished, press Save.
             </p>
           </section>
           <section
@@ -1652,10 +1695,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Choose Yarn Colorways</h3>
 
             <p>
-              To pick yarn colorways to use in your project, press the Choose
-              Colorways button. Select the colorways you want to use, choose to
-              add them to your existing palette or to create a new palette, then
-              press Use These Colorways.
+              To pick yarn colorways to use in your project, press Get Colors,
+              then Choose Colorways. Select the colorways you want to use,
+              choose to add them to your existing palette or to create a new
+              palette, then press Use These Colorways.
             </p>
           </section>
           <section

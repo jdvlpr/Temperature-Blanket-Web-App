@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
+  import SavePalette from '$lib/components/modals/SavePalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
   import {
     drawerState,
@@ -37,14 +38,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { createGaugeColors } from '$lib/state/gauges-state.svelte';
   import {
     ArrowDownWideNarrowIcon,
+    BookmarkPlusIcon,
+    ChevronDownIcon,
     CircleCheckIcon,
+    ClipboardPasteIcon,
     ExpandIcon,
     ImageIcon,
+    PaletteIcon,
     ShareIcon,
     ShrinkIcon,
     ShuffleIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
+  import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let { gauge = $bindable() } = $props();
 
@@ -66,6 +72,102 @@ If not, see <https://www.gnu.org/licenses/>. -->
     drawerState.closeAll();
 
     dialog.close();
+  }
+
+  let toolbarButtonClass = $derived(
+    `hover:preset-tonal-surface ${fullscreen.value ? 'btn-icon' : 'btn justify-start'}`,
+  );
+
+  const colorSources = [
+    {
+      value: 'browse',
+      label: 'Browse Palettes',
+      details: 'Saved, gallery, featured, and schemes',
+      icon: SwatchBookIcon,
+    },
+    {
+      value: 'colorways',
+      label: 'Choose Colorways',
+      details: 'Pick yarn by brand and yarn',
+      icon: CircleCheckIcon,
+    },
+    {
+      value: 'image',
+      label: 'From an Image',
+      details: 'Pick colors from a photo',
+      icon: ImageIcon,
+    },
+    {
+      value: 'random',
+      label: 'Random',
+      details: 'Generate random colors',
+      icon: ShuffleIcon,
+    },
+    {
+      value: 'paste',
+      label: 'Paste Colors or Code',
+      details: 'Color names, hex codes, palette codes, or links',
+      icon: ClipboardPasteIcon,
+    },
+  ];
+
+  function openColorSource(value: string) {
+    switch (value) {
+      case 'browse':
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: BrowsePalettes,
+            props: {
+              numberOfColors: gauge.numberOfColors,
+              schemeId: gauge.schemeId,
+              updateGauge,
+            },
+          },
+          options: { size: 'large' },
+        });
+        break;
+      case 'colorways':
+        dialog.trigger({
+          type: 'component',
+          component: { ref: ChooseColorways, props: { updateGauge } },
+          options: { size: 'large' },
+        });
+        break;
+      case 'image':
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: GetPaletteFromImage,
+            props: { numberOfColors: gauge.numberOfColors, updateGauge },
+          },
+          options: { size: 'large' },
+        });
+        break;
+      case 'random':
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: RandomPalette,
+            props: { numberOfColors: gauge.numberOfColors, updateGauge },
+          },
+          options: { size: 'medium' },
+        });
+        break;
+      case 'paste':
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: ImportExportPalette,
+            props: {
+              colors: $state.snapshot(gauge.colors),
+              updateGauge,
+              mode: 'import',
+            },
+          },
+        });
+        break;
+    }
   }
 
   $effect(() => {
@@ -155,142 +257,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/key}
 
-    <button
-      class={[
-        'hover:preset-tonal-surface',
-        fullscreen.value ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Select Premade Colorway Palettes"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: BrowsePalettes,
-            props: {
-              numberOfColors: gauge.numberOfColors,
-              schemeId: gauge.schemeId,
-              updateGauge,
-            },
-          },
-          options: { size: 'large' },
-        })}
+    <Menu
+      positioning={{ placement: 'bottom-start' }}
+      onSelect={(details) => openColorSource(details.value)}
     >
-      <SwatchBookIcon />
-      {#if !fullscreen.value}
-        Browse Palettes
-      {/if}
-    </button>
+      <Menu.Trigger
+        class={toolbarButtonClass}
+        title="Get Colors from Palettes, Yarn, an Image, and More"
+      >
+        <PaletteIcon />
+        {#if !fullscreen.value}
+          <span class="flex items-center gap-1"
+            >Get Colors <ChevronDownIcon size={18} /></span
+          >
+        {/if}
+      </Menu.Trigger>
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content
+            class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
+          >
+            {#each colorSources as source (source.value)}
+              <Menu.Item
+                value={source.value}
+                class="hover:preset-tonal-surface flex items-center justify-start gap-2 text-left whitespace-normal"
+              >
+                <source.icon class="shrink-0" />
+                <div class="flex min-w-0 flex-col text-left">
+                  <p>{source.label}</p>
+                  <p class="text-surface-700-300 text-xs">
+                    {source.details}
+                  </p>
+                </div>
+              </Menu.Item>
+            {/each}
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu>
 
     <button
-      class={[
-        'hover:preset-tonal-surface',
-        fullscreen.value ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Choose Yarn Colorways, Filtered by Brand and Yarn"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: ChooseColorways,
-            props: {
-              updateGauge,
-            },
-          },
-          options: {
-            size: 'large',
-          },
-        })}
-    >
-      <CircleCheckIcon />
-      {#if !fullscreen.value}
-        Choose Colorways
-      {/if}
-    </button>
-
-    <button
-      class={[
-        'hover:preset-tonal-surface',
-        fullscreen.value ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Get Palette from Image"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: GetPaletteFromImage,
-            props: {
-              numberOfColors: gauge.numberOfColors,
-              updateGauge,
-            },
-          },
-          options: {
-            size: 'large',
-          },
-        })}
-    >
-      <ImageIcon />
-      {#if !fullscreen.value}
-        Image Palette
-      {/if}</button
-    >
-
-    <button
-      class={[
-        'hover:preset-tonal-surface',
-        fullscreen.value ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Generate Random Colors"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: RandomPalette,
-            props: {
-              numberOfColors: gauge.numberOfColors,
-              updateGauge,
-            },
-          },
-          options: {
-            size: 'medium',
-          },
-        })}
-    >
-      <ShuffleIcon />
-      {#if !fullscreen.value}
-        Random
-      {/if}
-    </button>
-
-    <button
-      class={[
-        'hover:preset-tonal-surface',
-        fullscreen.value ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Load Colors or Get a Palette Code to Share"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: ImportExportPalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-              updateGauge,
-            },
-          },
-        })}
-    >
-      <ShareIcon />
-
-      {#if !fullscreen.value}
-        Export/Import
-      {/if}
-    </button>
-
-    <button
-      class={[
-        'hover:preset-tonal-surface',
-        fullscreen.value ? 'btn-icon' : 'btn justify-start',
-      ]}
+      class={toolbarButtonClass}
       title="Sort Colors"
       onclick={() =>
         dialog.trigger({
@@ -314,14 +321,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      aria-label="Fullscreen"
-      class={['btn hover:preset-tonal-surface']}
+      class={toolbarButtonClass}
+      title="Save This Palette to Use Again Later"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: SavePalette,
+            props: {
+              colors: $state.snapshot(gauge.colors),
+            },
+          },
+          options: {
+            size: 'medium',
+          },
+        })}
+    >
+      <BookmarkPlusIcon />
+      {#if !fullscreen.value}
+        <!-- Not just "Save": the Project Planner's top bar has a Save for the project -->
+        Save Palette
+      {/if}
+    </button>
+
+    <button
+      class={toolbarButtonClass}
+      title="Export as Color Codes, an Image, Yarn Names, or a Link"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: ImportExportPalette,
+            props: {
+              colors: $state.snapshot(gauge.colors),
+              mode: 'export',
+            },
+          },
+        })}
+    >
+      <ShareIcon />
+      {#if !fullscreen.value}
+        Export
+      {/if}
+    </button>
+
+    <button
+      class={[
+        'hover:preset-tonal-surface',
+        fullscreen.value ? 'btn' : 'btn-icon',
+      ]}
+      aria-label={fullscreen.value ? 'Exit Fullscreen' : 'Fullscreen'}
       onclick={() => (fullscreen.value = !fullscreen.value)}
       title="Toggle Fullscreen Editing Mode (f)"
     >
       {#if !fullscreen.value}
         <ExpandIcon />
-        Fullscreen
       {:else}
         <ShrinkIcon />
         Exit Fullscreen

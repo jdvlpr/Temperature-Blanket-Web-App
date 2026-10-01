@@ -188,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <WeatherSourceButton />
   </div>
 
-  <LocalProjects />
+  <LocalProjects limit={5} />
 
   <h2 class="mt-8 mb-2 text-xl font-bold">Help</h2>
   <div class="my-4 flex w-full flex-wrap gap-2">

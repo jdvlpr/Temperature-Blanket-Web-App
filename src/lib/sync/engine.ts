@@ -268,12 +268,16 @@ export async function syncAccount(
     let copyId: string | null = null;
     if (mine) {
       copyId = await newId();
+      // The copy's label says what it is: on the name, when it has one
+      const suffix = `(copy from this device, ${copyDateLabel(now())})`;
       const title = mine.title?.trim() || 'Untitled project';
       const wrote = await local.put(
         copyId,
         {
           ...mine,
-          title: `${title} (copy from this device, ${copyDateLabel(now())})`,
+          ...(mine.name
+            ? { name: `${mine.name} ${suffix}` }
+            : { title: `${title} ${suffix}` }),
           href: rehomeHref(mine.href, options.origin, copyId),
         },
         {
@@ -379,7 +383,8 @@ export async function syncAccount(
       server.upload(id, {
         baseRev,
         json: JSON.stringify(project),
-        title: project.title ?? '',
+        // What the account lists it as: its name, or its locations
+        title: project.name || project.title || '',
         clientUpdatedAt: sync.updatedAt,
         contentHash,
       });

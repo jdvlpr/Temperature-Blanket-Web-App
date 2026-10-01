@@ -317,6 +317,24 @@ describe('syncAccount', () => {
     expect(phone.titles()).toEqual(laptop.titles());
   });
 
+  it('lists a named project by its name, and marks a copy on the name', async () => {
+    const { server, phone, laptop } = twoDevices();
+    phone.edit('a', 'Lisbon, 2025');
+    phone.projects.get('a')!.project.name = 'Gift Blanket';
+    await phone.sync();
+    expect(server.rows.get('a')?.title).toBe('Gift Blanket');
+    await laptop.sync();
+
+    phone.edit('a', 'Lisbon, 2025');
+    laptop.edit('a', 'Lisbon, 2026');
+    await phone.sync();
+    const report = await laptop.sync();
+
+    const copy = await laptop.read(report.copies[0]);
+    expect(copy?.name).toMatch(/^Gift Blanket \(copy from this device, .+\)$/);
+    expect(copy?.title).toBe('Lisbon, 2026');
+  });
+
   it('keeps one copy when both devices made the same change', async () => {
     const { phone, laptop } = twoDevices();
     phone.edit('a', 'Original');

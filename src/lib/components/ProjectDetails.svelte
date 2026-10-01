@@ -18,24 +18,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import { extraColorsFromProjectHref } from '$lib/utils/extra-colors-utils';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { MAX_SAVED_PROJECT_NAME_LENGTH } from '$lib/storage/projects.svelte';
+  import { escapeHtml, pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
   import SyncIcon from '$lib/components/sync/SyncIcon.svelte';
   import type { SyncLabel } from '$lib/sync/status.svelte';
-  import { Trash2Icon } from '@lucide/svelte';
+  import { CheckIcon, PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
 
   interface Props {
     project: any;
     canRemove?: boolean;
+    newTab?: boolean;
     onclick?: () => void;
+    /** Shows a Rename button; called with the new name ('' clears it) */
+    onrename?: (name: string) => void;
     /** Where the project is kept, e.g. "Synced" (see $lib/sync) */
     syncLabel?: SyncLabel;
   }
 
-  let { project, canRemove = true, onclick, syncLabel }: Props = $props();
+  let {
+    project,
+    canRemove = true,
+    newTab = true,
+    onclick,
+    onrename,
+    syncLabel,
+  }: Props = $props();
 
   const href = $derived(project.href);
+  // The title comes from the project's locations; a name someone gave it wins
   const title = $derived(project.title);
+  const name = $derived(project.name || '');
+  const label = $derived(name || title || 'Untitled Project');
+
+  let editing = $state(false);
+  let editingName = $state('');
+
+  function saveName() {
+    editing = false;
+    onrename?.(editingName);
+  }
   const date = $derived(project.date);
   const isCustomWeatherData = $derived(project.isCustomWeatherData);
 
@@ -58,6 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }) {
     let schemeName =
       "<p class='flex flex-wrap justify-start items-center gap-x-4'>";
+    if (name && title) schemeName += `<span>${escapeHtml(title)}</span>`;
     schemeName += `<span class="inline-flex items-center justify-center gap-1"> Saved ${date}</span>`;
     if (isCustomWeatherData)
       schemeName += `<span class="">Custom Weather Data</span>`;
@@ -92,17 +115,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center justify-start gap-2 p-4"
 >
   <div class="flex w-full flex-col">
-    <div class="flex items-start gap-2">
-      {#if syncLabel}
-        <span class="mt-1"><SyncIcon label={syncLabel} /></span>
-      {/if}
-      <a
-        {href}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="line-clamp-4 min-w-0 underline">{title}</a
-      >
-    </div>
+    <!-- A full page load: the planner reads the project from the URL it starts
+    with, so arriving by client-side navigation skips the saved weather -->
+    {#if editing}
+      <div class="input-group mb-1 grid-cols-[1fr_auto_auto]">
+        <!-- svelte-ignore a11y_autofocus -->
+        <input
+          type="text"
+          class="ig-input"
+          aria-label="Project name"
+          autocomplete="off"
+          autofocus
+          maxlength={MAX_SAVED_PROJECT_NAME_LENGTH}
+          placeholder={title}
+          bind:value={editingName}
+          onkeydown={(e) => {
+            if (e.key === 'Enter') saveName();
+            if (e.key === 'Escape') {
+              e.stopPropagation();
+              editing = false;
+            }
+          }}
+        />
+        <button
+          type="button"
+          class="ig-btn hover:preset-tonal-surface"
+          title="Save Name"
+          onclick={saveName}
+        >
+          <CheckIcon />
+        </button>
+        <button
+          type="button"
+          class="ig-btn hover:preset-tonal-surface"
+          title="Cancel"
+          onclick={() => (editing = false)}
+        >
+          <XIcon />
+        </button>
+      </div>
+    {:else}
+      <div class="flex items-start gap-2">
+        {#if syncLabel}
+          <span class="mt-1"><SyncIcon label={syncLabel} /></span>
+        {/if}
+        <a
+          {href}
+          data-sveltekit-reload
+          target={newTab ? '_blank' : undefined}
+          rel="noopener noreferrer"
+          class="line-clamp-4 min-w-0 underline">{label}</a
+        >
+      </div>
+    {/if}
     {#if syncLabel?.tone === 'error'}
       <p class="text-error-700-300 text-sm">{syncLabel.text}</p>
     {/if}
@@ -114,10 +179,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
   </div>
+  {#if onrename && !editing}
+    <button
+      type="button"
+      class="btn-icon hover:preset-tonal-surface"
+      title="Rename Project"
+      aria-label="Rename {label}"
+      onclick={() => {
+        editingName = name;
+        editing = true;
+      }}
+    >
+      <PencilIcon />
+    </button>
+  {/if}
   {#if canRemove}
     <button
       class="btn-icon hover:preset-tonal-surface"
-      aria-label="Remove {title || 'project'}"
+      title="Delete Project"
+      aria-label="Delete {label}"
       {onclick}
     >
       <Trash2Icon />

@@ -21,7 +21,10 @@
 import { replaceState } from '$app/navigation';
 import { account } from '$lib/accounts/summary.svelte';
 import { project } from '$lib/state/project-state.svelte';
-import { ProjectStorage } from '$lib/storage/projects.svelte';
+import {
+  MAX_SAVED_PROJECT_NAME_LENGTH,
+  ProjectStorage,
+} from '$lib/storage/projects.svelte';
 import { sync } from '$lib/sync/status.svelte';
 import { newProjectId } from '$lib/utils/project-id-utils';
 
@@ -234,11 +237,18 @@ export async function saveOpenProject() {
 export async function saveCopy() {
   clearTimeout(timer);
   if (saving) await saving;
+  const name = (await ProjectStorage.getById(project.id))?.name;
   project.id = newProjectId();
   project.createdAt = new Date().toISOString();
   // eslint-disable-next-line svelte/no-navigation-without-resolve
   replaceState(new URL(project.url.href), '');
-  const item = await ProjectStorage.save();
+  let item = await ProjectStorage.save();
+  // A named project's copy says so; otherwise its locations name it, as before
+  if (item && name) {
+    const copyName = `${name} (copy)`.slice(0, MAX_SAVED_PROJECT_NAME_LENGTH);
+    await ProjectStorage.rename(project.id, copyName);
+    item = { ...item, meta: { ...item.meta, name: copyName } };
+  }
   project.status.saved = true;
   await projectSaved();
   return item;

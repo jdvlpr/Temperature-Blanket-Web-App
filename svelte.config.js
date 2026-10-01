@@ -51,6 +51,7 @@ const config = {
           '/faq',
           '/gallery',
           '/globe',
+          '/my-projects',
           '/privacy',
           '/supporters',
           '/weather',

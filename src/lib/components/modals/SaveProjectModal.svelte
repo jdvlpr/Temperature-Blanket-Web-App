@@ -18,8 +18,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { toast } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
   import {
+    MAX_SAVED_PROJECT_NAME_LENGTH,
+    ProjectStorage,
+    type StoredProjectIndexItem,
+  } from '$lib/storage/projects.svelte';
+  import {
+    CheckIcon,
     CircleCheckIcon,
     ClipboardCopyIcon,
     CopyPlusIcon,
@@ -48,6 +53,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let urlInputElement: HTMLInputElement | undefined = $state();
 
+  // An optional name, shown on My Projects instead of the location title
+  let name = $state('');
+
+  async function saveName() {
+    if (!storedProject) return;
+    const { id } = storedProject;
+    try {
+      await ProjectStorage.rename(id, name);
+      storedProject =
+        (await ProjectStorage.getIndex()).find((i) => i.id === id) ??
+        storedProject;
+      name = storedProject.meta.name ?? '';
+      toast.trigger({
+        message: name ? 'Name saved' : 'Name removed',
+        category: 'success',
+      });
+    } catch {
+      toast.trigger({
+        message: 'Unable to save the name',
+        category: 'error',
+      });
+    }
+  }
+
   async function saveProject({ copy = true }) {
     // Copy window url to clipboard
     if (copy) {
@@ -66,12 +95,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     storedProject = await saveOpenProject();
+    name = storedProject?.meta.name ?? '';
   }
 
   /** A new project from this one, which is left as it was saved */
   async function copyProject() {
     try {
       storedProject = await saveCopy();
+      name = storedProject?.meta.name ?? '';
       toast.trigger({
         message: 'Saved a copy. You’re now working on the copy.',
         category: 'success',
@@ -102,7 +133,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-surface-700-300 text-sm">
           Progress and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data is saved in this browser and syncs to every device where you’re signed
-          in. From now on, changes save automatically.
+          in. From now on, changes save automatically. Find it any time in
+          <a href="/my-projects" class="link">My Projects</a>.
         </p>
         <SyncStatus class="text-surface-700-300" />
       </div>
@@ -116,7 +148,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <p class="text-surface-700-300 text-sm">
           Progress and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-          data has been saved to this web browser.
+          data has been saved to this web browser. Find it any time in
+          <a href="/my-projects" class="link">My Projects</a>.
           <span class="font-bold">Note</span>: If your browser's site data is
           cleared, you'll lose access to this project unless you save the link
           below or send it to the Project Gallery.
@@ -159,6 +192,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if storedProject && storedProject?.meta}
+      <form
+        class="flex w-full flex-col gap-1"
+        onsubmit={(e) => {
+          e.preventDefault();
+          saveName();
+        }}
+      >
+        <label class="label" for="save-project-name">
+          <span class="label-text">Name (optional)</span>
+        </label>
+        <div class="input-group grid-cols-[1fr_auto]">
+          <input
+            id="save-project-name"
+            type="text"
+            class="ig-input"
+            autocomplete="off"
+            maxlength={MAX_SAVED_PROJECT_NAME_LENGTH}
+            placeholder={storedProject.meta.title}
+            bind:value={name}
+          />
+          <button type="submit" class="ig-btn hover:preset-tonal-surface">
+            <CheckIcon />
+            Save Name
+          </button>
+        </div>
+        <p class="text-surface-700-300 text-sm">
+          Leave it empty to use the project's locations and years.
+        </p>
+      </form>
       <div class="w-full">
         <ProjectDetails project={storedProject.meta} canRemove={false} />
       </div>

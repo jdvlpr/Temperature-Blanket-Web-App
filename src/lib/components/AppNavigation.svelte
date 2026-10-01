@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { version } from '$app/environment';
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import AppearanceDialog from '$lib/components/modals/AppearanceDialog.svelte';
@@ -34,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CodeIcon,
     ContrastIcon,
     ExternalLinkIcon,
+    FolderOpenIcon,
     GiftIcon,
     GlobeIcon,
     HeartIcon,
@@ -121,6 +123,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}><TriangleAlertIcon /> Save Your Projects</button
     >
   {/if}
+
+  <a
+    href={resolve('/my-projects')}
+    class={[
+      'btn hover:preset-tonal-surface w-fit',
+      page.url.pathname === '/my-projects' && 'preset-tonal-secondary',
+    ]}
+  >
+    <FolderOpenIcon />
+    My Projects
+  </a>
 
   <button
     class="btn hover:preset-tonal-surface"

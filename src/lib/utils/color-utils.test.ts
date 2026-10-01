@@ -1,10 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   colorsToCode,
+  colorsToPaletteCode,
   colorsToYarnDetails,
   getColorInfo,
   getColorsFromInput,
+  getPaletteFallbackName,
   getTextColor,
+  getYarnPageURL,
   sortColorsByName,
   sortColorsByNameZtoA,
   sortColorsDarktoLight,
@@ -240,6 +243,98 @@ describe('color-utils', () => {
       const sorted = sortColorsByNameZtoA({ colors: [...colors] as any });
       expect(sorted[0].name).toBe('White');
       expect(sorted[2].name).toBe('Black');
+    });
+  });
+
+  describe('colorsToPaletteCode', () => {
+    it('adds yarn details only when colors have them', () => {
+      expect(
+        colorsToPaletteCode([{ hex: '#ff0000' }, { hex: '#00ff00' }]),
+      ).toBe('palette:ff000000ff00');
+      expect(
+        colorsToPaletteCode([
+          { hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' },
+          { hex: '#00ff00', brandId: 'brand1', yarnId: 'yarn1' },
+        ]),
+      ).toBe('palette:ff000000ff00yarn:brand1-yarn1');
+    });
+
+    it('round-trips through getColorsFromInput', () => {
+      const colors = getColorsFromInput({
+        string: colorsToPaletteCode([
+          { hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' },
+        ]),
+      });
+      expect(colors).toEqual([
+        expect.objectContaining({
+          hex: '#ff0000',
+          brandId: 'brand1',
+          yarnId: 'yarn1',
+        }),
+      ]);
+    });
+  });
+
+  describe('getYarnPageURL', () => {
+    it('builds a /yarn link with optional yarn details and version', () => {
+      expect(
+        getYarnPageURL({
+          colors: [{ hex: '#ff0000' }],
+          origin: 'https://x.test',
+        }),
+      ).toBe('https://x.test/yarn?s=ff0000');
+      expect(
+        getYarnPageURL({
+          colors: [{ hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' }],
+          origin: 'https://x.test',
+          version: '6.3.2',
+        }),
+      ).toBe('https://x.test/yarn?s=ff0000&f=brand1-yarn1&v=6.3.2');
+    });
+
+    it('opens as the same colors in getColorsFromInput', () => {
+      const url = getYarnPageURL({
+        colors: [{ hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' }],
+        origin: 'https://x.test',
+      });
+      expect(getColorsFromInput({ string: url })).toEqual([
+        expect.objectContaining({ hex: '#ff0000', brandId: 'brand1' }),
+      ]);
+    });
+  });
+
+  describe('getPaletteFallbackName', () => {
+    const yarn = (brandName: string, yarnName: string) => ({
+      hex: '#ff0000',
+      brandName,
+      yarnName,
+    });
+
+    it('uses the color count when there is no yarn', () => {
+      expect(getPaletteFallbackName([{ hex: '#ff0000' }])).toBe('1 color');
+      expect(
+        getPaletteFallbackName([{ hex: '#ff0000' }, { hex: '#00ff00' }]),
+      ).toBe('2 colors');
+    });
+
+    it('names a single yarn', () => {
+      expect(
+        getPaletteFallbackName([
+          yarn('Bernat', 'Super Value'),
+          yarn('Bernat', 'Super Value'),
+          { hex: '#000000' },
+        ]),
+      ).toBe('Bernat Super Value, 3 colors');
+    });
+
+    it('counts the other yarns', () => {
+      expect(
+        getPaletteFallbackName([
+          yarn('Bernat', 'Super Value'),
+          yarn('Lion Brand', 'Pound of Love'),
+          yarn('Red Heart', 'Super Saver'),
+        ]),
+      ).toBe('Bernat Super Value + 2 more yarns, 3 colors');
     });
   });
 });

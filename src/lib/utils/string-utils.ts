@@ -55,3 +55,14 @@ export const decodeEntity = (inputStr: string): string => {
 
 export const stripHTMLTags = (str: string): string =>
   str.replace(/<[^>]*>/g, '');
+
+/**
+ * Escape text so it can go into HTML (e.g. a label rendered with {@html}).
+ */
+export const escapeHtml = (text: string): string =>
+  text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');

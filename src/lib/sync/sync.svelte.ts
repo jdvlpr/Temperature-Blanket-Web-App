@@ -266,6 +266,7 @@ export async function leaveAccount(userId: string, keep: boolean) {
   await ProjectStorage.updateSyncStates((item) =>
     item.sync?.ownerUserId === userId ? undefined : 'unchanged',
   );
+  await ProjectStorage.leaveAccountTrash(userId, keep);
   await ProjectStorage.clearAccountSyncState(userId);
 }
 

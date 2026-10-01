@@ -86,4 +86,18 @@ describe('string-utils', () => {
       expect(stringUtils.stripHTMLTags('Hello World')).toBe('Hello World');
     });
   });
+
+  describe('escapeHtml', () => {
+    it('escapes characters that could become markup', () => {
+      expect(stringUtils.escapeHtml(`<img src=x onerror="a('b')">&`)).toBe(
+        '&lt;img src=x onerror=&quot;a(&#39;b&#39;)&quot;&gt;&amp;',
+      );
+    });
+
+    it('leaves plain text alone', () => {
+      expect(stringUtils.escapeHtml('Sunset Stripes 2026')).toBe(
+        'Sunset Stripes 2026',
+      );
+    });
+  });
 });

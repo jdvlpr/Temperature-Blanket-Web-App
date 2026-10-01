@@ -199,7 +199,7 @@ _\*Items with a < before the version means sometime before that version, I'm not
 
 ### 🗃️ IndexedDB Storage
 
-User's saved projects are stored in the browser's IndexedDB.
+User's saved projects and saved palettes are stored in the browser's IndexedDB.
 
 <details>
 <summary>View Details</summary>
@@ -208,15 +208,18 @@ User's saved projects are stored in the browser's IndexedDB.
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- | ------------------------ |
 | projects_index         | An index of projects the user has saved                                                                                                                                         | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0                   |
 | p\_{id}                | An individual saved project                                                                                                                                                     | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0                   |
+| saved_palettes         | Palettes the user saved (deleted ones, in the Trash, are kept with `deletedAt` for 30 days)                                                                                     | _not set_     | array of [`SavedPalette`](src/lib/storage/palettes.svelte.ts) objects                    | unreleased (after 6.3.2) |
+| projects_trash         | Projects moved to the Trash, each with its index entry, data, list position and `deletedAt`; kept 30 days                                                                       | _not set_     | array of [`TrashedProject`](src/lib/storage/projects.svelte.ts) objects                  | unreleased (after 6.3.2) |
 | sync_account\_{userId} | Sync bookkeeping for a signed-in account on this device: the last server revision seen, deletions waiting to reach the server, whether the "add your projects" prompt was shown | _not set_     | [`AccountSyncState`](src/lib/sync/engine.ts)                                             | unreleased (after 6.3.2) |
 
 **Project IDs** are opaque strings (`^[A-Za-z0-9-]{1,64}$`), carried in the URL as `?project=<id>`. New projects currently use the millisecond timestamp of when the app was loaded, but code must not rely on that: use the stored `createdAt` for the creation date.
 
 **`p_{id}` fields added after 5.35.0:**
 
-| Field       | Description                                                           | Version Added            |
-| ----------- | --------------------------------------------------------------------- | ------------------------ |
-| `createdAt` | When the project was first created (ISO 8601, UTC); kept across saves | unreleased (after 6.3.2) |
+| Field       | Description                                                                                                                    | Version Added            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `createdAt` | When the project was first created (ISO 8601, UTC); kept across saves                                                          | unreleased (after 6.3.2) |
+| `name`      | The name given on My Projects, kept across saves (also on the `projects_index` entry's `meta`); when missing, `title` is shown | unreleased (after 6.3.2) |
 
 **`projects_index` item fields added after 5.35.0:**
 
