@@ -1,5 +1,8 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { ProjectStorage } from './projects.svelte';
+import {
+  MAX_SAVED_PROJECT_NAME_LENGTH,
+  ProjectStorage,
+} from './projects.svelte';
 
 // Shared store for mock
 const vi_mockStore = {
@@ -147,5 +150,53 @@ describe('ProjectStorage', () => {
     const display = await ProjectStorage.getProjectsForDisplay();
     expect(display[0].meta.title).toBe('Second');
     expect(display[1].meta.title).toBe('First');
+  });
+
+  it('names a project, keeps the name when re-saved, and clears it', async () => {
+    const project = { title: 'Lisbon, 2025', href: 'h1' } as any;
+    await ProjectStorage.save({ id: '1', localProject: project });
+
+    await ProjectStorage.rename('1', '  Gift for Ana  ');
+    expect((await ProjectStorage.getById('1'))?.name).toBe('Gift for Ana');
+    expect((await ProjectStorage.getIndex())[0].meta.name).toBe('Gift for Ana');
+
+    // The planner saves without a name: the given one stays
+    await ProjectStorage.save({ id: '1', localProject: { ...project } });
+    expect((await ProjectStorage.getById('1'))?.name).toBe('Gift for Ana');
+    expect((await ProjectStorage.getIndex())[0].meta.name).toBe('Gift for Ana');
+    expect(project.name).toBeUndefined();
+
+    await ProjectStorage.rename('1', '   ');
+    expect((await ProjectStorage.getById('1'))?.name).toBeUndefined();
+    expect((await ProjectStorage.getIndex())[0].meta.name).toBeUndefined();
+  });
+
+  it('caps long names', async () => {
+    await ProjectStorage.save({ id: '1', localProject: { href: 'h1' } as any });
+    await ProjectStorage.rename('1', 'x'.repeat(500));
+    expect((await ProjectStorage.getById('1'))?.name).toHaveLength(
+      MAX_SAVED_PROJECT_NAME_LENGTH,
+    );
+  });
+
+  it('restores a removed project at its old place', async () => {
+    for (const id of ['1', '2', '3'])
+      await ProjectStorage.save({
+        id,
+        localProject: { title: `P${id}`, href: `h${id}` } as any,
+      });
+    const index = await ProjectStorage.getIndex();
+    const item = index[1];
+    const stored = await ProjectStorage.getById('2');
+
+    await ProjectStorage.removeById('2');
+    await ProjectStorage.restore({ item, project: stored!, position: 1 });
+
+    expect((await ProjectStorage.getIndex()).map((i) => i.id)).toEqual([
+      '1',
+      '2',
+      '3',
+    ]);
+    expect(await ProjectStorage.getById('2')).toEqual(stored);
   });
 });

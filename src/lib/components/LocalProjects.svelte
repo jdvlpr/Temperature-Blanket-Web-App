@@ -17,9 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { resolve } from '$app/paths';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
-  import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
+  import type {
+    StoredProject,
+    StoredProjectIndexItem,
+  } from '$lib/storage/projects.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
-  import { FolderOpenIcon } from '@lucide/svelte';
+  import { FolderOpenIcon, Undo2Icon } from '@lucide/svelte';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
   // which shows them all under its own heading
@@ -31,6 +35,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projects = $state<StoredProjectIndexItem[]>([]);
   let loaded = $state(false);
   let shown = $derived(limit ? projects.slice(0, limit) : projects);
+
+  // Undo lives in the list, since in the Menu a toast button behind the modal
+  // dialog can't be clicked
+  let lastDeleted = $state<{
+    item: StoredProjectIndexItem;
+    project: StoredProject;
+    position: number;
+  } | null>(null);
+
+  async function remove(item: StoredProjectIndexItem) {
+    try {
+      const index = await ProjectStorage.getIndex();
+      const position = index.findIndex((i) => i.id === item.id);
+      const stored = await ProjectStorage.getById(item.id);
+      await ProjectStorage.removeById(item.id);
+      lastDeleted = stored ? { item, project: stored, position } : null;
+    } catch {
+      toast.trigger({
+        message: 'Unable to delete the project',
+        category: 'error',
+      });
+    }
+    await loadProjects();
+  }
+
+  async function undoRemove() {
+    if (!lastDeleted) return;
+    const deleted = $state.snapshot(lastDeleted);
+    lastDeleted = null;
+    try {
+      await ProjectStorage.restore(deleted);
+    } catch {
+      toast.trigger({
+        message: 'Unable to restore the project',
+        category: 'error',
+      });
+    }
+    await loadProjects();
+  }
+
+  async function rename(id: string, name: string) {
+    try {
+      await ProjectStorage.rename(id, name);
+    } catch {
+      toast.trigger({
+        message: 'Unable to rename the project',
+        category: 'error',
+      });
+    }
+    await loadProjects();
+  }
 
   async function loadProjects() {
     if (browser) {
@@ -46,6 +101,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
+{#if lastDeleted}
+  <div
+    class="card preset-tonal-surface mt-2 flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
+    role="status"
+  >
+    <span class="line-clamp-1"
+      >Deleted {lastDeleted.item.meta.name ||
+        lastDeleted.item.meta.title ||
+        'Untitled Project'}</span
+    >
+    <button
+      type="button"
+      class="btn btn-sm hover:preset-tonal-surface"
+      onclick={undoRemove}
+    >
+      <Undo2Icon />
+      Undo
+    </button>
+  </div>
+{/if}
+
 {#key projects}
   {#if projects?.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
@@ -59,10 +135,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ProjectDetails
             project={meta}
             newTab={!onMyProjectsPage}
-            onclick={async () => {
-              await ProjectStorage.removeByHref(meta.href);
-              await loadProjects();
-            }}
+            onclick={() => remove(project)}
+            onrename={onMyProjectsPage
+              ? (name) => rename(project.id, name)
+              : undefined}
           />
         {/each}
       </div>

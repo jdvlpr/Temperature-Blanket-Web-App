@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
 async function seedProject(page: Page, title: string) {
   await page.evaluate(async (title) => {
     const id = '1700000000000';
-    const href = `${location.origin}/?project=${id}`;
+    const href = `${location.origin}/?project=${id}#temp=ff0000`;
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open('keyval-store');
       request.onupgradeneeded = () =>
@@ -84,9 +84,27 @@ test.describe('My Projects', () => {
     // Nothing clickable inside the link
     await expect(paletteLink.getByRole('button')).toHaveCount(0);
 
-    // Delete the project
-    await page.getByRole('button', { name: 'Delete Test Town, 2024' }).click();
-    await expect(project).toHaveCount(0);
+    // Name the project: the name shows, with its location title in the details
+    await page.getByRole('button', { name: 'Rename Test Town, 2024' }).click();
+    await page.getByLabel('Project name').fill('Gift Blanket');
+    await page.getByRole('button', { name: 'Save Name' }).click();
+    const named = page.getByRole('link', { name: 'Gift Blanket' });
+    await expect(named).toBeVisible();
+    await expect(page.getByText('Test Town, 2024')).toBeVisible();
+    await page.reload();
+    await expect(named).toBeVisible();
+
+    // Delete, then undo
+    await page.getByRole('button', { name: 'Delete Gift Blanket' }).click();
+    await expect(named).toHaveCount(0);
+    await expect(page.getByRole('status')).toContainText(
+      'Deleted Gift Blanket',
+    );
+    await page.getByRole('button', { name: 'Undo' }).click();
+    await expect(named).toBeVisible();
+
+    // Delete for good
+    await page.getByRole('button', { name: 'Delete Gift Blanket' }).click();
     await expect(page.getByText('No saved projects yet')).toBeVisible();
 
     // A click on a swatch, not just the name, opens the palette too

@@ -23,11 +23,17 @@ export type StoredProjectIndexItem = {
     date: string;
     href: string;
     title: string;
+    /** The name someone gave the project; when empty, show the title */
+    name?: string;
     isCustomWeatherData: boolean;
   };
 };
 
+export const MAX_SAVED_PROJECT_NAME_LENGTH = 100;
+
 export type StoredProject = {
+  /** The name someone gave the project, kept across saves; the title (from its locations) is the fallback */
+  name?: string;
   date: string;
   href: string;
   locations?: LocationType[];
@@ -109,7 +115,13 @@ export class ProjectStorage {
     const _id = id || new URL(project.url.href).searchParams.get('project');
     if (!_id) return null;
 
-    const _project = localProject || this.project();
+    let _project = localProject || this.project();
+
+    // Re-saving from the planner keeps the name given on My Projects
+    if (_project.name === undefined) {
+      const name = (await this.getById(_id))?.name;
+      if (name) _project = { ..._project, name };
+    }
 
     // Atomic-like update: set the project data first
     await set(`${PROJECT_PREFIX}${_id}`, _project);
@@ -130,6 +142,7 @@ export class ProjectStorage {
         date: _project.date,
         href: _project.href,
         title: _project.title || '',
+        ...(_project.name && { name: _project.name }),
         isCustomWeatherData: _project.isCustomWeatherData || false,
       },
     };
@@ -158,6 +171,46 @@ export class ProjectStorage {
     if (newIndex.length !== index.length) {
       await this.setIndex(newIndex);
     }
+  }
+
+  /**
+   * Name a saved project, or clear its name with an empty string
+   */
+  static async rename(id: string, name: string): Promise<void> {
+    const stored = await this.getById(id);
+    if (!stored) return;
+    const trimmed = name.trim().slice(0, MAX_SAVED_PROJECT_NAME_LENGTH);
+    const { name: _, ...rest } = stored;
+    await set(
+      `${PROJECT_PREFIX}${id}`,
+      trimmed ? { ...rest, name: trimmed } : rest,
+    );
+
+    const index = await this.getIndex();
+    const item = index.find((i) => i.id === id);
+    if (!item) return;
+    const { name: __, ...meta } = item.meta;
+    item.meta = trimmed ? { ...meta, name: trimmed } : meta;
+    await this.setIndex(index);
+  }
+
+  /**
+   * Put back a project that was just removed, at its old place in the list
+   */
+  static async restore({
+    item,
+    project: stored,
+    position,
+  }: {
+    item: StoredProjectIndexItem;
+    project: StoredProject;
+    position: number;
+  }): Promise<void> {
+    if (!this.isAvailable()) throw new Error('IndexedDB is not available');
+    await set(`${PROJECT_PREFIX}${item.id}`, stored);
+    const index = (await this.getIndex()).filter((i) => i.id !== item.id);
+    index.splice(Math.min(position, index.length), 0, item);
+    await this.setIndex(index);
   }
 
   /**

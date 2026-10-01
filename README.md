@@ -159,4 +159,6 @@ User's saved projects and saved palettes are stored in the browser's IndexedDB.
 | p\_{id}        | An individual saved project                                      | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0        |
 | saved_palettes | Palettes the user saved (deleted ones are kept with `deletedAt`) | _not set_     | array of [`SavedPalette`](src/lib/storage/palettes.svelte.ts) objects                    | 6.4.0         |
 
+Since 6.4.0, a saved project and its `projects_index` entry can have an optional `name` (given on My Projects); when it's missing, the project's `title` is shown.
+
 </details>
