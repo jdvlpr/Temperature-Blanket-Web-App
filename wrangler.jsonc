@@ -30,7 +30,8 @@
     "BETTER_AUTH_SECRET": "local-development-secret-do-not-use-in-production",
     "AUTH_ALLOWED_HOSTS": "localhost:5173,localhost:4173,localhost:8788,*.ts.net:5173",
     "AUTH_PROTOCOL": "auto",
-    // Project sync. SYNC_BETA_EMAILS (comma-separated) would limit it to those accounts.
+    // ACCOUNTS_SIGNUP_LIMIT (a number, 0 = closed) would cap how many accounts there may be.
+    // Project sync, for every account.
     "SYNC_ENABLED": "true",
     // Publishing to the gallery from accounts stays off here, since
     // PUBLIC_WORDPRESS_BASE_URL may be the live gallery. To test it, point .env at

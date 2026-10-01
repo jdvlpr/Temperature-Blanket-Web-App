@@ -28,6 +28,7 @@ import { deleteUserProjectData } from '$lib/server/sync/store';
 import { cleanName } from '$lib/utils/string-utils';
 import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
 import { readAuthSettings } from './settings';
+import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
 
 type Auth = ReturnType<typeof createAuth>;
 
@@ -66,6 +67,13 @@ function createAuth(
           await releaseGalleryPosts(env.DB, defaultGalleryApi(), userId);
         }
         if (env?.PROJECTS) await deleteUserProjectData(env.PROJECTS, userId);
+      },
+      signUpsOpen: async () => {
+        const env = requestPlatform.getStore()?.env;
+        return (
+          !!env?.DB &&
+          signUpsOpen(env.DB, readSignUpLimit(env.ACCOUNTS_SIGNUP_LIMIT))
+        );
       },
       // Catch schema drift locally only: introspecting D1 on every cold start
       // costs CPU the free plan can't spare (works on D1 since 1.7.6, issue #11346)
@@ -117,6 +125,10 @@ export async function handleAuthRequest(
   const db = platform!.env!.DB!;
 
   return requestPlatform.run(platform, async () => {
+    // Set when sign-ups are closed or full: the reply says so, whether or not
+    // this email has an account, so it doesn't reveal which emails do
+    let signUpsPaused = false;
+
     if (isPost(event, '/api/auth/email-otp/send-verification-otp')) {
       const body = await jsonBody(event.request);
       if (
@@ -130,6 +142,20 @@ export async function handleAuthRequest(
           },
           { status: 429 },
         );
+
+      if (
+        body?.type === 'sign-in' &&
+        typeof body.email === 'string' &&
+        !(await signUpsOpen(
+          db,
+          readSignUpLimit(platform!.env!.ACCOUNTS_SIGNUP_LIMIT),
+        ))
+      ) {
+        // No code for a new email: it couldn't create an account
+        if (!(await hasAccount(db, body.email)))
+          return json({ success: true, signUpsPaused: true });
+        signUpsPaused = true;
+      }
     }
 
     if (isPost(event, '/api/auth/update-user')) {
@@ -161,6 +187,9 @@ export async function handleAuthRequest(
       event.url.protocol === 'https:',
     );
     if (signedIn) runInBackground(cleanUpExpired(db));
+
+    if (signUpsPaused && response.ok)
+      return json({ ...(await response.json()), signUpsPaused: true });
 
     if (emailChange && response.ok)
       runInBackground(

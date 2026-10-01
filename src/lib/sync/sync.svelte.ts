@@ -91,7 +91,6 @@ async function runPass(userId: string) {
     } else if (e.status === 0) sync.state = 'offline';
     else if (e.status === 401) sync.state = 'signed-out';
     else if (e.code === 'SYNC_PAUSED') sync.state = 'paused';
-    else if (e.code === 'SYNC_NOT_INVITED') sync.state = 'not-invited';
     else sync.state = 'error';
   } finally {
     sync.version++;

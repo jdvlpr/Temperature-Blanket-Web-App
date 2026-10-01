@@ -17,6 +17,7 @@
 // scripts/generate-auth-migration.ts can build the same options in Node.
 
 import type { BetterAuthOptions } from 'better-auth';
+import { APIError } from 'better-auth/api';
 import { emailOTP } from 'better-auth/plugins/email-otp';
 import { cleanName } from '../../utils/clean-name';
 
@@ -43,11 +44,15 @@ export type AuthConfig = {
   google?: { clientId: string; clientSecret: string };
   /** Deletes what the account stores outside the auth tables (synced projects in R2), and releases its gallery pages */
   deleteUserData?: (userId: string) => Promise<void>;
+  /** Whether a new account may be created now (ACCOUNTS_SIGNUP_LIMIT) */
+  signUpsOpen?: () => Promise<boolean>;
 };
 
 export const AUTH_BASE_PATH = '/api/auth';
 export const SESSION_EXPIRES_DAYS = 60;
 export const MAX_DISPLAY_NAME_LENGTH = 80;
+/** The error code, and ?error= after Google, when sign-ups are closed or full */
+export const SIGN_UPS_PAUSED = 'SIGN_UPS_PAUSED';
 
 const DAY = 24 * 60 * 60;
 
@@ -124,12 +129,20 @@ export function buildAuthOptions(config: AuthConfig) {
     databaseHooks: {
       user: {
         create: {
-          before: async (user) => ({
-            data: {
-              ...user,
-              name: cleanName(user.name, MAX_DISPLAY_NAME_LENGTH),
-            },
-          }),
+          // Every new account comes through here, by code or by Google
+          before: async (user) => {
+            if (config.signUpsOpen && !(await config.signUpsOpen()))
+              throw new APIError('FORBIDDEN', {
+                code: SIGN_UPS_PAUSED,
+                message: 'New sign-ups are paused',
+              });
+            return {
+              data: {
+                ...user,
+                name: cleanName(user.name, MAX_DISPLAY_NAME_LENGTH),
+              },
+            };
+          },
         },
         update: {
           before: async (user) => ({

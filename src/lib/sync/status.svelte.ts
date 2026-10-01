@@ -26,7 +26,6 @@ export type SyncState =
   | 'paused'
   /** The session ended; projects stay on this device */
   | 'signed-out'
-  | 'not-invited'
   | 'error';
 
 export const sync = $state({

@@ -68,10 +68,11 @@ Server settings, read from the Cloudflare environment (local values are in `wran
 | `EMAIL_SENDER`                             | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503 |
 | `RESEND_API_KEY`, `EMAIL_FROM`             | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                        |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                            |
+| `ACCOUNTS_SIGNUP_LIMIT`                    | Optional: the most accounts there may be. Unset means no limit, `0` closes sign-ups. Existing accounts keep signing in either way                                     |
 
 Secrets for local development (for example real Google credentials) go in `.dev.vars`, which wrangler reads and git ignores.
 
-Saved projects sync to the signed-in account through `/api/sync` (metadata in D1, gzipped project JSON in R2; see `src/lib/sync/protocol.ts`). The server needs `SYNC_ENABLED=true` and the `PROJECTS` R2 binding; `SYNC_BETA_EMAILS` (comma-separated) limits it to those accounts.
+Saved projects sync to the signed-in account through `/api/sync` (metadata in D1, gzipped project JSON in R2; see `src/lib/sync/protocol.ts`). The server needs `SYNC_ENABLED=true` and the `PROJECTS` R2 binding; every account may sync.
 
 To try accounts in the dev server, run `pnpm dev:accounts` (`pnpm dev` with `PUBLIC_ACCOUNTS_ENABLED=true`). No real email is sent: open `/api/dev/outbox?to=<email>` to read the code. It works over HTTPS on the tailnet too (`AUTH_ALLOWED_HOSTS` allows `*.ts.net:5173`). For Google, put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.dev.vars`, add `https://<host>:5173/api/auth/callback/google` as a redirect URI on the Google client, and restart the dev server.
 

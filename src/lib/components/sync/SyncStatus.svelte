@@ -45,9 +45,6 @@ Shows nothing while syncing works, which is the usual case. -->
     {:else if sync.state === 'paused'}
       <CloudOffIcon class="size-4 shrink-0 opacity-70" />
       <span>Sync paused. Your projects are safe in this browser.</span>
-    {:else if sync.state === 'not-invited'}
-      <CloudOffIcon class="size-4 shrink-0 opacity-70" />
-      <span>Sync is in a private beta for now.</span>
     {:else if sync.state === 'signed-out'}
       <CloudAlertIcon class="text-warning-700-300 size-4 shrink-0" />
       <span>Your session ended.</span>

@@ -62,6 +62,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let busy = $state(false);
   let errorMessage = $state('');
   let noticeMessage = $state('');
+  // Sign-ups are closed or full: only an existing account got a code
+  let signUpsPaused = $state(false);
+  // The page is prerendered: until it hydrates, submitting would reload it
+  let ready = $state(false);
   let providers: Record<SignInProvider, boolean> = $state({ google: false });
   let sentAt = $state(0);
   let now = $state(Date.now());
@@ -84,6 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onMount(async () => {
+    ready = true;
     // A failed provider sign-in returns with ?error=
     const error = new URL(window.location.href).searchParams.get('error');
     if (error) errorMessage = providerErrorMessage(error);
@@ -106,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     noticeMessage = '';
     busy = true;
     try {
-      await sendSignInCode(email.trim());
+      ({ signUpsPaused = false } = await sendSignInCode(email.trim()));
       code = '';
       sentAt = now = Date.now();
       step = 'code';
@@ -201,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           type="submit"
           class="btn preset-filled-primary-500 h-12 w-full"
-          disabled={busy}
+          disabled={busy || !ready}
         >
           {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<MailIcon
             />{/if}
@@ -218,9 +223,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col items-center gap-1 text-center">
         <MailCheckIcon class="text-primary-500 size-10" />
         <h3 class="h4">Check your email</h3>
-        <p>
-          We sent a code to <EmailText {email} />
-        </p>
+        {#if signUpsPaused}
+          <p>
+            If <EmailText {email} /> has an account, we sent it a code.
+          </p>
+          <p class="text-sm opacity-80" data-testid="sign-ups-paused">
+            New sign-ups are paused while the beta is full. Try again later.
+          </p>
+        {:else}
+          <p>
+            We sent a code to <EmailText {email} />
+          </p>
+        {/if}
       </div>
       <CodeInput bind:value={code} disabled={busy} />
       <p class="text-center text-sm opacity-80" aria-live="polite">

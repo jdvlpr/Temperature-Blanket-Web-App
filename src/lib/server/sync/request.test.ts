@@ -1,11 +1,7 @@
 import { SYNC_HEADERS } from '$lib/sync/protocol';
-import { describe, expect, it, vi } from 'vitest';
-
-// The allowlist check lives beside requireSync, which pulls in Better Auth
-vi.mock('$lib/server/auth', () => ({ requireAccount: vi.fn() }));
-const { syncAllowedFor } = await import('./index');
-const { isProjectId, parseSaveHeaders } = await import('./request');
-const { MAX_PROJECT_BYTES } = await import('./store');
+import { describe, expect, it } from 'vitest';
+import { isProjectId, parseSaveHeaders } from './request';
+import { MAX_PROJECT_BYTES } from './store';
 
 const valid = {
   'content-length': '1234',
@@ -74,18 +70,5 @@ describe('isProjectId', () => {
     expect(isProjectId('0b8c4f1e-2a3d-4e5f-8a9b-0c1d2e3f4a5b')).toBe(true);
     for (const bad of ['', '../x', 'a/b', 'x'.repeat(65), 'a b'])
       expect(isProjectId(bad)).toBe(false);
-  });
-});
-
-describe('syncAllowedFor', () => {
-  it('allows everyone without a beta list, and only the list with one', () => {
-    expect(syncAllowedFor('a@example.test', undefined)).toBe(true);
-    expect(syncAllowedFor('a@example.test', ' ')).toBe(true);
-    expect(
-      syncAllowedFor('A@Example.test', 'b@example.test, a@example.test'),
-    ).toBe(true);
-    expect(
-      syncAllowedFor('c@example.test', 'b@example.test,a@example.test'),
-    ).toBe(false);
   });
 });

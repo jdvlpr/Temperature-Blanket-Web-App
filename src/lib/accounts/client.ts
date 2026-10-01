@@ -44,6 +44,9 @@ export const needsFreshSession = (error: unknown) =>
   error instanceof AccountError &&
   (error.code === 'SESSION_EXPIRED' || error.code === 'SESSION_NOT_FRESH');
 
+const SIGN_UPS_PAUSED_MESSAGE =
+  'New sign-ups are paused while the beta is full. Try again later.';
+
 /** A message for people, from an account API error. */
 export function accountErrorMessage(error: unknown): string {
   if (!(error instanceof AccountError))
@@ -51,6 +54,7 @@ export function accountErrorMessage(error: unknown): string {
   if (error.code === 'TOO_MANY_REQUESTS')
     return 'Too many codes have been sent to this email. Try again in an hour.';
   if (error.code === 'NAME_TOO_LONG') return 'Use 80 characters or fewer.';
+  if (error.code === 'SIGN_UPS_PAUSED') return SIGN_UPS_PAUSED_MESSAGE;
   if (error.code === 'TOO_MANY_ATTEMPTS')
     return 'Too many tries. Request a new code.';
   if (error.status === 429)
@@ -89,11 +93,18 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
   return data as T;
 }
 
+/**
+ * Sends a sign-in code. With signUpsPaused, only an email that already has an
+ * account gets one (the reply is the same either way).
+ */
 export const sendSignInCode = (email: string) =>
-  call<{ success: boolean }>('/email-otp/send-verification-otp', {
-    email,
-    type: 'sign-in',
-  });
+  call<{ success: boolean; signUpsPaused?: boolean }>(
+    '/email-otp/send-verification-otp',
+    {
+      email,
+      type: 'sign-in',
+    },
+  );
 
 export const signInWithCode = (email: string, otp: string) =>
   call<{ user: AccountUser }>('/sign-in/email-otp', { email, otp });
@@ -197,6 +208,7 @@ export function providerErrorMessage(error: string): string {
   if (error === 'account_not_linked')
     return 'An account with this email already exists. Sign in with your email, then link it from your account page.';
   if (error === 'access_denied') return 'Sign-in was canceled.';
+  if (error === 'SIGN_UPS_PAUSED') return SIGN_UPS_PAUSED_MESSAGE;
   return 'That didn’t work. Try again, or use your email.';
 }
 

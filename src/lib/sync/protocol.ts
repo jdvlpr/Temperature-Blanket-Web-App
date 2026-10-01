@@ -109,7 +109,6 @@ export type ChangesResponse =
 export type SyncErrorCode =
   | 'CONFLICT'
   | 'SYNC_PAUSED'
-  | 'SYNC_NOT_INVITED'
   | 'QUOTA_EXCEEDED'
   | 'PROJECT_TOO_LARGE'
   | 'LENGTH_REQUIRED'

@@ -18,6 +18,7 @@ declare global {
         ENABLE_DEV_ROUTES?: string;
         EMAIL_SENDER?: string;
         ACCOUNTS_ENABLED?: string;
+        ACCOUNTS_SIGNUP_LIMIT?: string;
         BETTER_AUTH_SECRET?: string;
         AUTH_ALLOWED_HOSTS?: string;
         AUTH_PROTOCOL?: string;
@@ -26,7 +27,6 @@ declare global {
         GOOGLE_CLIENT_ID?: string;
         GOOGLE_CLIENT_SECRET?: string;
         SYNC_ENABLED?: string;
-        SYNC_BETA_EMAILS?: string;
         GALLERY_PUBLISH_ENABLED?: string;
       };
     }

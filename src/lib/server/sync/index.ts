@@ -28,20 +28,13 @@ export type SyncContext = {
   runInBackground: (promise: Promise<unknown>) => void;
 };
 
-/** Whether this account may sync: everyone, or the SYNC_BETA_EMAILS list when it's set. */
-export function syncAllowedFor(email: string, betaEmails: string | undefined) {
-  if (!betaEmails?.trim()) return true;
-  const allowed = betaEmails.split(',').map((e) => e.trim().toLowerCase());
-  return allowed.includes(email.trim().toLowerCase());
-}
-
 export const syncError = (status: number, code: string, message: string) =>
   json({ code, message }, { status, headers: { 'Cache-Control': 'no-store' } });
 
 /**
  * The signed-in user's sync storage, or a Response: 404 with accounts off, 401 when
  * signed out, 503 with code SYNC_PAUSED when sync is switched off or not set up
- * (everything local keeps working), 403 SYNC_NOT_INVITED outside the beta list.
+ * (everything local keeps working). Every account may sync.
  */
 export async function requireSync(
   event: RequestEvent,
@@ -52,8 +45,6 @@ export async function requireSync(
   const env = event.platform?.env;
   if (env?.SYNC_ENABLED !== 'true' || !env.DB || !env.PROJECTS)
     return syncError(503, 'SYNC_PAUSED', 'Sync is paused');
-  if (!syncAllowedFor(account.user.email, env.SYNC_BETA_EMAILS))
-    return syncError(403, 'SYNC_NOT_INVITED', 'Sync is in a private beta');
 
   const ctx = event.platform?.ctx;
   return {
