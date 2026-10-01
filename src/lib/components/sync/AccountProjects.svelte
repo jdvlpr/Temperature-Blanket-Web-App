@@ -15,16 +15,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The account's projects, for the account page, shown as in the list of saved
 projects. Syncing downloads every one of them, so the list on this device is the
-account's list; removing one removes it from the account too. -->
+account's list; deleting one moves it to the Trash (on My Projects) and removes
+it from the account. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import {
     ProjectStorage,
+    savedProjects,
     sortByRecent,
     type StoredProjectIndexItem,
   } from '$lib/storage/projects.svelte';
   import { sync, syncLabelFor } from '$lib/sync/status.svelte';
+  import { FolderOpenIcon } from '@lucide/svelte';
 
   let { userId }: { userId: string } = $props();
 
@@ -38,8 +42,9 @@ account's list; removing one removes it from the account too. -->
   }
 
   $effect(() => {
-    // Reload after each sync pass
+    // Reload after each sync pass, and any other change
     void sync.version;
+    void savedProjects.version;
     load();
   });
 </script>
@@ -52,10 +57,7 @@ account's list; removing one removes it from the account too. -->
           <ProjectDetails
             project={project.meta}
             syncLabel={syncLabelFor(project, true)}
-            onclick={async () => {
-              await ProjectStorage.removeById(project.id);
-              await load();
-            }}
+            onclick={() => ProjectStorage.moveToTrash(project.id)}
           />
         </li>
       {/each}
@@ -63,4 +65,11 @@ account's list; removing one removes it from the account too. -->
   {:else}
     <p class="px-4 py-3 text-sm opacity-70">No projects yet.</p>
   {/if}
+  <a
+    href={resolve('/my-projects')}
+    class="btn hover:preset-tonal-surface m-2 w-fit"
+  >
+    <FolderOpenIcon />
+    My Projects
+  </a>
 {/if}

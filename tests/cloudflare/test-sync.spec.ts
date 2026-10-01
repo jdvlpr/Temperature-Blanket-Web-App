@@ -264,11 +264,23 @@ test.describe('Sync in the browser', () => {
     await openSavedProjects(laptop);
     await expect(laptop.getByRole('link', { name: 'Doomed' })).toBeVisible();
 
-    await phone.getByRole('button', { name: 'Remove Doomed' }).click();
+    // Moving it to the Trash on My Projects deletes it from the account
+    await phone.goto('/my-projects');
+    await phone.getByRole('button', { name: 'Delete Doomed' }).click();
     await expect.poll(() => serverProjectIds(phone)).toEqual([]);
 
     await laptop.reload();
     await expect.poll(async () => (await savedIndex(laptop)).length).toBe(0);
+
+    // Restored from the Trash, it's uploaded over the deletion and comes back
+    await phone.getByRole('button', { name: 'Trash (1)' }).click();
+    await phone
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Restore Doomed' })
+      .click();
+    await expect.poll(() => serverProjectIds(phone)).toHaveLength(1);
+    await laptop.reload();
+    await expect.poll(async () => (await savedIndex(laptop)).length).toBe(1);
   });
 
   test('signing out removes synced projects, and asks only when some haven’t synced', async ({

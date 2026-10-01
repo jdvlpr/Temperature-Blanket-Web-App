@@ -155,7 +155,12 @@ test.describe('My Projects', () => {
     await page.getByRole('button', { name: 'Search', exact: true }).click();
     await expect(page.getByText('°C / mm °F / in')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    // Save is in the Project menu
+    await page.getByRole('button', { name: 'Project Options' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Save', exact: true })
+      .click();
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByText('Saved Locally')).toBeVisible();
     await dialog.getByLabel('Name (optional)').fill('Austin Gift');
