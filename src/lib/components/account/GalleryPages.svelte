@@ -13,9 +13,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Gallery pages published from this account, for the account page: whether they
-show the account's name, and removing them. Hidden until the account has a page or
-publishing from accounts is on. -->
+<!-- Gallery pages published from this account, on the My Projects page: whether
+they show the account's name, and removing them. Hidden until the account has a
+page or publishing from accounts is on. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -37,13 +37,10 @@ publishing from accounts is on. -->
 
   let {
     name,
-    pageCount = $bindable(0),
     cardClass,
   }: {
     /** The account's display name */
     name: string;
-    /** How many pages the account has, for the delete-account question */
-    pageCount?: number;
     cardClass: string;
   } = $props();
 
@@ -56,7 +53,10 @@ publishing from accounts is on. -->
   let busy = $state(false);
   let errorMessage = $state('');
 
-  let hasName = $derived(Boolean(name.trim()));
+  // The server's copy of the name, which may be newer than this browser's
+  let serverName = $state<string | null>(null);
+  let currentName = $derived(serverName ?? name);
+  let hasName = $derived(Boolean(currentName.trim()));
 
   const ROW_LINK =
     'hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors';
@@ -65,10 +65,10 @@ publishing from accounts is on. -->
     const gallery = await getGalleryPages();
     if (!gallery) return;
     pages = gallery.posts;
-    pageCount = pages.length;
     showName = gallery.settings.showName;
     publicId = gallery.settings.publicId;
     publishing = gallery.publishing;
+    if (typeof gallery.name === 'string') serverName = gallery.name;
     loaded = true;
   }
 
@@ -106,9 +106,7 @@ publishing from accounts is on. -->
 
 {#if loaded && (pages.length || publishing)}
   <section class="flex flex-col gap-2" aria-labelledby="gallery-pages">
-    <h3 id="gallery-pages" class="px-2 text-sm font-bold opacity-70">
-      Gallery pages
-    </h3>
+    <h2 id="gallery-pages" class="h3">Gallery Pages</h2>
     <div class={cardClass}>
       <label class="flex items-start gap-3 px-4 py-3">
         <input
@@ -122,10 +120,13 @@ publishing from accounts is on. -->
           <span class="font-bold">Show my name on my gallery pages</span>
           <span class="text-sm opacity-70">
             {#if hasName}
-              Pages you publish while signed in will say “By {name}”, linking to
-              a page that lists them all.
+              Pages you publish while signed in will say “By {currentName}”,
+              linking to a page that lists them all.
             {:else}
-              Add a display name above first.
+              First add a display name on <a
+                href={resolve('/account')}
+                class="link">your account page</a
+              >.
             {/if}
           </span>
         </span>

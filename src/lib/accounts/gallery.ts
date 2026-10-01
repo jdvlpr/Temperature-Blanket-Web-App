@@ -40,6 +40,8 @@ export async function getGalleryPages(): Promise<{
   settings: GalleryOwnerSettings;
   /** Whether publishing from accounts is switched on */
   publishing: boolean;
+  /** The account's display name, as it is now */
+  name?: string;
 } | null> {
   try {
     const response = await fetch(PATH);

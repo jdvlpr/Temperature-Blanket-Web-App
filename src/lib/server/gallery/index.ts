@@ -50,6 +50,8 @@ export const galleryError = (status: number, code: string, message: string) =>
 export type GalleryContext = {
   db: D1Database;
   userId: string;
+  /** The account's display name, as it is now */
+  name?: string;
   api: GalleryApi;
 };
 
@@ -74,7 +76,12 @@ export async function requireGallery(
       'GALLERY_PAUSED',
       'Publishing from accounts is paused',
     );
-  return { db: env.DB, userId: account.user.id, api: defaultGalleryApi() };
+  return {
+    db: env.DB,
+    userId: account.user.id,
+    name: account.user.name ?? '',
+    api: defaultGalleryApi(),
+  };
 }
 
 /** The saved project a gallery payload's link points at (?project=<id>), if any. */

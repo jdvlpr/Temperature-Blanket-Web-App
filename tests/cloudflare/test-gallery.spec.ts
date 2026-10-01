@@ -54,6 +54,7 @@ test.describe('Gallery pages from accounts', () => {
       posts: [],
       settings: { showName: false, removeOnDelete: false, publicId: null },
       publishing: false,
+      name: '',
     });
 
     const published = await api.post('/api/account/gallery', {
@@ -79,15 +80,17 @@ test.describe('Gallery pages from accounts', () => {
       404,
     );
 
-    // Nothing published and publishing off: no gallery section
-    await page.reload();
-    await expect(page.getByTestId('account-email')).toHaveText(email);
+    // Nothing published and publishing off: no gallery section on My Projects
+    await page.goto('/my-projects');
     await expect(
-      page.getByRole('heading', { name: 'Gallery pages' }),
+      page.getByRole('heading', { name: 'Projects', exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Gallery Pages' }),
     ).toHaveCount(0);
   });
 
-  test('the account page lists published pages and asks about them on deletion', async ({
+  test('My Projects lists published pages, and deleting the account asks about them', async ({
     page,
     request,
   }) => {
@@ -100,9 +103,9 @@ test.describe('Gallery pages from accounts', () => {
        values (${postId}, '${userId}', 'p1', 'Ottawa from 2025 to 2026', ${Date.now()})`,
     );
 
-    await page.reload();
+    await page.goto('/my-projects');
     await expect(
-      page.getByRole('heading', { name: 'Gallery pages' }),
+      page.getByRole('heading', { name: 'Gallery Pages' }),
     ).toBeVisible();
     const pages = page.getByRole('list', { name: 'Your gallery pages' });
     await expect(
@@ -114,6 +117,7 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('checkbox', { name: /Show my name/ }),
     ).toBeDisabled();
 
+    await page.goto('/account');
     await page.getByRole('button', { name: 'Delete account' }).click();
     await expect(
       page.getByRole('radio', {
@@ -165,8 +169,8 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('heading', { name: 'Projects by Grace Hopper' }),
     ).toBeVisible();
 
-    // Linked from the account page
-    await page.goto('/account');
+    // Linked from My Projects
+    await page.goto('/my-projects');
     await expect(page.getByTestId('gallery-owner-page')).toHaveAttribute(
       'href',
       `/gallery/by/${settings.publicId}`,

@@ -53,10 +53,16 @@ test.describe('My Projects', () => {
   test('lists saved projects and palettes', async ({ page }) => {
     // Save a palette
     await page.goto('/yarn');
-    await page
-      .getByRole('button', { name: 'Save Palette', exact: true })
-      .click();
     const dialog = page.getByRole('dialog');
+    // Retried: a click before the page finishes loading does nothing
+    await expect(async () => {
+      await page
+        .getByRole('button', { name: 'Save Palette', exact: true })
+        .click();
+      await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
     await dialog.getByLabel('Name (optional)').fill('Test Meadow');
     await dialog
       .getByRole('button', { name: 'Save Palette', exact: true })

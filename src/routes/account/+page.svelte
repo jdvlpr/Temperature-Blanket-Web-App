@@ -33,17 +33,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
   import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
   import DisplayName from '$lib/components/account/DisplayName.svelte';
-  import GalleryPages from '$lib/components/account/GalleryPages.svelte';
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
-  import AccountProjects from '$lib/components/sync/AccountProjects.svelte';
   import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
   import { sync } from '$lib/sync/status.svelte';
+  import { getGalleryPages } from '$lib/accounts/gallery';
+  import { ProjectStorage, savedProjects } from '$lib/storage/projects.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     ChevronRightIcon,
     CloudIcon,
     DownloadIcon,
+    FolderOpenIcon,
     LoaderCircleIcon,
     LogOutIcon,
     MonitorSmartphoneIcon,
@@ -60,7 +62,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let user = $state<AccountUser | null>(null);
   let busy = $state(false);
   let errorMessage = $state('');
+  // For the delete-account question
   let galleryPageCount = $state(0);
+  let projectCount = $state<number | null>(null);
+
+  // The projects and gallery pages themselves are on My Projects
+  $effect(() => {
+    if (status !== 'signed-in' || !user) return;
+    const userId = user.id;
+    void sync.version;
+    void savedProjects.version;
+    ProjectStorage.getIndex().then(
+      (index) =>
+        (projectCount = index.filter(
+          (item) => item.sync?.ownerUserId === userId,
+        ).length),
+    );
+  });
+  $effect(() => {
+    if (status !== 'signed-in') return;
+    getGalleryPages().then(
+      (gallery) => (galleryPageCount = gallery?.posts.length ?? 0),
+    );
+  });
 
   let memberSince = $derived(
     user?.createdAt
@@ -229,15 +253,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <AddToAccountButton class="mt-1" />
                 </div>
               </div>
-              <AccountProjects userId={user.id} />
+              <a href={resolve('/my-projects')} class={ROW}>
+                <FolderOpenIcon class="shrink-0 opacity-70" />
+                <span class="flex flex-1 flex-col">
+                  <span>My Projects</span>
+                  <span class="text-sm opacity-70">
+                    {#if projectCount !== null}
+                      {projectCount}
+                      {pluralize('project', projectCount)} in your account
+                    {:else}
+                      Your projects and gallery pages
+                    {/if}
+                  </span>
+                </span>
+                <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
+              </a>
             </div>
           </section>
-
-          <GalleryPages
-            name={user.name}
-            cardClass={CARD}
-            bind:pageCount={galleryPageCount}
-          />
 
           <section
             class="flex flex-col gap-2"

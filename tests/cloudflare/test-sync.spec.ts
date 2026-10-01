@@ -307,11 +307,7 @@ test.describe('Sync in the browser', () => {
 
     // Everything synced: no question, and the project leaves the laptop
     await laptop.goto('/account');
-    await expect(
-      laptop
-        .getByRole('list', { name: 'Your projects' })
-        .getByRole('link', { name: 'Synced' }),
-    ).toBeVisible();
+    await expect(laptop.getByText('1 project in your account')).toBeVisible();
     await laptop.getByRole('button', { name: 'Sign out', exact: true }).click();
     await expect(laptop.getByText('You’re not signed in.')).toBeVisible();
     await expect(laptop.getByRole('dialog')).toHaveCount(0);

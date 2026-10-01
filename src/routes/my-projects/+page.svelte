@@ -24,6 +24,7 @@ the account; palettes and the Trash stay in this browser. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import { account } from '$lib/accounts/summary.svelte';
   import { sync } from '$lib/sync/status.svelte';
+  import GalleryPages from '$lib/components/account/GalleryPages.svelte';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import SavedPalettes from '$lib/components/SavedPalettes.svelte';
   import Trash from '$lib/components/Trash.svelte';
@@ -35,10 +36,11 @@ the account; palettes and the Trash stay in this browser. -->
   let trashedProjectCount = $state(0);
   let trashCount = $derived(trashedProjectCount + savedPalettes.deleted.length);
 
-  // Signed in with sync on: projects are kept in the account
-  const synced = $derived(
-    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id) && sync.active,
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
   );
+  // Signed in with sync on: projects are kept in the account
+  const synced = $derived(signedIn && sync.active);
 
   $effect(() => {
     void savedProjects.version;
@@ -112,6 +114,14 @@ the account; palettes and the Trash stay in this browser. -->
           <SavedPalettes />
         {/if}
       </section>
+
+      <!-- Signed in: pages published to the gallery from the account -->
+      {#if browser && signedIn}
+        <GalleryPages
+          name={account.summary?.name ?? ''}
+          cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden"
+        />
+      {/if}
 
       <!-- Out of the way: deleted things are in a dialog, and the button only
       shows when there's something in it -->
