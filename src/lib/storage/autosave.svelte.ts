@@ -339,6 +339,35 @@ export async function saveCopy() {
   return item;
 }
 
+/**
+ * Moves the open project to the Trash, with a waiting change saved first so
+ * restoring it brings that back too. It stays on screen, unsaved: changes
+ * here no longer save, so they can't bring it back by themselves.
+ */
+export async function trashOpenProject() {
+  const id = openProjectId();
+  if (!id) return;
+  await saveNow();
+  clearTimeout(timer);
+  waitingSince = 0;
+  await ProjectStorage.moveToTrash(id);
+  autosave.state = 'saved';
+  await refresh();
+  project.status.saved = false;
+}
+
+/**
+ * Undoes trashOpenProject: puts it back, and saves any changes made here
+ * since as usual.
+ */
+export async function restoreOpenProject(id: string) {
+  await ProjectStorage.restoreFromTrash(id);
+  if (openProjectId() !== id) return;
+  await rememberStored();
+  await refresh();
+  projectChanged();
+}
+
 if (typeof document !== 'undefined') {
   // Leaving the tab: save now, so the change can sync before the tab sleeps
   document.addEventListener('visibilitychange', () => {

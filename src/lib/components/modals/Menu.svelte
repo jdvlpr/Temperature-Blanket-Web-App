@@ -34,13 +34,17 @@ button to it. -->
   import {
     autosave,
     changedElsewhereMessage,
+    restoreOpenProject,
     saveCopy,
+    storedItem,
+    trashOpenProject,
   } from '$lib/storage/autosave.svelte';
   import {
     ProjectStorage,
     savedProjects,
     type StoredProjectIndexItem,
   } from '$lib/storage/projects.svelte';
+  import { TRASH_DAYS } from '$lib/storage/trash';
   import { sync } from '$lib/sync/status.svelte';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import {
@@ -56,6 +60,7 @@ button to it. -->
     PlusIcon,
     RefreshCwIcon,
     SendIcon,
+    Trash2Icon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import AddToGallery from './AddToGallery.svelte';
@@ -119,6 +124,37 @@ button to it. -->
     } catch (e) {
       console.warn("Can't save a copy", { e });
       toast.trigger({ message: 'Unable to save a copy', category: 'error' });
+    }
+  }
+
+  // To the Trash, with Undo; it stays on screen, unsaved
+  async function trashProject() {
+    try {
+      const item = await storedItem();
+      if (!item) return;
+      const label = item.meta.name || item.meta.title || 'Untitled Project';
+      await trashOpenProject();
+      dialog.close();
+      toast.trigger({
+        message: `Moved ${label} to the Trash`,
+        category: 'success',
+        action: {
+          label: 'Undo',
+          response: () =>
+            void restoreOpenProject(item.id).catch(() =>
+              toast.trigger({
+                message: 'Unable to restore the project',
+                category: 'error',
+              }),
+            ),
+        },
+      });
+    } catch (e) {
+      console.warn("Can't move the project to the Trash", { e });
+      toast.trigger({
+        message: 'Unable to delete the project',
+        category: 'error',
+      });
     }
   }
 
@@ -330,6 +366,29 @@ button to it. -->
     </section>
   {/if}
 
+  <!-- Deleting it, apart from the rest -->
+  {#if hasWeather && autosave.stored}
+    <section aria-label="Delete project">
+      <ul class={PANEL_LIST}>
+        <li>
+          <button
+            type="button"
+            class="{ROW} text-error-700-300"
+            onclick={trashProject}
+            data-testid="trash-project"
+          >
+            <Trash2Icon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>Move to Trash</span>
+              <span class="text-xs opacity-70"
+                >Restore it from My Projects for {TRASH_DAYS} days</span
+              >
+            </span>
+          </button>
+        </li>
+      </ul>
+    </section>
+  {/if}
   <!-- A few recent projects; My Projects has them all -->
   {#if recentTotal}
     <section class="flex flex-col gap-2" aria-labelledby="recent-projects">

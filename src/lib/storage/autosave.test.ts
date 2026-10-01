@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
     sync?: { ownerUserId: string; updatedAt?: number };
     updatedAt?: number;
   }[],
+  trash: [] as { id: string; sync?: { ownerUserId: string } }[],
   save: vi.fn(async () => null),
 }));
 
@@ -28,6 +29,14 @@ vi.mock('$lib/storage/projects.svelte', () => ({
     syncOwner: () => state.owner,
     getIndex: async () => state.index,
     save: state.save,
+    moveToTrash: async (id: string) => {
+      state.trash = state.index.filter((i) => i.id === id);
+      state.index = state.index.filter((i) => i.id !== id);
+    },
+    restoreFromTrash: async (id: string) => {
+      state.index.push(...state.trash.filter((i) => i.id === id));
+      state.trash = [];
+    },
   },
 }));
 
@@ -38,6 +47,8 @@ import {
   projectChanged,
   projectSaved,
   resetAutosave,
+  restoreOpenProject,
+  trashOpenProject,
 } from './autosave.svelte';
 
 const edit = (hash: string) => {
@@ -237,5 +248,29 @@ describe('autosave', () => {
     projectChanged();
     await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
     expect(state.save).not.toHaveBeenCalled();
+  });
+
+  it('moved to the Trash, it stays on screen but stops saving', async () => {
+    await open();
+    await trashOpenProject();
+    expect(autosave.on).toBe(false);
+    expect(autosave.stored).toBe(false);
+    expect(state.project.status.saved).toBe(false);
+    vi.useFakeTimers();
+    edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
+    expect(state.save).not.toHaveBeenCalled();
+  });
+
+  it('undoing the Trash puts it back and saves changes made since', async () => {
+    await open();
+    await trashOpenProject();
+    edit('b');
+    vi.useFakeTimers();
+    await restoreOpenProject('p1');
+    expect(autosave.on).toBe(true);
+    expect(autosave.state).toBe('waiting');
+    await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
+    expect(state.save).toHaveBeenCalledTimes(1);
   });
 });
