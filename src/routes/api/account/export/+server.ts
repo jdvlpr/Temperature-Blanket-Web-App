@@ -13,7 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Download everything the account holds, as JSON. The page adds synced projects.
+// Download everything the account holds, as JSON, including saved palettes. The
+// page adds synced projects.
 
 import type { D1Database } from '@cloudflare/workers-types';
 import { json } from '@sveltejs/kit';
@@ -27,10 +28,11 @@ export const GET: RequestHandler = async (event) => {
   if (account instanceof Response) return account;
 
   const headers = event.request.headers;
-  const [signInMethods, sessions, gallery] = await Promise.all([
+  const [signInMethods, sessions, gallery, palettes] = await Promise.all([
     account.auth.api.listUserAccounts({ headers }),
     account.auth.api.listSessions({ headers }),
     galleryPages(event.platform?.env?.DB, account.user.id, event.url.origin),
+    savedPalettes(event.platform?.env?.DB, account.user.id),
   ]);
 
   const data = {
@@ -46,6 +48,7 @@ export const GET: RequestHandler = async (event) => {
       userAgent: session.userAgent,
     })),
     gallery,
+    palettes,
   };
 
   return json(data, {
@@ -56,6 +59,39 @@ export const GET: RequestHandler = async (event) => {
     },
   });
 };
+
+/** Palettes saved to the account, including ones in the Trash. */
+async function savedPalettes(db: D1Database | undefined, userId: string) {
+  if (!db) return null;
+  try {
+    const { results } = await db
+      .prepare(
+        `select "paletteId", "name", "code", "createdAt", "updatedAt", "deletedAt"
+         from "palette" where "userId" = ? and "purgedAt" is null order by "createdAt"`,
+      )
+      .bind(userId)
+      .all<{
+        paletteId: string;
+        name: string;
+        code: string;
+        createdAt: number;
+        updatedAt: number;
+        deletedAt: number | null;
+      }>();
+    return results.map((p) => ({
+      id: p.paletteId,
+      name: p.name,
+      code: p.code,
+      createdAt: new Date(p.createdAt).toISOString(),
+      updatedAt: new Date(p.updatedAt).toISOString(),
+      deletedAt:
+        p.deletedAt === null ? null : new Date(p.deletedAt).toISOString(),
+    }));
+  } catch {
+    // Not set up yet (migration 0006)
+    return null;
+  }
+}
 
 /** Gallery pages published from the account, with the gallery settings. */
 async function galleryPages(

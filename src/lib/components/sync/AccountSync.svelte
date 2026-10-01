@@ -58,13 +58,17 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
       const state = await ProjectStorage.accountSyncState(userId);
       if (state.importAsked) return;
       const ids = await syncModule.guestProjectIds();
-      if (!ids.length) return;
+      const paletteIds = await syncModule.guestPaletteIds();
+      if (!ids.length && !paletteIds.length) return;
       if (dialog.opened) return;
       const { default: SyncImportDialog } =
         await import('./SyncImportDialog.svelte');
       dialog.trigger({
         type: 'component',
-        component: { ref: SyncImportDialog, props: { userId, ids } },
+        component: {
+          ref: SyncImportDialog,
+          props: { userId, ids, paletteIds },
+        },
         options: { showCloseButton: false },
       });
     })();

@@ -17,8 +17,10 @@
 // browser compressed it; its metadata travels in headers, so the Worker never
 // has to decompress or parse the project.
 
-import { SYNC_HEADERS } from '$lib/sync/protocol';
+import { SYNC_HEADERS, type PaletteInput } from '$lib/sync/protocol';
 import {
+  MAX_PALETTE_CODE_LENGTH,
+  MAX_PALETTE_NAME_LENGTH,
   MAX_PROJECT_BYTES,
   MAX_TITLE_LENGTH,
   PROJECT_ID_PATTERN,
@@ -106,6 +108,39 @@ export function parseSaveHeaders(headers: Headers): Parsed<SaveHeaders> {
       title,
       contentHash,
       sizeBytes,
+    },
+  };
+}
+
+const time = (value: unknown): number | null =>
+  typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+    ? value
+    : null;
+
+/** A palette save's JSON body. Palette and project IDs share one pattern. */
+export function parsePaletteInput(body: unknown): Parsed<PaletteInput> {
+  if (!body || typeof body !== 'object') return invalid('A body is required');
+  const b = body as Record<string, unknown>;
+  const createdAt = time(b.createdAt);
+  const updatedAt = time(b.updatedAt);
+  if (createdAt === null || updatedAt === null) return invalid('Invalid times');
+  const deletedAt = b.deletedAt === null ? null : time(b.deletedAt);
+  if (deletedAt === null && b.deletedAt !== null)
+    return invalid('Invalid deletion time');
+  const purged = b.purged === true;
+  const code = typeof b.code === 'string' ? b.code : '';
+  const name = typeof b.name === 'string' ? b.name : '';
+  if (!purged && (!code || code.length > MAX_PALETTE_CODE_LENGTH))
+    return invalid('Invalid palette code');
+  return {
+    ok: true,
+    value: {
+      name: name.trim().slice(0, MAX_PALETTE_NAME_LENGTH),
+      code,
+      createdAt,
+      updatedAt,
+      deletedAt,
+      purged,
     },
   };
 }

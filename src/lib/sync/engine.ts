@@ -21,9 +21,17 @@
 // - Never lose data: when both sides changed, the server copy keeps the project
 //   and the device's copy becomes a new project, "… (copy from this device, …)".
 // - An edit beats a deletion from another device.
+// - Palettes ride the same changes feed; the newest change to one wins.
 
+import type { SavedPalette } from '$lib/storage/palettes.svelte';
 import type { StoredProject } from '$lib/storage/projects.svelte';
-import type { ChangesResponse, ProjectMeta, SyncErrorCode } from './protocol';
+import type {
+  ChangesResponse,
+  PaletteInput,
+  PaletteRecord,
+  ProjectMeta,
+  SyncErrorCode,
+} from './protocol';
 import type { Seen } from './seen';
 
 /** Sync bookkeeping kept with each saved project on this device. */
@@ -49,6 +57,9 @@ export type AccountSyncState = {
   since: number;
   /** Deletions made on this device that the server hasn't confirmed */
   pendingDeletes: { id: string; baseRev: number }[];
+  /** Projects deleted for good here before their deletion reached the server:
+   * once it has, their copy in the account's Trash goes too */
+  pendingPurges?: string[];
   /** Whether this device already asked to add its other projects to the account */
   importAsked?: boolean;
 };
@@ -79,6 +90,19 @@ export interface LocalStore {
   setAccountState(userId: string, state: AccountSyncState): Promise<void>;
 }
 
+/** The palettes on this device, for the sync pass (see PaletteStorage). */
+export interface PaletteLocal {
+  list(): Promise<SavedPalette[]>;
+  apply(userId: string, records: PaletteRecord[]): Promise<void>;
+  settle(
+    userId: string,
+    sentUpdatedAt: number,
+    record: PaletteRecord,
+    applied: boolean,
+  ): Promise<void>;
+  forgetMissing(userId: string, onServer: Set<string>): Promise<void>;
+}
+
 export type Upload = {
   baseRev: number | null;
   json: string;
@@ -100,6 +124,12 @@ export interface SyncServer {
   upload(id: string, upload: Upload): Promise<SaveOutcome>;
   /** Deleting a project that's already gone counts as done */
   remove(id: string, baseRev: number): Promise<DeleteOutcome>;
+  /** Deletes a project's copy in the account's Trash for good */
+  purgeTrashed?(id: string): Promise<void>;
+  uploadPalette?(
+    id: string,
+    palette: PaletteInput,
+  ): Promise<{ palette: PaletteRecord; applied: boolean }>;
 }
 
 /** A failed request. Anything but the codes below stops the whole pass. */
@@ -143,6 +173,8 @@ export type SyncOptions = {
   now?: () => number;
   /** A new ID for a conflict copy */
   newId?: () => string;
+  /** Palettes to sync too */
+  palettes?: PaletteLocal;
 };
 
 export type SyncReport = {
@@ -152,6 +184,8 @@ export type SyncReport = {
   /** IDs of the device copies made when both sides changed */
   copies: string[];
   failed: { id: string; code: SyncErrorCode }[];
+  /** Palette IDs that failed to upload; they try again next time */
+  palettesFailed?: string[];
 };
 
 /** A saved project's link, moved to this origin and this project ID. */
@@ -185,7 +219,9 @@ export async function syncAccount(
     removed: [],
     copies: [],
     failed: [],
+    palettesFailed: [],
   };
+  const palettes = server.uploadPalette ? options.palettes : undefined;
 
   let state = await local.accountState(userId);
   const saveState = async (next: AccountSyncState) => {
@@ -308,10 +344,21 @@ export async function syncAccount(
       pendingDeletes: state.pendingDeletes.filter((p) => p.id !== pending.id),
     });
   }
+  // Deleted for good while the deletion was waiting: now it's in the account's
+  // Trash, so empty it from there
+  for (const id of [...(state.pendingPurges ?? [])]) {
+    if (state.pendingDeletes.some((p) => p.id === id)) continue;
+    await server.purgeTrashed?.(id);
+    await saveState({
+      ...state,
+      pendingPurges: (state.pendingPurges ?? []).filter((p) => p !== id),
+    });
+  }
 
   // 2. Pull what changed on the server
   let fullResync = false;
   const seenOnServer = new Set<string>();
+  const palettesOnServer = new Set<string>();
   let since = state.since;
   for (;;) {
     const page = await server.changes(since);
@@ -355,6 +402,12 @@ export async function syncAccount(
         await download(meta.id, sync ?? 'absent', meta.clientUpdatedAt);
     }
 
+    // Before the page is marked seen, so a pass that stops here misses nothing
+    if (palettes && page.palettes?.length) {
+      for (const record of page.palettes) palettesOnServer.add(record.id);
+      await palettes.apply(userId, page.palettes);
+    }
+
     since = page.nextSince;
     await saveState({ ...state, since });
     if (!page.hasMore) break;
@@ -368,6 +421,7 @@ export async function syncAccount(
         await local.updateSync(id, (s) => ({ ...(s ?? sync), rev: null }));
       else if (await local.remove(id, sync)) report.removed.push(id);
     }
+  if (fullResync) await palettes?.forgetMissing(userId, palettesOnServer);
 
   // 3. Push what changed here, including copies made along the way
   const queue = [...(await owned()).keys()];
@@ -424,6 +478,33 @@ export async function syncAccount(
       if (copyId) queue.push(copyId);
     }
   }
+
+  // 4. Palettes changed here. One that fails doesn't stop the others; it tries
+  //    again on the next pass.
+  if (palettes)
+    for (const palette of await palettes.list()) {
+      if (palette.sync?.ownerUserId !== userId || !palette.sync.dirty) continue;
+      try {
+        const result = await server.uploadPalette!(palette.id, {
+          name: palette.name,
+          code: palette.code,
+          createdAt: palette.createdAt,
+          updatedAt: palette.updatedAt,
+          deletedAt: palette.deletedAt ?? null,
+          purged: palette.purged === true,
+        });
+        await palettes.settle(
+          userId,
+          palette.updatedAt,
+          result.palette,
+          result.applied,
+        );
+      } catch (e) {
+        if (e instanceof SyncHttpError && (e.status === 0 || e.status === 401))
+          throw e;
+        report.palettesFailed!.push(palette.id);
+      }
+    }
 
   return report;
 }

@@ -15,18 +15,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Deleted projects and palettes, in a dialog from the My Projects page:
 restore them, or delete them for good. Each is deleted for good after
-TRASH_DAYS anyway. -->
+TRASH_DAYS anyway. Signed in, it's the account's Trash: what was deleted on any
+device, restored everywhere (see $lib/storage/account-trash). -->
 
 <script lang="ts">
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { toast } from '$lib/state/page-state.svelte';
-  import { PaletteStorage, savedPalettes } from '$lib/storage/palettes.svelte';
   import {
-    ProjectStorage,
-    savedProjects,
-    type TrashedProject,
-  } from '$lib/storage/projects.svelte';
+    accountTrash,
+    deleteTrashEntryForever,
+    emptyProjectTrash,
+    loadProjectTrash,
+    refreshAccountTrash,
+    restoreTrashEntry,
+    trashedProject,
+    type ProjectTrashEntry,
+  } from '$lib/storage/account-trash.svelte';
+  import { PaletteStorage, savedPalettes } from '$lib/storage/palettes.svelte';
+  import { savedProjects } from '$lib/storage/projects.svelte';
   import { TRASH_DAYS } from '$lib/storage/trash';
   import type { Color } from '$lib/types/yarn-types';
   import {
@@ -48,22 +55,29 @@ TRASH_DAYS anyway. -->
     label: string;
     colors: Color[];
     deletedAt: number;
+    project?: ProjectTrashEntry;
   };
 
   let yarnDataReady = $state(false);
-  let trashedProjects = $state<TrashedProject[]>([]);
+  let trashedProjects = $state<ProjectTrashEntry[]>([]);
+  // Links of projects only the account has, once downloaded, for their colors
+  let downloadedHrefs = $state<Record<string, string>>({});
   // `${kind}:${id}` of the entry asking to be deleted for good, or 'all'
   let confirming = $state<string | null>(null);
 
   let entries = $derived.by((): Entry[] => {
     if (!yarnDataReady) return [];
-    const projects = trashedProjects.map(({ item, deletedAt }) => ({
-      kind: 'project' as const,
-      id: item.id,
-      label: item.meta.name || item.meta.title || 'Untitled Project',
-      colors: getColorsFromInput({ string: item.meta.href }) || [],
-      deletedAt,
-    }));
+    const projects = trashedProjects.map((project) => {
+      const href = project.local?.item.meta.href ?? downloadedHrefs[project.id];
+      return {
+        kind: 'project' as const,
+        id: project.id,
+        label: project.label,
+        colors: (href && getColorsFromInput({ string: href })) || [],
+        deletedAt: project.deletedAt,
+        project,
+      };
+    });
     const palettes = savedPalettes.deleted.map((palette) => {
       const colors = getColorsFromInput({ string: palette.code }) || [];
       return {
@@ -78,14 +92,27 @@ TRASH_DAYS anyway. -->
   });
 
   onMount(async () => {
-    await Promise.all([ensureYarnData(), savedPalettes.refresh()]);
+    await Promise.all([
+      ensureYarnData(),
+      savedPalettes.refresh(),
+      refreshAccountTrash(),
+    ]);
     yarnDataReady = true;
   });
 
   $effect(() => {
-    // Reload when projects move in or out of the Trash
+    // Reload when projects move in or out of the Trash, here or in the account
     void savedProjects.version;
-    ProjectStorage.getTrash().then((trash) => (trashedProjects = trash));
+    void accountTrash.list;
+    loadProjectTrash().then((trash) => (trashedProjects = trash));
+  });
+
+  $effect(() => {
+    for (const project of trashedProjects)
+      if (!project.local && !(project.id in downloadedHrefs))
+        trashedProject(project.id).then((p) => {
+          if (p) downloadedHrefs[project.id] = p.href;
+        });
   });
 
   async function run(action: () => Promise<void>, errorMessage: string) {
@@ -98,27 +125,27 @@ TRASH_DAYS anyway. -->
     await savedPalettes.refresh();
   }
 
-  const restore = ({ kind, id }: Entry) =>
+  const restore = ({ kind, id, project }: Entry) =>
     run(
       () =>
         kind === 'project'
-          ? ProjectStorage.restoreFromTrash(id)
+          ? restoreTrashEntry(project!)
           : PaletteStorage.restore(id),
       'Unable to restore it',
     );
 
-  const deleteForever = ({ kind, id }: Entry) =>
+  const deleteForever = ({ kind, id, project }: Entry) =>
     run(
       () =>
         kind === 'project'
-          ? ProjectStorage.deleteForever(id)
+          ? deleteTrashEntryForever(project!)
           : PaletteStorage.deleteForever(id),
       'Unable to delete it',
     );
 
   const emptyTrash = () =>
     run(async () => {
-      await ProjectStorage.emptyTrash();
+      await emptyProjectTrash(trashedProjects);
       await PaletteStorage.emptyTrash();
     }, 'Unable to empty the Trash');
 </script>

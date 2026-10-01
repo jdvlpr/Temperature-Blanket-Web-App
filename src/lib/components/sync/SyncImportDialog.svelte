@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- "Add the projects on this device to your account?" Shown once per account
 and device, after signing in, and again whenever someone asks to add projects
-(`later`). -->
+(`later`). Saved palettes go along unless someone chooses otherwise. -->
 
 <script lang="ts">
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
@@ -38,12 +38,19 @@ and device, after signing in, and again whenever someone asks to add projects
   let {
     userId,
     ids,
+    paletteIds = [],
     later = false,
-  }: { userId: string; ids: string[]; later?: boolean } = $props();
+  }: {
+    userId: string;
+    ids: string[];
+    paletteIds?: string[];
+    later?: boolean;
+  } = $props();
 
   let projects = $state<StoredProjectIndexItem[]>([]);
   // Everything is chosen to start with
   let chosen = $state<string[]>(untrack(() => [...ids]));
+  let addPalettes = $state(true);
   let choosing = $state(false);
   let busy = $state(false);
 
@@ -58,14 +65,24 @@ and device, after signing in, and again whenever someone asks to add projects
   const DETAIL = 'block text-sm opacity-75';
 
   const plural = (n: number) => (n === 1 ? 'project' : 'projects');
+  const palettesLabel = (n: number) =>
+    `${n} ${n === 1 ? 'palette' : 'palettes'}`;
+  /** "2 projects and 1 palette" */
+  const describe = (projects: number, palettes: number) =>
+    [
+      projects && `${projects} ${plural(projects)}`,
+      palettes && palettesLabel(palettes),
+    ]
+      .filter(Boolean)
+      .join(' and ');
 
-  async function answer(add: string[]) {
+  async function answer(add: string[], addPaletteIds: string[] = []) {
     busy = true;
     await markImportAsked(userId);
     dialog.close();
-    if (!add.length) return;
-    await addToAccount(userId, add);
-    const added = `${add.length} ${plural(add.length)}`;
+    if (!add.length && !addPaletteIds.length) return;
+    await addToAccount(userId, add, addPaletteIds);
+    const added = describe(add.length, addPaletteIds.length);
     // Problems have toasts of their own (see $lib/sync/sync.svelte)
     if (sync.state === 'idle')
       toast.trigger({
@@ -91,13 +108,13 @@ and device, after signing in, and again whenever someone asks to add projects
     <div class="flex flex-col gap-1">
       <h2 id="sync-import-title" class="h4">
         {later
-          ? 'Add projects to your account'
-          : 'Add your projects to your account?'}
+          ? `Add ${ids.length ? 'projects' : 'palettes'} to your account`
+          : `Add your ${ids.length ? 'projects' : 'palettes'} to your account?`}
       </h2>
       <p class="text-sm opacity-80">
-        This browser has {ids.length}
-        {plural(ids.length)} that {ids.length === 1 ? 'isn’t' : 'aren’t'} in your
-        account yet.
+        This browser has {describe(ids.length, paletteIds.length)} that
+        {ids.length + paletteIds.length === 1 ? 'isn’t' : 'aren’t'} in your account
+        yet.
       </p>
     </div>
   </div>
@@ -122,6 +139,16 @@ and device, after signing in, and again whenever someone asks to add projects
             </span>
           </label>
         {/each}
+        {#if paletteIds.length}
+          <label class="flex cursor-pointer items-center gap-3">
+            <input
+              type="checkbox"
+              class="checkbox shrink-0"
+              bind:checked={addPalettes}
+            />
+            <span>Also add {palettesLabel(paletteIds.length)}</span>
+          </label>
+        {/if}
       </div>
     </fieldset>
   {/if}
@@ -137,16 +164,25 @@ and device, after signing in, and again whenever someone asks to add projects
       <button
         type="button"
         class="bg-primary-50-950 hover:bg-primary-100-900 {ROW}"
-        disabled={busy || (choosing && !chosen.length)}
-        onclick={() => answer(choosing ? chosen : ids)}
+        disabled={busy ||
+          (choosing && !chosen.length && !(addPalettes && paletteIds.length))}
+        onclick={() =>
+          choosing
+            ? answer(chosen, addPalettes ? paletteIds : [])
+            : answer(ids, paletteIds)}
       >
         <CloudUploadIcon class="text-primary-600-400 {ICON}" />
         <span class="flex-1">
           <span class="block font-bold">
             {#if choosing}
-              Add {chosen.length} {plural(chosen.length)}
+              Add {describe(
+                chosen.length,
+                addPalettes ? paletteIds.length : 0,
+              ) || 'nothing'}
+            {:else if ids.length + paletteIds.length === 1}
+              Add it
             {:else}
-              Add {ids.length === 1 ? 'it' : `all ${ids.length}`}
+              Add all {ids.length + paletteIds.length}
             {/if}
           </span>
           <span class={DETAIL}>
@@ -166,7 +202,7 @@ and device, after signing in, and again whenever someone asks to add projects
           <ListChecksIcon class={ICON} />
           <span class="flex-1">
             <span class="block font-bold">Choose…</span>
-            <span class={DETAIL}>Pick which projects to add.</span>
+            <span class={DETAIL}>Pick what to add.</span>
           </span>
           <ChevronRightIcon class="mt-0.5 size-5 shrink-0 opacity-50" />
         </button>
@@ -186,7 +222,7 @@ and device, after signing in, and again whenever someone asks to add projects
         <span class="flex-1">
           <span class="block font-bold">{later ? 'Cancel' : 'Not now'}</span>
           <span class={DETAIL}>
-            They stay only in this browser. You can add them any time from Saved
+            They stay only in this browser. You can add them any time from My
             Projects or your Account page.
           </span>
         </span>

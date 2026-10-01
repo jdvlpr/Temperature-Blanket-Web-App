@@ -25,8 +25,14 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { account } from '$lib/accounts/summary.svelte';
 import { toast } from '$lib/state/page-state.svelte';
+import { PaletteStorage, savedPalettes } from '$lib/storage/palettes.svelte';
 import { ProjectStorage } from '$lib/storage/projects.svelte';
-import { syncAccount, SyncHttpError, type SyncReport } from './engine';
+import {
+  syncAccount,
+  SyncHttpError,
+  type PaletteLocal,
+  type SyncReport,
+} from './engine';
 import { createHttpSyncServer, sha256 } from './http';
 import { sync } from './status.svelte';
 
@@ -47,6 +53,15 @@ let shownProblem: Problem | null = null;
 
 const server = createHttpSyncServer();
 
+const paletteLocal: PaletteLocal = {
+  list: () => PaletteStorage.getAll(),
+  apply: (userId, records) => PaletteStorage.applyFromAccount(userId, records),
+  settle: (userId, sentUpdatedAt, record, applied) =>
+    PaletteStorage.settleUpload(userId, sentUpdatedAt, record, applied),
+  forgetMissing: (userId, onServer) =>
+    PaletteStorage.forgetMissing(userId, onServer),
+};
+
 /** Syncs soon, folding several quick changes into one pass. */
 export function scheduleSync(delay = SAVE_DELAY_MS) {
   if (!started) return;
@@ -65,7 +80,7 @@ async function runPass(userId: string) {
       userId,
       ProjectStorage.localStore(),
       server,
-      { origin: location.origin, sha256 },
+      { origin: location.origin, sha256, palettes: paletteLocal },
     );
     sync.state = 'idle';
     sync.lastSyncedAt = Date.now();
@@ -80,6 +95,8 @@ async function runPass(userId: string) {
     else sync.state = 'error';
   } finally {
     sync.version++;
+    // Palettes from other devices show up in open lists
+    await savedPalettes.refresh().catch(() => {});
   }
   await toastNewProblem(userId).catch(() => {});
 }
@@ -185,6 +202,7 @@ export function startSync() {
   started = true;
   sync.active = true;
   ProjectStorage.onChange = () => scheduleSync();
+  PaletteStorage.onChange = () => scheduleSync();
   document.addEventListener('visibilitychange', onFocus);
   window.addEventListener('focus', onFocus);
   window.addEventListener('online', onOnline);
@@ -198,6 +216,7 @@ export function stopSync() {
   sync.active = false;
   clearTimeout(timer);
   ProjectStorage.onChange = undefined;
+  PaletteStorage.onChange = undefined;
   document.removeEventListener('visibilitychange', onFocus);
   window.removeEventListener('focus', onFocus);
   window.removeEventListener('online', onOnline);
@@ -223,8 +242,19 @@ export async function guestProjectIds(): Promise<string[]> {
     .map((item) => item.id);
 }
 
-/** Adds projects on this device to the account; they upload on the next pass. */
-export async function addToAccount(userId: string, ids: string[]) {
+/** Palettes on this device that belong to no account. */
+export const guestPaletteIds = () => PaletteStorage.guestIds();
+
+/**
+ * Adds projects (and palettes) on this device to the account; they upload on
+ * the next pass.
+ */
+export async function addToAccount(
+  userId: string,
+  ids: string[],
+  paletteIds: string[] = [],
+) {
+  if (paletteIds.length) await PaletteStorage.addToAccount(userId, paletteIds);
   const chosen = new Set(ids);
   await ProjectStorage.updateSyncStates((item) =>
     chosen.has(item.id) && !item.sync
@@ -250,9 +280,9 @@ export async function unsyncedCount(userId: string): Promise<number> {
 }
 
 /**
- * Leaving the account on this device: signing out removes its projects from
- * here (`keep` false); deleting the account keeps them as projects of this
- * device. Projects that haven't finished uploading are always kept.
+ * Leaving the account on this device: signing out removes its projects and
+ * palettes from here (`keep` false); deleting the account keeps them as this
+ * device's own. Ones that haven't finished uploading are always kept.
  */
 export async function leaveAccount(userId: string, keep: boolean) {
   stopSync();
@@ -267,6 +297,8 @@ export async function leaveAccount(userId: string, keep: boolean) {
     item.sync?.ownerUserId === userId ? undefined : 'unchanged',
   );
   await ProjectStorage.leaveAccountTrash(userId, keep);
+  await PaletteStorage.leaveAccount(userId, keep);
+  await savedPalettes.refresh().catch(() => {});
   await ProjectStorage.clearAccountSyncState(userId);
 }
 

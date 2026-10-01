@@ -463,6 +463,41 @@ export class ProjectStorage {
   }
 
   /**
+   * Puts back a project downloaded from the account's Trash, with a change to
+   * upload: the next sync saves it over the deletion, so every device gets it.
+   */
+  static async putRestored(
+    id: string,
+    project: StoredProject,
+    sync: ProjectSyncState,
+  ): Promise<void> {
+    if (!this.isAvailable()) throw new Error('IndexedDB is not available');
+    await withIndexLock(async () => {
+      await set(`${PROJECT_PREFIX}${id}`, project);
+      const index = (await this.getIndex()).filter((i) => i.id !== id);
+      index.push(indexItemFor(id, project, sync));
+      await this.setIndex(index);
+    });
+    this.onChange?.();
+  }
+
+  /**
+   * Deleted for good before its deletion reached the account: the account's
+   * copy in its Trash goes once it has (see $lib/sync/engine)
+   */
+  static async queuePurge(userId: string, id: string): Promise<void> {
+    const state = await this.accountSyncState(userId);
+    await this.setAccountSyncState(userId, {
+      ...state,
+      pendingPurges: [
+        ...(state.pendingPurges ?? []).filter((p) => p !== id),
+        id,
+      ],
+    });
+    this.onChange?.();
+  }
+
+  /**
    * Projects in the Trash, most recently deleted first. Ones older than
    * TRASH_DAYS (see ./trash) are deleted for good on the way. While someone is
    * signed in, another account's projects stay hidden, as in the list.

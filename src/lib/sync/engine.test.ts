@@ -1,3 +1,4 @@
+import type { SavedPalette } from '$lib/storage/palettes.svelte';
 import type { StoredProject } from '$lib/storage/projects.svelte';
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
@@ -9,10 +10,11 @@ import {
   SyncHttpError,
   type AccountSyncState,
   type LocalStore,
+  type PaletteLocal,
   type ProjectSyncState,
   type SyncServer,
 } from './engine';
-import type { ProjectMeta } from './protocol';
+import type { PaletteRecord, ProjectMeta } from './protocol';
 
 // An in-memory server with the same rules as src/lib/server/sync/store.ts
 class FakeServer {
@@ -532,5 +534,131 @@ describe('rehomeHref', () => {
     expect(rehomeHref('not a url', 'https://x.test', 'a')).toBe(
       'https://x.test/?project=a',
     );
+  });
+});
+
+describe('syncAccount: palettes and the Trash', () => {
+  const record = (id: string, rev: number): PaletteRecord => ({
+    id,
+    rev,
+    name: id,
+    code: 'palette:ff0000',
+    createdAt: 1,
+    updatedAt: 1,
+    deletedAt: null,
+    purged: false,
+  });
+
+  /** One device, an empty project list, and a server with only palettes */
+  function setup(serverPalettes: PaletteRecord[] = []) {
+    const server = new FakeServer();
+    const device = new FakeDevice('https://phone.example', server);
+    const calls: string[] = [];
+    const api = server.api();
+    const local: SavedPalette[] = [];
+    const palettes: PaletteLocal = {
+      list: async () => local,
+      apply: async (_user, records) => {
+        calls.push(`apply ${records.map((r) => r.id).join(',')}`);
+      },
+      settle: async (_user, sent, rec, applied) => {
+        calls.push(`settle ${rec.id} ${sent} ${applied}`);
+      },
+      forgetMissing: async () => {
+        calls.push('forget');
+      },
+    };
+    const uploads: string[] = [];
+    const sync = (overrides: Partial<SyncServer> = {}) =>
+      syncAccount(
+        'u1',
+        device,
+        {
+          ...api,
+          changes: async (since) => {
+            const page = await api.changes(since);
+            if (page.fullResyncRequired) return page;
+            return {
+              ...page,
+              palettes: serverPalettes.filter((p) => p.rev > since),
+              nextSince: Math.max(
+                page.nextSince,
+                ...serverPalettes.map((p) => p.rev),
+              ),
+            };
+          },
+          uploadPalette: async (id, input) => {
+            uploads.push(id);
+            return {
+              palette: { ...record(id, 9), ...input },
+              applied: true,
+            };
+          },
+          ...overrides,
+        },
+        { origin: device.origin, sha256, palettes },
+      );
+    return { server, device, calls, local, uploads, sync };
+  }
+
+  it('takes in the account’s palettes and marks them seen', async () => {
+    const { device, calls, sync } = setup([record('a', 3), record('b', 4)]);
+    await sync();
+    expect(calls).toEqual(['apply a,b']);
+    expect((await device.accountState('u1')).since).toBe(4);
+    calls.length = 0;
+    await sync();
+    expect(calls).toEqual([]);
+  });
+
+  it('uploads palettes changed here, and one failing doesn’t stop the rest', async () => {
+    const { local, calls, uploads, sync } = setup();
+    const palette = (id: string, owner = 'u1', dirty = true): SavedPalette => ({
+      id,
+      name: '',
+      code: 'palette:00ff00',
+      createdAt: 1,
+      updatedAt: 7,
+      sync: { ownerUserId: owner, rev: null, dirty },
+    });
+    local.push(
+      palette('bad'),
+      palette('good'),
+      palette('clean', 'u1', false),
+      palette('theirs', 'u2'),
+    );
+    const report = await sync({
+      uploadPalette: async (id, input) => {
+        uploads.push(id);
+        if (id === 'bad') throw new SyncHttpError(500, undefined, 'Oops');
+        return { palette: { ...record(id, 9), ...input }, applied: true };
+      },
+    });
+    expect(uploads).toEqual(['bad', 'good']);
+    expect(calls).toEqual(['settle good 7 true']);
+    expect(report.palettesFailed).toEqual(['bad']);
+  });
+
+  it('empties a project deleted for good from the account’s Trash once its deletion is sent', async () => {
+    const { server, device, sync } = setup();
+    device.edit('a', 'Doomed');
+    await sync();
+    await device.delete('a');
+    const state = await device.accountState('u1');
+    await device.setAccountState('u1', { ...state, pendingPurges: ['a'] });
+
+    const order: string[] = [];
+    const api = server.api();
+    await sync({
+      remove: async (id, baseRev) => {
+        order.push(`remove ${id}`);
+        return api.remove(id, baseRev);
+      },
+      purgeTrashed: async (id) => {
+        order.push(`purge ${id}`);
+      },
+    });
+    expect(order).toEqual(['remove a', 'purge a']);
+    expect((await device.accountState('u1')).pendingPurges).toEqual([]);
   });
 });

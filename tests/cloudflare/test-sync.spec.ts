@@ -272,15 +272,85 @@ test.describe('Sync in the browser', () => {
     await laptop.reload();
     await expect.poll(async () => (await savedIndex(laptop)).length).toBe(0);
 
-    // Restored from the Trash, it's uploaded over the deletion and comes back
-    await phone.getByRole('button', { name: 'Trash (1)' }).click();
-    await phone
+    // The account's Trash: the laptop, which never had it in its Trash, can
+    // restore it, and it comes back everywhere
+    await laptop.goto('/my-projects');
+    await laptop.getByRole('button', { name: 'Trash (1)' }).click();
+    await laptop
       .getByRole('dialog')
       .getByRole('button', { name: 'Restore Doomed' })
       .click();
-    await expect.poll(() => serverProjectIds(phone)).toHaveLength(1);
-    await laptop.reload();
-    await expect.poll(async () => (await savedIndex(laptop)).length).toBe(1);
+    await expect.poll(() => serverProjectIds(laptop)).toHaveLength(1);
+    await phone.reload();
+    await expect.poll(async () => (await savedIndex(phone)).length).toBe(1);
+
+    // Deleted again on the phone (which keeps a copy in its own Trash), then
+    // deleted for good on the laptop: the phone's copy doesn't bring it back
+    await phone.goto('/my-projects');
+    await phone.getByRole('button', { name: 'Delete Doomed' }).click();
+    await expect.poll(() => serverProjectIds(phone)).toEqual([]);
+    await laptop.goto('/my-projects');
+    await laptop.getByRole('button', { name: 'Trash (1)' }).click();
+    const trash = laptop.getByRole('dialog');
+    await trash.getByRole('button', { name: 'Delete Doomed forever' }).click();
+    await trash.getByRole('button', { name: 'Yes, Delete Forever' }).click();
+    await expect(trash.getByText('The Trash is empty')).toBeVisible();
+
+    await phone.goto('/my-projects');
+    await expect(
+      phone.getByRole('heading', { name: 'Projects', exact: true }),
+    ).toBeVisible();
+    await expect(phone.getByRole('button', { name: /^Trash/ })).toHaveCount(0);
+  });
+
+  test('palettes sync between devices, Trash included', async ({
+    browser,
+    baseURL,
+  }) => {
+    const { phone, laptop } = await twoDevices(browser, baseURL!);
+    const email = uniqueEmail('sync-palettes');
+    await signIn(phone, phone.request, email);
+    await signIn(laptop, laptop.request, email);
+
+    await phone.goto('/yarn');
+    const dialog = phone.getByRole('dialog');
+    // Retried: a click before the page finishes loading does nothing
+    await expect(async () => {
+      await phone
+        .getByRole('button', { name: 'Save Palette', exact: true })
+        .click();
+      await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    await dialog.getByLabel('Name (optional)').fill('Shared Dusk');
+    await dialog
+      .getByRole('button', { name: 'Save Palette', exact: true })
+      .click();
+    await expect(phone.getByText('Palette saved')).toBeVisible();
+
+    const serverPalettes = async () =>
+      (await (await phone.request.get('/api/sync/changes?since=0')).json())
+        .palettes as { name: string; deletedAt: number | null }[];
+    await expect
+      .poll(async () => (await serverPalettes()).map((p) => p.name))
+      .toEqual(['Shared Dusk']);
+
+    // On the laptop, in My Projects
+    await laptop.goto('/my-projects');
+    const palettes = laptop.getByRole('list', { name: 'Saved palettes' });
+    await expect(palettes.getByText('Shared Dusk')).toBeVisible();
+
+    // Deleted on the laptop: in the phone's Trash too
+    await palettes.getByRole('button', { name: 'Delete Shared Dusk' }).click();
+    await expect
+      .poll(async () => (await serverPalettes())[0]?.deletedAt)
+      .not.toBeNull();
+    await phone.goto('/my-projects');
+    await phone.getByRole('button', { name: 'Trash (1)' }).click();
+    await expect(
+      phone.getByRole('dialog').getByRole('list', { name: 'Trash' }),
+    ).toContainText('Shared Dusk');
   });
 
   test('signing out removes synced projects, and asks only when some haven’t synced', async ({

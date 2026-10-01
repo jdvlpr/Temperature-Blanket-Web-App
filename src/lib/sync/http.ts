@@ -22,6 +22,7 @@ import {
   SYNC_HEADERS,
   SYNC_SCHEMA_VERSION,
   type ChangesResponse,
+  type PaletteRecord,
   type ProjectMeta,
   type SyncErrorCode,
 } from './protocol';
@@ -33,7 +34,9 @@ async function gzip(text: string): Promise<ArrayBuffer> {
   return new Response(stream).arrayBuffer();
 }
 
-async function gunzip(body: ReadableStream<Uint8Array>): Promise<string> {
+export async function gunzip(
+  body: ReadableStream<Uint8Array>,
+): Promise<string> {
   return new Response(
     body.pipeThrough(
       new DecompressionStream('gzip') as TransformStream<
@@ -134,6 +137,26 @@ export function createHttpSyncServer(
         };
       if (response.status === 404 || response.ok) return { ok: true };
       throw await errorFrom(response);
+    },
+
+    async purgeTrashed(id) {
+      const response = await request(`/trash/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw await errorFrom(response);
+    },
+
+    async uploadPalette(id, palette) {
+      const response = await request(`/palettes/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(palette),
+      });
+      if (!response.ok) throw await errorFrom(response);
+      return (await response.json()) as {
+        palette: PaletteRecord;
+        applied: boolean;
+      };
     },
   };
 }

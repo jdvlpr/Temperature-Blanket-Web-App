@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       {#if signedIn && sync.active}
         <SyncStatus class="text-surface-700-300 mb-2" />
-        <AddToAccountButton class="mb-2" />
+        <AddToAccountButton class="mb-2" kind="projects" />
       {:else if !onMyProjectsPage}
         <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
       {/if}

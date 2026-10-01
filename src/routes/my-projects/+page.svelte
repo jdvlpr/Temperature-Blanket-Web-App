@@ -25,12 +25,19 @@ the account; palettes and the Trash stay in this browser. -->
   import { account } from '$lib/accounts/summary.svelte';
   import { sync } from '$lib/sync/status.svelte';
   import GalleryPages from '$lib/components/account/GalleryPages.svelte';
+  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import SavedPalettes from '$lib/components/SavedPalettes.svelte';
   import Trash from '$lib/components/Trash.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { savedPalettes } from '$lib/storage/palettes.svelte';
-  import { ProjectStorage, savedProjects } from '$lib/storage/projects.svelte';
+  import { savedProjects } from '$lib/storage/projects.svelte';
+  import {
+    accountTrash,
+    loadProjectTrash,
+    refreshAccountTrash,
+  } from '$lib/storage/account-trash.svelte';
+  import { onMount } from 'svelte';
   import { PlusIcon, Trash2Icon } from '@lucide/svelte';
 
   let trashedProjectCount = $state(0);
@@ -42,13 +49,18 @@ the account; palettes and the Trash stay in this browser. -->
   // Signed in with sync on: projects are kept in the account
   const synced = $derived(signedIn && sync.active);
 
+  // The account's Trash once when the page opens (and again in the dialog),
+  // not on every change: requests are shared by everyone on the free plan
+  onMount(() => {
+    if (signedIn) refreshAccountTrash();
+  });
+
   $effect(() => {
     void savedProjects.version;
+    void accountTrash.list;
     void account.summary?.id;
     if (browser)
-      ProjectStorage.getTrash().then(
-        (trash) => (trashedProjectCount = trash.length),
-      );
+      loadProjectTrash().then((trash) => (trashedProjectCount = trash.length));
   });
 </script>
 
@@ -111,6 +123,9 @@ the account; palettes and the Trash stay in this browser. -->
           </a>
         </div>
         {#if browser}
+          {#if synced}
+            <AddToAccountButton kind="palettes" />
+          {/if}
           <SavedPalettes />
         {/if}
       </section>

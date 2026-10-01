@@ -19,8 +19,15 @@
 //   GET    /api/sync/projects/{id}               gzipped project JSON; ETag = revision
 //   PUT    /api/sync/projects/{id}               gzipped project JSON + SYNC_HEADERS → { meta }
 //   DELETE /api/sync/projects/{id}?baseRev=N     { meta }
+//   GET    /api/sync/trash                       { projects: TrashedProjectMeta[] }
+//   DELETE /api/sync/trash                       deletes everything in it for good
+//   GET    /api/sync/trash/{id}                  a trashed project's gzipped JSON
+//   DELETE /api/sync/trash/{id}                  deletes one for good
+//   PUT    /api/sync/palettes/{id}               PaletteInput → { palette, applied }
 //
 // A save or delete based on an outdated revision gets 409 { code: 'CONFLICT', current }.
+// A deleted project stays in the Trash (with its data) for TRASH_DAYS; restoring
+// one is an ordinary save over the deletion. Palettes travel in the changes feed.
 
 export const SYNC_API = '/api/sync';
 
@@ -53,11 +60,39 @@ export type ProjectMeta = {
   contentHash: string | null;
 };
 
+/** A saved palette as the account keeps it. Newest `updatedAt` wins. */
+export type PaletteRecord = {
+  id: string;
+  rev: number;
+  name: string;
+  /** Empty once purged */
+  code: string;
+  createdAt: number;
+  updatedAt: number;
+  /** In the Trash since then */
+  deletedAt: number | null;
+  /** Deleted for good: nothing brings it back */
+  purged: boolean;
+};
+
+export type PaletteInput = Omit<PaletteRecord, 'id' | 'rev'>;
+
+/** A deleted project the account still keeps (the Trash). */
+export type TrashedProjectMeta = {
+  id: string;
+  rev: number;
+  title: string;
+  deletedAt: number;
+  sizeBytes: number;
+};
+
 export type ChangesResponse =
   | { fullResyncRequired: true; rev: number }
   | {
       fullResyncRequired: false;
       changes: ProjectMeta[];
+      /** Palettes changed in the same revision range (absent from older servers) */
+      palettes?: PaletteRecord[];
       nextSince: number;
       hasMore: boolean;
     };

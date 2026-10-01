@@ -7,12 +7,19 @@ import {
   deleteProject,
   deleteUserProjectData,
   getProjectData,
+  getTrashedProjectData,
   listChanges,
+  listTrash,
   MAX_BYTES_PER_USER,
+  MAX_PALETTES_PER_USER,
   MAX_PROJECTS_PER_USER,
+  purgeTrash,
+  savePalette,
   saveProject,
   type SaveInput,
 } from './store';
+import { TRASH_DAYS } from '$lib/storage/trash';
+import type { PaletteInput } from '$lib/sync/protocol';
 
 /** An in-memory R2 bucket covering put/get/delete/list. */
 function createTestBucket() {
@@ -300,5 +307,167 @@ describe('deleteUserProjectData', () => {
     expect(
       sqlite.prepare(`select count(*) as n from "userSync"`).get(),
     ).toEqual({ n: 0 });
+  });
+});
+
+const DAY = 24 * 60 * 60 * 1000;
+
+describe('the Trash', () => {
+  it('keeps a deleted project’s data for TRASH_DAYS, and restores it by a save', async () => {
+    const { d1, bucket } = setup();
+    const t0 = Date.parse('2026-01-01T00:00:00Z');
+    await saveProject(d1, bucket, input({ title: 'Doomed' }), t0);
+    await deleteProject(d1, 'u1', 'p1', 1, t0);
+
+    expect(await listTrash(d1, 'u1', t0)).toEqual([
+      { id: 'p1', rev: 2, title: 'Doomed', deletedAt: t0, sizeBytes: 6 },
+    ]);
+    const trashed = await getTrashedProjectData(d1, bucket, 'u1', 'p1', t0);
+    expect(await text(trashed?.body)).toBe('Doomed');
+    // Not a normal download, and not someone else's
+    expect(await getProjectData(d1, bucket, 'u1', 'p1')).toBeNull();
+    expect(await listTrash(d1, 'u2', t0)).toEqual([]);
+
+    // Past TRASH_DAYS it's gone from the list, even before cleanup runs
+    const late = t0 + TRASH_DAYS * DAY + 1;
+    expect(await listTrash(d1, 'u1', late)).toEqual([]);
+    expect(
+      await getTrashedProjectData(d1, bucket, 'u1', 'p1', late),
+    ).toBeNull();
+
+    // Restoring is a save over the deletion
+    await saveProject(d1, bucket, input({ baseRev: 2, title: 'Doomed' }), t0);
+    expect(await listTrash(d1, 'u1', t0)).toEqual([]);
+  });
+
+  it('deletes for good, one or all, leaving the deletion records', async () => {
+    const { d1, bucket, objects } = setup();
+    for (const id of ['a', 'b', 'c'])
+      await saveProject(d1, bucket, input({ projectId: id }));
+    await deleteProject(d1, 'u1', 'a', 1);
+    await deleteProject(d1, 'u1', 'b', 2);
+    expect(objects.size).toBe(3);
+
+    expect(await purgeTrash(d1, bucket, 'u1', 'a')).toBe(1);
+    expect((await listTrash(d1, 'u1')).map((t) => t.id)).toEqual(['b']);
+    expect(objects.size).toBe(2);
+
+    expect(await purgeTrash(d1, bucket, 'u1', null)).toBe(1);
+    expect(await listTrash(d1, 'u1')).toEqual([]);
+    expect(objects.size).toBe(1);
+    // Other devices still learn the projects were deleted
+    const changes = await listChanges(d1, 'u1', 0, 100);
+    expect(
+      !changes.fullResyncRequired && changes.changes.map((c) => c.deleted),
+    ).toEqual([false, true, true]);
+  });
+
+  it('cleanup deletes kept data past TRASH_DAYS', async () => {
+    const { d1, bucket, objects } = setup();
+    const t0 = Date.parse('2026-01-01T00:00:00Z');
+    await saveProject(d1, bucket, input(), t0);
+    await deleteProject(d1, 'u1', 'p1', 1, t0);
+    await cleanUpUserSync(d1, bucket, 'u1', t0 + TRASH_DAYS * DAY + 1);
+    expect(objects.size).toBe(0);
+  });
+});
+
+const palette = (overrides: Partial<PaletteInput> = {}): PaletteInput => ({
+  name: 'Dusk',
+  code: 'palette:ff0000',
+  createdAt: 1000,
+  updatedAt: 1000,
+  deletedAt: null,
+  purged: false,
+  ...overrides,
+});
+
+describe('savePalette', () => {
+  it('saves newer changes, and keeps the account’s copy over older ones', async () => {
+    const { d1 } = setup();
+    expect(await savePalette(d1, 'u1', 'x', palette())).toMatchObject({
+      status: 'saved',
+      palette: { id: 'x', rev: 1, name: 'Dusk', purged: false },
+    });
+    const renamed = await savePalette(
+      d1,
+      'u1',
+      'x',
+      palette({ name: 'Dawn', updatedAt: 2000 }),
+    );
+    expect(renamed).toMatchObject({
+      status: 'saved',
+      palette: { rev: 2, name: 'Dawn' },
+    });
+    // An older change from a device that was offline
+    expect(
+      await savePalette(
+        d1,
+        'u1',
+        'x',
+        palette({ name: 'Old', updatedAt: 1500 }),
+      ),
+    ).toMatchObject({ status: 'kept', palette: { rev: 2, name: 'Dawn' } });
+  });
+
+  it('never changes a purged palette again', async () => {
+    const { d1 } = setup();
+    await savePalette(d1, 'u1', 'x', palette());
+    const purged = await savePalette(
+      d1,
+      'u1',
+      'x',
+      palette({ updatedAt: 2000, deletedAt: 2000, purged: true }),
+    );
+    expect(purged).toMatchObject({
+      status: 'saved',
+      palette: { purged: true, code: '', name: '' },
+    });
+    expect(
+      await savePalette(d1, 'u1', 'x', palette({ updatedAt: 9000 })),
+    ).toMatchObject({ status: 'kept', palette: { purged: true, code: '' } });
+  });
+
+  it('caps live palettes, not deleted ones', async () => {
+    const { d1, sqlite } = setup();
+    const insert = sqlite.prepare(
+      `insert into "palette" values ('u1', ?, 1, '', 'c', 1, 1, null, null)`,
+    );
+    for (let i = 0; i < MAX_PALETTES_PER_USER; i++) insert.run(`p${i}`);
+    expect(await savePalette(d1, 'u1', 'new', palette())).toEqual({
+      status: 'quota',
+    });
+    expect(
+      await savePalette(d1, 'u1', 'new', palette({ deletedAt: 1000 })),
+    ).toMatchObject({ status: 'saved' });
+  });
+
+  it('shares the changes feed with projects, in revision order', async () => {
+    const { d1, bucket } = setup();
+    await saveProject(d1, bucket, input({ projectId: 'a' }));
+    await savePalette(d1, 'u1', 'x', palette());
+    await saveProject(d1, bucket, input({ projectId: 'b' }));
+
+    const first = await listChanges(d1, 'u1', 0, 2);
+    expect(first).toMatchObject({
+      changes: [{ id: 'a', rev: 1 }],
+      palettes: [{ id: 'x', rev: 2 }],
+      nextSince: 2,
+      hasMore: true,
+    });
+    expect(await listChanges(d1, 'u1', 2, 2)).toMatchObject({
+      changes: [{ id: 'b', rev: 3 }],
+      palettes: [],
+      hasMore: false,
+    });
+  });
+
+  it('palette rows go with the user', async () => {
+    const { d1, sqlite } = setup();
+    await savePalette(d1, 'u1', 'x', palette());
+    sqlite.exec(`delete from "user" where "id" = 'u1'`);
+    expect(sqlite.prepare(`select count(*) as n from "palette"`).get()).toEqual(
+      { n: 0 },
+    );
   });
 });
