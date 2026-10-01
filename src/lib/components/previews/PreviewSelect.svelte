@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               'relative mx-1 shrink-0 snap-center rounded p-2',
               id === previews.activeId
                 ? 'bg-primary-200 dark:bg-primary-800 selected shadow-sm'
-                : 'hover:preset-tonal-surface',
+                : 'hover:bg-surface-100-900',
             ]}
             id={previews.activeId === id ? 'active-preview-button' : ''}
             onclick={() => {

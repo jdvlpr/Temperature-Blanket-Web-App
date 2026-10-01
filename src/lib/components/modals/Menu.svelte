@@ -219,8 +219,7 @@ button to it. -->
       <!-- Signed out: their account's projects are a sign-in away -->
       {#if __ACCOUNTS_ENABLED__ && !account.summary?.id}
         <p class="mt-2 text-sm opacity-70">
-          Sign in to open your saved projects and yarn palettes
-          from any device.
+          Sign in to open your saved projects and yarn palettes from any device.
         </p>
         <a
           href={resolve('/account')}
@@ -250,7 +249,7 @@ button to it. -->
           >
           <button
             type="button"
-            class="btn btn-sm hover:preset-tonal-surface"
+            class="btn btn-sm hover:bg-surface-200-800"
             onclick={() => window.location.reload()}
             ><RefreshCwIcon /> Reload the Latest</button
           >

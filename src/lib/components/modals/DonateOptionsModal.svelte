@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href="{PUBLIC_KOFI_LINK}/tiers"
       target="_blank"
       rel="noopener noreferrer"
-      class="block rounded-container border border-surface-200 p-4 transition hover:preset-tonal-surface"
+      class="rounded-container border-surface-200 hover:bg-surface-100-900 block border p-4 transition"
       onclick={() => dialog.close()}
     >
       <p class="font-semibold">Monthly donation</p>
@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href={PUBLIC_KOFI_LINK}
       target="_blank"
       rel="noopener noreferrer"
-      class="block rounded-container border border-surface-200 p-4 transition hover:preset-tonal-surface"
+      class="rounded-container border-surface-200 hover:bg-surface-100-900 block border p-4 transition"
       onclick={() => dialog.close()}
     >
       <p class="font-semibold">One-time donation</p>

@@ -175,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <textarea
         bind:this={textAreaInputElement}
         id="palette-code"
-        class="textarea select-all rounded-container"
+        class="textarea rounded-container select-all"
         placeholder="e.g. red, FFA500, #ADD8E6"
         bind:value={inputValue}
         onkeyup={triggerChange}
@@ -273,7 +273,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <!-- HTML Color Codes Button -->
         <button
-          class="card hover:preset-tonal-surface p-4 text-left"
+          class="card hover:bg-surface-100-900 p-4 text-left"
           onclick={() => (selectedExportType = 'html')}
         >
           <div class="flex items-center gap-2">
@@ -287,7 +287,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <!-- Image Export Button -->
         <button
-          class="card hover:preset-tonal-surface p-4 text-left"
+          class="card hover:bg-surface-100-900 p-4 text-left"
           onclick={() => (selectedExportType = 'image')}
         >
           <div class="flex items-center gap-2">
@@ -301,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <!-- Link Button (replaces the old Palette Code; pasting old codes still works) -->
         <button
-          class="card hover:preset-tonal-surface p-4 text-left"
+          class="card hover:bg-surface-100-900 p-4 text-left"
           onclick={() => (selectedExportType = 'link')}
         >
           <div class="flex items-center gap-2">
@@ -318,7 +318,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <!-- Yarn Colorway Names Button -->
         {#if colorNames}
           <button
-            class="card hover:preset-tonal-surface p-4 text-left"
+            class="card hover:bg-surface-100-900 p-4 text-left"
             onclick={() => (selectedExportType = 'colorway')}
           >
             <div class="flex items-center gap-2">
@@ -334,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else}
       <!-- Back Button -->
       <button
-        class="btn hover:preset-tonal-surface mt-4"
+        class="btn hover:bg-surface-100-900 mt-4"
         onclick={() => (selectedExportType = 'main')}
       >
         <ArrowLeftIcon />
@@ -403,7 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               <button
-                class="btn hover:preset-tonal-surface mb-8 w-fit"
+                class="btn hover:bg-surface-100-900 mb-8 w-fit"
                 onclick={downloadImage}
               >
                 <DownloadIcon />
@@ -437,7 +437,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <button
-              class="btn hover:preset-tonal-surface mt-4"
+              class="btn hover:bg-surface-100-900 mt-4"
               onclick={() => {
                 try {
                   if (typeof colorHexes === 'string') {
@@ -478,7 +478,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <button
-              class="btn hover:preset-tonal-surface mt-4"
+              class="btn hover:bg-surface-100-900 mt-4"
               onclick={() => {
                 try {
                   window.navigator.clipboard.writeText(paletteLink);
@@ -516,7 +516,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <button
-              class="btn hover:preset-tonal-surface mt-4"
+              class="btn hover:bg-surface-100-900 mt-4"
               onclick={() => {
                 try {
                   window.navigator.clipboard.writeText(colorNames);

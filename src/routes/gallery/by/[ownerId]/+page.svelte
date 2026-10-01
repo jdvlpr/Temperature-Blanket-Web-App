@@ -83,7 +83,7 @@ linked from "By <name>" on their gallery pages. -->
     >
       <a
         href={resolve('/gallery')}
-        class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
+        class="btn hover:bg-surface-100-900 mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
       >
         <ArrowLeftIcon />
         Project Gallery</a
@@ -106,7 +106,7 @@ linked from "By <name>" on their gallery pages. -->
             <li>
               <a
                 href={resolve('/gallery/[id]', { id: String(databaseId) })}
-                class="rounded-container hover:preset-tonal-surface flex flex-col items-center justify-center gap-1 p-2 text-center"
+                class="rounded-container hover:bg-surface-100-900 flex flex-col items-center justify-center gap-1 p-2 text-center"
               >
                 <img
                   src={featuredImage?.node?.mediaDetails.sizes?.[0]

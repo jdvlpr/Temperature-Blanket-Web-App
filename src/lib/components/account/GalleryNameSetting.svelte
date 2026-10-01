@@ -70,7 +70,7 @@ publishing from accounts is on. -->
       onchange={save}
     />
     {#if showName && !hasName}
-      <p class="px-4 pb-3 text-sm text-warning-700-300">
+      <p class="text-warning-700-300 px-4 pb-3 text-sm">
         Add a display name above to show it.
       </p>
     {/if}
@@ -82,7 +82,7 @@ publishing from accounts is on. -->
     <a
       href={resolve('/gallery/by/[ownerId]', { ownerId: publicId })}
       target="_blank"
-      class="hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors"
+      class="hover:bg-surface-100-900 flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors"
       data-testid="gallery-owner-page"
     >
       <UserRoundIcon class="shrink-0 opacity-70" />

@@ -122,7 +122,7 @@ syncs like any other change. -->
     {#if id}
       <button
         type="button"
-        class="hover:preset-tonal-surface rounded-base inline-flex size-7 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
+        class="hover:bg-surface-200-800 rounded-base inline-flex size-7 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
         title={savedName ? 'Rename Project' : 'Name this project'}
         aria-label={savedName ? `Rename ${savedName}` : 'Name this project'}
         onclick={() => {

@@ -60,7 +60,7 @@ Hidden until the account has a page or publishing from accounts is on. -->
   let currentName = $derived(serverName ?? name);
   let hasName = $derived(Boolean(currentName.trim()));
 
-  const ROW_LINK = `hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors ${ROW_FOCUS}`;
+  const ROW_LINK = `hover:bg-surface-200-800 flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors ${ROW_FOCUS}`;
 
   async function load() {
     const gallery = await getGalleryPages();

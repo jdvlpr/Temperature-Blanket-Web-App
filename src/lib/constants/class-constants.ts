@@ -31,4 +31,4 @@ export const LIST_ENDS =
 // goes to another page in this tab, as My Projects: it lists this project
 // too, which shouldn't be open in two tabs).
 export const PANEL_LIST = `bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden ${LIST_ENDS}`;
-export const PANEL_ROW = `hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;
+export const PANEL_ROW = `hover:bg-surface-200-800 flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;

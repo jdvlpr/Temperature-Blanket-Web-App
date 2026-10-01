@@ -194,7 +194,7 @@ and device, after signing in, and again whenever someone asks to add projects
       {#if !choosing}
         <button
           type="button"
-          class="hover:preset-tonal-surface {ROW}"
+          class="hover:bg-surface-100-900 {ROW}"
           disabled={busy}
           onclick={() => (choosing = true)}
         >
@@ -209,7 +209,7 @@ and device, after signing in, and again whenever someone asks to add projects
 
       <button
         type="button"
-        class="hover:preset-tonal-surface {ROW}"
+        class="hover:bg-surface-100-900 {ROW}"
         disabled={busy}
         onclick={() => answer([])}
       >
