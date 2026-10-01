@@ -587,7 +587,7 @@ test.describe('Auto-save', () => {
     await signIn(laptop, laptop.request, email);
     await buildProject(laptop);
     await saveFromMenu(laptop);
-    expect(await saveState(laptop)).toBe('Saved to your account');
+    await expect.poll(() => saveState(laptop)).toBe('Saved to your account');
     const id = openProjectId(laptop);
 
     // An edit, and no Save: once saved, the address bar holds the edited project
@@ -599,7 +599,7 @@ test.describe('Auto-save', () => {
         return item?.sync?.dirty === false && item.meta.href === laptop.url();
       })
       .toBe(true);
-    expect(await saveState(laptop)).toBe('Saved to your account');
+    await expect.poll(() => saveState(laptop)).toBe('Saved to your account');
 
     // The other device gets the edited project
     await signIn(phone, phone.request, email);
@@ -622,9 +622,11 @@ test.describe('Auto-save', () => {
     expect(after?.rev).toBe(before?.rev);
     expect(after?.updatedAt).toBe(before?.updatedAt);
 
-    // Nor is opening the Project menu
+    // Nor is opening the Project menu (which hides the rest of the page from
+    // assistive tech while open, so the label is read directly)
     await openMenu(laptop);
-    await expect(laptop.getByTestId('save-button')).toHaveAccessibleName(
+    await expect(laptop.getByTestId('save-button')).toHaveAttribute(
+      'aria-label',
       'Saved to your account',
     );
     await laptop.waitForTimeout(2000);
@@ -689,7 +691,7 @@ test.describe('Auto-save', () => {
       ),
     ).toBeVisible();
     await laptop.keyboard.press('Escape');
-    expect(await saveState(laptop)).toBe('Not saved');
+    await expect.poll(() => saveState(laptop)).toBe('Not saved');
 
     // An edit here doesn't replace the phone's version
     await choosePattern(laptop, 'Calendar');
@@ -709,7 +711,7 @@ test.describe('Auto-save', () => {
     await choosePattern(laptop, 'Chevrons');
     await expect(laptop).not.toHaveURL(/clnr=/);
     await expect(laptop).toHaveURL(new RegExp(`project=${copyId}`));
-    expect(await saveState(laptop)).toBe('Saved to your account');
+    await expect.poll(() => saveState(laptop)).toBe('Saved to your account');
   });
 
   test('a new project isn’t saved until someone saves it', async ({

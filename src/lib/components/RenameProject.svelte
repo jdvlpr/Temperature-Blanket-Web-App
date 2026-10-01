@@ -13,8 +13,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The open project's name at the top of the Project menu (falling back to
-the location title), with renaming once it's saved (or was opened from My
+<!-- The open project's name at the top of the Project menu on phones (wider
+screens have it in the top bar, see ProjectTitle), falling back to
+the location title, with renaming once it's saved (or was opened from My
 Projects). The name shows on My Projects instead of the location title, and
 syncs like any other change. -->
 

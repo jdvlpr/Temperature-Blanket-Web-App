@@ -338,11 +338,9 @@ export async function saveCopy() {
 }
 
 if (typeof document !== 'undefined') {
-  // Leaving the tab: save now, so the change can sync before the tab sleeps.
-  // Coming back: another tab may have saved over it meanwhile.
+  // Leaving the tab: save now, so the change can sync before the tab sleeps
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') void saveNow();
-    else if (baseline !== null) void refresh();
   });
 
   // Signing in or out, sync starting after the project opened, or a sync

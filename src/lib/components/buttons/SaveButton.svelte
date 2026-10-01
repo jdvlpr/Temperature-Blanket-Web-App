@@ -23,6 +23,7 @@ opens a popover saying where it's saved, like Google Docs' cloud icon. -->
 <script lang="ts">
   import SaveStatus from '$lib/components/SaveStatus.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { openProjectMenu } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { autosave } from '$lib/storage/autosave.svelte';
   import { saveProject } from '$lib/utils/save-project.svelte';
@@ -87,6 +88,11 @@ opens a popover saying where it's saved, like Google Docs' cloud icon. -->
   );
 
   async function save() {
+    // Saved, it saves by itself: the Project menu says where
+    if (status === 'saved') {
+      openProjectMenu();
+      return;
+    }
     busy = true;
     try {
       await saveProject();

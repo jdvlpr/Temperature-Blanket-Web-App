@@ -224,9 +224,10 @@ User's saved projects and saved palettes are stored in the browser's IndexedDB.
 
 **`projects_index` item fields added after 5.35.0:**
 
-| Field  | Description                                                                                                                                                                                                                 | Version Added            |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| `sync` | Set once the project belongs to an account: owner account ID, server revision, whether it changed since the last upload, last error ([`ProjectSyncState`](src/lib/sync/engine.ts)). Absent on projects of this browser only | unreleased (after 6.3.2) |
+| Field       | Description                                                                                                                                                                                                                 | Version Added            |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `sync`      | Set once the project belongs to an account: owner account ID, server revision, whether it changed since the last upload, last error ([`ProjectSyncState`](src/lib/sync/engine.ts)). Absent on projects of this browser only | unreleased (after 6.3.2) |
+| `updatedAt` | When a project of this browser only was last saved or renamed here (ms), so auto-save can tell when another tab saved over it; absent on projects saved before, and on account projects (see `sync.updatedAt`)              | unreleased (after 6.3.2) |
 
 > **Backwards compatibility:** Changes to IndexedDB are additive only. Projects without `createdAt` fall back to the time in their legacy timestamp ID, and get `createdAt` the next time they're saved.
 

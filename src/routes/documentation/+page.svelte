@@ -544,13 +544,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
             <p>
               To save your project, press the Save button at the top of the
-              page. The project is saved in your browser right away (or, if
-              you’re signed in, to your account, where later changes save by
-              themselves). To get the project’s URL, press Project, then Copy
-              Link. If you want to share your project or open it in a different
-              browser, make sure to save the URL in a place you can find it
-              again later. You can also use the following keyboard shortcut to
-              save your project:
+              page. The project is saved right away, in your browser (or, if
+              you’re signed in, to your account), and from then on your changes
+              save by themselves. The icon beside the project’s name shows where
+              it’s saved: a cloud for your account, or a screen for this browser
+              only. To get the project’s URL, press Project, then Copy Link. If
+              you want to share your project or open it in a different browser,
+              make sure to save the URL in a place you can find it again later.
+              You can also use the following keyboard shortcut to save your
+              project:
             </p>
             <figure class="">
               <table>
@@ -597,11 +599,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               On My Projects, use the pencil button to name a project (you can
-              also name the open project in the Project menu, or above the
-              Project Planner), or the trash button to move it to the Trash.
-              Deleted projects and palettes stay in the Trash for 30 days, so
-              you can restore them. Press Trash at the bottom of My Projects to
-              restore them or delete them for good.
+              also name the open project above the Project Planner, or in the
+              Project menu on phones), or the trash button to move it to the
+              Trash. Deleted projects and palettes stay in the Trash for 30
+              days, so you can restore them. Press Trash at the bottom of My
+              Projects to restore them or delete them for good.
             </p>
             <p>
               You can also open any project by pasting the project’s URL in your
