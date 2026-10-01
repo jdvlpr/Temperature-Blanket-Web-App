@@ -172,7 +172,7 @@ test.describe('My Projects', () => {
     // Save is in the top bar: it saves right away
     await page.getByTestId('save-button').click();
     await expect(
-      page.getByText('Saved in this browser. Changes now save by themselves.'),
+      page.getByText('Saved in this browser. Changes now save automatically.'),
     ).toBeVisible();
     await expect(page.getByTestId('save-button')).toHaveAccessibleName(
       'Saved in this browser',
@@ -208,21 +208,15 @@ test.describe('My Projects', () => {
     await title.press('Enter');
     await expect(title).toHaveValue('Austin Gift');
 
-    // Saved, the icon beside the name says where
+    // Saved, the icon beside the name opens the Project menu, which says
+    // where; with the name in the top bar, the menu doesn't repeat it
     await page.getByTestId('save-button').click();
+    await expect(menu.getByTestId('autosave-status')).toHaveText(
+      'Saved in this browser',
+    );
     await expect(
-      page.getByText('Changes save by themselves, but only here'),
+      menu.getByText('Changes save automatically, on this device only.'),
     ).toBeVisible();
-    // Opening moves the focus into it
-    await expect(page.getByRole('dialog')).toBeFocused();
-    await page.keyboard.press('Escape');
-    await expect(
-      page.getByText('Changes save by themselves, but only here'),
-    ).toBeHidden();
-
-    // With the name in the top bar, the menu doesn't repeat it
-    await page.getByRole('button', { name: 'Project Options' }).click();
-    await expect(menu.getByRole('button', { name: /^Download/ })).toBeVisible();
     await expect(menu.getByTestId('project-name')).toHaveCount(0);
     await page.keyboard.press('Escape');
 

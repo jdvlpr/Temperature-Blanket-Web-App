@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Where the open project saves by itself: the account (a cloud), or only
-this browser (a screen), with a way to keep that one safer. In the popover from
-the icon beside the project's name, and the Project menu on phones. -->
+this browser (a screen), with a way to sync that one. At the top of the
+Project menu. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -75,25 +75,18 @@ the icon beside the project's name, and the Project menu on phones. -->
   </p>
   <p class="opacity-70">
     {#if autosave.account}
-      Changes save by themselves, and show up on your other devices.
+      Changes save automatically and sync to your devices.
+    {:else if __ACCOUNTS_ENABLED__ && !signedIn}
+      Changes save automatically, on this device only. Sign in to sync them.
     {:else}
-      Changes save by themselves, but only here. It could be lost if this
-      browser’s site data is cleared.
+      Changes save automatically, on this device only.
     {/if}
   </p>
   {#if !autosave.account && __ACCOUNTS_ENABLED__}
-    <p class="opacity-70">
-      {#if signedIn}
-        Add it to your account to keep it safe and open it on your other
-        devices.
-      {:else}
-        Sign in to keep your projects in an account and open them on any device.
-      {/if}
-    </p>
     {#if signedIn}
       <button
         type="button"
-        class="btn btn-sm preset-tonal-primary self-start"
+        class="btn preset-tonal-primary self-start"
         disabled={adding}
         onclick={add}
       >
@@ -105,10 +98,7 @@ the icon beside the project's name, and the Project menu on phones. -->
         Add to Account
       </button>
     {:else}
-      <a
-        href={resolve('/account')}
-        class="btn btn-sm preset-tonal-primary self-start"
-      >
+      <a href={resolve('/account')} class="btn preset-tonal-primary self-start">
         <LogInIcon />
         Sign In
       </a>

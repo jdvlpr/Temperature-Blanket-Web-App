@@ -59,8 +59,8 @@ export async function saveProject() {
     message: !autosave.on
       ? 'Saved'
       : autosave.account
-        ? 'Saved to your account. Changes now save by themselves.'
-        : 'Saved in this browser. Changes now save by themselves.',
+        ? 'Saved to your account. Changes now save automatically.'
+        : 'Saved in this browser. Changes now save automatically.',
     category: 'success',
     // A new project: naming it is the likely next step. Wider screens show
     // its name in the top bar to click instead.

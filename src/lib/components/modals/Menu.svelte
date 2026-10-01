@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Project menu, about the open project only: a card with its name, save
-state and colors (on wider screens, the top bar has those, so the card is only
-for a problem saving); a list of what to do with it; a few recent projects; a line
+state and colors (on wider screens, the top bar has its name, so the card is
+only its save state); a list of what to do with it; a few recent projects; a line
 of help links. Save itself is in the top bar. A side panel on large screens
 (see openProjectMenu); dialogs opened from here open in the panel, with a Back
 button to it. -->
@@ -76,8 +76,8 @@ button to it. -->
       project.gallery.title === locations.projectTitle,
     ),
   );
-  // Wider screens show its name and whether it's saved in the top bar, so the
-  // card here is only for a problem saving
+  // Wider screens show its name in the top bar, so the card here just says
+  // where it's saved
   const inTopBar = $derived(isDesktop.current && hasWeather);
   const problem = $derived(
     autosave.on &&
@@ -141,97 +141,91 @@ button to it. -->
 <!-- Its title, Project, is in the dialog's header -->
 <div class="flex w-full flex-col gap-6 p-4 pt-2 text-left">
   <!-- This project -->
-  {#if !inTopBar || problem}
-    <section
-      class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-2 p-4"
-      aria-label="This project"
-    >
-      {#if !inTopBar}
-        <RenameProject />
+  <section
+    class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-2 p-4"
+    aria-label="This project"
+  >
+    {#if !inTopBar}
+      <RenameProject />
 
-        {#if colors.length}
-          <div
-            class="rounded-base flex h-3 w-full overflow-hidden"
-            aria-hidden="true"
-          >
-            {#each colors as color, i (i)}
-              <div class="flex-1" style:background-color={color.hex}></div>
-            {/each}
-          </div>
-        {/if}
-
-        <!-- Where it's saved -->
-        {#if problem}
-          <p
-            class="flex items-center gap-2 text-sm font-bold"
-            data-testid="autosave-status"
-          >
-            {#if autosave.account}
-              <CloudAlertIcon class="text-error-700-300 size-4" />
-            {:else}
-              <MonitorXIcon class="text-error-700-300 size-4" />
-            {/if}
-            Not saved
-          </p>
-        {:else if autosave.on}
-          <SaveStatus />
-        {:else if autosave.stored}
-          <!-- Another account's project, here signed out -->
-          <p class="flex items-start gap-1 text-sm">
-            <MonitorIcon class="mt-0.5 size-4 shrink-0 opacity-70" />
-            <span>
-              Saved in this browser{#if !project.status.saved}, with unsaved
-                changes{/if}.
-              <span class="opacity-70">
-                It could be lost if this browser’s site data is cleared.
-              </span>
-            </span>
-          </p>
-        {:else if hasProject}
-          <p class="text-sm opacity-70">Not saved yet</p>
-        {:else if !hasWeather}
-          <p class="text-sm opacity-70">
-            Choose a location and get its weather data to start a project.
-          </p>
-        {/if}
-      {/if}
-
-      {#if problem && autosave.state === 'conflict'}
+      {#if colors.length}
         <div
-          class="preset-tonal-warning rounded-container flex flex-col gap-2 p-3 text-sm"
-          role="alert"
+          class="rounded-base flex h-3 w-full overflow-hidden"
+          aria-hidden="true"
         >
-          <p class="flex items-start gap-2">
-            <TriangleAlertIcon class="size-4 shrink-0" />
-            {changedElsewhereMessage()}
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="btn btn-sm preset-filled-primary-500"
-              onclick={copyProject}><CopyPlusIcon /> Save a Copy</button
-            >
-            <button
-              type="button"
-              class="btn btn-sm hover:preset-tonal-surface"
-              onclick={() => window.location.reload()}
-              ><RefreshCwIcon /> Reload the Latest</button
-            >
-          </div>
+          {#each colors as color, i (i)}
+            <div class="flex-1" style:background-color={color.hex}></div>
+          {/each}
         </div>
-      {:else if problem}
-        <p class="text-error-700-300 text-sm" role="alert">
-          {#if autosave.account}
-            Changes couldn’t be saved. Check your connection; they’ll save once
-            they can.
-          {:else}
-            Changes couldn’t be saved in this browser. They’ll try again with
-            your next change.
-          {/if}
-        </p>
       {/if}
-    </section>
-  {/if}
+    {/if}
+
+    <!-- Where it's saved -->
+    {#if problem}
+      <p
+        class="flex items-center gap-2 text-sm font-bold"
+        data-testid="autosave-status"
+      >
+        {#if autosave.account}
+          <CloudAlertIcon class="text-error-700-300 size-4" />
+        {:else}
+          <MonitorXIcon class="text-error-700-300 size-4" />
+        {/if}
+        Not saved
+      </p>
+    {:else if autosave.on}
+      <SaveStatus />
+    {:else if autosave.stored}
+      <!-- Another account's project, here signed out -->
+      <p class="flex items-start gap-1 text-sm">
+        <MonitorIcon class="mt-0.5 size-4 shrink-0 opacity-70" />
+        <span>
+          Saved in this browser{#if !project.status.saved}, with unsaved changes{/if}.
+        </span>
+      </p>
+    {:else if hasProject}
+      <p class="text-sm opacity-70">Not saved yet</p>
+    {:else if !hasWeather}
+      <p class="text-sm opacity-70">
+        Choose a location and get its weather data to start a project.
+      </p>
+    {/if}
+
+    {#if problem && autosave.state === 'conflict'}
+      <div
+        class="preset-tonal-warning rounded-container flex flex-col gap-2 p-3 text-sm"
+        role="alert"
+      >
+        <p class="flex items-start gap-2">
+          <TriangleAlertIcon class="size-4 shrink-0" />
+          {changedElsewhereMessage()}
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="btn btn-sm preset-filled-primary-500"
+            onclick={copyProject}><CopyPlusIcon /> Save a Copy</button
+          >
+          <button
+            type="button"
+            class="btn btn-sm hover:preset-tonal-surface"
+            onclick={() => window.location.reload()}
+            ><RefreshCwIcon /> Reload the Latest</button
+          >
+        </div>
+      </div>
+    {:else if problem}
+      <p class="text-error-700-300 text-sm" role="alert">
+        {#if autosave.account}
+          Changes couldn’t be saved. Check your connection; they’ll save once
+          they can.
+        {:else}
+          Changes couldn’t be saved in this browser. They’ll try again with your
+          next change.
+        {/if}
+      </p>
+    {/if}
+  </section>
 
   <!-- What to do with it: nothing until there's a project -->
   {#if hasWeather}

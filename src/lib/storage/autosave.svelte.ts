@@ -326,9 +326,11 @@ export async function saveCopy() {
   // eslint-disable-next-line svelte/no-navigation-without-resolve
   replaceState(new URL(project.url.href), '');
   let item = await ProjectStorage.save();
-  // A named project's copy says so; otherwise its locations name it, as before
-  if (item && name) {
-    const copyName = `${name} (copy)`.slice(0, MAX_SAVED_PROJECT_NAME_LENGTH);
+  // The copy says so, unnamed too (from its title), so the two don't look the
+  // same on My Projects
+  const base = name || item?.meta.title;
+  if (item && base) {
+    const copyName = `${base} (copy)`.slice(0, MAX_SAVED_PROJECT_NAME_LENGTH);
     await ProjectStorage.rename(project.id, copyName);
     item = { ...item, meta: { ...item.meta, name: copyName } };
   }

@@ -17,12 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 state. Once saved, a project saves by itself, so it's a status (Saved,
 Saving…, Not saved); a problem opens the Project menu. Green means saved, and
 the icon says where: a cloud for the account, a screen for this browser only.
-Beside the project's name (wider screens), saved is just the icon there, which
-opens a popover saying where it's saved, like Google Docs' cloud icon. -->
+Beside the project's name (wider screens), saved is just the icon there, like
+Google Docs' cloud icon; either way, clicking it when saved opens the Project
+menu, which says where it's saved. -->
 
 <script lang="ts">
-  import SaveStatus from '$lib/components/SaveStatus.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { openProjectMenu } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { autosave } from '$lib/storage/autosave.svelte';
@@ -36,7 +35,6 @@ opens a popover saying where it's saved, like Google Docs' cloud icon. -->
     MonitorCheckIcon,
     MonitorXIcon,
   } from '@lucide/svelte';
-  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let { beside }: { beside?: 'title' } = $props();
 
@@ -73,7 +71,7 @@ opens a popover saying where it's saved, like Google Docs' cloud icon. -->
   const title = $derived(
     {
       problem: 'Not saved: see the Project menu',
-      saved: `Saved ${where}. Changes save by themselves.`,
+      saved: `Saved ${where}`,
       saving: 'Saving…',
       kept: 'Saved in this browser',
       changed: 'Save changes [Cmd ⌘]+[s] or [Ctrl]+[s]',
@@ -129,39 +127,17 @@ opens a popover saying where it's saved, like Google Docs' cloud icon. -->
 {/snippet}
 
 {#if statusOnly && status === 'saved'}
-  <Popover positioning={{ placement: 'bottom' }}>
-    <Popover.Trigger
-      class="hover:preset-tonal-surface rounded-base flex size-8 shrink-0 items-center justify-center [&_svg]:size-5"
-      aria-label="Saved {where}"
-      title="Saved {where}"
-      data-testid="save-button"
-    >
-      {@render icon()}
-    </Popover.Trigger>
-    <Portal>
-      <Popover.Positioner>
-        <Popover.Content
-          class="bg-surface-200-800 rounded-container z-50 w-72 max-w-[calc(100vw-2rem)] p-4 text-left shadow-xl"
-        >
-          {#snippet element(attributes)}
-            {#if !attributes.hidden}
-              <div {...attributes} transition:safeSlide>
-                <Popover.Description>
-                  <SaveStatus />
-                </Popover.Description>
-                <Popover.Arrow
-                  class="-z-10"
-                  style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
-                >
-                  <Popover.ArrowTip />
-                </Popover.Arrow>
-              </div>
-            {/if}
-          {/snippet}
-        </Popover.Content>
-      </Popover.Positioner>
-    </Portal>
-  </Popover>
+  <!-- The Project menu says where it's saved -->
+  <button
+    type="button"
+    class="hover:preset-tonal-surface rounded-base flex size-8 shrink-0 items-center justify-center [&_svg]:size-5"
+    aria-label="Saved {where}"
+    title="Saved {where}"
+    onclick={() => openProjectMenu()}
+    data-testid="save-button"
+  >
+    {@render icon()}
+  </button>
 {:else if statusOnly}
   <span
     role="img"
