@@ -3,55 +3,48 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation,
+under the terms of the GNU General Public License as published by the Free Software Foundation, 
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
+  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
+  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { defaultYarn, dialog } from '$lib/state/page-state.svelte';
+  import ImagePaletteCanvas from '$lib/features/image-palette/ImagePaletteCanvas.svelte';
+  import ImagePaletteSelected from '$lib/features/image-palette/ImagePaletteSelected.svelte';
+  import ImagePaletteSwatches from '$lib/features/image-palette/ImagePaletteSwatches.svelte';
+  import { ImagePaletteState } from '$lib/features/image-palette/image-palette-state.svelte';
   import {
-    getColorways,
-    stringToBrandAndYarnDetails,
-  } from '$lib/utils/yarn-utils';
-  import { getTextColor } from '$lib/utils/color-utils';
+    PALETTE_STYLES,
+    type PaletteStyle,
+  } from '$lib/features/image-palette/select';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import type { GaugeSettingsType } from '$lib/types/gauge-types';
+  import type { Color } from '$lib/types/yarn-types';
   import {
-    colorwayKey,
-    findClosestColorway,
-    indexColorways,
-    matchUniqueColorways,
-    sampleAverageHex,
-    type ColorwayIndex,
-    type MatchedColor,
-  } from '$lib/utils/image-palette-utils';
-  import {
+    ArrowLeftRightIcon,
     CameraIcon,
+    PlusIcon,
     RefreshCcwIcon,
+    SplineIcon,
     Trash2Icon,
     WandSparklesIcon,
     XIcon,
   } from '@lucide/svelte';
-  import chroma from 'chroma-js';
-  import type ColorThiefType from 'getimagepalette';
-  import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import SelectYarnWeight from '../SelectYarnWeight.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import type { GaugeSettingsType } from '$lib/types/gauge-types';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import { onMount, untrack } from 'svelte';
 
   interface Props {
     updateGauge: (params: {
@@ -59,318 +52,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _schemeId?: GaugeSettingsType['schemeId'];
     }) => void;
     numberOfColors: number;
+    /** Put the warm end of a gradient first (a high-to-low gauge) */
+    warmFirst?: boolean;
   }
 
-  let { updateGauge, numberOfColors }: Props = $props();
+  let { updateGauge, numberOfColors, warmFirst = true }: Props = $props();
 
-  // Large photos are drawn at most this many pixels wide or tall. Phone photos
-  // can be 12-48 megapixels, which is slow to sample and wastes memory.
-  const MAX_IMAGE_DIMENSION = 1200;
+  const palette = untrack(
+    () => new ImagePaletteState({ numberOfColors, warmFirst }),
+  );
 
-  let ColorThief: typeof ColorThiefType | undefined;
-  // Pixels of the drawn image, read once per image so picking a color doesn't
-  // need to read back from the canvas
-  let pixels: ImageData | undefined;
-  // A copy of the image for the palette extractor, which ignores near-white
-  // pixels, so those are nudged just under its cutoff to keep whites in play
-  let paletteSource:
-    | (HTMLCanvasElement & { naturalWidth: number; naturalHeight: number })
-    | undefined;
-  let colorwayIndex: ColorwayIndex = [];
-  let loadId = 0;
-  let hoverFrame = 0;
-  let lastPointer: { clientX: number; clientY: number } | null = null;
-  // Resolves once yarn data and the palette extractor are loaded, so an image
-  // chosen, dropped, or pasted before then waits instead of matching nothing
-  let resolveReady: () => void;
-  const ready = new Promise<void>((resolve) => (resolveReady = resolve));
-
-  let canvas: HTMLCanvasElement | undefined = $state();
-  let canvasWrap: HTMLDivElement | undefined = $state();
   let input: HTMLInputElement | undefined = $state();
-  let hasImage = $state(false);
-  let loading = $state(true);
-  let yarnReady = $state(false);
   let draggingFile = $state(false);
-  let matchingYarnColors: MatchedColor[] = $state([]);
-  let cursorColor: MatchedColor = $state({});
-  let coords = $state({ x: 0, y: 0 });
-  let showCursor = $state(false);
-  let cursorInside = $state(false);
-  let popCursor = $state(false);
-  let selectedBrandId: string | undefined = $state();
-  let selectedYarnId: string | undefined = $state();
-  let selectedYarnWeightId: string | undefined = $state();
-  let key = $state(false);
-  let numberOfColorsKey = $state(false);
-  let warningMessage = $state<string | null>(null);
-  let errorMessage = $state<string | null>(null);
-  let infoMessage = $state<string | null>(null);
 
-  onMount(async () => {
-    if (numberOfColors > MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
-      numberOfColors = MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES;
-    if (numberOfColors < 2) numberOfColors = 2;
+  const STYLE_LABELS: Record<PaletteStyle, string> = {
+    balanced: 'Balanced',
+    vivid: 'Vivid',
+    muted: 'Muted',
+    light: 'Light',
+    dark: 'Dark',
+  };
 
-    await ensureYarnData();
-    if (defaultYarn.value) {
-      const details = stringToBrandAndYarnDetails(defaultYarn.value);
-      selectedBrandId = details.brandId ?? undefined;
-      selectedYarnId = details.yarnId ?? undefined;
-    }
-    updateColorways();
-    yarnReady = true;
-
-    ColorThief = (await import('getimagepalette')).default;
-    resolveReady();
-
-    // Skip the random image if one was already chosen
-    if (loadId === 0) await getRandomImage();
+  onMount(() => {
+    palette.init();
+    return () => palette.destroy();
   });
 
-  function updateColorways() {
-    colorwayIndex = indexColorways(
-      getColorways({ selectedBrandId, selectedYarnId, selectedYarnWeightId }),
-    );
-  }
-
-  function setColors(colors: MatchedColor[]) {
-    matchingYarnColors = colors;
-    numberOfColors = colors.length;
-    key = !key;
-  }
-
-  async function loadImage(src: string, failMessage: string) {
-    const id = ++loadId;
-    loading = true;
-    errorMessage = null;
-    infoMessage = null;
-    const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.src = src;
-    try {
-      await image.decode();
-      await ready;
-    } catch {
-      if (id !== loadId) return;
-      // Keep showing the previous image, if there was one
-      errorMessage = failMessage;
-      loading = false;
-      return;
-    }
-    // A newer image was requested while this one loaded
-    if (id !== loadId) return;
-    drawImage(image);
-    loading = false;
-    autoPalette({ count: numberOfColors });
-  }
-
-  function drawImage(image: HTMLImageElement) {
-    if (!canvas) return;
-    const scale = Math.min(
-      1,
-      MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight),
-    );
-    const width = Math.max(1, Math.round(image.naturalWidth * scale));
-    const height = Math.max(1, Math.round(image.naturalHeight * scale));
-
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
-    ctx.drawImage(image, 0, 0, width, height);
-    pixels = ctx.getImageData(0, 0, width, height);
-
-    const data = new Uint8ClampedArray(pixels.data);
-    for (let i = 0; i < data.length; i += 4) {
-      if (data[i] > 250 && data[i + 1] > 250 && data[i + 2] > 250) {
-        data[i] = data[i + 1] = data[i + 2] = 250;
-      }
-    }
-    const source = document.createElement('canvas');
-    source.width = width;
-    source.height = height;
-    source
-      .getContext('2d')
-      ?.putImageData(new ImageData(data, width, height), 0, 0);
-    paletteSource = Object.assign(source, {
-      naturalWidth: width,
-      naturalHeight: height,
-    });
-
-    hasImage = true;
-  }
-
-  async function loadFile(file: File | undefined) {
-    if (!file) return;
-    const isHeic =
-      /image\/hei[cf]/.test(file.type) || /\.hei[cf]$/i.test(file.name);
-    if (!file.type.startsWith('image/') && !isHeic) {
-      errorMessage = "That file isn't an image. Try a JPG, PNG, or WebP file.";
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    await loadImage(
-      url,
-      isHeic
-        ? "This browser can't open HEIC photos. Try a JPG or PNG, or a screenshot of the photo."
-        : "Couldn't open that image. Try a JPG, PNG, or WebP file.",
-    );
-    URL.revokeObjectURL(url);
-  }
-
-  function getRandomImage() {
-    return loadImage(
-      `https://picsum.photos/720/480?random=${Date.now()}`,
-      "Couldn't load a random image. Check your connection and try again.",
-    );
-  }
-
-  /** Colors in the image, most common first */
-  function getImageHexes(count: number): string[] {
-    if (!ColorThief || !paletteSource) return [];
-    const palette = new ColorThief().getPalette(
-      paletteSource,
-      Math.min(Math.max(count, 2), MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES),
-    );
-    return palette?.map(([r, g, b]) => chroma(r, g, b).hex()) ?? [];
-  }
-
-  /** Replace unlocked colors with the image's most common colors */
-  function autoPalette({ count }: { count: number }) {
-    if (!hasImage) return;
-    if (!colorwayIndex.length) {
-      warningMessage = 'No colorways match the selected yarn.';
-      return;
-    }
-    count = Math.max(
-      count,
-      matchingYarnColors.findLastIndex((color) => color.locked) + 1,
-    );
-    const locked = matchingYarnColors
-      .slice(0, count)
-      .map((color) => (color.locked ? color : null));
-    const lockedColors = locked.filter((color) => color !== null);
-    const fresh = matchUniqueColorways({
-      hexes: getImageHexes(count),
-      count: count - lockedColors.length,
-      index: colorwayIndex,
-      exclude: new Set(lockedColors.map(colorwayKey)),
-    });
-
-    const colors: MatchedColor[] = [];
-    for (let i = 0; i < count; i++) {
-      const color = locked[i] ?? fresh.shift();
-      if (color) colors.push(locked[i] ? color : { ...color, locked: false });
-    }
-    if (colors.length < count) {
-      infoMessage = `This image only has ${colors.length} distinct ${colors.length === 1 ? 'color' : 'colors'}.`;
-    }
-    setColors(colors);
-  }
-
-  /** Add colors to the end, favoring image colors not already in the palette */
-  function addAutoColors(count: number) {
-    const fresh = matchUniqueColorways({
-      hexes: getImageHexes(matchingYarnColors.length + count),
-      count,
-      index: colorwayIndex,
-      exclude: new Set(matchingYarnColors.map(colorwayKey)),
-    });
-    if (fresh.length < count) {
-      infoMessage = `This image only has ${matchingYarnColors.length + fresh.length} distinct colors.`;
-    }
-    setColors([
-      ...$state.snapshot(matchingYarnColors),
-      ...fresh.map((color) => ({ ...color, locked: false })),
-    ]);
-  }
-
   function onYarnFilterChange() {
-    updateColorways();
-    if (!hasImage) return;
-    if (!matchingYarnColors.length) {
-      autoPalette({ count: numberOfColors });
-      return;
-    }
-    if (!colorwayIndex.length) {
-      warningMessage = 'No colorways match the selected yarn.';
-      return;
-    }
-    // Re-match the colors picked from the image against the new yarn, rather
-    // than replacing them
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- local, not state
-    const used = new Set(
-      matchingYarnColors.filter((color) => color.locked).map(colorwayKey),
-    );
-    setColors(
-      matchingYarnColors.map((color) => {
-        if (color.locked || !color.sourceHex) return color;
-        const match = findClosestColorway({
-          hex: color.sourceHex,
-          index: colorwayIndex,
-          exclude: used,
-        });
-        if (!match) return color;
-        used.add(colorwayKey(match));
-        return { ...match, locked: false };
-      }),
-    );
-  }
-
-  function toImagePoint(clientX: number, clientY: number) {
-    if (!canvas) return null;
-    const rect = canvas.getBoundingClientRect();
-    const x = ((clientX - rect.left) * canvas.width) / rect.width;
-    const y = ((clientY - rect.top) * canvas.height) / rect.height;
-    if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) return null;
-    return { x, y };
-  }
-
-  function sampleAt(clientX: number, clientY: number): string | null {
-    const point = toImagePoint(clientX, clientY);
-    if (!point || !pixels) return null;
-    return sampleAverageHex({
-      data: pixels.data,
-      width: pixels.width,
-      height: pixels.height,
-      ...point,
+    palette.setYarnFilter({
+      brandId: palette.selectedBrandId,
+      yarnId: palette.selectedYarnId,
+      yarnWeightId: palette.selectedYarnWeightId,
     });
-  }
-
-  function queueHover(e: PointerEvent) {
-    lastPointer = { clientX: e.clientX, clientY: e.clientY };
-    if (hoverFrame) return;
-    hoverFrame = requestAnimationFrame(() => {
-      hoverFrame = 0;
-      updateHover();
-    });
-  }
-
-  function updateHover() {
-    if (!lastPointer || !canvasWrap) return;
-    const hex = sampleAt(lastPointer.clientX, lastPointer.clientY);
-    cursorInside = !!hex;
-    if (!hex) return;
-    cursorColor = findClosestColorway({ hex, index: colorwayIndex }) ?? { hex };
-    const rect = canvasWrap.getBoundingClientRect();
-    coords = {
-      x: lastPointer.clientX - rect.left,
-      y: lastPointer.clientY - rect.top,
-    };
-  }
-
-  function addColorAt(clientX: number, clientY: number) {
-    if (matchingYarnColors.length >= MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
-      return;
-    const hex = sampleAt(clientX, clientY);
-    if (!hex) return;
-    const match = findClosestColorway({ hex, index: colorwayIndex });
-    if (!match) return;
-    popCursor = true;
-    setTimeout(() => (popCursor = false), 70);
-    matchingYarnColors.push({ ...match, locked: false });
-    numberOfColors = matchingYarnColors.length;
   }
 
   function onPaste(e: ClipboardEvent) {
@@ -379,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
     if (!file) return;
     e.preventDefault();
-    loadFile(file);
+    palette.loadFile(file);
   }
 </script>
 
@@ -396,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'rounded-container p-2',
+    'rounded-container flex flex-col gap-3 p-2',
     draggingFile && 'outline-primary-500 outline-2 outline-dashed',
   ]}
   role="region"
@@ -414,10 +127,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!e.dataTransfer?.files.length) return;
     e.preventDefault();
     draggingFile = false;
-    loadFile(e.dataTransfer.files[0]);
+    palette.loadFile(e.dataTransfer.files[0]);
   }}
 >
-  <div class="flex justify-center">
+  <div class="flex flex-wrap justify-center gap-2">
     <input
       type="file"
       accept="image/*"
@@ -425,15 +138,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={input}
       onchange={(e) => {
         const target = e.currentTarget;
-        loadFile(target.files?.[0]);
+        palette.loadFile(target.files?.[0]);
         // Allow choosing the same file again
         target.value = '';
       }}
     />
-    <button class="btn hover:preset-tonal-surface" onclick={getRandomImage}>
-      <RefreshCcwIcon />
-      Random Image</button
+    <button
+      class="btn hover:preset-tonal-surface"
+      onclick={() => palette.randomImage()}
     >
+      <RefreshCcwIcon />
+      Random Image
+    </button>
     <button
       class="btn hover:preset-tonal-surface"
       onclick={() => input?.click()}
@@ -443,43 +159,66 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
 
-  {#if errorMessage}
-    <p class="text-error-700-300 my-2 text-center" role="alert">
-      {errorMessage}
+  {#if palette.errorMessage}
+    <p class="text-error-700-300 text-center" role="alert">
+      {palette.errorMessage}
     </p>
   {/if}
 
-  {#if yarnReady}
-    <div
-      class="no-scroll my-2 grid w-full grid-cols-12 items-end justify-center gap-4"
+  <div class="flex flex-wrap items-center justify-center gap-2">
+    <SegmentedControl
+      value={palette.mode}
+      onValueChange={(e) => {
+        if (e.value === 'yarn' || e.value === 'exact') palette.setMode(e.value);
+      }}
     >
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
+        <SegmentedControl.Indicator />
+        <SegmentedControl.Item value="yarn">
+          <SegmentedControl.ItemText>Match to Yarn</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value="exact">
+          <SegmentedControl.ItemText>Exact Colors</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      </SegmentedControl.Control>
+    </SegmentedControl>
+  </div>
+
+  {#if palette.yarnReady && palette.mode === 'yarn'}
+    <div class="grid w-full grid-cols-12 items-end justify-center gap-4">
       <div
         class="order-1 col-span-full w-full md:col-span-9"
-        class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
+        class:md:col-span-full={!!palette.selectedBrandId &&
+          !!palette.selectedYarnId}
       >
         <SelectYarn
           context="modal"
-          bind:selectedBrandId
-          bind:selectedYarnId
+          bind:selectedBrandId={palette.selectedBrandId}
+          bind:selectedYarnId={palette.selectedYarnId}
           onselectautocomplete={onYarnFilterChange}
-          {selectedYarnWeightId}
+          selectedYarnWeightId={palette.selectedYarnWeightId}
         />
       </div>
 
-      {#if selectedBrandId && selectedYarnId}
+      {#if palette.selectedBrandId && palette.selectedYarnId}
         <div class="order-2 col-span-full w-full md:order-3">
-          <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
+          <DefaultYarnSet
+            selectedBrandId={palette.selectedBrandId}
+            selectedYarnId={palette.selectedYarnId}
+          />
         </div>
       {/if}
 
-      {#key selectedBrandId}
+      {#key palette.selectedBrandId}
         <div
           class="order-3 col-span-full w-full md:order-2 md:col-span-3"
-          class:hidden={!!selectedBrandId && !!selectedYarnId}
+          class:hidden={!!palette.selectedBrandId && !!palette.selectedYarnId}
         >
           <SelectYarnWeight
-            {selectedBrandId}
-            bind:selectedYarnWeightId
+            selectedBrandId={palette.selectedBrandId}
+            bind:selectedYarnWeightId={palette.selectedYarnWeightId}
             onchange={onYarnFilterChange}
           />
         </div>
@@ -487,163 +226,115 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="my-2 text-sm" class:hidden={!hasImage || loading}>
-    Click or touch-and-drag on the image to choose colors. You can also drop or
-    paste an image here.
-  </p>
-
-  <div
-    bind:this={canvasWrap}
-    class="relative mx-12 mb-2 flex flex-col items-center sm:mx-16"
-    class:hidden={!hasImage || loading}
-  >
-    {#if showCursor && cursorInside}
-      <div in:fade>
-        <p
-          class="rounded-container pointer-events-none absolute z-10 box-border flex max-w-[180px] min-w-[140px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center p-2 shadow-lg"
-          style="left:{coords.x}px;top:{coords.y -
-            70}px;background:{cursorColor.hex};color:{getTextColor(
-            cursorColor.hex ?? '#ffffff',
-          )};"
-        >
-          {#if cursorColor.name && cursorColor.brandName && cursorColor.yarnName}
-            <span class="text-xs"
-              >{cursorColor.brandName}
-              - {cursorColor.yarnName}</span
+  <div class="flex flex-wrap items-center justify-center gap-2">
+    <SegmentedControl
+      value={palette.style}
+      onValueChange={(e) => {
+        const style = e.value as PaletteStyle;
+        if (PALETTE_STYLES.includes(style)) palette.setStyle(style);
+      }}
+    >
+      <SegmentedControl.Control
+        class="bg-surface-100 dark:bg-surface-900 flex-wrap"
+      >
+        <SegmentedControl.Indicator />
+        {#each PALETTE_STYLES as style (style)}
+          <SegmentedControl.Item value={style}>
+            <SegmentedControl.ItemText
+              >{STYLE_LABELS[style]}</SegmentedControl.ItemText
             >
-            <span class="">{cursorColor.name}</span>
-            <span class="text-xs"
-              >{Math.floor(100 - (cursorColor.delta ?? 0))}% Match</span
-            >
-          {:else}
-            <span class="">{cursorColor.hex}</span>
-          {/if}
-        </p>
-        <div
-          class="rounded-container pointer-events-none absolute box-border h-10 w-10 -translate-x-1/2 -translate-y-1/2 shadow-lg transition-transform"
-          class:scale-0={popCursor}
-          style="left:{coords.x}px;top:{coords.y}px;background:{cursorColor.hex};border:2px solid {getTextColor(
-            cursorColor.hex ?? '#ffffff',
-          )}"
-        ></div>
-      </div>
-    {/if}
-    <canvas
-      bind:this={canvas}
-      class="block h-auto max-h-[65vh] w-auto max-w-full cursor-crosshair touch-none select-none"
-      aria-label="The chosen image. Click or touch it to pick colors, or use Auto Palette."
-      onpointerdown={(e) => {
-        if (e.cancelable) e.preventDefault();
-        showCursor = true;
-        queueHover(e);
-        if (e.pointerType === 'mouse') {
-          if (e.button !== 0) return;
-          addColorAt(e.clientX, e.clientY);
-        } else {
-          e.currentTarget.setPointerCapture(e.pointerId);
-        }
-      }}
-      onpointermove={(e) => {
-        if (e.pointerType !== 'mouse' && !e.buttons) return;
-        showCursor = true;
-        queueHover(e);
-      }}
-      onpointerup={(e) => {
-        if (e.pointerType === 'mouse') return;
-        addColorAt(e.clientX, e.clientY);
-        showCursor = false;
-      }}
-      onpointercancel={() => (showCursor = false)}
-      onpointerleave={(e) => {
-        if (e.pointerType === 'mouse') showCursor = false;
-      }}
-    ></canvas>
+            <SegmentedControl.ItemHiddenInput />
+          </SegmentedControl.Item>
+        {/each}
+      </SegmentedControl.Control>
+    </SegmentedControl>
+    <button
+      class="btn preset-filled-primary-500"
+      disabled={!palette.hasImage || palette.loading || palette.working}
+      onclick={() => palette.autoPalette()}
+    >
+      <WandSparklesIcon />
+      Auto Palette
+    </button>
   </div>
 
-  {#if matchingYarnColors.length >= MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES && !loading}
-    <p class="text-error-400">Maximum number of colors selected.</p>
-  {/if}
-
-  {#if infoMessage && !loading}
-    <p class="my-2 text-center text-sm">{infoMessage}</p>
-  {/if}
-
-  {#if loading}
-    <div class="my-12 text-center">
-      <Spinner />
-      <p class="my-2">Loading Image...</p>
-    </div>
-  {:else if hasImage}
-    <div class="mt-4 mb-2 flex flex-wrap items-center justify-center gap-2">
-      {#key numberOfColorsKey}
-        <SelectNumberOfColors
-          {numberOfColors}
-          max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
-          allowZero={true}
-          onchange={(e) => {
-            if (e.cancelable) e.preventDefault();
-
-            const value = parseInt((e.target as HTMLInputElement).value);
-            const lastLockedIndex = matchingYarnColors.findLastIndex(
-              (color) => color.locked,
-            );
-
-            if (value - 1 < lastLockedIndex) {
-              warningMessage = `Cannot decrease number of colors because it would delete a locked color`;
-              numberOfColorsKey = !numberOfColorsKey;
-              return;
-            }
-
-            infoMessage = null;
-            if (value < matchingYarnColors.length) {
-              setColors(matchingYarnColors.slice(0, value));
-            } else if (value > matchingYarnColors.length) {
-              addAutoColors(value - matchingYarnColors.length);
-            }
-            numberOfColorsKey = !numberOfColorsKey;
-          }}
-        />
-      {/key}
-
-      {#if warningMessage}
-        <div class="text-warning-900-100 flex gap-2">
-          <p>{warningMessage}</p>
-          <button
-            class="btn hover:preset-tonal-surface"
-            aria-label="close"
-            onclick={() => (warningMessage = null)}
+  <div class="flex flex-wrap items-center justify-center gap-2">
+    <SegmentedControl
+      value={palette.tool}
+      onValueChange={(e) => {
+        if (e.value === 'points' || e.value === 'line') palette.tool = e.value;
+      }}
+    >
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
+        <SegmentedControl.Indicator />
+        <SegmentedControl.Item value="points">
+          <SegmentedControl.ItemText class="flex items-center gap-1"
+            ><PlusIcon class="size-4" /> Pick Colors</SegmentedControl.ItemText
           >
-            <XIcon />
-          </button>
-        </div>
-      {/if}
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value="line">
+          <SegmentedControl.ItemText class="flex items-center gap-1"
+            ><SplineIcon class="size-4" /> Draw a Line</SegmentedControl.ItemText
+          >
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      </SegmentedControl.Control>
+    </SegmentedControl>
 
-      <button
-        class="btn hover:preset-tonal-surface"
-        onclick={() => {
-          infoMessage = null;
-          autoPalette({ count: Math.max(numberOfColors, 2) });
+    {#key palette.points.length}
+      <SelectNumberOfColors
+        numberOfColors={palette.points.length}
+        max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
+        allowZero={true}
+        onchange={(e) => {
+          palette.setCount(parseInt((e.target as HTMLSelectElement).value));
         }}
-      >
-        <WandSparklesIcon />
-        Auto Palette
-      </button>
+      />
+    {/key}
+  </div>
 
+  <p class="text-surface-700-300 text-center text-sm">
+    {#if palette.tool === 'line'}
+      Drag across the photo, like along a sunset or a shoreline, to get colors
+      evenly spaced along the line, in order.
+    {:else}
+      Click or tap the photo to add a color, and drag markers to adjust them.
+      You can also drop or paste an image here.
+    {/if}
+  </p>
+
+  <ImagePaletteCanvas {palette} />
+
+  {#if palette.warningMessage}
+    <div class="text-warning-900-100 flex items-center justify-center gap-2">
+      <p>{palette.warningMessage}</p>
       <button
-        class="btn hover:preset-tonal-surface"
-        onclick={() => {
-          infoMessage = null;
-          setColors(matchingYarnColors.filter((color) => color.locked));
-          numberOfColorsKey = !numberOfColorsKey;
-        }}
+        class="btn-icon hover:preset-tonal-surface"
+        aria-label="Dismiss"
+        onclick={() => (palette.warningMessage = null)}
       >
-        <Trash2Icon />
-        Delete Colors
+        <XIcon />
       </button>
     </div>
   {/if}
+  {#if palette.infoMessage}
+    <p class="text-center text-sm">{palette.infoMessage}</p>
+  {/if}
 
-  <p class="text-surface-700-300 my-2 text-center text-sm">
+  <div class="mx-auto w-full max-w-md">
+    <ToggleSwitch
+      label="Show the photo in these colors"
+      checked={palette.showYarnPreview}
+      disabled={!palette.hasImage}
+      onchange={(e) =>
+        palette.setYarnPreview((e.target as HTMLInputElement).checked)}
+    />
+  </div>
+
+  <ImagePaletteSelected {palette} />
+
+  <p class="text-surface-700-300 text-center text-sm">
     Random photos from <a
       href="https://unsplash.com"
       class="link"
@@ -660,32 +351,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 </div>
 <StickyPart position="bottom">
-  <div class="p-2">
-    {#if matchingYarnColors.length && !loading}
-      <div class="mb-2">
-        {#key numberOfColors}
-          {#key key}
-            <ColorPaletteEditable
-              canUserEditColor={false}
-              bind:colors={matchingYarnColors}
-              onchanged={() => {
-                if (matchingYarnColors.length !== numberOfColors)
-                  numberOfColors = matchingYarnColors.length;
-              }}
-            />
-          {/key}
-        {/key}
+  <div class="flex flex-col gap-2 p-2">
+    {#if palette.points.length && !palette.loading}
+      <div class="flex flex-wrap items-center justify-center gap-1">
+        <button
+          class="btn btn-sm hover:preset-tonal-surface"
+          title="Order the colors so each flows into the next"
+          onclick={() => palette.sortAsGradient()}
+        >
+          <SplineIcon />
+          Sort as Gradient
+        </button>
+        <button
+          class="btn btn-sm hover:preset-tonal-surface"
+          onclick={() => palette.reverse()}
+        >
+          <ArrowLeftRightIcon />
+          Reverse
+        </button>
+        <button
+          class="btn btn-sm hover:preset-tonal-surface"
+          title="Remove all unlocked colors"
+          onclick={() => palette.clear()}
+        >
+          <Trash2Icon />
+          Clear
+        </button>
       </div>
+      <ImagePaletteSwatches {palette} />
     {/if}
     <SaveAndCloseButtons
-      disabled={!hasImage || loading || !matchingYarnColors.length}
+      disabled={!palette.hasImage || palette.loading || !palette.points.length}
       onSave={() => {
-        updateGauge({
-          _colors: $state
-            .snapshot(matchingYarnColors)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            .map(({ id, locked, delta, sourceHex, ...color }) => color),
-        });
+        updateGauge({ _colors: palette.toColors() });
         dialog.close();
       }}
       onClose={dialog.close}

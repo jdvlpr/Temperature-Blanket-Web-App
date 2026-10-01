@@ -139,7 +139,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type: 'component',
           component: {
             ref: GetPaletteFromImage,
-            props: { numberOfColors: gauge.numberOfColors, updateGauge },
+            props: {
+              numberOfColors: gauge.numberOfColors,
+              warmFirst: gauge.rangeOptions?.direction !== 'low-to-high',
+              updateGauge,
+            },
           },
           options: { size: 'large' },
         });
