@@ -65,8 +65,8 @@ test.describe('Saved palettes', () => {
     await dialog.getByRole('button', { name: 'Undo' }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();
 
-    // Use it: the dialog closes
-    await list.getByTitle('Use This Palette').click();
+    // Use it with its button (the name in the label): the dialog closes
+    await list.getByRole('button', { name: 'Use Test Dusk' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
   });
 

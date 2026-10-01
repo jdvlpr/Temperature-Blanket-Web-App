@@ -70,17 +70,27 @@ test.describe('My Projects', () => {
     const project = page.getByRole('link', { name: 'Test Town, 2024' });
     await expect(project).toBeVisible();
     await expect(project).not.toHaveAttribute('target');
+    // A full page load, so the planner loads the saved weather
+    await expect(project).toHaveAttribute('data-sveltekit-reload');
 
     // The palette links to the Yarn Palette Creator
     const palettes = page.getByRole('list', { name: 'Saved palettes' });
     await expect(palettes.getByText('Test Meadow')).toBeVisible();
-    await expect(
-      palettes.getByRole('link', { name: 'Open in Yarn Palette Creator' }),
-    ).toHaveAttribute('href', /\/yarn\?s=/);
+    await expect(palettes.getByText(/^Saved .+ at .+/)).toBeVisible();
+    const paletteLink = palettes.getByRole('link', {
+      name: 'Open Test Meadow in Yarn Palette Creator',
+    });
+    await expect(paletteLink).toHaveAttribute('href', /\/yarn\?s=/);
+    // Nothing clickable inside the link
+    await expect(paletteLink.getByRole('button')).toHaveCount(0);
 
     // Delete the project
     await page.getByRole('button', { name: 'Delete Test Town, 2024' }).click();
     await expect(project).toHaveCount(0);
     await expect(page.getByText('No saved projects yet')).toBeVisible();
+
+    // A click on a swatch, not just the name, opens the palette too
+    await palettes.getByRole('listitem').getByRole('button').first().click();
+    await expect(page).toHaveURL(/\/yarn\?s=/);
   });
 });

@@ -10,6 +10,7 @@ import type {
 } from '$lib/types/weather-types';
 import {
   dateToISO8601String,
+  formatDateTime,
   numberOfDays,
   stringToDate,
 } from '$lib/utils/date-utils';
@@ -288,11 +289,7 @@ export class ProjectStorage {
    * Creates a project object to store the current project in local storage.
    */
   private static project = (): StoredProject => {
-    const _date = new Date();
-    const date =
-      _date.toLocaleDateString(undefined, { timeZone: 'UTC' }) +
-      ' at ' +
-      _date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const date = formatDateTime(new Date());
 
     const isCustomWeatherData = weather.isUserEdited || false;
     const _title = locations.projectTitle || '';

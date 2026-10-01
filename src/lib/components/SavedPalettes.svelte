@@ -31,11 +31,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPaletteFallbackName,
     getYarnPageURL,
   } from '$lib/utils/color-utils';
+  import { formatDateTime } from '$lib/utils/date-utils';
   import { escapeHtml } from '$lib/utils/string-utils';
   import {
     CheckIcon,
     PencilIcon,
-    SwatchBookIcon,
     Trash2Icon,
     Undo2Icon,
     XIcon,
@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
-  // (the My Projects page), each palette links to the Yarn Palette Creator
+  // (the My Projects page), each palette is a link to the Yarn Palette Creator
   let {
     updateGauge,
   }: {
@@ -67,6 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               palette,
               colors,
               label: palette.name || getPaletteFallbackName(colors),
+              saved: formatDateTime(palette.createdAt),
             };
           })
           .filter((n) => n !== null)
@@ -120,6 +121,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   }
 
+  // Laid out like a saved project's details: name, then when it was saved.
+  // The name is the palette's link (My Projects) or button (Browse Palettes).
+  // The button has no handler of its own: its click reaches choose()
+  function paletteDetails(label: string, saved: string, colors: Color[]) {
+    const name = escapeHtml(label);
+    const control = updateGauge
+      ? `<button type="button" class="underline cursor-pointer text-left"><span class="sr-only">Use </span>${name}</button>`
+      : `<a href="${escapeHtml(getYarnPageURL({ colors, origin: window.location.origin, version }))}" class="underline" title="Open in Yarn Palette Creator"><span class="sr-only">Open </span>${name}<span class="sr-only"> in Yarn Palette Creator</span></a>`;
+    return `<span class="flex flex-wrap items-center justify-start gap-x-4">${control}<span>Saved ${saved}</span></span>`;
+  }
+
+  // A click on the palette: links handle themselves, everything else uses the
+  // palette or follows its link
+  function choose(event: MouseEvent, colors: Color[]) {
+    if ((event.target as HTMLElement).closest('a')) return;
+    if (updateGauge) {
+      use(colors);
+      return;
+    }
+    (event.currentTarget as HTMLElement).querySelector('a')?.click();
+  }
+
   function use(colors: Color[]) {
     updateGauge?.({ _colors: colors, _schemeId: 'Custom' });
   }
@@ -164,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="my-2 flex w-full flex-col items-start justify-start gap-4"
       aria-label="Saved palettes"
     >
-      {#each palettes as { palette, colors, label } (palette.id)}
+      {#each palettes as { palette, colors, label, saved } (palette.id)}
         <li class="flex w-full items-start gap-2">
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
@@ -205,33 +228,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             </div>
           {:else}
-            {#if updateGauge}
-              <button
-                type="button"
-                class="w-full min-w-0 cursor-pointer"
-                title="Use This Palette"
-                onclick={() => use(colors)}
-              >
-                <ColorPalette {colors} schemeName={escapeHtml(label)} />
-              </button>
-            {:else}
-              <div class="flex w-full min-w-0 flex-col items-start gap-1">
-                <ColorPalette {colors} schemeName={escapeHtml(label)} />
-                <!-- eslint-disable svelte/no-navigation-without-resolve -- a full URL with the palette in its query -->
-                <a
-                  href={getYarnPageURL({
-                    colors,
-                    origin: window.location.origin,
-                    version,
-                  })}
-                  class="btn hover:preset-tonal-surface -ml-2 px-2"
-                >
-                  <SwatchBookIcon />
-                  Open in Yarn Palette Creator
-                </a>
-                <!-- eslint-enable svelte/no-navigation-without-resolve -->
-              </div>
-            {/if}
+            <!-- The name in the label is the real link or button, for keyboards and
+            screen readers; a click anywhere else on the palette does the same,
+            and the swatches keep their colorway popovers -->
+            <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+            <div
+              class="w-full min-w-0 cursor-pointer"
+              onclick={(event) => choose(event, colors)}
+            >
+              <ColorPalette
+                {colors}
+                schemeName={paletteDetails(label, saved, colors)}
+              />
+            </div>
             <!-- Centered on the 70px color bar, not the label under it -->
             <div class="flex h-[70px] shrink-0 items-center gap-1">
               <button

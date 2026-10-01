@@ -89,8 +89,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center justify-start gap-2 p-4"
 >
   <div class="flex w-full flex-col">
+    <!-- A full page load: the planner reads the project from the URL it starts
+    with, so arriving by client-side navigation skips the saved weather -->
     <a
       {href}
+      data-sveltekit-reload
       target={newTab ? '_blank' : undefined}
       rel="noopener noreferrer"
       class="line-clamp-4 underline">{title}</a

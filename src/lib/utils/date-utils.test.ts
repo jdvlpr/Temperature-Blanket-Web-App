@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   dateToISO8601String,
+  formatDateTime,
   getIsFutureDate,
   getLocalISODateString,
   getWeekNumber,
@@ -133,5 +134,19 @@ describe('date-utils', () => {
       const date = new Date(2024, 0, 5); // Jan 5
       expect(getLocalISODateString(date)).toBe('2024-01-05');
     });
+  });
+});
+
+describe('formatDateTime', () => {
+  it('formats a local date and time joined by "at"', () => {
+    const date = new Date(2026, 8, 30, 14, 5);
+    expect(formatDateTime(date.getTime())).toBe(
+      `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`,
+    );
+  });
+
+  it('uses the local day, not the UTC day, late in the evening', () => {
+    const date = new Date(2026, 8, 30, 23, 59);
+    expect(formatDateTime(date)).toContain(date.toLocaleDateString());
   });
 });
