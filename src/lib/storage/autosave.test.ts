@@ -47,7 +47,6 @@ import {
   projectChanged,
   projectSaved,
   resetAutosave,
-  restoreOpenProject,
   trashOpenProject,
 } from './autosave.svelte';
 
@@ -250,26 +249,17 @@ describe('autosave', () => {
     expect(state.save).not.toHaveBeenCalled();
   });
 
-  it('moved to the Trash, it stays on screen but stops saving', async () => {
+  it('moved to the Trash, it stops saving, with nothing to lose by leaving', async () => {
     await open();
+    vi.useFakeTimers();
+    edit('b');
     await trashOpenProject();
+    // The waiting change went in first, so Undo brings it back too
+    expect(state.save).toHaveBeenCalledTimes(1);
+    expect(state.trash.map((i) => i.id)).toEqual(['p1']);
     expect(autosave.on).toBe(false);
-    expect(autosave.stored).toBe(false);
-    expect(state.project.status.saved).toBe(false);
-    vi.useFakeTimers();
-    edit('b');
-    await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
-    expect(state.save).not.toHaveBeenCalled();
-  });
-
-  it('undoing the Trash puts it back and saves changes made since', async () => {
-    await open();
-    await trashOpenProject();
-    edit('b');
-    vi.useFakeTimers();
-    await restoreOpenProject('p1');
-    expect(autosave.on).toBe(true);
-    expect(autosave.state).toBe('waiting');
+    expect(state.project.status.saved).toBe(true);
+    edit('c');
     await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
     expect(state.save).toHaveBeenCalledTimes(1);
   });

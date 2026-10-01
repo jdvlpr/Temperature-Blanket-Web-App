@@ -34,7 +34,6 @@ button to it. -->
   import {
     autosave,
     changedElsewhereMessage,
-    restoreOpenProject,
     saveCopy,
     storedItem,
     trashOpenProject,
@@ -44,7 +43,7 @@ button to it. -->
     savedProjects,
     type StoredProjectIndexItem,
   } from '$lib/storage/projects.svelte';
-  import { TRASH_DAYS } from '$lib/storage/trash';
+  import { rememberJustTrashed, TRASH_DAYS } from '$lib/storage/trash';
   import { sync } from '$lib/sync/status.svelte';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import {
@@ -127,28 +126,19 @@ button to it. -->
     }
   }
 
-  // To the Trash, with Undo; it stays on screen, unsaved
+  // To the Trash, then a new project, which offers Undo (see the home page)
   async function trashProject() {
     try {
       const item = await storedItem();
       if (!item) return;
-      const label = item.meta.name || item.meta.title || 'Untitled Project';
       await trashOpenProject();
-      dialog.close();
-      toast.trigger({
-        message: `Moved ${label} to the Trash`,
-        category: 'success',
-        action: {
-          label: 'Undo',
-          response: () =>
-            void restoreOpenProject(item.id).catch(() =>
-              toast.trigger({
-                message: 'Unable to restore the project',
-                category: 'error',
-              }),
-            ),
-        },
+      rememberJustTrashed({
+        id: item.id,
+        label: item.meta.name || item.meta.title || 'Untitled Project',
+        href: item.meta.href,
       });
+      // Replaced, so Back doesn't return to it
+      window.location.replace(resolve('/'));
     } catch (e) {
       console.warn("Can't move the project to the Trash", { e });
       toast.trigger({
@@ -381,7 +371,8 @@ button to it. -->
             <span class="flex flex-1 flex-col">
               <span>Move to Trash</span>
               <span class="text-xs opacity-70"
-                >Restore it from My Projects for {TRASH_DAYS} days</span
+                >Then start a new one. Restore it from My Projects for {TRASH_DAYS}
+                days</span
               >
             </span>
           </button>

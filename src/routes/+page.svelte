@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     saveNow,
   } from '$lib/storage/autosave.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import { takeJustTrashed } from '$lib/storage/trash';
   import {
     loadFromHistory,
     updateHistory,
@@ -116,6 +117,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (hash && !loading) debounce(() => updateHistory(), 300);
   });
 
+  // Started over after moving a project to the Trash: offer to put it back
+  function showUndoTrash() {
+    const trashed = takeJustTrashed();
+    if (!trashed) return;
+    toast.trigger({
+      message: `Moved ${trashed.label} to the Trash`,
+      category: 'success',
+      action: {
+        label: 'Undo',
+        response: async () => {
+          try {
+            await ProjectStorage.restoreFromTrash(trashed.id);
+            window.location.assign(trashed.href);
+          } catch {
+            toast.trigger({
+              message: 'Unable to restore the project',
+              category: 'error',
+            });
+          }
+        },
+      },
+    });
+  }
+
   onMount(async () => {
     const isProject = new URL(window.location.href).searchParams.has('project');
 
@@ -126,6 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Setup up a new project
       // Load the default units based on window.navigator
       setUnitsFromNavigator();
+      showUndoTrash();
     }
 
     project.status.loading = false;

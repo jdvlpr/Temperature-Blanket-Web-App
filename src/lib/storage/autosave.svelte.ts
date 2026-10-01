@@ -341,8 +341,8 @@ export async function saveCopy() {
 
 /**
  * Moves the open project to the Trash, with a waiting change saved first so
- * restoring it brings that back too. It stays on screen, unsaved: changes
- * here no longer save, so they can't bring it back by themselves.
+ * restoring it brings that back too. Nothing saves after: the page starts
+ * over with a new project (see the Project menu).
  */
 export async function trashOpenProject() {
   const id = openProjectId();
@@ -351,21 +351,11 @@ export async function trashOpenProject() {
   clearTimeout(timer);
   waitingSince = 0;
   await ProjectStorage.moveToTrash(id);
+  autosave.on = false;
+  autosave.stored = false;
   autosave.state = 'saved';
-  await refresh();
-  project.status.saved = false;
-}
-
-/**
- * Undoes trashOpenProject: puts it back, and saves any changes made here
- * since as usual.
- */
-export async function restoreOpenProject(id: string) {
-  await ProjectStorage.restoreFromTrash(id);
-  if (openProjectId() !== id) return;
-  await rememberStored();
-  await refresh();
-  projectChanged();
+  // Nothing left to lose by leaving the page
+  project.status.saved = true;
 }
 
 if (typeof document !== 'undefined') {

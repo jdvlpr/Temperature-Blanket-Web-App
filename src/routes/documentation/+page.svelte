@@ -603,8 +603,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               also name the open project above the Project Planner, or in the
               Project menu on phones), or the trash button to move it to the
               Trash. To delete the open project, choose Move to Trash in the
-              Project menu. Deleted projects and palettes stay in the Trash for
-              30 days, so you can restore them. Press Trash at the bottom of My
+              Project menu: a new project starts in its place, with Undo for a
+              moment. Deleted projects and palettes stay in the Trash for 30
+              days, so you can restore them. Press Trash at the bottom of My
               Projects to restore them or delete them for good.
             </p>
             <p>

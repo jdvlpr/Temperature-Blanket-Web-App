@@ -198,6 +198,14 @@ _\*Items with a < before the version means sometime before that version, I'm not
 
 </details>
 
+### ⏳ Session Storage
+
+Kept only for the open tab.
+
+| Key Name             | Description                                                                                                                          | Default Value | Possible Values                           | Version Added            |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------------------- | ------------------------ |
+| just_trashed_project | The project just moved to the Trash from the Project menu, so the new project's page can offer Undo. Removed once that page reads it | none          | [`JustTrashed`](src/lib/storage/trash.ts) | unreleased (after 6.3.2) |
+
 ### 🗃️ IndexedDB Storage
 
 User's saved projects and saved palettes are stored in the browser's IndexedDB.
