@@ -59,8 +59,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
   };
 
+  // Left-aligned: the text fills the row, so a short one (CSV) lines up with
+  // the long ones rather than sitting in the middle
   const ITEM =
-    'hover:preset-tonal-surface flex h-auto items-center gap-2 text-left whitespace-pre-wrap';
+    'hover:preset-tonal-surface flex h-auto items-center justify-start gap-2 text-left whitespace-pre-wrap';
 </script>
 
 <Menu
@@ -80,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if menuList.includes('pdf')}
           <Menu.Item value="pdf" class={ITEM} title="Download PDF File">
             <FileTextIcon />
-            <div class="flex flex-col">
+            <div class="flex min-w-0 flex-1 flex-col">
               <p>Download PDF</p>
               <p class="text-surface-700-300 text-xs">Gauges & Weather Data</p>
             </div>
@@ -89,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if menuList.includes('csv')}
           <Menu.Item value="csv" class={ITEM} title="Download CSV File">
             <TableIcon />
-            <div class="flex flex-col">
+            <div class="flex min-w-0 flex-1 flex-col">
               <p>Download CSV</p>
               <p class="text-surface-700-300 text-xs">Weather Data</p>
             </div>
@@ -98,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if previews.active?.previewComponent && menuList.includes('png')}
           <Menu.Item value="preview" class={ITEM} title="Download PNG File">
             <ImageIcon />
-            <div class="flex flex-col">
+            <div class="flex min-w-0 flex-1 flex-col">
               <p>Download PNG</p>
               <p class="text-surface-700-300 text-xs">Preview Image</p>
             </div>
@@ -112,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Create Google Sheet"
           >
             <FilePlusIcon />
-            <div class="flex flex-col">
+            <div class="flex min-w-0 flex-1 flex-col">
               <p>Create Google Sheet</p>
               <p class="text-surface-700-300 text-xs">Gauges & Weather Data</p>
             </div>
