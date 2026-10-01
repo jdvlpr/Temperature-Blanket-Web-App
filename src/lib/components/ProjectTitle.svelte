@@ -96,8 +96,11 @@ wide as the title, focused or not -->
     class="invisible col-start-1 row-start-1 truncate border border-transparent px-2 whitespace-pre"
     aria-hidden="true">{name || fallback}</span
   >
+  <!-- size=1: otherwise its default width (20 characters) widens the column
+  past a short name -->
   <input
     type="text"
+    size={1}
     class="rounded-base hover:border-surface-300-700 focus:border-surface-300-700 focus:bg-surface-50-950 col-start-1 row-start-1 h-9 w-full min-w-0 truncate border border-transparent bg-transparent px-2 outline-none placeholder:text-current"
     class:placeholder:opacity-70={!autosave.stored}
     aria-label="Project name"
