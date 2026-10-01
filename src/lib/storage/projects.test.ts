@@ -22,6 +22,10 @@ vi.mock('idb-keyval', () => ({
     vi_mockStore.data.delete(key);
     return Promise.resolve();
   }),
+  update: vi.fn((key: string, updater: (old: any) => any) => {
+    vi_mockStore.data.set(key, updater(vi_mockStore.data.get(key)));
+    return Promise.resolve();
+  }),
 }));
 
 vi.mock('$app/environment', () => ({
@@ -331,6 +335,97 @@ describe('ProjectStorage', () => {
       });
       await ProjectStorage.load();
       expect(vi_mockWeather.setRawData).toHaveBeenCalled();
+    });
+  });
+
+  describe('Trash', () => {
+    const save = (id: string) =>
+      ProjectStorage.save({
+        id,
+        localProject: { title: `P${id}`, href: `h${id}` } as any,
+      });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('moves a project to the Trash and restores it in its old place', async () => {
+      for (const id of ['1', '2', '3']) await save(id);
+      const before = await ProjectStorage.getById('2');
+
+      await ProjectStorage.moveToTrash('2');
+      expect((await ProjectStorage.getIndex()).map((i) => i.id)).toEqual([
+        '1',
+        '3',
+      ]);
+      expect(await ProjectStorage.getById('2')).toBeNull();
+      const [trashed] = await ProjectStorage.getTrash();
+      expect(trashed.item.id).toBe('2');
+      expect(trashed.project).toEqual(before);
+
+      await ProjectStorage.restoreFromTrash('2');
+      expect((await ProjectStorage.getIndex()).map((i) => i.id)).toEqual([
+        '1',
+        '2',
+        '3',
+      ]);
+      expect(await ProjectStorage.getTrash()).toEqual([]);
+    });
+
+    it('keeps a newer copy saved since, rather than the one in the Trash', async () => {
+      await save('1');
+      await ProjectStorage.moveToTrash('1');
+      await ProjectStorage.save({
+        id: '1',
+        localProject: { title: 'Newer', href: 'h1' } as any,
+      });
+
+      await ProjectStorage.restoreFromTrash('1');
+      expect((await ProjectStorage.getById('1'))?.title).toBe('Newer');
+      expect(await ProjectStorage.getIndex()).toHaveLength(1);
+      expect(await ProjectStorage.getTrash()).toEqual([]);
+    });
+
+    it('removes a list entry whose project data is missing', async () => {
+      await save('1');
+      vi_mockStore.data.delete('p_1');
+      await ProjectStorage.moveToTrash('1');
+      expect(await ProjectStorage.getIndex()).toEqual([]);
+      expect(await ProjectStorage.getTrash()).toEqual([]);
+    });
+
+    it('deletes for good, one at a time or all at once', async () => {
+      for (const id of ['1', '2', '3']) await save(id);
+      for (const id of ['1', '2', '3']) await ProjectStorage.moveToTrash(id);
+
+      await ProjectStorage.deleteForever('2');
+      expect((await ProjectStorage.getTrash()).map((t) => t.item.id)).toEqual(
+        expect.arrayContaining(['1', '3']),
+      );
+      expect(await ProjectStorage.getTrash()).toHaveLength(2);
+
+      await ProjectStorage.emptyTrash();
+      expect(await ProjectStorage.getTrash()).toEqual([]);
+    });
+
+    it('lists newest first and drops projects after 30 days', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01'));
+      await save('old');
+      await ProjectStorage.moveToTrash('old');
+      vi.setSystemTime(new Date('2026-01-20'));
+      await save('new');
+      await ProjectStorage.moveToTrash('new');
+
+      expect((await ProjectStorage.getTrash()).map((t) => t.item.id)).toEqual([
+        'new',
+        'old',
+      ]);
+
+      vi.setSystemTime(new Date('2026-02-05'));
+      expect((await ProjectStorage.getTrash()).map((t) => t.item.id)).toEqual([
+        'new',
+      ]);
     });
   });
 });

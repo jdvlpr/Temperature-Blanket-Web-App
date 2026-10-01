@@ -14,6 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
@@ -43,9 +46,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
       toast.trigger({
         message: added
-          ? 'Palette saved. To find it, press Get Colors, then Browse Palettes.'
+          ? 'Palette saved. Find it on My Projects, or press Get Colors, then Browse Palettes.'
           : 'This palette is already saved',
         category: added ? 'success' : 'info',
+        // Not in the Project Planner, where leaving could lose unsaved changes
+        ...(added &&
+          page.url.pathname === '/yarn' && {
+            action: {
+              label: 'Open My Projects',
+              response: () => goto(resolve('/my-projects')),
+            },
+          }),
       });
       dialog.close();
     } catch {

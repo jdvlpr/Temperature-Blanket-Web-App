@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="card preset-tonal-surface flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
       role="status"
     >
-      <span class="line-clamp-1">Deleted {lastDeleted.label}</span>
+      <span class="line-clamp-1">Moved {lastDeleted.label} to the Trash</span>
       <button
         type="button"
         class="btn btn-sm hover:preset-tonal-surface"

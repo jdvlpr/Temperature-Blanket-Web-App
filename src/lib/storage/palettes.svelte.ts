@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { get, update } from 'idb-keyval';
+import { trashCutoff } from './trash';
 
 export type SavedPalette = {
   /** Internal id. Never put it in a URL. */
@@ -99,9 +100,50 @@ export class PaletteStorage {
     await this.change(id, (p) => ({ ...p, deletedAt: Date.now() }));
   }
 
-  /** Undo a remove */
+  /** Undo a remove, or restore from the Trash */
   static async restore(id: string): Promise<void> {
+    const all = await this.getAll();
+    const palette = all.find((p) => p.id === id);
+    // Saved again since: keep that one rather than show the palette twice
+    if (palette && all.some((p) => p.code === palette.code && !p.deletedAt)) {
+      await this.deleteForever(id);
+      return;
+    }
     await this.change(id, ({ deletedAt: _, ...p }) => p);
+  }
+
+  /**
+   * Deleted palettes (the Trash), most recently deleted first. Ones deleted
+   * more than TRASH_DAYS ago (see ./trash) are removed for good on the way.
+   */
+  static async listDeleted(): Promise<SavedPalette[]> {
+    const all = await this.getAll();
+    const cutoff = trashCutoff();
+    const expired = (p: SavedPalette) => !!p.deletedAt && p.deletedAt < cutoff;
+    if (all.some(expired)) {
+      await update<SavedPalette[]>(SAVED_PALETTES_KEY, (current = []) =>
+        current.filter((p) => !expired(p)),
+      );
+    }
+    return all
+      .filter((p) => p.deletedAt && !expired(p))
+      .sort((a, b) => (b.deletedAt ?? 0) - (a.deletedAt ?? 0));
+  }
+
+  /** Delete a palette in the Trash for good */
+  static async deleteForever(id: string): Promise<void> {
+    if (!this.isAvailable()) throw new Error('IndexedDB is not available');
+    await update<SavedPalette[]>(SAVED_PALETTES_KEY, (all = []) =>
+      all.filter((p) => p.id !== id),
+    );
+  }
+
+  /** Delete every palette in the Trash for good */
+  static async emptyTrash(): Promise<void> {
+    if (!this.isAvailable()) throw new Error('IndexedDB is not available');
+    await update<SavedPalette[]>(SAVED_PALETTES_KEY, (all = []) =>
+      all.filter((p) => !p.deletedAt),
+    );
   }
 
   private static async change(
@@ -117,10 +159,13 @@ export class PaletteStorage {
 
 class SavedPalettesState {
   items = $state<SavedPalette[]>([]);
+  /** Deleted palettes, for the Trash */
+  deleted = $state<SavedPalette[]>([]);
   loaded = $state(false);
 
   async refresh() {
     this.items = await PaletteStorage.list();
+    this.deleted = await PaletteStorage.listDeleted();
     this.loaded = true;
   }
 }

@@ -16,7 +16,8 @@ import {
 } from '$lib/utils/date-utils';
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { projectCreatedAtTime } from '$lib/utils/project-id-utils';
-import { del, get, set } from 'idb-keyval';
+import { del, get, set, update } from 'idb-keyval';
+import { trashCutoff } from './trash';
 
 export type StoredProjectIndexItem = {
   id: string;
@@ -31,6 +32,23 @@ export type StoredProjectIndexItem = {
 };
 
 export const MAX_SAVED_PROJECT_NAME_LENGTH = 100;
+
+/**
+ * A project moved to the Trash: the whole project, so it can be put back. Kept
+ * apart from projects_index, so nothing that reads the saved projects sees it.
+ */
+export type TrashedProject = {
+  item: StoredProjectIndexItem;
+  project: StoredProject;
+  /** Its place in projects_index, to put it back there */
+  position: number;
+  /** When it was moved to the Trash (ms) */
+  deletedAt: number;
+};
+
+/** Bumped on every change, so lists showing saved projects can reload */
+export const savedProjects = $state({ version: 0 });
+const changed = () => savedProjects.version++;
 
 export type StoredProject = {
   /** The name someone gave the project, kept across saves; the title (from its locations) is the fallback */
@@ -48,6 +66,7 @@ export type StoredProject = {
 
 const PROJECTS_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
+const PROJECTS_TRASH_KEY = 'projects_trash';
 
 export class ProjectStorage {
   /**
@@ -157,6 +176,7 @@ export class ProjectStorage {
     }
 
     await this.setIndex(index);
+    changed();
 
     return indexItem;
   }
@@ -174,6 +194,7 @@ export class ProjectStorage {
     if (newIndex.length !== index.length) {
       await this.setIndex(newIndex);
     }
+    changed();
   }
 
   /**
@@ -195,6 +216,7 @@ export class ProjectStorage {
     const { name: __, ...meta } = item.meta;
     item.meta = trimmed ? { ...meta, name: trimmed } : meta;
     await this.setIndex(index);
+    changed();
   }
 
   /**
@@ -214,6 +236,79 @@ export class ProjectStorage {
     const index = (await this.getIndex()).filter((i) => i.id !== item.id);
     index.splice(Math.min(position, index.length), 0, item);
     await this.setIndex(index);
+    changed();
+  }
+
+  /**
+   * Move a saved project to the Trash
+   */
+  static async moveToTrash(id: string): Promise<void> {
+    const index = await this.getIndex();
+    const position = index.findIndex((i) => i.id === id);
+    const stored = await this.getById(id);
+    if (position === -1) return;
+    // A list entry whose project data is missing: nothing to keep, just remove it
+    if (!stored) return this.removeById(id);
+    const trashed: TrashedProject = {
+      item: index[position],
+      project: stored,
+      position,
+      deletedAt: Date.now(),
+    };
+    // Into the Trash first, so a failure part way never loses the project
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) => [
+      ...trash.filter((t) => t.item.id !== id),
+      trashed,
+    ]);
+    await this.removeById(id);
+  }
+
+  /**
+   * Projects in the Trash, most recently deleted first. Ones older than
+   * TRASH_DAYS (see ./trash) are deleted for good on the way.
+   */
+  static async getTrash(): Promise<TrashedProject[]> {
+    if (!this.isAvailable()) return [];
+    const trash = (await get<TrashedProject[]>(PROJECTS_TRASH_KEY)) || [];
+    const cutoff = trashCutoff();
+    if (trash.some((t) => t.deletedAt < cutoff)) {
+      await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (current = []) =>
+        current.filter((t) => t.deletedAt >= cutoff),
+      );
+    }
+    return trash
+      .filter((t) => t.deletedAt >= cutoff)
+      .sort((a, b) => b.deletedAt - a.deletedAt);
+  }
+
+  /**
+   * Put a project from the Trash back where it was
+   */
+  static async restoreFromTrash(id: string): Promise<void> {
+    const trash = (await get<TrashedProject[]>(PROJECTS_TRASH_KEY)) || [];
+    const trashed = trash.find((t) => t.item.id === id);
+    if (!trashed) return;
+    // Saved again since (opened from its link): keep that newer copy
+    if (!(await this.getById(id))) await this.restore(trashed);
+    await this.deleteForever(id);
+  }
+
+  /**
+   * Delete a project in the Trash for good
+   */
+  static async deleteForever(id: string): Promise<void> {
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
+      trash.filter((t) => t.item.id !== id),
+    );
+    changed();
+  }
+
+  /**
+   * Delete every project in the Trash for good
+   */
+  static async emptyTrash(): Promise<void> {
+    await set(PROJECTS_TRASH_KEY, []);
+    changed();
   }
 
   /**

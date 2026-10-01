@@ -24,7 +24,22 @@ browser for now; with accounts, this is where synced projects and palettes show.
   import AppShell from '$lib/components/AppShell.svelte';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import SavedPalettes from '$lib/components/SavedPalettes.svelte';
-  import { PlusIcon } from '@lucide/svelte';
+  import Trash from '$lib/components/Trash.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { savedPalettes } from '$lib/storage/palettes.svelte';
+  import { ProjectStorage, savedProjects } from '$lib/storage/projects.svelte';
+  import { PlusIcon, Trash2Icon } from '@lucide/svelte';
+
+  let trashedProjectCount = $state(0);
+  let trashCount = $derived(trashedProjectCount + savedPalettes.deleted.length);
+
+  $effect(() => {
+    void savedProjects.version;
+    if (browser)
+      ProjectStorage.getTrash().then(
+        (trash) => (trashedProjectCount = trash.length),
+      );
+  });
 </script>
 
 <svelte:head>
@@ -83,6 +98,26 @@ browser for now; with accounts, this is where synced projects and palettes show.
           <SavedPalettes />
         {/if}
       </section>
+
+      <!-- Out of the way: deleted things are in a dialog, and the button only
+      shows when there's something in it -->
+      {#if browser && trashCount}
+        <div class="flex justify-center">
+          <button
+            type="button"
+            class="btn hover:preset-tonal-surface"
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: { ref: Trash },
+                options: { size: 'large' },
+              })}
+          >
+            <Trash2Icon />
+            Trash ({trashCount})
+          </button>
+        </div>
+      {/if}
     </main>
   {/snippet}
 </AppShell>

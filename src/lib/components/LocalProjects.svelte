@@ -18,15 +18,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import { toast } from '$lib/state/page-state.svelte';
-  import type {
-    StoredProject,
-    StoredProjectIndexItem,
-  } from '$lib/storage/projects.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
+  import { ProjectStorage, savedProjects } from '$lib/storage/projects.svelte';
   import { FolderOpenIcon, Undo2Icon } from '@lucide/svelte';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
-  // which shows them all under its own heading
+  // which shows them all under its own heading, with rename and delete
   let {
     limit,
     onMyProjectsPage = false,
@@ -36,55 +33,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loaded = $state(false);
   let shown = $derived(limit ? projects.slice(0, limit) : projects);
 
-  // Undo lives in the list, since in the Menu a toast button behind the modal
-  // dialog can't be clicked
-  let lastDeleted = $state<{
-    item: StoredProjectIndexItem;
-    project: StoredProject;
-    position: number;
-  } | null>(null);
+  // A quick undo for the project just moved to the Trash
+  let lastDeleted = $state<{ id: string; label: string } | null>(null);
+
+  const labelFor = (item: StoredProjectIndexItem) =>
+    item.meta.name || item.meta.title || 'Untitled Project';
+
+  async function run(action: () => Promise<void>, errorMessage: string) {
+    try {
+      await action();
+    } catch {
+      toast.trigger({ message: errorMessage, category: 'error' });
+    }
+  }
 
   async function remove(item: StoredProjectIndexItem) {
-    try {
-      const index = await ProjectStorage.getIndex();
-      const position = index.findIndex((i) => i.id === item.id);
-      const stored = await ProjectStorage.getById(item.id);
-      await ProjectStorage.removeById(item.id);
-      lastDeleted = stored ? { item, project: stored, position } : null;
-    } catch {
-      toast.trigger({
-        message: 'Unable to delete the project',
-        category: 'error',
-      });
-    }
-    await loadProjects();
+    lastDeleted = { id: item.id, label: labelFor(item) };
+    await run(
+      () => ProjectStorage.moveToTrash(item.id),
+      'Unable to delete the project',
+    );
   }
 
   async function undoRemove() {
     if (!lastDeleted) return;
-    const deleted = $state.snapshot(lastDeleted);
+    const { id } = lastDeleted;
     lastDeleted = null;
-    try {
-      await ProjectStorage.restore(deleted);
-    } catch {
-      toast.trigger({
-        message: 'Unable to restore the project',
-        category: 'error',
-      });
-    }
-    await loadProjects();
+    await run(
+      () => ProjectStorage.restoreFromTrash(id),
+      'Unable to restore the project',
+    );
   }
 
   async function rename(id: string, name: string) {
-    try {
-      await ProjectStorage.rename(id, name);
-    } catch {
-      toast.trigger({
-        message: 'Unable to rename the project',
-        category: 'error',
-      });
-    }
-    await loadProjects();
+    await run(
+      () => ProjectStorage.rename(id, name),
+      'Unable to rename the project',
+    );
   }
 
   async function loadProjects() {
@@ -97,6 +82,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
+    // Reload whenever saved projects change, here or in the Trash
+    void savedProjects.version;
     loadProjects();
   });
 </script>
@@ -106,11 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="card preset-tonal-surface mt-2 flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
     role="status"
   >
-    <span class="line-clamp-1"
-      >Deleted {lastDeleted.item.meta.name ||
-        lastDeleted.item.meta.title ||
-        'Untitled Project'}</span
-    >
+    <span class="line-clamp-1">Moved {lastDeleted.label} to the Trash</span>
     <button
       type="button"
       class="btn btn-sm hover:preset-tonal-surface"
@@ -135,6 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ProjectDetails
             project={meta}
             newTab={!onMyProjectsPage}
+            canRemove={onMyProjectsPage}
             onclick={() => remove(project)}
             onrename={onMyProjectsPage
               ? (name) => rename(project.id, name)
