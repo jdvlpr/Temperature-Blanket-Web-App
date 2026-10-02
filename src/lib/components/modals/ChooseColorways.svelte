@@ -36,6 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let container: HTMLElement | null = $state(null);
 
+  // The scroll-to-top button sits just above the footer, whose height
+  // changes with the palette
+  let footerHeight = $state(0);
+
   function getPaletteTitleText(colors: object[]) {
     if (colors.length) {
       return `${colors.length}
@@ -55,12 +59,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         block: 'start',
       });
     }}
-    scrollToTopButtonBottom={selectedColors.length ? '10rem' : '4rem'}
+    scrollToTopButtonBottom="{footerHeight}px"
   />
 </div>
 
 <StickyPart position="bottom">
-  <div class="p-2">
+  <div class="p-2" bind:clientHeight={footerHeight}>
     {#if selectedColors.length}
       <div class="">
         {#key selectedColors.length}
