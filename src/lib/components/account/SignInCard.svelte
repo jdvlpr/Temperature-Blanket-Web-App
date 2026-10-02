@@ -163,7 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mx-auto w-full max-w-md px-2 text-left md:p-6 md:shadow-lg"
+  class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mx-auto w-full max-w-md px-2 text-left md:p-6 md:shadow-lg"
 >
   {#if step === 'email'}
     <div class="flex flex-col gap-4" in:safeSlide>

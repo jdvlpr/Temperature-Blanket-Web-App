@@ -124,6 +124,29 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   --radius-container: 1.5rem;
 }
 
+/* Card edges: a shadow alone barely shows (in dark mode hardly at all), so
+   raised boxes get a thin border too. Give it at the same breakpoint as the
+   shadow (md:card-border with md:shadow-lg), so cards that run edge to edge on
+   small screens go without. Every Skeleton card gets it; in the components
+   layer, so a border utility on a card still wins. */
+@utility card-border {
+  border-width: 1px;
+  border-color: var(--color-surface-300-700);
+}
+@layer components {
+  .card {
+    border-width: 1px;
+    border-color: var(--color-surface-300-700);
+  }
+}
+@media (prefers-contrast: more) {
+  .card,
+  .card-border,
+  [class*=':card-border'] {
+    border-color: var(--color-surface-500);
+  }
+}
+
 /* Menu items: rounded rectangles whose corners follow the menu's (its radius
    less its padding), rather than pills, which crowd two-line items. Unlayered
    so it wins over Skeleton's own item styles. */

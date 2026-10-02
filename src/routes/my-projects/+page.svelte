@@ -163,7 +163,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
       {#if browser && signedIn}
         <GalleryPages
           name={account.summary?.name ?? ''}
-          cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS}"
+          cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS} card-border"
         />
       {/if}
 

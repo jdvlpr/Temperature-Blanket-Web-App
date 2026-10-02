@@ -291,7 +291,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mx-auto mb-2 px-2 md:p-4 md:shadow-lg"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mx-auto mb-2 px-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>

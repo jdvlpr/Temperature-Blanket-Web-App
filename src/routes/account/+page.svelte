@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
-  const CARD = `bg-surface-50-950 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden shadow-lg ${LIST_ENDS}`;
+  const CARD = `bg-surface-50-950 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden shadow-lg card-border ${LIST_ENDS}`;
   const ROW = `hover:bg-surface-100-900 flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50 ${ROW_FOCUS}`;
 
   let status: 'loading' | 'signed-in' | 'signed-out' | 'deleted' | 'error' =

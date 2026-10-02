@@ -169,7 +169,7 @@ button to it. -->
 <div class="flex w-full flex-col gap-6 p-4 pt-2 text-left">
   <!-- This project -->
   <section
-    class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-2 p-4"
+    class="bg-surface-100 dark:bg-surface-900 rounded-container card-border flex flex-col gap-2 p-4"
     aria-label="This project"
   >
     {#if !inTopBar}
