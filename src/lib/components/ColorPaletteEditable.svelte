@@ -267,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onpointerleave={() => onhover?.(null)}
       >
         <div
-          class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
+          class="flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] {fullscreen
             ? 'h-full'
             : 'h-[70px]'}"
           style="background:{hex ?? '#ffffff'};color:{getTextColor(
