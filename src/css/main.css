@@ -124,6 +124,14 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   --radius-container: 1.5rem;
 }
 
+/* Menu items: rounded rectangles whose corners follow the menu's (its radius
+   less its padding), rather than pills, which crowd two-line items. Unlayered
+   so it wins over Skeleton's own item styles. */
+[data-scope='menu'][data-part='item'] {
+  border-radius: max(0px, calc(var(--radius-container) - var(--spacing) * 2));
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+}
+
 /* Spacing */
 [data-spacing='compact'] {
   --spacing: 0.22rem;
