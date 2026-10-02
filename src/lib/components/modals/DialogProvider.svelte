@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { tick, untrack } from 'svelte';
   import { cubicOut, linear } from 'svelte/easing';
   import { MediaQuery } from 'svelte/reactivity';
-  import { fade, fly } from 'svelte/transition';
+  import { fade, fly, type TransitionConfig } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
 
@@ -55,11 +55,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Opening: rises into place (further on phones, where it comes up from the
   // bottom edge); the side panel slides in with CSS instead
-  const openFly = $derived(
-    side || reduceMotion
-      ? { duration: 0 }
-      : { y: phone.current ? 120 : 50, duration: 400, easing: cubicOut },
-  );
+  // Always from the same place, whatever transform or opacity it has now:
+  // svelte's fly and fade would build on those, so reopening during a
+  // closing slide (or before a drag is cleared) would start part way, then jump
+  const openIn: (node: Element) => TransitionConfig = () => {
+    if (side || reduceMotion) return { duration: 0 };
+    const y = phone.current ? 120 : 50;
+    return {
+      duration: 400,
+      easing: cubicOut,
+      css: (t, u) => `opacity: ${t}; transform: translateY(${u * y}px)`,
+    };
+  };
+
+  const backdropIn: (node: Element) => TransitionConfig = () => {
+    if (side || reduceMotion) return { duration: 0 };
+    return { duration: 200, css: (t) => `opacity: ${t}` };
+  };
 
   // Closing: a sheet slides down off the bottom edge (from wherever a drag
   // left it, at the speed it was let go), the side panel slides back out to
@@ -166,13 +178,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let startY = 0;
   let samples: { y: number; t: number }[] = [];
 
-  // Reset on opening, not closing: the closing slide starts from the drag
-  $effect(() => {
-    if (dialog.opened) {
-      dragOffset = 0;
-      dragging = false;
-      releaseVelocity = 0;
-    }
+  // Reset once the closing slide is done (it starts from the drag), and on
+  // opening, before the sheet renders: its opening slide builds on whatever
+  // transform it has, so a leftover drag would offset it, then jump
+  function resetDrag() {
+    dragOffset = 0;
+    dragging = false;
+    releaseVelocity = 0;
+  }
+
+  $effect.pre(() => {
+    if (dialog.opened) untrack(resetDrag);
   });
 
   /** A press on a control in the top bar (Back, Close) isn't a drag */
@@ -372,7 +388,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <!-- The side panel's backdrop fades in with CSS -->
           <div
             {...attributes}
-            in:fade={{ duration: side || reduceMotion ? 0 : 200 }}
+            in:backdropIn
             out:fade={{ duration: reduceMotion ? 0 : 200 }}
           ></div>
         {/if}
@@ -417,8 +433,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               {...attributes}
               bind:this={dialog.scrollElement}
-              in:fly={openFly}
+              in:openIn
               out:closeOut
+              onoutroend={resetDrag}
               use:sheetTouch
               style:transform={dragOffset
                 ? `translateY(${dragOffset}px)`
