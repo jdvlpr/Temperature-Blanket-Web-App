@@ -23,7 +23,7 @@ import { project } from '$lib/state/project-state.svelte';
 import { toast } from '$lib/state/page-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import { feedback } from '$lib/utils/feedback.svelte';
+import { feedback, showHistoryChange } from '$lib/utils/feedback.svelte';
 import { exists } from '$lib/utils/other-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
@@ -53,6 +53,10 @@ export const loadFromHistory = async ({
   const newParams = getProjectParametersFromURLHash(newHistoryState ?? '');
 
   let message = '';
+
+  // What changed, to glow for a moment: a gauge's colors/ranges, and the preview
+  let changedGaugeId: string | null = null;
+  let changedIndex: number | null = null;
 
   // Resolve a preview change first (this is the only async step) so it
   // settles before any of the synchronous mutations below, all of which
@@ -145,7 +149,13 @@ export const loadFromHistory = async ({
         );
 
         const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
-        if (_gauge && settings) _gauge.updateSettings({ settings });
+        if (_gauge && settings) {
+          const before = _gauge.colors.map((color) => color?.hex);
+          _gauge.updateSettings({ settings });
+          const after = _gauge.colors.map((color) => color?.hex);
+          changedGaugeId = gauge.id;
+          changedIndex = changedColorIndex(before, after);
+        }
 
         message = 'Colors';
       }
@@ -173,6 +183,12 @@ export const loadFromHistory = async ({
   // Change Preview
   if (previewChanged) message = 'Preview';
 
+  showHistoryChange({
+    gaugeId: changedGaugeId,
+    indices: changedIndex === null ? [] : [changedIndex],
+    preview: previewChanged,
+  });
+
   if (message) {
     toast.trigger({
       message: `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`,
@@ -180,6 +196,47 @@ export const loadFromHistory = async ({
     });
   }
 };
+/**
+ * The one color an undo or redo changed, added, or moved, by its index afterwards — or null when there's
+ * no single color to point to (only ranges changed, a color was removed, or the whole palette changed)
+ */
+export function changedColorIndex(
+  before: (string | undefined)[],
+  after: (string | undefined)[],
+): number | null {
+  const length = Math.max(before.length, after.length);
+  let first = -1;
+  let last = -1;
+  for (let i = 0; i < length; i++) {
+    if (before[i] !== after[i]) {
+      if (first === -1) first = i;
+      last = i;
+    }
+  }
+  if (first === -1) return null;
+
+  // A color was added: everything after it shifted along by one
+  if (after.length === before.length + 1) {
+    const withoutIt = after.filter((_, i) => i !== first);
+    return withoutIt.every((hex, i) => hex === before[i]) ? first : null;
+  }
+  if (after.length !== before.length) return null;
+
+  // One color changed
+  if (first === last) return first;
+
+  // One color moved: the colors between where it was and where it is shifted by one
+  const shifted = (from: number, to: number, by: number) => {
+    for (let i = from; i <= to; i++)
+      if (after[i] !== before[i + by]) return false;
+    return true;
+  };
+  if (after[first] === before[last] && shifted(first + 1, last, -1))
+    return first;
+  if (after[last] === before[first] && shifted(first, last - 1, 1)) return last;
+  return null;
+}
+
 export const updateHistory = () => {
   if (
     !weather.data.length ||

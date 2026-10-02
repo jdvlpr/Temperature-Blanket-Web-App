@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
   import type { Color } from '$lib/types/yarn-types';
-  import { getSortedPalette } from '$lib/utils/color-utils';
+  import { getSortedPalette, shuffleColors } from '$lib/utils/color-utils';
   import { dialog } from '$lib/state/page-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
 
@@ -86,7 +86,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               selectedColors =
                 sort === 'reverse'
                   ? colors.reverse()
-                  : getSortedPalette({ palette: colors, sortColors: sort });
+                  : sort === 'shuffle'
+                    ? shuffleColors(colors)
+                    : getSortedPalette({ palette: colors, sortColors: sort });
             }}
           />
         </div>

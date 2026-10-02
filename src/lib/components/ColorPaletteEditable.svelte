@@ -57,9 +57,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom?: boolean;
     isStaticGauge?: boolean;
     onchanged?: any;
+    /** Colors that just changed (by undo or redo), which glow for a moment */
+    flashIndices?: number[];
     /** A color to outline, as when its marker is hovered on an image */
     highlightIndex?: number | null;
-    /** Called with a color's index when it's hovered, and null after */
+    /** Called with a color's index when it's hovered or focused, and null after */
     onhover?: (index: number | null) => void;
     /** The first colors grow in one after another, e.g. a palette just taken from an image */
     staggerIn?: boolean;
@@ -75,6 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isStaticGauge = false,
     onchanged = null,
     highlightIndex = null,
+    flashIndices = [],
     onhover,
     staggerIn = false,
   }: Props = $props();
@@ -296,8 +299,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         animate:flip={{ duration: flipDurationMs }}
         id="palette-item-description-{uuid}-{index}"
         {...popover.reference()}
-        onpointerenter={() => onhover?.(index)}
+        onpointerenter={(e) => {
+          // A tap isn't a hover; it would only flash
+          if (e.pointerType !== 'touch' && !isDragging.value) onhover?.(index);
+        }}
         onpointerleave={() => onhover?.(null)}
+        onfocusin={(e) => {
+          // Keyboard focus only, not a click or tap
+          if ((e.target as Element).matches(':focus-visible')) onhover?.(index);
+        }}
+        onfocusout={() => onhover?.(null)}
       >
         <div
           role="button"
@@ -318,7 +329,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               e.currentTarget.click();
             }
           }}
-          class="flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current"
+          class={[
+            'flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
+            flashIndices.includes(index) && 'history-flash',
+          ]}
           style="background:{hex ?? '#ffffff'};color:{getTextColor(
             hex ?? '#ffffff',
           )};{highlightIndex === index

@@ -18,7 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   its settings beside it (below it on phones) and its actions at the bottom.
 -->
 <script lang="ts">
+  import CopyIcon from '$lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
+  import { Flash } from '$lib/utils/feedback.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import {
@@ -35,7 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import {
-    ClipboardCopyIcon,
     Columns3Icon,
     DownloadIcon,
     LayoutGridIcon,
@@ -259,13 +260,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
+  const copied = new Flash();
+
   async function copy() {
     if (!blob) return;
-    await copyToClipboard(
+    const ok = await copyToClipboard(
       [new ClipboardItem({ 'image/png': blob })],
       'Image copied',
       'Unable to copy the image',
     );
+    if (ok) copied.trigger();
   }
 
   const segmentClass = 'bg-surface-100 dark:bg-surface-900 w-full';
@@ -423,7 +427,7 @@ choice's icon beside it, and what it's for below -->
           disabled={!blob}
           onclick={copy}
         >
-          <ClipboardCopyIcon />
+          <CopyIcon copied={copied.is()} />
           Copy Image
         </button>
       {/if}

@@ -17,7 +17,11 @@ import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-const
 import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
 import { defaultYarn } from '$lib/state/page-state.svelte';
 import type { Color } from '$lib/types/yarn-types';
-import { getSortedPalette, type PaletteSort } from '$lib/utils/color-utils';
+import {
+  getSortedPalette,
+  shuffleColors,
+  type PaletteSort,
+} from '$lib/utils/color-utils';
 import {
   getColorways,
   stringToBrandAndYarnDetails,
@@ -657,6 +661,15 @@ export class ImagePaletteState {
 
   reverse() {
     this.points = [...this.points].reverse();
+    this.sortOrder = 'custom';
+  }
+
+  /** Put the colors in a random order, keeping locked colors where they are */
+  shuffle() {
+    const byId = new Map(this.points.map((point) => [point.id, point]));
+    this.points = shuffleColors(this.paletteColors()).map((color) =>
+      byId.get(color.pointId)!,
+    );
     this.sortOrder = 'custom';
   }
 

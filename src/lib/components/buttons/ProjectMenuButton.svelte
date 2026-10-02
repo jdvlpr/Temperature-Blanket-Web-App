@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- Project, in the top bar: opens the Project menu. Once the project saves by
 itself (and Save is gone), its icon is the save state, like Google Docs' cloud:
 a cloud for the account or a screen for this browser only, in the text color,
-since saved is the usual state; dimmed while a change waits to save, with a
-little pop when it lands; red only for a problem, which the menu explains. -->
+since saved is the usual state; a slow, dimmed spinner while a change waits
+to save, with a little pop when it lands; red only for a problem, which the menu explains. -->
 
 <script lang="ts">
   import { openProjectMenu } from '$lib/state/page-state.svelte';
@@ -26,6 +26,7 @@ little pop when it lands; red only for a problem, which the menu explains. -->
     CloudAlertIcon,
     CloudCheckIcon,
     EllipsisVerticalIcon,
+    LoaderCircleIcon,
     MonitorCheckIcon,
     MonitorXIcon,
   } from '@lucide/svelte';
@@ -69,13 +70,9 @@ little pop when it lands; red only for a problem, which the menu explains. -->
     {:else}
       <MonitorXIcon class="text-error-700-300" />
     {/if}
-  {:else}
-    {#key `${saved}${autosave.account}`}
-      <span
-        class="flex transition-opacity"
-        class:saved-pop={saved}
-        class:opacity-50={!saved}
-      >
+  {:else if saved}
+    {#key autosave.account}
+      <span class="saved-pop flex">
         {#if autosave.account}
           <CloudCheckIcon />
         {:else}
@@ -83,6 +80,8 @@ little pop when it lands; red only for a problem, which the menu explains. -->
         {/if}
       </span>
     {/key}
+  {:else}
+    <LoaderCircleIcon class="saving-spin opacity-60" />
   {/if}
   <span>Project</span>
 </button>
@@ -98,9 +97,23 @@ little pop when it lands; red only for a problem, which the menu explains. -->
       opacity: 0.5;
     }
   }
+  /* Saving: a slow turn, calmer than a busy spinner, since it shows after every change */
+  :global(.saving-spin) {
+    animation: saving-spin 1.6s linear infinite;
+  }
+  @keyframes saving-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .saved-pop {
+    .saved-pop,
+    :global(.saving-spin) {
       animation: none;
     }
+  }
+  :global([data-motion='reduce']) .saved-pop,
+  :global([data-motion='reduce'] .saving-spin) {
+    animation: none;
   }
 </style>

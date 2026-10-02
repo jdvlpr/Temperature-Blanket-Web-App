@@ -278,3 +278,6 @@ class PreviewsState {
 }
 
 export const previews = new PreviewsState();
+
+/** The yarn color being pointed at or focused in a gauge; the preview dims every other color */
+export const previewHighlight: { hex: string | null } = $state({ hex: null });

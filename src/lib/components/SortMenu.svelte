@@ -15,24 +15,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A Sort menu for a palette: the usual sorts, plus a smooth blend from warm
-  to cool (or back), and Reverse. Choosing one calls `onsort`.
+  to cool (or back), Reverse, and Shuffle. Choosing one calls `onsort`. Without a
+  `current` sort, the menu checks the sort the colors are already in.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
-  import { PALETTE_SORTS, type PaletteSort } from '$lib/utils/color-utils';
+  import {
+    getSortedPalette,
+    PALETTE_SORTS,
+    type PaletteSort,
+  } from '$lib/utils/color-utils';
   import {
     ArrowDownWideNarrowIcon,
     ArrowLeftRightIcon,
     CheckIcon,
     ChevronDownIcon,
+    ShuffleIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
   interface Props {
     /** The palette, to tell whether sorting by name makes sense */
     colors: Color[];
-    onsort: (sort: Exclude<PaletteSort, 'custom'> | 'reverse') => void;
-    /** The palette's current sort, to check in the menu */
+    onsort: (
+      sort: Exclude<PaletteSort, 'custom'> | 'reverse' | 'shuffle',
+    ) => void;
+    /** The palette's current sort, to check in the menu. Left out, the
+     * menu works it out from the colors' order when it opens. */
     current?: PaletteSort | null;
     triggerClass?: string;
     disabled?: boolean;
@@ -42,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     colors,
     onsort,
-    current = null,
+    current,
     triggerClass = 'btn hover:bg-surface-200-800 justify-start',
     disabled = false,
     placement = 'bottom-start',
@@ -52,14 +61,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors.length > 0 && colors.every((color) => color?.name),
   );
 
+  let open = $state(false);
+  /** The sort last chosen here, preferred when the colors fit more than one */
+  let lastChosen = $state<string | null>(null);
+
+  /** The one sort the colors are already in, worked out only while the menu
+   * is open, since some sorts take a moment on long palettes */
+  let alreadySorted = $derived.by(() => {
+    if (current !== undefined || !open || colors.length < 2) return null;
+    const key = (list: Color[]) =>
+      list.map((color) => `${color?.hex}|${color?.name ?? ''}`).join(',');
+    const now = key(colors);
+    const matches = PALETTE_SORTS.filter(
+      (sort) =>
+        (allColorsHaveNames || !sort.needsNames) &&
+        key(
+          getSortedPalette({ palette: [...colors], sortColors: sort.value }),
+        ) === now,
+    ).map((sort) => sort.value as string);
+    if (lastChosen && matches.includes(lastChosen)) return lastChosen;
+    return matches[0] ?? null;
+  });
+
+  const isCurrent = (sort: PaletteSort) =>
+    current !== undefined ? current === sort : alreadySorted === sort;
+
   const itemClass =
     'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 </script>
 
 <Menu
   positioning={{ placement }}
-  onSelect={(details) =>
-    onsort(details.value as Exclude<PaletteSort, 'custom'> | 'reverse')}
+  onOpenChange={(details) => (open = details.open)}
+  onSelect={(details) => {
+    lastChosen = details.value;
+    onsort(
+      details.value as Exclude<PaletteSort, 'custom'> | 'reverse' | 'shuffle',
+    );
+  }}
 >
   <Menu.Trigger class={triggerClass} title="Sort Colors" {disabled}>
     <ArrowDownWideNarrowIcon />
@@ -73,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#each PALETTE_SORTS.filter((sort) => allColorsHaveNames || !sort.needsNames) as sort (sort.value)}
           <Menu.Item value={sort.value} class={itemClass}>
             <p class="min-w-0 flex-1 text-left">{sort.label}</p>
-            {#if current === sort.value}
+            {#if isCurrent(sort.value)}
               <CheckIcon class="shrink-0" aria-label="Current" />
             {/if}
           </Menu.Item>
@@ -82,6 +121,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Menu.Item value="reverse" class={itemClass}>
           <ArrowLeftRightIcon class="shrink-0" />
           <p class="min-w-0 flex-1 text-left">Reverse</p>
+        </Menu.Item>
+        <Menu.Item value="shuffle" class={itemClass}>
+          <ShuffleIcon class="shrink-0" />
+          <p class="min-w-0 flex-1 text-left">Shuffle</p>
         </Menu.Item>
       </Menu.Content>
     </Menu.Positioner>

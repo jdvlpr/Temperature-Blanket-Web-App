@@ -16,15 +16,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
+  import { previewHighlight, previews } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { motion } from '$lib/utils/feedback.svelte';
   import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
   import { exists } from '$lib/utils/other-utils';
   import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
-  import { onMount, untrack } from 'svelte';
+  import { historyChange } from '$lib/utils/feedback.svelte';
+  import { onMount } from 'svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
   function initDefaultPreview() {
@@ -47,27 +46,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     initDefaultPreview();
   });
 
-  // When weather data first arrives (a new location, dates, or project), the
-  // preview fills in from the top, like rows being stitched. Not on edits.
-  let knitting = $state(false);
-  let hadWeather = false;
-  let knitTimer: ReturnType<typeof setTimeout>;
-  $effect(() => {
-    const hasWeather = weather.rawData.length > 0;
-    if (hasWeather && !hadWeather && !untrack(() => motion.reduced)) {
-      knitting = true;
-      clearTimeout(knitTimer);
-      // Long enough for a slower preview to finish drawing and still knit in
-      knitTimer = setTimeout(() => (knitting = false), 1500);
-    }
-    hadWeather = hasWeather;
+  // While a gauge color is pointed at or focused, every part of the preview in
+  // another color fades back, so the days knit in that yarn stand out
+  let highlightStyle = $derived.by(() => {
+    const hex = previewHighlight.hex;
+    if (!hex || !/^#[0-9a-f]{3,8}$/i.test(hex)) return '';
+    return `<style>#preview-svg-image :is(rect, path, polygon, polyline, circle, line):not([fill="${hex}" i]):not([stroke="${hex}" i]) { opacity: 0.15; }</style>`;
   });
 </script>
+
+<svelte:head>
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- built from a validated hex code -->
+  {@html highlightStyle}
+</svelte:head>
 
 <div
   class={[
     'preset-tonal-surface card mt-4 p-2 md:p-4 md:shadow-lg',
-    knitting && 'preview-knit',
+    historyChange.preview && 'history-flash-card',
   ]}
 >
   <PreviewSelect />

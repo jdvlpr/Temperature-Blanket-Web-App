@@ -33,8 +33,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPaletteFallbackName,
     getSortedPalette,
     getYarnPageURL,
+    shuffleColors,
   } from '$lib/utils/color-utils';
   import { drawerState, dialog } from '$lib/state/page-state.svelte';
+  import { previewHighlight } from '$lib/state/preview-state.svelte';
+  import { historyChange } from '$lib/utils/feedback.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import { createGaugeColors } from '$lib/state/gauges-state.svelte';
@@ -59,6 +62,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** A project's gauge, whose ranges mean something (the Yarn page's don't) */
     inProject = false,
   } = $props();
+
+  // Pointing at or focusing a color highlights the days in that yarn on the preview
+  let highlightIndex: number | null = $state(null);
+  // A new palette (an edit, undo, or new scheme) re-creates the swatches, so
+  // the one pointed at may be gone; it's highlighted again on the next hover
+  $effect.pre(() => {
+    void gauge.colors;
+    highlightIndex = null;
+  });
+  $effect(() => {
+    if (!inProject) return;
+    previewHighlight.hex =
+      highlightIndex === null
+        ? null
+        : (gauge.colors[highlightIndex]?.hex ?? null);
+    return () => (previewHighlight.hex = null);
+  });
+
+  let flashIndices = $derived(
+    inProject && historyChange.gaugeId === gauge.id
+      ? historyChange.indices
+      : [],
+  );
 
   /** Each color's range, as the gauge shows it, like "50–59 °F" */
   function getRangeLabels(): string[] | undefined {
@@ -293,6 +319,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showSchemeName={false}
         roundedBottom={false}
         isStaticGauge={gauge.isStatic}
+        {flashIndices}
+        onhover={(index: number | null) => (highlightIndex = index)}
         onchanged={() => {
           updateGauge({ _colors: gauge.colors });
         }}
@@ -365,10 +393,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           _colors:
             sort === 'reverse'
               ? colors.reverse()
-              : getSortedPalette({
-                  palette: colors,
-                  sortColors: sort,
-                }),
+              : sort === 'shuffle'
+                ? shuffleColors(colors)
+                : getSortedPalette({
+                    palette: colors,
+                    sortColors: sort,
+                  }),
         });
       }}
     />

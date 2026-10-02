@@ -282,3 +282,55 @@ export function dragFinalizeFeedback() {
   lastDragAt = performance.now();
   feedback('drop');
 }
+
+/**
+ * Briefly marks something (e.g. a copy button, which shows a check) for `ms`. A `key` tells apart several
+ * things that share one Flash, like the colorways in a list.
+ */
+export class Flash {
+  key: string | null = $state(null);
+  #timer: ReturnType<typeof setTimeout> | undefined;
+  trigger(key = '', ms = 1500) {
+    clearTimeout(this.#timer);
+    this.key = null;
+    // On the next frame, so flashing the same thing again restarts its animation
+    requestAnimationFrame(() => {
+      this.key = key;
+      this.#timer = setTimeout(() => (this.key = null), ms);
+    });
+  }
+  is(key = '') {
+    return this.key === key;
+  }
+}
+
+/** What an undo or redo just changed, so it can glow for a moment */
+export const historyChange: {
+  /** The gauge whose colors or ranges changed, and which of them */
+  gaugeId: string | null;
+  indices: number[];
+  /** Whether the preview's settings changed */
+  preview: boolean;
+} = $state({ gaugeId: null, indices: [], preview: false });
+
+let historyChangeTimer: ReturnType<typeof setTimeout> | undefined;
+
+export function showHistoryChange(change: {
+  gaugeId: string | null;
+  indices: number[];
+  preview: boolean;
+}) {
+  clearTimeout(historyChangeTimer);
+  historyChange.gaugeId = null;
+  historyChange.indices = [];
+  historyChange.preview = false;
+  // On the next frame, so undoing again restarts the glow
+  requestAnimationFrame(() => {
+    Object.assign(historyChange, change);
+    historyChangeTimer = setTimeout(() => {
+      historyChange.gaugeId = null;
+      historyChange.indices = [];
+      historyChange.preview = false;
+    }, 1400);
+  });
+}

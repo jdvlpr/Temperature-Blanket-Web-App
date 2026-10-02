@@ -29,6 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsDarktoLight,
     sortColorsLightToDark,
     sortColorsWarmToCool,
+    sortColorsByHue,
+    shuffleColorsWithSeed,
   } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
@@ -105,6 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
+  /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
+  let shuffleSeed = Math.random();
 
   let results = $state<(Color & { delta?: number })[]>([]);
 
@@ -211,6 +215,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           colors: _results,
           warmFirst: sortColors === 'warm-to-cool',
         });
+        break;
+      case 'rainbow':
+        _results = sortColorsByHue({ colors: _results });
+        break;
+      case 'shuffle':
+        _results = shuffleColorsWithSeed(_results, shuffleSeed);
         break;
       case 'light-to-dark':
         _results = sortColorsLightToDark({
@@ -399,6 +409,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="select truncate pl-10"
         id="sort-colors-by"
         bind:value={sortColors}
+        onchange={() => {
+          if (sortColors === 'shuffle') shuffleSeed = Math.random();
+        }}
         disabled={gettingResults}
       >
         {#if hasIncomingColor}
@@ -407,10 +420,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <option value="default">Default</option>
         <option value="warm-to-cool">Warm to Cool</option>
         <option value="cool-to-warm">Cool to Warm</option>
+        <option value="rainbow">Rainbow</option>
         <option value="light-to-dark">Light to Dark</option>
         <option value="dark-to-light">Dark to Light</option>
         <option value="name">Name A-Z</option>
         <option value="name-z-to-a">Name Z-A</option>
+        <option value="shuffle">Shuffle</option>
       </select>
     </div>
   </label>

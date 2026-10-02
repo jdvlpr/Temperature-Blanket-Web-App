@@ -60,13 +60,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsDarktoLight,
     sortColorsLightToDark,
     sortColorsWarmToCool,
+    sortColorsByHue,
+    shuffleColorsWithSeed,
   } from '$lib/utils/color-utils';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
+  import { Flash } from '$lib/utils/feedback.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowDownWideNarrowIcon,
     ChevronDownIcon,
     CircleQuestionMarkIcon,
+    CheckIcon,
     ClipboardCheckIcon,
     ExternalLinkIcon,
     PlusIcon,
@@ -86,12 +90,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let filtersContainer: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
+  /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
+  let shuffleSeed = Math.random();
 
   let results: ColorWithDelta[] = $state([]);
   let gettingResults = $state(true);
   let loadingAllColors = $state(false);
 
   let layout = $state('grid');
+
+  // The colorway name or hex code just copied, which shows a check for a moment
+  const copied = new Flash();
 
   let accordionState: string[] = $state([]);
 
@@ -266,6 +275,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           colors: _results,
           warmFirst: yarnColorwayFinderState.sortColors === 'warm-to-cool',
         });
+        break;
+      case 'rainbow':
+        _results = sortColorsByHue({ colors: _results });
+        break;
+      case 'shuffle':
+        _results = shuffleColorsWithSeed(_results, shuffleSeed);
         break;
       case 'light-to-dark':
         _results = sortColorsLightToDark({
@@ -596,15 +611,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="select truncate pl-10"
                     id="sort-colors-by"
                     bind:value={yarnColorwayFinderState.sortColors}
+                    onchange={() => {
+                      if (yarnColorwayFinderState.sortColors === 'shuffle')
+                        shuffleSeed = Math.random();
+                    }}
                     disabled={gettingResults}
                   >
                     <option value="default">Default</option>
                     <option value="warm-to-cool">Warm to Cool</option>
                     <option value="cool-to-warm">Cool to Warm</option>
+                    <option value="rainbow">Rainbow</option>
                     <option value="light-to-dark">Light to Dark</option>
                     <option value="dark-to-light">Dark to Light</option>
                     <option value="name">Name A-Z</option>
                     <option value="name-z-to-a">Name Z-A</option>
+                    <option value="shuffle">Shuffle</option>
                   </select>
                 </div>
               </label>
@@ -640,6 +661,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable } ((hex ?? '') + (name ?? '') + (brandName ?? '') + (yarnName ?? ''))}
                   {@const percentMatch = Math.floor(100 - Number(delta))}
+                  {@const key =
+                    (hex ?? '') +
+                    (name ?? '') +
+                    (brandName ?? '') +
+                    (yarnName ?? '')}
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
@@ -650,13 +676,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     style="background:{hex}; color:{getTextColor(
                       hex ?? '#ffffff',
                     )};"
-                    onclick={() =>
-                      copyToClipboard(name ?? '', {
+                    onclick={async () => {
+                      const ok = await copyToClipboard(name ?? '', {
                         message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
                         icon: ClipboardCheckIcon,
-                      })}
+                      });
+                      if (ok) copied.trigger(`name-${key}`);
+                    }}
                     title="Copy {name} to clipboard"
                   >
+                    {#if copied.is(`name-${key}`)}
+                      <CheckIcon
+                        class="feedback-pop absolute top-2 right-2 size-5"
+                        style="--pop-scale: 1.3"
+                        aria-hidden="true"
+                      />
+                    {/if}
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
                     <div class="min-h-[43px] min-w-[43px]">
                       {#if !unavailable}
@@ -711,13 +746,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         class="text-xs select-all hover:opacity-80"
                         aria-label="Copy {hex} to clipboard"
                         title="Copy {hex} to clipboard"
-                        onclick={(e) => {
+                        onclick={async (e) => {
                           e.stopPropagation();
-                          copyToClipboard(hex ?? '', {
+                          const ok = await copyToClipboard(hex ?? '', {
                             message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
                             icon: ClipboardCheckIcon,
                           });
-                        }}>{hex}</span
+                          if (ok) copied.trigger(`hex-${key}`);
+                        }}
+                        >{hex}{#if copied.is(`hex-${key}`)}<CheckIcon
+                            class="feedback-pop ml-1 inline size-3.5 align-[-2px]"
+                            style="--pop-scale: 1.3"
+                            aria-hidden="true"
+                          />{/if}</span
                       >
                     </div>
                   </div>

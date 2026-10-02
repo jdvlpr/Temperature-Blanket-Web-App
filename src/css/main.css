@@ -238,38 +238,69 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   animation: none;
 }
 
-/* The preview filling in from the top when weather data arrives, like rows being stitched */
-@keyframes preview-knit {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-.preview-knit #preview-svg-image {
-  animation: preview-knit 900ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+/* Preview cells ease to a new yarn color instead of snapping (only cells whose color changes animate),
+and fade back while another gauge color is highlighted */
+#preview-svg-image :is(rect, path, polygon, polyline, circle, line) {
+  transition:
+    fill 250ms ease,
+    opacity 200ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  .preview-knit #preview-svg-image {
-    animation: none;
-  }
-}
-[data-motion='reduce'] .preview-knit #preview-svg-image {
-  animation: none;
-}
-
-/* Preview cells ease to a new yarn color instead of snapping (only cells whose color changes animate) */
-#preview-svg-image :is(rect, path, polygon, circle) {
-  transition: fill 250ms ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  #preview-svg-image :is(rect, path, polygon, circle) {
+  #preview-svg-image :is(rect, path, polygon, polyline, circle, line) {
     transition: none;
   }
 }
-[data-motion='reduce'] #preview-svg-image :is(rect, path, polygon, circle) {
+[data-motion='reduce']
+  #preview-svg-image
+  :is(rect, path, polygon, polyline, circle, line) {
   transition: none;
+}
+
+/* What an undo or redo just changed glows for a moment: a ring in the swatch's own text color (which
+contrasts with it), or an outline around the preview. Reduced motion shows the same ring, without the fade. */
+@keyframes history-flash {
+  0%,
+  35% {
+    box-shadow: inset 0 0 0 4px currentColor;
+  }
+  100% {
+    box-shadow: inset 0 0 0 4px transparent;
+  }
+}
+.history-flash {
+  animation: history-flash 1400ms ease-out both;
+}
+@keyframes history-flash-card {
+  0%,
+  35% {
+    outline-color: var(--color-primary-500);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+.history-flash-card {
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+  animation: history-flash-card 1400ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .history-flash {
+    animation: none;
+    box-shadow: inset 0 0 0 4px currentColor;
+  }
+  .history-flash-card {
+    animation: none;
+    outline-color: var(--color-primary-500);
+  }
+}
+[data-motion='reduce'] .history-flash {
+  animation: none;
+  box-shadow: inset 0 0 0 4px currentColor;
+}
+[data-motion='reduce'] .history-flash-card {
+  animation: none;
+  outline-color: var(--color-primary-500);
 }
 
 /* A color being moved with the keyboard lifts off the page, like one being dragged with a pointer */

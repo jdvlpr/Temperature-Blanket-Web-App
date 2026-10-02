@@ -45,7 +45,9 @@ button to it. -->
   } from '$lib/storage/projects.svelte';
   import { rememberJustTrashed, TRASH_DAYS } from '$lib/storage/trash';
   import { sync } from '$lib/sync/status.svelte';
+  import CopyIcon from '$lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
+  import { Flash } from '$lib/utils/feedback.svelte';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import {
     ChevronRightIcon,
@@ -102,12 +104,15 @@ button to it. -->
       options: { title, returnable },
     });
 
+  const linkCopied = new Flash();
+
   async function copyLink() {
-    await copyToClipboard(
+    const ok = await copyToClipboard(
       project.url.href,
       'Link copied',
       'Unable to copy to your clipboard',
     );
+    if (ok) linkCopied.trigger();
   }
 
   async function copyProject() {
@@ -272,7 +277,11 @@ button to it. -->
         {#if hasProject}
           <li>
             <button type="button" class={ROW} onclick={copyLink}>
-              <LinkIcon class="shrink-0 opacity-70" />
+              <CopyIcon
+                copied={linkCopied.is()}
+                icon={LinkIcon}
+                class="shrink-0 opacity-70"
+              />
               <span class="flex flex-1 flex-col">
                 <span>Copy Link</span>
                 <span class="text-xs opacity-70"

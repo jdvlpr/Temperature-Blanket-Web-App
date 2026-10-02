@@ -18,18 +18,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import type { StoredProject } from '$lib/storage/projects.svelte';
+  import CopyIcon from '$lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
+  import { Flash } from '$lib/utils/feedback.svelte';
   import { convertTime } from '$lib/utils/unit-utils.svelte';
   import { exists } from '$lib/utils/other-utils';
   import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
-  import {
-    ClipboardCopyIcon,
-    DownloadIcon,
-    TriangleAlertIcon,
-  } from '@lucide/svelte';
+  import { DownloadIcon, TriangleAlertIcon } from '@lucide/svelte';
 
   let { uid, error } = $props();
+
+  const copied = new Flash();
 
   let _projects = $derived(project.status.temporaryProjectsBackup);
   let projects = $derived.by(() => {
@@ -170,10 +170,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex w-full flex-wrap items-center gap-2">
           <button
             class="btn preset-filled-primary-500 w-fit"
-            onclick={() =>
-              copyToClipboard(project.href, 'Copied to clipboard!')}
+            onclick={async () => {
+              if (await copyToClipboard(project.href, 'Copied to clipboard!'))
+                copied.trigger();
+            }}
           >
-            <ClipboardCopyIcon />
+            <CopyIcon copied={copied.is()} />
             Copy Project URL to Clipboard
           </button>
 

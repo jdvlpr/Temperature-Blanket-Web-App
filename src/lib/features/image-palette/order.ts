@@ -55,6 +55,33 @@ export function orderByHue(
   return warmFirst ? order : order.reverse();
 }
 
+/** How many hue bands a rainbow has, going around the color wheel */
+const RAINBOW_BANDS = 12;
+
+/**
+ * Order colors like a rainbow: bands of hue from pinks and reds through
+ * oranges, yellows, greens, blues, and purples, each band light to dark,
+ * then neutrals (lightest first). Unlike the warm-to-cool orders, it looks
+ * the same however many colors there are. Returns indices into `labs`.
+ */
+export function orderAsRainbow(labs: Oklab[]): number[] {
+  const keyed = labs.map(([L, a, b], i) => {
+    const hue = ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360;
+    const neutral = Math.hypot(a, b) < NEUTRAL_CHROMA;
+    return {
+      i,
+      L,
+      band: neutral
+        ? RAINBOW_BANDS
+        : Math.floor(
+            ((hue - WARM_START_HUE + 360) % 360) / (360 / RAINBOW_BANDS),
+          ),
+    };
+  });
+  keyed.sort((x, y) => x.band - y.band || y.L - x.L);
+  return keyed.map((n) => n.i);
+}
+
 const dist = (a: Oklab, b: Oklab) =>
   Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 

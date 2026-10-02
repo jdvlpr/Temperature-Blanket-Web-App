@@ -609,7 +609,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 triggerClass={toolbarButtonClass}
                 disabled={palette.points.length < 2}
                 onsort={(sort) =>
-                  sort === 'reverse' ? palette.reverse() : palette.sortBy(sort)}
+                  sort === 'reverse'
+                    ? palette.reverse()
+                    : sort === 'shuffle'
+                      ? palette.shuffle()
+                      : palette.sortBy(sort)}
               />
 
               <button

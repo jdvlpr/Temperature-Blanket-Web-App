@@ -31,7 +31,10 @@ import { isValueInRange } from '$lib/utils/range-utils.svelte';
 import { escapeHtml, pluralize } from '$lib/utils/string-utils';
 import { getBrands } from '$lib/data/yarns/colorways.svelte';
 import { hexToOklab } from '$lib/features/image-palette/color-space';
-import { orderAsGradient } from '$lib/features/image-palette/order';
+import {
+  orderAsGradient,
+  orderAsRainbow,
+} from '$lib/features/image-palette/order';
 import chroma from 'chroma-js';
 
 /**
@@ -707,6 +710,7 @@ export type PaletteSort =
   | 'custom'
   | 'warm-to-cool'
   | 'cool-to-warm'
+  | 'rainbow'
   | 'light-to-dark'
   | 'dark-to-light'
   | 'name'
@@ -720,6 +724,7 @@ export const PALETTE_SORTS: {
 }[] = [
   { value: 'warm-to-cool', label: 'Warm to Cool' },
   { value: 'cool-to-warm', label: 'Cool to Warm' },
+  { value: 'rainbow', label: 'Rainbow' },
   { value: 'light-to-dark', label: 'Light to Dark' },
   { value: 'dark-to-light', label: 'Dark to Light' },
   { value: 'name', label: 'Name A-Z', needsNames: true },
@@ -749,6 +754,66 @@ export const sortColorsWarmToCool = ({
   );
 };
 
+/**
+ * Order colors like a rainbow: bands of pinks and reds, then oranges,
+ * yellows, greens, blues, and purples, each light to dark, with grays,
+ * whites, and blacks last. Locked colors stay where they are, as in the other sorts.
+ */
+export const sortColorsByHue = ({ colors }: { colors: Color[] }): Color[] => {
+  const unlocked = colors.filter((color) => !color?.locked);
+  const order = orderAsRainbow(
+    unlocked.map((color) => hexToOklab(color.hex ?? '#ffffff')),
+  );
+  let next = 0;
+  return colors.map((color) =>
+    color?.locked ? color : unlocked[order[next++]],
+  );
+};
+
+/**
+ * Put colors in a random order that differs from the one they're in.
+ * Locked colors stay where they are, as in the sorts.
+ */
+export const shuffleColors = <T extends Color>(colors: T[]): T[] => {
+  const unlocked = colors.filter((color) => !color?.locked);
+  const differs = (order: T[]) =>
+    order.some((color, i) => color.hex !== unlocked[i].hex);
+  if (!differs([...unlocked].reverse())) return [...colors];
+  let shuffled = unlocked;
+  do {
+    shuffled = [...unlocked];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+  } while (!differs(shuffled));
+  let next = 0;
+  return colors.map((color) => (color?.locked ? color : shuffled[next++]));
+};
+
+/**
+ * Put colors in a random order that stays the same for the same `seed`, so
+ * a long list can grow (show more) without reshuffling what's already shown
+ */
+export const shuffleColorsWithSeed = <T extends Color>(
+  colors: T[],
+  seed: number,
+): T[] => {
+  const keyOf = (color: T) => {
+    // FNV-1a hash of the seed and the color
+    let hash = 2166136261;
+    for (const char of `${seed}|${color.hex}|${color.name ?? ''}`) {
+      hash ^= char.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  };
+  return colors
+    .map((color) => ({ color, key: keyOf(color) }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ color }) => color);
+};
+
 export const getSortedPalette = ({
   palette,
   sortColors,
@@ -761,6 +826,8 @@ export const getSortedPalette = ({
       return sortColorsWarmToCool({ colors: palette, warmFirst: true });
     case 'cool-to-warm':
       return sortColorsWarmToCool({ colors: palette, warmFirst: false });
+    case 'rainbow':
+      return sortColorsByHue({ colors: palette });
     case 'none':
     case 'custom':
       return palette;

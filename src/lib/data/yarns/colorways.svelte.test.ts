@@ -110,3 +110,18 @@ describe('colorways.svelte', () => {
     expect(name).toBe(sample.name);
   });
 });
+
+describe('yarn colorway data', () => {
+  // Lists of colorways are keyed by these fields, so a repeat breaks them
+  it('has no colorway listed twice for the same yarn', async () => {
+    await ensureYarnData();
+    const seen = new Set<string>();
+    const repeats: string[] = [];
+    for (const { hex, name, brandName, yarnName } of getAllColorways()) {
+      const key = `${hex}|${name}|${brandName}|${yarnName}`;
+      if (seen.has(key)) repeats.push(key);
+      seen.add(key);
+    }
+    expect(repeats).toEqual([]);
+  });
+});

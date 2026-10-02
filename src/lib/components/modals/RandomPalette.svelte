@@ -203,6 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <option value="none">None</option>
           <option value="warm-to-cool">Warm to Cool</option>
           <option value="cool-to-warm">Cool to Warm</option>
+          <option value="rainbow">Rainbow</option>
           <option value="light-to-dark">Light to Dark</option>
           <option value="dark-to-light">Dark to Light</option>
           <option value="name">Name A-Z</option>

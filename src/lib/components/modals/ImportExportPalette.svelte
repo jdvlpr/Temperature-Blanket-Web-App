@@ -14,10 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import CopyIcon from '$lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
+  import { Flash } from '$lib/utils/feedback.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import type { Color } from '$lib/types/yarn-types';
-  import { ClipboardCopyIcon } from '@lucide/svelte';
 
   let {
     colors = [],
@@ -27,6 +28,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** What to export; the toolbar's Save & Export menu chooses it */
     exportType?: 'html' | 'colorway';
   } = $props();
+
+  // The copy button just used, which shows a check for a moment
+  const copied = new Flash();
+
+  async function copyAndFlash(text: string, key: string) {
+    if (await copyToClipboard(text, 'Copied')) copied.trigger(key);
+  }
 
   let colorNamesAsArray = $state(false);
 
@@ -98,11 +106,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn hover:bg-surface-100-900 mt-4"
             onclick={() => {
               if (typeof colorHexes === 'string') {
-                copyToClipboard(colorHexes, 'Copied');
+                copyAndFlash(colorHexes, 'hexes');
               }
             }}
           >
-            <ClipboardCopyIcon />
+            <CopyIcon copied={copied.is('hexes')} />
             Copy HTML Color Codes
           </button>
         </div>
@@ -123,9 +131,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             class="btn hover:bg-surface-100-900 mt-4"
-            onclick={() => copyToClipboard(colorNames, 'Copied')}
+            onclick={() => copyAndFlash(colorNames, 'names')}
           >
-            <ClipboardCopyIcon />
+            <CopyIcon copied={copied.is('names')} />
             Copy Colorway Names
           </button>
         </div>
