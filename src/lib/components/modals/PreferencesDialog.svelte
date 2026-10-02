@@ -1,7 +1,7 @@
 <!-- Preferences: how the site looks, sounds, and moves. Every change applies
 right away. Built from the site's usual settings pieces (as in the palette
-image export): selects with the current choice's icon beside it and what it's
-for below, a segmented control for light/dark, and a card of switches. -->
+image export): selects with the current choice's icon beside it, a segmented
+control for light/dark, and a card of switches. -->
 
 <script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
@@ -28,7 +28,7 @@ for below, a segmented control for light/dark, and a card of switches. -->
 
   type Theme = typeof preferences.value.theme;
 
-  type Option = { id: string; name: string; description: string };
+  type Option = { id: string; name: string };
 
   const DEFAULT_THEME: Theme = {
     id: 'classic',
@@ -63,8 +63,8 @@ for below, a segmented control for light/dark, and a card of switches. -->
   };
 </script>
 
-<!-- A setting with a few choices, as the site's other selects: the current
-choice's icon beside it, and what it's for below -->
+<!-- A setting with a few choices, as the site's other selects, with the
+current choice's icon beside it -->
 {#snippet choiceSelect({
   label,
   key,
@@ -79,30 +79,26 @@ choice's icon beside it, and what it's for below -->
   icon: Snippet<[string]>;
 })}
   {@const current = preferences.value.theme[key] ?? fallback}
-  {@const chosen = options.find((option) => option.id === current)}
-  <div class="flex flex-col gap-1">
-    <label class="label">
-      <span class="label-text">{label}</span>
-      <div class="relative flex items-center">
-        <span
-          class="pointer-events-none absolute left-2 flex size-6 items-center justify-center"
-          aria-hidden="true"
-        >
-          {@render icon(current)}
-        </span>
-        <select
-          class="select truncate pl-10"
-          value={current}
-          onchange={(e) => choose(key, e.currentTarget.value)}
-        >
-          {#each options as option (option.id)}
-            <option value={option.id}>{option.name}</option>
-          {/each}
-        </select>
-      </div>
-    </label>
-    <p class="text-surface-700-300 text-xs">{chosen?.description}</p>
-  </div>
+  <label class="label">
+    <span class="label-text">{label}</span>
+    <div class="relative flex items-center">
+      <span
+        class="pointer-events-none absolute left-2 flex size-6 items-center justify-center"
+        aria-hidden="true"
+      >
+        {@render icon(current)}
+      </span>
+      <select
+        class="select truncate pl-10"
+        value={current}
+        onchange={(e) => choose(key, e.currentTarget.value)}
+      >
+        {#each options as option (option.id)}
+          <option value={option.id}>{option.name}</option>
+        {/each}
+      </select>
+    </div>
+  </label>
 {/snippet}
 
 {#snippet colorsIcon(id: string)}
@@ -220,7 +216,7 @@ choice's icon beside it, and what it's for below -->
     <ToggleSwitch
       bare
       label="Sounds"
-      details="Soft clicks when moving colors, copying, saving, and using switches"
+      details="Soft clicks as you move colors, copy, and save"
       checked={effects.sound}
       onchange={(e) =>
         setEffect('sound', (e.currentTarget as HTMLInputElement).checked)}
@@ -238,7 +234,7 @@ choice's icon beside it, and what it's for below -->
     <ToggleSwitch
       bare
       label="Reduce Motion"
-      details="Turns off decorative animations. Your device's Reduce Motion setting is always followed."
+      details="Fewer animations"
       checked={effects.motion === 'reduce'}
       onchange={(e) =>
         setEffect(
