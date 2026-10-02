@@ -218,7 +218,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex w-full flex-col gap-y-1 text-left {fullscreen ? 'h-full' : ''}"
 >
   <div
-    class="inline-flex w-full {fullscreen ? 'h-full flex-col' : 'h-[70px]'}"
+    class="inline-flex w-full {fullscreen
+      ? 'h-full flex-col'
+      : `rounded-t-container h-[70px] ${roundedBottom ? 'rounded-b-container' : ''}`}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
