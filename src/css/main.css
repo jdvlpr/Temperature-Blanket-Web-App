@@ -265,8 +265,26 @@ th div {
   text-align: left;
 }
 
+/* Icon buttons are circles, like the account button, with room around the
+icon for their hover background (Skeleton's are squarer and tighter) */
+@utility btn-icon {
+  border-radius: 9999px;
+  width: --spacing(6);
+  height: --spacing(6);
+  padding: --spacing(2);
+}
+
 .btn-icon > * {
   flex-shrink: 0 !important;
+}
+
+/* For buttons on a color: a tint of their text's color, which is black or
+white for contrast, shows on any color where a surface tint looks muddy */
+@utility hover-on-color {
+  @apply transition-colors;
+  &:hover {
+    background-color: color-mix(in oklab, currentColor 18%, transparent);
+  }
 }
 
 .lucide {

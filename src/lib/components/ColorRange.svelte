@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if gauges.activeGauge && gauges.activeGauge.rangeOptions && gauges.activeGauge.ranges}
   <span class="range-input-container">
     <button
-      class="btn hover:preset-tonal-surface h-auto"
+      class="btn hover-on-color h-auto"
       title="Adjust Range"
       onclick={(e: Event) => {
         const target = e.target as HTMLElement;

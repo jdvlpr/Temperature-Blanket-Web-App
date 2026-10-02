@@ -643,7 +643,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
-                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm transition-transform hover:scale-[1.02] hover:z-10 relative active:scale-95 cursor-pointer {layout ===
+                    class="rounded-container relative flex min-w-fit flex-1 cursor-pointer items-center gap-x-2 p-2 shadow-sm transition-transform hover:z-10 hover:scale-[1.02] active:scale-95 {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
@@ -667,7 +667,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <a
                             aria-label="Buy this yarn colorway"
                             title="Buy this yarn colorway"
-                            class="btn-icon hover:preset-tonal-surface"
+                            class="btn-icon hover-on-color"
                             href={affiliate_variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -678,7 +678,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {:else}
                           <a
                             aria-label="Open link to this yarn colorway"
-                            class="btn-icon hover:preset-tonal-surface"
+                            class="btn-icon hover-on-color"
                             href={variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -691,18 +691,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <div class="flex flex-col items-start gap-1 text-pretty">
-                      <span class="text-left text-xs pointer-events-none">
+                      <span class="pointer-events-none text-left text-xs">
                         {brandName} - {yarnName}
                       </span>
 
                       <span
-                        class="text-left text-lg leading-tight pointer-events-none"
+                        class="pointer-events-none text-left text-lg leading-tight"
                       >
                         {name}
                       </span>
 
                       {#if typeof percentMatch == 'number' && !isNaN(percentMatch)}
-                        <p class="text-xs pointer-events-none">
+                        <p class="pointer-events-none text-xs">
                           {percentMatch}% Match
                         </p>
                       {/if}

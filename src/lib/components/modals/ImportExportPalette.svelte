@@ -14,20 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { version } from '$app/environment';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { toast } from '$lib/state/page-state.svelte';
-  import { getYarnPageURL } from '$lib/utils/color-utils';
   import type { Color } from '$lib/types/yarn-types';
   import { ClipboardCopyIcon } from '@lucide/svelte';
 
   let {
     colors = [],
-    exportType = 'link',
+    exportType = 'html',
   }: {
     colors?: Color[];
     /** What to export; the toolbar's Save & Export menu chooses it */
-    exportType?: 'html' | 'colorway' | 'link';
+    exportType?: 'html' | 'colorway';
   } = $props();
 
   let colorNamesAsArray = $state(false);
@@ -35,10 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let colorCodesAsArray = $state(false);
 
   let colorHexesWithHashes = $state(true);
-
-  let paletteLink = $derived(
-    getYarnPageURL({ colors, origin: window.location.origin, version }),
-  );
 
   let palette = $derived(colors.map((n: Color) => n?.hex));
 
@@ -121,43 +115,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <ClipboardCopyIcon />
             Copy HTML Color Codes
-          </button>
-        </div>
-      </div>
-    {/if}
-
-    <!-- Link Section -->
-    {#if exportType === 'link' && paletteLink}
-      <div class="flex w-full flex-wrap items-start gap-4">
-        <p class="text-sm">
-          Anyone with this link can open the palette in the Yarn Palette
-          Creator. To use it in another palette, press Get Colors, then Paste
-          Colors or Code, and paste the link.
-        </p>
-        <div class="w-full">
-          <p class="card preset-tonal-primary w-full p-4 break-all select-all">
-            {paletteLink}
-          </p>
-
-          <button
-            class="btn hover:bg-surface-100-900 mt-4"
-            onclick={() => {
-              try {
-                window.navigator.clipboard.writeText(paletteLink);
-                toast.trigger({
-                  message: 'Copied',
-                  category: 'success',
-                });
-              } catch {
-                toast.trigger({
-                  message: 'Unable to copy to clipboard',
-                  category: 'error',
-                });
-              }
-            }}
-          >
-            <ClipboardCopyIcon />
-            Copy Link
           </button>
         </div>
       </div>

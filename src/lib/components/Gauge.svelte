@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { version } from '$app/environment';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
@@ -30,8 +31,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getPaletteFallbackName,
     getSortedPalette,
+    getYarnPageURL,
   } from '$lib/utils/color-utils';
-  import { drawerState, dialog } from '$lib/state/page-state.svelte';
+  import { drawerState, dialog, toast } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import { createGaugeColors } from '$lib/state/gauges-state.svelte';
@@ -191,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       value: 'link',
       label: 'Link',
       title: 'Palette Link',
-      details: 'Share it, or paste it into another palette',
+      details: 'Copy a link to share it, or to paste into another palette',
       icon: LinkIcon,
     },
     {
@@ -226,6 +228,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ),
   );
 
+  // A link needs nothing chosen first, so it's copied straight away
+  async function copyPaletteLink(colors: Color[]) {
+    try {
+      await navigator.clipboard.writeText(
+        getYarnPageURL({ colors, origin: window.location.origin, version }),
+      );
+      toast.trigger({ message: 'Palette link copied', category: 'success' });
+    } catch {
+      toast.trigger({
+        message: 'Unable to copy to clipboard',
+        category: 'error',
+      });
+    }
+  }
+
   function openPaletteOutput(value: string) {
     const output = paletteOutputs.find((output) => output.value === value);
     if (!output) return;
@@ -243,6 +260,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         },
         options: { size: 'xlarge', title: output.title },
       });
+      return;
+    }
+    if (value === 'link') {
+      copyPaletteLink(colors);
       return;
     }
     if (value === 'save') {

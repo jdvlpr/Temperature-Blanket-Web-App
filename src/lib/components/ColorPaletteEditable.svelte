@@ -327,7 +327,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     if (onchanged) onchanged($state.snapshot(colors));
                   }
                 }}
-                class="btn hover:preset-tonal-surface h-auto gap-1"
+                class="btn hover-on-color h-auto gap-1"
                 aria-label="Delete color {index + 1}"
               >
                 <span class="text-xs" aria-hidden="true">{index + 1}</span>
@@ -337,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if canUserEditColor}
               <button
-                class="btn hover:preset-tonal-surface h-auto"
+                class="btn hover-on-color h-auto"
                 onclick={() =>
                   dialog.trigger({
                     type: 'component',
@@ -425,7 +425,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if typeof color.locked !== 'undefined'}
               <button
-                class="btn-icon hover:preset-tonal-surface"
+                class="btn-icon hover-on-color"
                 onclick={(e) => {
                   e.preventDefault();
                   colors[index].locked = !colors[index].locked;

@@ -1629,10 +1629,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Export and Paste Colors</h3>
 
             <p>
-              To export a color palette as HTML color codes, an image, yarn
-              names, or a link, press Save & Export, then choose a format and
-              press Copy or Download. Share or paste the copied text somewhere
-              you can find it later.
+              To export a color palette as HTML color codes, an image, or yarn
+              names, press Save & Export, then choose a format and press Copy or
+              Download. To share a palette, press Save & Export, then Link: the
+              link is copied right away. Share or paste the copied text
+              somewhere you can find it later.
             </p>
             <p>
               To paste colors into a palette, press Get Colors, then Paste
