@@ -1,9 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({
-  preferences: { value: {} as Record<string, unknown> },
-  reducedMotion: { current: false },
-}));
+const mocks = vi.hoisted(() => {
+  // The module listens for the first tap or click (to unlock iOS audio) as it loads
+  vi.stubGlobal('window', {
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  });
+  return {
+    preferences: { value: {} as Record<string, unknown> },
+    reducedMotion: { current: false },
+    audioState: { value: 'running' as string },
+  };
+});
 
 vi.mock('$app/environment', () => ({ browser: true }));
 vi.mock('$lib/storage/preferences.svelte', () => ({
@@ -34,11 +42,16 @@ function stubDevice({ coarsePointer }: { coarsePointer: boolean }) {
   vibrate = vi.fn();
   vi.stubGlobal('navigator', { vibrate });
   vi.stubGlobal('window', {
+    addEventListener: () => {},
+    removeEventListener: () => {},
     matchMedia: (query: string) => ({
       matches: query === '(pointer: coarse)' ? coarsePointer : false,
     }),
     AudioContext: class {
-      state = 'running';
+      state = mocks.audioState.value;
+      resume = vi.fn(async () => {
+        this.state = 'running';
+      });
       currentTime = 0;
       destination = {};
       createOscillator = createOscillator;
@@ -141,6 +154,22 @@ describe('feedback', () => {
     setEffect('sound', true);
     feedback('success');
     expect(createOscillator).toHaveBeenCalledTimes(2); // two notes
+  });
+});
+
+describe('sounds on iOS', () => {
+  it('resumes a suspended audio context before playing', async () => {
+    vi.resetModules();
+    mocks.audioState.value = 'suspended';
+    const { feedback: freshFeedback, setEffect: freshSetEffect } =
+      await import('./feedback.svelte');
+    freshSetEffect('sound', true);
+    freshFeedback('drop');
+    expect(createOscillator).not.toHaveBeenCalled();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(createOscillator).toHaveBeenCalledOnce();
+    mocks.audioState.value = 'running';
   });
 });
 

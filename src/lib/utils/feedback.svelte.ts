@@ -111,15 +111,65 @@ function getAudioContext(): AudioContext | null {
       (window as unknown as { webkitAudioContext?: typeof AudioContext })
         .webkitAudioContext;
     if (!AudioContextClass) return null;
-    audioContext = new AudioContextClass();
+    audioContext = new AudioContextClass({ latencyHint: 'interactive' });
   }
-  // Browsers (notably iOS Safari) start the context suspended until a user gesture
-  if (audioContext.state === 'suspended') audioContext.resume();
   return audioContext;
 }
 
+/** Runs `play` once the audio context is running, resuming it first if needed (iOS suspends or "interrupts" it) */
+function whenRunning(context: AudioContext, play: () => void) {
+  if (context.state === 'running') {
+    play();
+    return;
+  }
+  context
+    .resume()
+    .then(() => {
+      if (context.state === 'running') play();
+    })
+    .catch(() => {
+      // Not allowed yet (no tap or click so far); the sound is skipped
+    });
+}
+
+// iOS only lets audio start during a tap, click, or key press — and dragging
+// a color starts on a touch *move*, which doesn't count. So the first such
+// gesture anywhere unlocks audio by playing a silent sample.
+const UNLOCK_EVENTS = ['pointerup', 'touchend', 'click', 'keydown'] as const;
+
+function unlockAudio() {
+  if (!getEffects().sound) return;
+  const context = getAudioContext();
+  if (!context) return;
+  try {
+    const source = context.createBufferSource();
+    source.buffer = context.createBuffer(1, 1, 22050);
+    source.connect(context.destination);
+    source.start(0);
+  } catch {
+    // Ignore; the next gesture tries again
+  }
+  context.resume().then(() => {
+    if (context.state === 'running') {
+      UNLOCK_EVENTS.forEach((type) =>
+        window.removeEventListener(type, unlockAudio, true),
+      );
+    }
+  });
+}
+
+if (browser) {
+  UNLOCK_EVENTS.forEach((type) =>
+    window.addEventListener(type, unlockAudio, {
+      capture: true,
+      passive: true,
+    }),
+  );
+}
+
 function playTone(context: AudioContext, tone: Tone) {
-  const start = context.currentTime + (tone.delay ?? 0);
+  // A moment ahead, so a just-resumed context doesn't drop the start
+  const start = context.currentTime + 0.01 + (tone.delay ?? 0);
   const end = start + tone.duration;
   const oscillator = context.createOscillator();
   const gain = context.createGain();
@@ -150,7 +200,11 @@ export function feedback(event: FeedbackEvent) {
   if (effects.sound) {
     try {
       const context = getAudioContext();
-      if (context) SOUNDS[event].forEach((tone) => playTone(context, tone));
+      if (context) {
+        whenRunning(context, () =>
+          SOUNDS[event].forEach((tone) => playTone(context, tone)),
+        );
+      }
     } catch {
       // Sound is a nicety; ignore failures
     }
