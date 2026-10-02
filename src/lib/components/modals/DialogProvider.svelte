@@ -99,9 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {#if dialog.type === 'component'}
                 {#if hasHeader}
-                  <!-- One header for every titled dialog: Back, title, Close -->
+                  <!-- One header for every titled dialog: Back, title, Close. z-20: above
+                  content with its own z-index (e.g. segmented control items, z-10) -->
                   <header
-                    class="bg-surface-50 dark:bg-surface-950 sticky top-0 z-10 mb-0 flex min-h-14 items-center gap-1 px-2 py-2"
+                    class="bg-surface-50 dark:bg-surface-950 sticky top-0 z-20 mb-0 flex min-h-14 items-center gap-1 px-2 py-2"
                   >
                     {#if dialog.stack.length || dialog.backAction}
                       <button
@@ -137,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {/if}
                   </header>
                 {:else if dialog.options.showCloseButton}
-                  <div class="sticky top-2 z-10 float-right mr-2">
+                  <div class="sticky top-2 z-20 float-right mr-2">
                     <CloseButton onClose={dialog.close} />
                   </div>
                 {/if}

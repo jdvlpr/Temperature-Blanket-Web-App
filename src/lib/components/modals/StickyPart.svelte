@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="sticky {classPosition} bg-surface-100 dark:bg-surface-900 z-10 mx-0 px-0"
+  class="sticky {classPosition} bg-surface-100 dark:bg-surface-900 z-20 mx-0 px-0"
 >
   {@render children?.()}
 </div>

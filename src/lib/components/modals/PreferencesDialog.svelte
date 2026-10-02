@@ -138,9 +138,7 @@ current choice's icon beside it -->
   {/if}
 {/snippet}
 
-<!-- isolate: the segmented control's items have their own z-index, which
-would otherwise draw over the dialog's sticky header when scrolling -->
-<div class="isolate flex w-full flex-col gap-4 px-4 pt-2 pb-4 text-left">
+<div class="flex w-full flex-col gap-4 px-4 pt-2 pb-4 text-left">
   <div class="flex flex-col gap-1">
     <SegmentedControl
       value={preferences.value.theme.mode ?? 'system'}
