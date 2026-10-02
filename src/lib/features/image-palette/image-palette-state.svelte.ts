@@ -773,9 +773,11 @@ export class ImagePaletteState {
     return { ...point, id: this.#nextId++, locked: false };
   }
 
-  /** The colors were changed by hand: they're no longer an Auto Palette */
+  /** The colors were changed by hand: they're no longer an Auto Palette,
+   * or in any particular order */
   #edited() {
     this.autoStyle = null;
+    this.sortOrder = 'custom';
   }
 
   #setPoints(points: PalettePoint[]) {

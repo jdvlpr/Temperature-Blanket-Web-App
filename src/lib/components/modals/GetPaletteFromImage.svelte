@@ -37,6 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowDownWideNarrowIcon,
     ArrowLeftRightIcon,
+    CheckIcon,
+    ChevronDownIcon,
     ChevronRightIcon,
     EyeIcon,
     ImagePlusIcon,
@@ -48,7 +50,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
     type LucideIconNode,
   } from '@lucide/svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import {
+    Menu,
+    Portal,
+    SegmentedControl,
+  } from '@skeletonlabs/skeleton-svelte';
   import { onMount, untrack } from 'svelte';
 
   interface Props {
@@ -74,13 +80,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ['path', { d: 'M6.5 17.5 17.5 6.5' }],
   ];
 
-  const STYLE_LABELS: Record<PaletteStyle, string> = {
-    balanced: 'Balanced',
-    vivid: 'Vivid',
-    muted: 'Muted',
-    light: 'Light',
-    dark: 'Dark',
+  const STYLES: Record<PaletteStyle, { label: string; details: string }> = {
+    balanced: { label: 'Balanced', details: 'Colors from across the photo' },
+    vivid: { label: 'Vivid', details: 'Favors bright, bold colors' },
+    muted: { label: 'Muted', details: 'Favors soft, grayed colors' },
+    light: { label: 'Light', details: 'Favors lighter colors' },
+    dark: { label: 'Dark', details: 'Favors deeper colors' },
   };
+
+  // The Sort Colors dialog's sorts, plus a gradient for photos
+  const SORTS: { value: SortOrder; label: string; needsNames?: boolean }[] = [
+    { value: 'gradient', label: 'Smooth Gradient' },
+    { value: 'light-to-dark', label: 'Lightest to Darkest' },
+    { value: 'dark-to-light', label: 'Darkest to Lightest' },
+    { value: 'name', label: 'Name A-Z', needsNames: true },
+    { value: 'name-z-to-a', label: 'Name Z-A', needsNames: true },
+  ];
+
+  // As in the main palette's toolbar
+  const toolbarButtonClass = 'btn hover:preset-tonal-surface justify-start';
+  const menuItemClass =
+    'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 
   // Choose a photo first, then work with it
   let step = $state<'start' | 'editor'>('start');
@@ -343,12 +363,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <p class="text-surface-700-300 text-center text-xs">
             {#if palette.showYarnPreview}
-              Palette View shows the photo in only your palette's colors, as it
-              might look worked in yarn. Areas that look wrong could use another
-              color.
+              Your photo in only your palette's colors.
             {:else if palette.tool === 'line'}
-              Drag across the photo, like along a sunset or shoreline, for
-              colors evenly spaced along the line. Drag either end to adjust it.
+              Drag across the photo for evenly spaced colors. Drag an end to
+              adjust.
             {:else}
               Click or tap to add a color. Drag a color to adjust it, or tap it
               for details.
@@ -380,49 +398,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </section>
 
         <aside
-          class="flex flex-col gap-4 lg:w-96 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
+          class="flex flex-col gap-4 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
         >
-          <div class="[&_select]:mx-0">
-            {#key palette.points.length}
-              <SelectNumberOfColors
-                numberOfColors={palette.points.length}
-                max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
-                allowZero={true}
-                onchange={(e) =>
-                  palette.setCount(
-                    parseInt((e.target as HTMLSelectElement).value),
-                  )}
-              />
-            {/key}
-          </div>
-
-          <div class="flex flex-col gap-1">
-            <span class="label-text flex items-center gap-1"
-              ><WandSparklesIcon class="size-4" /> Auto Palette</span
-            >
-            <div class="flex flex-wrap gap-1.5">
-              {#each PALETTE_STYLES as style (style)}
-                <button
-                  class={[
-                    'btn btn-sm',
-                    palette.autoStyle === style
-                      ? 'preset-filled-primary-500'
-                      : 'preset-outlined-surface-300-700 hover:preset-tonal-surface',
-                  ]}
-                  aria-pressed={palette.autoStyle === style}
-                  disabled={palette.loading || palette.working}
-                  onclick={() => palette.setStyle(style)}
-                >
-                  {STYLE_LABELS[style]}
-                </button>
-              {/each}
-            </div>
-            <p class="text-surface-700-300 text-xs">
-              Choose a style to pick the colors that best capture the photo.
-              Locked colors stay.
-            </p>
-          </div>
-
           <div class="flex flex-col gap-1">
             <span class="label-text">Colors</span>
             <SegmentedControl
@@ -480,65 +457,127 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <StickyPart position="bottom">
         <div class="flex flex-col gap-1 px-2 pt-2 sm:px-4">
-          {#if palette.points.length}
-            <ColorPaletteEditable
-              canUserEditColor={false}
-              showSchemeName={false}
-              colors={paletteColors}
-              {highlightIndex}
-              onhover={(index: number | null) =>
-                (palette.hoveredId =
-                  index === null ? null : (palette.points[index]?.id ?? null))}
-              onchanged={(
-                colors: Parameters<typeof palette.syncFromColors>[0],
-              ) => palette.syncFromColors(colors)}
-            />
-          {:else}
-            <div
-              class="rounded-container border-surface-300-700 text-surface-700-300 flex h-[70px] items-center justify-center border-2 border-dashed text-sm"
-            >
-              Tap the photo to add colors, or use Auto Palette
-            </div>
-          {/if}
+          <!-- The palette and its tools, as on the main page -->
           <div
-            class="flex flex-wrap items-center justify-center gap-1 sm:justify-between"
+            class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
           >
-            <div class="flex flex-wrap items-center justify-center gap-1">
-              <!-- The same sorting as the Sort Colors dialog, plus a gradient -->
-              <div class="relative flex items-center">
-                <ArrowDownWideNarrowIcon
-                  class="pointer-events-none absolute left-2"
-                />
-                <select
-                  class="select truncate pl-10"
-                  aria-label="Sort By"
-                  title="Sort By"
-                  disabled={palette.points.length < 2}
-                  value={palette.sortOrder}
-                  onchange={(e) =>
-                    palette.sortBy(e.currentTarget.value as SortOrder)}
-                >
-                  <option value="custom">Custom</option>
-                  <option value="gradient">Smooth Gradient</option>
-                  <option value="light-to-dark">Lightest to Darkest</option>
-                  <option value="dark-to-light">Darkest to Lightest</option>
-                  {#if allColorsHaveNames}
-                    <option value="name">Name A-Z</option>
-                    <option value="name-z-to-a">Name Z-A</option>
-                  {/if}
-                </select>
-              </div>
-              <button
-                class="btn hover:preset-tonal-surface"
-                title="Reverse Colors' Positions"
-                disabled={palette.points.length < 2}
-                onclick={() => palette.reverse()}
+            {#if palette.points.length}
+              <ColorPaletteEditable
+                canUserEditColor={false}
+                showSchemeName={false}
+                roundedBottom={false}
+                colors={paletteColors}
+                {highlightIndex}
+                onhover={(index: number | null) =>
+                  (palette.hoveredId =
+                    index === null
+                      ? null
+                      : (palette.points[index]?.id ?? null))}
+                onchanged={(
+                  colors: Parameters<typeof palette.syncFromColors>[0],
+                ) => palette.syncFromColors(colors)}
+              />
+            {:else}
+              <div
+                class="rounded-t-container border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
               >
-                Reverse
-                <ArrowLeftRightIcon />
-              </button>
+                Tap the photo to add colors, or use Auto Palette
+              </div>
+            {/if}
+
+            <div class="flex flex-wrap items-center justify-center gap-2 px-2">
+              {#key palette.points.length}
+                <SelectNumberOfColors
+                  numberOfColors={palette.points.length}
+                  max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
+                  allowZero={true}
+                  onchange={(e) =>
+                    palette.setCount(
+                      parseInt((e.target as HTMLSelectElement).value),
+                    )}
+                />
+              {/key}
+
+              <Menu
+                positioning={{ placement: 'top' }}
+                onSelect={(details) =>
+                  palette.setStyle(details.value as PaletteStyle)}
+              >
+                <Menu.Trigger
+                  class={toolbarButtonClass}
+                  title="Pick the colors that best capture the photo"
+                  disabled={palette.loading || palette.working}
+                >
+                  <WandSparklesIcon />
+                  <span class="flex items-center gap-1"
+                    >Auto Palette <ChevronDownIcon size={18} /></span
+                  >
+                </Menu.Trigger>
+                <Portal>
+                  <Menu.Positioner>
+                    <Menu.Content
+                      class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
+                    >
+                      {#each PALETTE_STYLES as style (style)}
+                        <Menu.Item value={style} class={menuItemClass}>
+                          <div class="flex min-w-0 flex-1 flex-col text-left">
+                            <p>{STYLES[style].label}</p>
+                            <p class="text-surface-700-300 text-xs">
+                              {STYLES[style].details}
+                            </p>
+                          </div>
+                          {#if palette.autoStyle === style}
+                            <CheckIcon class="shrink-0" aria-label="Current" />
+                          {/if}
+                        </Menu.Item>
+                      {/each}
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Portal>
+              </Menu>
+
+              <Menu
+                positioning={{ placement: 'top' }}
+                onSelect={(details) => {
+                  if (details.value === 'reverse') palette.reverse();
+                  else palette.sortBy(details.value as SortOrder);
+                }}
+              >
+                <Menu.Trigger
+                  class={toolbarButtonClass}
+                  title="Sort Colors"
+                  disabled={palette.points.length < 2}
+                >
+                  <ArrowDownWideNarrowIcon />
+                  <span class="flex items-center gap-1"
+                    >Sort <ChevronDownIcon size={18} /></span
+                  >
+                </Menu.Trigger>
+                <Portal>
+                  <Menu.Positioner>
+                    <Menu.Content
+                      class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
+                    >
+                      {#each SORTS.filter((sort) => allColorsHaveNames || !sort.needsNames) as sort (sort.value)}
+                        <Menu.Item value={sort.value} class={menuItemClass}>
+                          <p class="min-w-0 flex-1 text-left">{sort.label}</p>
+                          {#if palette.sortOrder === sort.value}
+                            <CheckIcon class="shrink-0" aria-label="Current" />
+                          {/if}
+                        </Menu.Item>
+                      {/each}
+                      <Menu.Separator />
+                      <Menu.Item value="reverse" class={menuItemClass}>
+                        <ArrowLeftRightIcon class="shrink-0" />
+                        <p class="min-w-0 flex-1 text-left">Reverse</p>
+                      </Menu.Item>
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Portal>
+              </Menu>
+
               <button
-                class="btn hover:preset-tonal-surface"
+                class={toolbarButtonClass}
                 title="Remove all unlocked colors"
                 disabled={!palette.points.some((point) => !point.locked)}
                 onclick={() => palette.clear()}
@@ -547,19 +586,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Clear
               </button>
             </div>
-            <div class="w-full sm:w-auto">
-              <SaveAndCloseButtons
-                disabled={!palette.hasImage ||
-                  palette.loading ||
-                  !palette.points.length}
-                onSave={() => {
-                  updateGauge({ _colors: palette.toColors() });
-                  dialog.close();
-                }}
-                onClose={dialog.close}
-              />
-            </div>
           </div>
+
+          <SaveAndCloseButtons
+            disabled={!palette.hasImage ||
+              palette.loading ||
+              !palette.points.length}
+            onSave={() => {
+              updateGauge({ _colors: palette.toColors() });
+              dialog.close();
+            }}
+            onClose={dialog.close}
+          />
         </div>
       </StickyPart>
     </div>
