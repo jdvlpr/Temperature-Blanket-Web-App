@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { motion } from '$lib/utils/feedback.svelte';
+  import { tick, untrack } from 'svelte';
   import { cubicOut, linear } from 'svelte/easing';
   import { MediaQuery } from 'svelte/reactivity';
   import { fade, fly } from 'svelte/transition';
@@ -102,6 +103,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // scrolled to the top): far or fast enough closes it, otherwise it settles
   // back. Close and Escape do the same without dragging.
   const grabbable = $derived(!side && phone.current);
+
+  // The on-screen keyboard: phones lay it over the page without resizing it,
+  // so a sheet at the bottom would sit behind it. While a field in the sheet
+  // has focus and the keyboard is up, the sheet follows the part of the
+  // screen that's still visible instead. (Not while pinch-zoomed, which
+  // shrinks the visible part too.)
+  let visibleArea = $state<{ top: number; height: number } | null>(null);
+
+  $effect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport || !grabbable || !dialog.opened) {
+      visibleArea = null;
+      return;
+    }
+    const update = () => {
+      const keyboard =
+        window.innerHeight - viewport.height - viewport.offsetTop;
+      const typing = document.activeElement?.matches(
+        'input, textarea, select, [contenteditable]',
+      );
+      const next =
+        typing && keyboard > 100 && Math.abs(viewport.scale - 1) < 0.01
+          ? { top: viewport.offsetTop, height: viewport.height }
+          : null;
+      const changed =
+        next?.top !== visibleArea?.top || next?.height !== visibleArea?.height;
+      if (!changed) return;
+      visibleArea = next;
+      // Keep the field being typed in on screen as the sheet shrinks
+      if (next)
+        tick().then(() =>
+          document.activeElement?.scrollIntoView({ block: 'nearest' }),
+        );
+    };
+    untrack(update);
+    viewport.addEventListener('resize', update);
+    viewport.addEventListener('scroll', update);
+    document.addEventListener('focusin', update);
+    document.addEventListener('focusout', update);
+    return () => {
+      viewport.removeEventListener('resize', update);
+      viewport.removeEventListener('scroll', update);
+      document.removeEventListener('focusin', update);
+      document.removeEventListener('focusout', update);
+    };
+  });
 
   /** Movement under this many px is a tap, not a drag. */
   const TAP_SLOP_PX = 6;
@@ -336,6 +383,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         'fixed inset-0 z-60 flex items-center justify-center',
         side ? 'items-stretch justify-end' : 'max-sm:items-end',
       ]}
+      style={visibleArea
+        ? `top: ${visibleArea.top}px; bottom: auto; height: ${visibleArea.height}px`
+        : undefined}
     >
       <Dialog.Content
         class={[
@@ -347,7 +397,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             : [
                 // A sheet on phones: square at the bottom edge, and short of
                 // the top so its rounded corners sit against the backdrop
-                'card shadow-xl max-sm:max-h-[calc(100dvh-2rem)] max-sm:rounded-b-none',
+                // (of the visible area, so above the keyboard when it's up)
+                'card shadow-xl max-sm:max-h-[calc(100%-2rem)] max-sm:rounded-b-none',
                 dialog.options.size === 'xlarge'
                   ? 'w-full lg:max-h-[92svh]'
                   : 'lg:max-h-[80svh]',
