@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
-  import AppearanceDialog from '$lib/components/modals/AppearanceDialog.svelte';
+  import PreferencesDialog from '$lib/components/modals/PreferencesDialog.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CircleQuestionMarkIcon,
     CloudyIcon,
     CodeIcon,
-    ContrastIcon,
     ExternalLinkIcon,
     FolderOpenIcon,
     GiftIcon,
@@ -45,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     NotebookPenIcon,
     RssIcon,
     ShieldAlertIcon,
+    SlidersHorizontalIcon,
     SquareTerminalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
@@ -140,13 +140,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick={() =>
       dialog.trigger({
         component: {
-          ref: AppearanceDialog,
+          ref: PreferencesDialog,
         },
         type: 'component',
+        options: { title: 'Preferences' },
       })}
   >
-    <ContrastIcon />
-    Appearance
+    <SlidersHorizontalIcon />
+    Preferences
   </button>
 
   <a
@@ -347,29 +348,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet element(attributes)}
           {#if !attributes.hidden}
             <div {...attributes} transition:safeSlide>
+              <a
+                href="/changelog"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit',
+                  page.url.pathname === '/changelog' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <GiftIcon />
+                What's New
+              </a>
 
-                <a
-                  href="/changelog"
-                  class={[
-                    'btn hover:preset-tonal-surface w-fit',
-                    page.url.pathname === '/changelog' &&
-                      'preset-tonal-secondary',
-                  ]}
-                >
-                  <GiftIcon />
-                  What's New
-                </a>
-
-                <a
-                  href="/privacy"
-                  class={[
-                    'btn hover:preset-tonal-surface w-fit',
-                    page.url.pathname === '/privacy' && 'preset-tonal-secondary',
-                  ]}
-                >
-                  <ShieldAlertIcon />
-                  Privacy
-                </a>
+              <a
+                href="/privacy"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit',
+                  page.url.pathname === '/privacy' && 'preset-tonal-secondary',
+                ]}
+              >
+                <ShieldAlertIcon />
+                Privacy
+              </a>
 
               <a
                 href="/api/yarn-colorways"

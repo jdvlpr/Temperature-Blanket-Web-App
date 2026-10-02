@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   its settings beside it (below it on phones) and its actions at the bottom.
 -->
 <script lang="ts">
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
@@ -261,17 +262,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function copy() {
     if (!blob) return;
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob }),
-      ]);
-      toast.trigger({ message: 'Image copied', category: 'success' });
-    } catch {
-      toast.trigger({
-        message: 'Unable to copy the image',
-        category: 'error',
-      });
-    }
+    await copyToClipboard(
+      [new ClipboardItem({ 'image/png': blob })],
+      'Image copied',
+      'Unable to copy the image',
+    );
   }
 
   const segmentClass = 'bg-surface-100 dark:bg-surface-900 w-full';

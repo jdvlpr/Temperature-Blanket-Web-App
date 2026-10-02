@@ -27,22 +27,28 @@ import {
   saveNow,
   saveOpenProject,
 } from '$lib/storage/autosave.svelte';
+import { feedback } from '$lib/utils/feedback.svelte';
 
-export async function saveProject() {
+/** Saves the open project; returns whether it saved. Only for explicit saves (it plays the success sound/vibration). */
+export async function saveProject(): Promise<boolean> {
   if (!weather.data.length) {
     toast.trigger({
       message: 'To save a project, first get weather data.',
       category: 'info',
     });
-    return;
+    return false;
   }
 
   // Saving by itself: a problem is explained in the Project menu
   if (autosave.on) {
-    if (autosave.state === 'conflict' || autosave.state === 'error')
+    if (autosave.state === 'conflict' || autosave.state === 'error') {
       openProjectMenu();
-    else await saveNow();
-    return;
+      return false;
+    }
+    await saveNow();
+    const saved = autosave.state === 'saved';
+    if (saved) feedback('success');
+    return saved;
   }
 
   const firstSave = !autosave.stored;
@@ -52,9 +58,10 @@ export async function saveProject() {
       message: 'There was a problem saving your project. Try again.',
       category: 'error',
     });
-    return;
+    return false;
   }
 
+  feedback('success');
   toast.trigger({
     message: !autosave.on
       ? 'Saved'
@@ -73,4 +80,5 @@ export async function saveProject() {
         },
       }),
   });
+  return true;
 }

@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import { drawerState } from '$lib/state/page-state.svelte';
@@ -23,11 +23,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     previewWeatherTargets,
   } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { motion } from '$lib/utils/feedback.svelte';
   import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
   import { exists } from '$lib/utils/other-utils';
   import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { Drawer } from 'vaul-svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
@@ -50,9 +52,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(() => {
     initDefaultPreview();
   });
+
+  // When weather data first arrives (a new location, dates, or project), the
+  // preview fills in from the top, like rows being stitched. Not on edits.
+  let knitting = $state(false);
+  let hadWeather = false;
+  let knitTimer: ReturnType<typeof setTimeout>;
+  $effect(() => {
+    const hasWeather = weather.rawData.length > 0;
+    if (hasWeather && !hadWeather && !untrack(() => motion.reduced)) {
+      knitting = true;
+      clearTimeout(knitTimer);
+      // Long enough for a slower preview to finish drawing and still knit in
+      knitTimer = setTimeout(() => (knitting = false), 1500);
+    }
+    hadWeather = hasWeather;
+  });
 </script>
 
-<div class="preset-tonal-surface card mt-4 p-2 md:p-4 md:shadow-lg">
+<div
+  class={[
+    'preset-tonal-surface card mt-4 p-2 md:p-4 md:shadow-lg',
+    knitting && 'preview-knit',
+  ]}
+>
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">

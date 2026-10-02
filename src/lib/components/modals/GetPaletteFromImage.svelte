@@ -77,7 +77,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ];
 
   const STYLES: Record<PaletteStyle, { label: string; details: string }> = {
-    balanced: { label: 'Balanced', details: 'Variety of colors from across the photo' },
+    balanced: {
+      label: 'Balanced',
+      details: 'Variety of colors from across the photo',
+    },
     vivid: { label: 'Vivid', details: 'Favors bright, bold colors' },
     muted: { label: 'Muted', details: 'Favors soft, subdued colors' },
     light: { label: 'Light', details: 'Favors lighter colors' },
@@ -525,6 +528,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             {#if palette.points.length}
               <ColorPaletteEditable
+                staggerIn
                 canUserEditColor={false}
                 showSchemeName={false}
                 roundedBottom={false}

@@ -24,6 +24,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
   import {
+    dragConsiderFeedback,
+    feedback,
+    growIn,
+    liftDraggedElement,
+    motionDuration,
+    Pop,
+  } from '$lib/utils/feedback.svelte';
+  import {
     LockKeyholeIcon,
     LockOpenIcon,
     MoveIcon,
@@ -38,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import { scale } from 'svelte/transition';
-  import { untrack } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   interface Props {
     colors?: Color[];
@@ -53,6 +61,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     highlightIndex?: number | null;
     /** Called with a color's index when it's hovered, and null after */
     onhover?: (index: number | null) => void;
+    /** The first colors grow in one after another, e.g. a palette just taken from an image */
+    staggerIn?: boolean;
   }
 
   let {
@@ -66,9 +76,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onchanged = null,
     highlightIndex = null,
     onhover,
+    staggerIn = false,
   }: Props = $props();
 
-  const flipDurationMs = 150;
+  const flipDurationMs = $derived(motionDuration(150));
+
+  // The color being moved with the keyboard, which stays in place instead of following a pointer
+  let keyboardDragId: number | null = $state(null);
+
+  // The swatch whose color just changed, for a little pop
+  const pop = new Pop();
+
+  // Colors added later grow in. The first colors just appear — unless
+  // `staggerIn`, when they grow in one after another.
+  let mounted = false;
+  onMount(() => {
+    requestAnimationFrame(() => (mounted = true));
+  });
+  function paletteIn(node: Element, { index }: { index: number }) {
+    if (!mounted && !staggerIn) return { duration: 0 };
+    return growIn(node, { delay: mounted ? 0 : index * 45 });
+  }
 
   let sortableColors = $state(getSortableColors());
 
@@ -124,6 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
+    pop.trigger(index);
   }
 
   function getSortableColors() {
@@ -137,21 +166,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function handleConsider(
     e: CustomEvent<{
       items: (Color & { id: number })[];
-      info: { source: string; trigger: string };
+      info: { source: string; trigger: string; id: string };
     }>,
   ) {
     isDragging.value = true;
 
     const {
       items: newItems,
-      info: { source, trigger },
+      info: { source, trigger, id },
     } = e.detail;
 
     sortableColors = newItems;
 
+    dragConsiderFeedback(newItems, e.detail.info);
+    if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STARTED) {
+      keyboardDragId = Number(id);
+    }
+
     // Ensure dragging is stopped on drag finish via keyboard
     if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
       isDragging.value = false;
+      keyboardDragId = null;
     }
   }
 
@@ -167,6 +202,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } = e.detail;
 
     sortableColors = newItems;
+    keyboardDragId = null;
+    feedback('drop');
 
     colors = $state.snapshot(sortableColors).map((color) => {
       const { id, ...rest } = color;
@@ -205,6 +242,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (tooltipElement) tooltipElement.style.display = 'none';
 
     draggedEl.style.zIndex = '30000';
+    liftDraggedElement(draggedEl);
   }
 
   $effect(() => {
@@ -251,6 +289,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="dnd-zone-item first:rounded-tl-container last:rounded-tr-container group h-[70px] w-full first:overflow-hidden last:overflow-hidden palette-item-{uuid} {roundedBottom
           ? 'first:rounded-bl-container last:rounded-br-container'
           : ''}"
+        class:dnd-keyboard-lifted={keyboardDragId === color.id}
+        class:feedback-pop={pop.index === index}
+        style:--pop-scale="1.08"
+        in:paletteIn|global={{ index }}
         animate:flip={{ duration: flipDurationMs }}
         id="palette-item-description-{uuid}-{index}"
         {...popover.reference()}

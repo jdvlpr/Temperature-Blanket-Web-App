@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { ClipboardCopyIcon } from '@lucide/svelte';
 
@@ -97,19 +97,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <button
             class="btn hover:bg-surface-100-900 mt-4"
             onclick={() => {
-              try {
-                if (typeof colorHexes === 'string') {
-                  window.navigator.clipboard.writeText(colorHexes);
-                }
-                toast.trigger({
-                  message: 'Copied',
-                  category: 'success',
-                });
-              } catch {
-                toast.trigger({
-                  message: 'Unable to copy to clipboard',
-                  category: 'error',
-                });
+              if (typeof colorHexes === 'string') {
+                copyToClipboard(colorHexes, 'Copied');
               }
             }}
           >
@@ -134,20 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             class="btn hover:bg-surface-100-900 mt-4"
-            onclick={() => {
-              try {
-                window.navigator.clipboard.writeText(colorNames);
-                toast.trigger({
-                  message: 'Copied',
-                  category: 'success',
-                });
-              } catch {
-                toast.trigger({
-                  message: 'Unable to copy to clipboard',
-                  category: 'error',
-                });
-              }
-            }}
+            onclick={() => copyToClipboard(colorNames, 'Copied')}
           >
             <ClipboardCopyIcon />
             Copy Colorway Names

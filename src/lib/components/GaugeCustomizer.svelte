@@ -27,6 +27,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
   import {
+    dragConsiderFeedback,
+    feedback,
+    growIn,
+    liftDraggedElement,
+    motionDuration,
+    Pop,
+  } from '$lib/utils/feedback.svelte';
+  import {
     ChevronDownIcon,
     LayoutPanelTopIcon,
     MoveIcon,
@@ -35,11 +43,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Trash2Icon,
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
+  import {
+    dragHandle,
+    dragHandleZone,
+    SOURCES,
+    TRIGGERS,
+  } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
 
-  const flipDurationMs = 150;
+  const flipDurationMs = $derived(motionDuration(150));
 
   const isProjectPlannerPage = page.url.pathname === '/';
 
@@ -54,6 +67,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let sortableColors: Color[] = $state(getSortableColors());
+
+  // The color being moved with the keyboard, which stays in place instead of following a pointer
+  let keyboardDragId: number | null = $state(null);
+
+  // The swatch whose color just changed, for a little pop
+  const pop = new Pop();
 
   let numberOfColumns = $derived.by(() => {
     let cols = 4;
@@ -112,12 +131,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = getSortableColors();
     dialog.close();
+    pop.trigger(index);
   }
 
   // Handle drag and drop events
   function handleConsider(e: Event) {
-    const event = e as CustomEvent<{ items: Color[] }>;
+    const event = e as CustomEvent<{
+      items: Color[];
+      info: { source: string; trigger: string; id: string };
+    }>;
     sortableColors = event.detail.items as (Color & { id: number })[];
+    dragConsiderFeedback(
+      event.detail.items as (Color & { id: number })[],
+      event.detail.info,
+    );
+    const { source, trigger, id } = event.detail.info;
+    if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STARTED) {
+      keyboardDragId = Number(id);
+    } else if (trigger === TRIGGERS.DRAG_STOPPED) {
+      keyboardDragId = null;
+    }
   }
 
   // On drag end, update the gauge colors
@@ -126,6 +159,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const newItems = event.detail.items as (Color & { id: number })[];
 
     sortableColors = newItems;
+    keyboardDragId = null;
+    feedback('drop');
 
     gauge.colors = sortableColors.map((color) => {
       const { id, ...rest } = color;
@@ -213,6 +248,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     items: sortableColors,
     flipDurationMs,
     type: 'gaugeCustomizer',
+    transformDraggedElement: liftDraggedElement,
   }}
   onconsider={handleConsider}
   onfinalize={handleFinalize}
@@ -226,6 +262,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="background:{hex ?? '#ffffff'};color:{getTextColor(
         hex ?? '#ffffff',
       )}"
+      class:dnd-keyboard-lifted={keyboardDragId === id}
+      class:feedback-pop={pop.index === index}
+      style:--pop-scale="1.03"
+      in:growIn
       animate:flip={{ duration: flipDurationMs }}
     >
       <!-- The following empty div is necessary to center content in list view -->

@@ -23,6 +23,7 @@ import { project } from '$lib/state/project-state.svelte';
 import { toast } from '$lib/state/page-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
+import { feedback } from '$lib/utils/feedback.svelte';
 import { exists } from '$lib/utils/other-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
@@ -37,6 +38,7 @@ export const loadFromHistory = async ({
 }: {
   action: 'Undo' | 'Redo';
 }) => {
+  feedback('undo');
   let oldHistoryState = project.history.current;
   let newHistoryState;
   if (action === 'Undo') {

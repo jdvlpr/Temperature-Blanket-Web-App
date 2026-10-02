@@ -202,6 +202,14 @@ Settings and user preferences are stored in the browser's Local Storage.
 | `gaps`       | Space between colors         | `false`                                                   | `true`, `false`                                  |
 | `labels`     | What's written on each color | `{ yarn: true, colorway: true, hex: false, range: true }` | booleans                                         |
 
+**`preferences.effects` fields** (sound, vibration, and motion, set in the Preferences dialog; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
+
+| Field     | Description                                                                         | Default    | Options                |
+| --------- | ----------------------------------------------------------------------------------- | ---------- | ---------------------- |
+| `sound`   | Soft sounds when moving colors, copying, saving, undoing, and using switches        | `false`    | `true`, `false`        |
+| `haptics` | Vibration for the same actions, on devices that support it (in practice, Android)   | `true`     | `true`, `false`        |
+| `motion`  | `'reduce'` turns off decorative animations; `'system'` follows the device's setting | `'system'` | `'system'`, `'reduce'` |
+
 > **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale`/`headingStyle` fields automatically receive defaults on next page load. No data is lost.
 
 _\*Items with a < before the version means sometime before that version, I'm not sure exactly when because I wasn't keeping track before version 3.28.3._

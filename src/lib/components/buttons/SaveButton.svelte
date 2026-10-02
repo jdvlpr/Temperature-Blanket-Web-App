@@ -30,6 +30,8 @@ project saves by itself: then the Project button's icon shows the save state
   let { beside }: { beside?: 'title' } = $props();
 
   let busy = $state(false);
+  // Briefly true after a save from this button, to give the check icon a little pop
+  let justSaved = $state(false);
 
   const status = $derived.by(() => {
     if (busy) return 'saving';
@@ -54,7 +56,10 @@ project saves by itself: then the Project button's icon shows the save state
   async function save() {
     busy = true;
     try {
-      await saveProject();
+      if (await saveProject()) {
+        justSaved = true;
+        setTimeout(() => (justSaved = false), 600);
+      }
     } finally {
       busy = false;
     }
@@ -65,7 +70,7 @@ project saves by itself: then the Project button's icon shows the save state
   {#if status === 'saving'}
     <LoaderCircleIcon class="animate-spin opacity-70" />
   {:else if status === 'saved'}
-    <BookmarkCheckIcon />
+    <BookmarkCheckIcon class={[justSaved && 'feedback-pop']} />
   {:else}
     <BookmarkIcon />
   {/if}

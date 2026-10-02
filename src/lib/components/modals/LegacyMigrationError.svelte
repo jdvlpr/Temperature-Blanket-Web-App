@@ -17,8 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
   import type { StoredProject } from '$lib/storage/projects.svelte';
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { convertTime } from '$lib/utils/unit-utils.svelte';
   import { exists } from '$lib/utils/other-utils';
   import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
@@ -170,13 +170,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex w-full flex-wrap items-center gap-2">
           <button
             class="btn preset-filled-primary-500 w-fit"
-            onclick={() => {
-              navigator.clipboard.writeText(project.href);
-              toast.trigger({
-                category: 'success',
-                message: 'Copied to clipboard!',
-              });
-            }}
+            onclick={() =>
+              copyToClipboard(project.href, 'Copied to clipboard!')}
           >
             <ClipboardCopyIcon />
             Copy Project URL to Clipboard

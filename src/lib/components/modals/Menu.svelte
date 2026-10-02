@@ -45,6 +45,7 @@ button to it. -->
   } from '$lib/storage/projects.svelte';
   import { rememberJustTrashed, TRASH_DAYS } from '$lib/storage/trash';
   import { sync } from '$lib/sync/status.svelte';
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import {
     ChevronRightIcon,
@@ -102,15 +103,11 @@ button to it. -->
     });
 
   async function copyLink() {
-    try {
-      await window.navigator.clipboard.writeText(project.url.href);
-      toast.trigger({ message: 'Link copied', category: 'success' });
-    } catch {
-      toast.trigger({
-        message: 'Unable to copy to your clipboard',
-        category: 'error',
-      });
-    }
+    await copyToClipboard(
+      project.url.href,
+      'Link copied',
+      'Unable to copy to your clipboard',
+    );
   }
 
   async function copyProject() {

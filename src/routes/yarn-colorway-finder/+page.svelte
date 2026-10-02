@@ -52,7 +52,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorwaysWithAffiliateLinks,
   } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { toast } from '$lib/state/page-state.svelte';
   import type { Color, YarnWeight } from '$lib/types/yarn-types';
   import {
     getTextColor,
@@ -62,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsLightToDark,
     sortColorsWarmToCool,
   } from '$lib/utils/color-utils';
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowDownWideNarrowIcon,
@@ -650,14 +650,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     style="background:{hex}; color:{getTextColor(
                       hex ?? '#ffffff',
                     )};"
-                    onclick={() => {
-                      window.navigator.clipboard.writeText(name ?? '');
-                      toast.trigger({
+                    onclick={() =>
+                      copyToClipboard(name ?? '', {
                         message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
-                        category: 'success',
                         icon: ClipboardCheckIcon,
-                      });
-                    }}
+                      })}
                     title="Copy {name} to clipboard"
                   >
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
@@ -716,10 +713,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         title="Copy {hex} to clipboard"
                         onclick={(e) => {
                           e.stopPropagation();
-                          window.navigator.clipboard.writeText(hex ?? '');
-                          toast.trigger({
+                          copyToClipboard(hex ?? '', {
                             message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
-                            category: 'success',
                             icon: ClipboardCheckIcon,
                           });
                         }}>{hex}</span

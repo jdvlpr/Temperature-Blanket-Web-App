@@ -208,6 +208,78 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
     animation: none !important;
   }
 }
+[data-motion='reduce'] ::view-transition-group(*),
+[data-motion='reduce'] ::view-transition-old(*),
+[data-motion='reduce'] ::view-transition-new(*) {
+  animation: none !important;
+}
+
+/* A quick, small grow-and-settle, e.g. a check icon after saving or a swatch after its color changes */
+@keyframes feedback-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(var(--pop-scale, 1.18));
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.feedback-pop {
+  animation: feedback-pop 300ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .feedback-pop {
+    animation: none;
+  }
+}
+[data-motion='reduce'] .feedback-pop {
+  animation: none;
+}
+
+/* The preview filling in from the top when weather data arrives, like rows being stitched */
+@keyframes preview-knit {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.preview-knit #preview-svg-image {
+  animation: preview-knit 900ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-knit #preview-svg-image {
+    animation: none;
+  }
+}
+[data-motion='reduce'] .preview-knit #preview-svg-image {
+  animation: none;
+}
+
+/* Preview cells ease to a new yarn color instead of snapping (only cells whose color changes animate) */
+#preview-svg-image :is(rect, path, polygon, circle) {
+  transition: fill 250ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  #preview-svg-image :is(rect, path, polygon, circle) {
+    transition: none;
+  }
+}
+[data-motion='reduce'] #preview-svg-image :is(rect, path, polygon, circle) {
+  transition: none;
+}
+
+/* A color being moved with the keyboard lifts off the page, like one being dragged with a pointer */
+.dnd-keyboard-lifted {
+  position: relative;
+  z-index: 10;
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 0.28),
+    0 2px 6px rgb(0 0 0 / 0.18);
+}
 
 h1,
 h2,

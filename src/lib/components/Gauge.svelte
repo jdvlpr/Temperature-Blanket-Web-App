@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { version } from '$app/environment';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -33,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSortedPalette,
     getYarnPageURL,
   } from '$lib/utils/color-utils';
-  import { drawerState, dialog, toast } from '$lib/state/page-state.svelte';
+  import { drawerState, dialog } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import { createGaugeColors } from '$lib/state/gauges-state.svelte';
@@ -230,17 +231,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // A link needs nothing chosen first, so it's copied straight away
   async function copyPaletteLink(colors: Color[]) {
-    try {
-      await navigator.clipboard.writeText(
-        getYarnPageURL({ colors, origin: window.location.origin, version }),
-      );
-      toast.trigger({ message: 'Palette link copied', category: 'success' });
-    } catch {
-      toast.trigger({
-        message: 'Unable to copy to clipboard',
-        category: 'error',
-      });
-    }
+    await copyToClipboard(
+      getYarnPageURL({ colors, origin: window.location.origin, version }),
+      'Palette link copied',
+    );
   }
 
   function openPaletteOutput(value: string) {

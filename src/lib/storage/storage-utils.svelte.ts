@@ -148,5 +148,13 @@ export async function initializeLocalStorage() {
             window.matchMedia('(prefers-color-scheme: dark)').matches),
       );
     });
+
+    // Reduced motion chosen in Preferences (client-only; it isn't needed for server rendering, since effects only follow user actions)
+    $effect(() => {
+      document.documentElement.setAttribute(
+        'data-motion',
+        preferences.value.effects?.motion ?? 'system',
+      );
+    });
   });
 }

@@ -11,6 +11,22 @@ type SeasonConfig = {
   endDate: string; // MM-DD format
 };
 
+/** Sound, vibration, and motion feedback settings */
+export type EffectsPreferences = {
+  /** Play small sounds on actions like moving colors or saving */
+  sound: boolean;
+  /** Vibrate on supporting devices (in practice, Android phones) */
+  haptics: boolean;
+  /** `'system'` follows the device's Reduce Motion setting; `'reduce'` always reduces motion */
+  motion: 'system' | 'reduce';
+};
+
+export const DEFAULT_EFFECTS: EffectsPreferences = {
+  sound: false,
+  haptics: true,
+  motion: 'system',
+};
+
 // User preferences for the web app stored in local storage
 type LocalStatePreferencesType = {
   disableToastAnalytics: boolean;
@@ -27,6 +43,8 @@ type LocalStatePreferencesType = {
   units: Unit | null;
   /** The palette image export's last settings; missing until first changed */
   paletteImage?: PaletteImageSettings;
+  /** Sound, vibration, and motion settings; missing until first changed */
+  effects?: EffectsPreferences;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(

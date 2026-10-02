@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { toast } from '$lib/state/page-state.svelte';
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     ClipboardCheckIcon,
@@ -29,19 +29,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let openState = $state(false);
 
   function copyURL() {
-    try {
-      window.navigator.clipboard.writeText(href);
-      toast.trigger({
-        message: `URL copied to clipboard`,
-        category: 'success',
-        icon: ClipboardCheckIcon,
-      });
-    } catch {
-      toast.trigger({
-        message: 'Unable to copy to your clipboard',
-        category: 'error',
-      });
-    }
+    copyToClipboard(
+      href,
+      { message: 'URL copied to clipboard', icon: ClipboardCheckIcon },
+      'Unable to copy to your clipboard',
+    );
   }
 </script>
 
