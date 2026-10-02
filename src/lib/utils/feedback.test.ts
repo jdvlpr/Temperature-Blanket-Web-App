@@ -10,6 +10,9 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
   DEFAULT_EFFECTS: { sound: false, haptics: true, motion: 'system' },
   preferences: mocks.preferences,
 }));
+vi.mock('svelte-dnd-action', () => ({
+  SHADOW_ITEM_MARKER_PROPERTY_NAME: 'isDndShadowItem',
+}));
 vi.mock('svelte/motion', () => ({
   prefersReducedMotion: mocks.reducedMotion,
 }));
@@ -143,6 +146,28 @@ describe('feedback', () => {
 
 describe('drag feedback', () => {
   const items = (...ids: number[]) => ids.map((id) => ({ id }));
+
+  it('ticks for pointer drags, whose placeholder has its own id', () => {
+    const shadow = (index: number, ids: number[]) =>
+      ids.map((id, i) =>
+        i === index ? { id: 'placeholder', isDndShadowItem: true } : { id },
+      );
+    dragConsiderFeedback(shadow(1, [0, 1, 2]), {
+      trigger: 'dragStarted',
+      id: '1',
+    });
+    expect(vibrate).toHaveBeenCalledTimes(1);
+    dragConsiderFeedback(shadow(1, [0, 1, 2]), {
+      trigger: 'draggedOverIndex',
+      id: '1',
+    });
+    expect(vibrate).toHaveBeenCalledTimes(1);
+    dragConsiderFeedback(shadow(0, [1, 0, 2]), {
+      trigger: 'draggedOverIndex',
+      id: '1',
+    });
+    expect(vibrate).toHaveBeenCalledTimes(2);
+  });
 
   it('picks up on drag start, then ticks only when the color moves to a new spot', () => {
     dragConsiderFeedback(items(0, 1, 2), { trigger: 'dragStarted', id: '1' });

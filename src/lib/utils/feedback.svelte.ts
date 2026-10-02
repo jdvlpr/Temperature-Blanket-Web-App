@@ -10,6 +10,7 @@ import {
 } from '$lib/storage/preferences.svelte';
 import { prefersReducedMotion } from 'svelte/motion';
 import { scale } from 'svelte/transition';
+import { SHADOW_ITEM_MARKER_PROPERTY_NAME } from 'svelte-dnd-action';
 
 /** The user's effects settings, with defaults filled in */
 export function getEffects(): EffectsPreferences {
@@ -56,7 +57,7 @@ export type FeedbackEvent =
 
 const HAPTICS: Record<FeedbackEvent, number | number[]> = {
   pickup: 12,
-  tick: 4,
+  tick: 6,
   drop: 8,
   copy: 8,
   success: [10, 70, 14],
@@ -82,7 +83,7 @@ const SOUNDS: Record<FeedbackEvent, Tone[]> = {
     { frequency: 1500, endFrequency: 900, duration: 0.05, volume: 0.06 },
   ],
   tick: [
-    { frequency: 2200, endFrequency: 1800, duration: 0.02, volume: 0.025 },
+    { frequency: 1700, endFrequency: 1300, duration: 0.035, volume: 0.05 },
   ],
   drop: [{ frequency: 900, endFrequency: 520, duration: 0.07, volume: 0.07 }],
   copy: [{ frequency: 1300, endFrequency: 1100, duration: 0.05, volume: 0.04 }],
@@ -173,7 +174,13 @@ export function dragConsiderFeedback(
   items: { id: number | string }[],
   info: { trigger: string; id: string },
 ) {
-  const index = items.findIndex((item) => String(item.id) === info.id);
+  // Where the dragged item would drop: its placeholder (pointer drags give it
+  // a placeholder id), or the item itself (keyboard drags keep its id)
+  const index = items.findIndex(
+    (item) =>
+      (item as Record<string, unknown>)[SHADOW_ITEM_MARKER_PROPERTY_NAME] ||
+      String(item.id) === info.id,
+  );
   if (info.trigger === 'dragStarted') {
     draggedIndex = index;
     feedback('pickup');
