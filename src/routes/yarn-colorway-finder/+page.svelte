@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
+    sortColorsWarmToCool,
   } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
@@ -259,6 +260,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
 
     switch (yarnColorwayFinderState.sortColors) {
+      case 'warm-to-cool':
+      case 'cool-to-warm':
+        _results = sortColorsWarmToCool({
+          colors: _results,
+          warmFirst: yarnColorwayFinderState.sortColors === 'warm-to-cool',
+        });
+        break;
       case 'light-to-dark':
         _results = sortColorsLightToDark({
           colors: _results,
@@ -591,8 +599,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     disabled={gettingResults}
                   >
                     <option value="default">Default</option>
-                    <option value="light-to-dark">Lightest to Darkest</option>
-                    <option value="dark-to-light">Darkest to Lightest</option>
+                    <option value="warm-to-cool">Warm to Cool</option>
+                    <option value="cool-to-warm">Cool to Warm</option>
+                    <option value="light-to-dark">Light to Dark</option>
+                    <option value="dark-to-light">Dark to Light</option>
                     <option value="name">Name A-Z</option>
                     <option value="name-z-to-a">Name Z-A</option>
                   </select>

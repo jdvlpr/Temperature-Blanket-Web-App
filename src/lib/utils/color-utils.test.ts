@@ -12,6 +12,7 @@ import {
   sortColorsByNameZtoA,
   sortColorsDarktoLight,
   sortColorsLightToDark,
+  sortColorsWarmToCool,
   yarnDetailsToColors,
 } from './color-utils';
 
@@ -336,5 +337,36 @@ describe('color-utils', () => {
         ]),
       ).toBe('Bernat Super Value + 2 more yarns, 3 colors');
     });
+  });
+});
+
+describe('sortColorsWarmToCool', () => {
+  const hexes = (colors: { hex?: string }[]) => colors.map((n) => n.hex);
+  // A ramp from yellow through red to blue, shuffled
+  const shuffled = ['#ff0000', '#0000ff', '#ffff00', '#aa0055', '#ff8000'].map(
+    (hex) => ({ hex }),
+  );
+
+  it('blends from the warm end to the cool end', () => {
+    expect(hexes(sortColorsWarmToCool({ colors: shuffled }))).toEqual([
+      '#ffff00',
+      '#ff8000',
+      '#ff0000',
+      '#aa0055',
+      '#0000ff',
+    ]);
+  });
+
+  it('starts from the cool end when asked', () => {
+    expect(
+      hexes(sortColorsWarmToCool({ colors: shuffled, warmFirst: false })),
+    ).toEqual(['#0000ff', '#aa0055', '#ff0000', '#ff8000', '#ffff00']);
+  });
+
+  it('keeps locked colors in place', () => {
+    const colors = [{ hex: '#0000ff', locked: true }, ...shuffled.slice(2)];
+    const sorted = sortColorsWarmToCool({ colors });
+    expect(sorted[0]).toEqual({ hex: '#0000ff', locked: true });
+    expect(sorted).toHaveLength(colors.length);
   });
 });

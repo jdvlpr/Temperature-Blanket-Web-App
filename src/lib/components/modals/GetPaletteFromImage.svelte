@@ -18,15 +18,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import SortMenu from '$lib/components/SortMenu.svelte';
   import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
   import ImagePaletteCanvas from '$lib/features/image-palette/ImagePaletteCanvas.svelte';
-  import {
-    ImagePaletteState,
-    type SortOrder,
-  } from '$lib/features/image-palette/image-palette-state.svelte';
+  import { ImagePaletteState } from '$lib/features/image-palette/image-palette-state.svelte';
   import {
     PALETTE_STYLES,
     type PaletteStyle,
@@ -35,8 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
   import {
-    ArrowDownWideNarrowIcon,
-    ArrowLeftRightIcon,
     CheckIcon,
     ChevronDownIcon,
     ChevronRightIcon,
@@ -88,15 +84,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dark: { label: 'Dark', details: 'Favors deeper colors' },
   };
 
-  // The Sort Colors dialog's sorts, plus a gradient for photos
-  const SORTS: { value: SortOrder; label: string; needsNames?: boolean }[] = [
-    { value: 'gradient', label: 'Smooth Gradient' },
-    { value: 'light-to-dark', label: 'Lightest to Darkest' },
-    { value: 'dark-to-light', label: 'Darkest to Lightest' },
-    { value: 'name', label: 'Name A-Z', needsNames: true },
-    { value: 'name-z-to-a', label: 'Name Z-A', needsNames: true },
-  ];
-
   // As in the main palette's toolbar
   const toolbarButtonClass = 'btn hover:preset-tonal-surface justify-start';
   const menuItemClass =
@@ -108,9 +95,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let draggingFile = $state(false);
 
   let paletteColors = $derived(palette.paletteColors());
-  let allColorsHaveNames = $derived(
-    paletteColors.length > 0 && paletteColors.every((color) => color.name),
-  );
   let highlightIndex = $derived(
     palette.points.findIndex((point) => point.id === palette.hoveredId),
   );
@@ -298,7 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {:else}
     <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
       <div
-        class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row"
+        class="isolate flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row"
       >
         <section class="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
           <div class="flex flex-wrap items-center justify-between gap-2">
@@ -536,45 +520,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </Portal>
               </Menu>
 
-              <Menu
-                positioning={{ placement: 'top' }}
-                onSelect={(details) => {
-                  if (details.value === 'reverse') palette.reverse();
-                  else palette.sortBy(details.value as SortOrder);
-                }}
-              >
-                <Menu.Trigger
-                  class={toolbarButtonClass}
-                  title="Sort Colors"
-                  disabled={palette.points.length < 2}
-                >
-                  <ArrowDownWideNarrowIcon />
-                  <span class="flex items-center gap-1"
-                    >Sort <ChevronDownIcon size={18} /></span
-                  >
-                </Menu.Trigger>
-                <Portal>
-                  <Menu.Positioner>
-                    <Menu.Content
-                      class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
-                    >
-                      {#each SORTS.filter((sort) => allColorsHaveNames || !sort.needsNames) as sort (sort.value)}
-                        <Menu.Item value={sort.value} class={menuItemClass}>
-                          <p class="min-w-0 flex-1 text-left">{sort.label}</p>
-                          {#if palette.sortOrder === sort.value}
-                            <CheckIcon class="shrink-0" aria-label="Current" />
-                          {/if}
-                        </Menu.Item>
-                      {/each}
-                      <Menu.Separator />
-                      <Menu.Item value="reverse" class={menuItemClass}>
-                        <ArrowLeftRightIcon class="shrink-0" />
-                        <p class="min-w-0 flex-1 text-left">Reverse</p>
-                      </Menu.Item>
-                    </Menu.Content>
-                  </Menu.Positioner>
-                </Portal>
-              </Menu>
+              <SortMenu
+                colors={paletteColors}
+                current={palette.sortOrder}
+                placement="top"
+                triggerClass={toolbarButtonClass}
+                disabled={palette.points.length < 2}
+                onsort={(sort) =>
+                  sort === 'reverse' ? palette.reverse() : palette.sortBy(sort)}
+              />
 
               <button
                 class={toolbarButtonClass}

@@ -18,6 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
+  import SortMenu from '$lib/components/SortMenu.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import { getSortedPalette } from '$lib/utils/color-utils';
   import { dialog } from '$lib/state/page-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
 
@@ -63,10 +66,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key selectedColors.length}
           <ColorPaletteEditable
             canUserEditColor={false}
-            schemeName={paletteTitleText}
+            showSchemeName={false}
             bind:colors={selectedColors}
           />
         {/key}
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs">{paletteTitleText}</p>
+          <SortMenu
+            colors={selectedColors as Color[]}
+            placement="top"
+            triggerClass="btn btn-sm hover:preset-tonal-surface"
+            disabled={selectedColors.length < 2}
+            onsort={(sort) => {
+              const colors = $state.snapshot(selectedColors) as Color[];
+              selectedColors =
+                sort === 'reverse'
+                  ? colors.reverse()
+                  : getSortedPalette({ palette: colors, sortColors: sort });
+            }}
+          />
+        </div>
       </div>
     {/if}
 

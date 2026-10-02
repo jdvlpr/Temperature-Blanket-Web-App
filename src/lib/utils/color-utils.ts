@@ -30,6 +30,8 @@ import {
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
 import { escapeHtml, pluralize } from '$lib/utils/string-utils';
 import { getBrands } from '$lib/data/yarns/colorways.svelte';
+import { hexToOklab } from '$lib/features/image-palette/color-space';
+import { orderAsGradient } from '$lib/features/image-palette/order';
 import chroma from 'chroma-js';
 
 /**
@@ -627,6 +629,53 @@ export const sortColorsByNameZtoA = ({
   return sortedColors;
 };
 
+/** Ways a palette can be sorted, as offered in sort menus and selects */
+export type PaletteSort =
+  | 'custom'
+  | 'warm-to-cool'
+  | 'cool-to-warm'
+  | 'light-to-dark'
+  | 'dark-to-light'
+  | 'name'
+  | 'name-z-to-a';
+
+export const PALETTE_SORTS: {
+  value: Exclude<PaletteSort, 'custom'>;
+  label: string;
+  /** Only offered when every color has a name */
+  needsNames?: boolean;
+}[] = [
+  { value: 'warm-to-cool', label: 'Warm to Cool' },
+  { value: 'cool-to-warm', label: 'Cool to Warm' },
+  { value: 'light-to-dark', label: 'Light to Dark' },
+  { value: 'dark-to-light', label: 'Dark to Light' },
+  { value: 'name', label: 'Name A-Z', needsNames: true },
+  { value: 'name-z-to-a', label: 'Name Z-A', needsNames: true },
+];
+
+/**
+ * Order colors so each blends into the next (the shortest path through
+ * them), starting from the warm or the cool end. Locked colors stay where
+ * they are, as in the other sorts.
+ */
+export const sortColorsWarmToCool = ({
+  colors,
+  warmFirst = true,
+}: {
+  colors: Color[];
+  warmFirst?: boolean;
+}): Color[] => {
+  const unlocked = colors.filter((color) => !color?.locked);
+  const order = orderAsGradient(
+    unlocked.map((color) => hexToOklab(color.hex ?? '#ffffff')),
+    { warmFirst },
+  );
+  let next = 0;
+  return colors.map((color) =>
+    color?.locked ? color : unlocked[order[next++]],
+  );
+};
+
 export const getSortedPalette = ({
   palette,
   sortColors,
@@ -635,6 +684,10 @@ export const getSortedPalette = ({
   sortColors: string;
 }): Color[] => {
   switch (sortColors) {
+    case 'warm-to-cool':
+      return sortColorsWarmToCool({ colors: palette, warmFirst: true });
+    case 'cool-to-warm':
+      return sortColorsWarmToCool({ colors: palette, warmFirst: false });
     case 'none':
     case 'custom':
       return palette;

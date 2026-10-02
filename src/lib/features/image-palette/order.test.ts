@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { hexToOklab } from './color-space';
-import { bestInsertionIndex, orderAsGradient } from './order';
+import { bestInsertionIndex, orderAsGradient, orderByHue } from './order';
 
 const ramp = [
   '#ffff00',
@@ -52,5 +52,41 @@ describe('bestInsertionIndex', () => {
   it('adds to the ends when that fits best', () => {
     expect(bestInsertionIndex(labs.slice(1), hexToOklab('#000000'))).toBe(0);
     expect(bestInsertionIndex(labs.slice(0, 2), hexToOklab('#ffffff'))).toBe(2);
+  });
+});
+
+describe('orderByHue', () => {
+  const hexes = [
+    '#808080',
+    '#0000ff',
+    '#00ff00',
+    '#ff0000',
+    '#ffff00',
+    '#ffffff',
+  ];
+  const labs = hexes.map(hexToOklab);
+  const names = (order: number[]) => order.map((i) => hexes[i]);
+
+  it('goes around the wheel from warm to cool, neutrals last', () => {
+    expect(names(orderByHue(labs, { warmFirst: true }))).toEqual([
+      '#ff0000',
+      '#ffff00',
+      '#00ff00',
+      '#0000ff',
+      '#ffffff',
+      '#808080',
+    ]);
+  });
+
+  it('is used for long lists, and handles them quickly', () => {
+    const many = Array.from({ length: 5000 }, (_, i) =>
+      hexToOklab(
+        `#${((i * 2654435761) >>> 8).toString(16).padStart(6, '0').slice(-6)}`,
+      ),
+    );
+    const start = performance.now();
+    const order = orderAsGradient(many, { warmFirst: true });
+    expect(performance.now() - start).toBeLessThan(500);
+    expect(new Set(order).size).toBe(many.length);
   });
 });

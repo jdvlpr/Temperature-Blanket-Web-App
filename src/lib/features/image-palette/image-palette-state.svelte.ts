@@ -17,7 +17,7 @@ import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-const
 import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
 import { defaultYarn } from '$lib/state/page-state.svelte';
 import type { Color } from '$lib/types/yarn-types';
-import { getSortedPalette } from '$lib/utils/color-utils';
+import { getSortedPalette, type PaletteSort } from '$lib/utils/color-utils';
 import {
   getColorways,
   stringToBrandAndYarnDetails,
@@ -61,14 +61,8 @@ export type PhotoSource = 'random' | 'file';
 export type PaletteColor = Color & { pointId: number; locked: boolean };
 export type PickTool = 'points' | 'line';
 
-/** The palette's order: the site's usual sorts, plus a smooth gradient */
-export type SortOrder =
-  | 'custom'
-  | 'gradient'
-  | 'light-to-dark'
-  | 'dark-to-light'
-  | 'name'
-  | 'name-z-to-a';
+/** The palette's order: one of the site's sorts, or custom */
+export type SortOrder = PaletteSort;
 
 /** A line drawn across the photo, and the colors spaced along it, in order */
 export type PaletteLine = { from: Point; to: Point; pointIds: number[] };
@@ -412,7 +406,7 @@ export class ImagePaletteState {
     if (!result) return;
     this.#setPoints(this.#sorted([...locked, ...result.points]));
     this.autoStyle = this.style;
-    this.sortOrder = 'gradient';
+    this.sortOrder = this.warmFirst ? 'warm-to-cool' : 'cool-to-warm';
     this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
   }
@@ -448,7 +442,9 @@ export class ImagePaletteState {
       );
       points.splice(at, 0, point);
     }
-    if (this.sortOrder !== 'gradient') this.sortOrder = 'custom';
+    // New colors slot into a blend; any other sort no longer holds
+    if (this.sortOrder !== 'warm-to-cool' && this.sortOrder !== 'cool-to-warm')
+      this.sortOrder = 'custom';
     this.#setPoints(points);
     this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
@@ -638,25 +634,13 @@ export class ImagePaletteState {
   sortBy(order: SortOrder) {
     this.sortOrder = order;
     if (order === 'custom') return;
-    const unlocked = this.points.filter((point) => !point.locked);
-    let sorted: PalettePoint[];
-    if (order === 'gradient') {
-      sorted = this.#sorted(unlocked);
-    } else {
-      const byId = new Map(this.points.map((point) => [point.id, point]));
-      sorted = (
-        getSortedPalette({
-          palette: this.paletteColors(),
-          sortColors: order,
-        }) as PaletteColor[]
-      ).map((color) => byId.get(color.pointId)!);
-      this.points = sorted;
-      return;
-    }
-    let next = 0;
-    this.points = this.points.map((point) =>
-      point.locked ? point : sorted[next++],
-    );
+    const byId = new Map(this.points.map((point) => [point.id, point]));
+    this.points = (
+      getSortedPalette({
+        palette: this.paletteColors(),
+        sortColors: order,
+      }) as PaletteColor[]
+    ).map((color) => byId.get(color.pointId)!);
   }
 
   reverse() {

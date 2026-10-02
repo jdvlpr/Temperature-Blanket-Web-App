@@ -27,7 +27,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SavePalette from '$lib/components/modals/SavePalette.svelte';
-  import SortPalette from '$lib/components/modals/SortPalette.svelte';
+  import SortMenu from '$lib/components/SortMenu.svelte';
+  import { getSortedPalette } from '$lib/utils/color-utils';
   import {
     drawerState,
     dialog,
@@ -37,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import { createGaugeColors } from '$lib/state/gauges-state.svelte';
   import {
-    ArrowDownWideNarrowIcon,
     BookmarkPlusIcon,
     ChevronDownIcon,
     CircleCheckIcon,
@@ -300,29 +300,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Portal>
     </Menu>
 
-    <button
-      class={toolbarButtonClass}
-      title="Sort Colors"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: SortPalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-              updateGauge,
-            },
-          },
-          options: {
-            size: 'medium',
-          },
-        })}
-    >
-      <ArrowDownWideNarrowIcon />
-      {#if !fullscreen.value}
-        Sort
-      {/if}
-    </button>
+    <SortMenu
+      colors={gauge.colors}
+      triggerClass={toolbarButtonClass}
+      hideLabel={fullscreen.value}
+      onsort={(sort) => {
+        const colors = $state.snapshot(gauge.colors);
+        updateGauge({
+          _colors:
+            sort === 'reverse'
+              ? colors.reverse()
+              : getSortedPalette({
+                  palette: colors,
+                  sortColors: sort,
+                }),
+        });
+      }}
+    />
 
     <button
       class={toolbarButtonClass}

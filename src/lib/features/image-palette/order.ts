@@ -15,6 +15,46 @@
 
 import { warmth, type Oklab } from './color-space';
 
+/** Above this many colors, order by hue rather than the shortest path */
+const MAX_PATH_COLORS = 60;
+
+/** Colors less colorful than this count as neutrals (grays, whites, blacks) */
+const NEUTRAL_CHROMA = 0.03;
+
+/** Where warm colors begin, going around the color wheel: pinks, then
+ * reds, oranges, yellows, greens, blues, and purples */
+const WARM_START_HUE = 350;
+
+/**
+ * Order colors around the color wheel from warm to cool, with neutrals last
+ * (lightest first). Quick for long lists, though less smooth than the
+ * shortest path.
+ */
+export function orderByHue(
+  labs: Oklab[],
+  { warmFirst }: { warmFirst: boolean },
+): number[] {
+  const keyed = labs.map(([L, a, b], i) => {
+    const chroma = Math.hypot(a, b);
+    const hue = ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360;
+    return {
+      i,
+      neutral: chroma < NEUTRAL_CHROMA,
+      key: (hue - WARM_START_HUE + 360) % 360,
+      L,
+    };
+  });
+  keyed.sort((x, y) =>
+    x.neutral !== y.neutral
+      ? Number(x.neutral) - Number(y.neutral)
+      : x.neutral
+        ? y.L - x.L
+        : x.key - y.key,
+  );
+  const order = keyed.map((n) => n.i);
+  return warmFirst ? order : order.reverse();
+}
+
 const dist = (a: Oklab, b: Oklab) =>
   Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
@@ -38,6 +78,10 @@ export function orderAsGradient(
 ): number[] {
   const n = labs.length;
   if (n < 3) return orient(labs, [...Array(n).keys()], warmFirst);
+  // The shortest path takes time that grows quickly with the number of
+  // colors, so long lists (like yarn search results) go around the color
+  // wheel instead
+  if (n > MAX_PATH_COLORS) return orderByHue(labs, { warmFirst });
 
   // Nearest neighbor from every starting color, keep the shortest
   let best: number[] = [];

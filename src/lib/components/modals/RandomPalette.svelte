@@ -204,8 +204,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <option value="none">None</option>
-          <option value="light-to-dark">Lightest to Darkest</option>
-          <option value="dark-to-light">Darkest to Lightest</option>
+          <option value="warm-to-cool">Warm to Cool</option>
+          <option value="cool-to-warm">Cool to Warm</option>
+          <option value="light-to-dark">Light to Dark</option>
+          <option value="dark-to-light">Dark to Light</option>
           <option value="name">Name A-Z</option>
           <option value="name-z-to-a">Name Z-A</option>
         </select>
