@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
@@ -81,14 +81,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const colorSources = [
     {
       value: 'browse',
-      label: 'Browse Palettes',
-      details: 'Saved, gallery, featured, and schemes',
+      label: 'Browse Presets',
+      details: 'Get inspiration, and your saved palettes',
       icon: SwatchBookIcon,
     },
     {
       value: 'colorways',
       label: 'Choose Colorways',
-      details: 'Pick yarn by brand and yarn',
+      details: 'Pick by brand and yarn',
       icon: CircleCheckIcon,
     },
     {
@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       value: 'paste',
       label: 'Paste Colors or Code',
-      details: 'Color names, hex codes, palette codes, or links',
+      details: 'Color names, hex codes, or links',
       icon: ClipboardPasteIcon,
     },
   ];
@@ -320,6 +320,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={toolbarButtonClass}
+      title="Export as Color Codes, an Image, Yarn Names, or a Link"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: ImportExportPalette,
+            props: {
+              colors: $state.snapshot(gauge.colors),
+              mode: 'export',
+            },
+          },
+        })}
+    >
+      <ShareIcon />
+      {#if !fullscreen.value}
+        Export
+      {/if}
+    </button>
+
+    <button
+      class={toolbarButtonClass}
       title="Save This Palette to Use Again Later"
       onclick={() =>
         dialog.trigger({
@@ -339,27 +360,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !fullscreen.value}
         <!-- Not just "Save": the Project Planner's top bar has a Save for the project -->
         Save Palette
-      {/if}
-    </button>
-
-    <button
-      class={toolbarButtonClass}
-      title="Export as Color Codes, an Image, Yarn Names, or a Link"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: ImportExportPalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-              mode: 'export',
-            },
-          },
-        })}
-    >
-      <ShareIcon />
-      {#if !fullscreen.value}
-        Export
       {/if}
     </button>
 
