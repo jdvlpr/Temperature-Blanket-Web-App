@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
   import ExportPaletteImage from '$lib/components/modals/ExportPaletteImage.svelte';
+  import { formatRangeLabel } from '$lib/features/palette-image/layout';
   import ChooseColorways from '$lib/components/modals/ChooseColorways.svelte';
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
@@ -63,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (range: { label?: string; from?: number; to?: number }) =>
         gauge.unit.type === 'category' || range.label
           ? (range.label ?? '')
-          : `${range.from}–${range.to} ${unit}`.trim(),
+          : formatRangeLabel(range.from ?? 0, range.to ?? 0, unit),
     );
   }
 

@@ -49,7 +49,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SunIcon,
     UnfoldVerticalIcon,
   } from '@lucide/svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import {
+    Menu,
+    Portal,
+    SegmentedControl,
+  } from '@skeletonlabs/skeleton-svelte';
+  import type { Component } from 'svelte';
   import { onMount } from 'svelte';
 
   interface Props {
@@ -100,34 +105,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let title = $state('');
 
   const LAYOUTS = [
-    { value: 'rows', label: 'Rows', icon: Rows3Icon },
-    { value: 'stripes', label: 'Stripes', icon: Columns3Icon },
-    { value: 'swatches', label: 'Swatches', icon: LayoutGridIcon },
+    {
+      value: 'rows',
+      label: 'Rows',
+      details: 'A band for each color, with room for names',
+      icon: Rows3Icon,
+    },
+    {
+      value: 'stripes',
+      label: 'Stripes',
+      details: 'Side by side, like the blanket',
+      icon: Columns3Icon,
+    },
+    {
+      value: 'swatches',
+      label: 'Swatches',
+      details: 'A grid of tiles',
+      icon: LayoutGridIcon,
+    },
   ] as const;
 
   const SHAPES = [
     {
       value: 'fit',
       label: 'Fit',
-      details: 'As tall as the colors need',
+      details: '1080 px wide, as tall as needed',
       icon: UnfoldVerticalIcon,
     },
     {
       value: 'square',
       label: 'Square',
-      details: '1080 × 1080, for posts',
+      details: '1080 × 1080 px',
       icon: SquareIcon,
     },
     {
       value: 'portrait',
       label: 'Portrait',
-      details: '1080 × 1350, for posts and pins',
+      details: '1080 × 1350 px',
       icon: RectangleVerticalIcon,
     },
     {
       value: 'landscape',
       label: 'Landscape',
-      details: '1920 × 1080, for screens and wide posts',
+      details: '1920 × 1080 px',
       icon: RectangleHorizontalIcon,
     },
   ] as const;
@@ -146,9 +166,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ].filter(Boolean) as { key: keyof PaletteImageLabels; label: string }[],
   );
 
-  let shapeDetails = $derived(
-    SHAPES.find((shape) => shape.value === settings.shape)?.details,
-  );
+  type Choice = {
+    value: string;
+    label: string;
+    details: string;
+    icon: Component;
+  };
 
   // One canvas, drawn again whenever something changes; the latest PNG is
   // kept ready so Share and Copy can use it straight away when pressed
@@ -254,6 +277,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const segmentClass = 'bg-surface-100 dark:bg-surface-900 w-full';
 </script>
 
+<!-- A setting with a few choices, as the site's other selects: the current
+choice's icon beside it, and what it's for below -->
+{#snippet choiceSelect({
+  label,
+  choices,
+  current,
+  onchoose,
+}: {
+  label: string;
+  choices: readonly Choice[];
+  current: string;
+  onchoose: (value: string) => void;
+})}
+  {@const chosen = choices.find((choice) => choice.value === current)}
+  <div class="flex flex-col gap-1">
+    <label class="label">
+      <span class="label-text">{label}</span>
+      <div class="relative flex items-center">
+        {#if chosen}
+          <chosen.icon class="pointer-events-none absolute left-2" />
+        {/if}
+        <select
+          class="select truncate pl-10"
+          value={current}
+          onchange={(e) => onchoose(e.currentTarget.value)}
+        >
+          {#each choices as choice (choice.value)}
+            <option value={choice.value}>{choice.label}</option>
+          {/each}
+        </select>
+      </div>
+    </label>
+    <p class="text-surface-700-300 text-xs">{chosen?.details}</p>
+  </div>
+{/snippet}
+
 <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
   <div class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row">
     <section
@@ -286,60 +345,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </label>
 
-      <div class="flex flex-col gap-1">
-        <span class="label-text">Layout</span>
-        <SegmentedControl
-          value={settings.layout}
-          onValueChange={(e) => {
-            const layout = LAYOUTS.find((n) => n.value === e.value)?.value;
-            if (!layout) return;
-            settings.layout = layout;
-            remember();
-          }}
-        >
-          <SegmentedControl.Control class={segmentClass}>
-            <SegmentedControl.Indicator />
-            {#each LAYOUTS as layout (layout.value)}
-              <SegmentedControl.Item value={layout.value} class="flex-1">
-                <SegmentedControl.ItemText
-                  class="flex flex-col items-center gap-0.5 text-sm"
-                  ><layout.icon class="size-4 shrink-0" />
-                  {layout.label}</SegmentedControl.ItemText
-                >
-                <SegmentedControl.ItemHiddenInput />
-              </SegmentedControl.Item>
-            {/each}
-          </SegmentedControl.Control>
-        </SegmentedControl>
-      </div>
+      {@render choiceSelect({
+        label: 'Layout',
+        choices: LAYOUTS,
+        current: settings.layout,
+        onchoose: (value) => {
+          const layout = LAYOUTS.find((n) => n.value === value)?.value;
+          if (!layout) return;
+          settings.layout = layout;
+          remember();
+        },
+      })}
 
-      <div class="flex flex-col gap-1">
-        <span class="label-text">Shape</span>
-        <SegmentedControl
-          value={settings.shape}
-          onValueChange={(e) => {
-            const shape = SHAPES.find((n) => n.value === e.value)?.value;
-            if (!shape) return;
-            settings.shape = shape;
-            remember();
-          }}
-        >
-          <SegmentedControl.Control class={segmentClass}>
-            <SegmentedControl.Indicator />
-            {#each SHAPES as shape (shape.value)}
-              <SegmentedControl.Item value={shape.value} class="flex-1 px-1">
-                <SegmentedControl.ItemText
-                  class="flex flex-col items-center gap-0.5 text-sm"
-                  ><shape.icon class="size-4 shrink-0" />
-                  {shape.label}</SegmentedControl.ItemText
-                >
-                <SegmentedControl.ItemHiddenInput />
-              </SegmentedControl.Item>
-            {/each}
-          </SegmentedControl.Control>
-        </SegmentedControl>
-        <p class="text-surface-700-300 text-xs">{shapeDetails}</p>
-      </div>
+      {@render choiceSelect({
+        label: 'Shape',
+        choices: SHAPES,
+        current: settings.shape,
+        onchoose: (value) => {
+          const shape = SHAPES.find((n) => n.value === value)?.value;
+          if (!shape) return;
+          settings.shape = shape;
+          remember();
+        },
+      })}
 
       <div class="flex flex-col gap-1">
         <span class="label-text">Background</span>
@@ -358,8 +386,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <SegmentedControl.Indicator />
             {#each BACKGROUNDS as background (background.value)}
               <SegmentedControl.Item value={background.value} class="flex-1">
-                <SegmentedControl.ItemText
-                  class="flex flex-col items-center gap-0.5 text-sm"
+                <SegmentedControl.ItemText class="flex items-center gap-1"
                   ><background.icon class="size-4 shrink-0" />
                   {background.label}</SegmentedControl.ItemText
                 >

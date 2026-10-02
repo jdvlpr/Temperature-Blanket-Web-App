@@ -61,7 +61,7 @@ test.describe('Palette toolbar', () => {
     const preview = dialog.getByRole('img', { name: 'Palette preview' });
     await expect(preview).toBeVisible();
     // Always 1080 wide; Square is 1080 tall
-    await dialog.getByText('Square', { exact: true }).click();
+    await dialog.getByLabel('Shape').selectOption('square');
     await expect
       .poll(() =>
         preview.evaluate((img: HTMLImageElement) => img.naturalHeight),

@@ -46,7 +46,9 @@ const THEMES = {
 const RADIUS = 16;
 /** Space kept between the title and the colors */
 const PADDING_BELOW_TITLE = 24;
-/** A range sits in a pill: its height and side padding, as parts of its size */
+/** A range sits in a pill: its height and side padding, as parts of its
+ * size. Every layout's margin is wider than the padding, so the pill stays
+ * inside its color. */
 const BADGE_HEIGHT = 1.45;
 const BADGE_PADDING = 0.5;
 
@@ -107,8 +109,9 @@ function getLines({
       size: primary * 1.05,
       weight: 700,
       badge: true,
-      // Its padding counts toward its width, and the pill toward its height
-      measure: (text, size) => measure(text, size) + size * BADGE_PADDING * 2,
+      // The pill reaches into the margin on the left, so its text lines up
+      // with the lines below; its right side counts toward its width
+      measure: (text, size) => measure(text, size) + size * BADGE_PADDING,
       lineHeight: BADGE_HEIGHT + 0.3,
     });
   }
@@ -160,22 +163,23 @@ function drawLines({
     if (line.badge) {
       // A tint of the text's color, so it shows on light and dark colors
       const pillHeight = size * BADGE_HEIGHT;
+      const padding = size * BADGE_PADDING;
       ctx.fillStyle =
         textColor === '#ffffff'
           ? 'rgba(255, 255, 255, 0.24)'
           : 'rgba(0, 0, 0, 0.14)';
       ctx.beginPath();
       ctx.roundRect(
-        x,
+        x - padding,
         middle - pillHeight / 2,
-        line.measure(line.text, size),
+        line.measure(line.text, size) + padding,
         pillHeight,
         pillHeight / 2,
       );
       ctx.fill();
       ctx.fillStyle = textColor;
       ctx.font = font(line.weight, size);
-      ctx.fillText(line.text, x + size * BADGE_PADDING, middle);
+      ctx.fillText(line.text, x, middle);
     } else {
       ctx.fillText(line.text, x, middle);
     }

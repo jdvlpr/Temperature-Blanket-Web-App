@@ -266,3 +266,12 @@ export function fitLines({
     }),
   );
 }
+
+const formatNumber = (n: number) => (n < 0 ? `\u2212${Math.abs(n)}` : `${n}`);
+
+/** A range for a color's label, like "50–59 °F". A negative number gets a
+ * minus sign, and "to" keeps it from running into the dash: "−15 to −5 °F". */
+export function formatRangeLabel(from: number, to: number, unit = ''): string {
+  const between = to < 0 ? ' to ' : '\u2013';
+  return `${formatNumber(from)}${between}${formatNumber(to)} ${unit}`.trim();
+}

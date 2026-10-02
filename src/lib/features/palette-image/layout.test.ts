@@ -9,6 +9,7 @@ import {
   SHAPE_SIZES,
   TITLE_HEIGHT,
   fitFontSize,
+  formatRangeLabel,
   fitLines,
   getPaletteImageGeometry,
   getSwatchColumns,
@@ -182,5 +183,23 @@ describe('getPaletteImageGeometry', () => {
       hasTitle: false,
     });
     expect(cells[0].width).toBeCloseTo(cells[0].height);
+  });
+});
+
+describe('formatRangeLabel', () => {
+  it('joins a range with a dash', () => {
+    expect(formatRangeLabel(50, 59, '°F')).toBe('50\u201359 °F');
+  });
+
+  it('gives negative numbers a minus sign', () => {
+    expect(formatRangeLabel(-10, 19, '°F')).toBe('\u221210\u201319 °F');
+  });
+
+  it('keeps a negative end from running into the dash', () => {
+    expect(formatRangeLabel(-15, -5, '°C')).toBe('\u221215 to \u22125 °C');
+  });
+
+  it('leaves out a missing unit', () => {
+    expect(formatRangeLabel(0, 10)).toBe('0\u201310');
   });
 });
