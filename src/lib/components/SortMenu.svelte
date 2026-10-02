@@ -35,8 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** The palette's current sort, to check in the menu */
     current?: PaletteSort | null;
     triggerClass?: string;
-    /** Show only the icon, as in a fullscreen palette's toolbar */
-    hideLabel?: boolean;
     disabled?: boolean;
     placement?: 'top' | 'bottom-start';
   }
@@ -46,7 +44,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onsort,
     current = null,
     triggerClass = 'btn hover:bg-surface-200-800 justify-start',
-    hideLabel = false,
     disabled = false,
     placement = 'bottom-start',
   }: Props = $props();
@@ -66,11 +63,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <Menu.Trigger class={triggerClass} title="Sort Colors" {disabled}>
     <ArrowDownWideNarrowIcon />
-    {#if !hideLabel}
-      <span class="flex items-center gap-1"
-        >Sort <ChevronDownIcon size={18} /></span
-      >
-    {/if}
+    <span class="flex items-center gap-1"
+      >Sort <ChevronDownIcon size={18} /></span
+    >
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>

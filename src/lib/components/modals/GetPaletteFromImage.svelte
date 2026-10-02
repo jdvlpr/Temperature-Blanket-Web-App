@@ -315,21 +315,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Another Photo
                 </button>
               {/if}
-              <button
+              <label
                 class={[
-                  'btn',
-                  palette.showYarnPreview
-                    ? 'preset-tonal-primary'
-                    : 'hover:bg-surface-200-800',
+                  'flex items-center gap-2 px-2 py-1',
+                  palette.loading ? 'opacity-50' : 'cursor-pointer',
                 ]}
                 title="See the photo in only your palette's colors"
-                aria-pressed={palette.showYarnPreview}
-                disabled={palette.loading}
-                onclick={() => palette.setYarnPreview(!palette.showYarnPreview)}
               >
-                <EyeIcon />
+                <EyeIcon class="size-4" />
                 Palette View
-              </button>
+                <input
+                  type="checkbox"
+                  role="switch"
+                  class="peer sr-only"
+                  checked={palette.showYarnPreview}
+                  disabled={palette.loading}
+                  onchange={(e) =>
+                    palette.setYarnPreview(e.currentTarget.checked)}
+                />
+                <span
+                  class="bg-surface-300 dark:bg-surface-700 peer-focus-visible:ring-tertiary-200 dark:peer-focus-visible:ring-tertiary-600 peer-checked:after:border-surface-50-950 after:bg-surface-50 after:border-surface-300 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600 relative h-6 w-11 shrink-0 rounded-full peer-focus-visible:ring-4 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full"
+                  aria-hidden="true"
+                ></span>
+              </label>
             </div>
           </div>
 
@@ -391,18 +399,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <SegmentedControl.Indicator />
                 <SegmentedControl.Item value="yarn" class="flex-1">
                   <SegmentedControl.ItemText
-                    >Match to Yarn</SegmentedControl.ItemText
+                    >Yarn Colors</SegmentedControl.ItemText
                   >
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
                 <SegmentedControl.Item value="exact" class="flex-1">
                   <SegmentedControl.ItemText
-                    >Photo Colors</SegmentedControl.ItemText
+                    >Exact Colors</SegmentedControl.ItemText
                   >
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
               </SegmentedControl.Control>
             </SegmentedControl>
+            <p class="text-surface-700-300 text-xs">
+              {#if palette.mode === 'yarn'}
+                Each color is matched to the closest yarn colorway.
+              {:else}
+                Exact colors from the photo. A yarn colorway might not exist for each
+                one.
+              {/if}
+            </p>
           </div>
 
           {#if palette.yarnReady && palette.mode === 'yarn'}

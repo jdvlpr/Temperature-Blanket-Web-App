@@ -49,7 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom?: boolean;
     isStaticGauge?: boolean;
     onchanged?: any;
-    fullscreen?: boolean;
     /** A color to outline, as when its marker is hovered on an image */
     highlightIndex?: number | null;
     /** Called with a color's index when it's hovered, and null after */
@@ -65,7 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom = true,
     isStaticGauge = false,
     onchanged = null,
-    fullscreen = $bindable(),
     highlightIndex = null,
     onhover,
   }: Props = $props();
@@ -214,13 +212,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div
-  class="flex w-full flex-col gap-y-1 text-left {fullscreen ? 'h-full' : ''}"
->
+<div class="flex w-full flex-col gap-y-1 text-left">
   <div
-    class="inline-flex w-full {fullscreen
-      ? 'h-full flex-col'
-      : `rounded-t-container h-[70px] ${roundedBottom ? 'rounded-b-container' : ''}`}"
+    class="rounded-t-container inline-flex h-[70px] w-full {roundedBottom
+      ? 'rounded-b-container'
+      : ''}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
@@ -252,10 +248,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         placement: 'top',
       })}
       <div
-        class="dnd-zone-item w-full {fullscreen
-          ? 'h-full'
-          : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uuid} {roundedBottom &&
-        !fullscreen
+        class="dnd-zone-item first:rounded-tl-container last:rounded-tr-container group h-[70px] w-full first:overflow-hidden last:overflow-hidden palette-item-{uuid} {roundedBottom
           ? 'first:rounded-bl-container last:rounded-br-container'
           : ''}"
         animate:flip={{ duration: flipDurationMs }}
@@ -283,9 +276,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               e.currentTarget.click();
             }
           }}
-          class="flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current {fullscreen
-            ? 'h-full'
-            : 'h-[70px]'}"
+          class="flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current"
           style="background:{hex ?? '#ffffff'};color:{getTextColor(
             hex ?? '#ffffff',
           )};{highlightIndex === index
