@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       value: 'browse',
       label: 'Browse Palettes',
-      details: 'Get inspiration, and your saved palettes',
+      details: 'Get inspiration, and access saved palettes',
       icon: SwatchBookIcon,
     },
     {
@@ -167,30 +167,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       value: 'save',
       label: 'Save Palette',
+      title: 'Save Palette',
       details: 'Keep it to use in any project',
       icon: BookmarkPlusIcon,
     },
     {
       value: 'link',
       label: 'Link',
+      title: 'Palette Link',
       details: 'Share it, or paste it into another palette',
       icon: LinkIcon,
     },
     {
       value: 'html',
       label: 'HTML Color Codes',
+      title: 'HTML Color Codes',
       details: 'Copy codes for web and design',
       icon: CodeIcon,
     },
     {
       value: 'image',
       label: 'Image',
+      title: 'Palette Image',
       details: 'Download a PNG image',
       icon: ImageIcon,
     },
     {
       value: 'colorway',
       label: 'Yarn Colorway Names',
+      title: 'Yarn Colorway Names',
       details: 'Copy colorway names',
       icon: ClipboardCopyIcon,
       needsNames: true,
@@ -206,12 +211,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   function openPaletteOutput(value: string) {
+    const output = paletteOutputs.find((output) => output.value === value);
+    if (!output) return;
     const colors = $state.snapshot(gauge.colors);
     if (value === 'save') {
       dialog.trigger({
         type: 'component',
         component: { ref: SavePalette, props: { colors } },
-        options: { size: 'medium', title: 'Save Palette' },
+        options: { size: 'medium', title: output.title },
       });
       return;
     }
@@ -221,7 +228,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ref: ImportExportPalette,
         props: { colors, mode: 'export', exportType: value },
       },
-      options: { title: 'Export Palette' },
+      options: { title: output.title },
     });
   }
 </script>

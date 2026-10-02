@@ -37,14 +37,18 @@ test.describe('Palette toolbar', () => {
       ).toBeVisible();
     }
 
-    // Each export opens on its own step, not the list of exports
+    // Each export opens straight on its format, with no list to go back to
     await page.getByRole('menuitem', { name: /^HTML Color Codes/ }).click();
     const dialog = page.getByRole('dialog');
     await expect(
+      dialog.getByRole('heading', { name: 'HTML Color Codes' }),
+    ).toBeVisible();
+    await expect(
       dialog.getByRole('button', { name: 'Copy HTML Color Codes' }),
     ).toBeVisible();
-    await dialog.getByRole('button', { name: 'All Export Options' }).click();
-    await expect(dialog.getByRole('button', { name: /^Image/ })).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: 'All Export Options' }),
+    ).toHaveCount(0);
   });
 
   test('paste colors into the palette', async ({ page }) => {

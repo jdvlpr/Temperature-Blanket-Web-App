@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import {
@@ -26,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorsToPaletteCode,
     getPaletteFallbackName,
   } from '$lib/utils/color-utils';
-  import { escapeHtml } from '$lib/utils/string-utils';
 
   let { colors }: { colors: Color[] } = $props();
 
@@ -60,9 +58,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 px-4 pt-2 pb-4 sm:min-w-[600px]">
-  <!-- ColorPalette renders its label as HTML -->
-  <ColorPalette {colors} schemeName={escapeHtml(name.trim() || fallbackName)} />
-
   <label class="label text-left">
     <span class="label-text">Name (optional)</span>
     <input
