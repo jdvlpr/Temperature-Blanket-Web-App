@@ -27,10 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getSortedPalette } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
-  import {
-    ArrowDownWideNarrowIcon,
-    ShuffleIcon
-  } from '@lucide/svelte';
+  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
@@ -148,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<div class="px-4 pt-8 pb-2 sm:pb-4">
+<div class="px-4 pt-2 pb-2 sm:pb-4">
   <div class="grid w-full grid-cols-12 items-end justify-center gap-4">
     <div
       class="order-1 col-span-full w-full md:col-span-9"

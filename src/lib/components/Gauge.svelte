@@ -124,14 +124,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               updateGauge,
             },
           },
-          options: { size: 'large' },
+          options: { size: 'large', title: 'Browse Presets' },
         });
         break;
       case 'colorways':
         dialog.trigger({
           type: 'component',
           component: { ref: ChooseColorways, props: { updateGauge } },
-          options: { size: 'large' },
+          options: { size: 'large', title: 'Choose Colorways' },
         });
         break;
       case 'image':
@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: RandomPalette,
             props: { numberOfColors: gauge.numberOfColors, updateGauge },
           },
-          options: { size: 'medium' },
+          options: { size: 'medium', title: 'Generate Random Colors' },
         });
         break;
       case 'paste':
@@ -169,6 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               mode: 'import',
             },
           },
+          options: { title: 'Paste Colors or Code' },
         });
         break;
     }
@@ -331,6 +332,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               mode: 'export',
             },
           },
+          options: { title: 'Export Palette' },
         })}
     >
       <ShareIcon />
@@ -353,6 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
           options: {
             size: 'medium',
+            title: 'Save Palette',
           },
         })}
     >

@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 p-4 pt-12 sm:min-w-[600px]">
+<div class="flex flex-col gap-4 px-4 pt-2 pb-4 sm:min-w-[600px]">
   <!-- ColorPalette renders its label as HTML -->
   <ColorPalette {colors} schemeName={escapeHtml(name.trim() || fallbackName)} />
 

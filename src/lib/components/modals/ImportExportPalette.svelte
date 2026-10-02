@@ -162,11 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="p-4">
-  <h2 class="h3 mb-4 px-8 text-center">
-    {mode === 'import' ? 'Paste Colors or Code' : 'Export Palette'}
-  </h2>
-
+<div class="px-4 pt-2 pb-4">
   {#if mode === 'import'}
     <label for="palette-code" class="label">
       <span class="label-text"
