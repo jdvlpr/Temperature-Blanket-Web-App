@@ -116,7 +116,6 @@ export function createImagePaletteEngine() {
     setCandidates: (args: Args<'setCandidates'>) => call('setCandidates', args),
     autoPalette: (args: Args<'autoPalette'>) => call('autoPalette', args),
     locate: (args: Args<'locate'>) => call('locate', args),
-    posterize: (args: Args<'posterize'>) => call('posterize', args),
     destroy() {
       worker?.terminate();
       worker = null;

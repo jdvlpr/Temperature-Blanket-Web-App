@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { rgbToHex, rgbToOklab } from './color-space';
+import { rgbToHex } from './color-space';
 
 export type Point = { x: number; y: number };
 
@@ -82,47 +82,6 @@ export function sampleHex({
     }
   }
   return rgbToHex(Math.round(r / n), Math.round(g / n), Math.round(b / n));
-}
-
-/**
- * Redraw an image using only the palette's colors: each pixel becomes the
- * closest palette color. Results are cached per (slightly rounded) pixel
- * color, so large photos stay fast.
- */
-export function posterize({
-  data,
-  palette,
-}: {
-  data: Uint8ClampedArray;
-  palette: [number, number, number][];
-}): Uint8ClampedArray {
-  const out = new Uint8ClampedArray(data.length);
-  if (!palette.length) return out;
-  const labs = palette.map(([r, g, b]) => rgbToOklab(r, g, b));
-  const cache = new Int16Array(1 << 15).fill(-1);
-  for (let i = 0; i < data.length; i += 4) {
-    const key =
-      ((data[i] >> 3) << 10) | ((data[i + 1] >> 3) << 5) | (data[i + 2] >> 3);
-    let index = cache[key];
-    if (index === -1) {
-      const [L, a, b] = rgbToOklab(data[i], data[i + 1], data[i + 2]);
-      let best = Infinity;
-      for (let j = 0; j < labs.length; j++) {
-        const d =
-          (labs[j][0] - L) ** 2 + (labs[j][1] - a) ** 2 + (labs[j][2] - b) ** 2;
-        if (d < best) {
-          best = d;
-          index = j;
-        }
-      }
-      cache[key] = index;
-    }
-    out[i] = palette[index][0];
-    out[i + 1] = palette[index][1];
-    out[i + 2] = palette[index][2];
-    out[i + 3] = data[i + 3];
-  }
-  return out;
 }
 
 /**

@@ -60,7 +60,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let stageHeight = $state(0);
   let frame: HTMLDivElement | undefined = $state();
   let imageCanvas: HTMLCanvasElement | undefined = $state();
-  let previewCanvas: HTMLCanvasElement | undefined = $state();
   let loupeCanvas: HTMLCanvasElement | undefined = $state();
   let drag = $state<Drag | null>(null);
   let pointer = $state<Pointer | null>(null);
@@ -110,14 +109,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     imageCanvas.width = pixels.width;
     imageCanvas.height = pixels.height;
     imageCanvas.getContext('2d')?.putImageData(pixels, 0, 0);
-  });
-
-  $effect(() => {
-    const pixels = palette.previewPixels;
-    if (!previewCanvas || !pixels) return;
-    previewCanvas.width = pixels.width;
-    previewCanvas.height = pixels.height;
-    previewCanvas.getContext('2d')?.putImageData(pixels, 0, 0);
   });
 
   const clamp = (n: number, min = 0, max = 1) =>
@@ -374,15 +365,9 @@ make the magnifier's fixed position relative to the photo, not the screen -->
   >
     <canvas
       bind:this={imageCanvas}
-      class="rounded-container absolute inset-0 h-full w-full shadow-lg"
+      class="absolute inset-0 h-full w-full shadow-lg"
       class:invisible={!palette.hasImage}
     ></canvas>
-    {#if palette.showYarnPreview && palette.previewPixels}
-      <canvas
-        bind:this={previewCanvas}
-        class="rounded-container absolute inset-0 h-full w-full"
-      ></canvas>
-    {/if}
 
     <!-- Picking surface: tap or click to add a color, drag to draw a line -->
     <div
@@ -585,7 +570,7 @@ make the magnifier's fixed position relative to the photo, not the screen -->
 
     {#if palette.loading}
       <div
-        class="rounded-container bg-surface-100-900 absolute inset-0 z-40 flex flex-col items-center justify-center gap-2"
+        class="bg-surface-100-900 absolute inset-0 z-40 flex flex-col items-center justify-center gap-2"
       >
         <Spinner />
         <p class="text-surface-700-300 text-sm">Loading photo...</p>

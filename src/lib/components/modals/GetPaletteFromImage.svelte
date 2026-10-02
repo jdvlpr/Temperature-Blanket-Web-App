@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CheckIcon,
     ChevronDownIcon,
     ChevronRightIcon,
-    EyeIcon,
+    ImageIcon,
     ImagePlusIcon,
     Icon,
     PipetteIcon,
@@ -83,6 +83,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     light: { label: 'Light', details: 'Favors lighter colors' },
     dark: { label: 'Dark', details: 'Favors deeper colors' },
   };
+
+  const PHOTO_SOURCES = [
+    {
+      value: 'random',
+      label: 'Random Photo',
+      icon: ShuffleIcon,
+    },
+    {
+      value: 'file',
+      label: 'Your Photo...',
+      icon: ImagePlusIcon,
+    },
+  ];
 
   // As in the main palette's toolbar
   const toolbarButtonClass = 'btn hover:bg-surface-200-800 justify-start';
@@ -277,7 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="isolate flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row"
       >
         <section class="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
-          <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center justify-center gap-2">
             <SegmentedControl
               value={palette.tool}
               onValueChange={(e) => {
@@ -303,48 +316,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </SegmentedControl.Item>
               </SegmentedControl.Control>
             </SegmentedControl>
-
-            <div class="flex flex-wrap items-center gap-1">
-              {#if palette.source === 'random'}
-                <button
-                  class="btn hover:bg-surface-200-800"
-                  disabled={palette.loading}
-                  onclick={() => palette.randomImage()}
-                >
-                  <ShuffleIcon />
-                  Another Photo
-                </button>
-              {/if}
-              <label
-                class={[
-                  'flex items-center gap-2 px-2 py-1',
-                  palette.loading ? 'opacity-50' : 'cursor-pointer',
-                ]}
-                title="See the photo in only your palette's colors"
-              >
-                <EyeIcon class="size-4" />
-                Palette View
-                <input
-                  type="checkbox"
-                  role="switch"
-                  class="peer sr-only"
-                  checked={palette.showYarnPreview}
-                  disabled={palette.loading}
-                  onchange={(e) =>
-                    palette.setYarnPreview(e.currentTarget.checked)}
-                />
-                <span
-                  class="bg-surface-300 dark:bg-surface-700 peer-focus-visible:ring-tertiary-200 dark:peer-focus-visible:ring-tertiary-600 peer-checked:after:border-surface-50-950 after:bg-surface-50 after:border-surface-300 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600 relative h-6 w-11 shrink-0 rounded-full peer-focus-visible:ring-4 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full"
-                  aria-hidden="true"
-                ></span>
-              </label>
-            </div>
           </div>
 
           <p class="text-surface-700-300 text-center text-xs">
-            {#if palette.showYarnPreview}
-              Your photo in only your palette's colors.
-            {:else if palette.tool === 'line'}
+            {#if palette.tool === 'line'}
               Drag across the photo for evenly spaced colors. Drag an end to
               adjust.
             {:else}
@@ -379,11 +354,73 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="min-h-0 flex-1 max-lg:px-6">
             <ImagePaletteCanvas {palette} />
           </div>
+
+          {#if palette.credit && palette.hasImage}
+            <!-- eslint-disable svelte/no-navigation-without-resolve -- the photo's page on Unsplash -->
+            <p class="text-surface-700-300 text-center text-xs">
+              Photo by <a
+                href={palette.credit.url}
+                target="_blank"
+                rel="noreferrer"
+                class="link">{palette.credit.author}</a
+              >
+              on
+              <a
+                href="https://unsplash.com"
+                target="_blank"
+                rel="noreferrer"
+                class="link">Unsplash</a
+              >
+            </p>
+            <!-- eslint-enable svelte/no-navigation-without-resolve -->
+          {/if}
         </section>
 
         <aside
           class="flex flex-col gap-4 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
         >
+          <!-- Styled like the yarn fields below it -->
+          <div class="label">
+            <span class="label-text">Photo</span>
+            <Menu
+              positioning={{ sameWidth: true }}
+              onSelect={(details) =>
+                details.value === 'random'
+                  ? palette.randomImage()
+                  : input?.click()}
+            >
+              <!-- As the yarn fields: icons beside the field, not in it -->
+              <div class="relative flex items-center">
+                <ImageIcon class="pointer-events-none absolute left-2" />
+                <Menu.Trigger
+                  class="select truncate pr-8 pl-10 text-left"
+                  disabled={palette.loading}
+                >
+                  {palette.source === 'random' ? 'Random Photo' : 'Your Photo'}
+                </Menu.Trigger>
+                <ChevronDownIcon
+                  class="pointer-events-none absolute right-2 size-4"
+                />
+              </div>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content
+                    class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
+                  >
+                    {#each PHOTO_SOURCES as source (source.value)}
+                      <Menu.Item value={source.value} class={menuItemClass}>
+                        <source.icon class="shrink-0" />
+                        <div class="flex min-w-0 flex-col text-left">
+                          <p>{source.label}</p>
+                        </div>
+                      </Menu.Item>
+                    {/each}
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu>
+          </div>
+
           <div class="flex flex-col gap-1">
             <span class="label-text">Colors</span>
             <SegmentedControl
@@ -415,8 +452,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if palette.mode === 'yarn'}
                 Each color is matched to the closest yarn colorway.
               {:else}
-                Exact colors from the photo. A yarn colorway might not exist for each
-                one.
+                Exact colors from the photo. A yarn colorway might not exist for
+                each one.
               {/if}
             </p>
           </div>

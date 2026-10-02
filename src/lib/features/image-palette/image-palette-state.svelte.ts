@@ -23,7 +23,7 @@ import {
   stringToBrandAndYarnDetails,
 } from '$lib/utils/yarn-utils';
 import chroma from 'chroma-js';
-import { hexToOklab, hexToRgb, oklabToHex, type Oklab } from './color-space';
+import { hexToOklab, oklabToHex, type Oklab } from './color-space';
 import { createImagePaletteEngine, type ImagePaletteEngine } from './engine';
 import {
   closestColorways,
@@ -38,6 +38,11 @@ import {
 } from './match';
 import { bestInsertionIndex, orderAsGradient } from './order';
 import { pointsAlongLine, sampleHex, type Point } from './pixels';
+import {
+  pickRandomPhoto,
+  randomPhotoSrc,
+  type RandomPhoto,
+} from './random-photos';
 import type { PaletteStyle } from './select';
 
 /** A palette color: a spot on the image and the yarn matched to it */
@@ -74,6 +79,7 @@ type Session = {
   pixels: ImageData;
   thumbnail: string;
   source: PhotoSource;
+  credit: RandomPhoto | null;
   points: PalettePoint[];
   mode: PaletteMode;
   style: PaletteStyle;
@@ -98,7 +104,6 @@ export class ImagePaletteState {
   sortOrder = $state<SortOrder>('custom');
   tool = $state<PickTool>('points');
   line = $state<PaletteLine | null>(null);
-  showYarnPreview = $state(false);
   selectedId = $state<number | null>(null);
   hoveredId = $state<number | null>(null);
   loading = $state(false);
@@ -116,8 +121,8 @@ export class ImagePaletteState {
   thumbnail = $state<string | null>(session?.thumbnail ?? null);
   /** Where the photo came from, so a random one can be swapped for another */
   source = $state<PhotoSource | null>(null);
-  /** The photo redrawn in the palette's colors */
-  previewPixels = $state.raw<ImageData | null>(null);
+  /** Who took the photo, when it's a random one */
+  credit = $state<RandomPhoto | null>(null);
 
   hasImage = $derived(!!this.pixels);
   selected = $derived(
@@ -134,7 +139,6 @@ export class ImagePaletteState {
   #loadId = 0;
   #paletteRequest = 0;
   #destroyed = false;
-  #previewTimer: ReturnType<typeof setTimeout> | undefined;
   #resolveReady!: () => void;
   #ready = new Promise<void>((resolve) => (this.#resolveReady = resolve));
 
@@ -184,12 +188,12 @@ export class ImagePaletteState {
   /** Keep the photo and palette for next time, and stop the worker */
   destroy() {
     this.#destroyed = true;
-    clearTimeout(this.#previewTimer);
     if (this.pixels)
       session = {
         pixels: this.pixels,
         thumbnail: this.thumbnail ?? '',
         source: this.source ?? 'file',
+        credit: this.credit,
         points: $state.snapshot(this.points),
         mode: this.mode,
         style: this.style,
@@ -272,9 +276,11 @@ export class ImagePaletteState {
 
   randomImage() {
     this.source = 'random';
+    const photo = pickRandomPhoto(this.credit?.id);
     return this.loadImage(
-      `https://picsum.photos/720/480?random=${Date.now()}`,
+      randomPhotoSrc(photo, MAX_IMAGE_DIMENSION, (MAX_IMAGE_DIMENSION * 2) / 3),
       "Couldn't load a random image. Check your connection and try again.",
+      photo,
     );
   }
 
@@ -298,7 +304,11 @@ export class ImagePaletteState {
     URL.revokeObjectURL(url);
   }
 
-  async loadImage(src: string, failMessage: string) {
+  async loadImage(
+    src: string,
+    failMessage: string,
+    credit: RandomPhoto | null = null,
+  ) {
     const id = ++this.#loadId;
     this.loading = true;
     this.errorMessage = null;
@@ -336,8 +346,8 @@ export class ImagePaletteState {
     await this.#engine!.setImage({ data: pixels.data, width, height });
     if (id !== this.#loadId || this.#destroyed) return;
     this.pixels = pixels;
+    this.credit = credit;
     this.thumbnail = makeThumbnail(canvas);
-    this.previewPixels = null;
     this.line = null;
 
     // Locked colors stay, moved to where they best appear in the new image
@@ -372,6 +382,7 @@ export class ImagePaletteState {
     this.pixels = saved.pixels;
     this.thumbnail = saved.thumbnail;
     this.source = saved.source;
+    this.credit = saved.credit;
     this.points = saved.points;
     this.#nextId = Math.max(0, ...saved.points.map((point) => point.id)) + 1;
     this.#loadId++;
@@ -379,7 +390,6 @@ export class ImagePaletteState {
     // This gauge may want a different number of colors than last time
     if (this.points.length !== this.targetCount)
       await this.setCount(this.targetCount);
-    this.#schedulePreview();
   }
 
   // Palette
@@ -500,13 +510,6 @@ export class ImagePaletteState {
   setMode(mode: PaletteMode) {
     this.mode = mode;
     if (mode === 'yarn') this.#rematch({ onlyMissing: true });
-    this.#schedulePreview();
-  }
-
-  setYarnPreview(show: boolean) {
-    this.showYarnPreview = show;
-    if (!show) this.previewPixels = null;
-    this.#schedulePreview();
   }
 
   /** Add a color picked from the image. Returns its id. */
@@ -561,7 +564,6 @@ export class ImagePaletteState {
       sourceHex,
       this.points.filter((n) => n.id !== id),
     );
-    this.#schedulePreview();
   }
 
   /** A drag finished: settle the colors along a line that was adjusted */
@@ -577,7 +579,6 @@ export class ImagePaletteState {
       point.yarn = this.#match(point.sourceHex, used);
       used.push(point);
     }
-    this.#schedulePreview();
   }
 
   setTool(tool: PickTool) {
@@ -615,7 +616,6 @@ export class ImagePaletteState {
     if (!point) return;
     this.#edited();
     point.yarn = this.#withDelta(colorway, point.sourceHex);
-    this.#schedulePreview();
   }
 
   /** Move a color left (-1) or right (+1) in the palette */
@@ -708,7 +708,6 @@ export class ImagePaletteState {
           this.points.filter((n) => n.id !== id),
         );
     });
-    this.#schedulePreview();
   }
 
   // Yarn filter
@@ -782,7 +781,6 @@ export class ImagePaletteState {
       !points.some((n) => n.id === this.selectedId)
     )
       this.selectedId = null;
-    this.#schedulePreview();
   }
 
   #sample(x: number, y: number): string | null {
@@ -815,7 +813,6 @@ export class ImagePaletteState {
       point.yarn = this.#match(point.sourceHex, used);
       used.push(point);
     }
-    this.#schedulePreview();
   }
 
   #withDelta(colorway: Color, sourceHex: string): MatchedColor {
@@ -845,24 +842,6 @@ export class ImagePaletteState {
   #tellFewerColors() {
     const n = this.points.length;
     this.infoMessage = `This image only has ${n} distinct ${n === 1 ? 'color' : 'colors'}${this.mode === 'yarn' ? ' for this yarn' : ''}.`;
-  }
-
-  #schedulePreview() {
-    clearTimeout(this.#previewTimer);
-    if (!this.showYarnPreview) return;
-    this.#previewTimer = setTimeout(async () => {
-      if (!this.#engine || !this.pixels) return;
-      const { width, height } = this.pixels;
-      const data = await this.#engine.posterize({
-        palette: this.points.map((n) => hexToRgb(this.colorOf(n))),
-      });
-      if (data && this.showYarnPreview)
-        this.previewPixels = new ImageData(
-          new Uint8ClampedArray(data),
-          width,
-          height,
-        );
-    }, 120);
   }
 }
 

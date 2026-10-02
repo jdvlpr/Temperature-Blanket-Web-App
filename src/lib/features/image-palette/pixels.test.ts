@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  placeMagnifier,
-  pointsAlongLine,
-  posterize,
-  sampleHex,
-} from './pixels';
+import { placeMagnifier, pointsAlongLine, sampleHex } from './pixels';
 
 describe('pointsAlongLine', () => {
   it('spaces points evenly, including both ends', () => {
@@ -40,21 +35,6 @@ describe('sampleHex', () => {
 
   it('returns null outside the image', () => {
     expect(sampleHex({ data, width: 2, height: 1, x: 1.2, y: 0.5 })).toBeNull();
-  });
-});
-
-describe('posterize', () => {
-  it('replaces each pixel with the closest palette color', () => {
-    const data = new Uint8ClampedArray([250, 10, 10, 255, 10, 10, 240, 128]);
-    expect([
-      ...posterize({
-        data,
-        palette: [
-          [255, 0, 0],
-          [0, 0, 255],
-        ],
-      }),
-    ]).toEqual([255, 0, 0, 255, 0, 0, 255, 128]);
   });
 });
 

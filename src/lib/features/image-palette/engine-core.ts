@@ -19,7 +19,6 @@ import {
   type ImageAnalysis,
 } from './analyze';
 import type { Oklab } from './color-space';
-import { posterize } from './pixels';
 import { applyPaletteStyle, selectColors, type PaletteStyle } from './select';
 
 export type AutoPaletteColor = {
@@ -116,11 +115,6 @@ export function createEngineCore() {
         if (position) used.add(position.pixel);
         return { x: position?.x ?? 0.5, y: position?.y ?? 0.5 };
       });
-    },
-
-    /** The image redrawn using only these colors (RGB triples) */
-    posterize({ palette }: { palette: [number, number, number][] }) {
-      return pixels ? posterize({ data: pixels, palette }) : null;
     },
   };
 }

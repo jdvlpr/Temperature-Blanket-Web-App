@@ -44,14 +44,6 @@ describe('createEngineCore', () => {
     expect(colors.every((n) => n.candidate === -1)).toBe(true);
   });
 
-  it('redraws the image in a palette', () => {
-    const core = createEngineCore();
-    core.setImage(image(['#fe0101'], 2, 1));
-    expect([...core.posterize({ palette: [[255, 0, 0]] })!]).toEqual([
-      255, 0, 0, 255, 255, 0, 0, 255,
-    ]);
-  });
-
   it('returns nothing before an image is set', () => {
     const core = createEngineCore();
     expect(
@@ -62,6 +54,5 @@ describe('createEngineCore', () => {
         exact: true,
       }),
     ).toEqual([]);
-    expect(core.posterize({ palette: [[0, 0, 0]] })).toBeNull();
   });
 });
