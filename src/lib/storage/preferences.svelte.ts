@@ -1,3 +1,4 @@
+import type { PaletteImageSettings } from '$lib/features/palette-image/layout';
 import type { PageLayout } from '$lib/types/page-types';
 import type { Unit } from '$lib/types/weather-types';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
@@ -24,6 +25,8 @@ type LocalStatePreferencesType = {
     headingStyle?: 'classic' | 'playful' | 'refined'; // Controls heading font-variation-settings
   };
   units: Unit | null;
+  /** The palette image export's last settings; missing until first changed */
+  paletteImage?: PaletteImageSettings;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(

@@ -51,6 +51,31 @@ test.describe('Palette toolbar', () => {
     ).toHaveCount(0);
   });
 
+  test('Image opens a preview to download', async ({ page }) => {
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Image/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(
+      dialog.getByRole('heading', { name: 'Palette Image' }),
+    ).toBeVisible();
+    const preview = dialog.getByRole('img', { name: 'Palette preview' });
+    await expect(preview).toBeVisible();
+    // Always 1080 wide; Square is 1080 tall
+    await dialog.getByText('Square', { exact: true }).click();
+    await expect
+      .poll(() =>
+        preview.evaluate((img: HTMLImageElement) => img.naturalHeight),
+      )
+      .toBe(1080);
+    expect(
+      await preview.evaluate((img: HTMLImageElement) => img.naturalWidth),
+    ).toBe(1080);
+
+    const download = page.waitForEvent('download');
+    await dialog.getByRole('button', { name: 'Download' }).click();
+    expect((await download).suggestedFilename()).toMatch(/\.png$/);
+  });
+
   test('paste colors into the palette', async ({ page }) => {
     await page.getByRole('button', { name: 'Get Colors' }).click();
     await page.getByRole('menuitem', { name: /Paste Colors or Code/ }).click();

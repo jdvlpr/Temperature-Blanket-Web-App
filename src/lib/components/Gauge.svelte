@@ -17,13 +17,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
+  import ExportPaletteImage from '$lib/components/modals/ExportPaletteImage.svelte';
   import ChooseColorways from '$lib/components/modals/ChooseColorways.svelte';
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SavePalette from '$lib/components/modals/SavePalette.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
-  import { getSortedPalette } from '$lib/utils/color-utils';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import {
+    getPaletteFallbackName,
+    getSortedPalette,
+  } from '$lib/utils/color-utils';
   import { drawerState, dialog } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
@@ -44,7 +49,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
-  let { gauge = $bindable() } = $props();
+  let {
+    gauge = $bindable(),
+    /** A project's gauge, whose ranges mean something (the Yarn page's don't) */
+    inProject = false,
+  } = $props();
+
+  /** Each color's range, as the gauge shows it, like "50–59 °F" */
+  function getRangeLabels(): string[] | undefined {
+    if (!inProject || !gauge.ranges?.length) return undefined;
+    const unit = gauge.unit.label?.[preferences.value.units ?? 'metric'] ?? '';
+    return gauge.ranges.map(
+      (range: { label?: string; from?: number; to?: number }) =>
+        gauge.unit.type === 'category' || range.label
+          ? (range.label ?? '')
+          : `${range.from}–${range.to} ${unit}`.trim(),
+    );
+  }
 
   function updateGauge({
     _colors,
@@ -214,6 +235,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const output = paletteOutputs.find((output) => output.value === value);
     if (!output) return;
     const colors = $state.snapshot(gauge.colors);
+    if (value === 'image') {
+      dialog.trigger({
+        type: 'component',
+        component: {
+          ref: ExportPaletteImage,
+          props: {
+            colors,
+            ranges: getRangeLabels(),
+            fallbackName: getPaletteFallbackName(colors),
+          },
+        },
+        options: { size: 'xlarge', title: output.title },
+      });
+      return;
+    }
     if (value === 'save') {
       dialog.trigger({
         type: 'component',

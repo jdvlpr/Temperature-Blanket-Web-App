@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   FIT_ROW_HEIGHT,
-  FOOTER_HEIGHT,
   IMAGE_WIDTH,
   LINE_HEIGHT,
   PADDING,
   PALETTE_IMAGE_LAYOUTS,
   PALETTE_IMAGE_SHAPES,
-  SHAPE_HEIGHTS,
+  SHAPE_SIZES,
   TITLE_HEIGHT,
   fitFontSize,
   fitLines,
@@ -55,6 +54,15 @@ describe('fitLines', () => {
     expect((sizes[0] + sizes[1]) * LINE_HEIGHT).toBeLessThanOrEqual(36.001);
   });
 
+  it('makes room for taller lines', () => {
+    const sizes = fitLines({
+      lines: [{ text: 'a', size: 40, measure, lineHeight: 2 }],
+      width: 1000,
+      height: 40,
+    });
+    expect(sizes[0]).toBeCloseTo(20);
+  });
+
   it('shrinks only the line that is too wide', () => {
     const lines = [
       { text: 'Short', size: 30, measure },
@@ -93,7 +101,7 @@ describe('getSwatchColumns', () => {
 });
 
 describe('getPaletteImageGeometry', () => {
-  it('is always the same width, and fixed shapes are their height', () => {
+  it('makes Fit images 1080 wide, and fixed shapes their size', () => {
     for (const layout of PALETTE_IMAGE_LAYOUTS) {
       for (const shape of PALETTE_IMAGE_SHAPES) {
         const geometry = getPaletteImageGeometry({
@@ -103,8 +111,12 @@ describe('getPaletteImageGeometry', () => {
           gaps: true,
           hasTitle: true,
         });
-        expect(geometry.width).toBe(IMAGE_WIDTH);
-        if (shape !== 'fit') expect(geometry.height).toBe(SHAPE_HEIGHTS[shape]);
+        if (shape === 'fit') {
+          expect(geometry.width).toBe(IMAGE_WIDTH);
+        } else {
+          expect(geometry.width).toBe(SHAPE_SIZES[shape].width);
+          expect(geometry.height).toBe(SHAPE_SIZES[shape].height);
+        }
         expect(geometry.cells).toHaveLength(7);
       }
     }
@@ -154,7 +166,7 @@ describe('getPaletteImageGeometry', () => {
       hasTitle: true,
     });
     expect(geometry.height).toBe(
-      PADDING + TITLE_HEIGHT + 5 * FIT_ROW_HEIGHT + PADDING + FOOTER_HEIGHT,
+      PADDING + TITLE_HEIGHT + 5 * FIT_ROW_HEIGHT + PADDING,
     );
     expect(geometry.title).not.toBeNull();
     expect(geometry.bounds.y).toBe(PADDING + TITLE_HEIGHT);

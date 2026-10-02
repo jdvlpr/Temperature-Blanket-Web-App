@@ -39,15 +39,16 @@ const BODY_FONT = '"Be Vietnam Pro", sans-serif';
 const HEADING_FONT = '"Fraunces Variable", serif';
 
 const THEMES = {
-  light: { background: '#ffffff', title: '#1c1917', footer: '#6b6b6b' },
-  dark: { background: '#18181b', title: '#f4f4f5', footer: '#a1a1aa' },
+  light: { background: '#ffffff', title: '#1c1917' },
+  dark: { background: '#18181b', title: '#f4f4f5' },
 };
 
 const RADIUS = 16;
 /** Space kept between the title and the colors */
 const PADDING_BELOW_TITLE = 24;
-const FOOTER_PREFIX = 'Create your own yarn palette at ';
-const FOOTER_URL = 'temperature-blanket.com/yarn';
+/** A range sits in a pill: its height and side padding, as parts of its size */
+const BADGE_HEIGHT = 1.45;
+const BADGE_PADDING = 0.5;
 
 /** Load the fonts the image uses, so text is measured in the font it's drawn in */
 export async function loadPaletteImageFonts() {
@@ -76,7 +77,11 @@ function measurer(
   };
 }
 
-type Line = TextLine & { weight: number };
+type Line = TextLine & {
+  weight: number;
+  /** Drawn in a pill, so it stands apart from the names */
+  badge?: boolean;
+};
 
 function getLines({
   ctx,
@@ -95,11 +100,24 @@ function getLines({
   const lines: Line[] = [];
   const add = (text: string, size: number, weight: number) =>
     lines.push({ text, size, weight, measure: measurer(ctx, weight) });
-  if (labels.range && range) add(range, primary, 600);
+  if (labels.range && range) {
+    const measure = measurer(ctx, 700);
+    lines.push({
+      text: range,
+      size: primary * 1.05,
+      weight: 700,
+      badge: true,
+      // Its padding counts toward its width, and the pill toward its height
+      measure: (text, size) => measure(text, size) + size * BADGE_PADDING * 2,
+      lineHeight: BADGE_HEIGHT + 0.3,
+    });
+  }
   if (labels.colorway && color.name) add(color.name, primary, 600);
+  // Without a range or name, the first of the rest takes their place
+  const lead = () => (lines.length ? secondary : primary);
   const yarn = [color.brandName, color.yarnName].filter(Boolean).join(' – ');
-  if (labels.yarn && yarn) add(yarn, secondary, 400);
-  if (labels.hex) add(color.hex.toUpperCase(), secondary, 400);
+  if (labels.yarn && yarn) add(yarn, lead(), 400);
+  if (labels.hex) add(color.hex.toUpperCase(), lead(), 400);
   return lines;
 }
 
@@ -124,18 +142,44 @@ function drawLines({
 }) {
   if (!lines.length || width <= 0 || height <= 0) return;
   const sizes = fitLines({ lines, width, height });
-  const blockHeight = sizes.reduce((sum, size) => sum + size * LINE_HEIGHT, 0);
+  const slots = lines.map(
+    (line, i) => sizes[i] * (line.lineHeight ?? LINE_HEIGHT),
+  );
+  const blockHeight = slots.reduce((sum, slot) => sum + slot, 0);
   let top =
     align === 'center'
       ? y + (height - blockHeight) / 2
       : y + height - blockHeight;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
+  const textColor = ctx.fillStyle;
   lines.forEach((line, i) => {
-    const slot = sizes[i] * LINE_HEIGHT;
-    ctx.font = font(line.weight, sizes[i]);
-    ctx.fillText(line.text, x, top + slot / 2);
-    top += slot;
+    const size = sizes[i];
+    const middle = top + slots[i] / 2;
+    ctx.font = font(line.weight, size);
+    if (line.badge) {
+      // A tint of the text's color, so it shows on light and dark colors
+      const pillHeight = size * BADGE_HEIGHT;
+      ctx.fillStyle =
+        textColor === '#ffffff'
+          ? 'rgba(255, 255, 255, 0.24)'
+          : 'rgba(0, 0, 0, 0.14)';
+      ctx.beginPath();
+      ctx.roundRect(
+        x,
+        middle - pillHeight / 2,
+        line.measure(line.text, size),
+        pillHeight,
+        pillHeight / 2,
+      );
+      ctx.fill();
+      ctx.fillStyle = textColor;
+      ctx.font = font(line.weight, size);
+      ctx.fillText(line.text, x + size * BADGE_PADDING, middle);
+    } else {
+      ctx.fillText(line.text, x, middle);
+    }
+    top += slots[i];
   });
 }
 
@@ -287,26 +331,6 @@ export function renderPaletteImage({
       y + (height - PADDING_BELOW_TITLE) / 2,
     );
   }
-
-  // The footer: one centered line, part of it bold
-  const { x, y, width, height } = geometry.footer;
-  const regular = measurer(ctx, 400);
-  const bold = measurer(ctx, 700);
-  const size = fitFontSize({
-    text: FOOTER_PREFIX + FOOTER_URL,
-    preferred: 24,
-    maxWidth: width,
-    measure: (_, s) => regular(FOOTER_PREFIX, s) + bold(FOOTER_URL, s),
-  });
-  const prefixWidth = regular(FOOTER_PREFIX, size);
-  const start = x + (width - prefixWidth - bold(FOOTER_URL, size)) / 2;
-  ctx.fillStyle = theme.footer;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.font = font(400, size);
-  ctx.fillText(FOOTER_PREFIX, start, y + height / 2);
-  ctx.font = font(700, size);
-  ctx.fillText(FOOTER_URL, start + prefixWidth, y + height / 2);
 }
 
 export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {

@@ -24,10 +24,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { getColorsFromInput, getYarnPageURL } from '$lib/utils/color-utils';
-  import { generatePaletteImage } from '$lib/utils/yarn-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
-  import { ClipboardCopyIcon, DownloadIcon } from '@lucide/svelte';
+  import { ClipboardCopyIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   let {
@@ -41,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** 'export' shares the current palette; 'import' pastes colors in */
     mode?: 'export' | 'import';
     /** What to export; the toolbar's Save & Export menu chooses it */
-    exportType?: 'image' | 'html' | 'colorway' | 'link';
+    exportType?: 'html' | 'colorway' | 'link';
   } = $props();
 
   let inputValue = $state('');
@@ -56,28 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let colorHexesWithHashes = $state(true);
 
-  let includeBrandInImage = $derived(colors.some((n: Color) => n.brandName));
-  let includeYarnInImage = $derived(colors.some((n: Color) => n.yarnName));
-  let includeColorwayInImage = $derived(colors.some((n: Color) => n.name));
-  let includeHexInImage = $state(false);
-  let includeSpacingInImage = $state(false);
-
   let isExpanded = $state(false);
-
-  let previewImageUrl = $derived(
-    mode === 'export' && colors.length
-      ? generatePaletteImage({
-          colors: colors.filter(
-            (color): color is Color & { hex: string } => !!color.hex,
-          ),
-          includeColorway: includeColorwayInImage,
-          includeHex: includeHexInImage,
-          includeBrand: includeBrandInImage,
-          includeYarn: includeYarnInImage,
-          includeSpacing: includeSpacingInImage,
-        })
-      : null,
-  );
 
   let paletteLink = $derived(
     getYarnPageURL({ colors, origin: window.location.origin, version }),
@@ -128,30 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return palette.join(', ');
   }
 
-  function downloadImage() {
-    try {
-      // Create a temporary link element using the preview URL
-      const link = document.createElement('a');
-      link.download = 'Yarn Palette.png';
-      link.href = previewImageUrl ?? '';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast.trigger({
-        message: 'Image downloaded',
-        category: 'success',
-      });
-    } catch (error) {
-      toast.trigger({
-        message: 'Unable to download image',
-        category: 'error',
-      });
-    }
-  }
   onMount(() => {
-    includeHexInImage =
-      !includeBrandInImage && !includeYarnInImage && !includeColorwayInImage;
     ensureYarnData();
   });
 </script>
@@ -253,79 +208,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   {:else if colors}
-    <!-- Image Export Section -->
-    {#if exportType === 'image'}
-      <div class="flex w-full flex-wrap items-start gap-4">
-        <div class="flex w-full flex-col gap-4">
-          <div
-            class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
-          >
-            <p class="text-2xl font-bold">Image Settings</p>
-            <p class="">Choose what to include for each colorway</p>
-            <div class="flex flex-wrap gap-4">
-              {#if colors.some((n: Color) => n.brandName)}
-                <div class="flex cursor-pointer items-center gap-2">
-                  <ToggleSwitch
-                    bind:checked={includeBrandInImage}
-                    label="Brand Name"
-                  />
-                </div>
-              {/if}
-              {#if colors.some((n: Color) => n.yarnName)}
-                <div class="flex cursor-pointer items-center gap-2">
-                  <ToggleSwitch
-                    bind:checked={includeYarnInImage}
-                    label="Yarn Name"
-                  />
-                </div>
-              {/if}
-              {#if colors.some((n: Color) => n.name)}
-                <div class="flex cursor-pointer items-center gap-2">
-                  <ToggleSwitch
-                    bind:checked={includeColorwayInImage}
-                    label="Colorway Name"
-                  />
-                </div>
-              {/if}
-              <div class="flex cursor-pointer items-center gap-2">
-                <ToggleSwitch
-                  bind:checked={includeHexInImage}
-                  label="HTML Color Code"
-                />
-              </div>
-              <div class="flex cursor-pointer items-center gap-2">
-                <ToggleSwitch
-                  bind:checked={includeSpacingInImage}
-                  label="Spacing"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap items-start gap-4">
-            {#if previewImageUrl !== null}
-              <div class="card preset-tonal-primary w-fit overflow-auto p-4">
-                <img
-                  src={previewImageUrl}
-                  alt="Color palette preview"
-                  class="shadow-md sm:max-h-[60vh]"
-                  style="image-rendering: crisp-edges;"
-                />
-              </div>
-            {/if}
-
-            <button
-              class="btn hover:bg-surface-100-900 mb-8 w-fit"
-              onclick={downloadImage}
-            >
-              <DownloadIcon />
-              Download Image
-            </button>
-          </div>
-        </div>
-      </div>
-    {/if}
-
     <!-- HTML Color Codes Section -->
     {#if exportType === 'html' && palette}
       <div class="flex w-full flex-wrap items-start gap-4">

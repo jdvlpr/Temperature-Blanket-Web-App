@@ -19,7 +19,12 @@
 export const PALETTE_IMAGE_LAYOUTS = ['rows', 'stripes', 'swatches'] as const;
 export type PaletteImageLayout = (typeof PALETTE_IMAGE_LAYOUTS)[number];
 
-export const PALETTE_IMAGE_SHAPES = ['fit', 'square', 'portrait'] as const;
+export const PALETTE_IMAGE_SHAPES = [
+  'fit',
+  'square',
+  'portrait',
+  'landscape',
+] as const;
 export type PaletteImageShape = (typeof PALETTE_IMAGE_SHAPES)[number];
 
 export type PaletteImageBackground = 'light' | 'dark';
@@ -49,14 +54,17 @@ export const DEFAULT_PALETTE_IMAGE_SETTINGS: PaletteImageSettings = {
   labels: { yarn: true, colorway: true, hex: false, range: true },
 };
 
-/** Every image is this wide, whatever the screen it's made on */
+/** Images are this wide, whatever the screen they're made on (Landscape is wider) */
 export const IMAGE_WIDTH = 1080;
-export const SHAPE_HEIGHTS = { square: 1080, portrait: 1350 } as const;
+export const SHAPE_SIZES = {
+  square: { width: 1080, height: 1080 },
+  portrait: { width: 1080, height: 1350 },
+  landscape: { width: 1920, height: 1080 },
+} as const;
 
 export const PADDING = 48;
 export const GAP = 16;
 export const TITLE_HEIGHT = 96;
-export const FOOTER_HEIGHT = 56;
 /** A row's height in a Fit image of rows */
 export const FIT_ROW_HEIGHT = 140;
 /** The stripes' height in a Fit image of stripes */
@@ -71,7 +79,6 @@ export type PaletteImageGeometry = {
   /** The area the colors fill */
   bounds: Rect;
   cells: Rect[];
-  footer: Rect;
 };
 
 /** Columns for a grid of swatches: the most even grid for a Fit image, or
@@ -119,7 +126,7 @@ export function getPaletteImageGeometry({
 }): PaletteImageGeometry {
   const n = Math.max(count, 1);
   const gap = gaps ? GAP : 0;
-  const width = IMAGE_WIDTH;
+  const width = shape === 'fit' ? IMAGE_WIDTH : SHAPE_SIZES[shape].width;
   const contentWidth = width - PADDING * 2;
   const top = PADDING + (hasTitle ? TITLE_HEIGHT : 0);
 
@@ -127,7 +134,7 @@ export function getPaletteImageGeometry({
   let contentHeight: number;
   let columns = 1;
   if (shape !== 'fit') {
-    contentHeight = SHAPE_HEIGHTS[shape] - top - PADDING - FOOTER_HEIGHT;
+    contentHeight = SHAPE_SIZES[shape].height - top - PADDING;
     if (layout === 'swatches')
       columns = getSwatchColumns({
         count: n,
@@ -146,7 +153,7 @@ export function getPaletteImageGeometry({
     contentHeight = rows * size + gap * (rows - 1);
   }
 
-  const height = top + contentHeight + PADDING + FOOTER_HEIGHT;
+  const height = top + contentHeight + PADDING;
   const bounds = {
     x: PADDING,
     y: top,
@@ -194,12 +201,6 @@ export function getPaletteImageGeometry({
       : null,
     bounds,
     cells,
-    footer: {
-      x: PADDING,
-      y: top + contentHeight + PADDING / 2,
-      width: contentWidth,
-      height: FOOTER_HEIGHT,
-    },
   };
 }
 
@@ -234,6 +235,8 @@ export type TextLine = {
   /** The size it would like to be */
   size: number;
   measure: Measure;
+  /** The line's height as a multiple of its size; LINE_HEIGHT by default */
+  lineHeight?: number;
 };
 
 export const LINE_HEIGHT = 1.2;
@@ -249,7 +252,10 @@ export function fitLines({
   width: number;
   height: number;
 }): number[] {
-  const total = lines.reduce((sum, line) => sum + line.size * LINE_HEIGHT, 0);
+  const total = lines.reduce(
+    (sum, line) => sum + line.size * (line.lineHeight ?? LINE_HEIGHT),
+    0,
+  );
   const scale = total > height ? Math.max(height, 0) / total : 1;
   return lines.map((line) =>
     fitFontSize({
