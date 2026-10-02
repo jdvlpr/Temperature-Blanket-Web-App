@@ -1588,10 +1588,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Saved Palettes</h3>
 
             <p>
-              To keep a palette to use again later, press Save Palette under the
-              palette. You can give it a name, or leave the name empty to use
-              its yarn and number of colors. Saved palettes are stored in this
-              browser.
+              To keep a palette to use again later, press Save & Export under
+              the palette, then Save Palette. You can give it a name, or leave
+              the name empty to use its yarn and number of colors. Saved
+              palettes are stored in this browser.
             </p>
             <p>
               To use a saved palette, press Get Colors, then Browse Palettes,
@@ -1630,9 +1630,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To export a color palette as HTML color codes, an image, yarn
-              names, or a link, press Export, then choose a format and press
-              Copy or Download. Share or paste the copied text somewhere you can
-              find it later.
+              names, or a link, press Save & Export, then choose a format and
+              press Copy or Download. Share or paste the copied text somewhere
+              you can find it later.
             </p>
             <p>
               To paste colors into a palette, press Get Colors, then Paste

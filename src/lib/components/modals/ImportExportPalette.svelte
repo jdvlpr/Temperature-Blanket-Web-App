@@ -35,17 +35,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ImageIcon,
     LinkIcon,
   } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   let {
     colors = [],
     updateGauge,
     mode = 'export',
+    exportType = 'main',
   }: {
     colors?: Color[];
     updateGauge?: (update: { _colors: Color[] }) => void;
     /** 'export' shares the current palette; 'import' pastes colors in */
     mode?: 'export' | 'import';
+    /** The export step to open on; 'main' lists them all */
+    exportType?: 'main' | 'image' | 'html' | 'colorway' | 'link';
   } = $props();
 
   let inputValue = $state('');
@@ -68,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isExpanded = $state(false);
 
-  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'colorway', 'link'
+  let selectedExportType = $state(untrack(() => exportType));
 
   let previewImageUrl = $derived(
     mode === 'export' && colors.length

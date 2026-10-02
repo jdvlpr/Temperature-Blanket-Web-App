@@ -18,9 +18,8 @@ test.describe('Saved palettes', () => {
     page,
   }) => {
     // Save with a name
-    await page
-      .getByRole('button', { name: 'Save Palette', exact: true })
-      .click();
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
     let dialog = page.getByRole('dialog');
     await dialog.getByLabel('Name (optional)').fill('Test Sunset');
     await dialog
@@ -30,9 +29,8 @@ test.describe('Saved palettes', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
     // The same palette isn't saved twice
-    await page
-      .getByRole('button', { name: 'Save Palette', exact: true })
-      .click();
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Save Palette', exact: true })
@@ -71,9 +69,9 @@ test.describe('Saved palettes', () => {
   });
 
   test('export a link that opens the palette', async ({ page }) => {
-    await page.getByRole('button', { name: 'Export', exact: true }).click();
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Link/ }).click();
     const dialog = page.getByRole('dialog');
-    await dialog.getByRole('button', { name: /^Link/ }).click();
     const link = dialog.getByText(/\/yarn\?s=/);
     await expect(link).toBeVisible();
 

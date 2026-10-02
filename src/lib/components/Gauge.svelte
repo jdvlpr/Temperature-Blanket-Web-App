@@ -32,8 +32,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     BookmarkPlusIcon,
     ChevronDownIcon,
     CircleCheckIcon,
+    ClipboardCopyIcon,
     ClipboardPasteIcon,
+    CodeIcon,
     ImageIcon,
+    LinkIcon,
     PaletteIcon,
     ShareIcon,
     ShuffleIcon,
@@ -66,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const colorSources = [
     {
       value: 'browse',
-      label: 'Browse Presets',
+      label: 'Browse Palettes',
       details: 'Get inspiration, and your saved palettes',
       icon: SwatchBookIcon,
     },
@@ -109,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               updateGauge,
             },
           },
-          options: { size: 'large', title: 'Browse Presets' },
+          options: { size: 'large', title: 'Browse Palettes' },
         });
         break;
       case 'colorways':
@@ -158,6 +161,68 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
         break;
     }
+  }
+
+  const paletteOutputs = [
+    {
+      value: 'save',
+      label: 'Save Palette',
+      details: 'Keep it to use in any project',
+      icon: BookmarkPlusIcon,
+    },
+    {
+      value: 'link',
+      label: 'Link',
+      details: 'Share it, or paste it into another palette',
+      icon: LinkIcon,
+    },
+    {
+      value: 'html',
+      label: 'HTML Color Codes',
+      details: 'Copy codes for web and design',
+      icon: CodeIcon,
+    },
+    {
+      value: 'image',
+      label: 'Image',
+      details: 'Download a PNG image',
+      icon: ImageIcon,
+    },
+    {
+      value: 'colorway',
+      label: 'Yarn Colorway Names',
+      details: 'Copy colorway names',
+      icon: ClipboardCopyIcon,
+      needsNames: true,
+    },
+  ];
+
+  // Colorway names can only be copied when some colors are yarn colorways
+  let availablePaletteOutputs = $derived(
+    paletteOutputs.filter(
+      (output) =>
+        !output.needsNames || gauge.colors.some((color: Color) => color.name),
+    ),
+  );
+
+  function openPaletteOutput(value: string) {
+    const colors = $state.snapshot(gauge.colors);
+    if (value === 'save') {
+      dialog.trigger({
+        type: 'component',
+        component: { ref: SavePalette, props: { colors } },
+        options: { size: 'medium', title: 'Save Palette' },
+      });
+      return;
+    }
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: ImportExportPalette,
+        props: { colors, mode: 'export', exportType: value },
+      },
+      options: { title: 'Export Palette' },
+    });
   }
 </script>
 
@@ -255,47 +320,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     />
 
-    <button
-      class={toolbarButtonClass}
-      title="Export as Color Codes, an Image, Yarn Names, or a Link"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: ImportExportPalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-              mode: 'export',
-            },
-          },
-          options: { title: 'Export Palette' },
-        })}
+    <Menu
+      positioning={{ placement: 'bottom-start' }}
+      onSelect={(details) => openPaletteOutput(details.value)}
     >
-      <ShareIcon />
-      Export
-    </button>
-
-    <button
-      class={toolbarButtonClass}
-      title="Save This Palette to Use Again Later"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: SavePalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-            },
-          },
-          options: {
-            size: 'medium',
-            title: 'Save Palette',
-          },
-        })}
-    >
-      <BookmarkPlusIcon />
       <!-- Not just "Save": the Project Planner's top bar has a Save for the project -->
-      Save Palette
-    </button>
+      <Menu.Trigger
+        class={toolbarButtonClass}
+        title="Save This Palette, or Export It as a Link, Color Codes, an Image, or Yarn Names"
+      >
+        <ShareIcon />
+        <span class="flex items-center gap-1"
+          >Save & Export <ChevronDownIcon size={18} /></span
+        >
+      </Menu.Trigger>
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content
+            class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
+          >
+            {#each availablePaletteOutputs as output, index (output.value)}
+              <!-- Saving keeps it here; the rest take it elsewhere -->
+              {#if index === 1}
+                <Menu.Separator />
+              {/if}
+              <Menu.Item
+                value={output.value}
+                class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
+              >
+                <output.icon class="shrink-0" />
+                <div class="flex min-w-0 flex-col text-left">
+                  <p>{output.label}</p>
+                  <p class="text-surface-700-300 text-xs">
+                    {output.details}
+                  </p>
+                </div>
+              </Menu.Item>
+            {/each}
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu>
   </div>
 </div>

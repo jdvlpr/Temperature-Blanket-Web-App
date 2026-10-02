@@ -29,6 +29,24 @@ test.describe('Palette toolbar', () => {
     }
   });
 
+  test('Save & Export lists saving and every export', async ({ page }) => {
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    for (const name of ['Save Palette', 'Link', 'HTML Color Codes', 'Image']) {
+      await expect(
+        page.getByRole('menuitem', { name: new RegExp(`^${name}`) }),
+      ).toBeVisible();
+    }
+
+    // Each export opens on its own step, not the list of exports
+    await page.getByRole('menuitem', { name: /^HTML Color Codes/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(
+      dialog.getByRole('button', { name: 'Copy HTML Color Codes' }),
+    ).toBeVisible();
+    await dialog.getByRole('button', { name: 'All Export Options' }).click();
+    await expect(dialog.getByRole('button', { name: /^Image/ })).toBeVisible();
+  });
+
   test('paste colors into the palette', async ({ page }) => {
     await page.getByRole('button', { name: 'Get Colors' }).click();
     await page.getByRole('menuitem', { name: /Paste Colors or Code/ }).click();
@@ -46,11 +64,8 @@ test.describe('Palette toolbar', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
     // The pasted colors are now the palette
-    await page.getByRole('button', { name: 'Export', exact: true }).click();
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: /^Link/ })
-      .click();
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Link/ }).click();
     await expect(
       page.getByRole('dialog').getByText(/\/yarn\?s=ff0000ffa5000000ff/),
     ).toBeVisible();
