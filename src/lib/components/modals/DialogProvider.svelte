@@ -28,7 +28,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // A titled dialog, or one opened from another, has a header bar
   const hasHeader = $derived(
-    Boolean(dialog.options.title) || dialog.stack.length > 0,
+    Boolean(dialog.options.title) ||
+      dialog.stack.length > 0 ||
+      Boolean(dialog.backAction),
   );
 
   // Moving between views of a dialog: a short slide, forward from the right
@@ -73,12 +75,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           'bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto max-sm:min-w-screen',
           side
             ? 'h-dvh w-full translate-x-full opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 sm:w-md starting:data-[state=open]:translate-x-full starting:data-[state=open]:opacity-0'
-            : 'card shadow-xl lg:max-h-[80svh]',
-          dialog.options.size === 'large'
-            ? 'max-w-(--breakpoint-lg)'
-            : dialog.options.size === 'medium'
-              ? 'max-w-(--breakpoint-md)'
-              : 'max-w-(--breakpoint-sm)',
+            : [
+                'card shadow-xl',
+                dialog.options.size === 'xlarge'
+                  ? 'w-full lg:max-h-[92svh]'
+                  : 'lg:max-h-[80svh]',
+              ],
+          dialog.options.size === 'xlarge'
+            ? 'max-w-(--breakpoint-xl)'
+            : dialog.options.size === 'large'
+              ? 'max-w-(--breakpoint-lg)'
+              : dialog.options.size === 'medium'
+                ? 'max-w-(--breakpoint-md)'
+                : 'max-w-(--breakpoint-sm)',
         ]}
       >
         {#snippet element(attributes)}
@@ -94,14 +103,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <header
                     class="bg-surface-50 dark:bg-surface-950 sticky top-0 z-10 mb-0 flex min-h-14 items-center gap-1 px-2 py-2"
                   >
-                    {#if dialog.stack.length}
+                    {#if dialog.stack.length || dialog.backAction}
                       <button
                         type="button"
                         class="btn-icon hover:preset-tonal-surface"
                         aria-label="Back"
                         title="Back"
                         data-dialog-back
-                        onclick={dialog.back}
+                        onclick={() =>
+                          dialog.backAction
+                            ? dialog.backAction()
+                            : dialog.back()}
                         in:fade={{ duration: reduceMotion ? 0 : 150 }}
                       >
                         <ArrowLeftIcon />

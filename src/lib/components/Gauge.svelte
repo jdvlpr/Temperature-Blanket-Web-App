@@ -145,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               updateGauge,
             },
           },
-          options: { size: 'large' },
+          options: { size: 'medium', title: 'Get Colors from an Image' },
         });
         break;
       case 'random':

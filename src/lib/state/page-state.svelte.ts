@@ -27,7 +27,9 @@ import { tick } from 'svelte';
 
 type DialogOptions = {
   showCloseButton?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  /** `xlarge`: wide and tall on large screens, for work like the image
+   * color picker */
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
   /** `side`: a panel on the right on large screens, as the Project menu */
   placement?: 'center' | 'side';
   /** Dialogs opened from this one open in its place, with a Back button to it */
@@ -77,6 +79,10 @@ class DialogClass {
   /** The returnable dialogs this one was opened from, for its Back button */
   stack = $state<DialogView[]>([]);
 
+  /** Set by a dialog with steps of its own to show the header's Back button
+   * for them. Cleared whenever another dialog opens. */
+  backAction = $state<(() => void) | null>(null);
+
   /** Which way the last change of view went, for its slide */
   direction = $state<'forward' | 'back' | 'none'>('none');
 
@@ -116,6 +122,7 @@ class DialogClass {
     } else {
       this.stack = [];
     }
+    this.backAction = null;
     this.direction = fromReturnable ? 'forward' : 'none';
 
     // Every dialog starts from the defaults, so nothing carries over from

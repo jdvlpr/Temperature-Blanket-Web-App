@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import { scale } from 'svelte/transition';
+  import { untrack } from 'svelte';
 
   interface Props {
     colors?: Color[];
@@ -49,6 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isStaticGauge?: boolean;
     onchanged?: any;
     fullscreen?: boolean;
+    /** A color to outline, as when its marker is hovered on an image */
+    highlightIndex?: number | null;
+    /** Called with a color's index when it's hovered, and null after */
+    onhover?: (index: number | null) => void;
   }
 
   let {
@@ -61,11 +66,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isStaticGauge = false,
     onchanged = null,
     fullscreen = $bindable(),
+    highlightIndex = null,
+    onhover,
   }: Props = $props();
 
   const flipDurationMs = 150;
 
   let sortableColors = $state(getSortableColors());
+
+  // Follow colors the parent replaces, except mid-drag
+  $effect(() => {
+    void colors;
+    untrack(() => {
+      if (!isDragging.value) sortableColors = getSortableColors();
+    });
+  });
 
   let uuid = $props.id();
 
@@ -165,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isDragging.value = false;
     }
 
-    if (onchanged) onchanged();
+    if (onchanged) onchanged($state.snapshot(colors));
   }
   function startDrag(e: MouseEvent | TouchEvent) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
@@ -246,6 +261,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-pressed={popover.isOpen()}
         {...popover.reference()}
         role="button"
+        onpointerenter={() => onhover?.(index)}
+        onpointerleave={() => onhover?.(null)}
       >
         <div
           class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
@@ -253,7 +270,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             : 'h-[70px]'}"
           style="background:{hex ?? '#ffffff'};color:{getTextColor(
             hex ?? '#ffffff',
-          )}"
+          )};{highlightIndex === index
+            ? `box-shadow: inset 0 0 0 4px ${getTextColor(hex ?? '#ffffff')}`
+            : ''}"
           title={brandName && yarnName && name
             ? `${brandName} - ${yarnName}: ${name}`
             : (hex ?? '#ffffff')}
@@ -288,7 +307,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   colors = colors.filter((_, i) => i !== index);
 
                   sortableColors = getSortableColors();
-                  if (onchanged) onchanged();
+                  if (onchanged) onchanged($state.snapshot(colors));
                 }}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -296,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     colors = colors.filter((_, i) => i !== index);
 
                     sortableColors = getSortableColors();
-                    if (onchanged) onchanged();
+                    if (onchanged) onchanged($state.snapshot(colors));
                   }
                 }}
                 class="btn hover:preset-tonal-surface h-auto gap-1"

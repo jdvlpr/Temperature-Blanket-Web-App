@@ -54,6 +54,10 @@ export type PalettePoint = {
 };
 
 export type PaletteMode = 'yarn' | 'exact';
+export type PhotoSource = 'random' | 'file';
+
+/** A palette color as the palette component shows it */
+export type PaletteColor = Color & { pointId: number; locked: boolean };
 export type PickTool = 'points' | 'line';
 
 // Large photos are drawn at most this many pixels wide or tall
@@ -61,6 +65,8 @@ const MAX_IMAGE_DIMENSION = 1200;
 
 type Session = {
   pixels: ImageData;
+  thumbnail: string;
+  source: PhotoSource;
   points: PalettePoint[];
   mode: PaletteMode;
   style: PaletteStyle;
@@ -83,7 +89,7 @@ export class ImagePaletteState {
   showYarnPreview = $state(false);
   selectedId = $state<number | null>(null);
   hoveredId = $state<number | null>(null);
-  loading = $state(true);
+  loading = $state(false);
   working = $state(false);
   yarnReady = $state(false);
   errorMessage = $state<string | null>(null);
@@ -94,6 +100,10 @@ export class ImagePaletteState {
   selectedYarnWeightId = $state<string | undefined>();
   /** The photo, downscaled. Replaced (not mutated) so the canvas redraws. */
   pixels = $state.raw<ImageData | null>(null);
+  /** A small preview of the photo, for continuing with it later */
+  thumbnail = $state<string | null>(session?.thumbnail ?? null);
+  /** Where the photo came from, so a random one can be swapped for another */
+  source = $state<PhotoSource | null>(null);
   /** The photo redrawn in the palette's colors */
   previewPixels = $state.raw<ImageData | null>(null);
 
@@ -144,11 +154,19 @@ export class ImagePaletteState {
     if (this.#destroyed) return;
     this.yarnReady = true;
     this.#resolveReady();
+  }
 
-    // An image may already have been chosen while loading
-    if (this.#loadId > 0) return;
+  /** Whether there's a photo to continue with, from now or an earlier visit */
+  get canContinue() {
+    return !!this.pixels || !!session;
+  }
+
+  /** Go back to the last photo and palette */
+  async continueSaved() {
+    if (this.pixels || !session) return;
+    this.loading = true;
+    await this.#ready;
     if (session) await this.#restore(session);
-    else await this.randomImage();
   }
 
   /** Keep the photo and palette for next time, and stop the worker */
@@ -158,6 +176,8 @@ export class ImagePaletteState {
     if (this.pixels)
       session = {
         pixels: this.pixels,
+        thumbnail: this.thumbnail ?? '',
+        source: this.source ?? 'file',
         points: $state.snapshot(this.points),
         mode: this.mode,
         style: this.style,
@@ -186,6 +206,31 @@ export class ImagePaletteState {
     });
   }
 
+  /** The palette for the palette component, which reports changes back
+   * through `syncFromColors` */
+  paletteColors(): PaletteColor[] {
+    const colors = this.toColors();
+    return this.points.map((point, i) => ({
+      ...colors[i],
+      pointId: point.id,
+      locked: point.locked,
+    }));
+  }
+
+  /** Apply reordering, deleting, and locking done in the palette component */
+  syncFromColors(colors: Partial<PaletteColor>[]) {
+    const byId = new Map(this.points.map((point) => [point.id, point]));
+    const points: PalettePoint[] = [];
+    for (const color of colors) {
+      const point = byId.get(color.pointId ?? -1);
+      if (!point) continue;
+      point.locked = !!color.locked;
+      points.push(point);
+    }
+    this.#setPoints(points);
+    this.targetCount = points.length;
+  }
+
   /** The closest yarn (or exact color) at a spot, for the hover label */
   colorAt(
     x: number,
@@ -208,6 +253,7 @@ export class ImagePaletteState {
   // Images
 
   randomImage() {
+    this.source = 'random';
     return this.loadImage(
       `https://picsum.photos/720/480?random=${Date.now()}`,
       "Couldn't load a random image. Check your connection and try again.",
@@ -223,6 +269,7 @@ export class ImagePaletteState {
         "That file isn't an image. Try a JPG, PNG, or WebP file.";
       return;
     }
+    this.source = 'file';
     const url = URL.createObjectURL(file);
     await this.loadImage(
       url,
@@ -271,6 +318,7 @@ export class ImagePaletteState {
     await this.#engine!.setImage({ data: pixels.data, width, height });
     if (id !== this.#loadId || this.#destroyed) return;
     this.pixels = pixels;
+    this.thumbnail = makeThumbnail(canvas);
     this.previewPixels = null;
     this.line = null;
 
@@ -302,6 +350,8 @@ export class ImagePaletteState {
     });
     if (this.#destroyed) return;
     this.pixels = saved.pixels;
+    this.thumbnail = saved.thumbnail;
+    this.source = saved.source;
     this.points = saved.points;
     this.#nextId = Math.max(0, ...saved.points.map((point) => point.id)) + 1;
     this.#loadId++;
@@ -450,7 +500,7 @@ export class ImagePaletteState {
     });
     this.#setPoints([...this.points, point]);
     this.targetCount = this.points.length;
-    this.selectedId = point.id;
+    this.line = null;
     return point.id;
   }
 
@@ -687,4 +737,13 @@ export class ImagePaletteState {
         );
     }, 120);
   }
+}
+
+function makeThumbnail(source: HTMLCanvasElement): string {
+  const scale = Math.min(1, 240 / Math.max(source.width, source.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(source.width * scale));
+  canvas.height = Math.max(1, Math.round(source.height * scale));
+  canvas.getContext('2d')?.drawImage(source, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', 0.8);
 }
