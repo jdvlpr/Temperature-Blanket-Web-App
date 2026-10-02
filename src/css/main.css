@@ -131,12 +131,12 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
    layer, so a border utility on a card still wins. */
 @utility card-border {
   border-width: 1px;
-  border-color: var(--color-surface-300-700);
+  border-color: var(--color-surface-200-800);
 }
 @layer components {
   .card {
     border-width: 1px;
-    border-color: var(--color-surface-300-700);
+    border-color: var(--color-surface-200-800);
   }
 }
 @media (prefers-contrast: more) {
