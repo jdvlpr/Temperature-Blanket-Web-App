@@ -5,7 +5,6 @@ control for light/dark, and a card of switches. -->
 
 <script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import {
     HEADING_STYLE,
@@ -15,7 +14,6 @@ control for light/dark, and a card of switches. -->
     TEXT_SCALE,
     THEMES,
   } from '$lib/constants/page-constants';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import {
     canVibrate,
@@ -249,7 +247,6 @@ current choice's icon beside it -->
   <div
     class="bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-2 sm:px-4"
   >
-    <CloseButton onClose={dialog.close} text="Close" />
     <button class="btn hover:preset-tonal-surface" onclick={resetAll}>
       <RotateCcwIcon />
       Reset to Defaults

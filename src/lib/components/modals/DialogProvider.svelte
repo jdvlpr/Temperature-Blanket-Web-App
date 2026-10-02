@@ -453,7 +453,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if grabbable}
                     <div
                       aria-hidden="true"
-                      class="flex h-4 items-end justify-center"
+                      class={[
+                        'flex justify-center pt-2.5',
+                        // Space below it when no header follows (a confirm
+                        // has its own)
+                        dialog.type === 'component' && !hasHeader && 'pb-2',
+                      ]}
                     >
                       <div
                         class="bg-surface-950-50/25 h-1 w-9 rounded-full"

@@ -20,7 +20,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import {
     DEFAULT_PALETTE_IMAGE_SETTINGS,
@@ -32,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     loadPaletteImageFonts,
     renderPaletteImage,
   } from '$lib/features/palette-image/render';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import {
@@ -418,7 +417,6 @@ choice's icon beside it, and what it's for below -->
     <div
       class="bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-2 sm:px-4"
     >
-      <CloseButton onClose={dialog.close} text="Close" />
       {#if canCopy}
         <button
           class="btn hover:preset-tonal-surface"
