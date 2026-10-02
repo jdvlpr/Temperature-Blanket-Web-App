@@ -228,6 +228,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       centreDraggedOnCursor: true,
       dropFromOthersDisabled: true,
       transformDraggedElement,
+      // Colors are tab stops of their own; the palette is one only while
+      // dragging with the keyboard
+      zoneTabIndex: -1,
     }}
     onconsider={handleConsider}
     onfinalize={handleFinalize}
@@ -257,17 +260,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : ''}"
         animate:flip={{ duration: flipDurationMs }}
         id="palette-item-description-{uuid}-{index}"
-        aria-haspopup="dialog"
-        aria-expanded={popover.isOpen()}
-        aria-label="Color {index + 1}: {name || hex}"
-        aria-pressed={popover.isOpen()}
         {...popover.reference()}
-        role="button"
         onpointerenter={() => onhover?.(index)}
         onpointerleave={() => onhover?.(null)}
       >
         <div
-          class="flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] {fullscreen
+          role="button"
+          tabindex="0"
+          aria-haspopup="dialog"
+          aria-expanded={popover.isOpen()}
+          aria-label="Color {index + 1}: {name || hex}"
+          onkeydown={(e) => {
+            // Focus opens the color's details; Enter or Space toggles them
+            if (
+              e.key === 'Enter' ||
+              e.key === ' ' ||
+              (e.key === 'Escape' && popover.isOpen())
+            ) {
+              e.preventDefault();
+              // Escape closes these details, not a dialog around them
+              e.stopPropagation();
+              e.currentTarget.click();
+            }
+          }}
+          class="flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current {fullscreen
             ? 'h-full'
             : 'h-[70px]'}"
           style="background:{hex ?? '#ffffff'};color:{getTextColor(
