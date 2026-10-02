@@ -64,13 +64,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     shuffleColorsWithSeed,
   } from '$lib/utils/color-utils';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { Flash } from '$lib/utils/feedback.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowDownWideNarrowIcon,
     ChevronDownIcon,
     CircleQuestionMarkIcon,
-    CheckIcon,
     ClipboardCheckIcon,
     ExternalLinkIcon,
     PlusIcon,
@@ -98,9 +96,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loadingAllColors = $state(false);
 
   let layout = $state('grid');
-
-  // The colorway name or hex code just copied, which shows a check for a moment
-  const copied = new Flash();
 
   let accordionState: string[] = $state([]);
 
@@ -661,11 +656,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable } ((hex ?? '') + (name ?? '') + (brandName ?? '') + (yarnName ?? ''))}
                   {@const percentMatch = Math.floor(100 - Number(delta))}
-                  {@const key =
-                    (hex ?? '') +
-                    (name ?? '') +
-                    (brandName ?? '') +
-                    (yarnName ?? '')}
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
@@ -676,22 +666,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     style="background:{hex}; color:{getTextColor(
                       hex ?? '#ffffff',
                     )};"
-                    onclick={async () => {
-                      const ok = await copyToClipboard(name ?? '', {
+                    onclick={() =>
+                      copyToClipboard(name ?? '', {
                         message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
                         icon: ClipboardCheckIcon,
-                      });
-                      if (ok) copied.trigger(`name-${key}`);
-                    }}
+                      })}
                     title="Copy {name} to clipboard"
                   >
-                    {#if copied.is(`name-${key}`)}
-                      <CheckIcon
-                        class="feedback-pop absolute top-2 right-2 size-5"
-                        style="--pop-scale: 1.3"
-                        aria-hidden="true"
-                      />
-                    {/if}
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
                     <div class="min-h-[43px] min-w-[43px]">
                       {#if !unavailable}
@@ -746,19 +727,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         class="text-xs select-all hover:opacity-80"
                         aria-label="Copy {hex} to clipboard"
                         title="Copy {hex} to clipboard"
-                        onclick={async (e) => {
+                        onclick={(e) => {
                           e.stopPropagation();
-                          const ok = await copyToClipboard(hex ?? '', {
+                          copyToClipboard(hex ?? '', {
                             message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
                             icon: ClipboardCheckIcon,
                           });
-                          if (ok) copied.trigger(`hex-${key}`);
-                        }}
-                        >{hex}{#if copied.is(`hex-${key}`)}<CheckIcon
-                            class="feedback-pop ml-1 inline size-3.5 align-[-2px]"
-                            style="--pop-scale: 1.3"
-                            aria-hidden="true"
-                          />{/if}</span
+                        }}>{hex}</span
                       >
                     </div>
                   </div>
