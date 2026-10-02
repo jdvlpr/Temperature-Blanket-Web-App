@@ -23,7 +23,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
   import ImagePaletteCanvas from '$lib/features/image-palette/ImagePaletteCanvas.svelte';
-  import { ImagePaletteState } from '$lib/features/image-palette/image-palette-state.svelte';
+  import {
+    ImagePaletteState,
+    type SortOrder,
+  } from '$lib/features/image-palette/image-palette-state.svelte';
   import {
     PALETTE_STYLES,
     type PaletteStyle,
@@ -32,16 +35,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
   import {
+    ArrowDownWideNarrowIcon,
     ArrowLeftRightIcon,
     ChevronRightIcon,
     EyeIcon,
     ImagePlusIcon,
-    MousePointerClickIcon,
+    Icon,
+    PipetteIcon,
     ShuffleIcon,
-    SplineIcon,
     Trash2Icon,
     WandSparklesIcon,
     XIcon,
+    type LucideIconNode,
   } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, untrack } from 'svelte';
@@ -62,6 +67,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     () => new ImagePaletteState({ numberOfColors, warmFirst }),
   );
 
+  // A straight line with dots at its ends: Lucide's Spline icon, unbent
+  const LINE_ICON: LucideIconNode[] = [
+    ['circle', { cx: '19', cy: '5', r: '2' }],
+    ['circle', { cx: '5', cy: '19', r: '2' }],
+    ['path', { d: 'M6.5 17.5 17.5 6.5' }],
+  ];
+
   const STYLE_LABELS: Record<PaletteStyle, string> = {
     balanced: 'Balanced',
     vivid: 'Vivid',
@@ -76,6 +88,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let draggingFile = $state(false);
 
   let paletteColors = $derived(palette.paletteColors());
+  let allColorsHaveNames = $derived(
+    paletteColors.length > 0 && paletteColors.every((color) => color.name),
+  );
   let highlightIndex = $derived(
     palette.points.findIndex((point) => point.id === palette.hoveredId),
   );
@@ -271,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value={palette.tool}
               onValueChange={(e) => {
                 if (e.value === 'points' || e.value === 'line')
-                  palette.tool = e.value;
+                  palette.setTool(e.value);
               }}
             >
               <SegmentedControl.Control
@@ -280,13 +295,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <SegmentedControl.Indicator />
                 <SegmentedControl.Item value="points">
                   <SegmentedControl.ItemText class="flex items-center gap-1"
-                    ><MousePointerClickIcon class="size-4" /> Pick Colors</SegmentedControl.ItemText
+                    ><PipetteIcon class="size-4" /> Pick Colors</SegmentedControl.ItemText
                   >
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
                 <SegmentedControl.Item value="line">
                   <SegmentedControl.ItemText class="flex items-center gap-1"
-                    ><SplineIcon class="size-4" /> Draw a Line</SegmentedControl.ItemText
+                    ><Icon iconNode={LINE_ICON} class="size-4" /> Draw a Line</SegmentedControl.ItemText
                   >
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
@@ -311,13 +326,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     ? 'preset-tonal-primary'
                     : 'hover:preset-tonal-surface',
                 ]}
-                title="Show the photo in only the palette's colors"
+                title="See the photo in only your palette's colors"
                 aria-pressed={palette.showYarnPreview}
                 disabled={palette.loading}
                 onclick={() => palette.setYarnPreview(!palette.showYarnPreview)}
               >
                 <EyeIcon />
-                Preview
+                Palette View
               </button>
             </div>
           </div>
@@ -327,9 +342,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
 
           <p class="text-surface-700-300 text-center text-xs">
-            {#if palette.tool === 'line'}
+            {#if palette.showYarnPreview}
+              Palette View shows the photo in only your palette's colors, as it
+              might look worked in yarn. Areas that look wrong could use another
+              color.
+            {:else if palette.tool === 'line'}
               Drag across the photo, like along a sunset or shoreline, for
-              colors evenly spaced along the line.
+              colors evenly spaced along the line. Drag either end to adjust it.
             {:else}
               Click or tap to add a color. Drag a color to adjust it, or tap it
               for details.
@@ -386,11 +405,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <button
                   class={[
                     'btn btn-sm',
-                    palette.style === style
+                    palette.autoStyle === style
                       ? 'preset-filled-primary-500'
                       : 'preset-outlined-surface-300-700 hover:preset-tonal-surface',
                   ]}
-                  aria-pressed={palette.style === style}
+                  aria-pressed={palette.autoStyle === style}
                   disabled={palette.loading || palette.working}
                   onclick={() => palette.setStyle(style)}
                 >
@@ -399,8 +418,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/each}
             </div>
             <p class="text-surface-700-300 text-xs">
-              Picks the colors that best capture the photo. Choose a style again
-              to start over, keeping locked colors.
+              Choose a style to pick the colors that best capture the photo.
+              Locked colors stay.
             </p>
           </div>
 
@@ -485,22 +504,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="flex flex-wrap items-center justify-center gap-1 sm:justify-between"
           >
             <div class="flex flex-wrap items-center justify-center gap-1">
+              <!-- The same sorting as the Sort Colors dialog, plus a gradient -->
+              <div class="relative flex items-center">
+                <ArrowDownWideNarrowIcon
+                  class="pointer-events-none absolute left-2"
+                />
+                <select
+                  class="select truncate pl-10"
+                  aria-label="Sort By"
+                  title="Sort By"
+                  disabled={palette.points.length < 2}
+                  value={palette.sortOrder}
+                  onchange={(e) =>
+                    palette.sortBy(e.currentTarget.value as SortOrder)}
+                >
+                  <option value="custom">Custom</option>
+                  <option value="gradient">Smooth Gradient</option>
+                  <option value="light-to-dark">Lightest to Darkest</option>
+                  <option value="dark-to-light">Darkest to Lightest</option>
+                  {#if allColorsHaveNames}
+                    <option value="name">Name A-Z</option>
+                    <option value="name-z-to-a">Name Z-A</option>
+                  {/if}
+                </select>
+              </div>
               <button
                 class="btn hover:preset-tonal-surface"
-                title="Order the colors so each flows into the next"
-                disabled={palette.points.length < 3}
-                onclick={() => palette.sortAsGradient()}
-              >
-                <SplineIcon />
-                Sort as Gradient
-              </button>
-              <button
-                class="btn hover:preset-tonal-surface"
+                title="Reverse Colors' Positions"
                 disabled={palette.points.length < 2}
                 onclick={() => palette.reverse()}
               >
-                <ArrowLeftRightIcon />
                 Reverse
+                <ArrowLeftRightIcon />
               </button>
               <button
                 class="btn hover:preset-tonal-surface"

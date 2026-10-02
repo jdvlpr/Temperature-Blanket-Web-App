@@ -42,7 +42,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * the photo (px, py), and in pixels on screen (cx, cy) */
   type Pointer = Point & { px: number; py: number; cx: number; cy: number };
   type Drag =
-    | { kind: 'point'; id: number; moved: boolean }
+    | {
+        kind: 'point';
+        id: number;
+        moved: boolean;
+        /** Where the drag started on screen, to tell a tap from a drag */
+        startX: number;
+        startY: number;
+      }
     | { kind: 'line'; from: Point; to: Point };
 
   // On large screens the photo fills the space it's given; on small ones it
@@ -208,7 +215,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     const id = palette.addPoint(at.x, at.y);
     palette.selectedId = null;
-    if (id !== null) startDrag(e, { kind: 'point', id, moved: true });
+    if (id !== null)
+      startDrag(e, {
+        kind: 'point',
+        id,
+        moved: true,
+        startX: e.clientX,
+        startY: e.clientY,
+      });
   }
 
   function onMarkerDown(e: PointerEvent, point: PalettePoint) {
@@ -219,7 +233,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       palette.selectedId = point.id;
       return;
     }
-    startDrag(e, { kind: 'point', id: point.id, moved: false });
+    startDrag(e, {
+      kind: 'point',
+      id: point.id,
+      moved: false,
+      startX: e.clientX,
+      startY: e.clientY,
+    });
   }
 
   function onMove(e: PointerEvent) {
@@ -247,7 +267,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  function onUp() {
+  function onUp(e: PointerEvent) {
+    // Apply where the pointer ended up now: a quick drag can end before the
+    // next animation frame would have moved anything
+    if (drag && e.type === 'pointerup') {
+      cancelAnimationFrame(frameRequest);
+      frameRequest = 0;
+      queued = null;
+      const at = toPointer(e);
+      if (drag.kind === 'line') {
+        drag.to = { x: at.x, y: at.y };
+      } else if (
+        drag.moved ||
+        Math.hypot(at.cx - drag.startX, at.cy - drag.startY) > 4
+      ) {
+        drag.moved = true;
+        palette.movePoint(drag.id, at.x, at.y);
+      }
+    }
     if (drag?.kind === 'line') {
       const { from, to } = drag;
       // Ignore taps: a line needs some length
@@ -256,6 +293,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else if (drag?.kind === 'point' && !drag.moved) {
       // A marker tapped without dragging: show its details
       palette.selectedId = drag.id;
+    } else if (drag?.kind === 'point') {
+      palette.finishMove(drag.id);
     }
     drag = null;
     pointer = null;
@@ -388,11 +427,20 @@ make the magnifier's fixed position relative to the photo, not the screen -->
         {@const color = palette.colorOf(point)}
         {@const raised =
           palette.selectedId === point.id || palette.hoveredId === point.id}
+        {@const lineEnd =
+          !!palette.line &&
+          (palette.line.pointIds[0] === point.id ||
+            palette.line.pointIds.at(-1) === point.id)}
         <button
           type="button"
           class={[
             'absolute z-10 flex size-6 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full border-[3px] border-white shadow-[0_0_0_1px_rgb(0_0_0/0.35),0_2px_8px_rgb(0_0_0/0.45)] transition-transform duration-150',
             raised && 'z-20 scale-[1.35]',
+            // A line's ends are handles for moving it
+            lineEnd && 'outline-2 outline-offset-2 outline-white/80',
+            // Drawing lines: only a line's ends can be grabbed, so a new
+            // line can start anywhere, even over another color
+            palette.tool === 'line' && !lineEnd && 'pointer-events-none',
             point.locked ? 'cursor-pointer' : 'cursor-grab',
           ]}
           style="left:{point.x * 100}%;top:{point.y *

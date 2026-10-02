@@ -17,6 +17,7 @@ import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-const
 import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
 import { defaultYarn } from '$lib/state/page-state.svelte';
 import type { Color } from '$lib/types/yarn-types';
+import { getSortedPalette } from '$lib/utils/color-utils';
 import {
   getColorways,
   stringToBrandAndYarnDetails,
@@ -60,6 +61,18 @@ export type PhotoSource = 'random' | 'file';
 export type PaletteColor = Color & { pointId: number; locked: boolean };
 export type PickTool = 'points' | 'line';
 
+/** The palette's order: the site's usual sorts, plus a smooth gradient */
+export type SortOrder =
+  | 'custom'
+  | 'gradient'
+  | 'light-to-dark'
+  | 'dark-to-light'
+  | 'name'
+  | 'name-z-to-a';
+
+/** A line drawn across the photo, and the colors spaced along it, in order */
+export type PaletteLine = { from: Point; to: Point; pointIds: number[] };
+
 // Large photos are drawn at most this many pixels wide or tall
 const MAX_IMAGE_DIMENSION = 1200;
 
@@ -70,7 +83,9 @@ type Session = {
   points: PalettePoint[];
   mode: PaletteMode;
   style: PaletteStyle;
-  line: { from: Point; to: Point } | null;
+  autoStyle: PaletteStyle | null;
+  sortOrder: SortOrder;
+  line: PaletteLine | null;
   brandId?: string;
   yarnId?: string;
   yarnWeightId?: string;
@@ -84,8 +99,11 @@ export class ImagePaletteState {
   points = $state<PalettePoint[]>([]);
   mode = $state<PaletteMode>('yarn');
   style = $state<PaletteStyle>('balanced');
+  /** The Auto Palette style the colors came from, until they're edited */
+  autoStyle = $state<PaletteStyle | null>(null);
+  sortOrder = $state<SortOrder>('custom');
   tool = $state<PickTool>('points');
-  line = $state<{ from: Point; to: Point } | null>(null);
+  line = $state<PaletteLine | null>(null);
   showYarnPreview = $state(false);
   selectedId = $state<number | null>(null);
   hoveredId = $state<number | null>(null);
@@ -181,6 +199,8 @@ export class ImagePaletteState {
         points: $state.snapshot(this.points),
         mode: this.mode,
         style: this.style,
+        autoStyle: this.autoStyle,
+        sortOrder: this.sortOrder,
         line: $state.snapshot(this.line),
         brandId: this.selectedBrandId,
         yarnId: this.selectedYarnId,
@@ -227,6 +247,10 @@ export class ImagePaletteState {
       point.locked = !!color.locked;
       points.push(point);
     }
+    const remaining = this.points.filter((point) => points.includes(point));
+    if (points.length < this.points.length) this.autoStyle = null;
+    if (points.some((point, i) => point !== remaining[i]))
+      this.sortOrder = 'custom';
     this.#setPoints(points);
     this.targetCount = points.length;
   }
@@ -338,6 +362,8 @@ export class ImagePaletteState {
   async #restore(saved: Session) {
     this.mode = saved.mode;
     this.style = saved.style;
+    this.autoStyle = saved.autoStyle;
+    this.sortOrder = saved.sortOrder;
     this.line = saved.line;
     this.selectedBrandId = saved.brandId;
     this.selectedYarnId = saved.yarnId;
@@ -385,6 +411,8 @@ export class ImagePaletteState {
     this.working = false;
     if (!result) return;
     this.#setPoints(this.#sorted([...locked, ...result.points]));
+    this.autoStyle = this.style;
+    this.sortOrder = 'gradient';
     this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
   }
@@ -420,6 +448,7 @@ export class ImagePaletteState {
       );
       points.splice(at, 0, point);
     }
+    if (this.sortOrder !== 'gradient') this.sortOrder = 'custom';
     this.#setPoints(points);
     this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
@@ -501,15 +530,31 @@ export class ImagePaletteState {
     this.#setPoints([...this.points, point]);
     this.targetCount = this.points.length;
     this.line = null;
+    this.#edited();
+    this.sortOrder = 'custom';
     return point.id;
   }
 
-  /** Move a color's point, picking up the image's color there */
+  /**
+   * Move a color's point, picking up the image's color there. Dragging the
+   * first or last color on a line moves that end of the line instead; any
+   * other color on it leaves the line.
+   */
   movePoint(id: number, x: number, y: number) {
     const point = this.points.find((n) => n.id === id);
     if (!point || point.locked) return;
     x = Math.min(Math.max(x, 0), 1);
     y = Math.min(Math.max(y, 0), 1);
+    this.#edited();
+    if (this.line) {
+      const ids = this.line.pointIds;
+      const at = ids.indexOf(id);
+      if (at === 0 || at === ids.length - 1) {
+        this.#moveLineEnd(at === 0 ? 'from' : 'to', { x, y });
+        return;
+      }
+      if (at !== -1) this.line = null;
+    }
     const sourceHex = this.#sample(x, y);
     if (!sourceHex) return;
     point.x = x;
@@ -523,9 +568,32 @@ export class ImagePaletteState {
     this.#schedulePreview();
   }
 
+  /** A drag finished: settle the colors along a line that was adjusted */
+  finishMove(id: number) {
+    if (!this.line?.pointIds.includes(id)) return;
+    const others = this.points.filter(
+      (n) => !this.line!.pointIds.includes(n.id),
+    );
+    const used = [...others];
+    for (const lineId of this.line.pointIds) {
+      const point = this.points.find((n) => n.id === lineId);
+      if (!point || point.locked) continue;
+      point.yarn = this.#match(point.sourceHex, used);
+      used.push(point);
+    }
+    this.#schedulePreview();
+  }
+
+  setTool(tool: PickTool) {
+    this.tool = tool;
+    // Picking colors one by one again: the line no longer applies
+    if (tool === 'points') this.line = null;
+  }
+
   removePoint(id: number) {
     const point = this.points.find((n) => n.id === id);
     if (!point) return;
+    this.#edited();
     this.#setPoints(this.points.filter((n) => n.id !== id));
     this.targetCount = this.points.length;
     if (this.selectedId === id) this.selectedId = null;
@@ -533,6 +601,7 @@ export class ImagePaletteState {
 
   /** Remove every unlocked color */
   clear() {
+    this.#edited();
     this.#setPoints(this.points.filter((point) => point.locked));
     this.targetCount = this.points.length;
     this.selectedId = null;
@@ -548,6 +617,7 @@ export class ImagePaletteState {
   setYarn(id: number, colorway: MatchedColor) {
     const point = this.points.find((n) => n.id === id);
     if (!point) return;
+    this.#edited();
     point.yarn = this.#withDelta(colorway, point.sourceHex);
     this.#schedulePreview();
   }
@@ -560,14 +630,38 @@ export class ImagePaletteState {
     const points = [...this.points];
     [points[from], points[to]] = [points[to], points[from]];
     this.points = points;
+    this.sortOrder = 'custom';
   }
 
-  sortAsGradient() {
-    this.points = this.#sorted(this.points);
+  /** Sort the palette, keeping locked colors where they are, as the site's
+   * other palette sorts do */
+  sortBy(order: SortOrder) {
+    this.sortOrder = order;
+    if (order === 'custom') return;
+    const unlocked = this.points.filter((point) => !point.locked);
+    let sorted: PalettePoint[];
+    if (order === 'gradient') {
+      sorted = this.#sorted(unlocked);
+    } else {
+      const byId = new Map(this.points.map((point) => [point.id, point]));
+      sorted = (
+        getSortedPalette({
+          palette: this.paletteColors(),
+          sortColors: order,
+        }) as PaletteColor[]
+      ).map((color) => byId.get(color.pointId)!);
+      this.points = sorted;
+      return;
+    }
+    let next = 0;
+    this.points = this.points.map((point) =>
+      point.locked ? point : sorted[next++],
+    );
   }
 
   reverse() {
     this.points = [...this.points].reverse();
+    this.sortOrder = 'custom';
   }
 
   /**
@@ -597,9 +691,40 @@ export class ImagePaletteState {
       );
       points.splice(at, 0, point);
     }
-    this.line = { from, to };
+    this.line = {
+      from,
+      to,
+      pointIds: points.filter((n) => !n.locked).map((n) => n.id),
+    };
     this.targetCount = points.length;
     this.#setPoints(points);
+    this.#edited();
+    this.sortOrder = 'custom';
+  }
+
+  /** Move one end of the line, respacing its colors along it. Only the
+   * dragged end is re-matched to yarn while dragging; `finishMove` settles
+   * the rest, since matching every color on every move would lag. */
+  #moveLineEnd(end: 'from' | 'to', at: Point) {
+    const line = this.line!;
+    line[end] = at;
+    const spots = pointsAlongLine(line.from, line.to, line.pointIds.length);
+    line.pointIds.forEach((id, i) => {
+      const point = this.points.find((n) => n.id === id);
+      if (!point || point.locked) return;
+      const sourceHex = this.#sample(spots[i].x, spots[i].y);
+      if (!sourceHex) return;
+      point.x = spots[i].x;
+      point.y = spots[i].y;
+      point.sourceHex = sourceHex;
+      const isEnd = i === 0 || i === line.pointIds.length - 1;
+      if (isEnd && (end === 'from') === (i === 0))
+        point.yarn = this.#match(
+          sourceHex,
+          this.points.filter((n) => n.id !== id),
+        );
+    });
+    this.#schedulePreview();
   }
 
   // Yarn filter
@@ -648,8 +773,24 @@ export class ImagePaletteState {
     return { ...point, id: this.#nextId++, locked: false };
   }
 
+  /** The colors were changed by hand: they're no longer an Auto Palette */
+  #edited() {
+    this.autoStyle = null;
+  }
+
   #setPoints(points: PalettePoint[]) {
     this.points = points;
+    if (this.line) {
+      const ids = new Set(points.map((n) => n.id));
+      const pointIds = this.line.pointIds.filter((id) => ids.has(id));
+      // A line needs both its ends; without them it's just colors
+      if (
+        pointIds[0] !== this.line.pointIds[0] ||
+        pointIds.at(-1) !== this.line.pointIds.at(-1)
+      )
+        this.line = null;
+      else this.line.pointIds = pointIds;
+    }
     if (
       this.selectedId !== null &&
       !points.some((n) => n.id === this.selectedId)
