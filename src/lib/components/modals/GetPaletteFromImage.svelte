@@ -432,7 +432,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <StickyPart position="bottom">
-        <div class="flex flex-col gap-1 px-2 pt-2 sm:px-4">
+        <!-- The dialog's own background, so the palette card stands out as
+        it does on the page -->
+        <div
+          class="bg-surface-50 dark:bg-surface-950 flex flex-col gap-1 px-2 pt-2 sm:px-4"
+        >
           <!-- The palette and its tools, as on the main page -->
           <div
             class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
