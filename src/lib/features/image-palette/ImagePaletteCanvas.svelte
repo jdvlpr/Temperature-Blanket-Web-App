@@ -493,7 +493,7 @@ make the magnifier's fixed position relative to the photo, not the screen -->
             {/if}
           </div>
           <button
-            class="btn-icon hover:preset-tonal-surface"
+            class="btn-icon hover:bg-surface-200-800"
             style="color:{text}"
             title={selected.locked ? 'Unlock' : 'Lock'}
             aria-label="{selected.locked ? 'Unlock' : 'Lock'} color"
@@ -503,7 +503,7 @@ make the magnifier's fixed position relative to the photo, not the screen -->
             {#if selected.locked}<LockKeyholeIcon />{:else}<LockOpenIcon />{/if}
           </button>
           <button
-            class="btn-icon hover:preset-tonal-surface"
+            class="btn-icon hover:bg-surface-200-800"
             style="color:{text}"
             title="Delete"
             aria-label="Delete color"

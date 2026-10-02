@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   // As in the main palette's toolbar
-  const toolbarButtonClass = 'btn hover:preset-tonal-surface justify-start';
+  const toolbarButtonClass = 'btn hover:bg-surface-200-800 justify-start';
   const menuItemClass =
     'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 
@@ -208,9 +208,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <!-- A card rather than a button so the photo credit links can sit
         inside it; the title button covers the whole card -->
         <div
-          class="card preset-outlined-surface-300-700 hover:preset-tonal-surface has-[:focus-visible]:outline-primary-500 relative flex flex-col items-center gap-3 p-6 text-center transition-colors has-[:focus-visible]:outline-2"
+          class="card preset-outlined-surface-300-700 hover:bg-surface-100-900 has-[:focus-visible]:outline-primary-500 relative flex flex-col items-center gap-3 p-6 text-center transition-colors has-[:focus-visible]:outline-2"
         >
-          <ShuffleIcon class="text-primary-600-400 size-10" />
+          <ShuffleIcon class="size-10 opacity-70" />
           <button
             class="text-lg font-bold outline-none after:absolute after:inset-0 after:content-['']"
             onclick={() => open(() => palette.randomImage())}
@@ -236,11 +236,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             'card flex flex-col items-center gap-3 p-6 text-center transition-colors',
             draggingFile
               ? 'preset-tonal-primary outline-primary-500 outline-2 outline-dashed'
-              : 'preset-outlined-surface-300-700 hover:preset-tonal-surface',
+              : 'preset-outlined-surface-300-700 hover:bg-surface-100-900',
           ]}
           onclick={() => input?.click()}
         >
-          <ImagePlusIcon class="text-primary-600-400 size-10" />
+          <ImagePlusIcon class="size-10 opacity-70" />
           <span class="text-lg font-bold">Your Photo</span>
           <span class="text-surface-700-300 text-sm"
             >Choose a photo, or drop or paste one here</span
@@ -250,7 +250,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if palette.canContinue && palette.thumbnail}
         <button
-          class="card preset-outlined-surface-300-700 hover:preset-tonal-surface flex items-center gap-4 p-3 text-left transition-colors"
+          class="card preset-outlined-surface-300-700 hover:bg-surface-100-900 flex items-center gap-4 p-3 text-left transition-colors"
           onclick={() =>
             open(() => {
               if (!palette.hasImage) palette.continueSaved();
@@ -259,7 +259,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <img
             src={palette.thumbnail}
             alt=""
-            class="rounded-base h-14 w-20 shrink-0 object-cover"
+            class="rounded-container h-14 w-20 shrink-0 object-cover"
           />
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="font-bold">Continue with your last photo</span>
@@ -307,7 +307,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class="flex flex-wrap items-center gap-1">
               {#if palette.source === 'random'}
                 <button
-                  class="btn hover:preset-tonal-surface"
+                  class="btn hover:bg-surface-200-800"
                   disabled={palette.loading}
                   onclick={() => palette.randomImage()}
                 >
@@ -320,7 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   'btn',
                   palette.showYarnPreview
                     ? 'preset-tonal-primary'
-                    : 'hover:preset-tonal-surface',
+                    : 'hover:bg-surface-200-800',
                 ]}
                 title="See the photo in only your palette's colors"
                 aria-pressed={palette.showYarnPreview}
@@ -363,7 +363,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <p>{palette.warningMessage}</p>
               <button
-                class="btn-icon btn-icon-sm hover:preset-tonal-surface"
+                class="btn-icon btn-icon-sm hover:bg-surface-200-800"
                 aria-label="Dismiss"
                 onclick={() => (palette.warningMessage = null)}
               >

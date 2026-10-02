@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <SortMenu
             colors={selectedColors as Color[]}
             placement="top"
-            triggerClass="btn btn-sm hover:preset-tonal-surface"
+            triggerClass="btn btn-sm hover:bg-surface-200-800"
             disabled={selectedColors.length < 2}
             onsort={(sort) => {
               const colors = $state.snapshot(selectedColors) as Color[];

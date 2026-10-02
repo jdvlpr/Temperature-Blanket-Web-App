@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors,
     onsort,
     current = null,
-    triggerClass = 'btn hover:preset-tonal-surface justify-start',
+    triggerClass = 'btn hover:bg-surface-200-800 justify-start',
     hideLabel = false,
     disabled = false,
     placement = 'bottom-start',
