@@ -60,11 +60,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : { y: phone.current ? 120 : 50, duration: 400, easing: cubicOut },
   );
 
-  // Dragging the sheet's grab bar down: far or fast enough closes it,
-  // otherwise it settles back. Close and Escape do the same without dragging.
+  // Dragging the sheet down by its top bar (grab bar and header): far or
+  // fast enough closes it, otherwise it settles back. Close and Escape do
+  // the same without dragging. Only the top bar drags, so drags inside the
+  // content (e.g. reordering colors) stay their own.
+  const grabbable = $derived(!side && phone.current);
+
+  /** Movement under this many px is a tap, not a drag. */
+  const TAP_SLOP_PX = 6;
+  /** Released faster than this (px/ms, downwards), the sheet closes. */
+  const CLOSE_VELOCITY = 0.5;
+
+  let topBar: HTMLElement | undefined = $state();
   let dragOffset = $state(0);
   let dragging = $state(false);
-  let dragStart = { y: 0, lastY: 0, lastTime: 0, velocity: 0 };
+  let sheetHeight = $state(0);
+  // How far the sheet has gone towards closed, for fading the backdrop
+  const dragProgress = $derived(
+    sheetHeight ? Math.min(1, dragOffset / sheetHeight) : 0,
+  );
+  let startY = 0;
+  let samples: { y: number; t: number }[] = [];
 
   $effect(() => {
     if (!dialog.opened) {
@@ -73,43 +89,119 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  function onGrabStart(event: PointerEvent) {
-    if (!event.isPrimary) return;
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  /** A press on a control in the top bar (Back, Close) isn't a drag */
+  function onControl(target: EventTarget | null) {
+    return Boolean(
+      (target as HTMLElement | null)?.closest(
+        'button, a, input, [role="button"]',
+      ),
+    );
+  }
+
+  function beginDrag(y: number, t: number) {
+    startY = y;
+    samples = [{ y, t }];
+    sheetHeight = dialog.scrollElement?.offsetHeight ?? 0;
     dragging = true;
-    dragStart = {
-      y: event.clientY,
-      lastY: event.clientY,
-      lastTime: event.timeStamp,
-      velocity: 0,
-    };
   }
 
-  function onGrabMove(event: PointerEvent) {
-    if (!dragging) return;
-    const elapsed = event.timeStamp - dragStart.lastTime;
-    if (elapsed > 0)
-      dragStart.velocity = (event.clientY - dragStart.lastY) / elapsed;
-    dragStart.lastY = event.clientY;
-    dragStart.lastTime = event.timeStamp;
-    dragOffset = Math.max(0, event.clientY - dragStart.y);
+  function moveDrag(y: number, t: number) {
+    // Down only: the sheet already reaches as high as it goes
+    dragOffset = Math.max(0, y - startY);
+    samples.push({ y, t });
+    // Only the last ~100ms decide the release velocity
+    while (samples.length > 2 && t - samples[0].t > 100) samples.shift();
   }
 
-  function onGrabEnd() {
+  function finishDrag(y: number, t: number, cancelled: boolean) {
     if (!dragging) return;
     dragging = false;
-    const height = dialog.scrollElement?.offsetHeight ?? 0;
-    if (dragOffset > height / 4 || dragStart.velocity > 0.5) {
-      if (reduceMotion) {
-        dialog.close();
-        return;
-      }
-      // Off the bottom edge, then closed
-      dragOffset = height;
-      setTimeout(dialog.close, 200);
-    } else {
+    const first = samples[0];
+    const dt = t - first.t;
+    const velocity = !cancelled && dt > 0 ? (y - first.y) / dt : 0;
+    const closing =
+      !cancelled &&
+      dragOffset > TAP_SLOP_PX &&
+      (dragOffset > sheetHeight / 4 || velocity > CLOSE_VELOCITY);
+    if (!closing) {
       dragOffset = 0;
+    } else if (reduceMotion) {
+      dialog.close();
+    } else {
+      // Off the bottom edge, then closed
+      dragOffset = sheetHeight;
+      setTimeout(dialog.close, 200);
     }
+  }
+
+  /*
+   * Touch, as with the globe's places sheet: pointer events can't do this on
+   * a phone, since once the browser claims a touch for scrolling it fires
+   * pointercancel and the page (or iOS's rubber-band bounce) moves instead
+   * of the sheet. A non-passive touchmove can preventDefault that, and
+   * Svelte registers ontouchmove as passive, hence addEventListener.
+   */
+  let touchActive = false;
+
+  function handleTouchStart(event: TouchEvent) {
+    touchActive = event.touches.length === 1 && !onControl(event.target);
+    if (touchActive) beginDrag(event.touches[0].clientY, event.timeStamp);
+  }
+
+  function handleTouchMove(event: TouchEvent) {
+    if (!touchActive || event.touches.length !== 1) return;
+    if (event.cancelable) event.preventDefault();
+    moveDrag(event.touches[0].clientY, event.timeStamp);
+  }
+
+  function handleTouchEnd(event: TouchEvent) {
+    if (!touchActive) return;
+    touchActive = false;
+    const touch = event.changedTouches[0];
+    finishDrag(
+      touch?.clientY ?? startY,
+      event.timeStamp,
+      event.type === 'touchcancel',
+    );
+  }
+
+  $effect(() => {
+    const element = topBar;
+    if (!element || !grabbable) return;
+    const options = { passive: false } as const;
+    element.addEventListener('touchstart', handleTouchStart, options);
+    element.addEventListener('touchmove', handleTouchMove, options);
+    element.addEventListener('touchend', handleTouchEnd);
+    element.addEventListener('touchcancel', handleTouchEnd);
+    return () => {
+      element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchmove', handleTouchMove);
+      element.removeEventListener('touchend', handleTouchEnd);
+      element.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  });
+
+  // A mouse or pen, e.g. a desktop browser in a narrow window
+  let pointerId: number | null = null;
+
+  function handlePointerDown(event: PointerEvent) {
+    if (!grabbable || event.pointerType === 'touch' || event.button !== 0)
+      return;
+    if (onControl(event.target)) return;
+    pointerId = event.pointerId;
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    beginDrag(event.clientY, event.timeStamp);
+  }
+
+  function handlePointerMove(event: PointerEvent) {
+    if (event.pointerId !== pointerId) return;
+    moveDrag(event.clientY, event.timeStamp);
+  }
+
+  function handlePointerUp(event: PointerEvent, cancelled: boolean) {
+    if (event.pointerId !== pointerId) return;
+    pointerId = null;
+    finishDrag(event.clientY, event.timeStamp, cancelled);
   }
 </script>
 
@@ -128,6 +220,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           !reduceMotion &&
           'opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0',
       ]}
+      style={grabbable
+        ? `opacity: ${1 - dragProgress}; transition: ${dragging || reduceMotion ? 'none' : 'opacity 200ms ease-out'}`
+        : undefined}
     />
     <Dialog.Positioner
       class={[
@@ -174,63 +269,77 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ? 'none'
                   : 'transform 200ms ease-out'}
             >
-              {#if !side}
-                <!-- The sheet's grab bar: drag it down to close. For pointers
-                only; Close and Escape do the same for everyone else. A tall
-                strip, so it's easy to catch, and nothing else in the sheet
-                drags it, so drags inside the content stay their own. -->
+              {#if grabbable || (dialog.type === 'component' && hasHeader)}
+                <!-- The top bar, always in view: on phones the sheet's grab bar,
+                and the whole bar drags the sheet (except its buttons); for a
+                titled dialog, one header for every one: Back, title, Close.
+                z-20: above content with its own z-index (e.g. segmented
+                control items, z-10) -->
+                <!-- Dragging is a pointer shortcut for Close/Escape, which
+                everyone has, so the bar itself isn't a control -->
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <div
-                  aria-hidden="true"
-                  class="mb-0 flex h-6 cursor-grab touch-none items-center justify-center active:cursor-grabbing sm:hidden"
-                  onpointerdown={onGrabStart}
-                  onpointermove={onGrabMove}
-                  onpointerup={onGrabEnd}
-                  onpointercancel={onGrabEnd}
+                  bind:this={topBar}
+                  class={[
+                    'bg-surface-50 dark:bg-surface-950 sticky top-0 z-20 mb-0',
+                    grabbable &&
+                      'cursor-grab touch-none select-none active:cursor-grabbing',
+                  ]}
+                  onpointerdown={handlePointerDown}
+                  onpointermove={handlePointerMove}
+                  onpointerup={(event) => handlePointerUp(event, false)}
+                  onpointercancel={(event) => handlePointerUp(event, true)}
                 >
-                  <div class="bg-surface-950-50 h-1.5 w-12 rounded-full"></div>
+                  {#if grabbable}
+                    <div
+                      aria-hidden="true"
+                      class="flex h-5 items-end justify-center"
+                    >
+                      <div
+                        class="bg-surface-950-50 h-1.5 w-12 rounded-full"
+                      ></div>
+                    </div>
+                  {/if}
+                  {#if dialog.type === 'component' && hasHeader}
+                    <header class="flex min-h-14 items-center gap-1 px-2 py-2">
+                      {#if dialog.stack.length || dialog.backAction}
+                        <button
+                          type="button"
+                          class="btn-icon hover:preset-tonal-surface"
+                          aria-label="Back"
+                          title="Back"
+                          data-dialog-back
+                          onclick={() =>
+                            dialog.backAction
+                              ? dialog.backAction()
+                              : dialog.back()}
+                          in:fade={{ duration: reduceMotion ? 0 : 150 }}
+                        >
+                          <ArrowLeftIcon />
+                        </button>
+                      {/if}
+                      {#key dialog.options.title}
+                        <Dialog.Title
+                          class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
+                        >
+                          {#snippet element(attributes)}
+                            <h2 {...attributes}>
+                              <span class="block truncate" in:fade={viewFade}
+                                >{dialog.options.title ?? ''}</span
+                              >
+                            </h2>
+                          {/snippet}
+                        </Dialog.Title>
+                      {/key}
+                      {#if dialog.options.showCloseButton}
+                        <CloseButton onClose={dialog.close} />
+                      {/if}
+                    </header>
+                  {/if}
                 </div>
               {/if}
               {#if dialog.type === 'component'}
-                {#if hasHeader}
-                  <!-- One header for every titled dialog: Back, title, Close. z-20: above
-                  content with its own z-index (e.g. segmented control items, z-10) -->
-                  <header
-                    class="bg-surface-50 dark:bg-surface-950 sticky top-0 z-20 mb-0 flex min-h-14 items-center gap-1 px-2 py-2"
-                  >
-                    {#if dialog.stack.length || dialog.backAction}
-                      <button
-                        type="button"
-                        class="btn-icon hover:preset-tonal-surface"
-                        aria-label="Back"
-                        title="Back"
-                        data-dialog-back
-                        onclick={() =>
-                          dialog.backAction
-                            ? dialog.backAction()
-                            : dialog.back()}
-                        in:fade={{ duration: reduceMotion ? 0 : 150 }}
-                      >
-                        <ArrowLeftIcon />
-                      </button>
-                    {/if}
-                    {#key dialog.options.title}
-                      <Dialog.Title
-                        class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
-                      >
-                        {#snippet element(attributes)}
-                          <h2 {...attributes}>
-                            <span class="block truncate" in:fade={viewFade}
-                              >{dialog.options.title ?? ''}</span
-                            >
-                          </h2>
-                        {/snippet}
-                      </Dialog.Title>
-                    {/key}
-                    {#if dialog.options.showCloseButton}
-                      <CloseButton onClose={dialog.close} />
-                    {/if}
-                  </header>
-                {:else if dialog.options.showCloseButton}
+                {#if !hasHeader && dialog.options.showCloseButton}
                   <div class="sticky top-2 z-20 float-right mr-2">
                     <CloseButton onClose={dialog.close} />
                   </div>
