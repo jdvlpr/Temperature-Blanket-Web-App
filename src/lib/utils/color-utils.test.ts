@@ -5,6 +5,7 @@ import {
   colorsToYarnDetails,
   getColorInfo,
   getColorsFromInput,
+  readPastedColors,
   getPaletteFallbackName,
   getTextColor,
   getYarnPageURL,
@@ -172,6 +173,65 @@ describe('color-utils', () => {
     it('should respect includePrefixes option', () => {
       const colors = [{ hex: '#ff0000' as Lowercase<string> }];
       expect(colorsToCode(colors, { includePrefixes: false })).toBe('ff0000');
+    });
+  });
+
+  describe('readPastedColors', () => {
+    const hexes = (text: string) =>
+      readPastedColors(text).colors.map((color) => color.hex);
+
+    it('reads nothing from empty text', () => {
+      expect(readPastedColors('  ')).toEqual({ colors: [], unreadable: [] });
+    });
+
+    it('reads one color per line, whatever the names', () => {
+      expect(hexes('red\nlightblue')).toEqual(['#ff0000', '#add8e6']);
+      expect(hexes('red,\nblue')).toEqual(['#ff0000', '#0000ff']);
+      expect(hexes('#FF0000\r\n#00FF00\n')).toEqual(['#ff0000', '#00ff00']);
+    });
+
+    it('reads tabs and semicolons, as from a spreadsheet', () => {
+      expect(hexes('#ff0000\t#00ff00')).toEqual(['#ff0000', '#00ff00']);
+      expect(hexes('red;blue')).toEqual(['#ff0000', '#0000ff']);
+    });
+
+    it('reads rgb() and hsl() colors, commas and all', () => {
+      expect(hexes('rgb(255, 0, 0), hsl(240, 100%, 50%)')).toEqual([
+        '#ff0000',
+        '#0000ff',
+      ]);
+    });
+
+    it('reads names written as more than one word', () => {
+      expect(hexes('dark blue, light goldenrod yellow')).toEqual([
+        '#00008b',
+        '#fafad2',
+      ]);
+      expect(hexes('red light blue')).toEqual(['#ff0000', '#add8e6']);
+    });
+
+    it('reads a copied array', () => {
+      expect(hexes('["#ff0000", "#00ff00"]')).toEqual(['#ff0000', '#00ff00']);
+    });
+
+    it('keeps the colors it can read, and names the rest', () => {
+      expect(readPastedColors('red, orange, blu')).toEqual({
+        colors: [{ hex: '#ff0000' }, { hex: '#ffa500' }],
+        unreadable: ['blu'],
+      });
+    });
+
+    it('still reads codes and links', () => {
+      expect(hexes('palette:ff0000ffa500')).toEqual(['#ff0000', '#ffa500']);
+      expect(hexes('https://coolors.co/ff0000-00ff00')).toEqual([
+        '#ff0000',
+        '#00ff00',
+      ]);
+      expect(hexes('FF0000-FFA500-ADD8E6')).toEqual([
+        '#ff0000',
+        '#ffa500',
+        '#add8e6',
+      ]);
     });
   });
 

@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseColorways from '$lib/components/modals/ChooseColorways.svelte';
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
+  import PasteColors from '$lib/components/modals/PasteColors.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SavePalette from '$lib/components/modals/SavePalette.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
@@ -171,14 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       case 'paste':
         dialog.trigger({
           type: 'component',
-          component: {
-            ref: ImportExportPalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-              updateGauge,
-              mode: 'import',
-            },
-          },
+          component: { ref: PasteColors, props: { updateGauge } },
           options: { title: 'Paste Colors or Code' },
         });
         break;
@@ -263,7 +257,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       type: 'component',
       component: {
         ref: ImportExportPalette,
-        props: { colors, mode: 'export', exportType: value },
+        props: { colors, exportType: value },
       },
       options: { title: output.title },
     });

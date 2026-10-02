@@ -1636,8 +1636,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               To paste colors into a palette, press Get Colors, then Paste
-              Colors or Code, then type color names or paste a valid code or
-              URL. When you're finished, press Save.
+              Colors or Code, then type or paste color names, hex codes, or a
+              link, separated by commas or new lines. Anything that can't be
+              read is listed, and the rest is kept. When you're finished, press
+              Use Colors.
             </p>
           </section>
           <section

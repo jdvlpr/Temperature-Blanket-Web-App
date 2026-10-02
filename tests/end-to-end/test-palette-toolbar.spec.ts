@@ -84,12 +84,16 @@ test.describe('Palette toolbar', () => {
     await expect(
       dialog.getByRole('heading', { name: 'Paste Colors or Code' }),
     ).toBeVisible();
-    await dialog
-      .getByLabel('Enter HTML colors, a palette code, or a project URL')
-      // The field listens for keyup, change and paste, not input
-      .pressSequentially('red, orange, blue');
-    await expect(dialog.getByText('3 Colors')).toBeVisible();
-    await dialog.getByRole('button', { name: 'Save' }).click();
+    const field = dialog.getByLabel('Colors, a code, or a link');
+    // What can't be read is named, and the rest is kept
+    await field.fill('red, orange, blu');
+    await expect(dialog.getByText('blu', { exact: true })).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: 'Use 2 Colors' }),
+    ).toBeEnabled();
+    // One color per line, as from a spreadsheet
+    await field.fill('red\norange\nblue');
+    await dialog.getByRole('button', { name: 'Use 3 Colors' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
     // The pasted colors are now the palette
@@ -106,9 +110,11 @@ test.describe('Palette toolbar', () => {
     await page.getByRole('menuitem', { name: /Paste Colors or Code/ }).click();
     const dialog = page.getByRole('dialog');
     await dialog
-      .getByLabel('Enter HTML colors, a palette code, or a project URL')
-      .pressSequentially('palette:ff0000ffa500');
-    await expect(dialog.getByText('2 Colors')).toBeVisible();
+      .getByLabel('Colors, a code, or a link')
+      .fill('palette:ff0000ffa500');
+    await expect(
+      dialog.getByRole('button', { name: 'Use 2 Colors' }),
+    ).toBeEnabled();
   });
 
   test('a menu item chosen with the keyboard opens its dialog', async ({
@@ -119,6 +125,8 @@ test.describe('Palette toolbar', () => {
     await expect(
       page.getByRole('menuitem', { name: /Browse Palettes/ }),
     ).toBeVisible();
+    // Keys pressed before the menu takes focus go nowhere
+    await expect(page.getByRole('menu', { name: 'Get Colors' })).toBeFocused();
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
     await expect(page.getByRole('menuitem')).toHaveCount(0);

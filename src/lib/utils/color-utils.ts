@@ -280,6 +280,79 @@ export const getColorsFromInput = ({
   return colors;
 };
 
+/** A color written as a function, like rgb(255, 0, 0); its commas aren't separators */
+const COLOR_FUNCTION = /\s*(?:rgba?|hsla?)\s*\([^)]*\)/gi;
+/** Long names are at most three words, like "light goldenrod yellow" */
+const MOST_WORDS_IN_A_NAME = 3;
+
+/** Reads the colors in one entry's words, a name of a few words at a time */
+function readWords(words: string[], unreadable: string[]): Color[] {
+  const colors: Color[] = [];
+  let i = 0;
+  while (i < words.length) {
+    let read = 0;
+    for (let n = Math.min(MOST_WORDS_IN_A_NAME, words.length - i); n > 0; n--) {
+      const word = words.slice(i, i + n).join('');
+      if (chroma.valid(word)) {
+        colors.push({ hex: chroma(word).hex() as Color['hex'] });
+        read = n;
+        break;
+      }
+      // Hex codes run together, like ff0000ffa500
+      if (n === 1 && /^#?(?:[0-9a-f]{6}){2,}$/i.test(word)) {
+        for (const hex of word.replace('#', '').match(/.{6}/g) ?? [])
+          colors.push({ hex: chroma(hex).hex() as Color['hex'] });
+        read = 1;
+        break;
+      }
+    }
+    if (!read) {
+      unreadable.push(words[i]);
+      read = 1;
+    }
+    i += read;
+  }
+  return colors;
+}
+
+/**
+ * The colors in pasted or typed text, and what couldn't be read, so one
+ * mistake doesn't lose the rest. Takes anything getColorsFromInput does
+ * (links, palette codes, Coolors), or a list of names, hex codes and rgb()
+ * colors separated by commas, semicolons, tabs, new lines or spaces.
+ */
+export const readPastedColors = (
+  text: string,
+): { colors: Color[]; unreadable: string[] } => {
+  const trimmed = text.trim();
+  if (!trimmed) return { colors: [], unreadable: [] };
+  // A list on many lines is read entry by entry: read whole, its entries
+  // would run together and be cut every six letters
+  const isList = /[;\t\n\r]/.test(trimmed) && !/:\/\/|palette:/.test(trimmed);
+  const whole = !isList && getColorsFromInput({ string: trimmed });
+  if (whole && whole.length) return { colors: whole, unreadable: [] };
+
+  const colors: Color[] = [];
+  const unreadable: string[] = [];
+  // Quotes and brackets, as in a copied array, aren't part of any color
+  const entries =
+    trimmed
+      .replace(/["'[\]{}]/g, ' ')
+      .match(new RegExp(`${COLOR_FUNCTION.source}|[^,;\\t\\n\\r]+`, 'gi')) ??
+    [];
+  for (const raw of entries) {
+    const entry = raw.trim();
+    if (!entry) continue;
+    if (chroma.valid(entry)) {
+      colors.push({ hex: chroma(entry).hex() as Color['hex'] });
+      continue;
+    }
+    const words = entry.split(/[\s-]+/).filter(Boolean);
+    colors.push(...readWords(words, unreadable));
+  }
+  return { colors, unreadable };
+};
+
 export type ColorInfo = Color & {
   index?: number;
   gaugeLength: number | undefined;
