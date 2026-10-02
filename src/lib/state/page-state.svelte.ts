@@ -324,10 +324,8 @@ export const windowLanguage: { value: string | null } = $state({
 });
 
 class DrawerStateClass {
-  weatherDetails = $state(false);
   appNavigation = $state(false);
   closeAll = () => {
-    this.weatherDetails = false;
     this.appNavigation = false;
   };
 }

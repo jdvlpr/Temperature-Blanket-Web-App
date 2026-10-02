@@ -20,9 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   fully open, where the list scrolls, and only a pull down from the top of the
   list drags the sheet closed again. Touching the globe never involves it.
 
-  Not vaul-svelte's Drawer (used elsewhere in the app): that is a modal,
-  dismissible drawer, and this sheet is always present with the globe behind
-  it fully usable.
+  Not the app's dialog (a bottom sheet on phones too): that is modal, and this
+  sheet is always present with the globe behind it fully usable.
 -->
 
 <script lang="ts">

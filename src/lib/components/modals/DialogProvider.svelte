@@ -17,14 +17,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '$lib/state/page-state.svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
+  import { motion } from '$lib/utils/feedback.svelte';
   import { cubicOut } from 'svelte/easing';
-  import { prefersReducedMotion } from 'svelte/motion';
+  import { MediaQuery } from 'svelte/reactivity';
   import { fade, fly } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
 
   // The Project menu: a panel that slides in from the right
   const side = $derived(dialog.options.placement === 'side');
+
+  // Below the sm breakpoint a dialog is a bottom sheet
+  const phone = new MediaQuery('(max-width: 639.98px)');
 
   // A titled dialog, or one opened from another, has a header bar
   const hasHeader = $derived(
@@ -35,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Moving between views of a dialog: a short slide, forward from the right
   // and back from the left. Nothing for a dialog opening by itself.
-  const reduceMotion = $derived(prefersReducedMotion.current);
+  const reduceMotion = $derived(motion.reduced);
   const moving = $derived(dialog.direction !== 'none' && !reduceMotion);
   const viewFly = $derived(
     moving
@@ -47,6 +51,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : { duration: 0 },
   );
   const viewFade = $derived({ duration: moving ? 180 : 0 });
+
+  // Opening: rises into place (further on phones, where it comes up from the
+  // bottom edge); the side panel slides in with CSS instead
+  const openFly = $derived(
+    side || reduceMotion
+      ? { duration: 0 }
+      : { y: phone.current ? 120 : 50, duration: 400, easing: cubicOut },
+  );
 </script>
 
 <Dialog
@@ -61,22 +73,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={[
         'bg-surface-50-950/50 fixed inset-0 z-60 backdrop-blur-md',
         side &&
+          !reduceMotion &&
           'opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0',
       ]}
     />
     <Dialog.Positioner
       class={[
         'fixed inset-0 z-60 flex items-center justify-center',
-        side && 'items-stretch justify-end',
+        side ? 'items-stretch justify-end' : 'max-sm:items-end',
       ]}
     >
       <Dialog.Content
         class={[
           'bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto max-sm:min-w-screen',
           side
-            ? 'h-dvh w-full translate-x-full opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 sm:w-md starting:data-[state=open]:translate-x-full starting:data-[state=open]:opacity-0'
+            ? reduceMotion
+              ? 'h-dvh w-full sm:w-md'
+              : 'h-dvh w-full translate-x-full opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 sm:w-md starting:data-[state=open]:translate-x-full starting:data-[state=open]:opacity-0'
             : [
-                'card shadow-xl',
+                // A sheet on phones: square at the bottom edge, and short of
+                // the top so its rounded corners sit against the backdrop
+                'card shadow-xl max-sm:max-h-[calc(100dvh-2rem)] max-sm:rounded-b-none',
                 dialog.options.size === 'xlarge'
                   ? 'w-full lg:max-h-[92svh]'
                   : 'lg:max-h-[80svh]',
@@ -95,8 +112,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               {...attributes}
               bind:this={dialog.scrollElement}
-              in:fly={side ? { duration: 0 } : { y: 50, duration: 400 }}
+              in:fly={openFly}
             >
+              {#if !side}
+                <!-- The sheet's grab bar, for looks only: it doesn't drag -->
+                <div
+                  aria-hidden="true"
+                  class="bg-surface-950-50 mx-auto mt-2 mb-0 h-1.5 w-12 shrink-0 rounded-full sm:hidden"
+                ></div>
+              {/if}
               {#if dialog.type === 'component'}
                 {#if hasHeader}
                   <!-- One header for every titled dialog: Back, title, Close. z-20: above

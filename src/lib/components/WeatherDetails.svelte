@@ -136,7 +136,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           event.preventDefault();
       }}
       class="range-slider-input"
-      data-vaul-no-drag
     />
 
     <button

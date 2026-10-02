@@ -15,13 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
-  import WeatherDetails from '$lib/components/WeatherDetails.svelte';
-  import { drawerState } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
-  import {
-    previews,
-    previewWeatherTargets,
-  } from '$lib/state/preview-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { motion } from '$lib/utils/feedback.svelte';
@@ -30,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
-  import { Drawer } from 'vaul-svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
   function initDefaultPreview() {
@@ -83,30 +77,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#key previews.active}
         <div class="flex w-full flex-wrap items-start justify-center gap-4">
           <previews.active.settingsComponent />
-
-          <Drawer.Root bind:open={drawerState.weatherDetails}>
-            <Drawer.Portal>
-              <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
-
-              <Drawer.Content
-                class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
-              >
-                <div
-                  class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
-                >
-                  <div
-                    class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
-                  ></div>
-                  <div class="mx-auto text-center">
-                    <WeatherDetails
-                      weatherTargets={previewWeatherTargets.value}
-                      getTargets={previewWeatherTargets.getter}
-                    />
-                  </div>
-                </div>
-              </Drawer.Content>
-            </Drawer.Portal>
-          </Drawer.Root>
         </div>
       {/key}
 

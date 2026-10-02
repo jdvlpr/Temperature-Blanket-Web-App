@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div data-vaul-drawer-wrapper="true">
+<div>
   <div
     class={[
       'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
