@@ -395,7 +395,7 @@ choice's icon beside it, and what it's for below -->
       <div
         class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
       >
-        <span class="label-text px-4 pt-3">Show on each color</span>
+        <span class="label-text px-4 py-2.5">Show on each color</span>
         {#each labelOptions as option (option.key)}
           <ToggleSwitch
             bare

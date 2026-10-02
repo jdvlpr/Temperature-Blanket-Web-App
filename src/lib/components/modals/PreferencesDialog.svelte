@@ -210,7 +210,7 @@ current choice's icon beside it -->
     aria-labelledby="preferences-sound-motion"
     class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
   >
-    <span id="preferences-sound-motion" class="label-text px-4 pt-3"
+    <span id="preferences-sound-motion" class="label-text px-4 py-2.5"
       >Sound & Motion</span
     >
     <ToggleSwitch
