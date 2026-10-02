@@ -414,9 +414,21 @@ export class ImagePaletteState {
     });
     this.working = false;
     if (!result) return;
-    this.#setPoints(this.#sorted([...locked, ...result.points]));
+    // Keep a sort the user chose; otherwise blend in the gauge's direction
+    const order = this.sortOrder;
+    const warmFirst =
+      order === 'warm-to-cool' || order === 'cool-to-warm'
+        ? order === 'warm-to-cool'
+        : this.warmFirst;
+    this.#setPoints(this.#sorted([...locked, ...result.points], warmFirst));
     this.autoStyle = this.style;
-    this.sortOrder = this.warmFirst ? 'warm-to-cool' : 'cool-to-warm';
+    if (
+      order !== 'custom' &&
+      order !== 'warm-to-cool' &&
+      order !== 'cool-to-warm'
+    )
+      this.sortBy(order);
+    else this.sortOrder = warmFirst ? 'warm-to-cool' : 'cool-to-warm';
     this.#rematchIfFilterChanged(result.index);
     if (this.points.length < count) this.#tellFewerColors();
   }
@@ -832,11 +844,9 @@ export class ImagePaletteState {
     );
   }
 
-  #sorted(points: PalettePoint[]): PalettePoint[] {
+  #sorted(points: PalettePoint[], warmFirst = this.warmFirst): PalettePoint[] {
     const labs: Oklab[] = points.map((n) => hexToOklab(this.colorOf(n)));
-    return orderAsGradient(labs, { warmFirst: this.warmFirst }).map(
-      (i) => points[i],
-    );
+    return orderAsGradient(labs, { warmFirst }).map((i) => points[i]);
   }
 
   #tellFewerColors() {
