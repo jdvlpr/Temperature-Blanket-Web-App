@@ -108,13 +108,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       value: 'rows',
       label: 'Rows',
-      details: 'A band for each color, with room for names',
+      details: 'A band for each color',
       icon: Rows3Icon,
     },
     {
       value: 'stripes',
       label: 'Stripes',
-      details: 'Side by side, like the blanket',
+      details: 'Side by side',
       icon: Columns3Icon,
     },
     {
