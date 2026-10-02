@@ -190,9 +190,10 @@ function drawLines({
       ctx.fillStyle = textColor;
       ctx.font = font(line.weight, size);
       // Centered on the glyphs themselves: numbers have no descenders, so
-      // the font's middle would sit them off-center in the pill
-      const glyphs = ctx.measureText(line.text);
+      // the font's middle would sit them off-center in the pill. Measured
+      // from the alphabetic baseline, which the bounds are relative to.
       ctx.textBaseline = 'alphabetic';
+      const glyphs = ctx.measureText(line.text);
       ctx.fillText(
         line.text,
         x + size * BADGE_PADDING,
