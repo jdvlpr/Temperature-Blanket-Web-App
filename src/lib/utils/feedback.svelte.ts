@@ -176,6 +176,7 @@ export function dragConsiderFeedback(
 ) {
   // Where the dragged item would drop: its placeholder (pointer drags give it
   // a placeholder id), or the item itself (keyboard drags keep its id)
+  lastDragAt = performance.now();
   const index = items.findIndex(
     (item) =>
       (item as Record<string, unknown>)[SHADOW_ITEM_MARKER_PROPERTY_NAME] ||
@@ -193,7 +194,12 @@ export function dragConsiderFeedback(
 }
 
 /** Svelte transition for a color added to a palette: grows in, or just appears when motion is reduced */
+// When an item was last dragged. Dragging swaps items for a placeholder and
+// back, which re-creates them; those aren't new colors, so they don't grow in.
+let lastDragAt = -Infinity;
+
 export function growIn(node: Element, { delay = 0 }: { delay?: number } = {}) {
+  if (performance.now() - lastDragAt < 500) return { duration: 0 };
   return scale(node, {
     start: 0.6,
     duration: motionDuration(200),
@@ -214,4 +220,10 @@ export class Pop {
       this.#timer = setTimeout(() => (this.index = null), 400);
     });
   }
+}
+
+/** Feedback for svelte-dnd-action's `finalize` event: the drop */
+export function dragFinalizeFeedback() {
+  lastDragAt = performance.now();
+  feedback('drop');
 }

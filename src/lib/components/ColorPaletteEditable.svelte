@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getTextColor } from '$lib/utils/color-utils';
   import {
     dragConsiderFeedback,
-    feedback,
+    dragFinalizeFeedback,
     growIn,
     liftDraggedElement,
     motionDuration,
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
     keyboardDragId = null;
-    feedback('drop');
+    dragFinalizeFeedback();
 
     colors = $state.snapshot(sortableColors).map((color) => {
       const { id, ...rest } = color;

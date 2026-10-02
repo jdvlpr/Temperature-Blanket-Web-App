@@ -1,9 +1,12 @@
 <!-- Preferences: how the site looks, sounds, and moves. Every change applies
-right away. Each choice is a set of tiles that show what it does; underneath,
-they're radio buttons, so arrow keys and screen readers work as expected. -->
+right away. Built from the site's usual settings pieces (as in the palette
+image export): selects with the current choice's icon beside it and what it's
+for below, a segmented control for light/dark, and a card of switches. -->
 
 <script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import CloseButton from '$lib/components/modals/CloseButton.svelte';
+  import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import {
     HEADING_STYLE,
     ROUNDNESS,
@@ -12,26 +15,20 @@ they're radio buttons, so arrow keys and screen readers work as expected. -->
     TEXT_SCALE,
     THEMES,
   } from '$lib/constants/page-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import {
     canVibrate,
     getEffects,
     setEffect,
   } from '$lib/utils/feedback.svelte';
-  import { CheckIcon, RotateCcwIcon } from '@lucide/svelte';
+  import { RotateCcwIcon } from '@lucide/svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, type Snippet } from 'svelte';
 
   type Theme = typeof preferences.value.theme;
 
   type Option = { id: string; name: string; description: string };
-
-  type TileGroup = {
-    legend: string;
-    key: keyof Theme;
-    options: Option[];
-    fallback: string;
-    preview: Snippet<[string]>;
-  };
 
   const DEFAULT_THEME: Theme = {
     id: 'classic',
@@ -59,73 +56,59 @@ they're radio buttons, so arrow keys and screen readers work as expected. -->
     preferences.value.effects = undefined;
   }
 
-  const TEXT_PREVIEW_SIZE: Record<string, string> = {
-    small: '0.95rem',
-    normal: '1.2rem',
-    large: '1.5rem',
-  };
-  const BUTTON_PREVIEW_RADIUS: Record<string, string> = {
+  const BUTTON_ICON_RADIUS: Record<string, string> = {
     sharp: 'rounded-none',
-    rounded: 'rounded-md',
+    rounded: 'rounded-[3px]',
     pill: 'rounded-full',
   };
 </script>
 
-<!-- A choice shown as tiles: a picture of each option above its name -->
-{#snippet tiles({ legend, key, options, fallback, preview }: TileGroup)}
+<!-- A setting with a few choices, as the site's other selects: the current
+choice's icon beside it, and what it's for below -->
+{#snippet choiceSelect({
+  label,
+  key,
+  options,
+  fallback,
+  icon,
+}: {
+  label: string;
+  key: keyof Theme;
+  options: Option[];
+  fallback: string;
+  icon: Snippet<[string]>;
+})}
   {@const current = preferences.value.theme[key] ?? fallback}
-  <fieldset class="flex flex-col gap-2">
-    <legend class="mb-2 text-sm font-semibold">{legend}</legend>
-    <div class="grid grid-cols-3 gap-2">
-      {#each options as option (option.id)}
-        {@const selected = current === option.id}
-        <label
-          title={option.description}
-          class={[
-            'rounded-container relative flex cursor-pointer flex-col items-center justify-center gap-1 border p-2 text-center transition-colors',
-            'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-current',
-            selected
-              ? 'border-primary-500 bg-primary-500/10 border-2'
-              : 'border-surface-300-700 hover:bg-surface-200-800 m-px',
-          ]}
+  {@const chosen = options.find((option) => option.id === current)}
+  <div class="flex flex-col gap-1">
+    <label class="label">
+      <span class="label-text">{label}</span>
+      <div class="relative flex items-center">
+        <span
+          class="pointer-events-none absolute left-2 flex size-6 items-center justify-center"
+          aria-hidden="true"
         >
-          <input
-            type="radio"
-            class="sr-only"
-            name="preferences-{key}"
-            value={option.id}
-            checked={selected}
-            onchange={() => choose(key, option.id)}
-          />
-          {#if selected}
-            <CheckIcon
-              aria-hidden="true"
-              class="text-primary-700-300 absolute top-1 right-1 size-4"
-            />
-          {/if}
-          <span class="flex h-9 w-full items-center justify-center">
-            {@render preview(option.id)}
-          </span>
-          <span class="text-sm leading-tight">{option.name}</span>
-        </label>
-      {/each}
-    </div>
-  </fieldset>
+          {@render icon(current)}
+        </span>
+        <select
+          class="select truncate pl-10"
+          value={current}
+          onchange={(e) => choose(key, e.currentTarget.value)}
+        >
+          {#each options as option (option.id)}
+            <option value={option.id}>{option.name}</option>
+          {/each}
+        </select>
+      </div>
+    </label>
+    <p class="text-surface-700-300 text-xs">{chosen?.description}</p>
+  </div>
 {/snippet}
 
-{#snippet modePreview(id: string)}
-  <span aria-hidden="true" class="[&_svg]:size-6">
-    {@html THEMES.find((theme) => theme.id === id)?.icon}
-  </span>
-{/snippet}
-
-{#snippet colorsPreview(id: string)}
+{#snippet colorsIcon(id: string)}
   {@const colors = SKELETON_THEMES.find((theme) => theme.id === id)?.colors}
   {#if colors}
-    <span
-      aria-hidden="true"
-      class="rounded-base flex h-8 w-full overflow-hidden border"
-    >
+    <span class="flex h-4 w-6 overflow-hidden rounded-[3px] border">
       <span class="flex-auto" style="background:{colors.surface}"></span>
       <span class="flex-auto" style="background:{colors.primary}"></span>
       <span class="flex-auto" style="background:{colors.secondary}"></span>
@@ -133,130 +116,147 @@ they're radio buttons, so arrow keys and screen readers work as expected. -->
   {/if}
 {/snippet}
 
-{#snippet textPreview(id: string)}
-  <span aria-hidden="true" style="font-size:{TEXT_PREVIEW_SIZE[id]}">Aa</span>
+{#snippet textSizeIcon(id: string)}
+  {@const Icon = TEXT_SCALE.find((option) => option.id === id)?.IconComponent}
+  {#if Icon}<Icon class="size-5" />{/if}
 {/snippet}
 
-{#snippet spacingPreview(id: string)}
-  {@const Icon = SPACING.find((spacing) => spacing.id === id)?.IconComponent}
-  {#if Icon}
-    <Icon aria-hidden="true" class="size-6" />
-  {/if}
+{#snippet spacingIcon(id: string)}
+  {@const Icon = SPACING.find((option) => option.id === id)?.IconComponent}
+  {#if Icon}<Icon class="size-5" />{/if}
 {/snippet}
 
-{#snippet buttonsPreview(id: string)}
-  <span
-    aria-hidden="true"
-    class="h-5 w-10 border-2 border-current {BUTTON_PREVIEW_RADIUS[id]}"
+{#snippet buttonsIcon(id: string)}
+  <span class="h-3.5 w-6 border-2 border-current {BUTTON_ICON_RADIUS[id]}"
   ></span>
 {/snippet}
 
-{#snippet headingsPreview(id: string)}
+{#snippet headingsIcon(id: string)}
   {@const style = HEADING_STYLE.find((heading) => heading.id === id)}
   {#if style}
     <span
-      aria-hidden="true"
-      class="text-2xl"
+      class="text-lg leading-none"
       style="font-family:var(--heading-font-family);font-variation-settings:'opsz' {style.opsz}, 'wght' {style.wght}, 'SOFT' {style.SOFT}, 'WONK' {style.WONK}"
       >Aa</span
     >
   {/if}
 {/snippet}
 
-<div class="flex w-full flex-col gap-8 px-4 pt-2 pb-4 text-left">
-  <section aria-labelledby="preferences-theme" class="flex flex-col gap-4">
-    <h3 id="preferences-theme" class="h4">Theme</h3>
-    {@render tiles({
-      legend: 'Mode',
-      key: 'mode',
-      options: THEMES,
-      fallback: 'system',
-      preview: modePreview,
-    })}
-    {@render tiles({
-      legend: 'Colors',
-      key: 'id',
-      options: SKELETON_THEMES,
-      fallback: 'classic',
-      preview: colorsPreview,
-    })}
-  </section>
+<div class="flex w-full flex-col gap-4 px-4 pt-2 pb-4 text-left">
+  <div class="flex flex-col gap-1">
+    <SegmentedControl
+      value={preferences.value.theme.mode ?? 'system'}
+      onValueChange={(e) => {
+        if (e.value) choose('mode', e.value);
+      }}
+    >
+      <SegmentedControl.Label class="label-text">Mode</SegmentedControl.Label>
+      <SegmentedControl.Control
+        class="bg-surface-100 dark:bg-surface-900 w-full"
+      >
+        <SegmentedControl.Indicator />
+        {#each THEMES as mode (mode.id)}
+          <SegmentedControl.Item value={mode.id} class="flex-1">
+            <SegmentedControl.ItemText
+              class="flex items-center gap-1 [&_svg]:size-4 [&_svg]:shrink-0"
+            >
+              {@html mode.icon}
+              {mode.name}
+            </SegmentedControl.ItemText>
+            <SegmentedControl.ItemHiddenInput />
+          </SegmentedControl.Item>
+        {/each}
+      </SegmentedControl.Control>
+    </SegmentedControl>
+  </div>
 
-  <section aria-labelledby="preferences-layout" class="flex flex-col gap-4">
-    <h3 id="preferences-layout" class="h4">Text & Layout</h3>
-    {@render tiles({
-      legend: 'Text Size',
+  {@render choiceSelect({
+    label: 'Colors',
+    key: 'id',
+    options: SKELETON_THEMES,
+    fallback: 'classic',
+    icon: colorsIcon,
+  })}
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    {@render choiceSelect({
+      label: 'Text Size',
       key: 'textScale',
       options: TEXT_SCALE,
       fallback: 'normal',
-      preview: textPreview,
+      icon: textSizeIcon,
     })}
-    {@render tiles({
-      legend: 'Spacing',
+    {@render choiceSelect({
+      label: 'Spacing',
       key: 'spacing',
       options: SPACING,
       fallback: 'normal',
-      preview: spacingPreview,
+      icon: spacingIcon,
     })}
-    {@render tiles({
-      legend: 'Buttons',
+    {@render choiceSelect({
+      label: 'Buttons',
       key: 'roundness',
       options: ROUNDNESS,
       fallback: 'pill',
-      preview: buttonsPreview,
+      icon: buttonsIcon,
     })}
-    {@render tiles({
-      legend: 'Headings',
+    {@render choiceSelect({
+      label: 'Headings',
       key: 'headingStyle',
       options: HEADING_STYLE,
       fallback: 'classic',
-      preview: headingsPreview,
+      icon: headingsIcon,
     })}
-  </section>
+  </div>
 
-  <section aria-labelledby="preferences-effects" class="flex flex-col gap-4">
-    <h3 id="preferences-effects" class="h4">Sound & Motion</h3>
-    <div
-      class="divide-surface-300-700 rounded-container border-surface-300-700 bg-surface-100 dark:bg-surface-900 flex flex-col divide-y border"
-    >
-      <ToggleSwitch
-        bare
-        label="Sounds"
-        details="Soft clicks when moving colors, copying, saving, and using switches"
-        checked={effects.sound}
-        onchange={(e) =>
-          setEffect('sound', (e.currentTarget as HTMLInputElement).checked)}
-      />
-      {#if showVibration}
-        <ToggleSwitch
-          bare
-          label="Vibration"
-          details="A light tap for the same actions"
-          checked={effects.haptics}
-          onchange={(e) =>
-            setEffect('haptics', (e.currentTarget as HTMLInputElement).checked)}
-        />
-      {/if}
-      <ToggleSwitch
-        bare
-        label="Reduce Motion"
-        details="Turns off decorative animations. Your device's Reduce Motion setting is always followed."
-        checked={effects.motion === 'reduce'}
-        onchange={(e) =>
-          setEffect(
-            'motion',
-            (e.currentTarget as HTMLInputElement).checked ? 'reduce' : 'system',
-          )}
-      />
-    </div>
-  </section>
-
-  <button
-    type="button"
-    class="btn hover:preset-tonal-surface self-center"
-    onclick={resetAll}
+  <div
+    role="group"
+    aria-labelledby="preferences-sound-motion"
+    class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
   >
-    <RotateCcwIcon />
-    Reset to Defaults
-  </button>
+    <span id="preferences-sound-motion" class="label-text px-4 pt-3"
+      >Sound & Motion</span
+    >
+    <ToggleSwitch
+      bare
+      label="Sounds"
+      details="Soft clicks when moving colors, copying, saving, and using switches"
+      checked={effects.sound}
+      onchange={(e) =>
+        setEffect('sound', (e.currentTarget as HTMLInputElement).checked)}
+    />
+    {#if showVibration}
+      <ToggleSwitch
+        bare
+        label="Vibration"
+        details="A light tap for the same actions"
+        checked={effects.haptics}
+        onchange={(e) =>
+          setEffect('haptics', (e.currentTarget as HTMLInputElement).checked)}
+      />
+    {/if}
+    <ToggleSwitch
+      bare
+      label="Reduce Motion"
+      details="Turns off decorative animations. Your device's Reduce Motion setting is always followed."
+      checked={effects.motion === 'reduce'}
+      onchange={(e) =>
+        setEffect(
+          'motion',
+          (e.currentTarget as HTMLInputElement).checked ? 'reduce' : 'system',
+        )}
+    />
+  </div>
 </div>
+
+<StickyPart position="bottom">
+  <div
+    class="bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-2 sm:px-4"
+  >
+    <CloseButton onClose={dialog.close} text="Close" />
+    <button class="btn hover:preset-tonal-surface" onclick={resetAll}>
+      <RotateCcwIcon />
+      Reset to Defaults
+    </button>
+  </div>
+</StickyPart>
