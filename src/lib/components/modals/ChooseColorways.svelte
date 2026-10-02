@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             bind:colors={selectedColors}
           />
         {/key}
-        <div class="flex items-center justify-between gap-2">
+        <div class="mt-2 flex items-center justify-between gap-2">
           <p class="text-xs">{paletteTitleText}</p>
           <SortMenu
             colors={selectedColors as Color[]}

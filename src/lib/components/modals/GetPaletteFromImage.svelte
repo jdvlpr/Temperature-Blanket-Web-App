@@ -205,20 +205,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <div class="grid gap-4 sm:grid-cols-2">
-        <button
-          class="card preset-outlined-surface-300-700 hover:preset-tonal-surface flex flex-col items-center gap-3 p-6 text-center transition-colors"
-          onclick={() => open(() => palette.randomImage())}
+        <!-- A card rather than a button so the photo credit links can sit
+        inside it; the title button covers the whole card -->
+        <div
+          class="card preset-outlined-surface-300-700 hover:preset-tonal-surface has-[:focus-visible]:outline-primary-500 relative flex flex-col items-center gap-3 p-6 text-center transition-colors has-[:focus-visible]:outline-2"
         >
-          <span
-            class="preset-tonal-primary flex size-14 items-center justify-center rounded-full"
+          <ShuffleIcon class="text-primary-600-400 size-10" />
+          <button
+            class="text-lg font-bold outline-none after:absolute after:inset-0 after:content-['']"
+            onclick={() => open(() => palette.randomImage())}
+            >Random Photo</button
           >
-            <ShuffleIcon class="size-7" />
-          </span>
-          <span class="text-lg font-bold">Random Photo</span>
           <span class="text-surface-700-300 text-sm"
-            >Get inspired by a photo from Unsplash</span
+            >A surprise photo from <a
+              href="https://unsplash.com"
+              class="link relative"
+              target="_blank"
+              rel="nofollow noreferrer">Unsplash</a
+            >, via
+            <a
+              href="https://picsum.photos"
+              class="link relative"
+              target="_blank"
+              rel="nofollow noreferrer">Lorem Picsum</a
+            ></span
           >
-        </button>
+        </div>
         <button
           class={[
             'card flex flex-col items-center gap-3 p-6 text-center transition-colors',
@@ -228,11 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ]}
           onclick={() => input?.click()}
         >
-          <span
-            class="preset-tonal-primary flex size-14 items-center justify-center rounded-full"
-          >
-            <ImagePlusIcon class="size-7" />
-          </span>
+          <ImagePlusIcon class="text-primary-600-400 size-10" />
           <span class="text-lg font-bold">Your Photo</span>
           <span class="text-surface-700-300 text-sm"
             >Choose a photo, or drop or paste one here</span
@@ -262,22 +270,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ChevronRightIcon class="shrink-0" />
         </button>
       {/if}
-
-      <p class="text-surface-700-300 text-center text-xs">
-        Random photos from <a
-          href="https://unsplash.com"
-          class="link"
-          target="_blank"
-          rel="nofollow noreferrer">Unsplash</a
-        >
-        via
-        <a
-          href="https://picsum.photos"
-          class="link"
-          target="_blank"
-          rel="nofollow noreferrer">Lorem Picsum</a
-        >.
-      </p>
     </div>
   {:else}
     <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
