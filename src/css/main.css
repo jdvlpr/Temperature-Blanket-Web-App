@@ -132,6 +132,19 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
 }
 
+/* Stacked segmented controls: the box takes the container's corners and its
+   options follow them (less its padding), as menus do, so a tall box isn't a
+   pill with pills inside it. */
+[data-scope='radio-group'][data-part='root'][data-orientation='vertical'] {
+  & [data-part='control'] {
+    border-radius: var(--radius-container);
+  }
+  & [data-part='indicator'],
+  & [data-part='item'] {
+    border-radius: max(0px, calc(var(--radius-container) - var(--spacing) * 2));
+  }
+}
+
 /* Spacing */
 [data-spacing='compact'] {
   --spacing: 0.22rem;

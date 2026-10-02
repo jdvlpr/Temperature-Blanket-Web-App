@@ -102,6 +102,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const menuItemClass =
     'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 
+  /** A segmented control's options stack only when they wouldn't fit side by
+   * side. Attach to an element as wide as the space the control has. */
+  function stackWhenNarrow() {
+    let stacked = $state(false);
+    // The options' width side by side, measured while they are
+    let needed = 0;
+    return {
+      get stacked() {
+        return stacked;
+      },
+      attach(area: HTMLElement) {
+        const control = area.querySelector<HTMLElement>(
+          '[data-part="control"]',
+        );
+        if (!control) return;
+        const update = () => {
+          if (!stacked) needed = control.scrollWidth;
+          stacked = needed > area.clientWidth;
+        };
+        const observer = new ResizeObserver(update);
+        observer.observe(area);
+        observer.observe(control);
+        return () => observer.disconnect();
+      },
+    };
+  }
+  const toolFit = stackWhenNarrow();
+  const modeFit = stackWhenNarrow();
+
   // Choose a photo first, then work with it
   let step = $state<'start' | 'editor'>('start');
   let input: HTMLInputElement | undefined = $state();
@@ -287,11 +316,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {:else}
     <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
       <div
-        class="isolate flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row"
+        class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row"
       >
-        <section class="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
-          <div class="flex flex-wrap items-center justify-center gap-2">
+        <!-- Isolated so the photo's markers stay under the palette bar; the side
+        panel isn't, so the yarn list can open over the bar -->
+        <section class="isolate flex min-h-0 min-w-0 flex-1 flex-col gap-2">
+          <div
+            class="flex flex-wrap items-center justify-center gap-2"
+            {@attach toolFit.attach}
+          >
             <SegmentedControl
+              orientation={toolFit.stacked ? 'vertical' : 'horizontal'}
               value={palette.tool}
               onValueChange={(e) => {
                 if (e.value === 'points' || e.value === 'line')
@@ -379,51 +414,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <aside
           class="flex flex-col gap-4 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
         >
-          <!-- Styled like the yarn fields below it -->
-          <div class="label">
-            <span class="label-text">Photo</span>
-            <Menu
-              positioning={{ sameWidth: true }}
-              onSelect={(details) =>
-                details.value === 'random'
-                  ? palette.randomImage()
-                  : input?.click()}
+          <!-- As the main palette's Get Colors and Sort menus -->
+          <Menu
+            positioning={{ placement: 'bottom-start' }}
+            onSelect={(details) =>
+              details.value === 'random'
+                ? palette.randomImage()
+                : input?.click()}
+          >
+            <Menu.Trigger
+              class={[toolbarButtonClass, 'self-start']}
+              disabled={palette.loading}
             >
-              <!-- As the yarn fields: icons beside the field, not in it -->
-              <div class="relative flex items-center">
-                <ImageIcon class="pointer-events-none absolute left-2" />
-                <Menu.Trigger
-                  class="select truncate pr-8 pl-10 text-left"
-                  disabled={palette.loading}
+              <ImageIcon />
+              <span class="flex items-center gap-1"
+                >Change Photo <ChevronDownIcon size={18} /></span
+              >
+            </Menu.Trigger>
+            <Portal>
+              <Menu.Positioner>
+                <Menu.Content
+                  class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
                 >
-                  {palette.source === 'random' ? 'Random Photo' : 'Your Photo'}
-                </Menu.Trigger>
-                <ChevronDownIcon
-                  class="pointer-events-none absolute right-2 size-4"
-                />
-              </div>
-              <Portal>
-                <Menu.Positioner>
-                  <Menu.Content
-                    class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
-                  >
-                    {#each PHOTO_SOURCES as source (source.value)}
-                      <Menu.Item value={source.value} class={menuItemClass}>
-                        <source.icon class="shrink-0" />
-                        <div class="flex min-w-0 flex-col text-left">
-                          <p>{source.label}</p>
-                        </div>
-                      </Menu.Item>
-                    {/each}
-                  </Menu.Content>
-                </Menu.Positioner>
-              </Portal>
-            </Menu>
-          </div>
+                  {#each PHOTO_SOURCES as source (source.value)}
+                    <Menu.Item value={source.value} class={menuItemClass}>
+                      <source.icon class="shrink-0" />
+                      <div class="flex min-w-0 flex-col text-left">
+                        <p>{source.label}</p>
+                      </div>
+                    </Menu.Item>
+                  {/each}
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu>
 
-          <div class="flex flex-col gap-1">
+          <div class="flex flex-col gap-1" {@attach modeFit.attach}>
             <span class="label-text">Colors</span>
             <SegmentedControl
+              orientation={modeFit.stacked ? 'vertical' : 'horizontal'}
               value={palette.mode}
               onValueChange={(e) => {
                 if (e.value === 'yarn' || e.value === 'exact')
