@@ -22,7 +22,7 @@ export type EffectsPreferences = {
 };
 
 export const DEFAULT_EFFECTS: EffectsPreferences = {
-  sound: false,
+  sound: true,
   haptics: true,
   motion: 'system',
 };

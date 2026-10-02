@@ -15,7 +15,7 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('$app/environment', () => ({ browser: true }));
 vi.mock('$lib/storage/preferences.svelte', () => ({
-  DEFAULT_EFFECTS: { sound: false, haptics: true, motion: 'system' },
+  DEFAULT_EFFECTS: { sound: true, haptics: true, motion: 'system' },
   preferences: mocks.preferences,
 }));
 vi.mock('svelte-dnd-action', () => ({
@@ -54,7 +54,8 @@ function stubDevice({ coarsePointer }: { coarsePointer: boolean }) {
       });
       currentTime = 0;
       destination = {};
-      createOscillator = createOscillator;
+      // Always the current test's mock: the module keeps one audio context across tests
+      createOscillator = () => createOscillator();
       createGain = () => ({
         gain: {
           setValueAtTime: vi.fn(),
@@ -89,16 +90,16 @@ afterEach(() => {
 describe('effects preferences', () => {
   it('fills in defaults when nothing is saved', () => {
     expect(getEffects()).toEqual({
-      sound: false,
+      sound: true,
       haptics: true,
       motion: 'system',
     });
   });
 
   it('keeps saved settings and fills in the rest', () => {
-    mocks.preferences.value = { effects: { sound: true } };
+    mocks.preferences.value = { effects: { sound: false } };
     expect(getEffects()).toEqual({
-      sound: true,
+      sound: false,
       haptics: true,
       motion: 'system',
     });
@@ -107,7 +108,7 @@ describe('effects preferences', () => {
   it('saves one setting without dropping the others', () => {
     setEffect('motion', 'reduce');
     expect(mocks.preferences.value.effects).toEqual({
-      sound: false,
+      sound: true,
       haptics: true,
       motion: 'reduce',
     });
@@ -148,12 +149,12 @@ describe('feedback', () => {
     expect(vibrate).not.toHaveBeenCalled();
   });
 
-  it('is silent unless sounds are on', () => {
-    feedback('success');
-    expect(createOscillator).not.toHaveBeenCalled();
-    setEffect('sound', true);
+  it('plays sounds by default, and is silent when they are turned off', () => {
     feedback('success');
     expect(createOscillator).toHaveBeenCalledTimes(2); // two notes
+    setEffect('sound', false);
+    feedback('success');
+    expect(createOscillator).toHaveBeenCalledTimes(2);
   });
 });
 

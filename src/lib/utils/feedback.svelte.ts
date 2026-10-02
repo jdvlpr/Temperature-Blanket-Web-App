@@ -83,7 +83,8 @@ const SOUNDS: Record<FeedbackEvent, Tone[]> = {
     { frequency: 1500, endFrequency: 900, duration: 0.05, volume: 0.06 },
   ],
   tick: [
-    { frequency: 1700, endFrequency: 1300, duration: 0.035, volume: 0.05 },
+    // The softest sound: it plays at every spot a dragged color passes
+    { frequency: 1400, endFrequency: 1100, duration: 0.03, volume: 0.025 },
   ],
   drop: [{ frequency: 900, endFrequency: 520, duration: 0.07, volume: 0.07 }],
   copy: [{ frequency: 1300, endFrequency: 1100, duration: 0.05, volume: 0.04 }],
