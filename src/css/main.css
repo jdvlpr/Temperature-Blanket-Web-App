@@ -132,6 +132,17 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
 }
 
+/* The usual button hover. preset-tonal-surface's background is the page's own
+   (surface 50/950), so as a hover it barely showed, and btn's brightness filter
+   washed it out further. A step off the background instead, without the
+   filter. Unlayered so it wins over the utility. */
+@media (hover: hover) {
+  .hover\:preset-tonal-surface:hover:not(:disabled) {
+    background-color: var(--color-surface-200-800);
+    filter: none;
+  }
+}
+
 /* Stacked segmented controls: the box takes the container's corners and its
    options follow them (less its padding), as menus do, so a tall box isn't a
    pill with pills inside it. */

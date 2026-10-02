@@ -77,11 +77,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ];
 
   const STYLES: Record<PaletteStyle, { label: string; details: string }> = {
-    balanced: { label: 'Balanced', details: 'Colors from across the photo' },
+    balanced: { label: 'Balanced', details: 'Variety of colors from across the photo' },
     vivid: { label: 'Vivid', details: 'Favors bright, bold colors' },
-    muted: { label: 'Muted', details: 'Favors soft, grayed colors' },
+    muted: { label: 'Muted', details: 'Favors soft, subdued colors' },
     light: { label: 'Light', details: 'Favors lighter colors' },
-    dark: { label: 'Dark', details: 'Favors deeper colors' },
+    dark: { label: 'Dark', details: 'Favors darker colors' },
   };
 
   const PHOTO_SOURCES = [
@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ];
 
   // As in the main palette's toolbar
-  const toolbarButtonClass = 'btn hover:bg-surface-200-800 justify-start';
+  const toolbarButtonClass = 'hover:preset-tonal-surface btn justify-start';
   const menuItemClass =
     'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 
