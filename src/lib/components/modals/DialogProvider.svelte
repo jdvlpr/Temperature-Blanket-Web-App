@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { motion } from '$lib/utils/feedback.svelte';
-  import { cubicOut } from 'svelte/easing';
+  import { cubicOut, linear } from 'svelte/easing';
   import { MediaQuery } from 'svelte/reactivity';
   import { fade, fly } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
@@ -60,6 +60,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : { y: phone.current ? 120 : 50, duration: 400, easing: cubicOut },
   );
 
+  // Closing: a sheet slides down off the bottom edge (from wherever a drag
+  // left it, at the speed it was let go), the side panel slides back out to
+  // the right, and a dialog on a larger screen fades as it drops a little
+  let releaseVelocity = 0;
+
+  function closeOut(node: HTMLElement) {
+    if (reduceMotion) return { duration: 0 };
+    if (side)
+      return {
+        duration: 250,
+        easing: cubicOut,
+        css: (_t: number, u: number) => `transform: translateX(${u * 100}%)`,
+      };
+    if (!phone.current)
+      return {
+        duration: 150,
+        easing: cubicOut,
+        css: (t: number, u: number) =>
+          `opacity: ${t}; transform: translateY(${u * 16}px)`,
+      };
+    const from = dragOffset;
+    const distance = Math.max(0, node.offsetHeight - from);
+    const thrown = releaseVelocity > 0;
+    return {
+      // Thrown: keep going at the release speed (but never crawl); otherwise
+      // the same pace as opening
+      duration: thrown
+        ? Math.min(
+            300,
+            Math.max(120, distance / Math.max(releaseVelocity, 1.5)),
+          )
+        : 280,
+      easing: thrown ? linear : cubicOut,
+      css: (_t: number, u: number) =>
+        `transform: translateY(${from + distance * u}px)`,
+    };
+  }
+
   // Dragging the sheet down by its top bar (grab bar and header): far or
   // fast enough closes it, otherwise it settles back. Close and Escape do
   // the same without dragging. Only the top bar drags, so drags inside the
@@ -82,10 +120,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let startY = 0;
   let samples: { y: number; t: number }[] = [];
 
+  // Reset on opening, not closing: the closing slide starts from the drag
   $effect(() => {
-    if (!dialog.opened) {
+    if (dialog.opened) {
       dragOffset = 0;
       dragging = false;
+      releaseVelocity = 0;
     }
   });
 
@@ -116,21 +156,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function finishDrag(y: number, t: number, cancelled: boolean) {
     if (!dragging) return;
     dragging = false;
-    const first = samples[0];
+    // From the moves in the last ~100ms before letting go: none if the
+    // finger stopped first
+    samples.push({ y, t });
+    const recent = samples.filter((sample) => t - sample.t <= 100);
+    const first = recent[0];
     const dt = t - first.t;
     const velocity = !cancelled && dt > 0 ? (y - first.y) / dt : 0;
     const closing =
       !cancelled &&
       dragOffset > TAP_SLOP_PX &&
       (dragOffset > sheetHeight / 4 || velocity > CLOSE_VELOCITY);
-    if (!closing) {
-      dragOffset = 0;
-    } else if (reduceMotion) {
+    if (closing) {
+      releaseVelocity = Math.max(0, velocity);
       dialog.close();
     } else {
-      // Off the bottom edge, then closed
-      dragOffset = sheetHeight;
-      setTimeout(dialog.close, 200);
+      dragOffset = 0;
     }
   }
 
@@ -159,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     touchActive = false;
     const touch = event.changedTouches[0];
     finishDrag(
-      touch?.clientY ?? startY,
+      touch?.clientY ?? samples[samples.length - 1].y,
       event.timeStamp,
       event.type === 'touchcancel',
     );
@@ -223,7 +264,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style={grabbable
         ? `opacity: ${1 - dragProgress}; transition: ${dragging || reduceMotion ? 'none' : 'opacity 200ms ease-out'}`
         : undefined}
-    />
+    >
+      {#snippet element(attributes)}
+        {#if !attributes.hidden}
+          <!-- The side panel's backdrop fades in with CSS -->
+          <div
+            {...attributes}
+            in:fade={{ duration: side || reduceMotion ? 0 : 200 }}
+            out:fade={{ duration: reduceMotion ? 0 : 200 }}
+          ></div>
+        {/if}
+      {/snippet}
+    </Dialog.Backdrop>
     <Dialog.Positioner
       class={[
         'fixed inset-0 z-60 flex items-center justify-center',
@@ -260,6 +312,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {...attributes}
               bind:this={dialog.scrollElement}
               in:fly={openFly}
+              out:closeOut
               style:transform={dragOffset
                 ? `translateY(${dragOffset}px)`
                 : undefined}
@@ -293,10 +346,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if grabbable}
                     <div
                       aria-hidden="true"
-                      class="flex h-5 items-end justify-center"
+                      class="flex h-4 items-end justify-center"
                     >
                       <div
-                        class="bg-surface-950-50 h-1.5 w-12 rounded-full"
+                        class="bg-surface-950-50/25 h-1 w-9 rounded-full"
                       ></div>
                     </div>
                   {/if}
