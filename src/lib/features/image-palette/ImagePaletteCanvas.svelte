@@ -356,6 +356,7 @@ make the magnifier's fixed position relative to the photo, not the screen -->
     )}px;width:{size.width}px;height:{size.height}px"
     role="group"
     aria-label="Photo with color markers"
+    data-sheet-no-drag
     onpointermove={onMove}
     onpointerup={onUp}
     onpointercancel={onUp}

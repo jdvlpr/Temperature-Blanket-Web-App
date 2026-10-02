@@ -504,6 +504,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? 'cursor: grab'
                 : 'cursor: grabbing'}"
               onmousedown={startDrag}
+              data-sheet-no-drag
               use:dragHandle
               ontouchstart={startDrag}
               onkeydown={handleKeyDown}

@@ -297,6 +297,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             tabindex="-1"
             aria-label="Crag handle for color {index + 1}"
             class="btn-icon hover-on-color handle p-2"
+            data-sheet-no-drag
             use:dragHandle
           >
             <MoveIcon />

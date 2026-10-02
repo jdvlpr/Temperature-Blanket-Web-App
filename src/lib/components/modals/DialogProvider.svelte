@@ -98,10 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   }
 
-  // Dragging the sheet down by its top bar (grab bar and header): far or
-  // fast enough closes it, otherwise it settles back. Close and Escape do
-  // the same without dragging. Only the top bar drags, so drags inside the
-  // content (e.g. reordering colors) stay their own.
+  // Dragging a phone's sheet down (by its top bar, or its content when
+  // scrolled to the top): far or fast enough closes it, otherwise it settles
+  // back. Close and Escape do the same without dragging.
   const grabbable = $derived(!side && phone.current);
 
   /** Movement under this many px is a tap, not a drag. */
@@ -181,46 +180,102 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * pointercancel and the page (or iOS's rubber-band bounce) moves instead
    * of the sheet. A non-passive touchmove can preventDefault that, and
    * Svelte registers ontouchmove as passive, hence addEventListener.
+   *
+   * The top bar always drags. The content drags too, the way the system's
+   * sheets do, when pulled down while scrolled to the top, except where a
+   * touch means something else there: form fields, canvases, anything that
+   * handles its own touches (touch-action other than auto/manipulation),
+   * and anything marked data-sheet-no-drag (e.g. reorder handles).
    */
-  let touchActive = false;
+  let touchMode: 'undecided' | 'sheet' | 'none' = 'none';
+  let touchStart = { x: 0, y: 0, t: 0 };
 
-  function handleTouchStart(event: TouchEvent) {
-    touchActive = event.touches.length === 1 && !onControl(event.target);
-    if (touchActive) beginDrag(event.touches[0].clientY, event.timeStamp);
+  function handlesItsOwnTouches(target: Element, sheet: HTMLElement) {
+    if (
+      target.closest(
+        'input, textarea, select, canvas, [contenteditable], [data-sheet-no-drag]',
+      )
+    )
+      return true;
+    for (
+      let element: Element | null = target;
+      element && element !== sheet;
+      element = element.parentElement
+    ) {
+      const touchAction = getComputedStyle(element).touchAction;
+      if (touchAction !== 'auto' && touchAction !== 'manipulation') return true;
+      // Something inside that's scrolled down scrolls back up first
+      if (element.scrollTop > 0) return true;
+    }
+    return false;
   }
 
-  function handleTouchMove(event: TouchEvent) {
-    if (!touchActive || event.touches.length !== 1) return;
-    if (event.cancelable) event.preventDefault();
-    moveDrag(event.touches[0].clientY, event.timeStamp);
-  }
+  function sheetTouch(sheet: HTMLElement) {
+    function start(event: TouchEvent) {
+      touchMode = 'none';
+      if (!grabbable || event.touches.length !== 1) return;
+      const target = event.target as Element;
+      if (topBar?.contains(target)) {
+        if (onControl(target)) return;
+        touchMode = 'sheet';
+      } else {
+        if (sheet.scrollTop > 0 || handlesItsOwnTouches(target, sheet)) return;
+        touchMode = 'undecided';
+      }
+      const touch = event.touches[0];
+      touchStart = { x: touch.clientX, y: touch.clientY, t: event.timeStamp };
+      if (touchMode === 'sheet') beginDrag(touch.clientY, event.timeStamp);
+    }
 
-  function handleTouchEnd(event: TouchEvent) {
-    if (!touchActive) return;
-    touchActive = false;
-    const touch = event.changedTouches[0];
-    finishDrag(
-      touch?.clientY ?? samples[samples.length - 1].y,
-      event.timeStamp,
-      event.type === 'touchcancel',
-    );
-  }
+    function move(event: TouchEvent) {
+      if (touchMode === 'none' || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      if (touchMode === 'undecided') {
+        // Decided on the very first movement: after that, the browser may
+        // have committed to scrolling and the event can't be cancelled
+        const dx = touch.clientX - touchStart.x;
+        const dy = touch.clientY - touchStart.y;
+        if (dx === 0 && dy === 0) return;
+        const pullingDown = dy > 0 && dy >= Math.abs(dx);
+        if (!pullingDown || sheet.scrollTop > 0) {
+          touchMode = 'none';
+          return;
+        }
+        touchMode = 'sheet';
+        beginDrag(touchStart.y, touchStart.t);
+      }
+      if (event.cancelable) event.preventDefault();
+      moveDrag(touch.clientY, event.timeStamp);
+    }
 
-  $effect(() => {
-    const element = topBar;
-    if (!element || !grabbable) return;
+    function end(event: TouchEvent) {
+      if (touchMode !== 'sheet') {
+        touchMode = 'none';
+        return;
+      }
+      touchMode = 'none';
+      const touch = event.changedTouches[0];
+      finishDrag(
+        touch?.clientY ?? samples[samples.length - 1].y,
+        event.timeStamp,
+        event.type === 'touchcancel',
+      );
+    }
+
     const options = { passive: false } as const;
-    element.addEventListener('touchstart', handleTouchStart, options);
-    element.addEventListener('touchmove', handleTouchMove, options);
-    element.addEventListener('touchend', handleTouchEnd);
-    element.addEventListener('touchcancel', handleTouchEnd);
-    return () => {
-      element.removeEventListener('touchstart', handleTouchStart);
-      element.removeEventListener('touchmove', handleTouchMove);
-      element.removeEventListener('touchend', handleTouchEnd);
-      element.removeEventListener('touchcancel', handleTouchEnd);
+    sheet.addEventListener('touchstart', start, options);
+    sheet.addEventListener('touchmove', move, options);
+    sheet.addEventListener('touchend', end);
+    sheet.addEventListener('touchcancel', end);
+    return {
+      destroy() {
+        sheet.removeEventListener('touchstart', start);
+        sheet.removeEventListener('touchmove', move);
+        sheet.removeEventListener('touchend', end);
+        sheet.removeEventListener('touchcancel', end);
+      },
     };
-  });
+  }
 
   // A mouse or pen, e.g. a desktop browser in a narrow window
   let pointerId: number | null = null;
@@ -313,6 +368,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:this={dialog.scrollElement}
               in:fly={openFly}
               out:closeOut
+              use:sheetTouch
               style:transform={dragOffset
                 ? `translateY(${dragOffset}px)`
                 : undefined}
