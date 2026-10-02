@@ -46,9 +46,7 @@ const THEMES = {
 const RADIUS = 16;
 /** Space kept between the title and the colors */
 const PADDING_BELOW_TITLE = 24;
-/** A range sits in a pill: its height and side padding, as parts of its
- * size. Every layout's margin is wider than the padding, so the pill stays
- * inside its color. */
+/** A range sits in a pill: its height and side padding, as parts of its size */
 const BADGE_HEIGHT = 1.45;
 const BADGE_PADDING = 0.5;
 
@@ -109,9 +107,8 @@ function getLines({
       size: primary * 1.05,
       weight: 700,
       badge: true,
-      // The pill reaches into the margin on the left, so its text lines up
-      // with the lines below; its right side counts toward its width
-      measure: (text, size) => measure(text, size) + size * BADGE_PADDING,
+      // The pill, padding and all, counts toward its width
+      measure: (text, size) => measure(text, size) + size * BADGE_PADDING * 2,
       lineHeight: BADGE_HEIGHT + 0.3,
     });
   }
@@ -144,7 +141,22 @@ function drawLines({
   align: 'center' | 'end';
 }) {
   if (!lines.length || width <= 0 || height <= 0) return;
-  const sizes = fitLines({ lines, width, height });
+  // A range's pill sits at the margin like any other line, so the lines
+  // around it move in by its padding to line up with the range's text
+  const badgeSize = fitLines({ lines, width, height }).find(
+    (_, i) => lines[i].badge,
+  );
+  const indent = badgeSize ? badgeSize * BADGE_PADDING : 0;
+  const fitted = lines.map((line) =>
+    line.badge || !indent
+      ? line
+      : {
+          ...line,
+          measure: (text: string, size: number) =>
+            line.measure(text, size) + indent,
+        },
+  );
+  const sizes = fitLines({ lines: fitted, width, height });
   const slots = lines.map(
     (line, i) => sizes[i] * (line.lineHeight ?? LINE_HEIGHT),
   );
@@ -154,7 +166,6 @@ function drawLines({
       ? y + (height - blockHeight) / 2
       : y + height - blockHeight;
   ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
   const textColor = ctx.fillStyle;
   lines.forEach((line, i) => {
     const size = sizes[i];
@@ -163,25 +174,35 @@ function drawLines({
     if (line.badge) {
       // A tint of the text's color, so it shows on light and dark colors
       const pillHeight = size * BADGE_HEIGHT;
-      const padding = size * BADGE_PADDING;
       ctx.fillStyle =
         textColor === '#ffffff'
           ? 'rgba(255, 255, 255, 0.24)'
           : 'rgba(0, 0, 0, 0.14)';
       ctx.beginPath();
       ctx.roundRect(
-        x - padding,
+        x,
         middle - pillHeight / 2,
-        line.measure(line.text, size) + padding,
+        line.measure(line.text, size),
         pillHeight,
         pillHeight / 2,
       );
       ctx.fill();
       ctx.fillStyle = textColor;
       ctx.font = font(line.weight, size);
-      ctx.fillText(line.text, x, middle);
+      // Centered on the glyphs themselves: numbers have no descenders, so
+      // the font's middle would sit them off-center in the pill
+      const glyphs = ctx.measureText(line.text);
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(
+        line.text,
+        x + size * BADGE_PADDING,
+        middle +
+          (glyphs.actualBoundingBoxAscent - glyphs.actualBoundingBoxDescent) /
+            2,
+      );
     } else {
-      ctx.fillText(line.text, x, middle);
+      ctx.textBaseline = 'middle';
+      ctx.fillText(line.text, x + indent, middle);
     }
     top += slots[i];
   });
