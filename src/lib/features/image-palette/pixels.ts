@@ -124,3 +124,39 @@ export function posterize({
   }
   return out;
 }
+
+/**
+ * Where to put a magnifier of `size` for a finger at (x, y) on screen: above
+ * the finger, `gap` away so the finger doesn't cover it. Without room above,
+ * beside the finger on the side with more room, never below where the hand
+ * would hide it. Kept `margin` inside the screen's edges.
+ */
+export function placeMagnifier({
+  x,
+  y,
+  size,
+  gap,
+  margin,
+  screenWidth,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  gap: number;
+  margin: number;
+  screenWidth: number;
+}): { left: number; top: number } {
+  let left = x - size / 2;
+  let top = y - gap - size;
+  if (top < margin) {
+    left = x > screenWidth / 2 ? x - gap - size : x + gap;
+    top = Math.max(margin, y - size / 2);
+  }
+  return {
+    left: Math.min(
+      Math.max(left, margin),
+      Math.max(margin, screenWidth - size - margin),
+    ),
+    top,
+  };
+}

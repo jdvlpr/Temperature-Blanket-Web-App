@@ -17,23 +17,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { getTextColor } from '$lib/utils/color-utils';
   import { LockKeyholeIcon, LockOpenIcon, Trash2Icon } from '@lucide/svelte';
+  import { Portal } from '@skeletonlabs/skeleton-svelte';
   import { MediaQuery } from 'svelte/reactivity';
-  import { innerHeight } from 'svelte/reactivity/window';
+  import { innerHeight, innerWidth } from 'svelte/reactivity/window';
   import { scale } from 'svelte/transition';
   import type {
     ImagePaletteState,
     PalettePoint,
   } from './image-palette-state.svelte';
   import { colorwayKey, type MatchedColor } from './match';
-  import { pointsAlongLine, type Point } from './pixels';
+  import { placeMagnifier, pointsAlongLine, type Point } from './pixels';
 
   let { palette }: { palette: ImagePaletteState } = $props();
 
   const LOUPE_SIZE = 112;
+  /** Space between the finger and the magnifier, so the finger never covers it */
+  const LOUPE_GAP = 44;
+  /** Space kept between the magnifier and the screen's edges */
+  const SCREEN_MARGIN = 8;
   const LOUPE_ZOOM = 6;
   const POPOVER_WIDTH = 288;
 
-  type Pointer = Point & { px: number; py: number };
+  /** A pointer position: as fractions of the photo (x, y), in pixels within
+   * the photo (px, py), and in pixels on screen (cx, cy) */
+  type Pointer = Point & { px: number; py: number; cx: number; cy: number };
   type Drag =
     | { kind: 'point'; id: number; moved: boolean }
     | { kind: 'line'; from: Point; to: Point };
@@ -116,6 +123,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       y: clamp((e.clientY - rect.top) / rect.height),
       px: e.clientX - rect.left,
       py: e.clientY - rect.top,
+      cx: e.clientX,
+      cy: e.clientY,
     };
   }
 
@@ -152,6 +161,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (pointer && loupeCanvas) drawLoupe();
+  });
+
+  let loupePosition = $derived(
+    pointer
+      ? placeMagnifier({
+          x: pointer.cx,
+          y: pointer.cy,
+          size: LOUPE_SIZE,
+          gap: LOUPE_GAP,
+          margin: SCREEN_MARGIN,
+          screenWidth: innerWidth.current ?? 0,
+        })
+      : null,
+  );
+
+  // Touch listeners added by Svelte are passive, so they can't stop a drag
+  // from also scrolling the dialog. This one can, and only acts mid-drag, so
+  // taps on buttons (like in a color's details) still work.
+  $effect(() => {
+    if (!frame) return;
+    const onTouchMove = (e: TouchEvent) => {
+      if (drag && e.cancelable) e.preventDefault();
+    };
+    frame.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => frame?.removeEventListener('touchmove', onTouchMove);
   });
 
   function startDrag(e: PointerEvent, next: Drag) {
@@ -275,6 +309,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
+<!-- The photo is centered with offsets, not a transform: a transform would
+make the magnifier's fixed position relative to the photo, not the screen -->
 <div
   class="relative w-full lg:h-full"
   style={large.current ? '' : `height:${size.height}px`}
@@ -283,8 +319,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div
     bind:this={frame}
-    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none"
-    style="width:{size.width}px;height:{size.height}px"
+    class="absolute select-none"
+    style="left:{(stageWidth - size.width) / 2}px;top:{Math.max(
+      0,
+      (stageHeight - size.height) / 2,
+    )}px;width:{size.width}px;height:{size.height}px"
     role="group"
     aria-label="Photo with color markers"
     onpointermove={onMove}
@@ -457,20 +496,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    {#if drag && pointer}
-      <!-- Magnifier above the finger, or below it near the top edge -->
-      <div
-        class="pointer-events-none absolute z-40 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white shadow-xl"
-        style="left:{pointer.px}px;top:{pointer.py +
-          (pointer.py < LOUPE_SIZE + 20 ? 1 : -1) *
-            (LOUPE_SIZE / 2 + 32)}px;width:{LOUPE_SIZE}px;height:{LOUPE_SIZE}px"
-      >
-        <canvas bind:this={loupeCanvas} width={LOUPE_SIZE} height={LOUPE_SIZE}
-        ></canvas>
-        <span
-          class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_0_1px_black]"
-        ></span>
-      </div>
+    {#if drag && loupePosition}
+      <!-- On the page itself, so neither the dialog's edges nor its opening
+      animation (a transform) can move or cut off the magnifier -->
+      <Portal>
+        <div
+          class="pointer-events-none fixed z-[70] overflow-hidden rounded-full border-4 border-white shadow-xl"
+          style="left:{loupePosition.left}px;top:{loupePosition.top}px;width:{LOUPE_SIZE}px;height:{LOUPE_SIZE}px"
+        >
+          <canvas bind:this={loupeCanvas} width={LOUPE_SIZE} height={LOUPE_SIZE}
+          ></canvas>
+          <span
+            class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_0_1px_black]"
+          ></span>
+        </div>
+      </Portal>
     {/if}
 
     {#if hover && !drag}
