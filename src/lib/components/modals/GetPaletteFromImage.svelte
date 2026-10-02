@@ -333,10 +333,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </div>
 
-          <div class="min-h-0 flex-1 max-lg:px-6">
-            <ImagePaletteCanvas {palette} />
-          </div>
-
           <p class="text-surface-700-300 text-center text-xs">
             {#if palette.showYarnPreview}
               Your photo in only your palette's colors.
@@ -371,6 +367,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </button>
             </div>
           {/if}
+
+          <div class="min-h-0 flex-1 max-lg:px-6">
+            <ImagePaletteCanvas {palette} />
+          </div>
         </section>
 
         <aside
