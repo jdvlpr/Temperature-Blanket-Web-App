@@ -34,10 +34,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="p-4 text-left">
+<div class="px-4 pt-2 pb-4 text-left">
   {#if page === 'locations'}
-    <div class="mt-4">
-      <h2 class="mb-2 text-xl font-bold">Locations</h2>
+    <div>
       <div class="flex flex-col gap-2">
         {#each savedWeatherLocations as { id, data, label }}
           <div
@@ -132,8 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
   {#if page === 'settings'}
-    <div class="mt-4 w-full">
-      <h2 class="mb-2 text-xl font-bold">Settings</h2>
+    <div class="w-full">
       <div
         class="bg-surface-50 dark:bg-surface-950 flex w-fit flex-col justify-center gap-2 rounded p-2"
       >

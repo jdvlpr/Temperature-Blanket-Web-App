@@ -371,6 +371,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 page: 'settings',
               },
             },
+            options: { title: 'Settings' },
           })}
       >
         <SettingsIcon />
@@ -389,6 +390,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   page: 'locations',
                 },
               },
+              options: { title: 'Locations' },
             })}
         >
           <ListIcon />
@@ -461,6 +463,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               page: 'locations',
                             },
                           },
+                          options: { title: 'Locations' },
                         })}
                       ><ListIcon />
                       Locations</button

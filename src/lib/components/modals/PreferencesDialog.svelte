@@ -1,7 +1,8 @@
 <!-- Preferences: how the site looks, sounds, and moves. Every change applies
 right away. Built from the site's usual settings pieces (as in the palette
 image export): selects with the current choice's icon beside it, a segmented
-control for light/dark, and a card of switches. -->
+control for light/dark, a row of color theme thumbnails (as the pattern
+picker), and a card of switches. -->
 
 <script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
@@ -18,6 +19,7 @@ control for light/dark, and a card of switches. -->
   import {
     canVibrate,
     getEffects,
+    motion,
     setEffect,
   } from '$lib/utils/feedback.svelte';
   import { RotateCcwIcon } from '@lucide/svelte';
@@ -43,6 +45,18 @@ control for light/dark, and a card of switches. -->
   let showVibration = $state(false);
   onMount(() => {
     showVibration = canVibrate();
+  });
+
+  // Keep the chosen color theme in view in its scrolling row, e.g. when it's
+  // picked from the select
+  let themeRow: HTMLElement | undefined = $state();
+  $effect(() => {
+    preferences.value.theme.id;
+    themeRow?.querySelector('[aria-pressed="true"]')?.scrollIntoView({
+      behavior: motion.reduced ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'nearest',
+    });
   });
 
   function choose(key: keyof Theme, value: string) {
@@ -100,14 +114,15 @@ current choice's icon beside it -->
 {/snippet}
 
 {#snippet colorsIcon(id: string)}
-  {@const colors = SKELETON_THEMES.find((theme) => theme.id === id)?.colors}
-  {#if colors}
-    <span class="flex h-4 w-6 overflow-hidden rounded-[3px] border">
-      <span class="flex-auto" style="background:{colors.surface}"></span>
-      <span class="flex-auto" style="background:{colors.primary}"></span>
-      <span class="flex-auto" style="background:{colors.secondary}"></span>
-    </span>
-  {/if}
+  <!-- data-theme scopes the theme's own colors here, so these follow light/dark -->
+  <span
+    data-theme={id}
+    class="border-surface-300-700 flex h-4 w-6 overflow-hidden rounded-[3px] border"
+  >
+    <span class="bg-surface-50-950 flex-auto"></span>
+    <span class="bg-primary-500 flex-auto"></span>
+    <span class="bg-secondary-500 flex-auto"></span>
+  </span>
 {/snippet}
 
 {#snippet textSizeIcon(id: string)}
@@ -164,13 +179,53 @@ current choice's icon beside it -->
     </SegmentedControl>
   </div>
 
-  {@render choiceSelect({
-    label: 'Colors',
-    key: 'id',
-    options: SKELETON_THEMES,
-    fallback: 'classic',
-    icon: colorsIcon,
-  })}
+  <div class="flex flex-col gap-1">
+    {@render choiceSelect({
+      label: 'Colors',
+      key: 'id',
+      options: SKELETON_THEMES,
+      fallback: 'classic',
+      icon: colorsIcon,
+    })}
+
+    <!-- Every color theme at a glance, as the pattern picker's thumbnails: a
+    tiny page in its background, button, and accent colors. data-theme scopes
+    each theme's own colors, so they follow light/dark like the site does. One
+    row that scrolls when it doesn't fit -->
+    <div
+      role="group"
+      aria-label="Color themes"
+      bind:this={themeRow}
+      class="mx-auto flex w-fit max-w-full snap-x gap-1 overflow-x-auto pb-2"
+    >
+      {#each SKELETON_THEMES as theme (theme.id)}
+        {@const selected =
+          (preferences.value.theme.id ?? 'classic') === theme.id}
+        <button
+          type="button"
+          class={[
+            'flex shrink-0 snap-center flex-col items-center gap-1 rounded p-2 text-xs whitespace-nowrap',
+            selected
+              ? 'bg-primary-200 dark:bg-primary-800 shadow-sm'
+              : 'hover:bg-surface-100-900',
+          ]}
+          aria-pressed={selected}
+          title="{theme.name} Colors"
+          onclick={() => choose('id', theme.id)}
+        >
+          <span
+            data-theme={theme.id}
+            class="bg-surface-50-950 border-surface-300-700 flex h-8 w-12 flex-col justify-between rounded-[3px] border p-1"
+            aria-hidden="true"
+          >
+            <span class="bg-secondary-500 h-1 w-7 rounded-full"></span>
+            <span class="bg-primary-500 h-2.5 w-5 self-end rounded-full"></span>
+          </span>
+          {theme.name}
+        </button>
+      {/each}
+    </div>
+  </div>
 
   <div class="grid gap-4 sm:grid-cols-2">
     {@render choiceSelect({
