@@ -59,6 +59,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? { duration: 0 }
       : { y: phone.current ? 120 : 50, duration: 400, easing: cubicOut },
   );
+
+  // Dragging the sheet's grab bar down: far or fast enough closes it,
+  // otherwise it settles back. Close and Escape do the same without dragging.
+  let dragOffset = $state(0);
+  let dragging = $state(false);
+  let dragStart = { y: 0, lastY: 0, lastTime: 0, velocity: 0 };
+
+  $effect(() => {
+    if (!dialog.opened) {
+      dragOffset = 0;
+      dragging = false;
+    }
+  });
+
+  function onGrabStart(event: PointerEvent) {
+    if (!event.isPrimary) return;
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    dragging = true;
+    dragStart = {
+      y: event.clientY,
+      lastY: event.clientY,
+      lastTime: event.timeStamp,
+      velocity: 0,
+    };
+  }
+
+  function onGrabMove(event: PointerEvent) {
+    if (!dragging) return;
+    const elapsed = event.timeStamp - dragStart.lastTime;
+    if (elapsed > 0)
+      dragStart.velocity = (event.clientY - dragStart.lastY) / elapsed;
+    dragStart.lastY = event.clientY;
+    dragStart.lastTime = event.timeStamp;
+    dragOffset = Math.max(0, event.clientY - dragStart.y);
+  }
+
+  function onGrabEnd() {
+    if (!dragging) return;
+    dragging = false;
+    const height = dialog.scrollElement?.offsetHeight ?? 0;
+    if (dragOffset > height / 4 || dragStart.velocity > 0.5) {
+      if (reduceMotion) {
+        dialog.close();
+        return;
+      }
+      // Off the bottom edge, then closed
+      dragOffset = height;
+      setTimeout(dialog.close, 200);
+    } else {
+      dragOffset = 0;
+    }
+  }
 </script>
 
 <Dialog
@@ -113,13 +165,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {...attributes}
               bind:this={dialog.scrollElement}
               in:fly={openFly}
+              style:transform={dragOffset
+                ? `translateY(${dragOffset}px)`
+                : undefined}
+              style:transition={side
+                ? undefined
+                : dragging || reduceMotion
+                  ? 'none'
+                  : 'transform 200ms ease-out'}
             >
               {#if !side}
-                <!-- The sheet's grab bar, for looks only: it doesn't drag -->
+                <!-- The sheet's grab bar: drag it down to close. For pointers
+                only; Close and Escape do the same for everyone else. A tall
+                strip, so it's easy to catch, and nothing else in the sheet
+                drags it, so drags inside the content stay their own. -->
                 <div
                   aria-hidden="true"
-                  class="bg-surface-950-50 mx-auto mt-2 mb-0 h-1.5 w-12 shrink-0 rounded-full sm:hidden"
-                ></div>
+                  class="mb-0 flex h-6 cursor-grab touch-none items-center justify-center active:cursor-grabbing sm:hidden"
+                  onpointerdown={onGrabStart}
+                  onpointermove={onGrabMove}
+                  onpointerup={onGrabEnd}
+                  onpointercancel={onGrabEnd}
+                >
+                  <div class="bg-surface-950-50 h-1.5 w-12 rounded-full"></div>
+                </div>
               {/if}
               {#if dialog.type === 'component'}
                 {#if hasHeader}
