@@ -385,7 +385,7 @@ choice's icon beside it, and what it's for below -->
             {#each BACKGROUNDS as background (background.value)}
               <SegmentedControl.Item value={background.value} class="flex-1">
                 <SegmentedControl.ItemText class="flex items-center gap-1"
-                  ><background.icon class="size-4 shrink-0" />
+                  ><background.icon class="shrink-0" />
                   {background.label}</SegmentedControl.ItemText
                 >
                 <SegmentedControl.ItemHiddenInput />

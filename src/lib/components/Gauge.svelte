@@ -224,18 +224,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       icon: LinkIcon,
     },
     {
-      value: 'html',
-      label: 'HTML Color Codes',
-      title: 'HTML Color Codes',
-      details: 'Copy codes for web and design',
-      icon: CodeIcon,
-    },
-    {
       value: 'image',
       label: 'Image',
       title: 'Palette Image',
       details: 'Download a PNG image',
       icon: ImageIcon,
+    },
+    {
+      value: 'html',
+      label: 'HTML Color Codes',
+      title: 'HTML Color Codes',
+      details: 'Copy codes for web and design',
+      icon: CodeIcon,
     },
     {
       value: 'colorway',

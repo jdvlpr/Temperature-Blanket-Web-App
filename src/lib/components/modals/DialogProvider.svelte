@@ -68,9 +68,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   };
 
+  // The backdrop's blur and tint at a strength from 0 (none) to 1 (full).
+  // It comes and goes by easing the blur itself rather than fading a blurred
+  // layer, which looked hazy, with a glowing double image, part way
+  function backdropLook(strength: number) {
+    const blur = `blur(${12 * strength}px)`;
+    return `background-color: color-mix(in oklab, var(--color-surface-50-950) ${50 * strength}%, transparent); backdrop-filter: ${blur}; -webkit-backdrop-filter: ${blur}`;
+  }
+
   const backdropIn: (node: Element) => TransitionConfig = () => {
-    if (side || reduceMotion) return { duration: 0 };
-    return { duration: 200, css: (t) => `opacity: ${t}` };
+    if (reduceMotion) return { duration: 0 };
+    return { duration: 200, easing: cubicOut, css: (t) => backdropLook(t) };
+  };
+
+  // From wherever a drag left it, not back up from full
+  const backdropOut: (node: Element) => TransitionConfig = () => {
+    if (reduceMotion) return { duration: 0 };
+    const from = grabbable ? 1 - dragProgress : 1;
+    return {
+      duration: 200,
+      easing: cubicOut,
+      css: (t) => backdropLook(t * from),
+    };
   };
 
   // Closing: a sheet slides down off the bottom edge (from wherever a drag
@@ -203,7 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function beginDrag(y: number, t: number) {
     startY = y;
     samples = [{ y, t }];
-    sheetHeight = dialog.scrollElement?.offsetHeight ?? 0;
+    sheetHeight = sheetElement?.offsetHeight ?? 0;
     dragging = true;
   }
 
@@ -273,6 +292,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return false;
   }
 
+  // The sheet itself doesn't scroll; the box inside it does
+  let sheetElement: HTMLElement | undefined = $state();
+  const scrolled = () => (dialog.scrollElement?.scrollTop ?? 0) > 0;
+
   function sheetTouch(sheet: HTMLElement) {
     function start(event: TouchEvent) {
       touchMode = 'none';
@@ -282,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (onControl(target)) return;
         touchMode = 'sheet';
       } else {
-        if (sheet.scrollTop > 0 || handlesItsOwnTouches(target, sheet)) return;
+        if (scrolled() || handlesItsOwnTouches(target, sheet)) return;
         touchMode = 'undecided';
       }
       const touch = event.touches[0];
@@ -300,7 +323,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         const dy = touch.clientY - touchStart.y;
         if (dx === 0 && dy === 0) return;
         const pullingDown = dy > 0 && dy >= Math.abs(dx);
-        if (!pullingDown || sheet.scrollTop > 0) {
+        if (!pullingDown || scrolled()) {
           touchMode = 'none';
           return;
         }
@@ -370,27 +393,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   initialFocusEl={undefined}
 >
   <Portal>
-    <!-- Blurred behind, as with the site menu's drawer; the side panel also
-    fades in, and slides in from the right (the site menu comes from the left) -->
+    <!-- Blurred behind, as with the site menu's drawer; the side panel slides
+    in from the right (the site menu comes from the left) -->
     <Dialog.Backdrop
-      class={[
-        'bg-surface-50-950/50 fixed inset-0 z-60 backdrop-blur-md',
-        side &&
-          !reduceMotion &&
-          'opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0',
-      ]}
-      style={grabbable
-        ? `opacity: ${1 - dragProgress}; transition: ${dragging || reduceMotion ? 'none' : 'opacity 200ms ease-out'}`
-        : undefined}
+      class="fixed inset-0 z-60"
+      style="{backdropLook(
+        grabbable ? 1 - dragProgress : 1,
+      )}; transition: {dragging || reduceMotion
+        ? 'none'
+        : 'background-color 200ms ease-out, backdrop-filter 200ms ease-out, -webkit-backdrop-filter 200ms ease-out'}"
     >
       {#snippet element(attributes)}
         {#if !attributes.hidden}
-          <!-- The side panel's backdrop fades in with CSS -->
-          <div
-            {...attributes}
-            in:backdropIn
-            out:fade={{ duration: reduceMotion ? 0 : 200 }}
-          ></div>
+          <div {...attributes} in:backdropIn out:backdropOut></div>
         {/if}
       {/snippet}
     </Dialog.Backdrop>
@@ -405,7 +420,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Dialog.Content
         class={[
-          'bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto max-sm:min-w-screen',
+          // Clips to its corners; the box inside scrolls, so its scrollbar
+          // stays within them too
+          'bg-surface-50 dark:bg-surface-950 flex max-h-dvh flex-col overflow-hidden max-sm:min-w-screen',
           side
             ? reduceMotion
               ? 'h-dvh w-full sm:w-md'
@@ -414,7 +431,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 // A sheet on phones: square at the bottom edge, and short of
                 // the top so its rounded corners sit against the backdrop
                 // (of the visible area, so above the keyboard when it's up)
-                'card shadow-xl max-sm:max-h-[calc(100%-2rem)] max-sm:rounded-b-none',
+                // No border on phones, as a native sheet, except a top edge
+                // where more contrast is asked for
+                'card shadow-xl max-sm:max-h-[calc(100%-2rem)] max-sm:rounded-b-none max-sm:border-0 max-sm:contrast-more:border-t',
                 dialog.options.size === 'xlarge'
                   ? 'w-full lg:max-h-[92svh]'
                   : 'lg:max-h-[80svh]',
@@ -432,7 +451,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if !attributes.hidden}
             <div
               {...attributes}
-              bind:this={dialog.scrollElement}
+              bind:this={sheetElement}
               in:openIn
               out:closeOut
               onoutroend={resetDrag}
@@ -446,126 +465,134 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ? 'none'
                   : 'transform 200ms ease-out'}
             >
-              {#if grabbable || (dialog.type === 'component' && hasHeader)}
-                <!-- The top bar, always in view: on phones the sheet's grab bar,
+              <div
+                bind:this={dialog.scrollElement}
+                tabindex="-1"
+                class="min-h-0 flex-1 space-y-4 overflow-auto outline-none"
+              >
+                {#if grabbable || (dialog.type === 'component' && hasHeader)}
+                  <!-- The top bar, always in view: on phones the sheet's grab bar,
                 and the whole bar drags the sheet (except its buttons); for a
                 titled dialog, one header for every one: Back, title, Close.
                 z-20: above content with its own z-index (e.g. segmented
                 control items, z-10) -->
-                <!-- Dragging is a pointer shortcut for Close/Escape, which
+                  <!-- Dragging is a pointer shortcut for Close/Escape, which
                 everyone has, so the bar itself isn't a control -->
-                <!-- svelte-ignore a11y_no_static_element_interactions -->
-                <div
-                  bind:this={topBar}
-                  class={[
-                    'bg-surface-50 dark:bg-surface-950 sticky top-0 z-20 mb-0',
-                    grabbable &&
-                      'cursor-grab touch-none select-none active:cursor-grabbing',
-                  ]}
-                  onpointerdown={handlePointerDown}
-                  onpointermove={handlePointerMove}
-                  onpointerup={(event) => handlePointerUp(event, false)}
-                  onpointercancel={(event) => handlePointerUp(event, true)}
-                >
-                  {#if grabbable}
-                    <div
-                      aria-hidden="true"
-                      class={[
-                        'flex justify-center pt-2.5',
-                        // Space below it when no header follows (a confirm
-                        // has its own)
-                        dialog.type === 'component' && !hasHeader && 'pb-2',
-                      ]}
-                    >
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <div
+                    bind:this={topBar}
+                    class={[
+                      'bg-surface-50 dark:bg-surface-950 sticky top-0 z-20 mb-0',
+                      grabbable &&
+                        'cursor-grab touch-none select-none active:cursor-grabbing',
+                    ]}
+                    onpointerdown={handlePointerDown}
+                    onpointermove={handlePointerMove}
+                    onpointerup={(event) => handlePointerUp(event, false)}
+                    onpointercancel={(event) => handlePointerUp(event, true)}
+                  >
+                    {#if grabbable}
                       <div
-                        class="bg-surface-950-50/25 h-1 w-9 rounded-full"
-                      ></div>
-                    </div>
-                  {/if}
-                  {#if dialog.type === 'component' && hasHeader}
-                    <header class="flex min-h-14 items-center gap-1 px-2 py-2">
-                      {#if dialog.stack.length || dialog.backAction}
-                        <button
-                          type="button"
-                          class="btn-icon hover:preset-tonal-surface"
-                          aria-label="Back"
-                          title="Back"
-                          data-dialog-back
-                          onclick={() =>
-                            dialog.backAction
-                              ? dialog.backAction()
-                              : dialog.back()}
-                          in:fade={{ duration: reduceMotion ? 0 : 150 }}
-                        >
-                          <ArrowLeftIcon />
-                        </button>
-                      {/if}
-                      {#key dialog.options.title}
-                        <Dialog.Title
-                          class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
-                        >
-                          {#snippet element(attributes)}
-                            <h2 {...attributes}>
-                              <span class="block truncate" in:fade={viewFade}
-                                >{dialog.options.title ?? ''}</span
-                              >
-                            </h2>
-                          {/snippet}
-                        </Dialog.Title>
-                      {/key}
-                      {#if dialog.options.showCloseButton}
-                        <CloseButton onClose={dialog.close} />
-                      {/if}
-                    </header>
-                  {/if}
-                </div>
-              {/if}
-              {#if dialog.type === 'component'}
-                {#if !hasHeader && dialog.options.showCloseButton}
-                  <div class="sticky top-2 z-20 float-right mr-2">
-                    <CloseButton onClose={dialog.close} />
+                        aria-hidden="true"
+                        class={[
+                          'flex justify-center pt-2.5',
+                          // Space below it when no header follows (a confirm
+                          // has its own)
+                          dialog.type === 'component' && !hasHeader && 'pb-2',
+                        ]}
+                      >
+                        <div
+                          class="bg-surface-950-50/25 h-1 w-9 rounded-full"
+                        ></div>
+                      </div>
+                    {/if}
+                    {#if dialog.type === 'component' && hasHeader}
+                      <header
+                        class="flex min-h-14 items-center gap-1 px-2 py-2"
+                      >
+                        {#if dialog.stack.length || dialog.backAction}
+                          <button
+                            type="button"
+                            class="btn-icon hover:preset-tonal-surface"
+                            aria-label="Back"
+                            title="Back"
+                            data-dialog-back
+                            onclick={() =>
+                              dialog.backAction
+                                ? dialog.backAction()
+                                : dialog.back()}
+                            in:fade={{ duration: reduceMotion ? 0 : 150 }}
+                          >
+                            <ArrowLeftIcon />
+                          </button>
+                        {/if}
+                        {#key dialog.options.title}
+                          <Dialog.Title
+                            class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
+                          >
+                            {#snippet element(attributes)}
+                              <h2 {...attributes}>
+                                <span class="block truncate" in:fade={viewFade}
+                                  >{dialog.options.title ?? ''}</span
+                                >
+                              </h2>
+                            {/snippet}
+                          </Dialog.Title>
+                        {/key}
+                        {#if dialog.options.showCloseButton}
+                          <CloseButton onClose={dialog.close} />
+                        {/if}
+                      </header>
+                    {/if}
                   </div>
                 {/if}
+                {#if dialog.type === 'component'}
+                  {#if !hasHeader && dialog.options.showCloseButton}
+                    <div class="sticky top-2 z-20 float-right mr-2">
+                      <CloseButton onClose={dialog.close} />
+                    </div>
+                  {/if}
 
-                {#if dialog.contentComponent.ref}
-                  {#key dialog.contentComponent.ref}
-                    <!-- Opened from the panel, or back to it: slides in from
+                  {#if dialog.contentComponent.ref}
+                    {#key dialog.contentComponent.ref}
+                      <!-- Opened from the panel, or back to it: slides in from
                     the way it went -->
-                    <div in:fly={viewFly}>
-                      <dialog.contentComponent.ref
-                        {...dialog.contentComponent.props ?? {}}
+                      <div in:fly={viewFly}>
+                        <dialog.contentComponent.ref
+                          {...dialog.contentComponent.props ?? {}}
+                        />
+                      </div>
+                    {/key}
+                  {/if}
+                {:else if dialog.type === 'confirm'}
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={dialog.title ?? ''}
+                    class="flex flex-col gap-4 p-4"
+                  >
+                    {#if dialog.title}
+                      <h4 class="h4">{dialog.title}</h4>
+                    {/if}
+                    {#if dialog.body}
+                      <p>{dialog.body}</p>
+                    {/if}
+                    <div>
+                      <SaveAndCloseButtons
+                        saveText="Yes"
+                        onSave={() => {
+                          dialog.response(true);
+                          dialog.close();
+                        }}
+                        onClose={() => {
+                          dialog.response(false);
+                          dialog.close();
+                        }}
                       />
                     </div>
-                  {/key}
-                {/if}
-              {:else if dialog.type === 'confirm'}
-                <div
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label={dialog.title ?? ''}
-                  class="flex flex-col gap-4 p-4"
-                >
-                  {#if dialog.title}
-                    <h4 class="h4">{dialog.title}</h4>
-                  {/if}
-                  {#if dialog.body}
-                    <p>{dialog.body}</p>
-                  {/if}
-                  <div>
-                    <SaveAndCloseButtons
-                      saveText="Yes"
-                      onSave={() => {
-                        dialog.response(true);
-                        dialog.close();
-                      }}
-                      onClose={() => {
-                        dialog.response(false);
-                        dialog.close();
-                      }}
-                    />
                   </div>
-                </div>
-              {/if}
+                {/if}
+              </div>
             </div>
           {/if}
         {/snippet}

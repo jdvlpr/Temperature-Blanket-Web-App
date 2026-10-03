@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import ChooseRangeDirection from '$lib/components/ChooseRangeDirection.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -244,16 +245,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="p-4">
   <div class="flex w-full items-start justify-center gap-2 max-lg:flex-col">
     <div
-      class="flex flex-col items-start justify-start lg:max-w-[400px]"
+      class="flex max-w-full flex-col items-start justify-start lg:max-w-[400px]"
       bind:this={setupContainer}
     >
-      <h2 class="mb-2 flex flex-wrap items-start text-xl font-bold">
-        Setup Ranges
-      </h2>
+      <h3 class="h5 mb-2">Setup Ranges</h3>
 
       <div class="rounded-container flex w-full flex-col gap-2">
-        <div class="flex flex-col items-start justify-start">
-          <p class="text-xs">Direction</p>
+        <div class="flex max-w-full flex-col items-start justify-start">
           <ChooseRangeDirection
             direction={_gauge.rangeOptions.direction}
             onchange={(e: { value: GaugeRangeOptions['direction'] }) => {
@@ -281,37 +279,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="card preset-filled-surface-200-800 flex flex-col items-start justify-start gap-2 p-4"
         >
-          <div class="flex flex-col items-start justify-start">
-            <p class="text-xs">Generate Ranges</p>
-
-            <SegmentedControl
-              value={incrementMode}
-              onValueChange={(e) => {
-                incrementMode = e.value as GaugeRangeOptions['mode'] | null;
-              }}
-            >
-              <SegmentedControl.Control
-                class="bg-surface-100 dark:bg-surface-900 flex-wrap gap-y-2"
-              >
-                <SegmentedControl.Indicator />
-                <SegmentedControl.Item value="auto">
-                  <SegmentedControl.ItemText
-                    class="flex items-center gap-1"
-                    title="Automatically Set the Gauge Values"
-                    ><WandIcon /> Automatic
-                  </SegmentedControl.ItemText>
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-                <SegmentedControl.Item value="manual">
-                  <SegmentedControl.ItemText
-                    class="flex items-center gap-1"
-                    title="Manually Set the Gauge Values"
-                    ><WrenchIcon /> Manual</SegmentedControl.ItemText
+          <div class="flex max-w-full flex-col items-start justify-start">
+            <SegmentsScroller collapse>
+              {#snippet children(iconsOnly)}
+                <SegmentedControl
+                  value={incrementMode}
+                  onValueChange={(e) => {
+                    incrementMode = e.value as GaugeRangeOptions['mode'] | null;
+                  }}
+                >
+                  <SegmentedControl.Label class="text-xs"
+                    >Generate Ranges{#if iconsOnly}<span aria-hidden="true"
+                        >: {incrementMode === 'manual'
+                          ? 'Manual'
+                          : 'Automatic'}</span
+                      >{/if}</SegmentedControl.Label
                   >
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-              </SegmentedControl.Control>
-            </SegmentedControl>
+                  <SegmentedControl.Control
+                    class="bg-surface-100 dark:bg-surface-900 min-w-max"
+                  >
+                    <SegmentedControl.Indicator />
+                    <SegmentedControl.Item value="auto">
+                      <SegmentedControl.ItemText
+                        class="flex items-center gap-1"
+                        title="Automatically Set the Gauge Values"
+                        ><WandIcon />
+                        <span class={{ 'sr-only': iconsOnly }}>Automatic</span>
+                      </SegmentedControl.ItemText>
+                      <SegmentedControl.ItemHiddenInput />
+                    </SegmentedControl.Item>
+                    <SegmentedControl.Item value="manual">
+                      <SegmentedControl.ItemText
+                        class="flex items-center gap-1"
+                        title="Manually Set the Gauge Values"
+                        ><WrenchIcon />
+                        <span class={{ 'sr-only': iconsOnly }}>Manual</span
+                        ></SegmentedControl.ItemText
+                      >
+                      <SegmentedControl.ItemHiddenInput />
+                    </SegmentedControl.Item>
+                  </SegmentedControl.Control>
+                </SegmentedControl>
+              {/snippet}
+            </SegmentsScroller>
 
             {#if !incrementMode}
               <p class="card bg-warning-300-700/80 mt-2 p-4 text-left">
@@ -578,9 +588,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="flex w-full max-w-(--breakpoint-md) flex-col items-start justify-start max-lg:mb-10"
     >
-      <h2 class="mb-2 flex flex-wrap items-start text-xl font-bold">
-        Edit Ranges
-      </h2>
+      <h3 class="h5 mb-2">Edit Ranges</h3>
 
       <div class=" rounded-container w-full">
         <div class="rounded-container flex flex-col overflow-hidden">

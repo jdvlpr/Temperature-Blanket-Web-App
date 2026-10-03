@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -145,28 +146,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-4 flex max-w-(--breakpoint-xl) flex-col items-center gap-4 px-2"
     >
-      <SegmentedControl
-        value={selectedTag}
-        onValueChange={(e) => {
-          selectedTag = (e.value as string) || 'All';
-        }}
-      >
-        <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900  mt-4"
+      <SegmentsScroller>
+        <SegmentedControl
+          value={selectedTag}
+          onValueChange={(e) => {
+            selectedTag = (e.value as string) || 'All';
+          }}
         >
-          <SegmentedControl.Indicator />
-          {#each tags as tag}
-            <SegmentedControl.Item value={tag}>
-              <SegmentedControl.ItemText>
-                <span class="flex items-center justify-center gap-1">
-                  {tag}
-                </span></SegmentedControl.ItemText
-              >
-              <SegmentedControl.ItemHiddenInput />
-            </SegmentedControl.Item>
-          {/each}
-        </SegmentedControl.Control>
-      </SegmentedControl>
+          <SegmentedControl.Control
+            class="bg-surface-100 dark:bg-surface-900 mt-4 min-w-max"
+          >
+            <SegmentedControl.Indicator />
+            {#each tags as tag}
+              <SegmentedControl.Item value={tag}>
+                <SegmentedControl.ItemText>
+                  <span class="flex items-center justify-center gap-1">
+                    {tag}
+                  </span></SegmentedControl.ItemText
+                >
+                <SegmentedControl.ItemHiddenInput />
+              </SegmentedControl.Item>
+            {/each}
+          </SegmentedControl.Control>
+        </SegmentedControl>
+      </SegmentsScroller>
 
       {#key selectedTag}
         <div

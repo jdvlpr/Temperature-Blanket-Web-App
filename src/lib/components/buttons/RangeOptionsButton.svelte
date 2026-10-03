@@ -44,8 +44,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         },
       },
       options: {
-        showCloseButton: false,
         size: 'large',
+        title: 'Configure Ranges',
       },
     })}
 >

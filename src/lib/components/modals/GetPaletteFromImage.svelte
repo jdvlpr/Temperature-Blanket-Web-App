@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -104,35 +105,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const toolbarButtonClass = 'hover:preset-tonal-surface btn justify-start';
   const menuItemClass =
     'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
-
-  /** A segmented control's options stack only when they wouldn't fit side by
-   * side. Attach to an element as wide as the space the control has. */
-  function stackWhenNarrow() {
-    let stacked = $state(false);
-    // The options' width side by side, measured while they are
-    let needed = 0;
-    return {
-      get stacked() {
-        return stacked;
-      },
-      attach(area: HTMLElement) {
-        const control = area.querySelector<HTMLElement>(
-          '[data-part="control"]',
-        );
-        if (!control) return;
-        const update = () => {
-          if (!stacked) needed = control.scrollWidth;
-          stacked = needed > area.clientWidth;
-        };
-        const observer = new ResizeObserver(update);
-        observer.observe(area);
-        observer.observe(control);
-        return () => observer.disconnect();
-      },
-    };
-  }
-  const toolFit = stackWhenNarrow();
-  const modeFit = stackWhenNarrow();
 
   // Choose a photo first, then work with it
   let step = $state<'start' | 'editor'>('start');
@@ -324,36 +296,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <!-- Isolated so the photo's markers stay under the palette bar; the side
         panel isn't, so the yarn list can open over the bar -->
         <section class="isolate flex min-h-0 min-w-0 flex-1 flex-col gap-2">
-          <div
-            class="flex flex-wrap items-center justify-center gap-2"
-            {@attach toolFit.attach}
-          >
-            <SegmentedControl
-              orientation={toolFit.stacked ? 'vertical' : 'horizontal'}
-              value={palette.tool}
-              onValueChange={(e) => {
-                if (e.value === 'points' || e.value === 'line')
-                  palette.setTool(e.value);
-              }}
-            >
-              <SegmentedControl.Control
-                class="bg-surface-100 dark:bg-surface-900"
-              >
-                <SegmentedControl.Indicator />
-                <SegmentedControl.Item value="points">
-                  <SegmentedControl.ItemText class="flex items-center gap-1"
-                    ><PipetteIcon class="size-4" /> Pick Colors</SegmentedControl.ItemText
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <SegmentsScroller collapse>
+              {#snippet children(iconsOnly)}
+                <SegmentedControl
+                  value={palette.tool}
+                  onValueChange={(e) => {
+                    if (e.value === 'points' || e.value === 'line')
+                      palette.setTool(e.value);
+                  }}
+                >
+                  <!-- Named only once just the icons show -->
+                  {#if iconsOnly}
+                    <SegmentedControl.Label class="label-text"
+                      >Tool<span aria-hidden="true"
+                        >: {palette.tool === 'line'
+                          ? 'Draw a Line'
+                          : 'Pick Colors'}</span
+                      ></SegmentedControl.Label
+                    >
+                  {/if}
+                  <SegmentedControl.Control
+                    class="bg-surface-100 dark:bg-surface-900 min-w-max"
                   >
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-                <SegmentedControl.Item value="line">
-                  <SegmentedControl.ItemText class="flex items-center gap-1"
-                    ><Icon iconNode={LINE_ICON} class="size-4" /> Draw a Line</SegmentedControl.ItemText
-                  >
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-              </SegmentedControl.Control>
-            </SegmentedControl>
+                    <SegmentedControl.Indicator />
+                    <SegmentedControl.Item
+                      value="points"
+                      title={iconsOnly ? 'Pick Colors' : undefined}
+                    >
+                      <SegmentedControl.ItemText class="flex items-center gap-1"
+                        ><PipetteIcon class="shrink-0" />
+                        <span class={{ 'sr-only': iconsOnly }}>Pick Colors</span
+                        ></SegmentedControl.ItemText
+                      >
+                      <SegmentedControl.ItemHiddenInput />
+                    </SegmentedControl.Item>
+                    <SegmentedControl.Item
+                      value="line"
+                      title={iconsOnly ? 'Draw a Line' : undefined}
+                    >
+                      <SegmentedControl.ItemText class="flex items-center gap-1"
+                        ><Icon iconNode={LINE_ICON} class="shrink-0" />
+                        <span class={{ 'sr-only': iconsOnly }}>Draw a Line</span
+                        ></SegmentedControl.ItemText
+                      >
+                      <SegmentedControl.ItemHiddenInput />
+                    </SegmentedControl.Item>
+                  </SegmentedControl.Control>
+                </SegmentedControl>
+              {/snippet}
+            </SegmentsScroller>
           </div>
 
           <p class="text-surface-700-300 text-center text-xs">
@@ -452,34 +444,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </Portal>
           </Menu>
 
-          <div class="flex flex-col gap-1" {@attach modeFit.attach}>
+          <div class="flex flex-col gap-1">
             <span class="label-text">Colors</span>
-            <SegmentedControl
-              orientation={modeFit.stacked ? 'vertical' : 'horizontal'}
-              value={palette.mode}
-              onValueChange={(e) => {
-                if (e.value === 'yarn' || e.value === 'exact')
-                  palette.setMode(e.value);
-              }}
-            >
-              <SegmentedControl.Control
-                class="bg-surface-100 dark:bg-surface-900 w-full"
+            <SegmentsScroller>
+              <SegmentedControl
+                value={palette.mode}
+                onValueChange={(e) => {
+                  if (e.value === 'yarn' || e.value === 'exact')
+                    palette.setMode(e.value);
+                }}
               >
-                <SegmentedControl.Indicator />
-                <SegmentedControl.Item value="yarn" class="flex-1">
-                  <SegmentedControl.ItemText
-                    >Yarn Colors</SegmentedControl.ItemText
-                  >
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-                <SegmentedControl.Item value="exact" class="flex-1">
-                  <SegmentedControl.ItemText
-                    >Exact Colors</SegmentedControl.ItemText
-                  >
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-              </SegmentedControl.Control>
-            </SegmentedControl>
+                <SegmentedControl.Control
+                  class="bg-surface-100 dark:bg-surface-900 w-full min-w-max"
+                >
+                  <SegmentedControl.Indicator />
+                  <SegmentedControl.Item value="yarn" class="flex-1">
+                    <SegmentedControl.ItemText
+                      >Yarn Colors</SegmentedControl.ItemText
+                    >
+                    <SegmentedControl.ItemHiddenInput />
+                  </SegmentedControl.Item>
+                  <SegmentedControl.Item value="exact" class="flex-1">
+                    <SegmentedControl.ItemText
+                      >Exact Colors</SegmentedControl.ItemText
+                    >
+                    <SegmentedControl.ItemHiddenInput />
+                  </SegmentedControl.Item>
+                </SegmentedControl.Control>
+              </SegmentedControl>
+            </SegmentsScroller>
             <p class="text-surface-700-300 text-xs">
               {#if palette.mode === 'yarn'}
                 Each color is matched to the closest yarn colorway.

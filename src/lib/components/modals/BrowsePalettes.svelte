@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import GalleryPalettes from '$lib/components/GalleryPalettes.svelte';
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
@@ -92,59 +93,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <!-- Four tabs don't fit on phones, so they become a 2x2 grid there -->
-    <div
-      class="bg-surface-100 dark:bg-surface-950 rounded-container grid w-full grid-cols-2 gap-1 p-1 sm:hidden"
-      role="group"
-      aria-label="Category"
-    >
-      {#each categories as categoryItem}
-        {@const Icon =
-          categoryIcons[categoryItem as keyof typeof categoryIcons]}
-        <button
-          type="button"
-          class={[
-            'btn justify-center',
-            category === categoryItem
-              ? 'preset-filled'
-              : 'hover:preset-tonal-surface',
-          ]}
-          aria-pressed={category === categoryItem}
-          onclick={() => (category = categoryItem)}
+    <SegmentsScroller collapse>
+      {#snippet children(iconsOnly)}
+        <SegmentedControl
+          value={category}
+          onValueChange={(e) => {
+            if (e.value) {
+              category = e.value as string;
+            }
+          }}
         >
-          <Icon size={18} />
-          {categoryItem}
-        </button>
-      {/each}
-    </div>
-
-    <div class="max-sm:hidden">
-      <SegmentedControl
-        value={category}
-        onValueChange={(e) => {
-          if (e.value) {
-            category = e.value as string;
-          }
-        }}
-      >
-        <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
-          <SegmentedControl.Indicator />
-          {#each categories as categoryItem}
-            {@const Icon =
-              categoryIcons[categoryItem as keyof typeof categoryIcons]}
-            <SegmentedControl.Item value={categoryItem}>
-              <SegmentedControl.ItemText
-                ><span class="flex items-center justify-center gap-1">
-                  <Icon size={18} />
-                  {categoryItem}
-                </span></SegmentedControl.ItemText
+          <!-- Named only once just the icons show -->
+          {#if iconsOnly}
+            <SegmentedControl.Label class="label-text"
+              >Category<span aria-hidden="true">: {category}</span
+              ></SegmentedControl.Label
+            >
+          {/if}
+          <SegmentedControl.Control
+            class="bg-surface-100 dark:bg-surface-950 min-w-max"
+          >
+            <SegmentedControl.Indicator />
+            {#each categories as categoryItem}
+              {@const Icon =
+                categoryIcons[categoryItem as keyof typeof categoryIcons]}
+              <SegmentedControl.Item
+                value={categoryItem}
+                title={iconsOnly ? categoryItem : undefined}
               >
-              <SegmentedControl.ItemHiddenInput />
-            </SegmentedControl.Item>
-          {/each}
-        </SegmentedControl.Control>
-      </SegmentedControl>
-    </div>
+                <SegmentedControl.ItemText
+                  ><span class="flex items-center justify-center gap-1">
+                    <Icon />
+                    <span class={{ 'sr-only': iconsOnly }}>{categoryItem}</span>
+                  </span></SegmentedControl.ItemText
+                >
+                <SegmentedControl.ItemHiddenInput />
+              </SegmentedControl.Item>
+            {/each}
+          </SegmentedControl.Control>
+        </SegmentedControl>
+      {/snippet}
+    </SegmentsScroller>
   </div>
 
   {#if category === 'Saved'}
