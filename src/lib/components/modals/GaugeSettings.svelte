@@ -248,7 +248,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex max-w-full flex-col items-start justify-start lg:max-w-[400px]"
       bind:this={setupContainer}
     >
-      <h3 class="h5 mb-2">Setup Ranges</h3>
+      <h3 class="mb-2 text-base font-bold">Setup Ranges</h3>
 
       <div class="rounded-container flex w-full flex-col gap-2">
         <div class="flex max-w-full flex-col items-start justify-start">
@@ -588,7 +588,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="flex w-full max-w-(--breakpoint-md) flex-col items-start justify-start max-lg:mb-10"
     >
-      <h3 class="h5 mb-2">Edit Ranges</h3>
+      <h3 class="mb-2 text-base font-bold">Edit Ranges</h3>
 
       <div class=" rounded-container w-full">
         <div class="rounded-container flex flex-col overflow-hidden">

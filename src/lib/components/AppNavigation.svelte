@@ -358,6 +358,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <GiftIcon />
                 What's New
+                <span class="text-surface-700-300 text-xs">v{version}</span>
               </a>
 
               <a
@@ -399,9 +400,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Accordion.ItemContent>
     </Accordion.Item>
   </Accordion>
-
-  <a
-    class="btn hover:preset-tonal-surface w-fit opacity-50 hover:opacity-100"
-    href="/changelog">v{version}</a
-  >
 </div>

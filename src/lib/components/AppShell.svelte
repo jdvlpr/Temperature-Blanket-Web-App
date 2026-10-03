@@ -22,12 +22,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showNavigationSideBar,
   } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
+  import { motion } from '$lib/utils/feedback.svelte';
   import {
     MenuIcon,
     PanelLeftClose,
     PanelRightCloseIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { cubicOut } from 'svelte/easing';
+  import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
@@ -41,6 +44,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
 
   let sidebarWidth = $state(0);
+
+  // The sidebar folds both ways at once, so the button under it glides to
+  // its place rather than jumping when the navigation is gone
+  function sidebarSlide(node: HTMLElement): TransitionConfig {
+    if (motion.reduced) return { duration: 0 };
+    const { width, height } = node.getBoundingClientRect();
+    return {
+      duration: 400,
+      easing: cubicOut,
+      css: (t) =>
+        `overflow: hidden; width: ${t * width}px; height: ${t * height}px; opacity: ${Math.min(t * 3, 1)}`,
+    };
+  }
 
   let debounceTimer: number | undefined;
   const debounce = (callback: () => void, time: number) => {
@@ -117,8 +133,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex h-fit flex-col items-start justify-start [view-transition-name:sidebar-navigation]"
       bind:clientWidth={sidebarWidth}
     >
+      {#if showNavigationSideBar.value}
+        <div class="hidden w-fit flex-col lg:flex" transition:sidebarSlide>
+          <div class="w-fit">
+            <AppNavigation />
+          </div>
+        </div>
+      {/if}
+      <!-- Below the navigation, so as it folds away (up as well as in) the
+      button rises with it to the top -->
       <button
-        class={["hover:preset-tonal-surface mx-2 mt-2 hidden justify-center lg:flex", showNavigationSideBar.value ? 'btn' : 'btn-icon ml-4 -top-0.5 relative']}
+        class={[
+          'hover:preset-tonal-surface mx-2 hidden justify-center lg:flex',
+          // Open, it follows the menu at the menu's own spacing
+          showNavigationSideBar.value
+            ? 'btn'
+            : 'btn-icon relative -top-0.5 mt-2 ml-4',
+        ]}
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
@@ -131,16 +162,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <PanelRightCloseIcon />
         {/if}
       </button>
-      {#if showNavigationSideBar.value}
-        <div
-          class="hidden w-fit flex-col lg:flex"
-          transition:safeSlide={{ axis: 'x' }}
-        >
-          <div class="w-fit">
-            <AppNavigation />
-          </div>
-        </div>
-      {/if}
     </div>
 
     <div class="min-w-0 flex-1">

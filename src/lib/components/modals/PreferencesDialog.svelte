@@ -238,7 +238,7 @@ site does -->
     >
       <h3>
         <Accordion.ItemTrigger
-          class="h5 flex w-full items-center justify-between py-1"
+          class="flex w-full items-center justify-between py-1 text-base font-bold"
         >
           Appearance
           {@render indicator()}
@@ -346,7 +346,7 @@ site does -->
     <Accordion.Item value="yarn" class="group/section flex flex-col gap-2">
       <h3>
         <Accordion.ItemTrigger
-          class="h5 flex w-full items-center justify-between py-1"
+          class="flex w-full items-center justify-between py-1 text-base font-bold"
         >
           Yarn
           {@render indicator()}
@@ -397,7 +397,7 @@ site does -->
     >
       <h3>
         <Accordion.ItemTrigger
-          class="h5 flex w-full items-center justify-between py-1"
+          class="flex w-full items-center justify-between py-1 text-base font-bold"
         >
           Sound & Motion
           {@render indicator()}
