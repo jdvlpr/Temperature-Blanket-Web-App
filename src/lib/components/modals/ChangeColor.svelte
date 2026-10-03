@@ -62,8 +62,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let inputTypeTextValue = $derived(hex);
 
-  let title = $derived(index !== null ? `${index + 1}` : '');
-
   let currentColor = $derived({ hex });
 
   let selectedColors = $derived([
@@ -186,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div class="flex flex-col justify-start gap-1">
-    <p class="label-text text-left">Color {title}</p>
+    <p class="label-text text-left">Color</p>
     <div class="flex w-full flex-wrap items-center justify-center gap-x-2">
       <label class="label" title="Choose a Color">
         <input

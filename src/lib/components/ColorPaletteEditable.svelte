@@ -413,6 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       },
                     },
                     options: {
+                      title: `Color ${index + 1}`,
                       size: 'large',
                     },
                   })}
@@ -437,6 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         },
                       },
                       options: {
+                        title: `Color ${index + 1}`,
                         size: 'large',
                       },
                     });

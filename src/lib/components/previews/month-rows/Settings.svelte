@@ -134,6 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
           options: {
+            title: 'Accent Color',
             size: 'large',
           },
         })}
@@ -183,6 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         },
         options: {
+          title: 'Color of Extra Rows',
           size: 'large',
         },
       })}

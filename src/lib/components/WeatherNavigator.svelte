@@ -59,6 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             component: {
               ref: ImportWeatherData,
             },
+            options: { title: 'Import Weather Data' },
           });
         }}
         title="Import Weather Data"

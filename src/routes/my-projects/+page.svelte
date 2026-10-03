@@ -153,6 +153,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
                   dialog.trigger({
                     type: 'component',
                     component: { ref: SharePalette, props },
+                    options: { title: 'Share to the Gallery' },
                   })
               : undefined}
           />

@@ -161,6 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onOkay: handleOkayHexagonDesigner,
           },
         },
+        options: { title: 'Customize Hexagon Design' },
       })}
   >
     <HexagonIcon />
@@ -190,6 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
           options: {
+            title: 'Accent Color',
             size: 'large',
           },
         })}
@@ -242,6 +244,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 dialog.close();
               },
             },
+          },
+          options: {
+            title: 'Border Color',
+            size: 'large',
           },
         })}
     >

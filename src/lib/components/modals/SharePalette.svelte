@@ -60,7 +60,6 @@ signed in. It goes live at once and is linked to the account. -->
 </script>
 
 <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
-  <h2 class="h3 pr-10">Share to the Gallery</h2>
   <ColorPalette {colors} schemeName=" " />
   {#if shared}
     <div class="flex flex-col items-center gap-2 text-center" role="status">

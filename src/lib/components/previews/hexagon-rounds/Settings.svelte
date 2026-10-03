@@ -218,6 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         },
         options: {
+          title: 'Accent Color',
           size: 'large',
         },
       })}

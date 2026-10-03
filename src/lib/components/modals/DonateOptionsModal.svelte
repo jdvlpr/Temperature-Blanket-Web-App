@@ -19,10 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 p-4">
-  <div>
-    <h3 class="h3">Become a Supporter</h3>
-    <p class="text-surface-500 mt-1 text-sm">Choose how you'd like to help.</p>
-  </div>
+  <p class="text-surface-500 text-sm">Choose how you'd like to help.</p>
 
   <div class="space-y-3">
     <a

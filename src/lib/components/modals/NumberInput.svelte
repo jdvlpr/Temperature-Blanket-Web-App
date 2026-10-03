@@ -26,6 +26,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     max: number;
     showSlider?: boolean;
     noMinMax?: boolean;
+    /** The dialog's header already shows the title, so it only names the
+     * input for screen readers */
+    hideLabel?: boolean;
   }
 
   let {
@@ -36,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     max,
     showSlider = true,
     noMinMax = false,
+    hideLabel = false,
   }: Props = $props();
 
   let _value = $state(value);
@@ -62,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="mx-auto inline-flex w-full flex-col items-center px-4 text-center">
-  <label for="number-input" class="label">
+  <label for="number-input" class={['label', hideLabel && 'sr-only']}>
     <span class="label-text">{@html title}</span>
   </label>
 

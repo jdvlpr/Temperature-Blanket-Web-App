@@ -114,7 +114,7 @@
                         ref: TextInput,
                         props: {
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
+                          title: label,
                           onOkay: async (_value: string) => {
                             weather.isUserEdited = true;
                             projectChanged({ weather: true });
@@ -146,6 +146,7 @@
                           },
                         },
                       },
+                      options: { title: `${row.date}` },
                     });
                   } else {
                     dialog.trigger({
@@ -155,7 +156,7 @@
                         props: {
                           max: 1000,
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span></span></div>`,
+                          title: `${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span>`,
                           noMinMax: true,
                           showSlider: false,
                           onOkay: async (_value: number) => {
@@ -198,6 +199,7 @@
                           },
                         },
                       },
+                      options: { title: `${row.date}` },
                     });
                   }
                 }}

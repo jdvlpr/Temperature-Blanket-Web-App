@@ -320,6 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       component: { ref: ChooseWeatherSource },
                       options: {
                         size: 'small',
+                        title: 'Weather Source',
                       },
                     });
                   }}>{weather.source.name}</button
