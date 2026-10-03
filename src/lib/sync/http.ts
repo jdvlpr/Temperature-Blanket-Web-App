@@ -17,6 +17,7 @@
 // server only ever stores and returns them.
 
 import { SyncHttpError, type SyncServer } from './engine';
+import type { PreferencesRecord } from './preferences';
 import {
   SYNC_API,
   SYNC_HEADERS,
@@ -154,6 +155,16 @@ export function createHttpSyncServer(
       });
       if (!response.ok) throw await errorFrom(response);
       return (await response.json()).results as PaletteUploadResult[];
+    },
+
+    async uploadPreferences(preferences) {
+      const response = await request('/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferences }),
+      });
+      if (!response.ok) throw await errorFrom(response);
+      return (await response.json()).preferences as PreferencesRecord;
     },
   };
 }

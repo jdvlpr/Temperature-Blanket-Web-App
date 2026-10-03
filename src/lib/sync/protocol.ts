@@ -24,10 +24,14 @@
 //   GET    /api/sync/trash/{id}                  a trashed project's gzipped JSON
 //   DELETE /api/sync/trash/{id}                  deletes one for good
 //   PUT    /api/sync/palettes                    { palettes: PaletteUpload[] } → { results }
+//   PUT    /api/sync/preferences                 { preferences: PreferencesUpload } → { preferences: PreferencesRecord }
 //
 // A save or delete based on an outdated revision gets 409 { code: 'CONFLICT', current }.
 // A deleted project stays in the Trash (with its data) for TRASH_DAYS; restoring
-// one is an ordinary save over the deletion. Palettes travel in the changes feed.
+// one is an ordinary save over the deletion. Palettes and preferences travel in
+// the changes feed.
+
+import type { PreferencesRecord } from './preferences';
 
 export const SYNC_API = '/api/sync';
 
@@ -102,6 +106,8 @@ export type ChangesResponse =
       changes: ProjectMeta[];
       /** Palettes changed in the same revision range (absent from older servers) */
       palettes?: PaletteRecord[];
+      /** The account's preferences, when they changed in the revision range (absent from older servers) */
+      preferences?: PreferencesRecord;
       nextSince: number;
       hasMore: boolean;
     };

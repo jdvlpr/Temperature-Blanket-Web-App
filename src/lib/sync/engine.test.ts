@@ -11,9 +11,11 @@ import {
   type AccountSyncState,
   type LocalStore,
   type PaletteLocal,
+  type PreferencesLocal,
   type ProjectSyncState,
   type SyncServer,
 } from './engine';
+import type { PreferencesRecord, PreferencesUpload } from './preferences';
 import type { PaletteRecord, ProjectMeta } from './protocol';
 
 // An in-memory server with the same rules as src/lib/server/sync/store.ts
@@ -664,5 +666,52 @@ describe('syncAccount: palettes and the Trash', () => {
     });
     expect(order).toEqual(['remove a', 'purge a']);
     expect((await device.accountState('u1')).pendingPurges).toEqual([]);
+  });
+
+  /** A pass with the account's preferences in the feed and `pending` here */
+  async function syncPreferences(
+    feed: PreferencesRecord | undefined,
+    pending: PreferencesUpload | null,
+  ) {
+    const { device } = setup();
+    const calls: string[] = [];
+    const api = new FakeServer().api();
+    const preferences: PreferencesLocal = {
+      apply: (_user, record) => void calls.push(`apply ${record.rev}`),
+      pending: () => pending,
+    };
+    await syncAccount(
+      'u1',
+      device,
+      {
+        ...api,
+        changes: async (since) => {
+          const page = await api.changes(since);
+          return page.fullResyncRequired
+            ? page
+            : { ...page, preferences: feed };
+        },
+        uploadPreferences: async (upload) => {
+          calls.push(`upload ${Object.keys(upload).join(',')}`);
+          return { rev: 3, values: upload };
+        },
+      },
+      { origin: device.origin, sha256, preferences },
+    );
+    return calls;
+  }
+
+  it('takes in the account’s preferences from the feed', async () => {
+    expect(await syncPreferences({ rev: 2, values: {} }, null)).toEqual([
+      'apply 2',
+    ]);
+  });
+
+  it('sends preferences changed here and takes in the account’s answer', async () => {
+    expect(
+      await syncPreferences(undefined, {
+        defaultYarn: { value: 'a-b', updatedAt: 9 },
+      }),
+    ).toEqual(['upload defaultYarn', 'apply 3']);
   });
 });

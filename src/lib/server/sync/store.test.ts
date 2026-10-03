@@ -15,6 +15,7 @@ import {
   MAX_PROJECTS_PER_USER,
   purgeTrash,
   savePalette,
+  savePreferences,
   saveProject,
   type SaveInput,
 } from './store';
@@ -469,5 +470,57 @@ describe('savePalette', () => {
     expect(sqlite.prepare(`select count(*) as n from "palette"`).get()).toEqual(
       { n: 0 },
     );
+  });
+});
+
+describe('savePreferences', () => {
+  it('takes the newer change to each preference, in the changes feed', async () => {
+    const { d1, bucket } = setup();
+    expect(
+      await savePreferences(d1, 'u1', {
+        'theme.id': { value: 'rocket', updatedAt: 10 },
+        defaultYarn: { value: 'a-b', updatedAt: 10 },
+      }),
+    ).toMatchObject({ rev: 1 });
+    await saveProject(d1, bucket, input({ projectId: 'a' }));
+
+    const merged = await savePreferences(d1, 'u1', {
+      'theme.id': { value: 'modern', updatedAt: 5 },
+      defaultYarn: { value: 'c-d', updatedAt: 20 },
+    });
+    expect(merged).toEqual({
+      rev: 3,
+      values: {
+        'theme.id': { value: 'rocket', updatedAt: 10 },
+        defaultYarn: { value: 'c-d', updatedAt: 20 },
+      },
+    });
+
+    // Nothing newer: no new revision
+    expect(
+      await savePreferences(d1, 'u1', {
+        defaultYarn: { value: 'x-y', updatedAt: 20 },
+      }),
+    ).toMatchObject({ rev: 3 });
+
+    expect(await listChanges(d1, 'u1', 0, 10)).toMatchObject({
+      changes: [{ id: 'a', rev: 2 }],
+      preferences: merged,
+      nextSince: 3,
+    });
+    expect(
+      (await listChanges(d1, 'u1', 3, 10)) as { preferences?: unknown },
+    ).toMatchObject({ preferences: undefined });
+  });
+
+  it('preference rows go with the user', async () => {
+    const { d1, sqlite } = setup();
+    await savePreferences(d1, 'u1', {
+      defaultYarn: { value: 'a-b', updatedAt: 1 },
+    });
+    sqlite.exec(`delete from "user" where "id" = 'u1'`);
+    expect(
+      sqlite.prepare(`select count(*) as n from "userPreferences"`).get(),
+    ).toEqual({ n: 0 });
   });
 });

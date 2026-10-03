@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               label="Preference Cookies (Required)"
               disabled
               detailsTextSize="text-normal"
-              details={`<p>Your settings for the site theme are stored as cookies. Other settings, and projects you save, are stored in your browser's own storage and aren't sent to this site unless you add them to an account, share a link or send a project to the Project Gallery.</p>`}
+              details={`<p>Your settings for the site theme are stored as cookies. Other settings, and projects you save, are stored in your browser's own storage and aren't sent to this site unless you add them to an account (signed in, some preferences are saved to it too), share a link or send a project to the Project Gallery.</p>`}
               checked={true}
             />
             {#if __ACCOUNTS_ENABLED__}
@@ -199,6 +199,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               devices where you’re signed in and are not public unless you send
               one to the
               <a href="/gallery" class="link">Project Gallery</a>.
+            </li>
+            <li>
+              <span class="font-bold">Your preferences</span>, while you’re
+              signed in: the site’s colors, light or dark mode, button and
+              heading styles, and your default yarn, so they follow you to your
+              other devices.
             </li>
             <li>
               <span class="font-bold">Security records</span>: to prevent abuse,

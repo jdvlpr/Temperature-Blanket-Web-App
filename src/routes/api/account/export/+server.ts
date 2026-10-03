@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Download everything the account holds, as JSON, including saved palettes. The
-// page adds synced projects.
+// Download everything the account holds, as JSON, including saved palettes and
+// preferences. The page adds synced projects.
 
 import type { D1Database } from '@cloudflare/workers-types';
 import { json } from '@sveltejs/kit';
@@ -28,12 +28,14 @@ export const GET: RequestHandler = async (event) => {
   if (account instanceof Response) return account;
 
   const headers = event.request.headers;
-  const [signInMethods, sessions, gallery, palettes] = await Promise.all([
-    account.auth.api.listUserAccounts({ headers }),
-    account.auth.api.listSessions({ headers }),
-    galleryPages(event.platform?.env?.DB, account.user.id, event.url.origin),
-    savedPalettes(event.platform?.env?.DB, account.user.id),
-  ]);
+  const [signInMethods, sessions, gallery, palettes, preferences] =
+    await Promise.all([
+      account.auth.api.listUserAccounts({ headers }),
+      account.auth.api.listSessions({ headers }),
+      galleryPages(event.platform?.env?.DB, account.user.id, event.url.origin),
+      savedPalettes(event.platform?.env?.DB, account.user.id),
+      savedPreferences(event.platform?.env?.DB, account.user.id),
+    ]);
 
   const data = {
     exportedAt: new Date().toISOString(),
@@ -49,6 +51,7 @@ export const GET: RequestHandler = async (event) => {
     })),
     gallery,
     palettes,
+    preferences,
   };
 
   return json(data, {
@@ -89,6 +92,29 @@ async function savedPalettes(db: D1Database | undefined, userId: string) {
     }));
   } catch {
     // Not set up yet (migration 0006)
+    return null;
+  }
+}
+
+/** Preferences saved to the account, each with when it was changed. */
+async function savedPreferences(db: D1Database | undefined, userId: string) {
+  if (!db) return null;
+  try {
+    const row = await db
+      .prepare(`select "values" from "userPreferences" where "userId" = ?`)
+      .bind(userId)
+      .first<{ values: string }>();
+    if (!row) return {};
+    const values: Record<string, { value: unknown; updatedAt: number }> =
+      JSON.parse(row.values);
+    return Object.fromEntries(
+      Object.entries(values).map(([key, { value, updatedAt }]) => [
+        key,
+        { value, updatedAt: new Date(updatedAt).toISOString() },
+      ]),
+    );
+  } catch {
+    // Not set up yet (migration 0008)
     return null;
   }
 }

@@ -45,6 +45,8 @@ type LocalStatePreferencesType = {
   paletteImage?: PaletteImageSettings;
   /** Sound, vibration, and motion settings; missing until first changed */
   effects?: EffectsPreferences;
+  /** The yarn chosen first where none is, as `{brandId}-{yarnId}`; missing or `''` for none */
+  defaultYarn?: string;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(

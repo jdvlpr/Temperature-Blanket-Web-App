@@ -1,11 +1,15 @@
-<!-- Preferences: how the site looks, sounds, and moves. Every change applies
-right away. Built from the site's usual settings pieces (as in the palette
-image export): selects with the current choice's icon beside it, a segmented
-control for light/dark, a row of color theme thumbnails (as the pattern
-picker), and a card of switches. -->
+<!-- Preferences: how the site looks, sounds, and moves, and the default yarn.
+Every change applies right away and is kept in this browser; signed in, the
+colors, mode, buttons, headings, and default yarn also follow the account (see
+$lib/sync/preferences). Built from the site's usual settings pieces (as in the
+palette image export): selects with the current choice's icon beside it, a
+segmented control for light/dark, rows of thumbnails for colors and headings
+(as the pattern picker), the usual yarn picker, and a card of switches. -->
 
 <script lang="ts">
+  import { account } from '$lib/accounts/summary.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import SelectYarn from '$lib/components/SelectYarn.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import {
     HEADING_STYLE,
@@ -15,6 +19,7 @@ picker), and a card of switches. -->
     TEXT_SCALE,
     THEMES,
   } from '$lib/constants/page-constants';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import {
     canVibrate,
@@ -25,6 +30,7 @@ picker), and a card of switches. -->
   import { RotateCcwIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, type Snippet } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
 
   type Theme = typeof preferences.value.theme;
 
@@ -47,17 +53,18 @@ picker), and a card of switches. -->
     showVibration = canVibrate();
   });
 
-  // Keep the chosen color theme in view in its scrolling row, e.g. when it's
+  // Keeps the chosen thumbnail in view in its scrolling row, e.g. when it's
   // picked from the select
-  let themeRow: HTMLElement | undefined = $state();
-  $effect(() => {
-    preferences.value.theme.id;
-    themeRow?.querySelector('[aria-pressed="true"]')?.scrollIntoView({
-      behavior: motion.reduced ? 'auto' : 'smooth',
-      block: 'nearest',
-      inline: 'nearest',
-    });
-  });
+  function keepInView(selected: boolean): Attachment<HTMLElement> {
+    return (node) => {
+      if (!selected) return;
+      node.scrollIntoView({
+        behavior: motion.reduced ? 'auto' : 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    };
+  }
 
   function choose(key: keyof Theme, value: string) {
     (preferences.value.theme as Record<string, string>)[key] = value;
@@ -66,7 +73,12 @@ picker), and a card of switches. -->
   function resetAll() {
     preferences.value.theme = { ...DEFAULT_THEME };
     preferences.value.effects = undefined;
+    defaultYarn.value = '';
+    // Shows the cleared yarn picker
+    yarnPickerKey++;
   }
+
+  let yarnPickerKey = $state(0);
 
   const BUTTON_ICON_RADIUS: Record<string, string> = {
     sharp: 'rounded-none',
@@ -113,16 +125,71 @@ current choice's icon beside it -->
   </label>
 {/snippet}
 
-{#snippet colorsIcon(id: string)}
-  <!-- data-theme scopes the theme's own colors here, so these follow light/dark -->
+<!-- A setting whose choices are easier seen than named: every choice at a
+glance, as the pattern picker's thumbnails, in one row that scrolls when it
+doesn't fit -->
+{#snippet choiceRow({
+  label,
+  key,
+  options,
+  fallback,
+  thumb,
+}: {
+  label: string;
+  key: keyof Theme;
+  options: Option[];
+  fallback: string;
+  thumb: Snippet<[string]>;
+})}
+  {@const current = preferences.value.theme[key] ?? fallback}
+  {@const labelId = `preferences-${key}`}
+  <div role="group" aria-labelledby={labelId} class="flex flex-col gap-1">
+    <span id={labelId} class="label-text">{label}</span>
+    <div class="flex max-w-full snap-x gap-1 overflow-x-auto pb-2">
+      {#each options as option (option.id)}
+        {@const selected = current === option.id}
+        <button
+          type="button"
+          class={[
+            'flex shrink-0 snap-center flex-col items-center gap-1 rounded p-2 text-xs whitespace-nowrap',
+            selected
+              ? 'bg-primary-200 dark:bg-primary-800 shadow-sm'
+              : 'hover:bg-surface-100-900',
+          ]}
+          aria-pressed={selected}
+          onclick={() => choose(key, option.id)}
+          {@attach keepInView(selected)}
+        >
+          <span aria-hidden="true">{@render thumb(option.id)}</span>
+          {option.name}
+        </button>
+      {/each}
+    </div>
+  </div>
+{/snippet}
+
+<!-- A tiny page in the theme's background, button, and accent colors.
+data-theme scopes each theme's own colors, so they follow light/dark like the
+site does -->
+{#snippet colorsThumb(id: string)}
   <span
     data-theme={id}
-    class="border-surface-300-700 flex h-4 w-6 overflow-hidden rounded-[3px] border"
+    class="bg-surface-50-950 border-surface-300-700 flex h-8 w-12 flex-col justify-between rounded-[3px] border p-1"
   >
-    <span class="bg-surface-50-950 flex-auto"></span>
-    <span class="bg-primary-500 flex-auto"></span>
-    <span class="bg-secondary-500 flex-auto"></span>
+    <span class="bg-secondary-500 h-1 w-7 rounded-full"></span>
+    <span class="bg-primary-500 h-2.5 w-5 self-end rounded-full"></span>
   </span>
+{/snippet}
+
+{#snippet headingsThumb(id: string)}
+  {@const style = HEADING_STYLE.find((heading) => heading.id === id)}
+  {#if style}
+    <span
+      class="flex h-8 w-12 items-center justify-center text-3xl leading-none"
+      style="font-family:var(--heading-font-family);font-variation-settings:'opsz' {style.opsz}, 'wght' {style.wght}, 'SOFT' {style.SOFT}, 'WONK' {style.WONK}"
+      >Aa</span
+    >
+  {/if}
 {/snippet}
 
 {#snippet textSizeIcon(id: string)}
@@ -138,17 +205,6 @@ current choice's icon beside it -->
 {#snippet buttonsIcon(id: string)}
   <span class="h-3.5 w-6 border-2 border-current {BUTTON_ICON_RADIUS[id]}"
   ></span>
-{/snippet}
-
-{#snippet headingsIcon(id: string)}
-  {@const style = HEADING_STYLE.find((heading) => heading.id === id)}
-  {#if style}
-    <span
-      class="text-lg leading-none"
-      style="font-family:var(--heading-font-family);font-variation-settings:'opsz' {style.opsz}, 'wght' {style.wght}, 'SOFT' {style.SOFT}, 'WONK' {style.WONK}"
-      >Aa</span
-    >
-  {/if}
 {/snippet}
 
 <div class="flex w-full flex-col gap-4 px-4 pt-2 pb-4 text-left">
@@ -179,55 +235,23 @@ current choice's icon beside it -->
     </SegmentedControl>
   </div>
 
-  <div class="flex flex-col gap-1">
-    {@render choiceSelect({
-      label: 'Colors',
-      key: 'id',
-      options: SKELETON_THEMES,
-      fallback: 'classic',
-      icon: colorsIcon,
-    })}
+  {@render choiceRow({
+    label: 'Colors',
+    key: 'id',
+    options: SKELETON_THEMES,
+    fallback: 'classic',
+    thumb: colorsThumb,
+  })}
 
-    <!-- Every color theme at a glance, as the pattern picker's thumbnails: a
-    tiny page in its background, button, and accent colors. data-theme scopes
-    each theme's own colors, so they follow light/dark like the site does. One
-    row that scrolls when it doesn't fit -->
-    <div
-      role="group"
-      aria-label="Color themes"
-      bind:this={themeRow}
-      class="mx-auto flex w-fit max-w-full snap-x gap-1 overflow-x-auto pb-2"
-    >
-      {#each SKELETON_THEMES as theme (theme.id)}
-        {@const selected =
-          (preferences.value.theme.id ?? 'classic') === theme.id}
-        <button
-          type="button"
-          class={[
-            'flex shrink-0 snap-center flex-col items-center gap-1 rounded p-2 text-xs whitespace-nowrap',
-            selected
-              ? 'bg-primary-200 dark:bg-primary-800 shadow-sm'
-              : 'hover:bg-surface-100-900',
-          ]}
-          aria-pressed={selected}
-          title="{theme.name} Colors"
-          onclick={() => choose('id', theme.id)}
-        >
-          <span
-            data-theme={theme.id}
-            class="bg-surface-50-950 border-surface-300-700 flex h-8 w-12 flex-col justify-between rounded-[3px] border p-1"
-            aria-hidden="true"
-          >
-            <span class="bg-secondary-500 h-1 w-7 rounded-full"></span>
-            <span class="bg-primary-500 h-2.5 w-5 self-end rounded-full"></span>
-          </span>
-          {theme.name}
-        </button>
-      {/each}
-    </div>
-  </div>
+  {@render choiceRow({
+    label: 'Headings',
+    key: 'headingStyle',
+    options: HEADING_STYLE,
+    fallback: 'classic',
+    thumb: headingsThumb,
+  })}
 
-  <div class="grid gap-4 sm:grid-cols-2">
+  <div class="grid gap-4 sm:grid-cols-3">
     {@render choiceSelect({
       label: 'Text Size',
       key: 'textScale',
@@ -249,13 +273,25 @@ current choice's icon beside it -->
       fallback: 'pill',
       icon: buttonsIcon,
     })}
-    {@render choiceSelect({
-      label: 'Headings',
-      key: 'headingStyle',
-      options: HEADING_STYLE,
-      fallback: 'classic',
-      icon: headingsIcon,
-    })}
+  </div>
+
+  <!-- The yarn picker fills in the default yarn itself. A yarn sets it,
+  clearing the picker removes it, and a brand alone leaves it as it was -->
+  <div role="group" aria-labelledby="preferences-default-yarn">
+    <span id="preferences-default-yarn" class="label-text">Default Yarn</span>
+    <p class="mb-1 text-sm opacity-70">
+      Chosen first where no yarn is, like for colors with none assigned
+    </p>
+    {#key yarnPickerKey}
+      <SelectYarn
+        context="modal"
+        onselectautocomplete={({ selectedBrandId, selectedYarnId }) => {
+          if (selectedBrandId && selectedYarnId)
+            defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;
+          else if (!selectedBrandId && !selectedYarnId) defaultYarn.value = '';
+        }}
+      />
+    {/key}
   </div>
 
   <div
@@ -302,6 +338,12 @@ current choice's icon beside it -->
   <div
     class="bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-2 sm:px-4"
   >
+    {#if account.summary}
+      <p class="w-full text-center text-sm opacity-70">
+        Colors, mode, buttons, headings, and default yarn are saved to your
+        account
+      </p>
+    {/if}
     <button class="btn hover:preset-tonal-surface" onclick={resetAll}>
       <RotateCcwIcon />
       Reset to Defaults

@@ -22,6 +22,7 @@
 //   and the device's copy becomes a new project, "… (copy from this device, …)".
 // - An edit beats a deletion from another device.
 // - Palettes ride the same changes feed; the newest change to one wins.
+// - So do preferences; the newest change to each one wins.
 
 import type { SavedPalette } from '$lib/storage/palettes.svelte';
 import type { StoredProject } from '$lib/storage/projects.svelte';
@@ -34,6 +35,7 @@ import type {
   SyncErrorCode,
 } from './protocol';
 import { MAX_PALETTES_PER_UPLOAD } from './protocol';
+import type { PreferencesRecord, PreferencesUpload } from './preferences';
 import type { Seen } from './seen';
 
 /** Sync bookkeeping kept with each saved project on this device. */
@@ -92,6 +94,14 @@ export interface LocalStore {
   setAccountState(userId: string, state: AccountSyncState): Promise<void>;
 }
 
+/** The synced preferences on this device, for the sync pass (see preferences-sync). */
+export interface PreferencesLocal {
+  /** Takes in the account's newer preferences; marks the matching ones synced */
+  apply(userId: string, record: PreferencesRecord): Promise<void> | void;
+  /** Preferences changed here since the account last had them, or null */
+  pending(userId: string): PreferencesUpload | null;
+}
+
 /** The palettes on this device, for the sync pass (see PaletteStorage). */
 export interface PaletteLocal {
   list(): Promise<SavedPalette[]>;
@@ -129,6 +139,9 @@ export interface SyncServer {
   /** Deletes a project's copy in the account's Trash for good */
   purgeTrashed?(id: string): Promise<void>;
   uploadPalettes?(palettes: PaletteUpload[]): Promise<PaletteUploadResult[]>;
+  uploadPreferences?(
+    preferences: PreferencesUpload,
+  ): Promise<PreferencesRecord>;
 }
 
 /** A failed request. Anything but the codes below stops the whole pass. */
@@ -174,6 +187,8 @@ export type SyncOptions = {
   newId?: () => string;
   /** Palettes to sync too */
   palettes?: PaletteLocal;
+  /** Preferences to sync too */
+  preferences?: PreferencesLocal;
 };
 
 export type SyncReport = {
@@ -185,6 +200,8 @@ export type SyncReport = {
   failed: { id: string; code: SyncErrorCode }[];
   /** Palette IDs that failed to upload; they try again next time */
   palettesFailed?: string[];
+  /** Preferences failed to upload; they try again next time */
+  preferencesFailed?: boolean;
 };
 
 /** A saved project's link, moved to this origin and this project ID. */
@@ -221,6 +238,9 @@ export async function syncAccount(
     palettesFailed: [],
   };
   const palettes = server.uploadPalettes ? options.palettes : undefined;
+  const preferences = server.uploadPreferences
+    ? options.preferences
+    : undefined;
 
   let state = await local.accountState(userId);
   const saveState = async (next: AccountSyncState) => {
@@ -406,6 +426,8 @@ export async function syncAccount(
       for (const record of page.palettes) palettesOnServer.add(record.id);
       await palettes.apply(userId, page.palettes);
     }
+    if (preferences && page.preferences)
+      await preferences.apply(userId, page.preferences);
 
     since = page.nextSince;
     await saveState({ ...state, since });
@@ -518,6 +540,21 @@ export async function syncAccount(
             result.applied,
           );
       }
+    }
+  }
+
+  // 5. Preferences changed here, all in one request
+  const changedPreferences = preferences?.pending(userId);
+  if (preferences && changedPreferences) {
+    try {
+      await preferences.apply(
+        userId,
+        await server.uploadPreferences!(changedPreferences),
+      );
+    } catch (e) {
+      if (e instanceof SyncHttpError && (e.status === 0 || e.status === 401))
+        throw e;
+      report.preferencesFailed = true;
     }
   }
 

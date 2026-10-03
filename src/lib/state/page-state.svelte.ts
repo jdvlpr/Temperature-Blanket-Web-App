@@ -388,7 +388,15 @@ export const pageSections = $state({
   ],
 });
 
-export const defaultYarn = $state({ value: '' });
+/** The default yarn, as `{brandId}-{yarnId}` or `''`; kept in preferences */
+export const defaultYarn = {
+  get value() {
+    return preferences.value.defaultYarn ?? '';
+  },
+  set value(value: string) {
+    preferences.value.defaultYarn = value;
+  },
+};
 
 // Go to a section
 export const goToProjectSection = async (

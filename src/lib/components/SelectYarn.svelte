@@ -225,6 +225,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
     initYarnPicker();
   });
 
+  // On a touch screen, a dialog's list goes in the dialog's content instead of
+  // over it: the on-screen keyboard moves and shrinks the sheet, and a list
+  // fixed to the screen would be left behind, over the field
+  const inlineList = () =>
+    context === 'modal' && window.matchMedia('(pointer: coarse)').matches;
+
+  // With the list open, keep the field at the top of the dialog, so the list
+  // has the room below it, including once the keyboard is up
+  $effect(() => {
+    if (!showingAutocomplete || !inlineList()) return;
+    const viewport = window.visualViewport;
+    let frame = 0;
+    const toTop = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() =>
+        inputGroup?.scrollIntoView({ block: 'start' }),
+      );
+    };
+    toTop();
+    viewport?.addEventListener('resize', toTop);
+    return () => {
+      cancelAnimationFrame(frame);
+      viewport?.removeEventListener('resize', toTop);
+    };
+  });
+
+  // In a dialog the list covers what's below it, so on a touch screen a drag
+  // that starts anywhere else closes it (and the keyboard), letting the dialog
+  // scroll. iOS doesn't blur the input on its own when the page is dragged.
+  $effect(() => {
+    if (context !== 'modal' || !showingAutocomplete) return;
+    let outside = false;
+    const onTouchStart = (e: TouchEvent) => {
+      const target = e.target as Node;
+      outside =
+        !autocompleteContainer?.contains(target) &&
+        !inputGroup?.contains(target);
+    };
+    const onTouchMove = () => {
+      if (!outside) return;
+      outside = false;
+      inputElement?.blur();
+    };
+    const options = { capture: true, passive: true };
+    document.addEventListener('touchstart', onTouchStart, options);
+    document.addEventListener('touchmove', onTouchMove, options);
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart, options);
+      document.removeEventListener('touchmove', onTouchMove, options);
+    };
+  });
+
   async function initYarnPicker() {
     await ensureYarnData();
     if (!inputElement) return; // component was unmounted before yarn data resolved
@@ -278,8 +330,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (maxHeight > 480) container.style.maxHeight = `480px`;
 
         container.style.overflowY = `scroll`;
+        // Scrolling to the list's end doesn't go on to scroll what's behind it
+        container.style.overscrollBehavior = `contain`;
 
-        if (context === 'modal') {
+        if (inlineList()) {
+          // In the dialog's content, right under the field, so it moves with
+          // the field when the keyboard opens and the sheet shrinks
+          container.style.position = 'relative';
+          container.style.top = '';
+          container.style.left = '';
+          container.style.width = '100%';
+          const visible = window.visualViewport?.height ?? window.innerHeight;
+          container.style.maxHeight = `${Math.round(Math.max(160, visible * 0.4))}px`;
+        } else if (context === 'modal') {
           container.style.position = 'fixed';
           container.style.top = `${inputRect.bottom}px`;
         }
@@ -393,7 +456,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="label flex w-full flex-col justify-start md:col-span-2"
+  class="label flex w-full scroll-mt-20 flex-col justify-start md:col-span-2"
   bind:this={inputGroup}
 >
   <span class="label-text"> Yarn Name </span>
@@ -483,7 +546,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           selectedYarnId = '';
           await delay(10);
           if (!inputValue.length) showingAutocomplete = false;
-          document.getElementById('input-select-yarn')?.focus();
+          inputElement?.focus();
           onselectautocomplete({
             selectedBrandId,
             selectedYarnId,

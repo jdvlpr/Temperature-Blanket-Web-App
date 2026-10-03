@@ -16,6 +16,7 @@
 import { browser } from '$app/environment';
 import { SKELETON_THEMES } from '$lib/constants/page-constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
+import { trackPreferenceChanges } from '$lib/storage/preferences-sync.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { PageLayout } from '$lib/types/page-types';
 import { MigrationManager } from './migration-manager';
@@ -92,6 +93,9 @@ export async function initializeLocalStorage() {
   } catch (e) {
     throw e;
   }
+
+  // Note when synced preferences change, so they sync once someone signs in
+  if (browser) trackPreferenceChanges();
 
   // Setup Theme Listeners
   if (browser) {

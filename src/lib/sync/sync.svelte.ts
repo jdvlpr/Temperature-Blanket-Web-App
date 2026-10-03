@@ -26,11 +26,18 @@ import { resolve } from '$app/paths';
 import { account } from '$lib/accounts/summary.svelte';
 import { toast } from '$lib/state/page-state.svelte';
 import { PaletteStorage, savedPalettes } from '$lib/storage/palettes.svelte';
+import {
+  applyAccountPreferences,
+  leaveAccountPreferences,
+  onPreferencesChange,
+  pendingPreferences,
+} from '$lib/storage/preferences-sync.svelte';
 import { ProjectStorage } from '$lib/storage/projects.svelte';
 import {
   syncAccount,
   SyncHttpError,
   type PaletteLocal,
+  type PreferencesLocal,
   type SyncReport,
 } from './engine';
 import { createHttpSyncServer, sha256 } from './http';
@@ -42,6 +49,9 @@ export { sync, type SyncState } from './status.svelte';
 const SAVE_DELAY_MS = 300;
 const FOCUS_INTERVAL_MS = 60_000;
 const BUSY_RETRY_MS = 10_000;
+// Long enough that trying out colors or settings one after another sends only
+// the last
+const PREFERENCES_DELAY_MS = 5_000;
 
 let started = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
@@ -62,6 +72,11 @@ const paletteLocal: PaletteLocal = {
     PaletteStorage.forgetMissing(userId, onServer),
 };
 
+const preferencesLocal: PreferencesLocal = {
+  apply: applyAccountPreferences,
+  pending: pendingPreferences,
+};
+
 /** Syncs soon, folding several quick changes into one pass. */
 export function scheduleSync(delay = SAVE_DELAY_MS) {
   if (!started) return;
@@ -80,7 +95,12 @@ async function runPass(userId: string) {
       userId,
       ProjectStorage.localStore(),
       server,
-      { origin: location.origin, sha256, palettes: paletteLocal },
+      {
+        origin: location.origin,
+        sha256,
+        palettes: paletteLocal,
+        preferences: preferencesLocal,
+      },
     );
     sync.state = 'idle';
     sync.lastSyncedAt = Date.now();
@@ -202,6 +222,7 @@ export function startSync() {
   sync.active = true;
   ProjectStorage.onChange = () => scheduleSync();
   PaletteStorage.onChange = () => scheduleSync();
+  onPreferencesChange(() => scheduleSync(PREFERENCES_DELAY_MS));
   document.addEventListener('visibilitychange', onFocus);
   window.addEventListener('focus', onFocus);
   window.addEventListener('online', onOnline);
@@ -216,6 +237,7 @@ export function stopSync() {
   clearTimeout(timer);
   ProjectStorage.onChange = undefined;
   PaletteStorage.onChange = undefined;
+  onPreferencesChange(undefined);
   document.removeEventListener('visibilitychange', onFocus);
   window.removeEventListener('focus', onFocus);
   window.removeEventListener('online', onOnline);
@@ -297,6 +319,7 @@ export async function leaveAccount(userId: string, keep: boolean) {
   );
   await ProjectStorage.leaveAccountTrash(userId, keep);
   await PaletteStorage.leaveAccount(userId, keep);
+  leaveAccountPreferences(userId);
   await savedPalettes.refresh().catch(() => {});
   await ProjectStorage.clearAccountSyncState(userId);
 }

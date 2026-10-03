@@ -27,6 +27,11 @@ import type {
   ProjectMeta,
   TrashedProjectMeta,
 } from '$lib/sync/protocol';
+import {
+  mergePreferences,
+  type PreferencesRecord,
+  type PreferencesUpload,
+} from '$lib/sync/preferences';
 import type {
   D1Database,
   R2Bucket,
@@ -103,6 +108,13 @@ const toPalette = (row: PaletteRow): PaletteRecord => ({
   purged: row.purgedAt !== null,
 });
 
+type PreferencesRow = { rev: number; values: string };
+
+const toPreferences = (row: PreferencesRow): PreferencesRecord => ({
+  rev: row.rev,
+  values: JSON.parse(row.values),
+});
+
 const blobKeyFor = (userId: string, projectId: string) =>
   `u/${userId}/p/${projectId}/${crypto.randomUUID()}.json.gz`;
 
@@ -161,7 +173,7 @@ export async function listChanges(
 
   // Each table's next `limit + 1` changes; merged by revision, the first `limit`
   // are the next page of both
-  const [projects, palettes] = await Promise.all([
+  const [projects, palettes, preferences] = await Promise.all([
     db
       .prepare(
         `select * from "project" where "userId" = ? and "rev" > ?
@@ -178,10 +190,19 @@ export async function listChanges(
       .all<PaletteRow>()
       // Before migration 0006: projects keep syncing without palettes
       .catch(() => ({ results: [] as PaletteRow[] })),
+    db
+      .prepare(
+        `select "rev", "values" from "userPreferences" where "userId" = ? and "rev" > ?`,
+      )
+      .bind(userId, since)
+      .first<PreferencesRow>()
+      // Before migration 0008
+      .catch(() => null),
   ]);
   const merged = [
     ...projects.results.map((row) => ({ rev: row.rev, project: row })),
     ...palettes.results.map((row) => ({ rev: row.rev, palette: row })),
+    ...(preferences ? [{ rev: preferences.rev, preferences }] : []),
   ].sort((a, b) => a.rev - b.rev);
   const page = merged.slice(0, limit);
 
@@ -191,6 +212,9 @@ export async function listChanges(
     palettes: page.flatMap((c) =>
       'palette' in c ? [toPalette(c.palette)] : [],
     ),
+    preferences: page.flatMap((c) =>
+      'preferences' in c ? [toPreferences(c.preferences)] : [],
+    )[0],
     nextSince: page.at(-1)?.rev ?? since,
     hasMore: merged.length > limit,
   };
@@ -531,6 +555,52 @@ export async function savePalette(
     status: (results.at(-1)?.meta.changes ?? 0) > 0 ? 'saved' : 'kept',
     palette: toPalette(saved),
   };
+}
+
+// *****************
+// Preferences
+// *****************
+
+/**
+ * Takes in each uploaded preference that's newer than the account's, and
+ * returns the account's preferences afterwards.
+ */
+export async function savePreferences(
+  db: D1Database,
+  userId: string,
+  upload: PreferencesUpload,
+): Promise<PreferencesRecord> {
+  const row = () =>
+    db
+      .prepare(
+        `select "rev", "values" from "userPreferences" where "userId" = ?`,
+      )
+      .bind(userId)
+      .first<PreferencesRow>();
+
+  const existing = await row();
+  const current = existing ? toPreferences(existing) : { rev: 0, values: {} };
+  const { values, changed } = mergePreferences(current.values, upload);
+  if (!changed) return current;
+
+  // Two devices saving at once: the later write is based on what it read, so
+  // it only applies if the row hasn't changed since
+  const results = await db.batch([
+    bumpRevision(db, userId),
+    db
+      .prepare(
+        `insert into "userPreferences" ("userId", "rev", "values")
+         values (?, ${CURRENT_REV}, ?)
+         on conflict ("userId") do update set
+           "rev" = excluded."rev", "values" = excluded."values"
+         where "userPreferences"."rev" = ?`,
+      )
+      .bind(userId, userId, JSON.stringify(values), current.rev),
+  ]);
+  // Lost the race: merge into the other device's save
+  if ((results.at(-1)?.meta.changes ?? 0) === 0)
+    return savePreferences(db, userId, upload);
+  return toPreferences((await row())!);
 }
 
 /**
