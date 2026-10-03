@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import AccountButton from '$lib/components/account/AccountButton.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { alignIconInk } from '$lib/state/attachments/align-icon-ink';
   import {
     drawerState,
     showNavigationSideBar,
@@ -145,12 +146,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class={[
           'hover:preset-tonal-surface mx-2 hidden justify-center lg:flex',
-          // Open, it follows the menu at the menu's own spacing
+          // Open, it follows the menu at the menu's own spacing, with room
+          // below it when the menu reaches the end of the page
           showNavigationSideBar.value
-            ? 'btn'
+            ? 'btn mb-4'
             : 'btn-icon relative -top-0.5 mt-2 ml-4',
         ]}
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
+        {@attach alignIconInk}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
         }}

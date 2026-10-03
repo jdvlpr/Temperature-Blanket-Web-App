@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
+  import { alignIconInk } from '$lib/state/attachments/align-icon-ink';
   let openedNavigationItems = $state(['tools', 'explore']);
 </script>
 
@@ -99,9 +100,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
+<!-- Icons line up by what's drawn, with the site logo's edge -->
 <div
   class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
+  {@attach alignIconInk}
 >
   {#if project.status.temporaryProjectsBackup && project.status.temporaryProjectsBackup.length && project.status.temporaryUid}
     <!--Access backups for project storage migration error, added in version 5.35.0 -->
