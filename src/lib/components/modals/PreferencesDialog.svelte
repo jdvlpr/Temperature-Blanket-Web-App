@@ -432,7 +432,7 @@ site does -->
                   <ToggleSwitch
                     bare
                     label="Vibration"
-                    details="A light tap for the same actions"
+                    details="A light tap for some actions"
                     checked={effects.haptics}
                     onchange={(e) =>
                       setEffect(

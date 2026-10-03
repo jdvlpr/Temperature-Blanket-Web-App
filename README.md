@@ -210,7 +210,7 @@ Settings and user preferences are stored in the browser's Local Storage.
 | Field     | Description                                                                         | Default    | Options                |
 | --------- | ----------------------------------------------------------------------------------- | ---------- | ---------------------- |
 | `sound`   | Soft sounds when moving colors, copying, saving, undoing, and using switches        | `true`     | `true`, `false`        |
-| `haptics` | Vibration for the same actions, on devices that support it (in practice, Android)   | `true`     | `true`, `false`        |
+| `haptics` | Vibration for some actions, on devices that support it (in practice, Android)   | `true`     | `true`, `false`        |
 | `motion`  | `'reduce'` turns off decorative animations; `'system'` follows the device's setting | `'system'` | `'system'`, `'reduce'` |
 
 **`preferences.defaultYarn`** (unreleased, after 6.3.2): the yarn chosen first where none is, as `{brandId}-{yarnId}`, set in the Preferences dialog or with "Set as Default Yarn". Missing or `''` for none (before, it was kept only until the page was reloaded).
