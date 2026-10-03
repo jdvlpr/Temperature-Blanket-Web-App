@@ -153,6 +153,7 @@ class DialogClass {
       this.response = response || null;
     }
     // Open the modal
+    this.#openings++;
     this.opened = true;
     // A new screen in the panel: from its top, with the focus on Back (the
     // button that opened it is gone)
@@ -165,8 +166,20 @@ class DialogClass {
       });
   };
 
+  /** Counts openings, so a close that's waiting can't close a newer dialog */
+  #openings = 0;
+
+  /**
+   * Closes once whatever else the same tap did has settled: a popover or
+   * menu in the dialog closing on that tap (a tap outside it), torn down in
+   * the same update, makes Svelte throw ("reading 'schedule'") and can leave
+   * parts of it behind in the next dialog
+   */
   close = () => {
-    this.opened = false;
+    const opening = this.#openings;
+    setTimeout(() => {
+      if (opening === this.#openings) this.opened = false;
+    });
   };
 
   /** Back to the dialog this one was opened from */
@@ -177,6 +190,7 @@ class DialogClass {
     this.type = 'component';
     this.contentComponent = view.component;
     this.options = view.options;
+    this.#openings++;
     this.opened = true;
     tick().then(() => {
       this.scrollElement?.scrollTo({ top: view.scrollTop });

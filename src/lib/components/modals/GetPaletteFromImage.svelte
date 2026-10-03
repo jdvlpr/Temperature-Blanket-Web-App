@@ -105,6 +105,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let paletteColors = $derived(palette.paletteColors());
 
+  let yarnOpen = $state(false);
+
   // Which yarn the colors are matched to, said briefly
   let yarnDetails = $derived.by(() => {
     if (!palette.yarnReady) return 'Closest yarn colorways';
@@ -469,8 +471,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
               {/key}
 
-              <!-- A popover rather than a menu, for the yarn search field -->
-              <Popover positioning={{ placement: 'top' }}>
+              <!-- A popover rather than a menu, for the yarn search field.
+              Its content exists only while open, so the dialog doesn't hide
+              it from screen readers (as with the yarn list) -->
+              <Popover
+                positioning={{ placement: 'top' }}
+                open={yarnOpen}
+                onOpenChange={(details) => (yarnOpen = details.open)}
+              >
                 <Popover.Trigger
                   class={toolbarButtonClass}
                   title={palette.mode === 'yarn'
@@ -483,56 +491,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >Yarn <ChevronDownIcon size={18} /></span
                   >
                 </Popover.Trigger>
-                <Portal>
-                  <Popover.Positioner>
-                    <Popover.Content
-                      class="card bg-surface-100-900 border-surface-200-800 z-9999 flex max-h-(--available-height) w-96 max-w-[calc(100vw-2rem)] flex-col overflow-y-auto border py-1 shadow-lg"
-                    >
-                      <Popover.Title class="sr-only">Yarn</Popover.Title>
-                      <ToggleSwitch
-                        bare
-                        label="Match to Yarn Colors"
-                        details={palette.mode === 'yarn'
-                          ? `${yarnDetails}.`
-                          : 'Off: exact colors from the photo. A yarn colorway might not exist for each one.'}
-                        detailsTextSize="text-xs"
-                        checked={palette.mode === 'yarn'}
-                        onchange={(e) =>
-                          palette.setMode(
-                            (e.currentTarget as HTMLInputElement).checked
-                              ? 'yarn'
-                              : 'exact',
-                          )}
-                      />
+                {#if yarnOpen}
+                  <Portal>
+                    <Popover.Positioner>
+                      <Popover.Content
+                        class="card bg-surface-100-900 border-surface-200-800 z-9999 flex max-h-(--available-height) w-96 max-w-[calc(100vw-2rem)] flex-col overflow-y-auto border py-1 shadow-lg"
+                      >
+                        <Popover.Title class="sr-only">Yarn</Popover.Title>
+                        <ToggleSwitch
+                          bare
+                          label="Match to Yarn Colors"
+                          details={palette.mode === 'yarn'
+                            ? `${yarnDetails}.`
+                            : 'Off: exact colors from the photo. A yarn colorway might not exist for each one.'}
+                          detailsTextSize="text-xs"
+                          checked={palette.mode === 'yarn'}
+                          onchange={(e) =>
+                            palette.setMode(
+                              (e.currentTarget as HTMLInputElement).checked
+                                ? 'yarn'
+                                : 'exact',
+                            )}
+                        />
 
-                      {#if palette.yarnReady && palette.mode === 'yarn'}
-                        <div class="flex flex-col gap-2 px-4 pb-3">
-                          <SelectYarn
-                            bind:selectedBrandId={palette.selectedBrandId}
-                            bind:selectedYarnId={palette.selectedYarnId}
-                            onselectautocomplete={onYarnFilterChange}
-                            selectedYarnWeightId={palette.selectedYarnWeightId}
-                          />
-                          <DefaultYarnSuggestion
-                            selectedBrandId={palette.selectedBrandId}
-                            selectedYarnId={palette.selectedYarnId}
-                          />
-                          {#if !palette.selectedBrandId || !palette.selectedYarnId}
-                            {#key palette.selectedBrandId}
-                              <SelectYarnWeight
-                                selectedBrandId={palette.selectedBrandId}
-                                bind:selectedYarnWeightId={
-                                  palette.selectedYarnWeightId
-                                }
-                                onchange={onYarnFilterChange}
-                              />
-                            {/key}
-                          {/if}
-                        </div>
-                      {/if}
-                    </Popover.Content>
-                  </Popover.Positioner>
-                </Portal>
+                        {#if palette.yarnReady && palette.mode === 'yarn'}
+                          <div class="flex flex-col gap-2 px-4 pb-3">
+                            <SelectYarn
+                              bind:selectedBrandId={palette.selectedBrandId}
+                              bind:selectedYarnId={palette.selectedYarnId}
+                              onselectautocomplete={onYarnFilterChange}
+                              selectedYarnWeightId={palette.selectedYarnWeightId}
+                            />
+                            <DefaultYarnSuggestion
+                              selectedBrandId={palette.selectedBrandId}
+                              selectedYarnId={palette.selectedYarnId}
+                            />
+                            {#if !palette.selectedBrandId || !palette.selectedYarnId}
+                              {#key palette.selectedBrandId}
+                                <SelectYarnWeight
+                                  selectedBrandId={palette.selectedBrandId}
+                                  bind:selectedYarnWeightId={
+                                    palette.selectedYarnWeightId
+                                  }
+                                  onchange={onYarnFilterChange}
+                                />
+                              {/key}
+                            {/if}
+                          </div>
+                        {/if}
+                      </Popover.Content>
+                    </Popover.Positioner>
+                  </Portal>
+                {/if}
               </Popover>
 
               <Menu
