@@ -13,23 +13,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
-  import WeatherDetails from '$lib/components/WeatherDetails.svelte';
-  import { drawerState } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import {
-    previews,
-    previewWeatherTargets,
-  } from '$lib/state/preview-state.svelte';
+  import { previewHighlight, previews } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
   import { exists } from '$lib/utils/other-utils';
   import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
+  import { historyChange } from '$lib/utils/feedback.svelte';
   import { onMount } from 'svelte';
-  import { Drawer } from 'vaul-svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
   function initDefaultPreview() {
@@ -51,9 +45,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(() => {
     initDefaultPreview();
   });
+
+  // While a gauge color is pointed at or focused, every part of the preview in
+  // another color fades back, so the days knit in that yarn stand out
+  let highlightStyle = $derived.by(() => {
+    const hex = previewHighlight.hex;
+    if (!hex || !/^#[0-9a-f]{3,8}$/i.test(hex)) return '';
+    return `<style>#preview-svg-image :is(rect, path, polygon, polyline, circle, line):not([fill="${hex}" i]):not([stroke="${hex}" i]) { opacity: 0.15; }</style>`;
+  });
 </script>
 
-<div class="preset-tonal-surface card p-2 md:p-4 md:shadow-lg mt-4">
+<svelte:head>
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- built from a validated hex code -->
+  {@html highlightStyle}
+</svelte:head>
+
+<div
+  class={[
+    'preset-tonal-surface card mt-4 p-2 md:p-4 md:shadow-lg',
+    historyChange.preview && 'history-flash-card',
+  ]}
+>
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">
@@ -61,30 +73,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#key previews.active}
         <div class="flex w-full flex-wrap items-start justify-center gap-4">
           <previews.active.settingsComponent />
-
-          <Drawer.Root bind:open={drawerState.weatherDetails}>
-            <Drawer.Portal>
-              <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
-
-              <Drawer.Content
-                class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
-              >
-                <div
-                  class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
-                >
-                  <div
-                    class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
-                  ></div>
-                  <div class="mx-auto text-center">
-                    <WeatherDetails
-                      weatherTargets={previewWeatherTargets.value}
-                      getTargets={previewWeatherTargets.getter}
-                    />
-                  </div>
-                </div>
-              </Drawer.Content>
-            </Drawer.Portal>
-          </Drawer.Root>
         </div>
       {/key}
 
@@ -93,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           class="btn hover:preset-tonal-surface"
-          title="Download PNG"
+          title="Download the preview image (PNG)"
           onclick={() => {
             const active = previews.active;
             if (!active?.width || !active?.height || !active?.svg) return;
@@ -101,24 +89,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <ImageIcon />
-          Download Image (PNG)
+          Download PNG
         </button>
 
+        <!-- Links to the gallery page instead once it's sent -->
         <SendToGalleryButton isPrimary={true} />
-
-        {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-          <div class="flex w-full flex-col justify-center gap-1">
-            <p>View this project's gallery page:</p>
-            <p>
-              <a
-                href={project.gallery.href}
-                target="_blank"
-                class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
-                rel="noreferrer">{project.gallery.title}</a
-              >
-            </p>
-          </div>
-        {/if}
       </div>
     {/if}
   </div>

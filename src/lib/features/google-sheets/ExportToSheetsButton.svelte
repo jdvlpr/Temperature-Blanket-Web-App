@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       component: {
         ref: ExportToGoogleSheetModal,
       },
+      options: { title: 'Create Google Sheet' },
     });
   }
 </script>

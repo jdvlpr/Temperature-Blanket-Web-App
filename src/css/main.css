@@ -17,8 +17,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* To avoid a breaking style issue in Windows-based browsers, it’s recommended you include this temporary fix into your global stylesheet. Please note this change will be automatically and permanently applied for you in Skeleton v5+. 
-https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix 
+/* To avoid a breaking style issue in Windows-based browsers, it’s recommended you include this temporary fix into your global stylesheet. Please note this change will be automatically and permanently applied for you in Skeleton v5+.
+https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 */
 
 .select,
@@ -78,8 +78,8 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 
 /* Override default theme font families */
 [data-theme] {
-  --base-font-family: 'apparat', sans-serif;
-  --heading-font-family: 'fraunces-variable', sans-serif;
+  --base-font-family: 'Be Vietnam Pro', sans-serif;
+  --heading-font-family: 'Fraunces Variable', serif;
   --heading-font-weight: inherit;
   --heading-font-style: inherit;
   --heading-letter-spacing: inherit;
@@ -124,6 +124,61 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   --radius-container: 1.5rem;
 }
 
+/* Card edges: a shadow alone barely shows (in dark mode hardly at all), so
+   raised boxes get a thin border too. Give it at the same breakpoint as the
+   shadow (md:card-border with md:shadow-lg), so cards that run edge to edge on
+   small screens go without. Every Skeleton card gets it; in the components
+   layer, so a border utility on a card still wins. */
+@utility card-border {
+  border-width: 1px;
+  border-color: var(--color-surface-200-800);
+}
+@layer components {
+  .card {
+    border-width: 1px;
+    border-color: var(--color-surface-200-800);
+  }
+}
+@media (prefers-contrast: more) {
+  .card,
+  .card-border,
+  [class*=':card-border'] {
+    border-color: var(--color-surface-500);
+  }
+}
+
+/* Menu items: rounded rectangles whose corners follow the menu's (its radius
+   less its padding), rather than pills, which crowd two-line items. Unlayered
+   so it wins over Skeleton's own item styles. */
+[data-scope='menu'][data-part='item'] {
+  border-radius: max(0px, calc(var(--radius-container) - var(--spacing) * 2));
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+}
+
+/* The usual button hover. preset-tonal-surface's background is the page's own
+   (surface 50/950), so as a hover it barely showed, and btn's brightness filter
+   washed it out further. A step off the background instead, without the
+   filter. Unlayered so it wins over the utility. */
+@media (hover: hover) {
+  .hover\:preset-tonal-surface:hover:not(:disabled) {
+    background-color: var(--color-surface-200-800);
+    filter: none;
+  }
+}
+
+/* Stacked segmented controls: the box takes the container's corners and its
+   options follow them (less its padding), as menus do, so a tall box isn't a
+   pill with pills inside it. */
+[data-scope='radio-group'][data-part='root'][data-orientation='vertical'] {
+  & [data-part='control'] {
+    border-radius: var(--radius-container);
+  }
+  & [data-part='indicator'],
+  & [data-part='item'] {
+    border-radius: max(0px, calc(var(--radius-container) - var(--spacing) * 2));
+  }
+}
+
 /* Spacing */
 [data-spacing='compact'] {
   --spacing: 0.22rem;
@@ -152,6 +207,109 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+[data-motion='reduce'] ::view-transition-group(*),
+[data-motion='reduce'] ::view-transition-old(*),
+[data-motion='reduce'] ::view-transition-new(*) {
+  animation: none !important;
+}
+
+/* A quick, small grow-and-settle, e.g. a check icon after saving or a swatch after its color changes */
+@keyframes feedback-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(var(--pop-scale, 1.18));
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.feedback-pop {
+  animation: feedback-pop 300ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .feedback-pop {
+    animation: none;
+  }
+}
+[data-motion='reduce'] .feedback-pop {
+  animation: none;
+}
+
+/* Preview cells ease to a new yarn color instead of snapping (only cells whose color changes animate),
+and fade back while another gauge color is highlighted */
+#preview-svg-image :is(rect, path, polygon, polyline, circle, line) {
+  transition:
+    fill 250ms ease,
+    opacity 200ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  #preview-svg-image :is(rect, path, polygon, polyline, circle, line) {
+    transition: none;
+  }
+}
+[data-motion='reduce']
+  #preview-svg-image
+  :is(rect, path, polygon, polyline, circle, line) {
+  transition: none;
+}
+
+/* What an undo or redo just changed glows for a moment: a ring in the swatch's own text color (which
+contrasts with it), or an outline around the preview. Reduced motion shows the same ring, without the fade. */
+@keyframes history-flash {
+  0%,
+  35% {
+    box-shadow: inset 0 0 0 4px currentColor;
+  }
+  100% {
+    box-shadow: inset 0 0 0 4px transparent;
+  }
+}
+.history-flash {
+  animation: history-flash 1400ms ease-out both;
+}
+@keyframes history-flash-card {
+  0%,
+  35% {
+    outline-color: var(--color-primary-500);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+.history-flash-card {
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+  animation: history-flash-card 1400ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .history-flash {
+    animation: none;
+    box-shadow: inset 0 0 0 4px currentColor;
+  }
+  .history-flash-card {
+    animation: none;
+    outline-color: var(--color-primary-500);
+  }
+}
+[data-motion='reduce'] .history-flash {
+  animation: none;
+  box-shadow: inset 0 0 0 4px currentColor;
+}
+[data-motion='reduce'] .history-flash-card {
+  animation: none;
+  outline-color: var(--color-primary-500);
+}
+
+/* A color being moved with the keyboard lifts off the page, like one being dragged with a pointer */
+.dnd-keyboard-lifted {
+  position: relative;
+  z-index: 10;
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 0.28),
+    0 2px 6px rgb(0 0 0 / 0.18);
 }
 
 h1,
@@ -223,6 +381,9 @@ th div {
 
 .text-gradient {
   @apply from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-linear-to-br box-decoration-clone bg-clip-text text-transparent dark:text-transparent;
+  /* The gradient is painted only inside the box, and Fraunces' descenders
+  (y, g, p) hang below its tight heading line height */
+  padding-bottom: 0.15em;
 }
 
 .label {
@@ -230,8 +391,26 @@ th div {
   text-align: left;
 }
 
+/* Icon buttons are circles, like the account button, with room around the
+icon for their hover background (Skeleton's are squarer and tighter) */
+@utility btn-icon {
+  border-radius: 9999px;
+  width: --spacing(6);
+  height: --spacing(6);
+  padding: --spacing(2);
+}
+
 .btn-icon > * {
   flex-shrink: 0 !important;
+}
+
+/* For buttons on a color: a tint of their text's color, which is black or
+white for contrast, shows on any color where a surface tint looks muddy */
+@utility hover-on-color {
+  @apply transition-colors;
+  &:hover {
+    background-color: color-mix(in oklab, currentColor 18%, transparent);
+  }
 }
 
 .lucide {

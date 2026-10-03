@@ -24,6 +24,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
   import {
+    dragConsiderFeedback,
+    dragFinalizeFeedback,
+    growIn,
+    liftDraggedElement,
+    motionDuration,
+    Pop,
+  } from '$lib/utils/feedback.svelte';
+  import {
     LockKeyholeIcon,
     LockOpenIcon,
     MoveIcon,
@@ -38,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import { scale } from 'svelte/transition';
+  import { onMount, untrack } from 'svelte';
 
   interface Props {
     colors?: Color[];
@@ -48,7 +57,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom?: boolean;
     isStaticGauge?: boolean;
     onchanged?: any;
-    fullscreen?: boolean;
+    /** Colors that just changed (by undo or redo), which glow for a moment */
+    flashIndices?: number[];
+    /** A color to outline, as when its marker is hovered on an image */
+    highlightIndex?: number | null;
+    /** Called with a color's index when it's hovered or focused, and null after */
+    onhover?: (index: number | null) => void;
+    /** The first colors grow in one after another, e.g. a palette just taken from an image */
+    staggerIn?: boolean;
   }
 
   let {
@@ -60,12 +76,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom = true,
     isStaticGauge = false,
     onchanged = null,
-    fullscreen = $bindable(),
+    highlightIndex = null,
+    flashIndices = [],
+    onhover,
+    staggerIn = false,
   }: Props = $props();
 
-  const flipDurationMs = 150;
+  const flipDurationMs = $derived(motionDuration(150));
+
+  // The color being moved with the keyboard, which stays in place instead of following a pointer
+  let keyboardDragId: number | null = $state(null);
+
+  // The swatch whose color just changed, for a little pop
+  const pop = new Pop();
+
+  // Colors added later grow in. The first colors just appear — unless
+  // `staggerIn`, when they grow in one after another.
+  let mounted = false;
+  onMount(() => {
+    requestAnimationFrame(() => (mounted = true));
+  });
+  function paletteIn(node: Element, { index }: { index: number }) {
+    if (!mounted && !staggerIn) return { duration: 0 };
+    return growIn(node, { delay: mounted ? 0 : index * 45 });
+  }
 
   let sortableColors = $state(getSortableColors());
+
+  // Follow colors the parent replaces, except mid-drag
+  $effect(() => {
+    void colors;
+    untrack(() => {
+      if (!isDragging.value) sortableColors = getSortableColors();
+    });
+  });
 
   let uuid = $props.id();
 
@@ -111,6 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
+    pop.trigger(index);
   }
 
   function getSortableColors() {
@@ -124,21 +169,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function handleConsider(
     e: CustomEvent<{
       items: (Color & { id: number })[];
-      info: { source: string; trigger: string };
+      info: { source: string; trigger: string; id: string };
     }>,
   ) {
     isDragging.value = true;
 
     const {
       items: newItems,
-      info: { source, trigger },
+      info: { source, trigger, id },
     } = e.detail;
 
     sortableColors = newItems;
 
+    dragConsiderFeedback(newItems, e.detail.info);
+    if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STARTED) {
+      keyboardDragId = Number(id);
+    }
+
     // Ensure dragging is stopped on drag finish via keyboard
     if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
       isDragging.value = false;
+      keyboardDragId = null;
     }
   }
 
@@ -154,6 +205,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } = e.detail;
 
     sortableColors = newItems;
+    keyboardDragId = null;
+    dragFinalizeFeedback();
 
     colors = $state.snapshot(sortableColors).map((color) => {
       const { id, ...rest } = color;
@@ -165,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isDragging.value = false;
     }
 
-    if (onchanged) onchanged();
+    if (onchanged) onchanged($state.snapshot(colors));
   }
   function startDrag(e: MouseEvent | TouchEvent) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
@@ -192,6 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (tooltipElement) tooltipElement.style.display = 'none';
 
     draggedEl.style.zIndex = '30000';
+    liftDraggedElement(draggedEl);
   }
 
   $effect(() => {
@@ -199,11 +253,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div
-  class="flex w-full flex-col gap-y-1 text-left {fullscreen ? 'h-full' : ''}"
->
+<div class="flex w-full flex-col gap-y-1 text-left">
   <div
-    class="inline-flex w-full {fullscreen ? 'h-full flex-col' : 'h-[70px]'}"
+    class="rounded-t-container inline-flex h-[70px] w-full {roundedBottom
+      ? 'rounded-b-container'
+      : ''}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
@@ -211,6 +265,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       centreDraggedOnCursor: true,
       dropFromOthersDisabled: true,
       transformDraggedElement,
+      // Colors are tab stops of their own; the palette is one only while
+      // dragging with the keyboard
+      zoneTabIndex: -1,
     }}
     onconsider={handleConsider}
     onfinalize={handleFinalize}
@@ -232,28 +289,55 @@ If not, see <https://www.gnu.org/licenses/>. -->
         placement: 'top',
       })}
       <div
-        class="dnd-zone-item w-full {fullscreen
-          ? 'h-full'
-          : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uuid} {roundedBottom &&
-        !fullscreen
+        class="dnd-zone-item first:rounded-tl-container last:rounded-tr-container group h-[70px] w-full first:overflow-hidden last:overflow-hidden palette-item-{uuid} {roundedBottom
           ? 'first:rounded-bl-container last:rounded-br-container'
           : ''}"
+        class:dnd-keyboard-lifted={keyboardDragId === color.id}
+        class:feedback-pop={pop.index === index}
+        style:--pop-scale="1.08"
+        in:paletteIn|global={{ index }}
         animate:flip={{ duration: flipDurationMs }}
         id="palette-item-description-{uuid}-{index}"
-        aria-haspopup="dialog"
-        aria-expanded={popover.isOpen()}
-        aria-label="Color {index + 1}: {name || hex}"
-        aria-pressed={popover.isOpen()}
         {...popover.reference()}
-        role="button"
+        onpointerenter={(e) => {
+          // A tap isn't a hover; it would only flash
+          if (e.pointerType !== 'touch' && !isDragging.value) onhover?.(index);
+        }}
+        onpointerleave={() => onhover?.(null)}
+        onfocusin={(e) => {
+          // Keyboard focus only, not a click or tap
+          if ((e.target as Element).matches(':focus-visible')) onhover?.(index);
+        }}
+        onfocusout={() => onhover?.(null)}
       >
         <div
-          class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
-            ? 'h-full'
-            : 'h-[70px]'}"
+          role="button"
+          tabindex="0"
+          aria-haspopup="dialog"
+          aria-expanded={popover.isOpen()}
+          aria-label="Color {index + 1}: {name || hex}"
+          onkeydown={(e) => {
+            // Focus opens the color's details; Enter or Space toggles them
+            if (
+              e.key === 'Enter' ||
+              e.key === ' ' ||
+              (e.key === 'Escape' && popover.isOpen())
+            ) {
+              e.preventDefault();
+              // Escape closes these details, not a dialog around them
+              e.stopPropagation();
+              e.currentTarget.click();
+            }
+          }}
+          class={[
+            'flex h-full w-full flex-auto flex-col items-center justify-center rounded-[inherit] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
+            flashIndices.includes(index) && 'history-flash',
+          ]}
           style="background:{hex ?? '#ffffff'};color:{getTextColor(
             hex ?? '#ffffff',
-          )}"
+          )};{highlightIndex === index
+            ? `box-shadow: inset 0 0 0 4px ${getTextColor(hex ?? '#ffffff')}`
+            : ''}"
           title={brandName && yarnName && name
             ? `${brandName} - ${yarnName}: ${name}`
             : (hex ?? '#ffffff')}
@@ -288,7 +372,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   colors = colors.filter((_, i) => i !== index);
 
                   sortableColors = getSortableColors();
-                  if (onchanged) onchanged();
+                  if (onchanged) onchanged($state.snapshot(colors));
                 }}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -296,10 +380,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     colors = colors.filter((_, i) => i !== index);
 
                     sortableColors = getSortableColors();
-                    if (onchanged) onchanged();
+                    if (onchanged) onchanged($state.snapshot(colors));
                   }
                 }}
-                class="btn hover:preset-tonal-surface h-auto gap-1"
+                class="btn hover-on-color h-auto gap-1"
                 aria-label="Delete color {index + 1}"
               >
                 <span class="text-xs" aria-hidden="true">{index + 1}</span>
@@ -309,7 +393,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if canUserEditColor}
               <button
-                class="btn hover:preset-tonal-surface h-auto"
+                class="btn hover-on-color h-auto"
                 onclick={() =>
                   dialog.trigger({
                     type: 'component',
@@ -329,6 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       },
                     },
                     options: {
+                      title: `Color ${index + 1}`,
                       size: 'large',
                     },
                   })}
@@ -353,6 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         },
                       },
                       options: {
+                        title: `Color ${index + 1}`,
                         size: 'large',
                       },
                     });
@@ -397,7 +483,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if typeof color.locked !== 'undefined'}
               <button
-                class="btn-icon hover:preset-tonal-surface"
+                class="btn-icon hover-on-color"
                 onclick={(e) => {
                   e.preventDefault();
                   colors[index].locked = !colors[index].locked;
@@ -434,6 +520,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? 'cursor: grab'
                 : 'cursor: grabbing'}"
               onmousedown={startDrag}
+              data-sheet-no-drag
               use:dragHandle
               ontouchstart={startDrag}
               onkeydown={handleKeyDown}

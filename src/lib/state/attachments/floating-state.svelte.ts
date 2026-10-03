@@ -47,8 +47,6 @@ export class InteractivePopoverInstance {
       onclick: () => {},
       onmouseover: () => {},
       onmouseout: () => {},
-      onfocus: () => {},
-      onblur: () => {},
     };
 
     const interactions = Array.isArray(this.options.interaction)
@@ -78,11 +76,21 @@ export class InteractivePopoverInstance {
       };
     }
 
-    attrs['onfocus'] = () => {
+    // Focus anywhere in the reference opens it, and moving focus between the
+    // reference and the floating element (as when tabbing into its buttons)
+    // keeps it open
+    attrs['onfocusin'] = () => {
       this.open = true;
       if (this.closeTimeout) clearTimeout(this.closeTimeout);
     };
-    attrs['onblur'] = () => {
+    attrs['onfocusout'] = (e: FocusEvent) => {
+      const next = e.relatedTarget as Node | null;
+      if (
+        next &&
+        (this.referenceElement?.contains(next) ||
+          this.floatingElement?.contains(next))
+      )
+        return;
       // Delay closing to allow quick movements into the floating element
       this.closeTimeout = setTimeout(() => {
         this.open = false;

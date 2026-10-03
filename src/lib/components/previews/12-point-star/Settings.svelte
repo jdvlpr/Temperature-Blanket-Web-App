@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       top, moving clockwise). Each chevron row within a point represents one {weather.grouping}'s
       weather data, radiating outward from the center.
     </p>
-    <p class="font-semibold mt-2">Important Note</p>
+    <p class="mt-2 font-semibold">Important Note</p>
     <p class="">
       The 12-Point Star works best with exactly 12 complete months of weather
       data (January 1st to December 31st). If there are fewer than 12 months,
@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Star Settings</p>
 
-  <div class="w-full max-w-md text-left mb-4">
+  <div class="mb-4 w-full max-w-md text-left">
     <Slider
       value={[twelvePointStarPreview.settings.sharpness]}
       min={0}
@@ -174,6 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         },
         options: {
+          title: 'Accent Color',
           size: 'large',
         },
       })}
@@ -230,6 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
           options: {
+            title: 'Border Color',
             size: 'large',
           },
         })}

@@ -1,14 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   colorsToCode,
+  colorsToPaletteCode,
   colorsToYarnDetails,
   getColorInfo,
   getColorsFromInput,
+  readPastedColors,
+  getPaletteFallbackName,
   getTextColor,
+  getYarnPageURL,
   sortColorsByName,
   sortColorsByNameZtoA,
   sortColorsDarktoLight,
   sortColorsLightToDark,
+  sortColorsWarmToCool,
   yarnDetailsToColors,
 } from './color-utils';
 
@@ -171,6 +176,65 @@ describe('color-utils', () => {
     });
   });
 
+  describe('readPastedColors', () => {
+    const hexes = (text: string) =>
+      readPastedColors(text).colors.map((color) => color.hex);
+
+    it('reads nothing from empty text', () => {
+      expect(readPastedColors('  ')).toEqual({ colors: [], unreadable: [] });
+    });
+
+    it('reads one color per line, whatever the names', () => {
+      expect(hexes('red\nlightblue')).toEqual(['#ff0000', '#add8e6']);
+      expect(hexes('red,\nblue')).toEqual(['#ff0000', '#0000ff']);
+      expect(hexes('#FF0000\r\n#00FF00\n')).toEqual(['#ff0000', '#00ff00']);
+    });
+
+    it('reads tabs and semicolons, as from a spreadsheet', () => {
+      expect(hexes('#ff0000\t#00ff00')).toEqual(['#ff0000', '#00ff00']);
+      expect(hexes('red;blue')).toEqual(['#ff0000', '#0000ff']);
+    });
+
+    it('reads rgb() and hsl() colors, commas and all', () => {
+      expect(hexes('rgb(255, 0, 0), hsl(240, 100%, 50%)')).toEqual([
+        '#ff0000',
+        '#0000ff',
+      ]);
+    });
+
+    it('reads names written as more than one word', () => {
+      expect(hexes('dark blue, light goldenrod yellow')).toEqual([
+        '#00008b',
+        '#fafad2',
+      ]);
+      expect(hexes('red light blue')).toEqual(['#ff0000', '#add8e6']);
+    });
+
+    it('reads a copied array', () => {
+      expect(hexes('["#ff0000", "#00ff00"]')).toEqual(['#ff0000', '#00ff00']);
+    });
+
+    it('keeps the colors it can read, and names the rest', () => {
+      expect(readPastedColors('red, orange, blu')).toEqual({
+        colors: [{ hex: '#ff0000' }, { hex: '#ffa500' }],
+        unreadable: ['blu'],
+      });
+    });
+
+    it('still reads codes and links', () => {
+      expect(hexes('palette:ff0000ffa500')).toEqual(['#ff0000', '#ffa500']);
+      expect(hexes('https://coolors.co/ff0000-00ff00')).toEqual([
+        '#ff0000',
+        '#00ff00',
+      ]);
+      expect(hexes('FF0000-FFA500-ADD8E6')).toEqual([
+        '#ff0000',
+        '#ffa500',
+        '#add8e6',
+      ]);
+    });
+  });
+
   describe('getColorsFromInput', () => {
     it('should parse single hex color', () => {
       const result = getColorsFromInput({ string: '#ff0000' });
@@ -241,5 +305,128 @@ describe('color-utils', () => {
       expect(sorted[0].name).toBe('White');
       expect(sorted[2].name).toBe('Black');
     });
+  });
+
+  describe('colorsToPaletteCode', () => {
+    it('adds yarn details only when colors have them', () => {
+      expect(
+        colorsToPaletteCode([{ hex: '#ff0000' }, { hex: '#00ff00' }]),
+      ).toBe('palette:ff000000ff00');
+      expect(
+        colorsToPaletteCode([
+          { hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' },
+          { hex: '#00ff00', brandId: 'brand1', yarnId: 'yarn1' },
+        ]),
+      ).toBe('palette:ff000000ff00yarn:brand1-yarn1');
+    });
+
+    it('round-trips through getColorsFromInput', () => {
+      const colors = getColorsFromInput({
+        string: colorsToPaletteCode([
+          { hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' },
+        ]),
+      });
+      expect(colors).toEqual([
+        expect.objectContaining({
+          hex: '#ff0000',
+          brandId: 'brand1',
+          yarnId: 'yarn1',
+        }),
+      ]);
+    });
+  });
+
+  describe('getYarnPageURL', () => {
+    it('builds a /yarn link with optional yarn details and version', () => {
+      expect(
+        getYarnPageURL({
+          colors: [{ hex: '#ff0000' }],
+          origin: 'https://x.test',
+        }),
+      ).toBe('https://x.test/yarn?s=ff0000');
+      expect(
+        getYarnPageURL({
+          colors: [{ hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' }],
+          origin: 'https://x.test',
+          version: '6.3.2',
+        }),
+      ).toBe('https://x.test/yarn?s=ff0000&f=brand1-yarn1&v=6.3.2');
+    });
+
+    it('opens as the same colors in getColorsFromInput', () => {
+      const url = getYarnPageURL({
+        colors: [{ hex: '#ff0000', brandId: 'brand1', yarnId: 'yarn1' }],
+        origin: 'https://x.test',
+      });
+      expect(getColorsFromInput({ string: url })).toEqual([
+        expect.objectContaining({ hex: '#ff0000', brandId: 'brand1' }),
+      ]);
+    });
+  });
+
+  describe('getPaletteFallbackName', () => {
+    const yarn = (brandName: string, yarnName: string) => ({
+      hex: '#ff0000',
+      brandName,
+      yarnName,
+    });
+
+    it('uses the color count when there is no yarn', () => {
+      expect(getPaletteFallbackName([{ hex: '#ff0000' }])).toBe('1 color');
+      expect(
+        getPaletteFallbackName([{ hex: '#ff0000' }, { hex: '#00ff00' }]),
+      ).toBe('2 colors');
+    });
+
+    it('names a single yarn', () => {
+      expect(
+        getPaletteFallbackName([
+          yarn('Bernat', 'Super Value'),
+          yarn('Bernat', 'Super Value'),
+          { hex: '#000000' },
+        ]),
+      ).toBe('Bernat Super Value, 3 colors');
+    });
+
+    it('counts the other yarns', () => {
+      expect(
+        getPaletteFallbackName([
+          yarn('Bernat', 'Super Value'),
+          yarn('Lion Brand', 'Pound of Love'),
+          yarn('Red Heart', 'Super Saver'),
+        ]),
+      ).toBe('Bernat Super Value + 2 more yarns, 3 colors');
+    });
+  });
+});
+
+describe('sortColorsWarmToCool', () => {
+  const hexes = (colors: { hex?: string }[]) => colors.map((n) => n.hex);
+  // A ramp from yellow through red to blue, shuffled
+  const shuffled = ['#ff0000', '#0000ff', '#ffff00', '#aa0055', '#ff8000'].map(
+    (hex) => ({ hex }),
+  );
+
+  it('blends from the warm end to the cool end', () => {
+    expect(hexes(sortColorsWarmToCool({ colors: shuffled }))).toEqual([
+      '#ffff00',
+      '#ff8000',
+      '#ff0000',
+      '#aa0055',
+      '#0000ff',
+    ]);
+  });
+
+  it('starts from the cool end when asked', () => {
+    expect(
+      hexes(sortColorsWarmToCool({ colors: shuffled, warmFirst: false })),
+    ).toEqual(['#0000ff', '#aa0055', '#ff0000', '#ff8000', '#ffff00']);
+  });
+
+  it('keeps locked colors in place', () => {
+    const colors = [{ hex: '#0000ff', locked: true }, ...shuffled.slice(2)];
+    const sorted = sortColorsWarmToCool({ colors });
+    expect(sorted[0]).toEqual({ hex: '#0000ff', locked: true });
+    expect(sorted).toHaveLength(colors.length);
   });
 });

@@ -1,3 +1,4 @@
+import type { PaletteImageSettings } from '$lib/features/palette-image/layout';
 import type { PageLayout } from '$lib/types/page-types';
 import type { Unit } from '$lib/types/weather-types';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
@@ -8,6 +9,22 @@ type SeasonConfig = {
   label: string;
   startDate: string; // MM-DD format
   endDate: string; // MM-DD format
+};
+
+/** Sound, vibration, and motion feedback settings */
+export type EffectsPreferences = {
+  /** Play small sounds on actions like moving colors or saving */
+  sound: boolean;
+  /** Vibrate on supporting devices (in practice, Android phones) */
+  haptics: boolean;
+  /** `'system'` follows the device's Reduce Motion setting; `'reduce'` always reduces motion */
+  motion: 'system' | 'reduce';
+};
+
+export const DEFAULT_EFFECTS: EffectsPreferences = {
+  sound: true,
+  haptics: true,
+  motion: 'system',
 };
 
 // User preferences for the web app stored in local storage
@@ -24,6 +41,12 @@ type LocalStatePreferencesType = {
     headingStyle?: 'classic' | 'playful' | 'refined'; // Controls heading font-variation-settings
   };
   units: Unit | null;
+  /** The palette image export's last settings; missing until first changed */
+  paletteImage?: PaletteImageSettings;
+  /** Sound, vibration, and motion settings; missing until first changed */
+  effects?: EffectsPreferences;
+  /** The yarn chosen first where none is, as `{brandId}-{yarnId}`; missing or `''` for none */
+  defaultYarn?: string;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(
@@ -86,9 +109,14 @@ export function persistedState<T>(
   const storageArea = browser ? getStorage(storage) : null;
 
   let storedValue: T;
+  // What's in storage as far as this tab knows: last read there, written
+  // there, or sent by another tab. Never written back, or two tabs could
+  // echo each other's changes forever (each passing on the other's older one)
+  let synced: string | null = null;
 
   try {
     const item = storageArea?.getItem(key);
+    synced = item ?? null;
     storedValue = item ? beforeRead(serializer.parse(item)) : initialValue;
   } catch (error) {
     onParseError(error);
@@ -99,34 +127,49 @@ export function persistedState<T>(
 
   function updateStorage(value: T) {
     try {
-      const valueToStore = beforeWrite(value);
-      storageArea?.setItem(key, serializer.stringify(valueToStore));
+      const serialized = serializer.stringify(beforeWrite(value));
+      if (serialized === synced) return;
+      storageArea?.setItem(key, serialized);
+      synced = serialized;
     } catch (error) {
       onWriteError(error);
     }
   }
 
-  if (syncTabs && typeof window !== 'undefined' && storage === 'local') {
-    window.addEventListener('storage', (event) => {
-      if (event.key === key && event.storageArea === localStorage) {
-        try {
-          const newValue = event.newValue
-            ? serializer.parse(event.newValue)
-            : initialValue;
-          state = beforeRead(newValue);
-        } catch (error) {
-          onParseError(error);
-        }
+  // Another tab changed it, or cleared storage: take that, without writing
+  // it back
+  function onStorage(event: StorageEvent) {
+    if (event.storageArea !== localStorage) return;
+    try {
+      if (event.key === key) {
+        synced = event.newValue;
+        state = beforeRead(
+          event.newValue ? serializer.parse(event.newValue) : initialValue,
+        );
+      } else if (event.key === null) {
+        state = initialValue;
+        synced = serializer.stringify(beforeWrite(initialValue));
       }
-    });
+    } catch (error) {
+      onParseError(error);
+    }
   }
 
-  $effect.root(() => {
+  const listening =
+    syncTabs && typeof window !== 'undefined' && storage === 'local';
+  if (listening) window.addEventListener('storage', onStorage);
+
+  const stopSaving = $effect.root(() => {
     $effect(() => {
       updateStorage(state);
     });
+  });
 
-    return () => {};
+  // Replaced when this file changes in development: the old copy stops, or
+  // it would keep listening and writing alongside the new one
+  import.meta.hot?.dispose(() => {
+    if (listening) window.removeEventListener('storage', onStorage);
+    stopSaving();
   });
 
   return {

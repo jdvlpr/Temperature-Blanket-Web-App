@@ -1,0 +1,41 @@
+// Local development and test configuration only.
+//
+// This file has no `pages_build_output_dir`, so Cloudflare Pages ignores it for
+// deployed builds: production and preview bindings are still set in the Pages
+// dashboard. It gives `pnpm dev` (through the adapter's platformProxy),
+// `wrangler pages dev` and `wrangler d1 migrations apply --local` the same
+// local D1 database and R2 bucket, stored under .wrangler/state.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "temperature-blanket",
+  // Pinned because the local runtime rejects today's date
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tb-accounts",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [{ "binding": "PROJECTS", "bucket_name": "tb-projects" }],
+  "vars": {
+    // Enables the /api/dev/* routes and the dev email outbox. Never set in production.
+    "ENABLE_DEV_ROUTES": "true",
+    "EMAIL_SENDER": "dev-outbox",
+    // Accounts, with local-only values. Production sets these in the Pages dashboard,
+    // with BETTER_AUTH_SECRET as an encrypted secret.
+    "ACCOUNTS_ENABLED": "true",
+    "BETTER_AUTH_SECRET": "local-development-secret-do-not-use-in-production",
+    "AUTH_ALLOWED_HOSTS": "localhost:5173,localhost:4173,localhost:8788,*.ts.net:5173",
+    "AUTH_PROTOCOL": "auto",
+    // ACCOUNTS_SIGNUP_LIMIT (a number, 0 = closed) would cap how many accounts there may be.
+    // Project sync, for every account.
+    "SYNC_ENABLED": "true",
+    // Publishing to the gallery from accounts stays off here, since
+    // PUBLIC_WORDPRESS_BASE_URL may be the live gallery. To test it, point .env at
+    // the Local WordPress site (plugin dev/README.md) and pass
+    // --binding GALLERY_PUBLISH_ENABLED=true to wrangler pages dev.
+  },
+}

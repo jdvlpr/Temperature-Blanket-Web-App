@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="API">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex">
+    <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
     <div class="sm:hidden">

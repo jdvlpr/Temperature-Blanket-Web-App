@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
@@ -34,10 +35,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="p-4 text-left">
+<div class="px-4 pt-2 pb-4 text-left">
   {#if page === 'locations'}
-    <div class="mt-4">
-      <h2 class="mb-2 text-xl font-bold">Locations</h2>
+    <div>
       <div class="flex flex-col gap-2">
         {#each savedWeatherLocations as { id, data, label }}
           <div
@@ -132,36 +132,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
   {#if page === 'settings'}
-    <div class="mt-4 w-full">
-      <h2 class="mb-2 text-xl font-bold">Settings</h2>
+    <div class="w-full">
       <div
-        class="bg-surface-50 dark:bg-surface-950 flex w-fit flex-col justify-center gap-2 rounded p-2"
+        class="bg-surface-50 dark:bg-surface-950 flex w-fit max-w-full flex-col justify-center gap-2 rounded p-2"
       >
         <div><UnitChanger /></div>
         <div
           class="rounded-container flex flex-wrap items-center justify-center gap-4 p-2"
         >
-          <div class="flex flex-wrap items-center justify-center gap-2">
-            <SegmentedControl
-              value={weatherState.hour}
-              onValueChange={(e) => {
-                weatherState.hour = e.value as '12' | '24';
-              }}
-            >
-              <SegmentedControl.Control
-                class="bg-surface-100 dark:bg-surface-900 flex-wrap gap-y-2"
+          <div
+            class="flex max-w-full min-w-0 flex-wrap items-center justify-center gap-2"
+          >
+            <SegmentsScroller>
+              <SegmentedControl
+                value={weatherState.hour}
+                onValueChange={(e) => {
+                  weatherState.hour = e.value as '12' | '24';
+                }}
               >
-                <SegmentedControl.Indicator />
-                <SegmentedControl.Item value="12">
-                  <SegmentedControl.ItemText>12hr</SegmentedControl.ItemText>
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-                <SegmentedControl.Item value="24">
-                  <SegmentedControl.ItemText>24hr</SegmentedControl.ItemText>
-                  <SegmentedControl.ItemHiddenInput />
-                </SegmentedControl.Item>
-              </SegmentedControl.Control>
-            </SegmentedControl>
+                <SegmentedControl.Control
+                  class="bg-surface-100 dark:bg-surface-900 min-w-max"
+                >
+                  <SegmentedControl.Indicator />
+                  <SegmentedControl.Item value="12">
+                    <SegmentedControl.ItemText>12hr</SegmentedControl.ItemText>
+                    <SegmentedControl.ItemHiddenInput />
+                  </SegmentedControl.Item>
+                  <SegmentedControl.Item value="24">
+                    <SegmentedControl.ItemText>24hr</SegmentedControl.ItemText>
+                    <SegmentedControl.ItemHiddenInput />
+                  </SegmentedControl.Item>
+                </SegmentedControl.Control>
+              </SegmentedControl>
+            </SegmentsScroller>
             <p class="text-sm">
               {new Date().toLocaleTimeString(navigator.language, {
                 timeStyle: 'short',

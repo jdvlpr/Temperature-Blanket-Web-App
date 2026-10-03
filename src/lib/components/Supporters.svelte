@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             year: 'numeric',
           })}
           <div
-            class="bg-surface-50 dark:bg-surface-950 rounded-container flex w-full flex-col justify-center px-2 py-4"
+            class="bg-surface-50 dark:bg-surface-950 rounded-container card-border flex w-full flex-col justify-center px-2 py-4"
           >
             {#if imageSrc}
               <Avatar
@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           })}
 
           <div
-            class="bg-surface-50 dark:bg-surface-950 rounded-container flex h-fit flex-col items-center p-4"
+            class="bg-surface-50 dark:bg-surface-950 rounded-container card-border flex h-fit flex-col items-center p-4"
           >
             <h4 class="h4">{name}</h4>
             <p class="text-surface-500 text-xs">
@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             year: 'numeric',
           })}
           <div
-            class="bg-surface-50 dark:bg-surface-950 rounded-container flex h-fit flex-col items-center p-4"
+            class="bg-surface-50 dark:bg-surface-950 rounded-container card-border flex h-fit flex-col items-center p-4"
           >
             <h4 class="h4">{name}</h4>
             <p class="text-surface-500 text-xs">

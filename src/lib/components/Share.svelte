@@ -14,34 +14,26 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { toast } from '$lib/state/page-state.svelte';
+  import CopyIcon from '$lib/components/CopyIcon.svelte';
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
+  import { Flash } from '$lib/utils/feedback.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import {
-    ClipboardCheckIcon,
-    ClipboardCopyIcon,
-    Share2Icon,
-    XIcon,
-  } from '@lucide/svelte';
+  import { ClipboardCheckIcon, Share2Icon, XIcon } from '@lucide/svelte';
   import { Popover } from '@skeletonlabs/skeleton-svelte';
 
   let { href } = $props();
 
   let openState = $state(false);
 
-  function copyURL() {
-    try {
-      window.navigator.clipboard.writeText(href);
-      toast.trigger({
-        message: `URL copied to clipboard`,
-        category: 'success',
-        icon: ClipboardCheckIcon,
-      });
-    } catch {
-      toast.trigger({
-        message: 'Unable to copy to your clipboard',
-        category: 'error',
-      });
-    }
+  const copied = new Flash();
+
+  async function copyURL() {
+    const ok = await copyToClipboard(
+      href,
+      { message: 'URL copied to clipboard', icon: ClipboardCheckIcon },
+      'Unable to copy to your clipboard',
+    );
+    if (ok) copied.trigger();
   }
 </script>
 
@@ -75,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="btn preset-filled-primary-500"
                   onclick={() => copyURL()}
                 >
-                  <ClipboardCopyIcon />
+                  <CopyIcon copied={copied.is()} />
                   Copy URL</button
                 >
 

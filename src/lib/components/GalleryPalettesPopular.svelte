@@ -183,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="button"
           class="w-full cursor-pointer"
           onclick={() => {
-            recordPageView(projectId);
+            if (projectId) recordPageView(projectId);
             updateGauge({
               _colors: colors,
               _schemeId: 'Custom',

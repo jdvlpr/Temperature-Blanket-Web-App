@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
+    "dev:accounts": "PUBLIC_ACCOUNTS_ENABLED=true SYNC_ENABLED=true vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -15,17 +16,21 @@
     "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
     "test:unit": "vitest run src",
     "test:integration": "node scripts/test-integration.js",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:cloudflare": "playwright test --config playwright.cloudflare.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource/be-vietnam-pro": "^5.3.0",
     "@lucide/lab": "^0.1.2",
     "@lucide/svelte": "^1.23.0",
     "autocompleter": "^9.3.2",
+    "better-auth": "1.7.7",
     "canvg": "^4.0.3",
     "chart.js": "^4.5.1",
     "chroma-js": "^3.2.0",
-    "getimagepalette": "^2.4.0",
     "globe.gl": "^2.46.1",
     "idb-keyval": "^6.2.6",
     "jspdf": "^4.2.1",
@@ -34,6 +39,7 @@
     "three": "0.183.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
     "@skeletonlabs/skeleton": "^4.15.2",
@@ -67,7 +73,6 @@
     "tslib": "^2.8.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.1",
-    "vaul-svelte": "1.0.0-next.3",
     "vite": "^8.1.3",
     "vitest": "^4.1.9",
     "wrangler": "^4.120.0"

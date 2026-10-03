@@ -52,11 +52,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title,
           min,
           max,
+          hideLabel: true,
           onOkay: (_value: number) => {
             value = _value;
           },
         },
       },
+      options: { title },
     })}
 >
   <iconcomponent.ref />

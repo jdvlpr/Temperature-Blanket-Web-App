@@ -14,9 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import pdfExtraColors from '$lib/features/pdf/sections/extra-colors.svelte';
-import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
-import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
+import PdfOptions from '$lib/components/modals/PdfOptions.svelte';
 import {
   allGaugesAttributes,
   gauges,
@@ -54,31 +52,12 @@ export const getProjectParametersFromURLHash = (
     }, {});
 };
 
-export const downloadPDF = async () => {
+/** Asks what to put in the PDF, then downloads it */
+export const downloadPDF = () => {
   dialog.trigger({
-    type: 'choose-weather-params',
-    response: async (response: boolean) => {
-      if (response) {
-        await import('jspdf')
-          .then((module) => {
-            const JsPDF = module.default;
-            const doc = new JsPDF();
-            const totalPages =
-              pdfGauges.pages() +
-              pdfExtraColors.pages() +
-              pdfWeatherData.pages();
-            pdfGauges.create(doc, totalPages);
-            pdfExtraColors.create(doc, totalPages);
-            pdfWeatherData.create(doc, totalPages);
-            // Remove blank first page, ugly hack
-            doc.deletePage(1);
-            doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      }
-    },
+    type: 'component',
+    component: { ref: PdfOptions },
+    options: { title: 'Download PDF' },
   });
 };
 
@@ -152,7 +131,15 @@ export const downloadWeatherCSV = () => {
   document.body.removeChild(link);
 };
 
-export const sendToProjectGallery = async (img: string) => {
+/**
+ * Sends the project to the gallery. `fromAccount` publishes it as the signed-in
+ * user when it's saved to their account, falling back to an anonymous submission
+ * when that isn't possible.
+ */
+export const sendToProjectGallery = async (
+  img: string,
+  { fromAccount = false } = {},
+) => {
   const colors: Color[][] = [];
   const palettes: string[] = [];
   const yarnUrls: string[] = [];
@@ -219,18 +206,30 @@ export const sendToProjectGallery = async (img: string) => {
     if (!body) {
       return 'Sorry, this project is too large to add to the gallery. Try a shorter date range or fewer locations.';
     }
-    const request = await fetch('/api/project', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-    const response = await request.json();
+    // WordPress's answer, from either route
+    let response: Awaited<ReturnType<Response['json']>> | undefined;
+    if (fromAccount) {
+      const { publishFromAccount } = await import('$lib/accounts/gallery');
+      const result = await publishFromAccount(body);
+      if (result.status === 'answered') response = result.response;
+    }
+    if (!response) {
+      const request = await fetch('/api/project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+      response = await request.json();
+    }
 
     if (response.code === 200) {
       // success
       message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
+      if (response.linked)
+        message +=
+          '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from My Projects.</p>';
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();

@@ -19,17 +19,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 p-4">
-  <div>
-    <h3 class="h3">Become a Supporter</h3>
-    <p class="text-surface-500 mt-1 text-sm">Choose how you'd like to help.</p>
-  </div>
+  <p class="text-surface-500 text-sm">Choose how you'd like to help.</p>
 
   <div class="space-y-3">
     <a
       href="{PUBLIC_KOFI_LINK}/tiers"
       target="_blank"
       rel="noopener noreferrer"
-      class="block rounded-container border border-surface-200 p-4 transition hover:preset-tonal-surface"
+      class="rounded-container border-surface-200 hover:bg-surface-100-900 block border p-4 transition"
       onclick={() => dialog.close()}
     >
       <p class="font-semibold">Monthly donation</p>
@@ -43,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href={PUBLIC_KOFI_LINK}
       target="_blank"
       rel="noopener noreferrer"
-      class="block rounded-container border border-surface-200 p-4 transition hover:preset-tonal-surface"
+      class="rounded-container border-surface-200 hover:bg-surface-100-900 block border p-4 transition"
       onclick={() => dialog.close()}
     >
       <p class="font-semibold">One-time donation</p>

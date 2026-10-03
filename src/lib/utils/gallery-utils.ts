@@ -45,6 +45,94 @@ export type FetchProjectsResult = {
   edges: { node: GalleryProjectNode }[];
 };
 
+/** A palette shared to the gallery on its own, from an account (plugin 1.5.0). */
+export type GallerySharedPaletteNode = {
+  __typename: 'Palette';
+  title: string;
+  databaseId: number;
+  /** A JSON array holding the palette's Yarn Palette Creator link */
+  yarnUrls: string;
+  date: string;
+};
+
+export type PaletteGalleryNode =
+  | (Omit<GalleryProjectNode, 'featuredImage'> & { __typename: 'Project' })
+  | GallerySharedPaletteNode;
+
+export type FetchPaletteGalleryResult = {
+  pageInfo: GalleryPageInfo;
+  edges: { node: PaletteGalleryNode }[];
+};
+
+/**
+ * Projects and shared palettes for the palette galleries, in one list ordered by
+ * date, so one cursor pages through both. Search and the yarn filter cover both.
+ * Falls back to projects alone where the gallery has no palettes yet.
+ */
+export const fetchPaletteGallery = async ({
+  first = 40,
+  after = null,
+  search = '',
+  order = 'DESC',
+  yarn = '',
+}: {
+  first?: number;
+  after?: string | null;
+  search?: string;
+  order?: string;
+  yarn?: string;
+}): Promise<FetchPaletteGalleryResult> => {
+  const query = `
+    query PALETTE_GALLERY($first: Int, $after: String, $search: String, $yarn: String, $order: OrderEnum!) {
+      contentNodes(
+        first: $first
+        after: $after
+        where: {
+          contentTypes: [TEMPBLANKET_PROJECT, TEMPBLANKET_PALETTE]
+          search: $search
+          yarnUrls: $yarn
+          orderby: { field: DATE, order: $order }
+        }
+      ) {
+        pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+        edges {
+          node {
+            __typename
+            ... on Project { title databaseId projectUrl yarnUrls locations date }
+            ... on Palette { title databaseId yarnUrls date }
+          }
+        }
+      }
+    }`;
+  const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query,
+      variables: {
+        first,
+        after,
+        // Unset rather than empty, so the plugin's yarn filter isn't applied
+        search: search || null,
+        yarn: yarn || null,
+        order: order === 'ASC' ? 'ASC' : 'DESC',
+      },
+    }),
+  });
+  const result = await response.json().catch(() => null);
+  if (result?.data?.contentNodes) return result.data.contentNodes;
+
+  // A gallery without palettes (plugin before 1.5.0) rejects the query: show
+  // palettes from projects only, as before
+  const projects = await fetchProjects({ first, after, search, order, yarn });
+  return {
+    pageInfo: projects.pageInfo,
+    edges: projects.edges.map(({ node }) => ({
+      node: { ...node, __typename: 'Project' as const },
+    })),
+  };
+};
+
 export type PopularProjectMeta = {
   project_url: string;
   yarn_urls: string;

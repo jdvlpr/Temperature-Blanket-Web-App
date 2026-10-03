@@ -3,18 +3,19 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
+  import { beforeNavigate } from '$app/navigation';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -22,46 +23,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Previews from '$lib/components/Previews.svelte';
+  import WeatherSearchOverlay from '$lib/components/WeatherSearchOverlay.svelte';
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
-  import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
-  import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
-  import Menu from '$lib/components/modals/Menu.svelte';
-  import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog, pageSections } from '$lib/state/page-state.svelte';
+  import ProjectMenuButton from '$lib/components/buttons/ProjectMenuButton.svelte';
+  import SaveButton from '$lib/components/buttons/SaveButton.svelte';
+  import ProjectTitle from '$lib/components/ProjectTitle.svelte';
   import { locations } from '$lib/state/location-state.svelte';
+  import {
+    dialog,
+    isDesktop,
+    pageSections,
+    toast,
+  } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
+  import {
+    autosave,
+    changedElsewhereMessage,
+    saveCopy,
+    saveNow,
+  } from '$lib/storage/autosave.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import { takeJustTrashed } from '$lib/storage/trash';
   import {
     loadFromHistory,
     updateHistory,
   } from '$lib/utils/history-utils.svelte';
   import { loadProjectFromURL } from '$lib/utils/load-project-utils.svelte';
-  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
   import { upToDate } from '$lib/utils/other-utils';
-  import {
-    BadgeQuestionMarkIcon,
-    BookmarkIcon,
-    BookOpenTextIcon,
-    CircleQuestionMarkIcon,
-    CloudyIcon,
-    EllipsisVerticalIcon,
-    Icon,
-    KeyboardIcon,
-    LightbulbIcon,
-    MailIcon,
-    RedoIcon,
-    SwatchBookIcon,
-    UndoIcon,
-  } from '@lucide/svelte';
-  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
-  import { yarnBall } from '@lucide/lab';
+  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
+  import { RedoIcon, UndoIcon } from '@lucide/svelte';
+  import { onMount, untrack } from 'svelte';
 
   let debounceTimer: number;
 
@@ -87,6 +83,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (locations.allValid) project.status.wasLoaded = true;
   }
 
+  // Leaving for another page of the site: a change waiting to save saves now
+  beforeNavigate(() => void saveNow());
+
+  // Another tab or device changed the open project: say so once, since
+  // changes here stop saving rather than overwrite it
+  $effect(() => {
+    if (autosave.state !== 'conflict') return;
+    untrack(() =>
+      toast.trigger({
+        message: `${changedElsewhereMessage()} Save them as a copy, or reload to get the latest version.`,
+        category: 'warning',
+        autohide: false,
+        action: {
+          label: 'Save a copy',
+          response: async () => {
+            await saveCopy();
+            toast.trigger({
+              message: 'Saved a copy. You’re now working on the copy.',
+              category: 'success',
+            });
+          },
+        },
+      }),
+    );
+  });
+
   $effect(() => {
     const hash = project.url.hash;
     const loading = project.status.loading;
@@ -95,6 +117,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // intermediate (e.g. preview-less) hash and push it to history.
     if (hash && !loading) debounce(() => updateHistory(), 300);
   });
+
+  // Started over after moving a project to the Trash: offer to put it back
+  function showUndoTrash() {
+    const trashed = takeJustTrashed();
+    if (!trashed) return;
+    toast.trigger({
+      message: `Moved ${trashed.label} to the Trash`,
+      category: 'success',
+      action: {
+        label: 'Undo',
+        response: async () => {
+          try {
+            await ProjectStorage.restoreFromTrash(trashed.id);
+            window.location.assign(trashed.href);
+          } catch {
+            toast.trigger({
+              message: 'Unable to restore the project',
+              category: 'error',
+            });
+          }
+        },
+      },
+    });
+  }
 
   onMount(async () => {
     const isProject = new URL(window.location.href).searchParams.has('project');
@@ -106,6 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Setup up a new project
       // Load the default units based on window.navigator
       setUnitsFromNavigator();
+      showUndoTrash();
     }
 
     project.status.loading = false;
@@ -154,15 +201,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex">
+    <div class="hidden shrink-0 lg:inline-flex">
       <AppLogo />
     </div>
-    <div class="flex flex-1 justify-between gap-2 sm:justify-end">
+    <div class="flex min-w-0 flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length}
-        <div class="mx-auto sm:mx-0">
+        <!-- The project's name and whether it's saved, in the space wider
+        screens have spare -->
+        {#if isDesktop.current}
+          <div class="flex min-w-0 flex-1 items-center gap-0.5 lg:ml-2">
+            <ProjectTitle />
+          </div>
+        {/if}
+        <!-- One row: icon buttons on smaller screens, never wrapping -->
+        <div class="mx-auto flex shrink-0 gap-2 sm:mx-0">
           <button
             aria-label="Undo"
-            class="btn hover:preset-tonal-surface"
+            class="max-md:btn-icon md:btn hover:preset-tonal-surface"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -180,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Redo"
-            class="btn hover:preset-tonal-surface"
+            class="max-md:btn-icon md:btn hover:preset-tonal-surface"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -195,145 +250,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <RedoIcon />
             <span class="inline-block max-md:hidden">Redo</span>
           </button>
+
+          {#if !isDesktop.current}
+            <SaveButton />
+          {/if}
         </div>
       {/if}
     </div>
 
-    <Popover>
-      <Popover.Trigger
-        class="btn hover:preset-tonal-surface"
-        aria-label="Help"
-        title="Help"
-      >
-        <BadgeQuestionMarkIcon />
-        <span class="hidden sm:inline-block">Help</span>
-      </Popover.Trigger>
-      <Portal>
-        <Popover.Positioner>
-          <Popover.Content class="card bg-surface-200-800 z-49 p-2 shadow-xl">
-            {#snippet element(attributes)}
-              {#if !attributes.hidden}
-                <div {...attributes} transition:safeSlide>
-                  <Popover.Description>
-                    <div
-                      class="flex flex-col gap-2 p-2"
-                      aria-orientation="vertical"
-                      aria-label="Help Menu"
-                    >
-                      <button
-                        aria-label="Getting Started Guide"
-                        onclick={() => {
-                          dialog.trigger({
-                            type: 'component',
-                            component: { ref: GettingStarted },
-                          });
-                        }}
-                        class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
-                      >
-                        <LightbulbIcon />
-                        Getting Started
-                      </button>
-
-                      <p>
-                        <a
-                          href="/faq"
-                          title="View Frequently Asked Questions"
-                          class="btn hover:preset-tonal-surface"
-                        >
-                          <CircleQuestionMarkIcon />
-                          Frequently Asked Questions</a
-                        >
-                      </p>
-
-                      <p>
-                        <a
-                          href="/documentation"
-                          class="btn hover:preset-tonal-surface"
-                        >
-                          <BookOpenTextIcon />
-                          Documentation</a
-                        >
-                      </p>
-
-                      <p>
-                        <a
-                          href="/contact"
-                          class="btn hover:preset-tonal-surface"
-                        >
-                          <MailIcon />
-                          Contact</a
-                        >
-                      </p>
-
-                      <button
-                        class="btn hover:preset-tonal-surface w-fit"
-                        onclick={() => {
-                          dialog.trigger({
-                            type: 'component',
-                            component: { ref: KeyboardShortcuts },
-                          });
-                        }}
-                        title="View Keyboard Shortcuts"
-                      >
-                        <KeyboardIcon />
-                        <span class="text-left whitespace-pre-wrap"
-                          >Keyboard Shortcuts</span
-                        >
-                      </button>
-                    </div>
-                  </Popover.Description>
-                  <Popover.Arrow
-                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
-                  >
-                    <Popover.ArrowTip />
-                  </Popover.Arrow>
-                </div>
-              {/if}
-            {/snippet}
-          </Popover.Content>
-        </Popover.Positioner>
-      </Portal>
-    </Popover>
-
-    {#if weather.data.length && locations.allValid}
-      <div class="hidden sm:inline-flex">
-        <button
-          class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
-          title="Save your project in this browser and as a URL."
-          onclick={() =>
-            dialog.trigger({
-              type: 'component',
-              component: { ref: SaveProjectModal },
-            })}
-        >
-          <BookmarkIcon />
-          <span class="inline-block max-sm:hidden">Save</span>
-        </button>
-      </div>
-    {/if}
-
-    <button
-      aria-label="Project Options"
-      title="Project Options"
-      class="btn hover:preset-tonal-surface gap-1"
-      onclick={() =>
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: Menu,
-          },
-        })}
-    >
-      <EllipsisVerticalIcon />
-      <span class="">Project</span>
-    </button>
+    <ProjectMenuButton />
   {/snippet}
 
   {#snippet main()}
     <main class="mx-auto pb-18 text-center" id="main-page">
       <div
         id="page-section-location"
-        class="mx-auto scroll-mt-[76px] max-w-(--breakpoint-md)"
+        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="w-full px-2 py-4">
@@ -360,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 px-2 md:p-4 md:shadow-lg mx-auto"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mx-auto mb-2 px-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>
@@ -389,6 +321,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       component: { ref: ChooseWeatherSource },
                       options: {
                         size: 'small',
+                        title: 'Weather Source',
                       },
                     });
                   }}>{weather.source.name}</button
@@ -449,3 +382,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Navigation />
   {/snippet}
 </AppShell>
+
+<WeatherSearchOverlay />

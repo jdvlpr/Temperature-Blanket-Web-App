@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
+  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
@@ -28,6 +28,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
+    sortColorsWarmToCool,
+    sortColorsByHue,
+    shuffleColorsWithSeed,
   } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
@@ -104,6 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
+  /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
+  let shuffleSeed = Math.random();
 
   let results = $state<(Color & { delta?: number })[]>([]);
 
@@ -203,6 +208,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
             };
           })
           .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
+        break;
+      case 'warm-to-cool':
+      case 'cool-to-warm':
+        _results = sortColorsWarmToCool({
+          colors: _results,
+          warmFirst: sortColors === 'warm-to-cool',
+        });
+        break;
+      case 'rainbow':
+        _results = sortColorsByHue({ colors: _results });
+        break;
+      case 'shuffle':
+        _results = shuffleColorsWithSeed(_results, shuffleSeed);
         break;
       case 'light-to-dark':
         _results = sortColorsLightToDark({
@@ -337,18 +355,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
   >
     <SelectYarn
-      context="modal"
       bind:selectedBrandId
       bind:selectedYarnId
       {selectedYarnWeightId}
     />
   </div>
 
-  {#if selectedBrandId && selectedYarnId}
-    <div class="order-2 col-span-full w-full md:order-3">
-      <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
-    </div>
-  {/if}
+  <DefaultYarnSuggestion
+    {selectedBrandId}
+    {selectedYarnId}
+    class="order-2 col-span-full md:order-3"
+  />
 
   {#if yarnDataReady}
     {#key selectedBrandId}
@@ -391,16 +408,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="select truncate pl-10"
         id="sort-colors-by"
         bind:value={sortColors}
+        onchange={() => {
+          if (sortColors === 'shuffle') shuffleSeed = Math.random();
+        }}
         disabled={gettingResults}
       >
         {#if hasIncomingColor}
           <option value="best-match">Best Match</option>
         {/if}
         <option value="default">Default</option>
-        <option value="light-to-dark">Lightest to Darkest</option>
-        <option value="dark-to-light">Darkest to Lightest</option>
+        <option value="warm-to-cool">Warm to Cool</option>
+        <option value="cool-to-warm">Cool to Warm</option>
+        <option value="rainbow">Rainbow</option>
+        <option value="light-to-dark">Light to Dark</option>
+        <option value="dark-to-light">Dark to Light</option>
         <option value="name">Name A-Z</option>
         <option value="name-z-to-a">Name Z-A</option>
+        <option value="shuffle">Shuffle</option>
       </select>
     </div>
   </label>

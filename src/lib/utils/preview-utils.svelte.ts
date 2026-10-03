@@ -14,10 +14,9 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import WeatherDetails from '$lib/components/WeatherDetails.svelte';
-import { drawerState, isDesktop, dialog } from '$lib/state/page-state.svelte';
+import { dialog } from '$lib/state/page-state.svelte';
 import { gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
 import { locations } from '$lib/state/location-state.svelte';
-import { previewWeatherTargets } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import type { WeatherDay } from '$lib/types/weather-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
@@ -28,23 +27,16 @@ export const showPreviewImageWeatherDetails = (
   targets: WeatherParam[],
   getTargets?: (index: number) => WeatherParam[],
 ) => {
-  previewWeatherTargets.value = targets;
-  previewWeatherTargets.getter = getTargets;
-
-  if (isDesktop.current) {
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: WeatherDetails,
-        props: {
-          weatherTargets: targets,
-          getTargets,
-        },
+  dialog.trigger({
+    type: 'component',
+    component: {
+      ref: WeatherDetails,
+      props: {
+        weatherTargets: targets,
+        getTargets,
       },
-    });
-  } else {
-    drawerState.weatherDetails = true;
-  }
+    },
+  });
 };
 export const svgToPNG = async ({
   svgNode,

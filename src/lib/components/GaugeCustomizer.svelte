@@ -22,10 +22,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog } from '$lib/state/page-state.svelte';
+  import { previewHighlight } from '$lib/state/preview-state.svelte';
   import { gauges, showDaysInRange } from '$lib/state/gauges-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
+  import {
+    dragConsiderFeedback,
+    dragFinalizeFeedback,
+    growIn,
+    historyChange,
+    liftDraggedElement,
+    motionDuration,
+    Pop,
+  } from '$lib/utils/feedback.svelte';
   import {
     ChevronDownIcon,
     LayoutPanelTopIcon,
@@ -35,11 +45,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Trash2Icon,
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
+  import {
+    dragHandle,
+    dragHandleZone,
+    SOURCES,
+    TRIGGERS,
+  } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
 
-  const flipDurationMs = 150;
+  const flipDurationMs = $derived(motionDuration(150));
 
   const isProjectPlannerPage = page.url.pathname === '/';
 
@@ -54,6 +69,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let sortableColors: Color[] = $state(getSortableColors());
+
+  // The color being moved with the keyboard, which stays in place instead of following a pointer
+  let keyboardDragId: number | null = $state(null);
+
+  // The swatch whose color just changed, for a little pop
+  const pop = new Pop();
+
+  // Pointing at or focusing a color highlights the days in that yarn on the
+  // preview (on the project page, where there's one)
+  let highlightIndex: number | null = $state(null);
+  $effect.pre(() => {
+    void gauge.colors;
+    highlightIndex = null;
+  });
+  $effect(() => {
+    if (!isProjectPlannerPage) return;
+    previewHighlight.hex =
+      highlightIndex === null || keyboardDragId !== null
+        ? null
+        : (gauge.colors[highlightIndex]?.hex ?? null);
+    return () => (previewHighlight.hex = null);
+  });
 
   let numberOfColumns = $derived.by(() => {
     let cols = 4;
@@ -112,12 +149,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = getSortableColors();
     dialog.close();
+    pop.trigger(index);
   }
 
   // Handle drag and drop events
   function handleConsider(e: Event) {
-    const event = e as CustomEvent<{ items: Color[] }>;
+    const event = e as CustomEvent<{
+      items: Color[];
+      info: { source: string; trigger: string; id: string };
+    }>;
     sortableColors = event.detail.items as (Color & { id: number })[];
+    dragConsiderFeedback(
+      event.detail.items as (Color & { id: number })[],
+      event.detail.info,
+    );
+    const { source, trigger, id } = event.detail.info;
+    if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STARTED) {
+      keyboardDragId = Number(id);
+    } else if (trigger === TRIGGERS.DRAG_STOPPED) {
+      keyboardDragId = null;
+    }
   }
 
   // On drag end, update the gauge colors
@@ -126,6 +177,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const newItems = event.detail.items as (Color & { id: number })[];
 
     sortableColors = newItems;
+    keyboardDragId = null;
+    dragFinalizeFeedback();
 
     gauge.colors = sortableColors.map((color) => {
       const { id, ...rest } = color;
@@ -213,11 +266,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     items: sortableColors,
     flipDurationMs,
     type: 'gaugeCustomizer',
+    transformDraggedElement: liftDraggedElement,
   }}
   onconsider={handleConsider}
   onfinalize={handleFinalize}
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
+    <!-- Pointing at a color only highlights it on the preview; focusing it does the same from the keyboard -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="color flex flex-wrap items-center justify-around gap-2 p-2 {preferences
         .value.layout === 'grid'
@@ -226,6 +282,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="background:{hex ?? '#ffffff'};color:{getTextColor(
         hex ?? '#ffffff',
       )}"
+      class:dnd-keyboard-lifted={keyboardDragId === id}
+      class:feedback-pop={pop.index === index}
+      class:history-flash={historyChange.gaugeId === gauge.id &&
+        historyChange.indices.includes(index)}
+      style:--pop-scale="1.03"
+      onpointerenter={(e) => {
+        // A tap isn't a hover; it would only flash
+        if (e.pointerType !== 'touch') highlightIndex = index;
+      }}
+      onpointerleave={() => (highlightIndex = null)}
+      onfocusin={(e) => {
+        // Keyboard focus only, not a click or tap
+        if ((e.target as Element).matches(':focus-visible'))
+          highlightIndex = index;
+      }}
+      onfocusout={() => (highlightIndex = null)}
+      in:growIn
       animate:flip={{ duration: flipDurationMs }}
     >
       <!-- The following empty div is necessary to center content in list view -->
@@ -236,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if movable && !isStaticGauge}
             <button
               title="Remove Color"
-              class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-center gap-1"
+              class="btn hover-on-color flex flex-wrap items-center justify-center gap-1"
               onclick={() => {
                 gauge.updateColors({
                   colors: gauge.colors.filter(
@@ -256,7 +329,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Move Color"
             tabindex="-1"
             aria-label="Crag handle for color {index + 1}"
-            class="btn-icon hover:preset-tonal-surface handle p-2"
+            class="btn-icon hover-on-color handle p-2"
+            data-sheet-no-drag
             use:dragHandle
           >
             <MoveIcon />
@@ -284,7 +358,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class={[preferences.value.layout === 'list' && 'flex-auto']}>
           <button
-            class={['btn hover:preset-tonal-surface flex h-auto justify-start']}
+            class={['btn hover-on-color flex h-auto justify-start']}
             title="Choose a Color"
             onclick={() =>
               dialog.trigger({
@@ -305,6 +379,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   },
                 },
                 options: {
+                  title: `Color ${index + 1}`,
                   size: 'large',
                 },
               })}
@@ -329,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if affiliate_variant_href}
           <a
-            class="btn hover:preset-tonal-surface"
+            class="btn hover-on-color"
             href={affiliate_variant_href}
             target="_blank"
             rel="noreferrer nofollow"

@@ -2,6 +2,7 @@ import type { GalleryPalette } from '$lib/utils/color-utils';
 import type {
   GalleryPageInfo,
   GalleryProjectNode,
+  PaletteGalleryNode,
   PopularProject,
 } from '$lib/utils/gallery-utils';
 
@@ -39,7 +40,7 @@ class YarnPaletteGalleryState {
   filteredYarnId = $state('');
   palettesContainOnlyFilteredYarn = $state(false);
   orderBy = $state('DESC');
-  projects: GalleryProjectNode[] = $state([]);
+  projects: PaletteGalleryNode[] = $state([]);
   palettes: GalleryPalette[] = $state([]);
   popularPalettes: GalleryPalette[] = $state([]);
   gallery: { pageInfo?: GalleryPageInfo } = $state({});

@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ref: DonateOptionsModal,
       },
       options: {
+        title: 'Become a Supporter',
         showCloseButton: true,
         size: 'small',
       },

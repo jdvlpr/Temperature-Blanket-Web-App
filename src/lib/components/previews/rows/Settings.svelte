@@ -122,6 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     onClose: () => dialog.close(),
                   },
                 },
+                options: { title: 'Edit Seasons' },
               });
             }}
           >
@@ -194,6 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
           options: {
+            title: 'Accent Color',
             size: 'large',
           },
         })}

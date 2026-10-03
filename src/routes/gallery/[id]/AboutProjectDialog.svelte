@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { pluralize } from '$lib/utils/string-utils';
   import type { PageData } from './$types';
@@ -30,6 +31,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project: PageData['project'];
     /** The project's title as plain text, for the dialog heading. */
     title: string;
+    /** The publishing account, when its owner chose to show their name. */
+    owner?: { name: string; publicId: string } | null;
     /** The project's colours grouped by yarn (see +page.svelte). */
     reshapedColors: Array<{
       brandName: string;
@@ -40,7 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherSources: Array<{ name: string; url: string }> | null;
   }
 
-  let { project, title, reshapedColors, weatherSources }: Props = $props();
+  let { project, title, owner, reshapedColors, weatherSources }: Props =
+    $props();
 </script>
 
 <div class="flex flex-col gap-4 p-2 pb-8 text-left sm:p-4">
@@ -56,6 +60,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         timeZone: 'UTC',
       })}
     </p>
+    {#if owner}
+      <p>
+        <span class="font-bold">Made by:</span>
+        <a
+          class="link"
+          href={resolve('/gallery/by/[ownerId]', { ownerId: owner.publicId })}
+          >{owner.name}</a
+        >
+      </p>
+    {/if}
 
     {#if JSON.stringify(reshapedColors) !== '{}'}
       {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}

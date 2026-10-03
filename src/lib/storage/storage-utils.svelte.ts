@@ -16,6 +16,7 @@
 import { browser } from '$app/environment';
 import { SKELETON_THEMES } from '$lib/constants/page-constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
+import { trackPreferenceChanges } from '$lib/storage/preferences-sync.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { PageLayout } from '$lib/types/page-types';
 import { MigrationManager } from './migration-manager';
@@ -93,6 +94,9 @@ export async function initializeLocalStorage() {
     throw e;
   }
 
+  // Note when synced preferences change, so they sync once someone signs in
+  if (browser) trackPreferenceChanges();
+
   // Setup Theme Listeners
   if (browser) {
     window
@@ -146,6 +150,14 @@ export async function initializeLocalStorage() {
         preferences.value.theme.mode === 'dark' ||
           (preferences.value.theme.mode === 'system' &&
             window.matchMedia('(prefers-color-scheme: dark)').matches),
+      );
+    });
+
+    // Reduced motion chosen in Preferences (client-only; it isn't needed for server rendering, since effects only follow user actions)
+    $effect(() => {
+      document.documentElement.setAttribute(
+        'data-motion',
+        preferences.value.effects?.motion ?? 'system',
       );
     });
   });

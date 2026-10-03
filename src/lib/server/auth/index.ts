@@ -1,0 +1,220 @@
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
+//
+// This file is part of Temperature-Blanket-Web-App.
+//
+// Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+// If not, see <https://www.gnu.org/licenses/>.
+
+// Accounts are loaded only for /api/auth/* requests (see hooks.server.ts), so the
+// rest of the site never pays for them.
+
+import { getEmailSender } from '$lib/server/email';
+import { json, type RequestEvent } from '@sveltejs/kit';
+import { betterAuth } from 'better-auth';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { cleanUpExpired } from './cleanup';
+import { allowCodeRequest } from './code-request-limit';
+import { emailChangedNotice, signInCodeEmail } from './emails';
+import { withSignedInHint } from './hint-cookie';
+import { deleteUserProjectData } from '$lib/server/sync/store';
+import { cleanName } from '$lib/utils/string-utils';
+import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
+import { readAuthSettings } from './settings';
+import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
+
+type Auth = ReturnType<typeof createAuth>;
+
+// The current request's platform, for work Better Auth starts on its own
+// (sending codes, background tasks) from an instance shared across requests.
+const requestPlatform = new AsyncLocalStorage<App.Platform | undefined>();
+
+function runInBackground(promise: Promise<unknown>) {
+  const logged = promise.catch((e) =>
+    console.error('Account background task failed', e),
+  );
+  requestPlatform.getStore()?.ctx.waitUntil(logged);
+}
+
+function createAuth(
+  platform: App.Platform,
+  settings: Extract<
+    ReturnType<typeof readAuthSettings>,
+    { status: 'ready' }
+  >['settings'],
+) {
+  return betterAuth(
+    buildAuthOptions({
+      ...settings,
+      database: platform.env!.DB!,
+      sendSignInCode: async (email, code, purpose) => {
+        const sender = getEmailSender(requestPlatform.getStore());
+        await sender.send(signInCodeEmail(email, code, purpose));
+      },
+      runInBackground,
+      deleteUserData: async (userId) => {
+        const env = requestPlatform.getStore()?.env;
+        if (env?.DB) {
+          const { releaseGalleryPosts, defaultGalleryApi } =
+            await import('$lib/server/gallery');
+          await releaseGalleryPosts(env.DB, defaultGalleryApi(), userId);
+        }
+        if (env?.PROJECTS) await deleteUserProjectData(env.PROJECTS, userId);
+      },
+      signUpsOpen: async () => {
+        const env = requestPlatform.getStore()?.env;
+        return (
+          !!env?.DB &&
+          signUpsOpen(env.DB, readSignUpLimit(env.ACCOUNTS_SIGNUP_LIMIT))
+        );
+      },
+      // Catch schema drift locally only: introspecting D1 on every cold start
+      // costs CPU the free plan can't spare (works on D1 since 1.7.6, issue #11346)
+      validateSchema: platform.env?.ENABLE_DEV_ROUTES === 'true',
+    }),
+  );
+}
+
+// One instance per isolate: creating it is too costly to repeat on every request
+let cached: { key: string; auth: Auth } | undefined;
+
+/** The shared auth instance, or a 404 (accounts off) or 503 (misconfigured) Response. */
+function authFor(platform: App.Platform | undefined): Auth | Response {
+  const result = readAuthSettings(platform?.env);
+
+  if (result.status === 'disabled')
+    return json({ message: 'Not found' }, { status: 404 });
+  if (result.status === 'misconfigured' || !platform?.env?.DB) {
+    console.error(
+      'Accounts are misconfigured:',
+      result.status === 'misconfigured' ? result.reason : 'no DB binding',
+    );
+    return json({ message: 'Accounts are not available' }, { status: 503 });
+  }
+
+  const key = JSON.stringify(result.settings);
+  if (cached?.key !== key)
+    cached = { key, auth: createAuth(platform, result.settings) };
+  return cached.auth;
+}
+
+async function jsonBody(request: Request) {
+  return request
+    .clone()
+    .json()
+    .catch(() => null);
+}
+
+const isPost = (event: RequestEvent, path: string) =>
+  event.request.method === 'POST' && event.url.pathname === path;
+
+/** Handles a request under /api/auth. */
+export async function handleAuthRequest(
+  event: RequestEvent,
+): Promise<Response> {
+  const { platform } = event;
+  const auth = authFor(platform);
+  if (auth instanceof Response) return auth;
+  const db = platform!.env!.DB!;
+
+  return requestPlatform.run(platform, async () => {
+    // Set when sign-ups are closed or full: the reply says so, whether or not
+    // this email has an account, so it doesn't reveal which emails do
+    let signUpsPaused = false;
+
+    if (isPost(event, '/api/auth/email-otp/send-verification-otp')) {
+      const body = await jsonBody(event.request);
+      if (
+        typeof body?.email === 'string' &&
+        !(await allowCodeRequest(db, body.email))
+      )
+        return json(
+          {
+            code: 'TOO_MANY_REQUESTS',
+            message: 'Too many codes requested for this email',
+          },
+          { status: 429 },
+        );
+
+      if (
+        body?.type === 'sign-in' &&
+        typeof body.email === 'string' &&
+        !(await signUpsOpen(
+          db,
+          readSignUpLimit(platform!.env!.ACCOUNTS_SIGNUP_LIMIT),
+        ))
+      ) {
+        // No code for a new email: it couldn't create an account
+        if (!(await hasAccount(db, body.email)))
+          return json({ success: true, signUpsPaused: true });
+        signUpsPaused = true;
+      }
+    }
+
+    if (isPost(event, '/api/auth/update-user')) {
+      const body = await jsonBody(event.request);
+      if (
+        typeof body?.name === 'string' &&
+        cleanName(body.name, Infinity).length > MAX_DISPLAY_NAME_LENGTH
+      )
+        return json(
+          { code: 'NAME_TOO_LONG', message: 'Display name is too long' },
+          { status: 400 },
+        );
+    }
+
+    // Who to notify, and of what, if this request changes the account's email.
+    // Read before Better Auth consumes the request body.
+    let emailChange: { from: string; to: string } | undefined;
+    if (isPost(event, '/api/auth/email-otp/change-email')) {
+      const [session, body] = await Promise.all([
+        auth.api.getSession({ headers: event.request.headers }),
+        jsonBody(event.request),
+      ]);
+      if (session && typeof body?.newEmail === 'string')
+        emailChange = { from: session.user.email, to: body.newEmail };
+    }
+
+    const { response, signedIn } = withSignedInHint(
+      await auth.handler(event.request),
+      event.url.protocol === 'https:',
+    );
+    if (signedIn) runInBackground(cleanUpExpired(db));
+
+    if (signUpsPaused && response.ok)
+      return json({ ...(await response.json()), signUpsPaused: true });
+
+    if (emailChange && response.ok)
+      runInBackground(
+        getEmailSender(platform).send(
+          emailChangedNotice(emailChange.from, emailChange.to),
+        ),
+      );
+    return response;
+  });
+}
+
+/**
+ * The signed-in user for an app route under /api/account, with the auth
+ * instance for further calls. A Response (404, 503 or 401) when there's none.
+ */
+export async function requireAccount(
+  event: RequestEvent,
+): Promise<
+  { auth: Auth; user: { id: string; email: string; name: string } } | Response
+> {
+  const auth = authFor(event.platform);
+  if (auth instanceof Response) return auth;
+  const session = await auth.api.getSession({
+    headers: event.request.headers,
+  });
+  if (!session) return json({ message: 'Not signed in' }, { status: 401 });
+  return { auth, user: session.user };
+}
