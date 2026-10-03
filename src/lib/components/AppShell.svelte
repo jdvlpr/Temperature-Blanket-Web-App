@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn hover:preset-tonal-surface mx-2 mt-2 hidden justify-center lg:flex"
+        class={["hover:preset-tonal-surface mx-2 mt-2 hidden justify-center lg:flex", showNavigationSideBar.value ? 'btn' : 'btn-icon ml-4 -top-0.5 relative']}
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
