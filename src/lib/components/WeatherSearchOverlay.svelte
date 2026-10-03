@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Dialog.Content class="flex h-dvh w-full">
           <!-- Fades in over the page, its content rising into place -->
           <div
-            class="bg-surface-50/95 dark:bg-surface-950/95 flex w-full flex-col items-center justify-center gap-6 overflow-auto p-4 pt-[max(--spacing(4),env(safe-area-inset-top))] pb-[max(--spacing(4),env(safe-area-inset-bottom))] text-center"
+            class="bg-surface-50 dark:bg-surface-950 flex w-full flex-col items-center justify-center gap-6 overflow-auto p-4 pt-[max(--spacing(4),env(safe-area-inset-top))] pb-[max(--spacing(4),env(safe-area-inset-bottom))] text-center"
             in:fade={{ duration: motionDuration(200) }}
           >
             {#key Boolean(weatherSearch.error)}

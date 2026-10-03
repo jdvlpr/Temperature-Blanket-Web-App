@@ -71,9 +71,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // The backdrop's blur and tint at a strength from 0 (none) to 1 (full).
   // It comes and goes by easing the blur itself rather than fading a blurred
   // layer, which looked hazy, with a glowing double image, part way
+  // A plain dim behind (no blur, which reads as the page moving as it
+  // sharpens again); it only fades
   function backdropLook(strength: number) {
-    const blur = `blur(${12 * strength}px)`;
-    return `background-color: color-mix(in oklab, var(--color-surface-50-950) ${50 * strength}%, transparent); backdrop-filter: ${blur}; -webkit-backdrop-filter: ${blur}`;
+    return `opacity: ${strength}`;
   }
 
   const backdropIn: (node: Element) => TransitionConfig = () => {
@@ -393,15 +394,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   initialFocusEl={undefined}
 >
   <Portal>
-    <!-- Blurred behind, as with the site menu's drawer; the side panel slides
+    <!-- Dimmed behind, as with the site menu's drawer; the side panel slides
     in from the right (the site menu comes from the left) -->
     <Dialog.Backdrop
-      class="fixed inset-0 z-60"
+      class="bg-surface-950/35 fixed inset-0 z-60 dark:bg-black/55"
       style="{backdropLook(
         grabbable ? 1 - dragProgress : 1,
       )}; transition: {dragging || reduceMotion
         ? 'none'
-        : 'background-color 200ms ease-out, backdrop-filter 200ms ease-out, -webkit-backdrop-filter 200ms ease-out'}"
+        : 'opacity 200ms ease-out'}"
     >
       {#snippet element(attributes)}
         {#if !attributes.hidden}
