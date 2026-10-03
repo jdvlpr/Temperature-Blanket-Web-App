@@ -319,7 +319,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col gap-2 px-2 py-4 text-center">
           <h2 class="h1 text-gradient mb-0">Account</h2>
           <p class="text-sm opacity-80">
-            Sign in to save your projects and work on them from any device.
+            Sign in to keep your projects and yarn palettes on all your devices.
           </p>
 
           <p class="mx-auto max-w-md px-2 py-4 text-center text-sm opacity-80">

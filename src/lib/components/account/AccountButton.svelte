@@ -183,8 +183,8 @@ when accounts are off. -->
     <a
       href={resolve('/account')}
       class={[BUTTON, 'relative', onAccountPage && 'preset-tonal-secondary']}
-      aria-label={isNew ? 'Sign in. New: Accounts (Beta)' : 'Sign in'}
-      title={isNew ? 'Sign in. New: Accounts (Beta)' : 'Sign in'}
+      aria-label={isNew ? 'Sign in. Accounts (Beta)' : 'Sign in'}
+      title={isNew ? 'Sign in. Accounts (Beta)' : 'Sign in'}
       data-testid="account-button"
       onclick={() => accountsIntro.markButtonSeen()}
     >

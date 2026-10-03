@@ -50,6 +50,12 @@ class YarnUses {
   // Empty on the server, where there's no Local Storage
   state = $state<YarnUsesState>(readState());
 
+  // Before a change: another tab may have made one since this loaded, which
+  // writing this tab's older copy would undo
+  #refresh() {
+    this.state = readState();
+  }
+
   #write() {
     try {
       localStorage.setItem(KEY, JSON.stringify(this.state));
@@ -62,11 +68,13 @@ class YarnUses {
   record(brandId?: string | null, yarnId?: string | null) {
     const key = yarnKey(brandId, yarnId);
     if (!key) return;
+    this.#refresh();
     this.state.counts[key] = (this.state.counts[key] ?? 0) + 1;
     this.#write();
   }
 
   decline(key: string) {
+    this.#refresh();
     if (!key || this.state.declined.includes(key)) return;
     this.state.declined.push(key);
     this.#write();

@@ -123,7 +123,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
           class="bg-surface-100-900 rounded-container flex flex-col items-center gap-3 p-4 text-center"
         >
           <p class="text-sm">
-            <span class="font-bold">New: Accounts (Beta).</span> Sign in to keep your
+            <span class="font-bold">Accounts (Beta).</span> Sign in to keep your
             projects and yarn palettes on all your devices.
           </p>
           <a href={resolve('/account')} class="btn preset-filled-primary-500">

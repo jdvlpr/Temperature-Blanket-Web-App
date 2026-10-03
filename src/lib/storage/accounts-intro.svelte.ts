@@ -46,6 +46,12 @@ class AccountsIntro {
   // Empty on the server, where there's no Local Storage
   state = $state<AccountsIntroState>(readState());
 
+  // Before a change: another tab may have made one since this loaded, which
+  // writing this tab's older copy would undo
+  #refresh() {
+    this.state = readState();
+  }
+
   #write() {
     try {
       localStorage.setItem(KEY, JSON.stringify(this.state));
@@ -66,19 +72,21 @@ class AccountsIntro {
   /** Call when the account button is used, or the account page is opened */
   markButtonSeen() {
     if (this.state.buttonSeen) return;
+    this.#refresh();
     this.state.buttonSeen = true;
     this.#write();
   }
 
   /** Call after a project or palette is saved for the first time */
   offerAfterSave() {
+    this.#refresh();
     if (!this.#signedOut || this.state.saveNoticeShown) return;
     this.state.saveNoticeShown = true;
     this.#write();
     toast.trigger({
       // One element, as the toast lays out its parts side by side
       message:
-        '<span><b>New: Accounts (Beta).</b> Sign in to keep your projects and yarn palettes on all your devices.</span>',
+        '<span><b>Accounts (Beta).</b> Sign in to keep your projects and yarn palettes on all your devices.</span>',
       category: 'info',
       // Stays until dismissed, so there's time to read it and choose
       autohide: false,
