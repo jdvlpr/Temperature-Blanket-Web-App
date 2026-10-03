@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getSortedPalette, shuffleColors } from '$lib/utils/color-utils';
   import { dialog } from '$lib/state/page-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
+  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
 
   interface Props {
     updateGauge: any;
@@ -31,6 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { updateGauge }: Props = $props();
 
   let selectedColors: object[] = $state([]);
+  let selectedBrandId = $state('');
+  let selectedYarnId = $state('');
 
   let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
 
@@ -53,6 +56,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div bind:this={container} class="p-2">
   <YarnGridSelect
     bind:selectedColors
+    bind:selectedBrandId
+    bind:selectedYarnId
     onClickScrollToTop={() => {
       container?.scrollIntoView({
         behavior: 'smooth',
@@ -98,6 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="max-sm:pb-2">
       <SaveAndCloseButtons
         onSave={() => {
+          yarnUses.record(selectedBrandId, selectedYarnId);
           updateGauge({
             _colors: selectedColors,
           });

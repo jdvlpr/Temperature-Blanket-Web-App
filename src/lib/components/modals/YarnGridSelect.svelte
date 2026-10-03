@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
+  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
@@ -362,11 +362,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
 
-  {#if selectedBrandId && selectedYarnId}
-    <div class="order-2 col-span-full w-full md:order-3">
-      <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
-    </div>
-  {/if}
+  <DefaultYarnSuggestion
+    {selectedBrandId}
+    {selectedYarnId}
+    class="order-2 col-span-full md:order-3"
+  />
 
   {#if yarnDataReady}
     {#key selectedBrandId}

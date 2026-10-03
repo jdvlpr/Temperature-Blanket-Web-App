@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
-  import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
+  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
+  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
@@ -513,12 +514,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             onselectautocomplete={onYarnFilterChange}
                             selectedYarnWeightId={palette.selectedYarnWeightId}
                           />
-                          {#if palette.selectedBrandId && palette.selectedYarnId}
-                            <DefaultYarnSet
-                              selectedBrandId={palette.selectedBrandId}
-                              selectedYarnId={palette.selectedYarnId}
-                            />
-                          {:else}
+                          <DefaultYarnSuggestion
+                            selectedBrandId={palette.selectedBrandId}
+                            selectedYarnId={palette.selectedYarnId}
+                          />
+                          {#if !palette.selectedBrandId || !palette.selectedYarnId}
                             {#key palette.selectedBrandId}
                               <SelectYarnWeight
                                 selectedBrandId={palette.selectedBrandId}
@@ -609,6 +609,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               palette.loading ||
               !palette.points.length}
             onSave={() => {
+              if (palette.mode === 'yarn')
+                yarnUses.record(
+                  palette.selectedBrandId,
+                  palette.selectedYarnId,
+                );
               updateGauge({ _colors: palette.toColors() });
               dialog.close();
             }}

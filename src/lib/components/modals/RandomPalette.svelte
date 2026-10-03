@@ -15,7 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
-  import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
+  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
+  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -159,11 +160,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    {#if selectedBrandId && selectedYarnId}
-      <div class="order-2 col-span-full w-full md:order-3">
-        <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
-      </div>
-    {/if}
+    <DefaultYarnSuggestion
+      {selectedBrandId}
+      {selectedYarnId}
+      class="order-2 col-span-full md:order-3"
+    />
 
     {#if yarnDataReady}
       {#key selectedBrandId}
@@ -249,6 +250,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       disabled={!yarnDataReady}
       onSave={() => {
+        yarnUses.record(selectedBrandId, selectedYarnId);
         updateGauge({
           _colors: randomPalette.map((color) => {
             delete color.locked;
