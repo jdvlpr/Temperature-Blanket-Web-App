@@ -213,8 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Email me a code
         </button>
         <p class="text-center text-sm opacity-80">
-          No passwords. We only email you sign-in codes, and the first one
-          creates your account.
+          You don't need a password for this web app. Instead, you'll be emailed sign-in codes.
         </p>
       </form>
     </div>

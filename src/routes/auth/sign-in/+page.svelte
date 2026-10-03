@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="mx-auto flex w-full max-w-(--breakpoint-md) flex-col pb-8">
       <div class="flex flex-col gap-2 px-2 py-4 text-center">
         <h2 class="h1 text-gradient mb-0">Sign In</h2>
-        <p>Save your projects and pick them up on any device.</p>
+        <p>Save your projects and work on them from any device.</p>
       </div>
       {#if __ACCOUNTS_ENABLED__}
         <SignInCard {redirectTo} />

@@ -84,7 +84,7 @@ accordion sections (as the site navigation), each holding a card, for appearance
   let yarnPickerKey = $state(0);
 
   // Appearance starts open; any section can be opened or closed
-  let openSections = $state(['appearance']);
+  let openSections = $state(['appearance', 'yarn', 'sound-motion']);
 
   const BUTTON_ICON_RADIUS: Record<string, string> = {
     sharp: 'rounded-none',
