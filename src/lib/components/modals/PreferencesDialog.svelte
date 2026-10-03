@@ -57,15 +57,23 @@ accordion sections (as the site navigation), each holding a card, for appearance
   });
 
   // Keeps the chosen thumbnail in view in its scrolling row, e.g. when it's
-  // picked from the select
+  // picked from the select. Only the row scrolls, sideways: this runs again
+  // on any change to the preferences, and scrolling the dialog too would jump
+  // it back up here from wherever was just changed
   function keepInView(selected: boolean): Attachment<HTMLElement> {
     return (node) => {
-      if (!selected) return;
-      node.scrollIntoView({
-        behavior: motion.reduced ? 'auto' : 'smooth',
-        block: 'nearest',
-        inline: 'nearest',
-      });
+      const row = node.parentElement;
+      if (!selected || !row) return;
+      const rowRect = row.getBoundingClientRect();
+      const rect = node.getBoundingClientRect();
+      const left =
+        rect.left < rowRect.left
+          ? rect.left - rowRect.left
+          : rect.right > rowRect.right
+            ? rect.right - rowRect.right
+            : 0;
+      if (left)
+        row.scrollBy({ left, behavior: motion.reduced ? 'auto' : 'smooth' });
     };
   }
 
