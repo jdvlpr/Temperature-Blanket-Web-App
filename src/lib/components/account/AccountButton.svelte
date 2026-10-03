@@ -27,6 +27,7 @@ when accounts are off. -->
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { toast } from '$lib/state/page-state.svelte';
+  import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
   import { sync } from '$lib/sync/status.svelte';
   import {
     CircleUserRoundIcon,
@@ -46,8 +47,17 @@ when accounts are off. -->
 
   let onAccountPage = $derived(page.url.pathname === '/account');
 
+  // After loading, so the server's page (which can't know) doesn't differ
+  let mounted = $state(false);
+
   onMount(() => {
     if (__ACCOUNTS_ENABLED__) loadAccountSummary();
+    mounted = true;
+  });
+
+  // Opened the account page some other way: it's been seen
+  $effect(() => {
+    if (onAccountPage) accountsIntro.markButtonSeen();
   });
 
   async function signOut() {
@@ -168,14 +178,23 @@ when accounts are off. -->
       </Popover.Positioner>
     </Popover>
   {:else}
+    <!-- A "New" dot, until it's used, to introduce accounts -->
+    {@const isNew = mounted && accountsIntro.showDot}
     <a
       href={resolve('/account')}
-      class={[BUTTON, onAccountPage && 'preset-tonal-secondary']}
-      aria-label="Sign in"
-      title="Sign in"
+      class={[BUTTON, 'relative', onAccountPage && 'preset-tonal-secondary']}
+      aria-label={isNew ? 'Sign in. New: Accounts (Beta)' : 'Sign in'}
+      title={isNew ? 'Sign in. New: Accounts (Beta)' : 'Sign in'}
       data-testid="account-button"
+      onclick={() => accountsIntro.markButtonSeen()}
     >
       <CircleUserRoundIcon />
+      {#if isNew}
+        <span
+          class="bg-primary-500 absolute top-1.5 right-1.5 size-2.5 rounded-full"
+          aria-hidden="true"
+        ></span>
+      {/if}
     </a>
   {/if}
 {/if}

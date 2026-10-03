@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
   import {
     MAX_SAVED_PALETTE_NAME_LENGTH,
     PaletteStorage,
@@ -46,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category: added ? 'success' : 'info',
       });
       dialog.close();
+      if (added) accountsIntro.offerAfterSave();
     } catch {
       toast.trigger({
         message: 'Unable to save the palette in this browser',

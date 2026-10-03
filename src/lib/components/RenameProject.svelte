@@ -20,7 +20,7 @@ Projects). The name shows on My Projects instead of the location title, and
 syncs like any other change. -->
 
 <script lang="ts">
-  import { projectMenu, toast } from '$lib/state/page-state.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { renameOpenProject, storedItem } from '$lib/storage/autosave.svelte';
@@ -29,7 +29,6 @@ syncs like any other change. -->
     savedProjects,
   } from '$lib/storage/projects.svelte';
   import { CheckIcon, PencilIcon, XIcon } from '@lucide/svelte';
-  import { untrack } from 'svelte';
 
   let id = $state<string | null>(null);
   let savedName = $state('');
@@ -44,12 +43,6 @@ syncs like any other change. -->
       id = item?.id ?? null;
       savedName = item?.meta.name ?? '';
       title = item?.meta.title ?? '';
-      // Opened from the "Name it" toast after saving
-      if (id && untrack(() => projectMenu.renameNext)) {
-        projectMenu.renameNext = false;
-        name = savedName;
-        editing = true;
-      }
     });
   });
 

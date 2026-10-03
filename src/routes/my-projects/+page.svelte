@@ -41,7 +41,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
     refreshAccountTrash,
   } from '$lib/storage/account-trash.svelte';
   import { onMount } from 'svelte';
-  import { PlusIcon, Trash2Icon } from '@lucide/svelte';
+  import { LogInIcon, PlusIcon, Trash2Icon } from '@lucide/svelte';
 
   let trashedProjectCount = $state(0);
   let trashCount = $derived(trashedProjectCount + savedPalettes.deleted.length);
@@ -116,6 +116,22 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
           cleared, they'll be lost.
         {/if}
       </p>
+
+      <!-- Signed out: an account keeps them safe, and on every device -->
+      {#if browser && __ACCOUNTS_ENABLED__ && !signedIn}
+        <div
+          class="bg-surface-100-900 rounded-container flex flex-col items-center gap-3 p-4 text-center"
+        >
+          <p class="text-sm">
+            <span class="font-bold">New: Accounts (Beta).</span> Sign in to keep your
+            projects and yarn palettes on all your devices.
+          </p>
+          <a href={resolve('/account')} class="btn preset-filled-primary-500">
+            <LogInIcon />
+            Sign In
+          </a>
+        </div>
+      {/if}
 
       <section class="flex flex-col gap-2" aria-labelledby="projects">
         <div class="flex flex-wrap items-center justify-between gap-2">

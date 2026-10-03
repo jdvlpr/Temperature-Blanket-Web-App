@@ -49,7 +49,9 @@ button to it. -->
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { Flash } from '$lib/utils/feedback.svelte';
   import { getColorsFromInput } from '$lib/utils/color-utils';
+  import { saveProject } from '$lib/utils/save-project.svelte';
   import {
+    BookmarkIcon,
     ChevronRightIcon,
     CloudAlertIcon,
     CopyPlusIcon,
@@ -57,6 +59,7 @@ button to it. -->
     ExternalLinkIcon,
     FolderOpenIcon,
     LinkIcon,
+    LoaderCircleIcon,
     LogInIcon,
     MonitorIcon,
     MonitorXIcon,
@@ -103,6 +106,17 @@ button to it. -->
       component: { ref },
       options: { title, returnable },
     });
+
+  // Saves it here: the card then says where it's saved
+  let saving = $state(false);
+  async function save() {
+    saving = true;
+    try {
+      await saveProject();
+    } finally {
+      saving = false;
+    }
+  }
 
   const linkCopied = new Flash();
 
@@ -214,6 +228,20 @@ button to it. -->
       </p>
     {:else if hasProject}
       <p class="text-sm opacity-70">Not saved yet</p>
+      <button
+        type="button"
+        class="btn preset-tonal-primary self-start"
+        disabled={saving}
+        onclick={save}
+        data-testid="menu-save"
+      >
+        {#if saving}
+          <LoaderCircleIcon class="animate-spin" />
+        {:else}
+          <BookmarkIcon />
+        {/if}
+        Save Project
+      </button>
     {:else if !hasWeather}
       <p class="text-sm opacity-70">
         Choose a location and get its weather data to start a project.

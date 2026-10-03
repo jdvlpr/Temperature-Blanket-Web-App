@@ -323,6 +323,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         </div>
         <SignInCard onsignedin={showSignedIn} />
+        <p class="mx-auto max-w-md px-2 pt-4 text-center text-sm opacity-80">
+          <span class="badge preset-tonal-secondary mr-1">Beta</span>
+          Accounts are new, so you might run into a few rough edges.
+          <a href={resolve('/blog/2026-09-28-accounts-beta')} class="link"
+            >Read about accounts</a
+          >, and if something doesn't work as expected, please
+          <a href={resolve('/contact')} class="link">get in touch</a>.
+        </p>
       {:else}
         <div class="flex flex-col gap-2 px-2 py-4 text-center">
           <h2 class="h1 text-gradient mb-0">Account</h2>

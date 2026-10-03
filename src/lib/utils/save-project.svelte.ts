@@ -16,17 +16,14 @@
 // Saving from the top bar (and Ctrl+S): right away, with a toast to say where
 // it went. There's no Save dialog; the Project menu has the rest.
 
-import {
-  isDesktop,
-  openProjectMenu,
-  toast,
-} from '$lib/state/page-state.svelte';
+import { openProjectMenu, toast } from '$lib/state/page-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import {
   autosave,
   saveNow,
   saveOpenProject,
 } from '$lib/storage/autosave.svelte';
+import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
 import { feedback } from '$lib/utils/feedback.svelte';
 
 /** Saves the open project; returns whether it saved. Only for explicit saves (it plays the success sound/vibration). */
@@ -69,16 +66,7 @@ export async function saveProject(): Promise<boolean> {
         ? 'Saved to your account. Changes now save automatically.'
         : 'Saved in this browser. Changes now save automatically.',
     category: 'success',
-    // A new project: naming it is the likely next step. Wider screens show
-    // its name in the top bar to click instead.
-    ...(firstSave &&
-      !item.meta.name &&
-      !isDesktop.current && {
-        action: {
-          label: 'Name it',
-          response: () => openProjectMenu({ rename: true }),
-        },
-      }),
   });
+  if (firstSave) accountsIntro.offerAfterSave();
   return true;
 }

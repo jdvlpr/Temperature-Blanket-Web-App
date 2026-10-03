@@ -207,14 +207,10 @@ class DialogClass {
 
 export const dialog = new DialogClass();
 
-/** Asks the Project menu to open with its name field, once (not on Back) */
-export const projectMenu = $state({ renameNext: false });
-
 /** The Project menu: a side panel, and dialogs opened from it can go back to it */
-export function openProjectMenu({ rename = false } = {}) {
+export function openProjectMenu() {
   // Already showing: nothing to open
   if (dialog.opened && dialog.contentComponent.ref === Menu) return;
-  projectMenu.renameNext = rename;
   // Fresh, not on top of a screen it opened
   dialog.close();
   dialog.trigger({
