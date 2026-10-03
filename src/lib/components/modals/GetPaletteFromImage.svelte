@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
+  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
@@ -30,6 +31,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PALETTE_STYLES,
     type PaletteStyle,
   } from '$lib/features/image-palette/select';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { getBrands } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
@@ -37,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CheckIcon,
     ChevronDownIcon,
     ChevronRightIcon,
-    ImageIcon,
     ImagePlusIcon,
     Icon,
     PipetteIcon,
@@ -49,9 +51,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import {
     Menu,
+    Popover,
     Portal,
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
+  import { yarnBall } from '@lucide/lab';
   import { onMount, untrack } from 'svelte';
 
   interface Props {
@@ -88,19 +92,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dark: { label: 'Dark', details: 'Favors darker colors' },
   };
 
-  const PHOTO_SOURCES = [
-    {
-      value: 'random',
-      label: 'Random Photo',
-      icon: ShuffleIcon,
-    },
-    {
-      value: 'file',
-      label: 'Your Photo...',
-      icon: ImagePlusIcon,
-    },
-  ];
-
   // As in the main palette's toolbar
   const toolbarButtonClass = 'hover:preset-tonal-surface btn justify-start';
   const menuItemClass =
@@ -112,6 +103,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let draggingFile = $state(false);
 
   let paletteColors = $derived(palette.paletteColors());
+
+  // Which yarn the colors are matched to, said briefly
+  let yarnDetails = $derived.by(() => {
+    if (!palette.yarnReady) return 'Closest yarn colorways';
+    const brand = getBrands().find(
+      (brand) => brand.id === palette.selectedBrandId,
+    );
+    const yarn = brand?.yarns.find(
+      (yarn) => yarn.id === palette.selectedYarnId,
+    );
+    if (brand && yarn)
+      return `Closest colorways from ${brand.name} ${yarn.name}`;
+    const weight = ALL_YARN_WEIGHTS.find(
+      (weight) => weight.id === palette.selectedYarnWeightId,
+    );
+    const colorways = weight ? `${weight.name} weight colorways` : 'colorways';
+    return brand
+      ? `Closest ${colorways} from ${brand.name}`
+      : weight
+        ? `Closest ${colorways}`
+        : 'Closest colorways from any yarn';
+  });
   let highlightIndex = $derived(
     palette.points.findIndex((point) => point.id === palette.hoveredId),
   );
@@ -290,11 +303,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {:else}
     <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
-      <div
-        class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row"
-      >
-        <!-- Isolated so the photo's markers stay under the palette bar; the side
-        panel isn't, so the yarn list can open over the bar -->
+      <div class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4">
+        <!-- Isolated so the photo's markers stay under the palette bar -->
         <section class="isolate flex min-h-0 min-w-0 flex-1 flex-col gap-2">
           <div class="flex flex-wrap items-center justify-center gap-2">
             <SegmentsScroller collapse>
@@ -405,108 +415,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <!-- eslint-enable svelte/no-navigation-without-resolve -->
           {/if}
         </section>
-
-        <aside
-          class="flex flex-col gap-4 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
-        >
-          <!-- As the main palette's Get Colors and Sort menus -->
-          <Menu
-            positioning={{ placement: 'bottom-start' }}
-            onSelect={(details) =>
-              details.value === 'random'
-                ? palette.randomImage()
-                : input?.click()}
-          >
-            <Menu.Trigger
-              class={[toolbarButtonClass, 'self-start']}
-              disabled={palette.loading}
-            >
-              <ImageIcon />
-              <span class="flex items-center gap-1"
-                >Change Photo <ChevronDownIcon size={18} /></span
-              >
-            </Menu.Trigger>
-            <Portal>
-              <Menu.Positioner>
-                <Menu.Content
-                  class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
-                >
-                  {#each PHOTO_SOURCES as source (source.value)}
-                    <Menu.Item value={source.value} class={menuItemClass}>
-                      <source.icon class="shrink-0" />
-                      <div class="flex min-w-0 flex-col text-left">
-                        <p>{source.label}</p>
-                      </div>
-                    </Menu.Item>
-                  {/each}
-                </Menu.Content>
-              </Menu.Positioner>
-            </Portal>
-          </Menu>
-
-          <div class="flex flex-col gap-1">
-            <span class="label-text">Colors</span>
-            <SegmentsScroller>
-              <SegmentedControl
-                value={palette.mode}
-                onValueChange={(e) => {
-                  if (e.value === 'yarn' || e.value === 'exact')
-                    palette.setMode(e.value);
-                }}
-              >
-                <SegmentedControl.Control
-                  class="bg-surface-100 dark:bg-surface-900 w-full min-w-max"
-                >
-                  <SegmentedControl.Indicator />
-                  <SegmentedControl.Item value="yarn" class="flex-1">
-                    <SegmentedControl.ItemText
-                      >Yarn Colors</SegmentedControl.ItemText
-                    >
-                    <SegmentedControl.ItemHiddenInput />
-                  </SegmentedControl.Item>
-                  <SegmentedControl.Item value="exact" class="flex-1">
-                    <SegmentedControl.ItemText
-                      >Exact Colors</SegmentedControl.ItemText
-                    >
-                    <SegmentedControl.ItemHiddenInput />
-                  </SegmentedControl.Item>
-                </SegmentedControl.Control>
-              </SegmentedControl>
-            </SegmentsScroller>
-            <p class="text-surface-700-300 text-xs">
-              {#if palette.mode === 'yarn'}
-                Each color is matched to the closest yarn colorway.
-              {:else}
-                Exact colors from the photo. A yarn colorway might not exist for
-                each one.
-              {/if}
-            </p>
-          </div>
-
-          {#if palette.yarnReady && palette.mode === 'yarn'}
-            <SelectYarn
-              context="modal"
-              bind:selectedBrandId={palette.selectedBrandId}
-              bind:selectedYarnId={palette.selectedYarnId}
-              onselectautocomplete={onYarnFilterChange}
-              selectedYarnWeightId={palette.selectedYarnWeightId}
-            />
-            {#if palette.selectedBrandId && palette.selectedYarnId}
-              <DefaultYarnSet
-                selectedBrandId={palette.selectedBrandId}
-                selectedYarnId={palette.selectedYarnId}
-              />
-            {:else}
-              {#key palette.selectedBrandId}
-                <SelectYarnWeight
-                  selectedBrandId={palette.selectedBrandId}
-                  bind:selectedYarnWeightId={palette.selectedYarnWeightId}
-                  onchange={onYarnFilterChange}
-                />
-              {/key}
-            {/if}
-          {/if}
-        </aside>
       </div>
 
       <StickyPart position="bottom">
@@ -540,7 +448,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div
                 class="rounded-t-container border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
               >
-                Tap the photo to add colors, or use Auto Palette
+                Tap the photo to add colors, or use Auto<span
+                  class="max-sm:hidden">&nbsp;Palette</span
+                >
               </div>
             {/if}
 
@@ -557,6 +467,75 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
               {/key}
 
+              <!-- A popover rather than a menu, for the yarn search field -->
+              <Popover positioning={{ placement: 'top' }}>
+                <Popover.Trigger
+                  class={toolbarButtonClass}
+                  title={palette.mode === 'yarn'
+                    ? `Yarn Colors: ${yarnDetails}`
+                    : 'Exact Colors'}
+                  disabled={palette.loading}
+                >
+                  <Icon iconNode={yarnBall} />
+                  <span class="flex items-center gap-1"
+                    >Yarn <ChevronDownIcon size={18} /></span
+                  >
+                </Popover.Trigger>
+                <Portal>
+                  <Popover.Positioner>
+                    <Popover.Content
+                      class="card bg-surface-100-900 border-surface-200-800 z-9999 flex max-h-(--available-height) w-96 max-w-[calc(100vw-2rem)] flex-col overflow-y-auto border py-1 shadow-lg"
+                    >
+                      <Popover.Title class="sr-only">Yarn</Popover.Title>
+                      <ToggleSwitch
+                        bare
+                        label="Match to Yarn Colors"
+                        details={palette.mode === 'yarn'
+                          ? `${yarnDetails}.`
+                          : 'Off: exact colors from the photo. A yarn colorway might not exist for each one.'}
+                        detailsTextSize="text-xs"
+                        checked={palette.mode === 'yarn'}
+                        onchange={(e) =>
+                          palette.setMode(
+                            (e.currentTarget as HTMLInputElement).checked
+                              ? 'yarn'
+                              : 'exact',
+                          )}
+                      />
+
+                      {#if palette.yarnReady && palette.mode === 'yarn'}
+                        <div class="flex flex-col gap-2 px-4 pb-3">
+                          <SelectYarn
+                            context="modal"
+                            listInline
+                            bind:selectedBrandId={palette.selectedBrandId}
+                            bind:selectedYarnId={palette.selectedYarnId}
+                            onselectautocomplete={onYarnFilterChange}
+                            selectedYarnWeightId={palette.selectedYarnWeightId}
+                          />
+                          {#if palette.selectedBrandId && palette.selectedYarnId}
+                            <DefaultYarnSet
+                              selectedBrandId={palette.selectedBrandId}
+                              selectedYarnId={palette.selectedYarnId}
+                            />
+                          {:else}
+                            {#key palette.selectedBrandId}
+                              <SelectYarnWeight
+                                selectedBrandId={palette.selectedBrandId}
+                                bind:selectedYarnWeightId={
+                                  palette.selectedYarnWeightId
+                                }
+                                onchange={onYarnFilterChange}
+                              />
+                            {/key}
+                          {/if}
+                        </div>
+                      {/if}
+                    </Popover.Content>
+                  </Popover.Positioner>
+                </Portal>
+              </Popover>
+
               <Menu
                 positioning={{ placement: 'top' }}
                 onSelect={(details) =>
@@ -564,12 +543,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <Menu.Trigger
                   class={toolbarButtonClass}
+                  aria-label="Auto Palette"
                   title="Pick the colors that best capture the photo"
                   disabled={palette.loading || palette.working}
                 >
                   <WandSparklesIcon />
+                  <!-- Shortened on small screens, to fit the toolbar -->
                   <span class="flex items-center gap-1"
-                    >Auto Palette <ChevronDownIcon size={18} /></span
+                    >Auto<span class="max-sm:hidden">&nbsp;Palette</span>
+                    <ChevronDownIcon size={18} /></span
                   >
                 </Menu.Trigger>
                 <Portal>
@@ -616,7 +598,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 onclick={() => palette.clear()}
               >
                 <Trash2Icon />
-                Clear
+                <!-- Just the icon on small screens, so the tools fit two rows -->
+                <span class="max-sm:sr-only">Clear</span>
               </button>
             </div>
           </div>

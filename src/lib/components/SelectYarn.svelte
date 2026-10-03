@@ -57,6 +57,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context?: string;
     disabled?: boolean;
     preselectDefaultYarn?: boolean;
+    /** Show the list in the content, under the field, rather than over it.
+     * For a popover, which a list fixed to the screen can't line up with. */
+    listInline?: boolean;
     onselectautocomplete?: (detail: {
       selectedBrandId: string | undefined;
       selectedYarnId: string | undefined;
@@ -70,6 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context = '',
     disabled = false,
     preselectDefaultYarn = true,
+    listInline = false,
     onselectautocomplete = () => {},
   }: Props = $props();
 
@@ -333,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // Scrolling to the list's end doesn't go on to scroll what's behind it
         container.style.overscrollBehavior = `contain`;
 
-        if (inlineList()) {
+        if (listInline || inlineList()) {
           // In the dialog's content, right under the field, so it moves with
           // the field when the keyboard opens and the sheet shrinks
           container.style.position = 'relative';
