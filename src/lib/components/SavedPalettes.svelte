@@ -3,17 +3,19 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { TrashUndos } from '$lib/utils/trash-undo.svelte';
+  import TrashUndo from '$lib/components/TrashUndo.svelte';
   import { version } from '$app/environment';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
@@ -38,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PencilIcon,
     Share2Icon,
     Trash2Icon,
-    Undo2Icon,
     XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
@@ -62,8 +63,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let yarnDataReady = $state(false);
   let editingId = $state<string | null>(null);
   let editingName = $state('');
-  // Undo lives in the list, since the dialog is modal and a toast button behind it can't be clicked
-  let lastDeleted = $state<{ id: string; label: string } | null>(null);
+  // Undos live in the list, since the dialog is modal and a toast button behind
+  // it can't be clicked: each where its palette was, so it's right there
+  const undos = new TrashUndos();
 
   let palettes = $derived(
     yarnDataReady
@@ -80,6 +82,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           })
           .filter((n) => n !== null)
       : [],
+  );
+
+  const undoSpots = $derived(
+    undos.placed(palettes.map((item) => item.palette.id)),
   );
 
   onMount(async () => {
@@ -112,17 +118,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function remove(palette: SavedPalette, label: string) {
-    lastDeleted = { id: palette.id, label };
+    undos.add(
+      palette.id,
+      label,
+      palettes.map((item) => item.palette.id),
+    );
     await run(
       () => PaletteStorage.remove(palette.id),
       'Unable to delete the palette',
     );
   }
 
-  async function undoRemove() {
-    if (!lastDeleted) return;
-    const { id } = lastDeleted;
-    lastDeleted = null;
+  async function undoRemove(id: string) {
+    undos.remove(id);
     await run(
       () => PaletteStorage.restore(id),
       'Unable to restore the palette',
@@ -163,21 +171,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     updateGauge && 'px-2 md:min-w-[44rem] lg:min-w-[62rem]',
   ]}
 >
-  {#if lastDeleted}
-    <div
-      class="card preset-tonal-surface flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
-      role="status"
-    >
-      <span class="line-clamp-1">Moved {lastDeleted.label} to the Trash</span>
-      <button
-        type="button"
-        class="btn btn-sm hover:preset-tonal-surface"
-        onclick={undoRemove}
-      >
-        <Undo2Icon />
-        Undo
-      </button>
-    </div>
+  {#snippet undoAt(anchor: string | null, asListItems: boolean)}
+    {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
+      {#if asListItems}
+        <li class="w-full">
+          <TrashUndo
+            label={entry.label}
+            onundo={() => undoRemove(entry.id)}
+            focus={undos.focusId === entry.id}
+            onfocused={() => (undos.focusId = null)}
+          />
+        </li>
+      {:else}
+        <TrashUndo
+          label={entry.label}
+          onundo={() => undoRemove(entry.id)}
+          focus={undos.focusId === entry.id}
+          onfocused={() => (undos.focusId = null)}
+        />
+      {/if}
+    {/each}
+  {/snippet}
+
+  <!-- With nothing left to list, they show on their own -->
+  {#if yarnDataReady && !palettes.length && undoSpots.size}
+    <div class="flex w-full flex-col gap-2">{@render undoAt(null, false)}</div>
   {/if}
   {#if !yarnDataReady}
     <div class="my-1"></div>
@@ -185,10 +203,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {:else if !palettes.length}
     <div class="my-8 flex max-w-prose flex-col gap-2 text-center">
       <p class="font-bold">No saved palettes yet</p>
-      <p class="text-sm">
-        Use the Save Palette button under any palette to keep it here. Saved
-        palettes are stored in this browser.
-      </p>
     </div>
   {:else}
     <ul
@@ -196,6 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Saved palettes"
     >
       {#each palettes as { palette, colors, label, saved } (palette.id)}
+        {@render undoAt(palette.id, true)}
         <li class="flex w-full items-start gap-2">
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
@@ -285,6 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </li>
       {/each}
+      {@render undoAt(null, true)}
     </ul>
   {/if}
 </div>

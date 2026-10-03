@@ -158,7 +158,6 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 </script>
 
 <div class="flex w-full flex-col gap-2 px-4 pb-4 md:min-w-[40rem]">
-  <h2 class="h3 text-center">Trash</h2>
   <p class="text-surface-700-300 text-center text-sm">
     Deleted projects and palettes stay here for {TRASH_DAYS} days, then they're deleted
     for good.

@@ -3,17 +3,19 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { TrashUndos } from '$lib/utils/trash-undo.svelte';
+  import TrashUndo from '$lib/components/TrashUndo.svelte';
   import { browser } from '$app/environment';
   import { resolve } from '$app/paths';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
@@ -24,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
   import { sync, syncLabelFor } from '$lib/sync/status.svelte';
-  import { FolderOpenIcon, Undo2Icon } from '@lucide/svelte';
+  import { FolderOpenIcon } from '@lucide/svelte';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
   // which shows them all under its own heading, with rename and delete
@@ -37,8 +39,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loaded = $state(false);
   let shown = $derived(limit ? projects.slice(0, limit) : projects);
 
-  // A quick undo for the project just moved to the Trash
-  let lastDeleted = $state<{ id: string; label: string } | null>(null);
+  // Quick undos for projects just moved to the Trash, each where it was
+  const undos = new TrashUndos();
+  const undoSpots = $derived(undos.placed(shown.map((project) => project.id)));
 
   const labelFor = (item: StoredProjectIndexItem) =>
     item.meta.name || item.meta.title || 'Untitled Project';
@@ -52,17 +55,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function remove(item: StoredProjectIndexItem) {
-    lastDeleted = { id: item.id, label: labelFor(item) };
+    undos.add(
+      item.id,
+      labelFor(item),
+      shown.map((project) => project.id),
+    );
     await run(
       () => ProjectStorage.moveToTrash(item.id),
       'Unable to delete the project',
     );
   }
 
-  async function undoRemove() {
-    if (!lastDeleted) return;
-    const { id } = lastDeleted;
-    lastDeleted = null;
+  async function undoRemove(id: string) {
+    undos.remove(id);
     await run(
       () => ProjectStorage.restoreFromTrash(id),
       'Unable to restore the project',
@@ -100,21 +105,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-{#if lastDeleted}
-  <div
-    class="card preset-tonal-surface mt-2 flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
-    role="status"
-  >
-    <span class="line-clamp-1">Moved {lastDeleted.label} to the Trash</span>
-    <button
-      type="button"
-      class="btn btn-sm hover:preset-tonal-surface"
-      onclick={undoRemove}
-    >
-      <Undo2Icon />
-      Undo
-    </button>
-  </div>
+{#snippet undoAt(anchor: string | null)}
+  {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
+    <TrashUndo
+      label={entry.label}
+      onundo={() => undoRemove(entry.id)}
+      focus={undos.focusId === entry.id}
+      onfocused={() => (undos.focusId = null)}
+    />
+  {/each}
+{/snippet}
+
+<!-- With nothing left to list, they show on their own -->
+{#if !shown.length && undoSpots.size}
+  <div class="mt-2 flex w-full flex-col gap-2">{@render undoAt(null)}</div>
 {/if}
 
 {#key projects}
@@ -132,6 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex w-full flex-col items-start justify-center gap-2">
         {#each shown as project (project.id)}
           {@const { meta } = project}
+          {@render undoAt(project.id)}
           <ProjectDetails
             project={meta}
             newTab={!onMyProjectsPage}
@@ -145,6 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : undefined}
           />
         {/each}
+        {@render undoAt(null)}
       </div>
       {#if limit}
         <a
@@ -161,10 +167,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {:else if onMyProjectsPage && loaded}
     <div class="my-8 flex w-full flex-col gap-2 text-center">
       <p class="font-bold">No saved projects yet</p>
-      <p class="text-sm">
-        In the Project Planner, press Save to keep a project here. On a small
-        screen, press Project, then Save.
-      </p>
     </div>
   {/if}
 {/key}

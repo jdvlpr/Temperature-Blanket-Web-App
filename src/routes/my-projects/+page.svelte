@@ -140,7 +140,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
           <h2 id="palettes" class="h3">My Yarn Palettes</h2>
           <a href={resolve('/yarn')} class="btn hover:preset-tonal-surface">
             <PlusIcon />
-            Create a Palette
+            New Palette
           </a>
         </div>
         {#if browser}
@@ -178,7 +178,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
               dialog.trigger({
                 type: 'component',
                 component: { ref: Trash },
-                options: { size: 'large' },
+                options: { size: 'large', title: 'Trash' },
               })}
           >
             <Trash2Icon />
