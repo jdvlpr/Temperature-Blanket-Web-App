@@ -15,15 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import ProjectNameField from '$lib/components/ProjectNameField.svelte';
   import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import { extraColorsFromProjectHref } from '$lib/utils/extra-colors-utils';
-  import { MAX_SAVED_PROJECT_NAME_LENGTH } from '$lib/storage/projects.svelte';
   import { escapeHtml, pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
   import SyncIcon from '$lib/components/sync/SyncIcon.svelte';
   import type { SyncLabel } from '$lib/sync/status.svelte';
-  import { CheckIcon, PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
+  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
 
   interface Props {
     project: any;
@@ -118,41 +118,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- A full page load: the planner reads the project from the URL it starts
     with, so arriving by client-side navigation skips the saved weather -->
     {#if editing}
-      <div class="input-group mb-1 grid-cols-[1fr_auto_auto]">
-        <!-- svelte-ignore a11y_autofocus -->
-        <input
-          type="text"
-          class="ig-input"
-          aria-label="Project name"
-          autocomplete="off"
-          autofocus
-          maxlength={MAX_SAVED_PROJECT_NAME_LENGTH}
-          placeholder={title}
+      <div class="mb-1">
+        <ProjectNameField
           bind:value={editingName}
-          onkeydown={(e) => {
-            if (e.key === 'Enter') saveName();
-            if (e.key === 'Escape') {
-              e.stopPropagation();
-              editing = false;
-            }
-          }}
+          placeholder={title}
+          onsave={saveName}
+          oncancel={() => (editing = false)}
         />
-        <button
-          type="button"
-          class="ig-btn hover:preset-tonal-surface"
-          title="Save Name"
-          onclick={saveName}
-        >
-          <CheckIcon />
-        </button>
-        <button
-          type="button"
-          class="ig-btn hover:preset-tonal-surface"
-          title="Cancel"
-          onclick={() => (editing = false)}
-        >
-          <XIcon />
-        </button>
       </div>
     {:else}
       <div class="flex items-start gap-2">
@@ -193,7 +165,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <PencilIcon />
     </button>
   {/if}
-  {#if canRemove}
+  <!-- Not while renaming, which gets the room -->
+  {#if canRemove && !editing}
     <button
       class="btn-icon hover:preset-tonal-surface"
       title="Delete Project"

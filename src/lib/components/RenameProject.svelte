@@ -20,15 +20,13 @@ Projects). The name shows on My Projects instead of the location title, and
 syncs like any other change. -->
 
 <script lang="ts">
+  import ProjectNameField from '$lib/components/ProjectNameField.svelte';
   import { toast } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { renameOpenProject, storedItem } from '$lib/storage/autosave.svelte';
-  import {
-    MAX_SAVED_PROJECT_NAME_LENGTH,
-    savedProjects,
-  } from '$lib/storage/projects.svelte';
-  import { CheckIcon, PencilIcon, XIcon } from '@lucide/svelte';
+  import { savedProjects } from '$lib/storage/projects.svelte';
+  import { PencilIcon } from '@lucide/svelte';
 
   let id = $state<string | null>(null);
   let savedName = $state('');
@@ -66,44 +64,12 @@ syncs like any other change. -->
 </script>
 
 {#if editing && id}
-  <div class="input-group w-full grid-cols-[1fr_auto_auto]">
-    <!-- svelte-ignore a11y_autofocus -->
-    <input
-      type="text"
-      class="ig-input"
-      aria-label="Project name"
-      autocomplete="off"
-      autofocus
-      maxlength={MAX_SAVED_PROJECT_NAME_LENGTH}
-      placeholder={title}
-      bind:value={name}
-      onkeydown={(e) => {
-        if (e.key === 'Enter') save();
-        if (e.key === 'Escape') {
-          e.stopPropagation();
-          editing = false;
-        }
-      }}
-    />
-    <button
-      type="button"
-      class="ig-btn hover:preset-tonal-surface"
-      title="Save Name"
-      aria-label="Save name"
-      onclick={save}
-    >
-      <CheckIcon />
-    </button>
-    <button
-      type="button"
-      class="ig-btn hover:preset-tonal-surface"
-      title="Cancel"
-      aria-label="Cancel renaming"
-      onclick={() => (editing = false)}
-    >
-      <XIcon />
-    </button>
-  </div>
+  <ProjectNameField
+    bind:value={name}
+    placeholder={title}
+    onsave={save}
+    oncancel={() => (editing = false)}
+  />
 {:else}
   <div class="flex items-center gap-1">
     <p
