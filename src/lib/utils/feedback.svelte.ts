@@ -74,19 +74,43 @@ type Tone = {
   /** Seconds */
   duration: number;
   volume: number;
+  /** Seconds to reach full volume; longer is softer, less of a click */
+  attack?: number;
   type?: OscillatorType;
 };
 
 // Short, soft, wooden-ish tones — closer to knitting needles than to a phone notification
 const SOUNDS: Record<FeedbackEvent, Tone[]> = {
+  // Dragging a color: low and soft, as it can sound many times in a row. Kept
+  // above ~300 Hz, which phone speakers barely play
   pickup: [
-    { frequency: 1500, endFrequency: 900, duration: 0.05, volume: 0.06 },
+    {
+      frequency: 760,
+      endFrequency: 480,
+      duration: 0.06,
+      volume: 0.045,
+      attack: 0.012,
+    },
   ],
   tick: [
     // The softest sound: it plays at every spot a dragged color passes
-    { frequency: 1400, endFrequency: 1100, duration: 0.03, volume: 0.025 },
+    {
+      frequency: 640,
+      endFrequency: 520,
+      duration: 0.035,
+      volume: 0.02,
+      attack: 0.008,
+    },
   ],
-  drop: [{ frequency: 900, endFrequency: 520, duration: 0.07, volume: 0.07 }],
+  drop: [
+    {
+      frequency: 520,
+      endFrequency: 320,
+      duration: 0.09,
+      volume: 0.05,
+      attack: 0.012,
+    },
+  ],
   copy: [{ frequency: 1300, endFrequency: 1100, duration: 0.05, volume: 0.04 }],
   success: [
     { frequency: 660, duration: 0.12, volume: 0.05 },
@@ -180,7 +204,10 @@ function playTone(context: AudioContext, tone: Tone) {
     oscillator.frequency.exponentialRampToValueAtTime(tone.endFrequency, end);
   }
   gain.gain.setValueAtTime(0.0001, start);
-  gain.gain.exponentialRampToValueAtTime(tone.volume, start + 0.005);
+  gain.gain.exponentialRampToValueAtTime(
+    tone.volume,
+    start + (tone.attack ?? 0.005),
+  );
   gain.gain.exponentialRampToValueAtTime(0.0001, end);
   oscillator.connect(gain).connect(context.destination);
   oscillator.start(start);
