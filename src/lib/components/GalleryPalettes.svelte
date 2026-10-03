@@ -160,7 +160,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:selectedBrandId={galleryPalettesState.filteredBrandId}
           bind:selectedYarnId={galleryPalettesState.filteredYarnId}
           onselectautocomplete={debouncedSearch}
-          context="modal"
         />
       </div>
 

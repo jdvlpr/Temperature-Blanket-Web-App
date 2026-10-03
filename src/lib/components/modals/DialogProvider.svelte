@@ -434,11 +434,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 // No border on phones, as a native sheet, except a top edge
                 // where more contrast is asked for
                 'card shadow-xl max-sm:max-h-[calc(100%-2rem)] max-sm:rounded-b-none max-sm:border-0 max-sm:contrast-more:border-t',
-                dialog.options.size === 'xlarge'
-                  ? 'w-full lg:max-h-[92svh]'
-                  : 'lg:max-h-[80svh]',
+                dialog.options.size === 'full'
+                  ? 'h-[calc(100%-2rem)] w-full sm:h-[92svh]'
+                  : dialog.options.size === 'xlarge'
+                    ? 'w-full lg:max-h-[92svh]'
+                    : 'lg:max-h-[80svh]',
               ],
-          dialog.options.size === 'xlarge'
+          dialog.options.size === 'xlarge' || dialog.options.size === 'full'
             ? 'max-w-(--breakpoint-xl)'
             : dialog.options.size === 'large'
               ? 'max-w-(--breakpoint-lg)'
@@ -468,7 +470,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div
                 bind:this={dialog.scrollElement}
                 tabindex="-1"
-                class="min-h-0 flex-1 space-y-4 overflow-auto outline-none"
+                class={[
+                  'min-h-0 flex-1 space-y-4 overflow-auto outline-none',
+                  // Its content can fill it
+                  dialog.options.size === 'full' && 'flex flex-col',
+                ]}
               >
                 {#if grabbable || (dialog.type === 'component' && hasHeader)}
                   <!-- The top bar, always in view: on phones the sheet's grab bar,
@@ -557,7 +563,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#key dialog.contentComponent.ref}
                       <!-- Opened from the panel, or back to it: slides in from
                     the way it went -->
-                      <div in:fly={viewFly}>
+                      <div
+                        in:fly={viewFly}
+                        class={[
+                          dialog.options.size === 'full' &&
+                            'flex min-h-0 flex-1 flex-col',
+                        ]}
+                      >
                         <dialog.contentComponent.ref
                           {...dialog.contentComponent.props ?? {}}
                         />

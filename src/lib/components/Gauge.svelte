@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         dialog.trigger({
           type: 'component',
           component: { ref: ChooseColorways, props: { updateGauge } },
-          options: { size: 'large', title: 'Choose Colorways' },
+          options: { size: 'full', title: 'Choose Colorways' },
         });
         break;
       case 'image':

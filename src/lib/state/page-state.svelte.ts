@@ -27,9 +27,10 @@ import { tick } from 'svelte';
 
 type DialogOptions = {
   showCloseButton?: boolean;
-  /** `xlarge`: wide and tall on large screens, for work like the image
-   * color picker */
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  /** `xlarge`: wide and tall on large screens. `full`: as wide, and always
+   * that tall (the whole sheet on phones), whatever's in it, for work like the
+   * image color picker; its content can grow to fill it (`flex-1`) */
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | 'full';
   /** `side`: a panel on the right on large screens, as the Project menu */
   placement?: 'center' | 'side';
   /** Dialogs opened from this one open in its place, with a Back button to it */

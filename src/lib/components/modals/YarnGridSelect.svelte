@@ -355,7 +355,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
   >
     <SelectYarn
-      context="modal"
       bind:selectedBrandId
       bind:selectedYarnId
       {selectedYarnWeightId}

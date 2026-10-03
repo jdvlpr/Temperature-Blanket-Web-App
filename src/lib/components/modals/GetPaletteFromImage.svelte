@@ -142,7 +142,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // dialog widens to make room for the photo
   $effect(() => {
     dialog.backAction = step === 'editor' ? () => (step = 'start') : null;
-    dialog.options.size = step === 'editor' ? 'xlarge' : 'medium';
+    dialog.options.size = step === 'editor' ? 'full' : 'medium';
   });
 
   // A photo that couldn't load leaves nothing to edit
@@ -206,6 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   role="region"
   aria-label="Get colors from an image"
+  class={[step === 'editor' && 'flex min-h-0 flex-1 flex-col']}
   ondragover={(e) => {
     if (!e.dataTransfer?.types.includes('Files')) return;
     e.preventDefault();
@@ -303,7 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
   {:else}
-    <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
+    <div class="flex min-h-0 flex-1 flex-col">
       <div class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4">
         <!-- Isolated so the photo's markers stay under the palette bar -->
         <section class="isolate flex min-h-0 min-w-0 flex-1 flex-col gap-2">
@@ -507,8 +508,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {#if palette.yarnReady && palette.mode === 'yarn'}
                         <div class="flex flex-col gap-2 px-4 pb-3">
                           <SelectYarn
-                            context="modal"
-                            listInline
                             bind:selectedBrandId={palette.selectedBrandId}
                             bind:selectedYarnId={palette.selectedYarnId}
                             onselectautocomplete={onYarnFilterChange}

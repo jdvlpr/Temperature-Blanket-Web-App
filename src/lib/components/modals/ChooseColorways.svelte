@@ -53,7 +53,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div bind:this={container} class="p-2">
+<!-- Grows, keeping the footer at the bottom of the dialog -->
+<div bind:this={container} class="flex-1 p-2">
   <YarnGridSelect
     bind:selectedColors
     bind:selectedBrandId

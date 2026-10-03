@@ -372,7 +372,6 @@ site does -->
                   </p>
                   {#key yarnPickerKey}
                     <SelectYarn
-                      context="modal"
                       onselectautocomplete={({
                         selectedBrandId,
                         selectedYarnId,
