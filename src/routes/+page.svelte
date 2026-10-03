@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Previews from '$lib/components/Previews.svelte';
+  import WeatherSearchOverlay from '$lib/components/WeatherSearchOverlay.svelte';
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
@@ -381,3 +382,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Navigation />
   {/snippet}
 </AppShell>
+
+<WeatherSearchOverlay />

@@ -318,7 +318,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else if status === 'signed-out'}
         <div class="flex flex-col gap-2 px-2 py-4 text-center">
           <h2 class="h1 text-gradient mb-0">Account</h2>
-          <p>You’re not signed in.</p>
           <p class="text-sm opacity-80">
             Sign in to save your projects and pick them up on any device.
           </p>
