@@ -73,6 +73,7 @@ button to it. -->
   import ExportOptions from './ExportOptions.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
 
   const ROW = PANEL_ROW;
   const LINK = 'hover:underline opacity-80 hover:opacity-100';
@@ -383,7 +384,7 @@ button to it. -->
               <span class="flex flex-1 flex-col">
                 <span>Save a Copy</span>
                 <span class="text-xs opacity-70"
-                  >A new project from this one, which stays as it is</span
+                  >A new project from this one</span
                 >
               </span>
             </button>
@@ -436,6 +437,8 @@ button to it. -->
       </h2>
       <ul class={PANEL_LIST}>
         {#each recent as item (item.id)}
+          {@const itemColors =
+            getColorsFromInput({ string: item.meta.href }) || []}
           <li>
             <!-- eslint-disable svelte/no-navigation-without-resolve -- the saved project's address -->
             <a
@@ -452,6 +455,19 @@ button to it. -->
                     'Untitled Project'}</span
                 >
                 <span class="text-xs opacity-70">Saved {item.meta.date}</span>
+                <!-- Its gauge colors, as on My Projects; just a picture here,
+                inside the link -->
+                {#if itemColors.length}
+                  <span
+                    class="rounded-container mt-1.5 flex h-4 w-full overflow-hidden"
+                    aria-hidden="true"
+                  >
+                    {#each itemColors as color, i (i)}
+                      <span class="flex-1" style="background:{color.hex}"
+                      ></span>
+                    {/each}
+                  </span>
+                {/if}
               </span>
               <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
             </a>
@@ -463,7 +479,7 @@ button to it. -->
             <FolderOpenIcon class="shrink-0 opacity-70" />
             <span class="flex-1"
               >{recentTotal > recent.length
-                ? `All ${recentTotal} Projects`
+                ? `All ${recentTotal} ${pluralize('Project', recentTotal)}`
                 : 'My Projects'}</span
             >
           </a>
@@ -474,7 +490,7 @@ button to it. -->
 
   <!-- Help, in one line: the site menu has the rest -->
   <nav
-    class="border-surface-200-800 flex flex-wrap gap-x-4 gap-y-1 border-t pt-4 text-sm"
+    class="border-surface-200-800 flex flex-wrap gap-x-4 gap-y-2 border-t pt-4"
     aria-label="Help"
   >
     <button
@@ -483,17 +499,17 @@ button to it. -->
       onclick={() => open(GettingStarted, 'Getting Started')}
       >Getting Started</button
     >
-    <a href={resolve('/documentation')} target="_blank" class={LINK}
-      >Documentation <ExternalLinkIcon class={LINK_ICON} /></a
-    >
-    <a href={resolve('/faq')} target="_blank" class={LINK}
-      >FAQ <ExternalLinkIcon class={LINK_ICON} /></a
-    >
     <button
       type="button"
       class={LINK}
       onclick={() => open(KeyboardShortcuts, 'Keyboard Shortcuts')}
       >Keyboard Shortcuts</button
+    >
+    <a href={resolve('/faq')} target="_blank" class={LINK}
+      >FAQ <ExternalLinkIcon class={LINK_ICON} /></a
+    >
+    <a href={resolve('/documentation')} target="_blank" class={LINK}
+      >Documentation <ExternalLinkIcon class={LINK_ICON} /></a
     >
     <a href={resolve('/contact')} target="_blank" class={LINK}
       >Contact <ExternalLinkIcon class={LINK_ICON} /></a
