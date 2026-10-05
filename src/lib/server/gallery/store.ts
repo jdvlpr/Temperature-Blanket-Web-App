@@ -180,7 +180,8 @@ export async function getSettings(
 ): Promise<GalleryOwnerSettings> {
   const row = await db
     .prepare(
-      `select "showOwnerDefault", "removeOnDelete", "publicId" from "galleryOwner" where "userId" = ?`,
+      // The column kept its old name (migration 0009)
+      `select "showName" as "showOwnerDefault", "removeOnDelete", "publicId" from "galleryOwner" where "userId" = ?`,
     )
     .bind(userId)
     .first<{
@@ -210,9 +211,9 @@ export async function updateSettings(
   const settings = { ...current, ...changes };
   await db
     .prepare(
-      `insert into "galleryOwner" ("userId", "showOwnerDefault", "removeOnDelete")
+      `insert into "galleryOwner" ("userId", "showName", "removeOnDelete")
        values (?, ?, ?)
-       on conflict ("userId") do update set "showOwnerDefault" = excluded."showOwnerDefault",
+       on conflict ("userId") do update set "showName" = excluded."showName",
          "removeOnDelete" = excluded."removeOnDelete"`,
     )
     .bind(

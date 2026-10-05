@@ -83,7 +83,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: ImageIcon,
-                text: `A project's name, if you've given it one on My Projects, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. Visits to project pages now count toward Popular.`,
+                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. Visits to project pages now count toward Popular.`,
                 title: 'Project Gallery',
               },
               {

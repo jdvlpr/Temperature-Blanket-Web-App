@@ -184,10 +184,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Project names in the gallery</p>
             <p>
-              If you've named a project on My Projects, its name now shows in
-              the gallery, above its locations and dates. This works whether or
-              not you're signed in. Gallery pages are public, so pick a name
-              you're happy for anyone to see.
+              If you've named a project, its name now shows in the gallery,
+              above its locations and dates. This works whether or not you're
+              signed in. Gallery pages are public, so pick a name you're happy
+              for anyone to see.
             </p>
 
             <p class="font-bold">Removing what you've shared</p>

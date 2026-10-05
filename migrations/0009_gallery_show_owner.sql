@@ -7,6 +7,6 @@ alter table "galleryPost" add column "showOwner" integer not null default 0;
 update "galleryPost" set "showOwner" = 1
 where "userId" in (select "userId" from "galleryOwner" where "showName" = 1);
 
--- The account-wide choice becomes the starting choice for the next page: the
--- last one the owner made
-alter table "galleryOwner" rename column "showName" to "showOwnerDefault";
+-- "galleryOwner"."showName" now means the starting choice for the next page:
+-- the last one the owner made (showOwnerDefault in the code). Not renamed, so
+-- code from before this migration keeps working on a shared database.
