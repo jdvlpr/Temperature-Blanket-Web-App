@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // One project in the account's Trash: its data, to show or restore it, or
-// deleting it for good.
+// deleting it forever.
 
 import { SYNC_HEADERS } from '$lib/sync/protocol';
 import type { RequestHandler } from './$types';

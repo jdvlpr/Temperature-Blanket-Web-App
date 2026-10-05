@@ -122,7 +122,7 @@ test.describe('My Projects', () => {
     await page.keyboard.press('Escape');
     await expect(named).toBeVisible();
 
-    // Delete it for good, after confirming
+    // Delete it forever, after confirming
     await page.getByRole('button', { name: 'Delete Gift Blanket' }).click();
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     trash = page.getByRole('dialog');

@@ -32,7 +32,7 @@ export const GET: RequestHandler = async (event) => {
   return Response.json({ projects }, { headers: NO_STORE });
 };
 
-/** Empty Trash: deletes everything in it for good, in one request. */
+/** Empty Trash: deletes everything in it forever, in one request. */
 export const DELETE: RequestHandler = async (event) => {
   const { requireSync } = await import('$lib/server/sync');
   const { purgeTrash } = await import('$lib/server/sync/store');

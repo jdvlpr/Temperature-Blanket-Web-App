@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Deleted projects and palettes, in a dialog from the My Projects page:
-restore them, or delete them for good. Each is deleted for good after
+restore them, or delete them forever. Each is deleted forever after
 TRASH_DAYS anyway. Signed in, it's the account's Trash: what was deleted on any
 device, restored everywhere (see $lib/storage/account-trash). -->
 
@@ -46,6 +46,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     NotebookPenIcon,
     SwatchBookIcon,
     Trash2Icon,
+    XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -62,7 +63,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
   let trashedProjects = $state<ProjectTrashEntry[]>([]);
   // Links of projects only the account has, once downloaded, for their colors
   let downloadedHrefs = $state<Record<string, string>>({});
-  // `${kind}:${id}` of the entry asking to be deleted for good, or 'all'
+  // `${kind}:${id}` of the entry asking to be deleted forever, or 'all'
   let confirming = $state<string | null>(null);
 
   let entries = $derived.by((): Entry[] => {
@@ -159,8 +160,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 
 <div class="flex w-full flex-col gap-2 px-4 pb-4 md:min-w-[40rem]">
   <p class="text-surface-700-300 text-center text-sm">
-    Deleted projects and palettes stay here for {TRASH_DAYS} days, then they're deleted
-    for good.
+    Deleted projects and palettes stay here for {TRASH_DAYS} days before they're permanently removed.
   </p>
 
   {#if !entries.length}
@@ -188,7 +188,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
           />
           {#if confirming === key}
             <div class="flex flex-wrap items-center gap-2" role="group">
-              <span class="text-sm">Delete {entry.label} for good?</span>
+              <span class="text-sm">This action cannot be undone.</span>
               <button
                 type="button"
                 class="btn preset-filled-error-500"
@@ -202,6 +202,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
                 class="btn hover:preset-tonal-surface"
                 onclick={() => (confirming = null)}
               >
+                  <XIcon/>
                 Cancel
               </button>
             </div>
@@ -234,7 +235,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     {#if confirming === 'all'}
       <div class="mt-4 flex flex-wrap items-center gap-2" role="group">
         <span class="text-sm"
-          >Delete everything in the Trash for good? This can't be undone.</span
+          >Delete everything in the Trash forever? This can't be undone.</span
         >
         <button
           type="button"

@@ -108,7 +108,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
     >
       <p class="text-surface-700-300 text-center text-sm">
         {#if synced}
-          Your projects, yarn palettes, and Trash are saved to your account and
+          Your projects and yarn palettes are saved to your account and
           show up on every device where you're signed in.
         {:else}
           Your saved projects and yarn palettes are stored in this browser, so
@@ -123,7 +123,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
           class="bg-surface-100-900 rounded-container flex flex-col items-center gap-3 p-4 text-center"
         >
           <p class="text-sm">
-            <span class="font-bold">Accounts (Beta).</span> Sign in to keep your
+            Sign in to keep your
             projects and yarn palettes on all your devices.
           </p>
           <a href={resolve('/account')} class="btn preset-filled-primary-500">

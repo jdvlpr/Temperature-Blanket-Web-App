@@ -276,7 +276,7 @@ test.describe('Sync in the browser', () => {
     await expect.poll(async () => (await savedIndex(phone)).length).toBe(1);
 
     // Deleted again on the phone (which keeps a copy in its own Trash), then
-    // deleted for good on the laptop: the phone's copy doesn't bring it back
+    // deleted forever on the laptop: the phone's copy doesn't bring it back
     await phone.goto('/my-projects');
     await phone.getByRole('button', { name: 'Delete Doomed' }).click();
     await expect.poll(() => serverProjectIds(phone)).toEqual([]);
