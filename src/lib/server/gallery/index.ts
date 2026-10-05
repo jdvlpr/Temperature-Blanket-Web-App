@@ -25,10 +25,13 @@ import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import {
   countPalettesSince,
+  ensurePublicId,
   forgetPost,
   getSettings,
   listPosts,
   recordPost,
+  updateSettings,
+  type GalleryPost,
   type GallerySettings,
 } from './store';
 import { galleryApi, type GalleryApi } from './wordpress';
@@ -105,6 +108,21 @@ export function projectIdFromLink(projectUrl: unknown): string | null {
 }
 
 /**
+ * Records a page published from the account, with whether it's included on the
+ * owner's public gallery, and remembers that choice as the next page's default.
+ */
+async function recordPublished(
+  gallery: GalleryContext,
+  post: GalleryPost & { showOwner: boolean },
+) {
+  await recordPost(gallery.db, gallery.userId, post);
+  await updateSettings(gallery.db, gallery.userId, {
+    showOwnerDefault: post.showOwner,
+  });
+  if (post.showOwner) await ensurePublicId(gallery.db, gallery.userId);
+}
+
+/**
  * Publishes the browser's gallery payload (as sent to /api/project) as this user.
  * Ownership comes from the session, so the project needn't be saved to the
  * account; its ID (?project=) is kept to tie the page to it. WordPress's own answers
@@ -114,9 +132,14 @@ export function projectIdFromLink(projectUrl: unknown): string | null {
 export async function publishFromAccount(
   gallery: GalleryContext,
   payloadText: string,
+  { showOwner = false } = {},
   now = Date.now(),
 ): Promise<Response> {
-  let payload: { project_url?: unknown; title?: unknown };
+  let payload: {
+    project_url?: unknown;
+    title?: unknown;
+    project_name?: unknown;
+  };
   try {
     payload = JSON.parse(payloadText);
   } catch {
@@ -135,15 +158,17 @@ export async function publishFromAccount(
       console.error('Gallery publish returned no post ID');
       return json({ ...response, linked: false });
     }
+    // The project's name when it has one, as the gallery shows it
     const title =
-      typeof payload.title === 'string' && payload.title.trim()
-        ? payload.title.trim().slice(0, MAX_TITLE_LENGTH)
-        : 'Untitled project';
-    await recordPost(gallery.db, gallery.userId, {
+      cleanName(payload.project_name, MAX_TITLE_LENGTH) ||
+      cleanName(payload.title, MAX_TITLE_LENGTH) ||
+      'Untitled project';
+    await recordPublished(gallery, {
       postId: response.id,
       projectId,
       title,
       publishedAt: now,
+      showOwner,
     });
     return json({ ...response, linked: true });
   }
@@ -166,7 +191,7 @@ export function paletteLink(value: unknown, origin: string): string | null {
 
 /**
  * Shares a saved palette to the gallery as this user, from
- * { paletteId, title, yarnUrl }. Accounts only: WordPress's palette route
+ * { paletteId, title, yarnUrl, showOwner }. Accounts only: WordPress's palette route
  * needs the owner. Its answers (400, 409 already shared, 500) come back with
  * status 200, as for projects, adding `linked: true` once recorded.
  */
@@ -206,13 +231,14 @@ export async function publishPaletteFromAccount(
     gallery.userId,
   );
   if (Number(response.code) === 200 && typeof response.id === 'number') {
-    await recordPost(gallery.db, gallery.userId, {
+    await recordPublished(gallery, {
       postId: response.id,
       projectId: paletteId,
       title,
       publishedAt: now,
       kind: 'palette',
       link: yarnUrl,
+      showOwner: input.showOwner === true,
     });
     return json({ ...response, linked: true });
   }

@@ -28,7 +28,11 @@ import {
   getTitleFromLocationsMeta,
 } from '$lib/utils/project-utils.svelte';
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
-import { escapeHtml, pluralize } from '$lib/utils/string-utils';
+import {
+  decodeHtmlEntities,
+  escapeHtml,
+  pluralize,
+} from '$lib/utils/string-utils';
 import { getBrands } from '$lib/data/yarns/colorways.svelte';
 import { hexToOklab } from '$lib/features/image-palette/color-space';
 import {
@@ -853,6 +857,8 @@ type GallerySharedPaletteSummary = {
 
 type GalleryProjectSummary = {
   __typename?: 'Project';
+  /** The name the project was given, if any */
+  projectName?: string | null;
   projectUrl: string;
   yarnUrls: string;
   locations: string;
@@ -861,22 +867,27 @@ type GalleryProjectSummary = {
 
 export type GalleryPalette = {
   colors: Color[];
-  /** The project it came from; null for a palette shared on its own */
-  projectId: string | number | null;
+  /** The gallery post it came from (a project, or a palette shared on its own), for counting views */
+  postId: string | number;
   schemeName: string;
 };
+
+const EXTERNAL_LINK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
 
 export const getPalettesFromProjects = ({
   projects,
   selectedBrandId = '',
   selectedYarnId = '',
   palettesContainOnlyFilteredYarn = false,
+  minColors = 0,
 }: {
   /** Projects, and palettes shared on their own */
   projects: (GalleryProjectSummary | GallerySharedPaletteSummary)[];
   selectedBrandId?: string;
   selectedYarnId?: string;
   palettesContainOnlyFilteredYarn?: boolean;
+  /** Leave out palettes with this many colors or fewer */
+  minColors?: number;
 }): GalleryPalette[] => {
   if (!projects.length) return [];
   let _palettes: GalleryPalette[] = [];
@@ -938,7 +949,8 @@ export const getPalettesFromProjects = ({
         someColorsAreYarn &&
         isUniquePalette &&
         hasSelectedBrandAndYarn &&
-        colors
+        colors &&
+        colors.length > minColors
       ) {
         let schemeName =
           "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
@@ -958,22 +970,24 @@ export const getPalettesFromProjects = ({
         }
         schemeName += '</p>'; // end line-clamp-1
 
-        // A shared palette has a name and no project page: the card itself
-        // opens it in the Yarn Palette Creator
+        // The card itself opens the colors in the Yarn Palette Creator; the
+        // link opens the palette's or project's gallery page. Names are
+        // anyone's text, so they're escaped
+        const id = Number(project.databaseId);
         if (sharedPalette)
-          schemeName += `<span class="line-clamp-1 font-semibold">${escapeHtml(sharedPalette.title)}</span>`;
-        else
-          schemeName += `<a href="/gallery/${
-            project.databaseId
-          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-<span class="whitespace-pre-wrap">${getTitleFromLocationsMeta((project as GalleryProjectSummary).locations)} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+          schemeName += `<a href="/gallery/palette/${id}" target="_blank" rel="noreferrer" class="underline line-clamp-1 font-semibold" title="Open Palette Page" onclick="event.stopPropagation()">${EXTERNAL_LINK_ICON}
+<span class="whitespace-pre-wrap">${escapeHtml(decodeHtmlEntities(sharedPalette.title))}</span></a>`;
+        else {
+          const { projectName, locations } = project as GalleryProjectSummary;
+          const title = projectName
+            ? escapeHtml(projectName)
+            : getTitleFromLocationsMeta(locations);
+          schemeName += `<a href="/gallery/${id}" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()">${EXTERNAL_LINK_ICON}
+<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+        }
         schemeName += '</div>';
 
-        _palettes.push({
-          colors,
-          projectId: sharedPalette ? null : project.databaseId,
-          schemeName,
-        });
+        _palettes.push({ colors, postId: id, schemeName });
       }
     });
   });

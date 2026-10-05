@@ -135,10 +135,16 @@ async function galleryPages(
     return {
       settings,
       pages: posts.map((post) => ({
+        kind: post.kind ?? 'project',
         title: post.title,
-        url: `${origin}/gallery/${post.postId}`,
+        url:
+          post.kind === 'palette'
+            ? `${origin}/gallery/palette/${post.postId}`
+            : `${origin}/gallery/${post.postId}`,
         projectId: post.projectId,
         publishedAt: new Date(post.publishedAt).toISOString(),
+        // Shown with the account's display name, on its public gallery page
+        onPublicGallery: post.showOwner ?? false,
       })),
     };
   } catch (e) {

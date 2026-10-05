@@ -15,7 +15,8 @@
 
 // The signed-in user's gallery pages: list them with the gallery settings and
 // whether publishing is on (GET),
-// publish one (POST, the same payload as /api/project) or change settings (PATCH).
+// publish one (POST, the same payload as /api/project, with ?showOwner=true to
+// include it on the owner's public gallery) or change settings (PATCH).
 
 import type { RequestHandler } from './$types';
 
@@ -48,7 +49,11 @@ export const POST: RequestHandler = async (event) => {
   const gallery = await requireGallery(event, { publishing: true });
   if (gallery instanceof Response) return gallery;
 
-  return publishFromAccount(gallery, await event.request.text());
+  // In the URL, so the payload goes to WordPress exactly as the browser sent it
+  const showOwner = event.url.searchParams.get('showOwner') === 'true';
+  return publishFromAccount(gallery, await event.request.text(), {
+    showOwner,
+  });
 };
 
 export const PATCH: RequestHandler = async (event) => {
@@ -58,8 +63,8 @@ export const PATCH: RequestHandler = async (event) => {
   if (gallery instanceof Response) return gallery;
 
   const body = await event.request.json().catch(() => null);
-  const changes: { showName?: boolean; removeOnDelete?: boolean } = {};
-  for (const key of ['showName', 'removeOnDelete'] as const)
+  const changes: { showOwnerDefault?: boolean; removeOnDelete?: boolean } = {};
+  for (const key of ['showOwnerDefault', 'removeOnDelete'] as const)
     if (typeof body?.[key] === 'boolean') changes[key] = body[key];
   if (!Object.keys(changes).length)
     return galleryError(400, 'INVALID_REQUEST', 'Nothing to change');

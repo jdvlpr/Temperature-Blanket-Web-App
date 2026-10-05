@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
   import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
   import DisplayName from '$lib/components/account/DisplayName.svelte';
-  import GalleryNameSetting from '$lib/components/account/GalleryNameSetting.svelte';
+  import GalleryProfileLink from '$lib/components/account/GalleryProfileLink.svelte';
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
   import { getGalleryPages } from '$lib/accounts/gallery';
@@ -202,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   rememberAccountSummary(user);
                 }}
               />
-              <GalleryNameSetting name={user.name} />
+              <GalleryProfileLink name={user.name} />
               <ChangeEmail
                 email={user.email}
                 onchanged={(newEmail) => {
@@ -327,12 +327,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Accounts were
             <a href={resolve('/blog/2026-09-28-accounts-beta')} class="link"
               >recently announced</a
-              > and are currently in beta; if something doesn't work as expected, please
+            >
+            and are currently in beta; if something doesn't work as expected,
+            please
             <a href={resolve('/contact')} class="link">get in touch</a>.
           </p>
         </div>
         <SignInCard onsignedin={showSignedIn} />
-
       {:else}
         <div class="flex flex-col gap-2 px-2 py-4 text-center">
           <h2 class="h1 text-gradient mb-0">Account</h2>

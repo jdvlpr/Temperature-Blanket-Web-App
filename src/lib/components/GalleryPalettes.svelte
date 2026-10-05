@@ -237,12 +237,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
     <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
-      {#each galleryPalettesState.palettes as { colors, schemeName, projectId }}
+      {#each galleryPalettesState.palettes as { colors, schemeName, postId }}
         <button
           type="button"
           class="w-full cursor-pointer"
           onclick={() => {
-            if (projectId) recordPageView(projectId);
+            recordPageView(postId);
             updateGauge({
               _colors: colors,
               _schemeId: 'Custom',

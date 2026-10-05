@@ -1591,7 +1591,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               To keep a palette to use again later, press Save & Export under
               the palette, then Save Palette. You can give it a name, or leave
               the name empty to use its yarn and number of colors. Saved
-              palettes are stored in this browser.
+              palettes are stored in this browser{#if __ACCOUNTS_ENABLED__}, or
+                in your account while you’re signed in, so they show up on your
+                other devices too{/if}.
             </p>
             <p>
               To use a saved palette, press Get Colors, then Browse Palettes,

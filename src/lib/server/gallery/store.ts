@@ -30,17 +30,22 @@ export type GalleryPost = {
   kind?: GalleryPostKind;
   /** A palette's Yarn Palette Creator link */
   link?: string | null;
+  /**
+   * Included on the owner's public gallery: the page says "By" and the owner's
+   * display name, and their owner page lists it (migration 0009)
+   */
+  showOwner?: boolean;
 };
 
 export type GallerySettings = {
-  /** Show the account's display name on its gallery pages */
-  showName: boolean;
+  /** Whether the next page starts out included on the owner's public gallery: their last choice */
+  showOwnerDefault: boolean;
   /** When the account is deleted, remove its gallery pages instead of keeping them */
   removeOnDelete: boolean;
 };
 
 const DEFAULT_SETTINGS: GallerySettings = {
-  showName: false,
+  showOwnerDefault: false,
   removeOnDelete: false,
 };
 
@@ -51,8 +56,8 @@ export async function recordPost(
 ) {
   await db
     .prepare(
-      `insert or ignore into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt", "kind", "link")
-       values (?, ?, ?, ?, ?, ?, ?)`,
+      `insert or ignore into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt", "kind", "link", "showOwner")
+       values (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       post.postId,
@@ -62,6 +67,7 @@ export async function recordPost(
       post.publishedAt,
       post.kind ?? 'project',
       post.link ?? null,
+      Number(post.showOwner ?? false),
     )
     .run();
 }
@@ -73,12 +79,33 @@ export async function listPosts(
 ): Promise<GalleryPost[]> {
   const { results } = await db
     .prepare(
-      `select "postId", "projectId", "title", "publishedAt", "kind", "link" from "galleryPost"
+      `select "postId", "projectId", "title", "publishedAt", "kind", "link", "showOwner" from "galleryPost"
        where "userId" = ? order by "publishedAt" desc`,
     )
     .bind(userId)
-    .all<GalleryPost>();
-  return results;
+    .all<Omit<GalleryPost, 'showOwner'> & { showOwner: number }>();
+  return results.map((post) => ({ ...post, showOwner: post.showOwner === 1 }));
+}
+
+/**
+ * Includes one of the user's pages on their public gallery, or takes it off.
+ * False when the user has no such page.
+ */
+export async function setPostShowOwner(
+  db: D1Database,
+  userId: string,
+  postId: number,
+  showOwner: boolean,
+): Promise<boolean> {
+  const { meta } = await db
+    .prepare(
+      `update "galleryPost" set "showOwner" = ? where "postId" = ? and "userId" = ?`,
+    )
+    .bind(Number(showOwner), postId, userId)
+    .run();
+  if (!meta.changes) return false;
+  if (showOwner) await ensurePublicId(db, userId);
+  return true;
 }
 
 /** Whether this user published this page from their account. */
@@ -123,7 +150,7 @@ export async function forgetPost(
     .run();
 }
 
-/** The settings, and the owner page's ID once they've shown their name. */
+/** The settings, and the owner page's ID once a page has shown their name. */
 export type GalleryOwnerSettings = GallerySettings & {
   publicId: string | null;
 };
@@ -153,17 +180,17 @@ export async function getSettings(
 ): Promise<GalleryOwnerSettings> {
   const row = await db
     .prepare(
-      `select "showName", "removeOnDelete", "publicId" from "galleryOwner" where "userId" = ?`,
+      `select "showOwnerDefault", "removeOnDelete", "publicId" from "galleryOwner" where "userId" = ?`,
     )
     .bind(userId)
     .first<{
-      showName: number;
+      showOwnerDefault: number;
       removeOnDelete: number;
       publicId: string | null;
     }>();
   return row
     ? {
-        showName: row.showName === 1,
+        showOwnerDefault: row.showOwnerDefault === 1,
         removeOnDelete: row.removeOnDelete === 1,
         publicId: row.publicId,
       }
@@ -171,8 +198,8 @@ export async function getSettings(
 }
 
 /**
- * Changes the settings given; the rest keep their current values. Showing the
- * name for the first time gives the owner a page ID, which then never changes.
+ * Changes the settings given; the rest keep their current values. The owner
+ * page ID is kept as it is: see ensurePublicId.
  */
 export async function updateSettings(
   db: D1Database,
@@ -181,36 +208,50 @@ export async function updateSettings(
 ): Promise<GalleryOwnerSettings> {
   const current = await getSettings(db, userId);
   const settings = { ...current, ...changes };
-  if (settings.showName && !settings.publicId)
-    settings.publicId = newPublicId();
   await db
     .prepare(
-      `insert into "galleryOwner" ("userId", "showName", "removeOnDelete", "publicId")
-       values (?, ?, ?, ?)
-       on conflict ("userId") do update set "showName" = excluded."showName",
-         "removeOnDelete" = excluded."removeOnDelete",
-         "publicId" = coalesce("galleryOwner"."publicId", excluded."publicId")`,
+      `insert into "galleryOwner" ("userId", "showOwnerDefault", "removeOnDelete")
+       values (?, ?, ?)
+       on conflict ("userId") do update set "showOwnerDefault" = excluded."showOwnerDefault",
+         "removeOnDelete" = excluded."removeOnDelete"`,
     )
     .bind(
       userId,
-      Number(settings.showName),
+      Number(settings.showOwnerDefault),
       Number(settings.removeOnDelete),
-      settings.publicId,
     )
     .run();
   return settings;
 }
 
+/**
+ * The owner page's ID, made the first time a page is included on the owner's
+ * public gallery. It never changes after that, so links to it keep working.
+ */
+export async function ensurePublicId(
+  db: D1Database,
+  userId: string,
+): Promise<string> {
+  await db
+    .prepare(
+      `insert into "galleryOwner" ("userId", "publicId") values (?, ?)
+       on conflict ("userId") do update set
+         "publicId" = coalesce("galleryOwner"."publicId", excluded."publicId")`,
+    )
+    .bind(userId, newPublicId())
+    .run();
+  return (await getSettings(db, userId)).publicId!;
+}
+
 export type GalleryOwner = { name: string; publicId: string };
 
-// Only owners who chose to show their name and have one
-const SHOWN_OWNER = `"galleryOwner"."showName" = 1
-  and "galleryOwner"."publicId" is not null and trim("user"."name") != ''`;
+// Owners with an owner page and a name to show
+const NAMED_OWNER = `"galleryOwner"."publicId" is not null and trim("user"."name") != ''`;
 
 /**
- * Who published a gallery page, when they chose to show their name: null for
- * anonymous pages and owners who haven't. Read at render time, so a rename
- * updates every page.
+ * Who published a gallery page, when it's included on their public gallery:
+ * null for anonymous pages, pages not included and owners without a display
+ * name. Read at render time, so a rename updates every page.
  */
 export async function ownerForPost(
   db: D1Database,
@@ -222,14 +263,17 @@ export async function ownerForPost(
        from "galleryPost"
        join "galleryOwner" on "galleryOwner"."userId" = "galleryPost"."userId"
        join "user" on "user"."id" = "galleryPost"."userId"
-       where "galleryPost"."postId" = ? and ${SHOWN_OWNER}`,
+       where "galleryPost"."postId" = ? and "galleryPost"."showOwner" = 1 and ${NAMED_OWNER}`,
     )
     .bind(postId)
     .first<GalleryOwner>();
   return row ? { name: row.name.trim(), publicId: row.publicId } : null;
 }
 
-/** An owner's page: their name and gallery pages (projects and palettes), newest first, or null. */
+/**
+ * An owner's page: their name and the gallery pages (projects and palettes)
+ * included on it, newest first, or null when there are none to show.
+ */
 export async function ownerPage(
   db: D1Database,
   publicId: string,
@@ -242,12 +286,13 @@ export async function ownerPage(
     .prepare(
       `select "user"."id" as "userId", "user"."name" as "name" from "galleryOwner"
        join "user" on "user"."id" = "galleryOwner"."userId"
-       where "galleryOwner"."publicId" = ? and ${SHOWN_OWNER}`,
+       where "galleryOwner"."publicId" = ? and ${NAMED_OWNER}`,
     )
     .bind(publicId)
     .first<{ userId: string; name: string }>();
   if (!owner) return null;
-  const posts = await listPosts(db, owner.userId);
+  const posts = (await listPosts(db, owner.userId)).filter((p) => p.showOwner);
+  if (!posts.length) return null;
   const ids = (kind: GalleryPostKind) =>
     posts.filter((p) => (p.kind ?? 'project') === kind).map((p) => p.postId);
   return {

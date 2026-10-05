@@ -15,6 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
+  import { account } from '$lib/accounts/summary.svelte';
+  import { sync } from '$lib/sync/status.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
   import {
@@ -77,7 +79,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <p class="text-sm opacity-68">
-    Saved palettes are stored in this browser.
+    {#if __ACCOUNTS_ENABLED__ && account.summary && sync.active}
+      Saved palettes are kept in your account, so they show up on every device
+      where you’re signed in.
+    {:else}
+      Saved palettes are stored in this browser.
+    {/if}
   </p>
 
   <SaveAndCloseButtons

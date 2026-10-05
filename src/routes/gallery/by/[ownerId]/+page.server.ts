@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// An owner's gallery pages, for owners who chose to show their name. The list
+// An owner's gallery pages: those they included on their public gallery. The list
 // comes from D1; titles and images from the gallery, which leaves out any page
 // that's been removed there.
 
-import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-import type {
-  GalleryProjectNode,
-  GallerySharedPaletteNode,
+import {
+  queryGallery,
+  type GalleryProjectNode,
+  type GallerySharedPaletteNode,
 } from '$lib/utils/gallery-utils';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -32,7 +32,7 @@ const MAX_PAGES = 100;
 
 export type OwnerProject = Pick<
   GalleryProjectNode,
-  'databaseId' | 'locations' | 'featuredImage'
+  'databaseId' | 'locations' | 'featuredImage' | 'projectName'
 >;
 
 export type OwnerPalette = Pick<
@@ -69,14 +69,12 @@ export const load: PageServerLoad = async (event) => {
 /** The gallery's published projects among these IDs, newest first; null if it can't be reached. */
 async function fetchProjects(ids: number[]): Promise<OwnerProject[] | null> {
   try {
-    const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `query OWNER_PROJECTS($ids: [ID]) {
+    const { response, result } = await queryGallery(
+      `query OWNER_PROJECTS($ids: [ID]) {
           projects(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
             nodes {
               databaseId
+              projectName
               locations
               featuredImage {
                 node {
@@ -87,10 +85,8 @@ async function fetchProjects(ids: number[]): Promise<OwnerProject[] | null> {
             }
           }
         }`,
-        variables: { ids },
-      }),
-    });
-    const result = await response.json();
+      { ids },
+    );
     return response.ok && Array.isArray(result?.data?.projects?.nodes)
       ? result.data.projects.nodes
       : null;
@@ -103,19 +99,14 @@ async function fetchProjects(ids: number[]): Promise<OwnerProject[] | null> {
 /** The gallery's shared palettes among these IDs, newest first; null if it can't be reached. */
 async function fetchPalettes(ids: number[]): Promise<OwnerPalette[] | null> {
   try {
-    const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `query OWNER_PALETTES($ids: [ID]) {
+    const { response, result } = await queryGallery(
+      `query OWNER_PALETTES($ids: [ID]) {
           palettes(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
             nodes { databaseId title yarnUrls }
           }
         }`,
-        variables: { ids },
-      }),
-    });
-    const result = await response.json();
+      { ids },
+    );
     return response.ok && Array.isArray(result?.data?.palettes?.nodes)
       ? result.data.palettes.nodes
       : null;

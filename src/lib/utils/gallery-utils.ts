@@ -23,8 +23,34 @@ export type GalleryPageInfo = {
   endCursor: string | null;
 };
 
+/**
+ * Sends a query to the gallery's GraphQL. A gallery plugin before 1.6.0 has no
+ * `projectName`, and rejects any query asking for it: the query is then sent
+ * again without it, so the gallery works whichever plugin is live.
+ */
+export async function queryGallery(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<{ response: Response; result: any }> {
+  const send = async (text: string) => {
+    const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: text, variables }),
+    });
+    return { response, result: await response.json().catch(() => null) };
+  };
+  const first = await send(query);
+  const missingName = first.result?.errors?.some((e: { message?: string }) =>
+    e.message?.includes('projectName'),
+  );
+  return missingName ? send(query.replace(/\bprojectName\b/g, '')) : first;
+}
+
 export type GalleryProjectNode = {
   title: string;
+  /** The name the project was given, if any (gallery plugin 1.6.0) */
+  projectName?: string | null;
   databaseId: number;
   projectUrl: string;
   yarnUrls: string;
@@ -98,28 +124,20 @@ export const fetchPaletteGallery = async ({
         edges {
           node {
             __typename
-            ... on Project { title databaseId projectUrl yarnUrls locations date }
+            ... on Project { title projectName databaseId projectUrl yarnUrls locations date }
             ... on Palette { title databaseId yarnUrls date }
           }
         }
       }
     }`;
-  const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query,
-      variables: {
-        first,
-        after,
-        // Unset rather than empty, so the plugin's yarn filter isn't applied
-        search: search || null,
-        yarn: yarn || null,
-        order: order === 'ASC' ? 'ASC' : 'DESC',
-      },
-    }),
+  const { result } = await queryGallery(query, {
+    first,
+    after,
+    // Unset rather than empty, so the plugin's yarn filter isn't applied
+    search: search || null,
+    yarn: yarn || null,
+    order: order === 'ASC' ? 'ASC' : 'DESC',
   });
-  const result = await response.json().catch(() => null);
   if (result?.data?.contentNodes) return result.data.contentNodes;
 
   // A gallery without palettes (plugin before 1.5.0) rejects the query: show
@@ -137,11 +155,16 @@ export type PopularProjectMeta = {
   project_url: string;
   yarn_urls: string;
   locations: string;
+  /** The name the project was given (gallery plugin 1.6.0) */
+  project_name?: string;
 };
 
+/** A project, or since gallery plugin 1.6.0 a palette shared on its own (`type`) */
 export type PopularProject = {
   id: number;
-  title: string;
+  type?: string;
+  /** WordPress's rendered title, HTML-encoded */
+  title: string | { rendered: string };
   date: string;
   featured_media: number;
   featured_image_src: string;
@@ -167,7 +190,6 @@ export const fetchProjects = async ({
   yarn?: string;
   pattern?: string;
 }): Promise<FetchProjectsResult> => {
-  const url = `${PUBLIC_WORDPRESS_BASE_URL}/graphql`;
   const query = `
             query GET_PAGINATED_PROJECTS
               {
@@ -204,6 +226,7 @@ export const fetchProjects = async ({
                   edges {
                     node {
                       title
+                      projectName
                       databaseId
                       projectUrl
                       yarnUrls
@@ -224,23 +247,8 @@ export const fetchProjects = async ({
                 }
               }`;
 
-  const requestObj = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query,
-    }),
-  };
-
-  // id,title,link,date,featured_media,featured_image_src,meta
-  let response = await fetch(url, requestObj);
-
-  const projects = await response.json();
-
-  let data = projects.data.projects;
-  return data;
+  const { result } = await queryGallery(query);
+  return result.data.projects;
 };
 
 export const recordPageView = async (id: string | number) => {
@@ -253,14 +261,18 @@ export const recordPageView = async (id: string | number) => {
   );
 };
 
+/** Popular gallery posts. Palette galleries ask for shared palettes too. */
 export const fetchPopularProjects = async ({
   months = 3,
   limit = 40,
   timeUnit = 'month',
+  palettes = false,
 }: {
   months?: number;
   limit?: number;
   timeUnit?: string;
+  /** Include palettes shared on their own; a gallery plugin before 1.6.0 leaves them out */
+  palettes?: boolean;
 }): Promise<PopularProject[]> => {
   if (months == 0.25) {
     // 0.25 months means 1 week
@@ -271,9 +283,36 @@ export const fetchPopularProjects = async ({
     timeUnit = 'day';
     months = 1;
   }
-  const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wordpress-popular-posts/v1/popular-posts/?post_type=tempblanket_project&limit=${limit}&range=custom&time_unit=${timeUnit}&time_quantity=${months}&_fields=id,title,date,featured_media,featured_image_src,meta`;
+  const postTypes = palettes
+    ? 'tempblanket_project,tempblanket_palette'
+    : 'tempblanket_project';
+  const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wordpress-popular-posts/v1/popular-posts/?post_type=${postTypes}&limit=${limit}&range=custom&time_unit=${timeUnit}&time_quantity=${months}&_fields=id,type,title,date,featured_media,featured_image_src,meta`;
 
   const response = await fetch(url);
   const popularProjects = await response.json();
   return popularProjects;
 };
+
+/**
+ * Popular posts in the shape the palette galleries read (see
+ * getPalettesFromProjects): projects, and palettes shared on their own.
+ */
+export const popularToGalleryNodes = (popular: PopularProject[]) =>
+  popular.map((post) =>
+    post.type === 'tempblanket_palette'
+      ? {
+          __typename: 'Palette' as const,
+          databaseId: post.id,
+          title:
+            typeof post.title === 'string' ? post.title : post.title.rendered,
+          yarnUrls: post.meta.yarn_urls,
+        }
+      : {
+          __typename: 'Project' as const,
+          databaseId: post.id,
+          projectUrl: post.meta.project_url,
+          projectName: post.meta.project_name,
+          yarnUrls: post.meta.yarn_urls,
+          locations: post.meta.locations,
+        },
+  );

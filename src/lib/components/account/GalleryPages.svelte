@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Gallery pages and palettes published from this account, on the My Projects page: whether
-they show the account's name (changed on the Account page), and removing them.
+each is included on the account's public gallery (with its display name), and removing them.
 Hidden until the account has a page or publishing from accounts is on. -->
 
 <script lang="ts">
@@ -24,6 +24,7 @@ Hidden until the account has a page or publishing from accounts is on. -->
     GALLERY_PAGES_CHANGED,
     getGalleryPages,
     removeGalleryPage,
+    setGalleryPageShowOwner,
     type GalleryPage,
   } from '$lib/accounts/gallery';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
@@ -49,7 +50,6 @@ Hidden until the account has a page or publishing from accounts is on. -->
   let loaded = $state(false);
   let publishing = $state(false);
   let pages = $state<GalleryPage[]>([]);
-  let showName = $state(false);
   let publicId = $state<string | null>(null);
   let confirming = $state<number | null>(null);
   let busy = $state(false);
@@ -66,7 +66,6 @@ Hidden until the account has a page or publishing from accounts is on. -->
     const gallery = await getGalleryPages();
     if (!gallery) return;
     pages = gallery.posts;
-    showName = gallery.settings.showName;
     publicId = gallery.settings.publicId;
     publishing = gallery.publishing;
     if (typeof gallery.name === 'string') serverName = gallery.name;
@@ -82,15 +81,23 @@ Hidden until the account has a page or publishing from accounts is on. -->
 
   const isPalette = (page: GalleryPage) => page.kind === 'palette';
 
-  /** Where a row links: the project's gallery page, or the palette's Yarn Palette Creator link on this site. */
+  /** Where a row links: the project's or the palette's gallery page. */
   function pageHref(page: GalleryPage) {
-    if (!isPalette(page))
-      return resolve('/gallery/[id]', { id: String(page.postId) });
+    return isPalette(page)
+      ? resolve('/gallery/palette/[id]', { id: String(page.postId) })
+      : resolve('/gallery/[id]', { id: String(page.postId) });
+  }
+
+  let anyIncluded = $derived(pages.some((page) => page.showOwner));
+
+  async function setShowOwner(page: GalleryPage, showOwner: boolean) {
+    errorMessage = '';
+    page.showOwner = showOwner;
     try {
-      const url = new URL(page.link ?? '');
-      return `${url.pathname}${url.search}`;
+      ({ publicId } = await setGalleryPageShowOwner(page.postId, showOwner));
     } catch {
-      return `${resolve('/gallery')}?view=yarn-palettes`;
+      page.showOwner = !showOwner;
+      errorMessage = 'That change couldn’t be saved. Try again later.';
     }
   }
 
@@ -120,22 +127,17 @@ Hidden until the account has a page or publishing from accounts is on. -->
       Anyone can see them.
     </p>
     <div class={cardClass}>
-      <div
-        class="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-sm"
-        data-testid="gallery-name-status"
-      >
-        <span>
-          {#if showName && hasName}
-            Your pages say “By {currentName}”.
-          {:else}
-            Your pages don’t show your name.
-          {/if}
-        </span>
-        <a href={resolve('/account')} class="link"
-          >Change on your Account page</a
-        >
-      </div>
-      {#if showName && hasName && publicId}
+      <p class="px-4 py-3 text-sm" data-testid="gallery-name-status">
+        {#if hasName}
+          Those on your public gallery say “By {currentName}”. The others don’t
+          show your name.
+        {:else}
+          Add a display name on your <a href={resolve('/account')} class="link"
+            >Account page</a
+          > to show it on those you include on your public gallery.
+        {/if}
+      </p>
+      {#if anyIncluded && hasName && publicId}
         <a
           href={resolve('/gallery/by/[ownerId]', { ownerId: publicId })}
           target="_blank"
@@ -171,6 +173,21 @@ Hidden until the account has a page or publishing from accounts is on. -->
                     >{isPalette(page) ? 'Palette, shared' : 'Published'}
                     {publishedOn(page.publishedAt)}</span
                   >
+                  <label
+                    class="mt-1 flex w-fit cursor-pointer items-center gap-2 text-sm"
+                    title="Include on my public gallery, with my name"
+                  >
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      aria-label="On my public gallery: {page.title}"
+                      checked={page.showOwner ?? false}
+                      onchange={(event) =>
+                        setShowOwner(page, event.currentTarget.checked)}
+                      disabled={busy}
+                    />
+                    On my public gallery
+                  </label>
                 </div>
                 {#if confirming !== page.postId}
                   <button

@@ -26,6 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '$lib/state/page-state.svelte';
   import { onMount } from 'svelte';
   import StickyPart from './StickyPart.svelte';
+  import ShowOwnerToggle from '$lib/components/account/ShowOwnerToggle.svelte';
+  import { ProjectStorage } from '$lib/storage/projects.svelte';
 
   // In the Project menu's narrow panel: one column, not three
   const inPanel = $derived(dialog.options.placement === 'side');
@@ -35,17 +37,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Signed in with publishing from accounts on: the page is linked to the account
   let fromAccount = $state(false);
-  // Whether the account shows its name, which is set on the Account page
-  let showName = $state(false);
+  // Include it on the account's public gallery, starting from the last choice
+  let showOwner = $state(false);
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
+  // The name the saved project was given, which the gallery shows as its title
+  let projectName = $state('');
 
   onMount(async () => {
+    projectName = (await ProjectStorage.getById(project.id))?.name ?? '';
     if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
     const { getGalleryPages } = await import('$lib/accounts/gallery');
     const gallery = await getGalleryPages();
     if (!gallery?.publishing) return;
-    showName = gallery.settings.showName;
+    showOwner = gallery.settings.showOwnerDefault;
     if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
   });
@@ -74,7 +79,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const img = new Image();
     img.onload = async () => {
       message = {
-        text: await sendToProjectGallery(imgSrc, { fromAccount }),
+        text: await sendToProjectGallery(imgSrc, {
+          fromAccount,
+          showOwner: fromAccount && showOwner,
+          name: projectName,
+        }),
         icon: 'none',
       };
       submitting = false;
@@ -116,15 +125,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <div class="flex flex-col gap-2 text-left">
           <p>
-            • I am submitting this project's location and dates, gauge and yarn
-            information, URL, preview image, and the current date to be
-            displayed as a gallery page in the public <a
-              href="/gallery"
-              target="_blank"
-              class="link">Project Gallery</a
-            >.{#if fromAccount && showName && ownerName}
-              It will say “By {ownerName}”, linking to your public page of
-              gallery projects.
+            • I am submitting this project's {projectName
+              ? 'name, '
+              : ''}location and dates, gauge and yarn information, URL, preview
+            image, and the current date to be displayed as a gallery page in the
+            public
+            <a href="/gallery" target="_blank" class="link">Project Gallery</a
+            >.{#if fromAccount && showOwner && ownerName}
+              It will say “By {ownerName}”, linking to your public gallery page.
             {:else}
               No personal information will be sent.
             {/if}
@@ -149,17 +157,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>• Gallery pages are subject to change.</p>
         </div>
         {#if fromAccount}
-          <p class="text-left text-sm opacity-80">
-            {#if showName && ownerName}
-              To hide your name or change it,
-            {:else}
-              To show your name on your gallery pages,
-            {/if}
-            go to your
-            <a href={resolve('/account')} target="_blank" class="link"
-              >Account page <ExternalLinkIcon class="inline size-3" /></a
-            >.
-          </p>
+          <ShowOwnerToggle
+            kind="project"
+            bind:checked={showOwner}
+            name={ownerName}
+          />
         {/if}
       </div>
       <div
@@ -167,7 +169,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? ''
           : 'sm:col-span-1'}"
       >
-        <span class="line-clamp-4 font-bold">{locations.projectTitle}</span>
+        <span class="line-clamp-4 font-bold"
+          >{projectName || locations.projectTitle}</span
+        >
         {#if previews.active}
           <previews.active.previewComponent />
         {/if}

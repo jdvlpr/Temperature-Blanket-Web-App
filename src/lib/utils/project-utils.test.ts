@@ -136,5 +136,19 @@ describe('project-utils', () => {
       const result = projectUtils.getTitleFromLocationsMeta(locations);
       expect(result).toContain('Region, Country');
     });
+
+    it('escapes labels and dates, which anyone can send to the gallery', () => {
+      const locations = JSON.stringify([
+        {
+          label: '<img src=x onerror=alert(1)> & Co',
+          from: '"><script>',
+          to: '2024-12-31',
+        },
+      ]);
+      const result = projectUtils.getTitleFromLocationsMeta(locations);
+      expect(result).not.toMatch(/<img|<script/);
+      expect(result).toContain('from &quot;&gt;&lt;script&gt;');
+      expect(result).toContain('&lt;img src=x onerror=alert(1)&gt; &amp; Co');
+    });
   });
 });

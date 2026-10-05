@@ -137,3 +137,19 @@ describe('cleanName', () => {
     expect(cleanName('   ', 100)).toBe('');
   });
 });
+
+describe('decodeHtmlEntities', () => {
+  it('turns WordPress’s rendered titles back into text', () => {
+    expect(
+      stringUtils.decodeHtmlEntities(
+        'Mum&#8217;s &amp; Dad&#039;s &quot;blanket&quot; &#x2014; &lt;b&gt;',
+      ),
+    ).toBe('Mum’s & Dad\'s "blanket" — <b>');
+  });
+
+  it('leaves unknown or invalid entities alone', () => {
+    expect(
+      stringUtils.decodeHtmlEntities('&bogus; &#0; &#x110000; a & b'),
+    ).toBe('&bogus; &#0; &#x110000; a & b');
+  });
+});

@@ -9,7 +9,13 @@ import {
   releaseGalleryPosts,
   type GalleryContext,
 } from './index';
-import { listPosts, recordPost, updateSettings } from './store';
+import {
+  getSettings,
+  listPosts,
+  PUBLIC_ID_PATTERN,
+  recordPost,
+  updateSettings,
+} from './store';
 import { galleryApi, type PublishResponse } from './wordpress';
 
 vi.mock('$lib/server/auth', () => ({ requireAccount: vi.fn() }));
@@ -86,7 +92,7 @@ describe('publishFromAccount', () => {
       }),
     );
     const body = payload('https://temperature-blanket.com/?project=p1#h');
-    const response = await publishFromAccount(gallery, body, 1234);
+    const response = await publishFromAccount(gallery, body, {}, 1234);
 
     expect(await response.json()).toMatchObject({ code: 200, linked: true });
     expect(calls).toHaveLength(1);
@@ -104,8 +110,30 @@ describe('publishFromAccount', () => {
         publishedAt: 1234,
         kind: 'project',
         link: null,
+        showOwner: false,
       },
     ]);
+    expect((await getSettings(d1, 'u1')).publicId).toBeNull();
+  });
+
+  it('includes it on the public gallery when chosen, and remembers the choice', async () => {
+    const { d1, gallery } = await setup(() => answered({ code: 200, id: 78 }));
+    const body = JSON.stringify({
+      ...JSON.parse(payload('https://t.com/?project=p1#h')),
+      project_name: '  Grandma’s\u202e blanket ',
+    });
+    await publishFromAccount(gallery, body, { showOwner: true }, 5);
+
+    expect(await listPosts(d1, 'u1')).toEqual([
+      expect.objectContaining({
+        postId: 78,
+        title: 'Grandma’s blanket',
+        showOwner: true,
+      }),
+    ]);
+    const settings = await getSettings(d1, 'u1');
+    expect(settings.showOwnerDefault).toBe(true);
+    expect(settings.publicId).toMatch(PUBLIC_ID_PATTERN);
   });
 
   it.each([
@@ -116,7 +144,7 @@ describe('publishFromAccount', () => {
     const { d1, gallery, calls } = await setup(() =>
       answered({ code: 200, id: 5 }),
     );
-    const response = await publishFromAccount(gallery, payload(url), 9);
+    const response = await publishFromAccount(gallery, payload(url), {}, 9);
     expect(await response.json()).toMatchObject({ linked: true });
     expect(calls).toHaveLength(1);
     expect(await listPosts(d1, 'u1')).toEqual([
@@ -244,7 +272,12 @@ describe('sharing a palette', () => {
     );
     const response = await publishPaletteFromAccount(
       gallery,
-      { paletteId: 'pal-1', title: ' Autumn\u202e ', yarnUrl: link },
+      {
+        paletteId: 'pal-1',
+        title: ' Autumn\u202e ',
+        yarnUrl: link,
+        showOwner: true,
+      },
       origin,
       1000,
     );
@@ -265,8 +298,10 @@ describe('sharing a palette', () => {
         publishedAt: 1000,
         kind: 'palette',
         link,
+        showOwner: true,
       },
     ]);
+    expect((await getSettings(d1, 'u1')).showOwnerDefault).toBe(true);
   });
 
   it('refuses a missing name or link before calling WordPress', async () => {

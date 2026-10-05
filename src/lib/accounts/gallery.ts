@@ -24,24 +24,27 @@ export type GalleryPage = {
   kind?: 'project' | 'palette';
   /** A palette's Yarn Palette Creator link */
   link?: string | null;
+  /** Included on the owner's public gallery, with their name */
+  showOwner?: boolean;
 };
 
 /** Fired on window when the account's gallery pages change, so lists reload. */
 export const GALLERY_PAGES_CHANGED = 'tb:gallery-pages-changed';
 
 export type GallerySettings = {
-  showName: boolean;
+  /** Whether the next page starts out included on the public gallery: the last choice */
+  showOwnerDefault: boolean;
   removeOnDelete: boolean;
 };
 
 const PATH = '/api/account/gallery';
 
-/** The account's gallery pages and settings, or null when they aren't available. */
-/** The settings, and the owner page's ID once the name has been shown */
+/** The settings, and the owner page's ID once a page has been included */
 export type GalleryOwnerSettings = GallerySettings & {
   publicId: string | null;
 };
 
+/** The account's gallery pages and settings, or null when they aren't available. */
 export async function getGalleryPages(): Promise<{
   posts: GalleryPage[];
   settings: GalleryOwnerSettings;
@@ -71,6 +74,24 @@ export async function updateGallerySettings(
   return (await response.json()).settings;
 }
 
+/**
+ * Includes one of the account's pages on its public gallery or takes it off.
+ * Answers the owner page's ID, which exists once a page has been included.
+ */
+export async function setGalleryPageShowOwner(
+  postId: number,
+  showOwner: boolean,
+): Promise<{ publicId: string | null }> {
+  const response = await fetch(`${PATH}/${postId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ showOwner }),
+  });
+  if (!response.ok)
+    throw new Error(`Changing the gallery page failed: ${response.status}`);
+  return response.json();
+}
+
 export async function removeGalleryPage(postId: number) {
   const response = await fetch(`${PATH}/${postId}`, { method: 'DELETE' });
   if (!response.ok && response.status !== 404)
@@ -86,8 +107,9 @@ export type AccountPublishResult =
 /** Publishes the gallery payload as the signed-in user. */
 export async function publishFromAccount(
   body: string,
+  { showOwner = false } = {},
 ): Promise<AccountPublishResult> {
-  const response = await fetch(PATH, {
+  const response = await fetch(`${PATH}?showOwner=${showOwner}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body,
@@ -98,13 +120,16 @@ export async function publishFromAccount(
 }
 
 export type SharePaletteResult =
-  { status: 'shared' } | { status: 'error'; message: string };
+  | { status: 'shared'; postId: number | null }
+  | { status: 'error'; message: string };
 
 /** Shares a saved palette to the gallery as the signed-in user. */
 export async function sharePalette(palette: {
   paletteId: string;
   title: string;
   yarnUrl: string;
+  /** Include it on the account's public gallery, with its name */
+  showOwner: boolean;
 }): Promise<SharePaletteResult> {
   let response: Response;
   try {
@@ -136,5 +161,8 @@ export async function sharePalette(palette: {
           : 'The palette couldn’t be shared. Try again later.',
     };
   window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-  return { status: 'shared' };
+  return {
+    status: 'shared',
+    postId: typeof data?.id === 'number' ? data.id : null,
+  };
 }

@@ -13,11 +13,48 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Removes one of the signed-in user's gallery pages (WordPress moves it to the trash).
+// One of the signed-in user's gallery pages: include it on their public gallery
+// or take it off (PATCH { showOwner }), or remove it (DELETE: WordPress moves it
+// to the trash).
 
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
+
+/** The page ID from the URL, or null when it isn't one. */
+function postIdFrom(param: string) {
+  const postId = Number(param);
+  return Number.isSafeInteger(postId) && postId > 0 ? postId : null;
+}
+
+export const PATCH: RequestHandler = async (event) => {
+  const { requireGallery, galleryError } = await import('$lib/server/gallery');
+  const { setPostShowOwner, getSettings } =
+    await import('$lib/server/gallery/store');
+  const gallery = await requireGallery(event);
+  if (gallery instanceof Response) return gallery;
+
+  const postId = postIdFrom(event.params.postId);
+  const body = await event.request.json().catch(() => null);
+  if (!postId || typeof body?.showOwner !== 'boolean')
+    return galleryError(400, 'INVALID_REQUEST', 'Nothing to change');
+  // Only in the app: WordPress never has the owner's name, so there's nothing to tell it
+  if (
+    !(await setPostShowOwner(
+      gallery.db,
+      gallery.userId,
+      postId,
+      body.showOwner,
+    ))
+  )
+    return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+
+  const { publicId } = await getSettings(gallery.db, gallery.userId);
+  return Response.json(
+    { showOwner: body.showOwner, publicId },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
+};
 
 export const DELETE: RequestHandler = async (event) => {
   const { requireGallery, galleryError } = await import('$lib/server/gallery');
@@ -25,8 +62,8 @@ export const DELETE: RequestHandler = async (event) => {
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 
-  const postId = Number(event.params.postId);
-  if (!Number.isSafeInteger(postId) || postId < 1)
+  const postId = postIdFrom(event.params.postId);
+  if (!postId)
     return galleryError(400, 'INVALID_REQUEST', 'Invalid gallery page');
   // Ownership from the session, checked here before WordPress checks it again
   if (!(await ownsPost(gallery.db, gallery.userId, postId)))

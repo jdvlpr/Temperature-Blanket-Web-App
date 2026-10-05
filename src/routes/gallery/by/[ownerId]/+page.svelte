@@ -24,9 +24,16 @@ linked from "By <name>" on their gallery pages. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { getColorsFromInput } from '$lib/utils/color-utils';
   import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
-  import { escapeHtml, stripHTMLTags } from '$lib/utils/string-utils';
+  import {
+    galleryTitleText,
+    sharedPaletteFrom,
+  } from '$lib/utils/shared-palette-utils';
+  import {
+    decodeHtmlEntities,
+    escapeHtml,
+    stripHTMLTags,
+  } from '$lib/utils/string-utils';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -47,19 +54,6 @@ linked from "By <name>" on their gallery pages. -->
     if (data.palettes?.length) await ensureYarnData();
     yarnDataReady = true;
   });
-
-  /** A shared palette's colors, and its Yarn Palette Creator link on this site. */
-  function paletteFrom(yarnUrls: string) {
-    try {
-      const url = new URL((JSON.parse(yarnUrls) as string[])[0]);
-      const colors = getColorsFromInput({ string: url.href });
-      return colors && colors.length
-        ? { colors, href: `${url.pathname}${url.search}` }
-        : null;
-    } catch {
-      return null;
-    }
-  }
 </script>
 
 <svelte:head>
@@ -101,8 +95,12 @@ linked from "By <name>" on their gallery pages. -->
           class="grid w-full grid-cols-2 items-start justify-center gap-2 px-2 md:grid-cols-3 xl:grid-cols-4"
           aria-label={heading}
         >
-          {#each data.projects as { databaseId, featuredImage, locations } (databaseId)}
-            {@const title = stripHTMLTags(getTitleFromLocationsMeta(locations))}
+          {#each data.projects as { databaseId, featuredImage, locations, projectName } (databaseId)}
+            {@const title =
+              projectName?.trim() ||
+              decodeHtmlEntities(
+                stripHTMLTags(getTitleFromLocationsMeta(locations)),
+              )}
             <li>
               <a
                 href={resolve('/gallery/[id]', { id: String(databaseId) })}
@@ -130,19 +128,19 @@ linked from "By <name>" on their gallery pages. -->
           aria-label="Yarn palettes by {data.name}"
         >
           {#each data.palettes as { databaseId, title, yarnUrls } (databaseId)}
-            {@const palette = paletteFrom(yarnUrls)}
+            {@const palette = sharedPaletteFrom(yarnUrls)}
             {#if palette}
               <li>
-                <!-- A link on this site, built from the palette's own path -->
-                <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
                 <a
-                  href={palette.href}
+                  href={resolve('/gallery/palette/[id]', {
+                    id: String(databaseId),
+                  })}
                   class="flex w-full flex-col gap-y-1 text-left"
-                  title="Open in Yarn Palette Creator"
+                  title="Open the palette's page"
                 >
                   <ColorPalette
                     colors={palette.colors}
-                    schemeName={`<span class="font-semibold">${escapeHtml(title)}</span>`}
+                    schemeName={`<span class="font-semibold">${escapeHtml(galleryTitleText(title))}</span>`}
                   />
                 </a>
               </li>

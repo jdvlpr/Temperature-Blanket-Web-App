@@ -39,6 +39,13 @@ test.describe('Gallery pages from accounts', () => {
       (await request.post('/api/account/gallery', { data: {} })).status(),
     ).toBe(401);
     expect((await request.delete('/api/account/gallery/1')).status()).toBe(401);
+    expect(
+      (
+        await request.patch('/api/account/gallery/1', {
+          data: { showOwner: true },
+        })
+      ).status(),
+    ).toBe(401);
   });
 
   test('with publishing off, publishing pauses but settings work', async ({
@@ -52,7 +59,11 @@ test.describe('Gallery pages from accounts', () => {
     const listed = await api.get('/api/account/gallery');
     expect(await listed.json()).toEqual({
       posts: [],
-      settings: { showName: false, removeOnDelete: false, publicId: null },
+      settings: {
+        showOwnerDefault: false,
+        removeOnDelete: false,
+        publicId: null,
+      },
       publishing: false,
       name: '',
     });
@@ -64,12 +75,12 @@ test.describe('Gallery pages from accounts', () => {
     expect((await published.json()).code).toBe('GALLERY_PAUSED');
 
     const patched = await api.patch('/api/account/gallery', {
-      data: { showName: true },
+      data: { showOwnerDefault: true },
     });
     expect((await patched.json()).settings).toEqual({
-      showName: true,
+      showOwnerDefault: true,
       removeOnDelete: false,
-      publicId: expect.stringMatching(/^[A-Za-z0-9]{12}$/),
+      publicId: null,
     });
     expect(
       (await api.patch('/api/account/gallery', { data: {} })).status(),
@@ -79,6 +90,13 @@ test.describe('Gallery pages from accounts', () => {
     expect((await api.delete('/api/account/gallery/123456')).status()).toBe(
       404,
     );
+    expect(
+      (
+        await api.patch('/api/account/gallery/123456', {
+          data: { showOwner: true },
+        })
+      ).status(),
+    ).toBe(404);
 
     // Nothing published and publishing off: no gallery section on My Projects
     await page.goto('/my-projects');
@@ -112,17 +130,21 @@ test.describe('Gallery pages from accounts', () => {
       pages.getByRole('link', { name: /Ottawa from 2025 to 2026/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
 
-    // The name setting itself is on the Account page, linked from here
+    // Each page is included on the public gallery on its own; the display
+    // name itself is on the Account page
+    const include = pages.getByRole('checkbox', {
+      name: 'On my public gallery: Ottawa from 2025 to 2026',
+    });
+    await expect(include).not.toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
-      'Your pages don’t show your name.',
+      'Add a display name',
     );
-    await page
-      .getByRole('link', { name: 'Change on your Account page' })
-      .click();
+    await include.check();
+    await expect(include).toBeChecked();
+    await page.getByRole('link', { name: 'Account page', exact: true }).click();
     await expect(page).toHaveURL(/\/account$/);
-    await page.getByText('Show my name on my gallery pages').click();
     await expect(
-      page.getByText('Add a display name above to show it.'),
+      page.getByText('Add a display name above to show it'),
     ).toBeVisible();
     await page.getByLabel('Display name', { exact: true }).fill('Ada Lovelace');
     await page.getByRole('button', { name: 'Save name' }).click();
@@ -145,11 +167,12 @@ test.describe('Gallery pages from accounts', () => {
       expect.objectContaining({
         title: 'Ottawa from 2025 to 2026',
         url: expect.stringMatching(new RegExp(`/gallery/${postId}$`)),
+        onPublicGallery: true,
       }),
     ]);
   });
 
-  test('an owner who shows their name gets a page listing their gallery pages', async ({
+  test('an owner gets a page listing the gallery pages they include', async ({
     page,
     request,
   }) => {
@@ -159,23 +182,23 @@ test.describe('Gallery pages from accounts', () => {
     localD1(
       `update "user" set "name" = 'Grace Hopper' where "id" = '${userId}'`,
     );
-    // One published page, so the account page shows its gallery section
+    const postId = 800_000_000 + Math.floor(Math.random() * 1e8);
     localD1(
       `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
-       values (${800_000_000 + Math.floor(Math.random() * 1e8)}, '${userId}', 'p1', 'Lima', ${Date.now()})`,
+       values (${postId}, '${userId}', 'p1', 'Lima', ${Date.now()})`,
     );
 
     expect((await request.get('/gallery/by/AAAAAAAAAAAA')).status()).toBe(404);
     expect((await request.get('/gallery/by/not-an-id')).status()).toBe(404);
 
-    const { settings } = await (
-      await page.request.patch('/api/account/gallery', {
-        data: { showName: true },
+    const { publicId } = await (
+      await page.request.patch(`/api/account/gallery/${postId}`, {
+        data: { showOwner: true },
       })
     ).json();
-    expect(settings.publicId).toMatch(/^[A-Za-z0-9]{12}$/);
+    expect(publicId).toMatch(/^[A-Za-z0-9]{12}$/);
 
-    await page.goto(`/gallery/by/${settings.publicId}`);
+    await page.goto(`/gallery/by/${publicId}`);
     await expect(
       page.getByRole('heading', { name: 'Projects by Grace Hopper' }),
     ).toBeVisible();
@@ -184,15 +207,13 @@ test.describe('Gallery pages from accounts', () => {
     await page.goto('/my-projects');
     await expect(page.getByTestId('gallery-owner-page')).toHaveAttribute(
       'href',
-      `/gallery/by/${settings.publicId}`,
+      `/gallery/by/${publicId}`,
     );
 
-    // Hiding the name takes the page down
-    await page.request.patch('/api/account/gallery', {
-      data: { showName: false },
+    // With nothing included any more, the page goes away
+    await page.request.patch(`/api/account/gallery/${postId}`, {
+      data: { showOwner: false },
     });
-    expect(
-      (await request.get(`/gallery/by/${settings.publicId}`)).status(),
-    ).toBe(404);
+    expect((await request.get(`/gallery/by/${publicId}`)).status()).toBe(404);
   });
 });

@@ -238,6 +238,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]"
             />
             <p class="line-clamp-4 text-xs">
+              {#if meta.project_name}<span class="block text-sm font-semibold"
+                  >{meta.project_name}</span
+                >{/if}
+              <!-- Escaped by getTitleFromLocationsMeta -->
               {@html title || ''}
             </p>
           </a>
@@ -370,7 +374,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'flex flex-col items-start justify-start'}"
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations }}
+        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName }}
           {@const title = getTitleFromLocationsMeta(locations)}
           <a
             href="/gallery/{databaseId}"
@@ -388,6 +392,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : 'max-h-[900px] max-w-full'}
             />
             <p class="line-clamp-4 text-xs">
+              {#if projectName}<span class="block text-sm font-semibold"
+                  >{projectName}</span
+                >{/if}
+              <!-- Escaped by getTitleFromLocationsMeta -->
               {@html title || ''}
             </p>
           </a>

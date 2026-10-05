@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-import { recordPageView } from '$lib/utils/gallery-utils';
+import { queryGallery } from '$lib/utils/gallery-utils';
 import type { GalleryOwner } from '$lib/server/gallery/store';
 import type { PageServerLoad } from './$types';
 
@@ -47,16 +46,13 @@ async function getOwner(
 async function getProject(event: Parameters<PageServerLoad>[0]) {
   const id = +event.params.id;
 
-  const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query: `
-            query GET_PROJECT_BY_ID {
-                project(id: ${id}, idType: DATABASE_ID) {
+  if (!Number.isSafeInteger(id) || id < 1) return { project: null };
+
+  const { response, result: project } = await queryGallery(
+    `query GET_PROJECT_BY_ID($id: ID!) {
+                project(id: $id, idType: DATABASE_ID) {
                     title
+                    projectName
                     date
                     projectUrl
                     totalDays
@@ -77,16 +73,15 @@ async function getProject(event: Parameters<PageServerLoad>[0]) {
                     }
                 }
             }`,
-    }),
-  });
-
-  const project = await response.json();
+    { id },
+  );
 
   if (!response.ok || !project?.data?.project) {
     return { project: null };
   }
 
-  await recordPageView(id);
+  // Views are counted by the page in the browser (recordPageView does nothing
+  // on the server)
 
   // Modify the project url origin to match the event url's origin
   // For example https://temperature-blanket.com gets changed to http://localhost:5173 in dev

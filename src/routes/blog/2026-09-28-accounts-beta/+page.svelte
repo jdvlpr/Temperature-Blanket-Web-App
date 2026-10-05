@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const title = 'Accounts (Beta): Your Projects on Every Device';
   const description =
-    'Sign in to save your temperature blanket projects to an account, open them on any device, and have changes save automatically. Accounts are optional and in beta.';
+    'Sign in to keep your temperature blanket projects, yarn palettes and preferences in an account, open them on any device, and share your work in the gallery under your name. Accounts are optional and in beta.';
 </script>
 
 <svelte:head>
@@ -94,17 +94,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Sign in on another computer, phone or tablet and they're there.
               Syncing happens by itself in the background. You can see when your
               projects last synced by pressing your picture or initial in the
-              top bar.
+              top bar. All of them are listed on the
+              <a href="/my-projects" class="link">My Projects</a> page.
+            </p>
+
+            <p class="font-bold">
+              Yarn palettes, preferences and the Trash too
+            </p>
+            <p>
+              Yarn palettes you save while signed in are kept in your account as
+              well, so they show up under
+              <span class="italic">Get Colors</span>, then
+              <span class="italic">Browse Palettes</span>, then
+              <span class="italic">Saved</span> on every device. Your default yarn
+              and your theme choices in Preferences (colors, light or dark mode, roundness
+              and heading style) follow you too. Projects and palettes you delete
+              go to the Trash for 30 days, and you can put them back from any device.
             </p>
 
             <p class="font-bold">Changes save automatically</p>
             <p>
               Save a new project once, using <span class="italic">Save</span> in
-              the <span class="italic">Project</span> menu. After that, any
-              changes you make save on their own a moment after you stop
-              editing. The <span class="italic">Project</span> menu shows whether
-              the latest change is saved. New projects don't save until you save them
-              yourself, so trying out ideas won't fill up your account.
+              the top bar. After that, any changes you make save on their own a
+              moment after you stop editing. The
+              <span class="italic">Project</span> menu shows whether the latest change
+              is saved. New projects don't save until you save them yourself, so trying
+              out ideas won't fill up your account.
             </p>
             <p>
               If you'd like to try something different without changing the
@@ -115,10 +130,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Projects you've already saved</p>
             <p>
-              Projects saved in your browser before you signed in stay there.
-              When you first sign in, you'll be asked whether to add them to
-              your account. You can also add them later from your
-              <a href="/account" class="link">Account</a> page.
+              Projects and palettes saved in your browser before you signed in
+              stay there. When you first sign in, you'll be asked whether to add
+              them to your account. You can also add them later from the
+              <a href="/my-projects" class="link">My Projects</a> page.
             </p>
 
             <p class="font-bold">Editing on two devices at once</p>
@@ -126,6 +141,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
               If a project is changed on another device while you have it open,
               the app won't overwrite those changes. Instead, you can save your
               version as a copy, or reload to get the latest version.
+            </p>
+
+            <hr class="hr my-2" />
+
+            <p class="text-2xl font-bold">Sharing in the gallery</p>
+
+            <p class="font-bold">
+              Your name on the things you share, if you like
+            </p>
+            <p>
+              When you send a project to the
+              <a href="/gallery" class="link">Project Gallery</a> while signed
+              in, you can choose
+              <span class="italic"
+                >Include this project on my public gallery</span
+              >. Then its page says “By” and your display name, and it's listed
+              on your own public gallery page, which links to everything you've
+              included there. Leave it off and the project is in the gallery
+              without your name, the same as it's always been.
+            </p>
+            <p>
+              You choose for each project, and you can change your mind at any
+              time from My Projects, under My Public Gallery Pages. Your name
+              comes from your <a href="/account" class="link">Account</a> page, so
+              if you change it there, it changes on everything you've included. The
+              next time you share, the switch starts where you left it last time.
+            </p>
+
+            <p class="font-bold">Share yarn palettes</p>
+            <p>
+              Signed in, you can also share a saved yarn palette on its own. On
+              <a href="/my-projects" class="link">My Projects</a>, press the
+              share button next to a palette (three connected dots) and give it
+              a name. It goes into the Yarn Palette Gallery right away, with a
+              page of its own listing its colors and yarns. The same
+              <span class="italic"
+                >Include this palette on my public gallery</span
+              >
+              choice decides whether your name is shown.
+            </p>
+
+            <p class="font-bold">Project names in the gallery</p>
+            <p>
+              If you've named a project on My Projects, its name now shows in
+              the gallery, above its locations and dates. This works whether or
+              not you're signed in. Gallery pages are public, so pick a name
+              you're happy for anyone to see.
+            </p>
+
+            <p class="font-bold">Removing what you've shared</p>
+            <p>
+              Anything you add to the gallery while signed in is listed on My
+              Projects, where you can remove it. Projects added without an
+              account can't be removed that way, since they aren't linked to
+              anyone.
             </p>
 
             <hr class="hr my-2" />
@@ -140,17 +210,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Signing out</p>
             <p>
-              When you sign out, you can choose to keep your projects in that
-              browser or remove them, which is handy on a shared computer.
-              Either way, they stay in your account for next time.
+              When you sign out, your account's projects and palettes are
+              removed from that browser, which is handy on a shared computer.
+              They stay in your account for next time. If any changes haven't
+              reached your account yet, you'll be asked first, and those stay in
+              the browser.
             </p>
 
             <p class="font-bold">Your data</p>
             <p>
               From your <a href="/account" class="link">Account</a> page you can
               change your name or email, download everything in your account, or
-              delete your account and its projects. An account can hold up to
-              200 projects. The
+              delete your account and its projects. When you delete your
+              account, you can choose to remove what you've shared in the
+              gallery or leave it there without your name. An account can hold
+              up to 200 projects. The
               <a href="/privacy" class="link">Privacy Policy</a> explains what's stored
               and why. In short, it's what's needed to sign you in and keep your projects,
               and nothing is sold or used for ads.
