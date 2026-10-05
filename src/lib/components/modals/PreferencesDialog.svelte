@@ -2,9 +2,10 @@
 Every change applies right away and is kept in this browser; signed in, the
 colors, mode, buttons, headings, and default yarn also follow the account (see
 $lib/sync/preferences). Built from the site's usual settings pieces (as in the
-palette image export): selects with the current choice's icon beside it, a
-accordion sections (as the site navigation), each holding a card, for appearance
-(with the light/dark segmented control), yarn, and sound & motion, rows of thumbnails for colors and headings
+palette image export): selects with the current choice's icon beside it,
+headed sections (as the account page), each holding a card, for appearance
+(with the light/dark segmented control), yarn, and sound & motion, rows of
+thumbnails for colors and headings
 (as the pattern picker), the usual yarn picker, and a card of switches. -->
 
 <script lang="ts">
@@ -29,9 +30,8 @@ accordion sections (as the site navigation), each holding a card, for appearance
     motion,
     setEffect,
   } from '$lib/utils/feedback.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { ChevronDownIcon, RotateCcwIcon } from '@lucide/svelte';
-  import { Accordion, SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import { RotateCcwIcon } from '@lucide/svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, type Snippet } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
 
@@ -90,9 +90,6 @@ accordion sections (as the site navigation), each holding a card, for appearance
   }
 
   let yarnPickerKey = $state(0);
-
-  // Appearance starts open; any section can be opened or closed
-  let openSections = $state(['appearance', 'yarn', 'sound-motion']);
 
   const BUTTON_ICON_RADIUS: Record<string, string> = {
     sharp: 'rounded-none',
@@ -221,258 +218,178 @@ site does -->
   ></span>
 {/snippet}
 
-{#snippet indicator()}
-  <Accordion.ItemIndicator>
-    <ChevronDownIcon
-      class="h-5 w-5 transition group-data-[state=open]/section:rotate-180"
-    />
-  </Accordion.ItemIndicator>
-{/snippet}
-
-<!-- A set width, so the dialog doesn't shrink as sections close -->
-<div class="flex w-full flex-col gap-4 px-4 pt-2 pb-4 text-left sm:w-xl">
-  <Accordion
-    value={openSections}
-    onValueChange={(e) => {
-      openSections = e.value;
-    }}
-    collapsible
-    multiple
-    class="flex flex-col gap-4"
-  >
-    <Accordion.Item
-      value="appearance"
-      class="group/section flex flex-col gap-2"
+<div class="flex w-full flex-col gap-6 px-4 pt-2 pb-4 text-left sm:w-xl">
+  <section class="flex flex-col gap-2" aria-labelledby="preferences-appearance">
+    <h3 id="preferences-appearance" class="px-2 text-sm font-bold opacity-70">
+      Appearance
+    </h3>
+    <div
+      class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-4 border border-gray-300 p-4 dark:border-gray-700"
     >
-      <h3>
-        <Accordion.ItemTrigger
-          class="flex w-full items-center justify-between py-1 text-base font-bold"
-        >
-          Appearance
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent>
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <div
-                class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-4 border border-gray-300 p-4 dark:border-gray-700"
-              >
-                <SegmentsScroller collapse>
-                  {#snippet children(iconsOnly)}
-                    <SegmentedControl
-                      value={preferences.value.theme.mode ?? 'system'}
-                      onValueChange={(e) => {
-                        if (e.value) choose('mode', e.value);
-                      }}
-                    >
-                      <!-- With only icons showing, the label names the choice, as the
-                    old theme switcher did: "Mode: Light" -->
-                      <SegmentedControl.Label class="label-text"
-                        >Mode{#if iconsOnly}<span aria-hidden="true"
-                            >: {THEMES.find(
-                              (mode) =>
-                                mode.id ===
-                                (preferences.value.theme.mode ?? 'system'),
-                            )?.name}</span
-                          >{/if}</SegmentedControl.Label
-                      >
-                      <!-- flex-row! keeps the options side by side: Skeleton stacks them
-                    under any vertical group, and the accordion is one -->
-                      <SegmentedControl.Control
-                        class="bg-surface-50-950 w-full min-w-max flex-row!"
-                      >
-                        <SegmentedControl.Indicator />
-                        {#each THEMES as mode (mode.id)}
-                          <SegmentedControl.Item
-                            value={mode.id}
-                            class="flex-1"
-                            title={iconsOnly ? mode.name : undefined}
-                          >
-                            <SegmentedControl.ItemText
-                              class="flex items-center gap-1 [&_svg]:shrink-0"
-                            >
-                              {@html mode.icon}
-                              <span class={{ 'sr-only': iconsOnly }}
-                                >{mode.name}</span
-                              >
-                            </SegmentedControl.ItemText>
-                            <SegmentedControl.ItemHiddenInput />
-                          </SegmentedControl.Item>
-                        {/each}
-                      </SegmentedControl.Control>
-                    </SegmentedControl>
-                  {/snippet}
-                </SegmentsScroller>
-
-                {@render choiceRow({
-                  label: 'Colors',
-                  key: 'id',
-                  options: SKELETON_THEMES,
-                  fallback: 'classic',
-                  thumb: colorsThumb,
-                })}
-
-                {@render choiceRow({
-                  label: 'Headings',
-                  key: 'headingStyle',
-                  options: HEADING_STYLE,
-                  fallback: 'classic',
-                  thumb: headingsThumb,
-                })}
-
-                <div class="grid gap-4 sm:grid-cols-3">
-                  {@render choiceSelect({
-                    label: 'Text Size',
-                    key: 'textScale',
-                    options: TEXT_SCALE,
-                    fallback: 'normal',
-                    icon: textSizeIcon,
-                  })}
-                  {@render choiceSelect({
-                    label: 'Spacing',
-                    key: 'spacing',
-                    options: SPACING,
-                    fallback: 'normal',
-                    icon: spacingIcon,
-                  })}
-                  {@render choiceSelect({
-                    label: 'Buttons',
-                    key: 'roundness',
-                    options: ROUNDNESS,
-                    fallback: 'pill',
-                    icon: buttonsIcon,
-                  })}
-                </div>
-              </div>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-    <Accordion.Item value="yarn" class="group/section flex flex-col gap-2">
-      <h3>
-        <Accordion.ItemTrigger
-          class="flex w-full items-center justify-between py-1 text-base font-bold"
-        >
-          Yarn
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent>
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <div
-                class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col border border-gray-300 p-4 dark:border-gray-700"
-              >
-                <!-- The yarn picker fills in the default yarn itself. A yarn
-                sets it, clearing the picker removes it, and a brand alone
-                leaves it as it was -->
-                <div role="group" aria-labelledby="preferences-default-yarn">
-                  <span id="preferences-default-yarn" class="label-text"
-                    >Default Yarn</span
+      <SegmentsScroller collapse>
+        {#snippet children(iconsOnly)}
+          <SegmentedControl
+            value={preferences.value.theme.mode ?? 'system'}
+            onValueChange={(e) => {
+              if (e.value) choose('mode', e.value);
+            }}
+          >
+            <!-- With only icons showing, the label names the choice, as the
+          old theme switcher did: "Mode: Light" -->
+            <SegmentedControl.Label class="label-text"
+              >Mode{#if iconsOnly}<span aria-hidden="true"
+                  >: {THEMES.find(
+                    (mode) =>
+                      mode.id === (preferences.value.theme.mode ?? 'system'),
+                  )?.name}</span
+                >{/if}</SegmentedControl.Label
+            >
+            <!-- flex-row! keeps the options side by side: Skeleton stacks them
+          under any vertical group -->
+            <SegmentedControl.Control
+              class="bg-surface-50-950 w-full min-w-max flex-row!"
+            >
+              <SegmentedControl.Indicator />
+              {#each THEMES as mode (mode.id)}
+                <SegmentedControl.Item
+                  value={mode.id}
+                  class="flex-1"
+                  title={iconsOnly ? mode.name : undefined}
+                >
+                  <SegmentedControl.ItemText
+                    class="flex items-center gap-1 [&_svg]:shrink-0"
                   >
-                  <p class="mb-1 text-sm opacity-70">
-                    Chosen first where no yarn is, like for colors with none
-                    assigned
-                  </p>
-                  {#key yarnPickerKey}
-                    <SelectYarn
-                      onselectautocomplete={({
-                        selectedBrandId,
-                        selectedYarnId,
-                      }) => {
-                        if (selectedBrandId && selectedYarnId)
-                          defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;
-                        else if (!selectedBrandId && !selectedYarnId)
-                          defaultYarn.value = '';
-                      }}
-                    />
-                  {/key}
-                </div>
-              </div>
-            </div>
-          {/if}
+                    {@html mode.icon}
+                    <span class={{ 'sr-only': iconsOnly }}>{mode.name}</span>
+                  </SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+              {/each}
+            </SegmentedControl.Control>
+          </SegmentedControl>
         {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-    <Accordion.Item
-      value="sound-motion"
-      class="group/section flex flex-col gap-2"
+      </SegmentsScroller>
+
+      {@render choiceRow({
+        label: 'Colors',
+        key: 'id',
+        options: SKELETON_THEMES,
+        fallback: 'classic',
+        thumb: colorsThumb,
+      })}
+
+      {@render choiceRow({
+        label: 'Headings',
+        key: 'headingStyle',
+        options: HEADING_STYLE,
+        fallback: 'classic',
+        thumb: headingsThumb,
+      })}
+
+      <div class="grid gap-4 sm:grid-cols-3">
+        {@render choiceSelect({
+          label: 'Text Size',
+          key: 'textScale',
+          options: TEXT_SCALE,
+          fallback: 'normal',
+          icon: textSizeIcon,
+        })}
+        {@render choiceSelect({
+          label: 'Spacing',
+          key: 'spacing',
+          options: SPACING,
+          fallback: 'normal',
+          icon: spacingIcon,
+        })}
+        {@render choiceSelect({
+          label: 'Buttons',
+          key: 'roundness',
+          options: ROUNDNESS,
+          fallback: 'pill',
+          icon: buttonsIcon,
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-2" aria-labelledby="preferences-yarn">
+    <h3 id="preferences-yarn" class="px-2 text-sm font-bold opacity-70">
+      Yarn
+    </h3>
+    <div
+      class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col border border-gray-300 p-4 dark:border-gray-700"
     >
-      <h3>
-        <Accordion.ItemTrigger
-          class="flex w-full items-center justify-between py-1 text-base font-bold"
+      <!-- The yarn picker fills in the default yarn itself. A yarn
+      sets it, clearing the picker removes it, and a brand alone
+      leaves it as it was -->
+      <div role="group" aria-labelledby="preferences-default-yarn">
+        <span id="preferences-default-yarn" class="label-text"
+          >Default Yarn</span
         >
-          Sound & Motion
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent>
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <div
-                class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
-              >
-                <ToggleSwitch
-                  bare
-                  label="Sounds"
-                  details="Soft clicks as you move colors, copy, and save"
-                  checked={effects.sound}
-                  onchange={(e) =>
-                    setEffect(
-                      'sound',
-                      (e.currentTarget as HTMLInputElement).checked,
-                    )}
-                />
-                {#if showVibration}
-                  <ToggleSwitch
-                    bare
-                    label="Vibration"
-                    details="A light tap for some actions"
-                    checked={effects.haptics}
-                    onchange={(e) =>
-                      setEffect(
-                        'haptics',
-                        (e.currentTarget as HTMLInputElement).checked,
-                      )}
-                  />
-                {/if}
-                <ToggleSwitch
-                  bare
-                  label="Reduce Motion"
-                  details="Fewer animations"
-                  checked={effects.motion === 'reduce'}
-                  onchange={(e) =>
-                    setEffect(
-                      'motion',
-                      (e.currentTarget as HTMLInputElement).checked
-                        ? 'reduce'
-                        : 'system',
-                    )}
-                />
-              </div>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-  </Accordion>
+        <p class="mb-1 text-sm opacity-70">
+          Chosen first where no yarn is, like for colors with none assigned
+        </p>
+        {#key yarnPickerKey}
+          <SelectYarn
+            onselectautocomplete={({ selectedBrandId, selectedYarnId }) => {
+              if (selectedBrandId && selectedYarnId)
+                defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;
+              else if (!selectedBrandId && !selectedYarnId)
+                defaultYarn.value = '';
+            }}
+          />
+        {/key}
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="flex flex-col gap-2"
+    aria-labelledby="preferences-sound-motion"
+  >
+    <h3 id="preferences-sound-motion" class="px-2 text-sm font-bold opacity-70">
+      Sound & Motion
+    </h3>
+    <div
+      class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
+    >
+      <ToggleSwitch
+        bare
+        label="Sounds"
+        details="Soft clicks as you move colors, copy, and save"
+        checked={effects.sound}
+        onchange={(e) =>
+          setEffect('sound', (e.currentTarget as HTMLInputElement).checked)}
+      />
+      {#if showVibration}
+        <ToggleSwitch
+          bare
+          label="Vibration"
+          details="A light tap for some actions"
+          checked={effects.haptics}
+          onchange={(e) =>
+            setEffect('haptics', (e.currentTarget as HTMLInputElement).checked)}
+        />
+      {/if}
+      <ToggleSwitch
+        bare
+        label="Reduce Motion"
+        details="Fewer animations"
+        checked={effects.motion === 'reduce'}
+        onchange={(e) =>
+          setEffect(
+            'motion',
+            (e.currentTarget as HTMLInputElement).checked ? 'reduce' : 'system',
+          )}
+      />
+    </div>
+  </section>
 </div>
 
 <StickyPart position="bottom">
   <div
     class="bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-2 sm:px-4"
   >
-    {#if account.summary}
-      <p class="w-full text-center text-sm opacity-70">
-        Colors, mode, buttons, headings, and default yarn are saved to your
-        account
-      </p>
-    {/if}
     <button class="btn hover:preset-tonal-surface" onclick={resetAll}>
       <RotateCcwIcon />
       Reset to Defaults
