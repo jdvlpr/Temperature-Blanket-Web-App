@@ -24,22 +24,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { version = null, notes }: Props = $props();
 </script>
 
+<!-- One bordered card; its notes are borderless tiles inside it, with corners
+that follow the card's (its radius less its padding) -->
 <div
-  class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-2"
+  class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
   id={version}
 >
   <div class="flex flex-wrap gap-2 text-xs">
     {#if version}
       <div
-        class="bg-tertiary-100 dark:bg-tertiary-900 inline-flex items-center gap-2 rounded px-2"
+        class="bg-tertiary-100 dark:bg-tertiary-900 rounded-base inline-flex items-center gap-2 px-2.5 py-0.5"
       >
         <p class="">Version {version}</p>
       </div>
     {/if}
   </div>
-  <div class="card flex flex-wrap gap-2">
+  <div class="flex flex-wrap gap-2">
     {#each notes as { icon, text, title, instructions, IconComponent }}
-      <div class="card bg-surface-50 dark:bg-surface-950 flex-auto p-4">
+      <div
+        class="bg-surface-50 dark:bg-surface-950 flex-auto rounded-[max(0px,calc(var(--radius-container)-var(--spacing)*4))] p-4"
+      >
         <p class="flex items-center gap-2 text-base sm:gap-4">
           {#if icon}
             <span class="shrink-0">{@html icon}</span>

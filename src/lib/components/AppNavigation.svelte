@@ -3,25 +3,27 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
+  import { alignIconInk } from '$lib/state/attachments/align-icon-ink';
   let openedNavigationItems = $state(['tools', 'explore']);
 </script>
 
 <script>
   import { version } from '$app/environment';
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
-  import AppearanceDialog from '$lib/components/modals/AppearanceDialog.svelte';
+  import PreferencesDialog from '$lib/components/modals/PreferencesDialog.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -32,8 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CircleQuestionMarkIcon,
     CloudyIcon,
     CodeIcon,
-    ContrastIcon,
     ExternalLinkIcon,
+    FolderOpenIcon,
     GiftIcon,
     GlobeIcon,
     HeartIcon,
@@ -43,6 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     NotebookPenIcon,
     RssIcon,
     ShieldAlertIcon,
+    SlidersHorizontalIcon,
     SquareTerminalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
@@ -70,11 +73,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           break;
         case '/faq':
         case '/contact':
-        case '/privacy':
         case '/documentation':
+          if (!openedNavigationItems.includes('help'))
+            openedNavigationItems = [...openedNavigationItems, 'help'];
+          break;
+        case '/privacy':
         case '/changelog':
-          if (!openedNavigationItems.includes('about'))
-            openedNavigationItems = [...openedNavigationItems, 'about'];
+          if (!openedNavigationItems.includes('more'))
+            openedNavigationItems = [...openedNavigationItems, 'more'];
           break;
         case '/supporters':
           if (!openedNavigationItems.includes(''))
@@ -83,20 +89,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       if (page.route.id?.includes('api')) {
-        openedNavigationItems = [...openedNavigationItems, 'developer'];
+        openedNavigationItems = [...openedNavigationItems, 'more'];
       }
 
       if (page.route.id?.includes('/blog')) {
-        if (!openedNavigationItems.includes('about'))
-          openedNavigationItems = [...openedNavigationItems, 'about'];
+        if (!openedNavigationItems.includes('explore'))
+          openedNavigationItems = [...openedNavigationItems, 'explore'];
       }
     });
   });
 </script>
 
+<!-- Icons line up by what's drawn, with the site logo's edge -->
 <div
   class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
+  {@attach alignIconInk}
 >
   {#if project.status.temporaryProjectsBackup && project.status.temporaryProjectsBackup.length && project.status.temporaryUid}
     <!--Access backups for project storage migration error, added in version 5.35.0 -->
@@ -119,18 +127,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
   {/if}
 
+  <a
+    href={resolve('/my-projects')}
+    class={[
+      'btn hover:preset-tonal-surface w-fit',
+      page.url.pathname === '/my-projects' && 'preset-tonal-secondary',
+    ]}
+  >
+    <FolderOpenIcon />
+    My Projects
+  </a>
+
   <button
     class="btn hover:preset-tonal-surface"
     onclick={() =>
       dialog.trigger({
         component: {
-          ref: AppearanceDialog,
+          ref: PreferencesDialog,
         },
         type: 'component',
+        options: { title: 'Preferences' },
       })}
   >
-    <ContrastIcon />
-    Appearance
+    <SlidersHorizontalIcon />
+    Preferences
   </button>
 
   <a
@@ -242,6 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <LandmarkIcon />
                 Gallery
               </a>
+
               <a
                 href="/globe"
                 class={[
@@ -252,16 +273,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <GlobeIcon />
                 Globe
               </a>
+
+              <a
+                href="/blog"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit text-left',
+                  (page.url.pathname === '/blog' ||
+                    page.url.pathname.includes('/blog')) &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <RssIcon /> Blog
+              </a>
             </div>
           {/if}
         {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
 
-    <Accordion.Item value="about" class="group gap-0">
+    <Accordion.Item value="help" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
-          About
+          Help
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
@@ -281,18 +314,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </a>
 
               <a
-                href="/changelog"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/changelog' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <GiftIcon />
-                What's New
-              </a>
-
-              <a
                 href="/contact"
                 class={[
                   'btn hover:preset-tonal-surface w-fit',
@@ -301,18 +322,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <MailIcon />
                 Contact
-              </a>
-
-              <a
-                href="/blog"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit text-left',
-                  (page.url.pathname === '/blog' ||
-                    page.url.pathname.includes('/blog')) &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <RssIcon /> Blog
               </a>
 
               <a
@@ -326,6 +335,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <BookOpenTextIcon />
                 Documentation
               </a>
+            </div>
+          {/if}
+        {/snippet}
+      </Accordion.ItemContent>
+    </Accordion.Item>
+    <Accordion.Item value="more" class="group gap-0">
+      <h3>
+        <Accordion.ItemTrigger class="flex items-center justify-between">
+          More
+          {@render indicator()}
+        </Accordion.ItemTrigger>
+      </h3>
+      <Accordion.ItemContent class="flex w-full flex-col gap-2">
+        {#snippet element(attributes)}
+          {#if !attributes.hidden}
+            <div {...attributes} transition:safeSlide>
+              <a
+                href="/changelog"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit',
+                  page.url.pathname === '/changelog' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <GiftIcon />
+                What's New
+                <span class="text-surface-700-300 text-xs">v{version}</span>
+              </a>
 
               <a
                 href="/privacy"
@@ -337,22 +374,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <ShieldAlertIcon />
                 Privacy
               </a>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-    <Accordion.Item value="developer" class="group gap-0">
-      <h3>
-        <Accordion.ItemTrigger class="flex items-center justify-between">
-          Developer
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent class="flex w-full flex-col gap-2">
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
+
               <a
                 href="/api/yarn-colorways"
                 class={[
@@ -381,9 +403,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Accordion.ItemContent>
     </Accordion.Item>
   </Accordion>
-
-  <a
-    class="btn hover:preset-tonal-surface w-fit opacity-50 hover:opacity-100"
-    href="/changelog">v{version}</a
-  >
 </div>

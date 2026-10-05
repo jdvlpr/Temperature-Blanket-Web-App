@@ -3,30 +3,35 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import AppNavigation from '$lib/components/AppNavigation.svelte';
+  import AccountButton from '$lib/components/account/AccountButton.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { alignIconInk } from '$lib/state/attachments/align-icon-ink';
   import {
     drawerState,
     showNavigationSideBar,
   } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
+  import { motion } from '$lib/utils/feedback.svelte';
   import {
     MenuIcon,
     PanelLeftClose,
     PanelRightCloseIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { cubicOut } from 'svelte/easing';
+  import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
@@ -40,6 +45,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
 
   let sidebarWidth = $state(0);
+
+  // The sidebar folds both ways at once, so the button under it glides to
+  // its place rather than jumping when the navigation is gone
+  function sidebarSlide(node: HTMLElement): TransitionConfig {
+    if (motion.reduced) return { duration: 0 };
+    const { width, height } = node.getBoundingClientRect();
+    return {
+      duration: 400,
+      easing: cubicOut,
+      css: (t) =>
+        `overflow: hidden; width: ${t * width}px; height: ${t * height}px; opacity: ${Math.min(t * 3, 1)}`,
+    };
+  }
 
   let debounceTimer: number | undefined;
   const debounce = (callback: () => void, time: number) => {
@@ -55,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div data-vaul-drawer-wrapper="true">
+<div>
   <div
     class={[
       'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
@@ -82,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Dialog.Trigger>
           <Portal>
             <Dialog.Backdrop
-              class="bg-surface-50-950/50 fixed inset-0 z-50 opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0"
+              class="bg-surface-950/35 fixed inset-0 z-50 opacity-0 transition transition-discrete data-[state=open]:opacity-100 dark:bg-black/55 starting:data-[state=open]:opacity-0"
             />
             <Dialog.Positioner class="fixed inset-0 z-50 flex justify-start">
               <Dialog.Content
@@ -98,7 +116,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Dialog>
       </div>
 
-      {@render stickyHeader?.()}
+      <!-- The page's own items sit on the right, next to the account link; the
+      first (usually the logo, shown on wide screens) stays on the left -->
+      <div
+        class="flex min-w-0 flex-1 items-center justify-end max-sm:gap-1 sm:gap-2 [&>:first-child]:mr-auto"
+      >
+        {@render stickyHeader?.()}
+      </div>
+
+      <!-- Always the last item in the top bar -->
+      <AccountButton />
     </div>
   </div>
 
@@ -107,9 +134,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex h-fit flex-col items-start justify-start [view-transition-name:sidebar-navigation]"
       bind:clientWidth={sidebarWidth}
     >
+      {#if showNavigationSideBar.value}
+        <div class="hidden w-fit flex-col lg:flex" transition:sidebarSlide>
+          <div class="w-fit">
+            <AppNavigation />
+          </div>
+        </div>
+      {/if}
+      <!-- Below the navigation, so as it folds away (up as well as in) the
+      button rises with it to the top -->
       <button
-        class="btn hover:preset-tonal-surface mx-2 mt-2 hidden justify-center lg:flex"
+        class={[
+          'hover:preset-tonal-surface mx-2 hidden justify-center lg:flex',
+          // Open, it follows the menu at the menu's own spacing, with room
+          // below it when the menu reaches the end of the page
+          showNavigationSideBar.value
+            ? 'btn mb-4'
+            : 'btn-icon relative -top-0.5 mt-2 ml-4',
+        ]}
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
+        {@attach alignIconInk}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
         }}
@@ -121,16 +165,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <PanelRightCloseIcon />
         {/if}
       </button>
-      {#if showNavigationSideBar.value}
-        <div
-          class="hidden w-fit flex-col lg:flex"
-          transition:safeSlide={{ axis: 'x' }}
-        >
-          <div class="w-fit">
-            <AppNavigation />
-          </div>
-        </div>
-      {/if}
     </div>
 
     <div class="min-w-0 flex-1">

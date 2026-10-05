@@ -32,7 +32,9 @@ test.describe('Project Planner', () => {
   });
 
   test('Loads successfully', async ({ page }) => {
-    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Project Options' }),
+    ).toBeVisible();
     await expect(page.getByPlaceholder('Enter a place')).toBeVisible();
   });
 
@@ -89,20 +91,21 @@ test.describe('Project Planner', () => {
     // Go to Colors Tab (using nth(1) as there are 2 "Colors" buttons)
     await page.getByRole('button', { name: 'Colors' }).nth(1).click();
     await expect(
-      page.getByRole('button', { name: 'Browse Palettes' }),
+      page.getByRole('button', { name: 'Get Colors' }),
     ).toBeVisible();
 
     // Go to Preview Tab
     await page.getByRole('button', { name: 'Preview' }).nth(1).click();
     await expect(page.getByRole('button', { name: 'Calendar' })).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Download Image (PNG)' }),
+      page.getByRole('button', { name: 'Download PNG' }),
     ).toBeVisible();
   });
 
   test('Shared-URL preview restore and Undo/Redo (B2 async preview lazy-load)', async ({
     page,
     context,
+    baseURL,
   }) => {
     // Pre-seed the analytics-consent cookies so the app's persistent,
     // non-auto-dismissing consent toast (bottom-anchored, same collision zone as
@@ -110,8 +113,8 @@ test.describe('Project Planner', () => {
     // clicks below -- re-navigate so this take effect on the page from
     // `beforeEach`, not just pages created later in this test.
     await context.addCookies([
-      { name: '_clck', value: '1', url: 'https://localhost:4173' },
-      { name: '_clsk', value: '1', url: 'https://localhost:4173' },
+      { name: '_clck', value: '1', url: baseURL },
+      { name: '_clsk', value: '1', url: baseURL },
     ]);
     await page.goto('/');
 
@@ -146,10 +149,10 @@ test.describe('Project Planner', () => {
     await expect(page.locator('#select-pattern-type')).toHaveValue('clnr');
 
     // 2. Save -- this is the app's own mechanism for writing the current project
-    // state into a shareable URL (SaveProjectModal calls replaceState on mount).
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    // state into a shareable URL (saving calls replaceState).
+    await page.getByTestId('save-button').click();
     await expect(
-      page.getByText(/Saved Locally|problem saving your project/),
+      page.getByText(/Saved in this browser|problem saving your project/),
     ).toBeVisible();
     const savedUrl = page.url();
     expect(savedUrl).toContain('#');

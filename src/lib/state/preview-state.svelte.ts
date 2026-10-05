@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { WeatherParam } from '$lib/types/gauge-types';
 import {
   extraColorsToUrlHash,
   type PreviewExtraColor,
@@ -32,11 +31,6 @@ import type { RowsPreviewClass } from '$lib/components/previews/rows/state.svelt
 import type { SplitMonthSquaresPreviewClass } from '$lib/components/previews/split-month-squares/state.svelte';
 import type { SquareRoundsPreviewClass } from '$lib/components/previews/square-rounds/state.svelte';
 import type { SquaresPreviewClass } from '$lib/components/previews/squares/state.svelte';
-
-export const previewWeatherTargets = $state({
-  value: [] as WeatherParam[],
-  getter: undefined as ((index: number) => WeatherParam[]) | undefined,
-});
 
 // The union of every preview's real (heavy) instance type. These are
 // type-only imports, so they're erased at build time and don't pull the
@@ -284,3 +278,6 @@ class PreviewsState {
 }
 
 export const previews = new PreviewsState();
+
+/** The yarn color being pointed at or focused in a gauge; the preview dims every other color */
+export const previewHighlight: { hex: string | null } = $state({ hex: null });

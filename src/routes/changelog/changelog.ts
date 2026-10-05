@@ -17,7 +17,13 @@ import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
+  BellRingIcon,
   CloudCogIcon,
+  FolderHeartIcon,
+  PaletteIcon,
+  ShieldCheckIcon,
+  SmartphoneIcon,
+  UserRoundIcon,
   CogIcon,
   GlobeIcon,
   ImageIcon,
@@ -34,6 +40,62 @@ export const entries: ChangelogItemGroup[] = [
   {
     year: 2026,
     months: [
+      {
+        month: 'October',
+        items: [
+          // The accounts beta opens after this release, when accounts are
+          // switched on, so the note only appears then
+          ...(__ACCOUNTS_ENABLED__
+            ? [
+                {
+                  notes: [
+                    {
+                      IconComponent: UserRoundIcon,
+                      text: `You can now sign in, with an emailed code or with Google, to keep your projects, yarn palettes and preferences in an account and open them on any device. Projects and palettes you share in the gallery can show your name and appear on your own public gallery page, if you choose, and you can share yarn palettes on their own. Accounts are optional. Read all about it in the <a href="/blog/2026-09-28-accounts-beta" class="link">Accounts (Beta) blog post</a>.`,
+                      title: 'Accounts (Beta)',
+                    },
+                  ],
+                },
+              ]
+            : []),
+          {
+            notes: [
+              {
+                IconComponent: FolderHeartIcon,
+                instructions: 'Find it at the top of the site menu',
+                text: `The new <a href="/my-projects" class="link">My Projects</a> page lists your saved projects and yarn palettes. You can name your projects, and deleted projects and palettes go to a Trash for 30 days, so they can be put back. Once a project is saved, your changes save by themselves; <span class="italic">Save</span> is now in the top bar, and the Project menu has everything else.`,
+                title: 'My Projects, Saved Palettes & Auto-Save',
+              },
+              {
+                IconComponent: PaletteIcon,
+                text: `Save yarn palettes to use again later, copy a palette's link in one click, and save a palette as an image with a choice of layouts. Paste Colors reads lists of hex codes forgivingly, Get Colors From an Image has been rebuilt around markers on the photo, and palettes can be sorted from warm to cool.`,
+                title: 'Yarn Palette Tools',
+              },
+              {
+                IconComponent: BellRingIcon,
+                text: `Preferences have been redesigned with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn on small sounds, vibrations and motion touches (or turn them off) under Sound & Motion.`,
+                title: 'Preferences',
+              },
+              {
+                IconComponent: SmartphoneIcon,
+                text: `On phones, dialogs now open as sheets from the bottom of the screen. Drag one down to close it. The header fits better on small screens, too.`,
+                title: 'Easier on Phones',
+              },
+              {
+                IconComponent: ImageIcon,
+                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. Visits to project pages now count toward Popular.`,
+                title: 'Project Gallery',
+              },
+              {
+                IconComponent: ShieldCheckIcon,
+                text: `The <a href="/privacy" class="link">Privacy Policy</a> has been rewritten to be clearer. Fonts are now served from this site, and videos only load from YouTube when you choose to play one.`,
+                title: 'Privacy',
+              },
+            ],
+            version: '6.4.0',
+          },
+        ],
+      },
       {
         month: 'September',
         items: [

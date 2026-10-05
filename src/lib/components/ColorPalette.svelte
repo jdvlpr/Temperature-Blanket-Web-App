@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     style="height:{height}"
   >
     {#if colors}
-      {#each colors as { hex, brandName, yarnName, name }}
+      {#each colors as { hex, brandName, yarnName, name }, index}
         {@const popover = new PopoverInstance({
           interaction: 'hover',
           placement: 'top',
@@ -45,7 +45,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key hex}
           <button
             {...popover.reference()}
-            class="flex h-full w-full max-w-[90vw] cursor-pointer flex-wrap items-center justify-center"
+            class={[
+              // The focus ring is drawn inside the swatch, which rounds only
+              // where the strip does, so the ring follows the strip's shape
+              'flex h-full w-full max-w-[90vw] cursor-pointer flex-wrap items-center justify-center focus-visible:ring-4 focus-visible:ring-black focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white focus-visible:ring-inset',
+              index === 0 && 'rounded-l-container',
+              index === colors.length - 1 && 'rounded-r-container',
+            ]}
             style="background:{hex}"
             title={brandName && yarnName && name
               ? `${brandName} - ${yarnName}: ${name}`

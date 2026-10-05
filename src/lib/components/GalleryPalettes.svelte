@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
   import type {
-    GalleryProjectNode,
+    PaletteGalleryNode,
     GalleryPageInfo,
   } from '$lib/utils/gallery-utils';
   import type { GalleryPalette } from '$lib/utils/color-utils';
@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     filteredYarnId = $state('');
     palettesContainOnlyFilteredYarn = $state(false);
     orderBy = $state('DESC');
-    projects = $state<GalleryProjectNode[]>([]);
+    projects = $state<PaletteGalleryNode[]>([]);
     palettes = $state<GalleryPalette[]>([]);
     gallery = $state<{ pageInfo?: GalleryPageInfo }>({});
 
@@ -57,7 +57,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { isDesktop } from '$lib/state/page-state.svelte';
   import { getPalettesFromProjects } from '$lib/utils/color-utils';
-  import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
+  import {
+    fetchPaletteGallery,
+    recordPageView,
+  } from '$lib/utils/gallery-utils';
   import { ArrowUpDownIcon, EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -87,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         yarnId: galleryPalettesState.filteredYarnId,
       });
 
-      let results = await fetchProjects({
+      let results = await fetchPaletteGallery({
         search: galleryPalettesState.search,
         order: galleryPalettesState.orderBy,
         yarn: yarnSearch,
@@ -111,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     if (!galleryPalettesState.projects.length) {
       loading = true;
-      let results = await fetchProjects({
+      let results = await fetchPaletteGallery({
         first,
         after: endCursor,
         search: galleryPalettesState.search,
@@ -157,7 +160,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:selectedBrandId={galleryPalettesState.filteredBrandId}
           bind:selectedYarnId={galleryPalettesState.filteredYarnId}
           onselectautocomplete={debouncedSearch}
-          context="modal"
         />
       </div>
 
@@ -182,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <div class="col-span-12 flex w-full flex-col justify-start md:col-span-3">
-        <span class="label-text text-left"> Search Projects </span>
+        <span class="label-text text-left"> Search </span>
         <div class="input-group grid-cols-[auto_1fr_auto]">
           <span class="ig-cell">
             <EarthIcon />
@@ -235,12 +237,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
     <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
-      {#each galleryPalettesState.palettes as { colors, schemeName, projectId }}
+      {#each galleryPalettesState.palettes as { colors, schemeName, postId }}
         <button
           type="button"
           class="w-full cursor-pointer"
           onclick={() => {
-            recordPageView(projectId);
+            recordPageView(postId);
             updateGauge({
               _colors: colors,
               _schemeId: 'Custom',
@@ -273,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           brandId: galleryPalettesState.filteredBrandId,
           yarnId: galleryPalettesState.filteredYarnId,
         });
-        let results = await fetchProjects({
+        let results = await fetchPaletteGallery({
           first,
           after: endCursor,
           search: galleryPalettesState.search,

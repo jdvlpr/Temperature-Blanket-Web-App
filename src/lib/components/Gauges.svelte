@@ -164,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div class="px-2">
-    <Gauge bind:gauge={gauges.activeGauge} />
+    <Gauge bind:gauge={gauges.activeGauge} inProject />
   </div>
 
   {#key gauges.activeGauge.colors}

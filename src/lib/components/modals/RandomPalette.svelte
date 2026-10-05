@@ -3,38 +3,34 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
-  import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
+  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
+  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
-  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { getSortedPalette } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
-  import type { Color } from '$lib/types/yarn-types';
-  import {
-    ArrowDownWideNarrowIcon,
-    ExternalLinkIcon,
-    ShuffleIcon,
-  } from '@lucide/svelte';
+  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
+  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
-  import HelpIcon from '../buttons/HelpIcon.svelte';
 
   let { numberOfColors, updateGauge } = $props();
 
@@ -150,25 +146,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<div class="px-4 pt-8">
+<div class="px-4 pt-2 pb-2 sm:pb-4">
   <div class="grid w-full grid-cols-12 items-end justify-center gap-4">
     <div
       class="order-1 col-span-full w-full md:col-span-9"
       class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
     >
       <SelectYarn
-        context="modal"
         bind:selectedBrandId
         bind:selectedYarnId
         {selectedYarnWeightId}
       />
     </div>
 
-    {#if selectedBrandId && selectedYarnId}
-      <div class="order-2 col-span-full w-full md:order-3">
-        <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
-      </div>
-    {/if}
+    <DefaultYarnSuggestion
+      {selectedBrandId}
+      {selectedYarnId}
+      class="order-2 col-span-full md:order-3"
+    />
 
     {#if yarnDataReady}
       {#key selectedBrandId}
@@ -206,8 +201,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <option value="none">None</option>
-          <option value="light-to-dark">Lightest to Darkest</option>
-          <option value="dark-to-light">Darkest to Lightest</option>
+          <option value="warm-to-cool">Warm to Cool</option>
+          <option value="cool-to-warm">Cool to Warm</option>
+          <option value="rainbow">Rainbow</option>
+          <option value="light-to-dark">Light to Dark</option>
+          <option value="dark-to-light">Dark to Light</option>
           <option value="name">Name A-Z</option>
           <option value="name-z-to-a">Name Z-A</option>
         </select>
@@ -251,6 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       disabled={!yarnDataReady}
       onSave={() => {
+        yarnUses.record(selectedBrandId, selectedYarnId);
         updateGauge({
           _colors: randomPalette.map((color) => {
             delete color.locked;

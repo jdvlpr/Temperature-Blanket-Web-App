@@ -272,3 +272,15 @@ export const getLocalISODateString = (
 
   return `${year}-${month}-${day}`;
 };
+
+/**
+ * Formats a date and time as "9/30/2026 at 2:15 PM" in the local time zone,
+ * for things like "Saved 9/30/2026 at 2:15 PM"
+ */
+export const formatDateTime = (time: number | Date): string => {
+  const date = new Date(time);
+  return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit',
+  })}`;
+};

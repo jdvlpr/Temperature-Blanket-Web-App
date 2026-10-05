@@ -2,7 +2,12 @@
   import { run } from 'svelte/legacy';
   import { flip } from 'svelte/animate';
   import { toast } from '$lib/state/page-state.svelte';
-  import { CircleAlertIcon, CircleCheckIcon, InfoIcon } from '@lucide/svelte';
+  import {
+    CircleAlertIcon,
+    CircleCheckIcon,
+    InfoIcon,
+    TriangleAlertIcon,
+  } from '@lucide/svelte';
   import { fade } from 'svelte/transition';
 
   // Props
@@ -49,7 +54,7 @@
     width = 'max-w-[640px]',
     color = '',
     padding = 'p-4',
-    spacing = 'space-x-4',
+    spacing = 'gap-x-4 gap-y-2',
     rounded = 'rounded-container',
     shadow = 'shadow-lg',
     zIndex = 'z-9999',
@@ -62,8 +67,11 @@
   const cWrapper =
     'flex fixed top-0 left-0 right-0 bottom-0 pointer-events-none ';
   const cSnackbar = 'flex flex-col gap-y-2';
-  const cToast = 'flex justify-between items-center pointer-events-auto';
-  const cToastActions = 'flex items-center space-x-2';
+  // On narrow screens the buttons go below the message, rather than
+  // squeezing it
+  const cToast =
+    'flex flex-wrap justify-between items-center pointer-events-auto';
+  const cToastActions = 'ml-auto flex shrink-0 items-center gap-2';
 
   let { cPosition, cAlign, animAxis } = $derived(getLocalPosition(position));
 
@@ -181,6 +189,7 @@
               t.category === 'success' && 'preset-filled-success-100-900',
               t.category === 'error' && 'preset-filled-error-50-950',
               t.category === 'info' && 'preset-filled-secondary-100-900',
+              t.category === 'warning' && 'preset-filled-warning-100-900',
               !t.category && (t.background || background),
               t.classes,
             ]}
@@ -188,27 +197,32 @@
           >
             {#if t.icon}
               {@const CustomIcon = t.icon as any}
-              <div class="flex items-center justify-between gap-4 text-base">
+              <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CustomIcon class="inline" />
                 {@html t.message}
               </div>
             {:else if t.category === 'success'}
-              <div class="flex items-center justify-between gap-4 text-base">
+              <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CircleCheckIcon class="inline" />
                 {@html t.message}
               </div>
             {:else if t.category === 'error'}
-              <div class="flex items-center justify-between gap-4 text-base">
+              <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CircleAlertIcon class="inline" />
                 {@html t.message}
               </div>
+            {:else if t.category === 'warning'}
+              <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
+                <TriangleAlertIcon class="inline shrink-0" />
+                {@html t.message}
+              </div>
             {:else if t.category === 'info'}
-              <div class="flex items-center justify-between gap-4 text-base">
+              <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <InfoIcon class="inline" />
                 {@html t.message}
               </div>
             {:else}
-              <div class="text-base">{@html t.message}</div>
+              <div class="min-w-48 flex-1 text-base">{@html t.message}</div>
             {/if}
             {#if t.action || !t.hideDismiss}
               <div class="toast-actions {cToastActions}">

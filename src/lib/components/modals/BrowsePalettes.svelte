@@ -14,11 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import GalleryPalettes from '$lib/components/GalleryPalettes.svelte';
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
+  import SavedPalettes from '$lib/components/SavedPalettes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
+  import {
+    BlendIcon,
+    BookmarkIcon,
+    LandmarkIcon,
+    StarIcon,
+  } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
@@ -53,7 +61,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
     { threshold: 1 },
   );
-  const categories = ['Gallery', 'Featured', 'Schemes'];
+  const categories = ['Saved', 'Gallery', 'Featured', 'Schemes'];
+
+  // Bookmark matches the Save button; Landmark matches Gallery in the sidebar
+  const categoryIcons = {
+    Saved: BookmarkIcon,
+    Gallery: LandmarkIcon,
+    Featured: StarIcon,
+    Schemes: BlendIcon,
+  };
 
   onMount(() => {
     ensureYarnData();
@@ -77,31 +93,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <SegmentedControl
-      value={category}
-      onValueChange={(e) => {
-        if (e.value) {
-          category = e.value as string;
-        }
-      }}
-    >
-      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
-        <SegmentedControl.Indicator />
-        {#each categories as categoryItem}
-          <SegmentedControl.Item value={categoryItem}>
-            <SegmentedControl.ItemText
-              ><span class="flex items-center justify-center gap-1">
-                {categoryItem}
-              </span></SegmentedControl.ItemText
+    <SegmentsScroller collapse>
+      {#snippet children(iconsOnly)}
+        <SegmentedControl
+          value={category}
+          onValueChange={(e) => {
+            if (e.value) {
+              category = e.value as string;
+            }
+          }}
+        >
+          <!-- Named only once just the icons show -->
+          {#if iconsOnly}
+            <SegmentedControl.Label class="label-text"
+              >Category<span aria-hidden="true">: {category}</span
+              ></SegmentedControl.Label
             >
-            <SegmentedControl.ItemHiddenInput />
-          </SegmentedControl.Item>
-        {/each}
-      </SegmentedControl.Control>
-    </SegmentedControl>
+          {/if}
+          <SegmentedControl.Control
+            class="bg-surface-100 dark:bg-surface-950 min-w-max"
+          >
+            <SegmentedControl.Indicator />
+            {#each categories as categoryItem}
+              {@const Icon =
+                categoryIcons[categoryItem as keyof typeof categoryIcons]}
+              <SegmentedControl.Item
+                value={categoryItem}
+                title={iconsOnly ? categoryItem : undefined}
+              >
+                <SegmentedControl.ItemText
+                  ><span class="flex items-center justify-center gap-1">
+                    <Icon />
+                    <span class={{ 'sr-only': iconsOnly }}>{categoryItem}</span>
+                  </span></SegmentedControl.ItemText
+                >
+                <SegmentedControl.ItemHiddenInput />
+              </SegmentedControl.Item>
+            {/each}
+          </SegmentedControl.Control>
+        </SegmentedControl>
+      {/snippet}
+    </SegmentsScroller>
   </div>
 
-  {#if category === 'Gallery'}
+  {#if category === 'Saved'}
+    <SavedPalettes {updateGauge} />
+  {:else if category === 'Gallery'}
     <GalleryPalettes {updateGauge} />
   {:else if category === 'Featured'}
     <GalleryPalettesPopular {updateGauge} />

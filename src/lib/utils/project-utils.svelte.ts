@@ -14,9 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import pdfExtraColors from '$lib/features/pdf/sections/extra-colors.svelte';
-import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
-import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
+import PdfOptions from '$lib/components/modals/PdfOptions.svelte';
 import {
   allGaugesAttributes,
   gauges,
@@ -36,6 +34,7 @@ import {
   getLocalISODateString,
   stringToDate,
 } from '$lib/utils/date-utils';
+import { decodeHtmlEntities, escapeHtml } from '$lib/utils/string-utils';
 import type { GaugeAttributes } from '$lib/types/gauge-types';
 import type { Color } from '$lib/types/yarn-types';
 
@@ -54,31 +53,12 @@ export const getProjectParametersFromURLHash = (
     }, {});
 };
 
-export const downloadPDF = async () => {
+/** Asks what to put in the PDF, then downloads it */
+export const downloadPDF = () => {
   dialog.trigger({
-    type: 'choose-weather-params',
-    response: async (response: boolean) => {
-      if (response) {
-        await import('jspdf')
-          .then((module) => {
-            const JsPDF = module.default;
-            const doc = new JsPDF();
-            const totalPages =
-              pdfGauges.pages() +
-              pdfExtraColors.pages() +
-              pdfWeatherData.pages();
-            pdfGauges.create(doc, totalPages);
-            pdfExtraColors.create(doc, totalPages);
-            pdfWeatherData.create(doc, totalPages);
-            // Remove blank first page, ugly hack
-            doc.deletePage(1);
-            doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
-          })
-          .catch((error) => {
-            throw new Error(error);
-          });
-      }
-    },
+    type: 'component',
+    component: { ref: PdfOptions },
+    options: { title: 'Download PDF' },
   });
 };
 
@@ -152,7 +132,25 @@ export const downloadWeatherCSV = () => {
   document.body.removeChild(link);
 };
 
-export const sendToProjectGallery = async (img: string) => {
+/**
+ * Sends the project to the gallery. `fromAccount` publishes it as the signed-in
+ * user when it's saved to their account, falling back to an anonymous submission
+ * when that isn't possible.
+ */
+export const sendToProjectGallery = async (
+  img: string,
+  {
+    fromAccount = false,
+    showOwner = false,
+    name = '',
+  }: {
+    fromAccount?: boolean;
+    /** From an account: include it on the owner's public gallery, with their name */
+    showOwner?: boolean;
+    /** The name the project was given, shown in the gallery instead of its location title */
+    name?: string;
+  } = {},
+) => {
   const colors: Color[][] = [];
   const palettes: string[] = [];
   const yarnUrls: string[] = [];
@@ -212,6 +210,9 @@ export const sendToProjectGallery = async (img: string) => {
     weather_grouping: weather.grouping,
     weather_sources: JSON.stringify(weather.getWeatherSourceDetails()),
     wp_tag_id: previews.active?.wpTagId,
+    // Only when named: older gallery plugins ignore it, and the title stays the
+    // location title so gallery search by place still works
+    ...(name && { project_name: name }),
   };
   let message = '';
   try {
@@ -219,26 +220,39 @@ export const sendToProjectGallery = async (img: string) => {
     if (!body) {
       return 'Sorry, this project is too large to add to the gallery. Try a shorter date range or fewer locations.';
     }
-    const request = await fetch('/api/project', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-    const response = await request.json();
+    // WordPress's answer, from either route
+    let response: Awaited<ReturnType<Response['json']>> | undefined;
+    if (fromAccount) {
+      const { publishFromAccount } = await import('$lib/accounts/gallery');
+      const result = await publishFromAccount(body, { showOwner });
+      if (result.status === 'answered') response = result.response;
+    }
+    if (!response) {
+      const request = await fetch('/api/project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+      response = await request.json();
+    }
 
     if (response.code === 200) {
       // success
-      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
+      message = `<p class="font-bold text-xl my-2">${escapeHtml(String(response.message ?? ''))}</p><p>The project gallery webpage has been created.</p>`;
+      if (response.linked)
+        message +=
+          '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from My Projects.</p>';
       project.gallery.href = response.link;
-      project.gallery.title = response.title;
+      project.gallery.title = decodeHtmlEntities(String(response.title ?? ''));
       // reloadRecentGalleryProjects();
     } else if (response.code === 409) {
       // duplicate project
       response.data = JSON.parse(response.data);
       message = response.message;
-      message += `<a class="link" href="${response.data.permalink}" target="_blank">${response.data.title}</a>`;
+      // Another page's title, from WordPress: text, never HTML
+      message += `<a class="link" href="${escapeHtml(String(response.data.permalink ?? ''))}" target="_blank">${escapeHtml(decodeHtmlEntities(String(response.data.title ?? '')))}</a>`;
     } else if (response.code === 400) {
       // unexpected or missing request param
       message = response.message;
@@ -274,10 +288,13 @@ export const getTitleFromLocationsMeta = (locations: string | null): string => {
     ? _locations
         .flatMap((item) => {
           // Some locations have a missing city name `, ,`, so replace that with just one comma `,`
-          const label = item.label.replace(', ,', ',');
+          // Anyone can send any label to the gallery, and this is shown as HTML: escape it
+          const label = escapeHtml(
+            String(item.label ?? '').replace(', ,', ','),
+          );
 
-          let from: string = item.from;
-          let to: string = item.to;
+          let from: string = String(item.from ?? '');
+          let to: string = String(item.to ?? '');
 
           // Before version 3.36.0, projects' location from and to dates were saved in the user's locale format,
           // which means different project's displayed other locale's formats, not always the user's locale formate.
@@ -291,7 +308,7 @@ export const getTitleFromLocationsMeta = (locations: string | null): string => {
             });
           }
 
-          return `<span class="font-bold">${label}</span> from ${from} to ${to}`;
+          return `<span class="font-bold">${label}</span> from ${escapeHtml(from)} to ${escapeHtml(to)}`;
         })
         .join('; ')
     : null;

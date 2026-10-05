@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { projectChanged } from '$lib/storage/autosave.svelte';
   import { UNIT_LABELS } from '$lib/constants/weather-constants';
   import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -99,8 +100,7 @@
             >
               <button
                 class={[
-                  weather.grouping === 'day' &&
-                    'hover:preset-tonal-surface btn',
+                  weather.grouping === 'day' && 'hover-on-color btn',
                   (weather.grouping === 'week' || id === 'moon') &&
                     'disabled:opacity-100',
                   isRecentDate && 'opacity-65',
@@ -114,9 +114,10 @@
                         ref: TextInput,
                         props: {
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
+                          title: label,
                           onOkay: async (_value: string) => {
                             weather.isUserEdited = true;
+                            projectChanged({ weather: true });
 
                             const time = _value.split(':');
 
@@ -145,6 +146,7 @@
                           },
                         },
                       },
+                      options: { title: `${row.date}` },
                     });
                   } else {
                     dialog.trigger({
@@ -154,11 +156,12 @@
                         props: {
                           max: 1000,
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span></span></div>`,
+                          title: `${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span>`,
                           noMinMax: true,
                           showSlider: false,
                           onOkay: async (_value: number) => {
                             weather.isUserEdited = true;
+                            projectChanged({ weather: true });
                             const mappedWeather = weather.rawData.map(
                               (n) =>
                                 `${dateToISO8601String(n.date)}-${n.location}`,
@@ -196,6 +199,7 @@
                           },
                         },
                       },
+                      options: { title: `${row.date}` },
                     });
                   }
                 }}

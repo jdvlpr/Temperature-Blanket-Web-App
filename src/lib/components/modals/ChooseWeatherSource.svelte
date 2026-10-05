@@ -25,10 +25,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     InfoIcon,
   } from '@lucide/svelte';
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
-  import GettingWeather from './GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
   import StickyPart from './StickyPart.svelte';
+  import { weatherSearch } from '$lib/state/weather-search.svelte';
 
   let warnSearchAgain = $derived.by(() => {
     if (!weather.data.length) return false;
@@ -54,6 +54,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   async function _onOkay() {
     const _warnSearchAgain = warnSearchAgain; // save a copy of the current derived value
 
+    // The settings to go back to if the new search is cancelled
+    const previous = $state.snapshot(weather.source);
+    const onCancel = () => Object.assign(weather.source, previous);
+
     weather.source.name = sourceName;
     weather.source.useSecondary = useSecondary;
     weather.source.settings.meteoStat.model = meteostatModel;
@@ -67,21 +71,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type: 'component',
           component: {
             ref: GettingWeatherWarnCustomWeather,
+            props: { onCancel },
           },
         });
       } else {
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: GettingWeather,
-          },
-        });
+        weatherSearch.start({ onCancel });
       }
     }
   }
 </script>
 
-<div class="flex w-full flex-col items-start gap-2 py-2 px-2 sm:px-4 text-left">
+<div class="flex w-full flex-col items-start gap-2 px-2 py-2 text-left sm:px-4">
   <label class="label">
     <span class="label-text">Choose a Weather Source</span>
     <select class="select" bind:value={sourceName}>
@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   {#if sourceName === 'Open-Meteo'}
-    <div class="flex flex-col items-start justify-center text-sm w-full">
+    <div class="flex w-full flex-col items-start justify-center text-sm">
       <p class="">5 day delay</p>
 
       <p>
@@ -134,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     </div>
   {:else if sourceName === 'Meteostat'}
-    <div class="flex flex-col items-start justify-center w-full text-sm">
+    <div class="flex w-full flex-col items-start justify-center text-sm">
       <p class="">1 to 7 day delay</p>
 
       <p>
@@ -199,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
 
-  <p class="font-bold text-xl w-full">Settings</p>
+  <p class="w-full text-xl font-bold">Settings</p>
 
   {#if sourceName === 'Open-Meteo'}
     <div class="flex flex-col gap-2">
@@ -242,7 +242,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     </div>
   {:else if sourceName === 'Meteostat'}
-    <div class="mt-2 flex flex-col gap-1 w-full">
+    <div class="mt-2 flex w-full flex-col gap-1">
       <label class="flex items-center gap-2 pb-1 font-bold">
         <input
           type="checkbox"

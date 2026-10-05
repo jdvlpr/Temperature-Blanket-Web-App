@@ -1,0 +1,49 @@
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
+//
+// This file is part of Temperature-Blanket-Web-App.
+//
+// Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+//
+// Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+// If not, see <https://www.gnu.org/licenses/>.
+
+import type { EmailMessage, EmailSender } from './types';
+
+/** Sends email through Resend's HTTP API (https://resend.com/docs/api-reference/emails/send-email). */
+export class ResendSender implements EmailSender {
+  constructor(
+    private apiKey: string,
+    /** e.g. "Temperature Blanket <sign-in@mail.temperature-blanket.com>" */
+    private from: string,
+    // A wrapper, not fetch itself: Workers throw "Illegal invocation" when
+    // fetch is called as a method of another object (this.fetchFn(...))
+    private fetchFn: typeof fetch = (input, init) => fetch(input, init),
+  ) {}
+
+  async send(message: EmailMessage): Promise<void> {
+    const response = await this.fetchFn('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: this.from,
+        to: [message.to],
+        subject: message.subject,
+        text: message.text,
+        ...(message.html ? { html: message.html } : {}),
+      }),
+    });
+    if (!response.ok)
+      throw new Error(
+        `Resend responded ${response.status}: ${await response.text()}`,
+      );
+  }
+}

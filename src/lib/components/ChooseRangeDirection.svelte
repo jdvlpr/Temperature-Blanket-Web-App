@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import {
     ArrowDownNarrowWideIcon,
     ArrowDownWideNarrowIcon,
@@ -23,26 +24,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { direction, onchange } = $props();
 </script>
 
-<SegmentedControl value={direction} onValueChange={onchange}>
-  <SegmentedControl.Control
-    class="bg-surface-100 dark:bg-surface-900 flex-wrap items-start justify-start gap-y-2 "
-  >
-    <SegmentedControl.Indicator />
-    <SegmentedControl.Item value="high-to-low">
-      <SegmentedControl.ItemText
-        title="Set Gauge Direction to High to Low"
-        class="flex items-center gap-1"
-        ><ArrowDownWideNarrowIcon class="" /> High to Low</SegmentedControl.ItemText
+<SegmentsScroller collapse>
+  {#snippet children(iconsOnly)}
+    <SegmentedControl value={direction} onValueChange={onchange}>
+      <SegmentedControl.Label class="text-xs"
+        >Direction{#if iconsOnly}<span aria-hidden="true"
+            >: {direction === 'low-to-high'
+              ? 'Low to High'
+              : 'High to Low'}</span
+          >{/if}</SegmentedControl.Label
       >
-      <SegmentedControl.ItemHiddenInput />
-    </SegmentedControl.Item>
-    <SegmentedControl.Item value="low-to-high">
-      <SegmentedControl.ItemText
-        title="Set Gauge Direction to Low to High"
-        class="flex items-center gap-1"
-        ><ArrowDownNarrowWideIcon class="" /> Low to High</SegmentedControl.ItemText
+      <SegmentedControl.Control
+        class="bg-surface-100 dark:bg-surface-900 min-w-max"
       >
-      <SegmentedControl.ItemHiddenInput />
-    </SegmentedControl.Item>
-  </SegmentedControl.Control>
-</SegmentedControl>
+        <SegmentedControl.Indicator />
+        <SegmentedControl.Item value="high-to-low">
+          <SegmentedControl.ItemText
+            title="Set Gauge Direction to High to Low"
+            class="flex items-center gap-1"
+            ><ArrowDownWideNarrowIcon />
+            <span class={{ 'sr-only': iconsOnly }}>High to Low</span
+            ></SegmentedControl.ItemText
+          >
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value="low-to-high">
+          <SegmentedControl.ItemText
+            title="Set Gauge Direction to Low to High"
+            class="flex items-center gap-1"
+            ><ArrowDownNarrowWideIcon />
+            <span class={{ 'sr-only': iconsOnly }}>Low to High</span
+            ></SegmentedControl.ItemText
+          >
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      </SegmentedControl.Control>
+    </SegmentedControl>
+  {/snippet}
+</SegmentsScroller>

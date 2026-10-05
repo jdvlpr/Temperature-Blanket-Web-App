@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, version } from '$app/environment';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -22,20 +21,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Footer from '$lib/components/Footer.svelte';
   import Gauge from '$lib/components/Gauge.svelte';
   import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
-  import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import {
-    colorsToCode,
-    colorsToYarnDetails,
-    stringToColors,
-    yarnDetailsToColors,
-  } from '$lib/utils/color-utils';
+  import { stringToColors, yarnDetailsToColors } from '$lib/utils/color-utils';
   import { onMount } from 'svelte';
   import { yarnPageState } from './state.svelte';
 
   let urlParams;
-  let isFinishedOnMount = $state(false);
 
   onMount(() => {
     initPage();
@@ -67,30 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }) || yarnPageState.gauge.colors;
       }
     }
-
-    isFinishedOnMount = true;
   }
-
-  function getYarnFilterParams(colors: any[]): string {
-    const details = colorsToYarnDetails({ colors });
-    if (!details) return '';
-    return `&f=${details}`;
-  }
-
-  function getShareableURL(colors: any[]): string | undefined {
-    if (!browser || !isFinishedOnMount) return;
-    const yarnFilterText = getYarnFilterParams(colors);
-    const url = `${window.location.origin}${window.location.pathname}?s=${colorsToCode(
-      colors,
-      {
-        includePrefixes: false,
-      },
-    )}${yarnFilterText}&v=${version}`;
-    const href = new URL(url).href;
-    return href;
-  }
-
-  let shareableURL = $derived(getShareableURL(yarnPageState.gauge.colors));
 </script>
 
 <svelte:head>
@@ -118,7 +87,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <AppShell pageName="Yarn Palette Creator">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
-    <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}
     <div>
@@ -134,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <Card>
           {#snippet header()}
-            <p class="opacity-68 p-4 text-sm">
+            <p class="p-4 text-sm opacity-68">
               This is a standalone version of the palette creator used in the
               <a href="/" class="link">Project Planner</a> tool. If you're making
               a temperature blanket project, use the Project Planner instead, which

@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
   import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
+  import AccountSync from '$lib/components/sync/AccountSync.svelte';
   import {
     consentToMSClarityCookies,
     dialog,
@@ -30,9 +31,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
+  // Fonts are served from this site, so pages load nothing from font services
+  import '@fontsource/be-vietnam-pro/300.css';
+  import '@fontsource/be-vietnam-pro/400.css';
+  import '@fontsource/be-vietnam-pro/400-italic.css';
+  import '@fontsource/be-vietnam-pro/500.css';
+  import '@fontsource/be-vietnam-pro/600.css';
+  import '@fontsource/be-vietnam-pro/700.css';
+  import '@fontsource/be-vietnam-pro/700-italic.css';
+  import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
   import { ICONS } from '$lib/constants/icon-constants';
-  import { RssIcon, SquarePlayIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -149,8 +158,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
   <link rel="shortcut icon" href="/favicon.ico" />
 
-  <link rel="stylesheet" href="https://use.typekit.net/obw5vhr.css" />
-
   <meta name="theme-color" content="#f5f5f5" />
 
   {#if consentToMSClarityCookies.value && PUBLIC_MICROSOFT_CLARITY_ID}
@@ -181,26 +188,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<!-- <div
-  class="flex w-full flex-col [view-transition-name:top-banner]"
-  id="top-banner"
->
-  <div class="bg-secondary-100-900 w-full p-2 text-center">
-    <a
-      href="/blog/2026-07-09-version-6"
-      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
-    >
-      <RssIcon />
-      News | Version 6: Improved Sun Position Accuracy
-    </a>
-  </div>
-</div> -->
-
 {@render children?.()}
 
 <ToastProvider />
 
 <DialogProvider />
+
+{#if __ACCOUNTS_ENABLED__}
+  <AccountSync />
+{/if}
 
 <style>
   @keyframes fade-in {

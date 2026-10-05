@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     numberOfColors: number;
     max?: number;
     allowZero?: boolean;
-    hideText?: boolean;
     onchange?: (event: Event) => void;
   }
 
@@ -26,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     numberOfColors = $bindable(),
     max = 99,
     allowZero = false,
-    hideText = false,
     onchange,
   }: Props = $props();
 
@@ -38,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>
     <select
-      class={['select mx-auto w-fit', hideText ? '' : 'min-w-[120px]']}
+      class="select mx-auto w-fit min-w-[120px]"
       bind:this={numEl}
       id="number-of-colors"
       bind:value={numberOfColors}
@@ -49,9 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if i > start}
           <option value={i}>
             {i}
-            {#if !hideText}
-              {i === 1 ? 'Color' : 'Colors'}
-            {/if}
+            {i === 1 ? 'Color' : 'Colors'}
           </option>
         {/if}
       {/each}

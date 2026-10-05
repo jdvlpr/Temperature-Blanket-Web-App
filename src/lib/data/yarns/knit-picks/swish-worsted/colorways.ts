@@ -249,10 +249,6 @@ const colorways: Colorway[] = [
         name: 'Allium',
       },
       {
-        hex: '#a31d6d',
-        name: 'Throne',
-      },
-      {
         hex: '#553156',
         name: 'Amethyst Heather',
       },

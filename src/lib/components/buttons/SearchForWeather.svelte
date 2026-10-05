@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
+  import { weatherSearch } from '$lib/state/weather-search.svelte';
   import { PopoverInstance } from '$lib/state/attachments/floating-state.svelte';
   import { ChevronRightIcon } from '@lucide/svelte';
   import { scale } from 'svelte/transition';
@@ -67,11 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type: 'component',
           component: { ref: GettingWeatherWarnCustomWeather },
         });
-      else
-        dialog.trigger({
-          type: 'component',
-          component: { ref: GettingWeather },
-        });
+      else weatherSearch.start();
     }}
     title="Search for Weather Data"
     id="location-action-button"

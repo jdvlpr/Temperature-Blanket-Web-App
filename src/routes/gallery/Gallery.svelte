@@ -230,7 +230,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(meta.locations)}
           <a
             href="/gallery/{id}"
-            class="rounded-container group hover:preset-tonal-surface mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
+            class="rounded-container group hover:bg-surface-100-900 mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
           >
             <img
               src={featured_image_src}
@@ -238,6 +238,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]"
             />
             <p class="line-clamp-4 text-xs">
+              {#if meta.project_name}<span class="block text-sm font-semibold"
+                  >{meta.project_name}</span
+                >{/if}
+              <!-- Escaped by getTitleFromLocationsMeta -->
               {@html title || ''}
             </p>
           </a>
@@ -307,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if showSearchReset}
               <button
-                class="ig-btn hover:preset-tonal-surface"
+                class="ig-btn hover:bg-surface-100-900"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';
@@ -370,11 +374,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'flex flex-col items-start justify-start'}"
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations }}
+        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName }}
           {@const title = getTitleFromLocationsMeta(locations)}
           <a
             href="/gallery/{databaseId}"
-            class="rounded-container group hover:preset-tonal-surface flex gap-1 p-2 text-center {layout ===
+            class="rounded-container group hover:bg-surface-100-900 flex gap-1 p-2 text-center {layout ===
             'grid'
               ? 'flex-col items-center justify-center'
               : 'w-full flex-col items-center justify-start'}"
@@ -388,6 +392,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : 'max-h-[900px] max-w-full'}
             />
             <p class="line-clamp-4 text-xs">
+              {#if projectName}<span class="block text-sm font-semibold"
+                  >{projectName}</span
+                >{/if}
+              <!-- Escaped by getTitleFromLocationsMeta -->
               {@html title || ''}
             </p>
           </a>

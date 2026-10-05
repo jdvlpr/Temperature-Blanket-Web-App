@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="API">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
 
   {#snippet main()}
@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div class="flex flex-col gap-4">
         <a
-          class="card hover:preset-tonal-surfacep-4 flex w-fit flex-col items-center justify-center gap-2 text-center whitespace-pre-wrap"
+          class="card hover:bg-surface-100-900 flex w-fit flex-col items-center justify-center gap-2 p-4 text-center whitespace-pre-wrap"
           href="/api/yarn-colorways"
         >
           <img

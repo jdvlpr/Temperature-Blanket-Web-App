@@ -15,6 +15,7 @@
       component: { ref: ChooseWeatherSource },
       options: {
         size: 'small',
+        title: 'Weather Source',
       },
     });
   }}

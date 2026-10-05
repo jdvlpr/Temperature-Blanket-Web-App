@@ -18,7 +18,6 @@ import type { Component } from 'svelte';
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
@@ -28,8 +27,30 @@ import { tick } from 'svelte';
 
 type DialogOptions = {
   showCloseButton?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  /** `xlarge`: wide and tall on large screens. `full`: as wide, and always
+   * that tall (the whole sheet on phones), whatever's in it, for work like the
+   * image color picker; its content can grow to fill it (`flex-1`) */
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | 'full';
+  /** `side`: a panel on the right on large screens, as the Project menu */
+  placement?: 'center' | 'side';
+  /** Dialogs opened from this one open in its place, with a Back button to it */
+  returnable?: boolean;
+  /** Shown in the dialog's header, beside its Back and Close buttons */
+  title?: string;
 };
+
+type DialogComponent = {
+  ref: Component<any> | null;
+  props: Record<string, any> | null;
+};
+
+/** A dialog that another was opened from, to go back to */
+type DialogView = {
+  component: DialogComponent;
+  options: DialogOptions;
+  scrollTop: number;
+};
+
 class DialogClass {
   #defaultOptions: DialogOptions = {
     showCloseButton: true,
@@ -38,7 +59,7 @@ class DialogClass {
 
   opened = $state(false);
 
-  type = $state<'component' | 'confirm' | 'choose-weather-params' | null>(null);
+  type = $state<'component' | 'confirm' | null>(null);
 
   title = $state<string | null>('');
 
@@ -51,13 +72,24 @@ class DialogClass {
     size: 'small',
   });
 
-  contentComponent = $state<{
-    ref: Component<any> | null;
-    props: Record<string, any> | null;
-  }>({
+  contentComponent = $state<DialogComponent>({
     ref: null,
     props: null,
   });
+
+  /** The returnable dialogs this one was opened from, for its Back button */
+  stack = $state<DialogView[]>([]);
+
+  /** Set by a dialog with steps of its own to show the header's Back button
+   * for them. Cleared whenever another dialog opens. */
+  backAction = $state<(() => void) | null>(null);
+
+  /** Which way the last change of view went, for its slide */
+  direction = $state<'forward' | 'back' | 'none'>('none');
+
+  /** The dialog's scrolling element (set by DialogProvider), so Back returns
+   * to the same place */
+  scrollElement: HTMLElement | null = null;
 
   trigger = async ({
     type,
@@ -67,13 +99,41 @@ class DialogClass {
     body,
     response,
   }: {
-    type: 'component' | 'confirm' | 'choose-weather-params';
+    type: 'component' | 'confirm';
     title?: string | null;
     body?: string | null;
     response?: any;
     component?: any;
     options?: DialogOptions;
   }) => {
+    // Opened from a returnable dialog (like the Project menu): opens in its
+    // place, which Back returns to. Not a wide one, which needs the room.
+    const fromReturnable =
+      type === 'component' &&
+      this.opened &&
+      this.type === 'component' &&
+      Boolean(this.options.returnable) &&
+      (options?.size ?? 'small') === 'small';
+    if (fromReturnable) {
+      this.stack.push({
+        component: this.contentComponent,
+        options: this.options,
+        scrollTop: this.scrollElement?.scrollTop ?? 0,
+      });
+    } else {
+      this.stack = [];
+    }
+    this.backAction = null;
+    this.direction = fromReturnable ? 'forward' : 'none';
+
+    // Every dialog starts from the defaults, so nothing carries over from
+    // the last one, except a panel's placement for what opens in it
+    this.options = {
+      ...this.#defaultOptions,
+      ...(fromReturnable && { placement: this.options.placement }),
+      ...options,
+    };
+
     // close the dialog
     this.close();
 
@@ -87,25 +147,78 @@ class DialogClass {
         ref,
         props,
       };
-
-      this.options = { ...this.#defaultOptions, ...options };
-    } else if (type === 'choose-weather-params') {
-      this.response = response || null;
     } else if (type === 'confirm') {
       this.title = title || null;
       this.body = body || null;
       this.response = response || null;
     }
     // Open the modal
+    this.#openings++;
     this.opened = true;
+    // A new screen in the panel: from its top, with the focus on Back (the
+    // button that opened it is gone)
+    if (fromReturnable)
+      tick().then(() => {
+        this.scrollElement?.scrollTo({ top: 0 });
+        this.scrollElement
+          ?.querySelector<HTMLElement>('[data-dialog-back]')
+          ?.focus({ preventScroll: true });
+      });
   };
 
+  /** Counts openings, so a close that's waiting can't close a newer dialog */
+  #openings = 0;
+
+  /**
+   * Closes once whatever else the same tap did has settled: a popover or
+   * menu in the dialog closing on that tap (a tap outside it), torn down in
+   * the same update, makes Svelte throw ("reading 'schedule'") and can leave
+   * parts of it behind in the next dialog
+   */
   close = () => {
-    this.opened = false;
+    const opening = this.#openings;
+    setTimeout(() => {
+      if (opening === this.#openings) this.opened = false;
+    });
+  };
+
+  /** Back to the dialog this one was opened from */
+  back = () => {
+    const view = this.stack.pop();
+    if (!view) return;
+    this.direction = 'back';
+    this.type = 'component';
+    this.contentComponent = view.component;
+    this.options = view.options;
+    this.#openings++;
+    this.opened = true;
+    tick().then(() => {
+      this.scrollElement?.scrollTo({ top: view.scrollTop });
+      this.scrollElement?.focus({ preventScroll: true });
+    });
+  };
+
+  /** Cancel: back to the dialog this one was opened from, or else close */
+  dismiss = () => {
+    if (this.stack.length) this.back();
+    else this.close();
   };
 }
 
 export const dialog = new DialogClass();
+
+/** The Project menu: a side panel, and dialogs opened from it can go back to it */
+export function openProjectMenu() {
+  // Already showing: nothing to open
+  if (dialog.opened && dialog.contentComponent.ref === Menu) return;
+  // Fresh, not on top of a screen it opened
+  dialog.close();
+  dialog.trigger({
+    type: 'component',
+    component: { ref: Menu },
+    options: { placement: 'side', returnable: true, title: 'Project' },
+  });
+}
 
 export interface ToastSettings {
   /** Provide the toast message. Supports HTML. */
@@ -222,10 +335,8 @@ export const windowLanguage: { value: string | null } = $state({
 });
 
 class DrawerStateClass {
-  weatherDetails = $state(false);
   appNavigation = $state(false);
   closeAll = () => {
-    this.weatherDetails = false;
     this.appNavigation = false;
   };
 }
@@ -288,7 +399,15 @@ export const pageSections = $state({
   ],
 });
 
-export const defaultYarn = $state({ value: '' });
+/** The default yarn, as `{brandId}-{yarnId}` or `''`; kept in preferences */
+export const defaultYarn = {
+  get value() {
+    return preferences.value.defaultYarn ?? '';
+  },
+  set value(value: string) {
+    preferences.value.defaultYarn = value;
+  },
+};
 
 // Go to a section
 export const goToProjectSection = async (
@@ -470,13 +589,11 @@ export const handleKeyDown = (ev: KeyboardEvent) => {
         dialog.trigger({
           type: 'component',
           component: { ref: KeyboardShortcuts },
+          options: { title: 'Keyboard Shortcuts' },
         });
         break;
       case '.':
-        dialog.trigger({
-          type: 'component',
-          component: { ref: Menu },
-        });
+        openProjectMenu();
         break;
       case 'u':
         project.toggleUnits();
@@ -499,10 +616,9 @@ export const handleKeyDown = (ev: KeyboardEvent) => {
           loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
-        dialog.trigger({
-          type: 'component',
-          component: { ref: SaveProjectModal },
-        });
+        void import('$lib/utils/save-project.svelte').then(({ saveProject }) =>
+          saveProject(),
+        );
       }
       // Check for section navigation shortcuts
       switch (ev.key) {

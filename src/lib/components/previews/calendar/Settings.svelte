@@ -133,6 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onOkay: handelOkaySquareDesigner,
           },
         },
+        options: { title: 'Customize Square Design' },
       });
     }}
   >
@@ -162,6 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         },
         options: {
+          title: 'Accent Color',
           size: 'large',
         },
       })}
@@ -215,6 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
           options: {
+            title: 'Border Color',
             size: 'large',
           },
         })}

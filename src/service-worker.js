@@ -49,11 +49,7 @@ self.addEventListener('fetch', (event) => {
   // ignore POST requests etc
   if (event.request.method !== 'GET') return;
 
-  if (
-    event.request.url.includes('typekit') ||
-    event.request.url.includes('clarity.ms')
-  )
-    return;
+  if (event.request.url.includes('clarity.ms')) return;
 
   async function respond() {
     const url = new URL(event.request.url);

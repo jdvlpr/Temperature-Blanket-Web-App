@@ -52,7 +52,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorwaysWithAffiliateLinks,
   } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { toast } from '$lib/state/page-state.svelte';
   import type { Color, YarnWeight } from '$lib/types/yarn-types';
   import {
     getTextColor,
@@ -60,7 +59,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
+    sortColorsWarmToCool,
+    sortColorsByHue,
+    shuffleColorsWithSeed,
   } from '$lib/utils/color-utils';
+  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowDownWideNarrowIcon,
@@ -85,6 +88,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let filtersContainer: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
+  /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
+  let shuffleSeed = Math.random();
 
   let results: ColorWithDelta[] = $state([]);
   let gettingResults = $state(true);
@@ -259,6 +264,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
 
     switch (yarnColorwayFinderState.sortColors) {
+      case 'warm-to-cool':
+      case 'cool-to-warm':
+        _results = sortColorsWarmToCool({
+          colors: _results,
+          warmFirst: yarnColorwayFinderState.sortColors === 'warm-to-cool',
+        });
+        break;
+      case 'rainbow':
+        _results = sortColorsByHue({ colors: _results });
+        break;
+      case 'shuffle':
+        _results = shuffleColorsWithSeed(_results, shuffleSeed);
+        break;
       case 'light-to-dark':
         _results = sortColorsLightToDark({
           colors: _results,
@@ -588,13 +606,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="select truncate pl-10"
                     id="sort-colors-by"
                     bind:value={yarnColorwayFinderState.sortColors}
+                    onchange={() => {
+                      if (yarnColorwayFinderState.sortColors === 'shuffle')
+                        shuffleSeed = Math.random();
+                    }}
                     disabled={gettingResults}
                   >
                     <option value="default">Default</option>
-                    <option value="light-to-dark">Lightest to Darkest</option>
-                    <option value="dark-to-light">Darkest to Lightest</option>
+                    <option value="warm-to-cool">Warm to Cool</option>
+                    <option value="cool-to-warm">Cool to Warm</option>
+                    <option value="rainbow">Rainbow</option>
+                    <option value="light-to-dark">Light to Dark</option>
+                    <option value="dark-to-light">Dark to Light</option>
                     <option value="name">Name A-Z</option>
                     <option value="name-z-to-a">Name Z-A</option>
+                    <option value="shuffle">Shuffle</option>
                   </select>
                 </div>
               </label>
@@ -633,21 +659,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
-                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm transition-transform hover:scale-[1.02] hover:z-10 relative active:scale-95 cursor-pointer {layout ===
+                    class="rounded-container relative flex min-w-fit flex-1 cursor-pointer items-center gap-x-2 p-2 shadow-sm transition-transform hover:z-10 hover:scale-[1.02] active:scale-95 {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
                     style="background:{hex}; color:{getTextColor(
                       hex ?? '#ffffff',
                     )};"
-                    onclick={() => {
-                      window.navigator.clipboard.writeText(name ?? '');
-                      toast.trigger({
+                    onclick={() =>
+                      copyToClipboard(name ?? '', {
                         message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
-                        category: 'success',
                         icon: ClipboardCheckIcon,
-                      });
-                    }}
+                      })}
                     title="Copy {name} to clipboard"
                   >
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
@@ -657,7 +680,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <a
                             aria-label="Buy this yarn colorway"
                             title="Buy this yarn colorway"
-                            class="btn-icon hover:preset-tonal-surface"
+                            class="btn-icon hover-on-color"
                             href={affiliate_variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -668,7 +691,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {:else}
                           <a
                             aria-label="Open link to this yarn colorway"
-                            class="btn-icon hover:preset-tonal-surface"
+                            class="btn-icon hover-on-color"
                             href={variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -681,18 +704,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <div class="flex flex-col items-start gap-1 text-pretty">
-                      <span class="text-left text-xs pointer-events-none">
+                      <span class="pointer-events-none text-left text-xs">
                         {brandName} - {yarnName}
                       </span>
 
                       <span
-                        class="text-left text-lg leading-tight pointer-events-none"
+                        class="pointer-events-none text-left text-lg leading-tight"
                       >
                         {name}
                       </span>
 
                       {#if typeof percentMatch == 'number' && !isNaN(percentMatch)}
-                        <p class="text-xs pointer-events-none">
+                        <p class="pointer-events-none text-xs">
                           {percentMatch}% Match
                         </p>
                       {/if}
@@ -706,10 +729,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         title="Copy {hex} to clipboard"
                         onclick={(e) => {
                           e.stopPropagation();
-                          window.navigator.clipboard.writeText(hex ?? '');
-                          toast.trigger({
+                          copyToClipboard(hex ?? '', {
                             message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
-                            category: 'success',
                             icon: ClipboardCheckIcon,
                           });
                         }}>{hex}</span

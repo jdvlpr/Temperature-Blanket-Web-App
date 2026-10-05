@@ -69,7 +69,12 @@ const {
   },
 }));
 
+vi.mock('$lib/utils/feedback.svelte', () => ({
+  feedback: vi.fn(),
+  showHistoryChange: vi.fn(),
+}));
 vi.mock('$app/environment', () => ({ browser: true }));
+vi.mock('$lib/storage/autosave.svelte', () => ({ projectChanged: vi.fn() }));
 
 vi.mock('$lib/state/gauges-state.svelte', () => ({
   allGaugesAttributes: mockGauges.allGaugesAttributes,
@@ -111,7 +116,7 @@ vi.mock('$lib/utils/seasons-utils.svelte', () => ({
   seasonsFromUrlHash: vi.fn(),
 }));
 
-const { loadFromHistory, updateHistory } =
+const { changedColorIndex, loadFromHistory, updateHistory } =
   await import('./history-utils.svelte');
 
 describe('loadFromHistory - preview switching', () => {
@@ -211,5 +216,28 @@ describe('updateHistory', () => {
     updateHistory();
 
     expect(mockProject.history.push).not.toHaveBeenCalled();
+  });
+});
+
+describe('changedColorIndex', () => {
+  it('points to the one color that changed', () => {
+    expect(changedColorIndex(['a', 'b', 'c'], ['a', 'x', 'c'])).toBe(1);
+  });
+  it('points to an added color, not the ones it shifted along', () => {
+    expect(changedColorIndex(['a', 'b', 'c'], ['a', 'x', 'b', 'c'])).toBe(1);
+    expect(changedColorIndex(['a', 'b'], ['a', 'b', 'x'])).toBe(2);
+  });
+  it('points to a moved color, not the ones it shifted along', () => {
+    expect(changedColorIndex(['a', 'b', 'c', 'd'], ['a', 'd', 'b', 'c'])).toBe(
+      1,
+    );
+    expect(changedColorIndex(['a', 'b', 'c', 'd'], ['a', 'c', 'd', 'b'])).toBe(
+      3,
+    );
+  });
+  it('points to nothing when no single color changed', () => {
+    expect(changedColorIndex(['a', 'b'], ['a', 'b'])).toBeNull();
+    expect(changedColorIndex(['a', 'b', 'c'], ['a', 'c'])).toBeNull();
+    expect(changedColorIndex(['a', 'b', 'c'], ['x', 'y', 'z'])).toBeNull();
   });
 });

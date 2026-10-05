@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -26,6 +26,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     max: number;
     showSlider?: boolean;
     noMinMax?: boolean;
+    /** The dialog's header already shows the title, so it only names the
+     * input for screen readers */
+    hideLabel?: boolean;
   }
 
   let {
@@ -36,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     max,
     showSlider = true,
     noMinMax = false,
+    hideLabel = false,
   }: Props = $props();
 
   let _value = $state(value);
@@ -62,14 +66,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="mx-auto inline-flex w-full flex-col items-center px-4 text-center">
-  <label for="number-input" class="label">
+  <label for="number-input" class={['label', hideLabel && 'sr-only']}>
     <span class="label-text">{@html title}</span>
   </label>
 
   <div class="my-2 flex w-fit flex-col items-center justify-center gap-2">
     <input
       type="number"
-      class="input w-fit text-2xl"
+      class="input text-2xl"
       id="number-input"
       min={noMinMax ? '' : min}
       max={noMinMax ? '' : max || getMaxValue(_value)}

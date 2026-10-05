@@ -70,7 +70,8 @@ export const privacy = {
       }, 1000);
     });
 
-    // Check if already consented (cookie exists), and if not, show the consent popup
+    // Check if already consented (cookie exists), and if not, show the consent popup.
+    // Analytics starts off: consent must be a choice someone makes (GDPR)
     // Microsoft Clarity Cookie Names include '_clck' and '_clsk'
     // See https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-list
     if (!this.get_cookie('_clck') || !this.get_cookie('_clsk')) {
@@ -80,8 +81,8 @@ export const privacy = {
       <div class="flex flex-col gap-2 justify-start items-start">
           <label class="relative inline-flex items-center cursor-pointer gap-2">
             <div class="relative">
-              <input type="checkbox" id="clarity-consent-toggle" class="sr-only peer" checked> 
-              <div class="shrink-0 w-11 h-6 bg-surface-300-600-token peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"></div> 
+              <input type="checkbox" id="clarity-consent-toggle" class="sr-only peer"> 
+              <div class="shrink-0 w-11 h-6 bg-surface-300 dark:bg-surface-700 peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"></div> 
             </div>
             
             <span class="font-bold">Allow Analytics</span>

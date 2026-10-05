@@ -3,17 +3,18 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import DataSourcesCredits from '$lib/components/DataSourcesCredits.svelte';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -251,13 +252,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
       </li>
       <li class="toc-list-item ml-4 block">
+        <a
+          href="#saved-palettes"
+          class="toc-anchor opacity-60 hover:opacity-100">Saved Palettes</a
+        >
+      </li>
+      <li class="toc-list-item ml-4 block">
         <a href="#image-palette" class="toc-anchor opacity-60 hover:opacity-100"
           >Image Palette</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
         <a href="#importexport" class="toc-anchor opacity-60 hover:opacity-100"
-          >Import/Export</a
+          >Export and Paste Colors</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
@@ -344,13 +351,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Download Preview Image (PNG)</a
         >
       </li>
+      <li class="toc-list-item block">
+        <a href="#credits" class="toc-anchor opacity-60 hover:opacity-100"
+          >Data Sources & Credits</a
+        >
+      </li>
     </ul>
   </nav>
 {/snippet}
 
 <AppShell pageName="Documentation">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex">
+    <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
     <div class="sm:hidden">
@@ -532,12 +544,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
             <p>
               To save your project, press the Save button at the top of the
-              page. The project will be saved in your browser, and the project’s
-              URL will be shown. Press Copy URL to copy the URL to your
-              clipboard. If you want to share your project or open it in a
-              different browser, make sure to save the URL in a place you can
-              find it again later. You can also use the following keyboard
-              shortcut to save your project:
+              page. The project is saved right away, in your browser (or, if
+              you’re signed in, to your account), and from then on your changes
+              save automatically, so the Save button goes away. Instead, the
+              icon on the Project button shows where it’s saved: a cloud for
+              your account, or a screen for this browser only. Press Project for
+              details. To get the project’s URL, press Project, then Copy Link.
+              If you want to share your project or open it in a different
+              browser, make sure to save the URL in a place you can find it
+              again later. You can also use the following keyboard shortcut to
+              save your project:
             </p>
             <figure class="">
               <table>
@@ -576,9 +592,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Open Project</h3>
             <p>
-              Recently saved projects are stored in your browser’s local
-              storage. Open the menu and select a project to load it’s settings
-              and weather data.
+              Saved projects are stored in your browser. To open one, go to My
+              Projects in the site menu, or press Project in the Project
+              Planner, and select a project to load its settings and weather
+              data. My Projects also lists your
+              <a href="#saved-palettes" class="link">saved palettes</a>.
+            </p>
+            <p>
+              On My Projects, use the pencil button to name a project (you can
+              also name the open project above the Project Planner, or in the
+              Project menu on phones), or the trash button to move it to the
+              Trash. To delete the open project, choose Move to Trash in the
+              Project menu: a new project starts in its place, with Undo for a
+              moment. Deleted projects and palettes stay in the Trash for 30
+              days, so you can restore them. Press Trash at the bottom of My
+              Projects to restore them or delete them forever.
             </p>
             <p>
               You can also open any project by pasting the project’s URL in your
@@ -592,10 +620,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Change Units</h3>
             <p>
-              To change your project’s units between metric and imperial, from
-              the top bar select °C / mm or °F / in. On smaller screens, press
-              the Project Menu, then choose your Units selection. On the Project
-              Planner you can also use the following keyboard shortcut:
+              To change your project’s units between metric and imperial, select
+              °C / mm or °F / in above the weather data in the Weather section.
+              On the Project Planner you can also use the following keyboard
+              shortcut:
             </p>
             <figure class="">
               <table>
@@ -820,7 +848,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               Temperature-blanket.com provides several options from where to get
               weather data. To change the weather source settings, press the
-              Weather Source button in the Weather tab or Project Menu.
+              Weather Source button above the weather data in the Weather
+              section.
             </p>
             <ul class="flex flex-col gap-4">
               <li class="flex flex-col gap-1">
@@ -1516,11 +1545,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To browse collection of preset colors to use in your project,
-              press Browse Palettes. Then select a Category and change the
-              filters to see different color combinations. Select the palette to
-              use it in your project. The categories are as follows:
+              press Get Colors, then Browse Palettes. Then select a Category and
+              change the filters to see different color combinations. Select the
+              palette to use it in your project. The categories are as follows:
             </p>
             <ul class="ml-4 flex flex-col gap-2">
+              <li>
+                <span class="font-bold">Saved</span> – Palettes you saved in this
+                browser
+              </li>
               <li>
                 <span class="font-bold">Gallery</span> – All user-made color palettes
               </li>
@@ -1549,14 +1582,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
           </section>
           <section
+            id="saved-palettes"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+          >
+            <h3 class="text-xl font-bold">Saved Palettes</h3>
+
+            <p>
+              To keep a palette to use again later, press Save & Export under
+              the palette, then Save Palette. You can give it a name, or leave
+              the name empty to use its yarn and number of colors. Saved
+              palettes are stored in this browser{#if __ACCOUNTS_ENABLED__}, or
+                in your account while you’re signed in, so they show up on your
+                other devices too{/if}.
+            </p>
+            <p>
+              To use a saved palette, press Get Colors, then Browse Palettes,
+              then choose the Saved category. Use the pencil button to rename a
+              palette, or the trash button to move it to the Trash.
+            </p>
+            <p>
+              You can also see all your saved palettes on the
+              <a href="/my-projects" class="link">My Projects</a> page, and open any
+              of them in the Yarn Palette Creator.
+            </p>
+          </section>
+          <section
             id="image-palette"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
             <h3 class="text-xl font-bold">Image Palette</h3>
 
             <p>
-              To create a palette of colors from an image, press the Image
-              Palette button. Use a random image (from <a
+              To create a palette of colors from an image, press Get Colors,
+              then From an Image. Use a random image (from <a
                 class="link"
                 rel="noreferrer noopener"
                 href="http://hunsplash.com"
@@ -1570,17 +1628,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="importexport"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold">Export/Import</h3>
+            <h3 class="text-xl font-bold">Export and Paste Colors</h3>
 
             <p>
-              To export a color palette as HTML color codes or yarn names, press
-              Export/Import, then press Copy for whichever format you want.
-              Share or paste the copied text somewhere you can find it later.
+              To export a color palette as HTML color codes, an image, or yarn
+              names, press Save & Export, then choose a format and press Copy or
+              Download. To share a palette, press Save & Export, then Link: the
+              link is copied right away. Share or paste the copied text
+              somewhere you can find it later.
             </p>
             <p>
-              To import a color palette, press Export/Import, press the Import
-              button, then type color names or paste a valid code or URL. When
-              you're finished, press Save.
+              To paste colors into a palette, press Get Colors, then Paste
+              Colors or Code, then type or paste color names, hex codes, or a
+              link, separated by commas or new lines. Anything that can't be
+              read is listed, and the rest is kept. When you're finished, press
+              Use Colors.
             </p>
           </section>
           <section
@@ -1652,10 +1714,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Choose Yarn Colorways</h3>
 
             <p>
-              To pick yarn colorways to use in your project, press the Choose
-              Colorways button. Select the colorways you want to use, choose to
-              add them to your existing palette or to create a new palette, then
-              press Use These Colorways.
+              To pick yarn colorways to use in your project, press Get Colors,
+              then Choose Colorways. Select the colorways you want to use,
+              choose to add them to your existing palette or to create a new
+              palette, then press Use These Colorways.
             </p>
           </section>
           <section
@@ -1896,8 +1958,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To download your color charts and weather data as a PDF file,
-              press the Project Menu, press the Download/Export button, then
-              press the Color Charts and Weather Data (PDF) button.
+              press Project at the top of the page, press Download / Export,
+              then press PDF and choose what to include. It’s also in the
+              Download / Export button below the weather data.
             </p>
           </section>
           <section
@@ -1906,9 +1969,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Download Weather Data (CSV)</h3>
             <p>
-              To download a CSV file with your project’s weather data, press the
-              Project Menu, press Download/Export button, then press Weather
-              Data (CSV).
+              To download a CSV file with your project’s weather data, press
+              Project at the top of the page, press Download / Export, then
+              press CSV. It’s also in the Download / Export button below the
+              weather data.
             </p>
           </section>
           <section
@@ -1917,10 +1981,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Download Preview Image (PNG)</h3>
             <p>
-              To download a PNG file of your project’s preview image, press the
-              Project Menu, press Download/Export button, then press Preview
-              Image (PNG).
+              To download a PNG file of your project’s preview image, press
+              Project at the top of the page, press Download / Export, then
+              press PNG. Or press Download PNG below the preview.
             </p>
+          </section>
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="credits">
+            Data Sources & Credits
+          </h2>
+          <section
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+          >
+            <DataSourcesCredits />
           </section>
         </div>
         <div

@@ -28,8 +28,17 @@ import {
   getTitleFromLocationsMeta,
 } from '$lib/utils/project-utils.svelte';
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
-import { pluralize } from '$lib/utils/string-utils';
+import {
+  decodeHtmlEntities,
+  escapeHtml,
+  pluralize,
+} from '$lib/utils/string-utils';
 import { getBrands } from '$lib/data/yarns/colorways.svelte';
+import { hexToOklab } from '$lib/features/image-palette/color-space';
+import {
+  orderAsGradient,
+  orderAsRainbow,
+} from '$lib/features/image-palette/order';
 import chroma from 'chroma-js';
 
 /**
@@ -178,6 +187,54 @@ export const colorsToCode = (
   return text;
 };
 
+/**
+ * A palette code with its yarn details, e.g. "palette:ff0000ffa500yarn:bernat-super_value".
+ * Hex codes plus brand and yarn ids are the source of truth; colorway names are
+ * looked up again when the code is read with getColorsFromInput.
+ */
+export const colorsToPaletteCode = (colors: Color[]): string => {
+  const yarnDetails = colorsToYarnDetails({ colors });
+  return `${colorsToCode(colors, { includePrefixes: true })}${yarnDetails ? 'yarn:' + yarnDetails : ''}`;
+};
+
+/**
+ * A link that opens the palette in the Yarn Palette Creator (/yarn?s=…&f=…).
+ */
+export const getYarnPageURL = ({
+  colors,
+  origin,
+  version,
+}: {
+  colors: Color[];
+  origin: string;
+  version?: string;
+}): string => {
+  const yarnDetails = colorsToYarnDetails({ colors });
+  let url = `${origin}/yarn?s=${colorsToCode(colors, { includePrefixes: false })}`;
+  if (yarnDetails) url += `&f=${yarnDetails}`;
+  if (version) url += `&v=${version}`;
+  return url;
+};
+
+/**
+ * A name for a palette that has none, e.g. "Bernat Super Value, 8 colors".
+ * Colors must already have their yarn details (see getColorsFromInput).
+ */
+export const getPaletteFallbackName = (colors: Color[]): string => {
+  const count = `${colors.length} ${pluralize('color', colors.length)}`;
+  const yarns = [
+    ...new Set(
+      colors
+        .filter((color) => color?.brandName && color?.yarnName)
+        .map((color) => `${color.brandName} ${color.yarnName}`),
+    ),
+  ];
+  if (!yarns.length) return count;
+  if (yarns.length === 1) return `${yarns[0]}, ${count}`;
+  const more = yarns.length - 1;
+  return `${yarns[0]} + ${more} more ${pluralize('yarn', more)}, ${count}`;
+};
+
 export const stringToColors = ({
   string,
 }: {
@@ -228,6 +285,79 @@ export const getColorsFromInput = ({
     colors = yarnDetailsToColors({ string: yarnDetails, colors });
 
   return colors;
+};
+
+/** A color written as a function, like rgb(255, 0, 0); its commas aren't separators */
+const COLOR_FUNCTION = /\s*(?:rgba?|hsla?)\s*\([^)]*\)/gi;
+/** Long names are at most three words, like "light goldenrod yellow" */
+const MOST_WORDS_IN_A_NAME = 3;
+
+/** Reads the colors in one entry's words, a name of a few words at a time */
+function readWords(words: string[], unreadable: string[]): Color[] {
+  const colors: Color[] = [];
+  let i = 0;
+  while (i < words.length) {
+    let read = 0;
+    for (let n = Math.min(MOST_WORDS_IN_A_NAME, words.length - i); n > 0; n--) {
+      const word = words.slice(i, i + n).join('');
+      if (chroma.valid(word)) {
+        colors.push({ hex: chroma(word).hex() as Color['hex'] });
+        read = n;
+        break;
+      }
+      // Hex codes run together, like ff0000ffa500
+      if (n === 1 && /^#?(?:[0-9a-f]{6}){2,}$/i.test(word)) {
+        for (const hex of word.replace('#', '').match(/.{6}/g) ?? [])
+          colors.push({ hex: chroma(hex).hex() as Color['hex'] });
+        read = 1;
+        break;
+      }
+    }
+    if (!read) {
+      unreadable.push(words[i]);
+      read = 1;
+    }
+    i += read;
+  }
+  return colors;
+}
+
+/**
+ * The colors in pasted or typed text, and what couldn't be read, so one
+ * mistake doesn't lose the rest. Takes anything getColorsFromInput does
+ * (links, palette codes, Coolors), or a list of names, hex codes and rgb()
+ * colors separated by commas, semicolons, tabs, new lines or spaces.
+ */
+export const readPastedColors = (
+  text: string,
+): { colors: Color[]; unreadable: string[] } => {
+  const trimmed = text.trim();
+  if (!trimmed) return { colors: [], unreadable: [] };
+  // A list on many lines is read entry by entry: read whole, its entries
+  // would run together and be cut every six letters
+  const isList = /[;\t\n\r]/.test(trimmed) && !/:\/\/|palette:/.test(trimmed);
+  const whole = !isList && getColorsFromInput({ string: trimmed });
+  if (whole && whole.length) return { colors: whole, unreadable: [] };
+
+  const colors: Color[] = [];
+  const unreadable: string[] = [];
+  // Quotes and brackets, as in a copied array, aren't part of any color
+  const entries =
+    trimmed
+      .replace(/["'[\]{}]/g, ' ')
+      .match(new RegExp(`${COLOR_FUNCTION.source}|[^,;\\t\\n\\r]+`, 'gi')) ??
+    [];
+  for (const raw of entries) {
+    const entry = raw.trim();
+    if (!entry) continue;
+    if (chroma.valid(entry)) {
+      colors.push({ hex: chroma(entry).hex() as Color['hex'] });
+      continue;
+    }
+    const words = entry.split(/[\s-]+/).filter(Boolean);
+    colors.push(...readWords(words, unreadable));
+  }
+  return { colors, unreadable };
 };
 
 export type ColorInfo = Color & {
@@ -579,6 +709,115 @@ export const sortColorsByNameZtoA = ({
   return sortedColors;
 };
 
+/** Ways a palette can be sorted, as offered in sort menus and selects */
+export type PaletteSort =
+  | 'custom'
+  | 'warm-to-cool'
+  | 'cool-to-warm'
+  | 'rainbow'
+  | 'light-to-dark'
+  | 'dark-to-light'
+  | 'name'
+  | 'name-z-to-a';
+
+export const PALETTE_SORTS: {
+  value: Exclude<PaletteSort, 'custom'>;
+  label: string;
+  /** Only offered when every color has a name */
+  needsNames?: boolean;
+}[] = [
+  { value: 'warm-to-cool', label: 'Warm to Cool' },
+  { value: 'cool-to-warm', label: 'Cool to Warm' },
+  { value: 'rainbow', label: 'Rainbow' },
+  { value: 'light-to-dark', label: 'Light to Dark' },
+  { value: 'dark-to-light', label: 'Dark to Light' },
+  { value: 'name', label: 'Name A-Z', needsNames: true },
+  { value: 'name-z-to-a', label: 'Name Z-A', needsNames: true },
+];
+
+/**
+ * Order colors so each blends into the next (the shortest path through
+ * them), starting from the warm or the cool end. Locked colors stay where
+ * they are, as in the other sorts.
+ */
+export const sortColorsWarmToCool = ({
+  colors,
+  warmFirst = true,
+}: {
+  colors: Color[];
+  warmFirst?: boolean;
+}): Color[] => {
+  const unlocked = colors.filter((color) => !color?.locked);
+  const order = orderAsGradient(
+    unlocked.map((color) => hexToOklab(color.hex ?? '#ffffff')),
+    { warmFirst },
+  );
+  let next = 0;
+  return colors.map((color) =>
+    color?.locked ? color : unlocked[order[next++]],
+  );
+};
+
+/**
+ * Order colors like a rainbow: bands of pinks and reds, then oranges,
+ * yellows, greens, blues, and purples, each light to dark, with grays,
+ * whites, and blacks last. Locked colors stay where they are, as in the other sorts.
+ */
+export const sortColorsByHue = ({ colors }: { colors: Color[] }): Color[] => {
+  const unlocked = colors.filter((color) => !color?.locked);
+  const order = orderAsRainbow(
+    unlocked.map((color) => hexToOklab(color.hex ?? '#ffffff')),
+  );
+  let next = 0;
+  return colors.map((color) =>
+    color?.locked ? color : unlocked[order[next++]],
+  );
+};
+
+/**
+ * Put colors in a random order that differs from the one they're in.
+ * Locked colors stay where they are, as in the sorts.
+ */
+export const shuffleColors = <T extends Color>(colors: T[]): T[] => {
+  const unlocked = colors.filter((color) => !color?.locked);
+  const differs = (order: T[]) =>
+    order.some((color, i) => color.hex !== unlocked[i].hex);
+  if (!differs([...unlocked].reverse())) return [...colors];
+  let shuffled = unlocked;
+  do {
+    shuffled = [...unlocked];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+  } while (!differs(shuffled));
+  let next = 0;
+  return colors.map((color) => (color?.locked ? color : shuffled[next++]));
+};
+
+/**
+ * Put colors in a random order that stays the same for the same `seed`, so
+ * a long list can grow (show more) without reshuffling what's already shown
+ */
+export const shuffleColorsWithSeed = <T extends Color>(
+  colors: T[],
+  seed: number,
+): T[] => {
+  const keyOf = (color: T) => {
+    // FNV-1a hash of the seed and the color
+    let hash = 2166136261;
+    for (const char of `${seed}|${color.hex}|${color.name ?? ''}`) {
+      hash ^= char.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  };
+  return colors
+    .map((color) => ({ color, key: keyOf(color) }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ color }) => color);
+};
+
 export const getSortedPalette = ({
   palette,
   sortColors,
@@ -587,6 +826,12 @@ export const getSortedPalette = ({
   sortColors: string;
 }): Color[] => {
   switch (sortColors) {
+    case 'warm-to-cool':
+      return sortColorsWarmToCool({ colors: palette, warmFirst: true });
+    case 'cool-to-warm':
+      return sortColorsWarmToCool({ colors: palette, warmFirst: false });
+    case 'rainbow':
+      return sortColorsByHue({ colors: palette });
     case 'none':
     case 'custom':
       return palette;
@@ -603,7 +848,17 @@ export const getSortedPalette = ({
   }
 };
 
+type GallerySharedPaletteSummary = {
+  __typename: 'Palette';
+  title: string;
+  yarnUrls: string;
+  databaseId: string | number;
+};
+
 type GalleryProjectSummary = {
+  __typename?: 'Project';
+  /** The name the project was given, if any */
+  projectName?: string | null;
   projectUrl: string;
   yarnUrls: string;
   locations: string;
@@ -612,27 +867,39 @@ type GalleryProjectSummary = {
 
 export type GalleryPalette = {
   colors: Color[];
-  projectId: string | number;
+  /** The gallery post it came from (a project, or a palette shared on its own), for counting views */
+  postId: string | number;
   schemeName: string;
 };
+
+const EXTERNAL_LINK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
 
 export const getPalettesFromProjects = ({
   projects,
   selectedBrandId = '',
   selectedYarnId = '',
   palettesContainOnlyFilteredYarn = false,
+  minColors = 0,
 }: {
-  projects: GalleryProjectSummary[];
+  /** Projects, and palettes shared on their own */
+  projects: (GalleryProjectSummary | GallerySharedPaletteSummary)[];
   selectedBrandId?: string;
   selectedYarnId?: string;
   palettesContainOnlyFilteredYarn?: boolean;
+  /** Leave out palettes with this many colors or fewer */
+  minColors?: number;
 }): GalleryPalette[] => {
   if (!projects.length) return [];
   let _palettes: GalleryPalette[] = [];
   projects.forEach((project) => {
-    const params = getProjectParametersFromURLHash(
-      new URL(project.projectUrl).hash.substring(1),
-    );
+    const sharedPalette = project.__typename === 'Palette' ? project : null;
+    const params = sharedPalette
+      ? null
+      : getProjectParametersFromURLHash(
+          new URL((project as GalleryProjectSummary).projectUrl).hash.substring(
+            1,
+          ),
+        );
 
     (JSON.parse(project.yarnUrls) as string[]).forEach((yarn_url, i) => {
       const isNotPresetScheme = allGaugesAttributes.every(
@@ -682,9 +949,9 @@ export const getPalettesFromProjects = ({
         someColorsAreYarn &&
         isUniquePalette &&
         hasSelectedBrandAndYarn &&
-        colors
+        colors &&
+        colors.length > minColors
       ) {
-        const title = getTitleFromLocationsMeta(project.locations);
         let schemeName =
           "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
         schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
@@ -703,17 +970,24 @@ export const getPalettesFromProjects = ({
         }
         schemeName += '</p>'; // end line-clamp-1
 
-        schemeName += `<a href="/gallery/${
-          project.databaseId
-        }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        // The card itself opens the colors in the Yarn Palette Creator; the
+        // link opens the palette's or project's gallery page. Names are
+        // anyone's text, so they're escaped
+        const id = Number(project.databaseId);
+        if (sharedPalette)
+          schemeName += `<a href="/gallery/palette/${id}" target="_blank" rel="noreferrer" class="underline line-clamp-1 font-semibold" title="Open Palette Page" onclick="event.stopPropagation()">${EXTERNAL_LINK_ICON}
+<span class="whitespace-pre-wrap">${escapeHtml(decodeHtmlEntities(sharedPalette.title))}</span></a>`;
+        else {
+          const { projectName, locations } = project as GalleryProjectSummary;
+          const title = projectName
+            ? escapeHtml(projectName)
+            : getTitleFromLocationsMeta(locations);
+          schemeName += `<a href="/gallery/${id}" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()">${EXTERNAL_LINK_ICON}
 <span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+        }
         schemeName += '</div>';
 
-        _palettes.push({
-          colors,
-          projectId: project.databaseId,
-          schemeName,
-        });
+        _palettes.push({ colors, postId: id, schemeName });
       }
     });
   });

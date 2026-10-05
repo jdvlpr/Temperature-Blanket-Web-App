@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$env/static/public';
@@ -45,7 +46,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
   } from '$lib/utils/project-utils.svelte';
-  import { stripHTMLTags } from '$lib/utils/string-utils';
+  import { recordPageView } from '$lib/utils/gallery-utils';
+  import { decodeHtmlEntities, stripHTMLTags } from '$lib/utils/string-utils';
   import {
     ArrowLeftIcon,
     GlobeIcon,
@@ -72,7 +74,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectTitle = $derived(
     project ? getTitleFromLocationsMeta(project.locations) : '',
   );
-  let projectTitleNoHTML = $derived(stripHTMLTags(projectTitle));
+  // The name the project was given, if any, shown above its locations
+  let projectName = $derived(project?.projectName?.trim() ?? '');
+  // As text (for the page title and the about dialog)
+  let projectTitleNoHTML = $derived(
+    projectName || decodeHtmlEntities(stripHTMLTags(projectTitle)),
+  );
+
+  // Counts a view for Popular, in the browser (once per project shown)
+  $effect(() => {
+    if (project) recordPageView(page.params.id ?? '');
+  });
   // Null when the project has no usable coordinates, which hides the link.
   let globeLink = $derived(
     project ? buildGlobeLinkFromLocationsMeta(project.locations) : null,
@@ -123,6 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         props: {
           project,
           title: projectTitleNoHTML,
+          owner: data.owner,
           reshapedColors,
           weatherSources,
         },
@@ -240,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Project Preview">
   {#snippet stickyHeader()}
-    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <div class="opacity-100 transition-opacity">
@@ -259,13 +272,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
             >
-              <p class="text-xl">
+              {#if projectName}
+                <h1 class="text-2xl font-bold break-words">{projectName}</h1>
+              {/if}
+              <p class={projectName ? '' : 'text-xl'}>
                 {#if project}
+                  <!-- Escaped by getTitleFromLocationsMeta -->
                   {@html projectTitle}
                 {:else}
                   This project gallery page cannot be found.
                 {/if}
               </p>
+              {#if project && data.owner}
+                <p class="text-surface-600-400" data-testid="gallery-owner">
+                  By <a
+                    class="link"
+                    href={resolve('/gallery/by/[ownerId]', {
+                      ownerId: data.owner.publicId,
+                    })}>{data.owner.name}</a
+                  >
+                </p>
+              {/if}
 
               <div class="flex flex-wrap items-center justify-center gap-4">
                 {#if projectURL}

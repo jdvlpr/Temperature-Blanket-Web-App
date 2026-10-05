@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1366 768" role="img" aria-label="Temperature blanket stripes with a cloud">
+  <!-- Stripes in temperature colors, cold to warm -->
+  <g>
+    <rect y="0" width="1366" height="64" fill="#2c4f9e"/>
+    <rect y="64" width="1366" height="64" fill="#3a6fc4"/>
+    <rect y="128" width="1366" height="64" fill="#5aa0d8"/>
+    <rect y="192" width="1366" height="64" fill="#8fcbe0"/>
+    <rect y="256" width="1366" height="64" fill="#b9dfb0"/>
+    <rect y="320" width="1366" height="64" fill="#e8e39a"/>
+    <rect y="384" width="1366" height="64" fill="#f6d06e"/>
+    <rect y="448" width="1366" height="64" fill="#f3a95a"/>
+    <rect y="512" width="1366" height="64" fill="#e97d4f"/>
+    <rect y="576" width="1366" height="64" fill="#d6544a"/>
+    <rect y="640" width="1366" height="64" fill="#b33a44"/>
+    <rect y="704" width="1366" height="64" fill="#8a2c3f"/>
+  </g>
+  <!-- A cloud with a check mark: projects saved to an account -->
+  <g transform="translate(683 384)">
+    <circle r="230" fill="#ffffff" fill-opacity="0.85"/>
+    <g transform="translate(-120 -120) scale(10)" fill="none" stroke="#2c4f9e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+      <path d="m9 14 2 2 4-4"/>
+    </g>
+  </g>
+</svg>
