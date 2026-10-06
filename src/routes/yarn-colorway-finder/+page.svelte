@@ -40,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
   import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
@@ -67,12 +68,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorwaysWithAffiliateLinks,
   } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { dialog } from '$lib/state/page-state.svelte';
   import type { Color, YarnWeight } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ChevronDownIcon,
     CircleQuestionMarkIcon,
+    ImageIcon,
     PlusIcon,
     SearchIcon,
     ShoppingCartIcon,
@@ -295,6 +298,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
   }
+  function pickFromImage() {
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: PickColorFromImage,
+        props: {
+          onPick: (hex: string) => inputTypeColorOnChange({ value: hex }),
+        },
+      },
+      options: { size: 'medium', title: 'Pick a Color from a Photo' },
+    });
+  }
+
   let areAnyResultsAffiliate = $derived(
     results.some((result) => result.affiliate_variant_href),
   );
@@ -315,13 +331,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <title>Yarn Colorway Finder</title>
   <meta
     name="description"
-    content="Browse a collection of yarn colorways. Filter by brand or yarn name, and search by HTML color name or hex code to find matching yarn colorways."
+    content="Browse a collection of yarn colorways. Filter by brand or yarn name, and search by HTML color name, hex code, or a color picked from a photo to find matching yarn colorways."
   />
 
   <meta property="og:title" content="Yarn Colorway Finder" />
   <meta
     property="og:description"
-    content="Browse yarn colorways, filter by brand or yarn, and search by hex color code."
+    content="Browse yarn colorways, filter by brand or yarn, and search by hex color code or a color from a photo."
   />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/yarn-colorway-finder" />
   <meta property="og:type" content="website" />
@@ -345,7 +361,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <h2 class="h1 text-gradient mb-0">Find Yarn by Color</h2>
           <p>
             Browse yarn colorways, filter by brand or yarn, and search by hex
-            color code.
+            color code or a color picked from a photo.
           </p>
         </div>
       </div>
@@ -358,7 +374,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <div class="label col-span-full w-full">
                 <span class="label-text"> Search by Color</span>
-                <div class="input-group w-full grid-cols-[auto_1fr_auto]">
+                <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
                   <input
                     type="color"
                     class="input ig-cell m-2 rounded-full! p-0"
@@ -408,6 +424,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       ><XIcon />
                     </button>
                   {/if}
+                  <button
+                    aria-label="Pick color from a photo"
+                    title="Pick color from a photo"
+                    class="ig-btn gap-1"
+                    onclick={pickFromImage}
+                    ><ImageIcon /> Photo
+                  </button>
                 </div>
               </div>
 

@@ -511,7 +511,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 href="/yarn-colorway-finder"
                 rel="noreferrer noopener"
                 >temperature-blanket.com/yarn-colorway-finder</a
-              >.
+              >. To search by a color you see in a photo, use the image button
+              next to the color field, then tap or drag on your photo to pick
+              the color. Photos stay on your device.
             </p>
           </section>
 

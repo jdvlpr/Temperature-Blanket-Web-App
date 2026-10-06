@@ -28,6 +28,13 @@ import {
 } from '$lib/utils/yarn-utils';
 import chroma from 'chroma-js';
 import { hexToOklab, oklabToHex, type Oklab } from './color-space';
+import {
+  checkImageFile,
+  decodeImage,
+  imageToPixels,
+  makeThumbnail,
+  MAX_IMAGE_DIMENSION,
+} from './decode';
 import { createImagePaletteEngine, type ImagePaletteEngine } from './engine';
 import {
   closestColorways,
@@ -75,9 +82,6 @@ export type SortOrder = PaletteSort;
 
 /** A line drawn across the photo, and the colors spaced along it, in order */
 export type PaletteLine = { from: Point; to: Point; pointIds: number[] };
-
-// Large photos are drawn at most this many pixels wide or tall
-const MAX_IMAGE_DIMENSION = 1200;
 
 type Session = {
   pixels: ImageData;
@@ -290,21 +294,14 @@ export class ImagePaletteState {
 
   async loadFile(file: File | undefined) {
     if (!file) return;
-    const isHeic =
-      /image\/hei[cf]/.test(file.type) || /\.hei[cf]$/i.test(file.name);
-    if (!file.type.startsWith('image/') && !isHeic) {
-      this.errorMessage =
-        "That file isn't an image. Try a JPG, PNG, or WebP file.";
+    const check = checkImageFile(file);
+    if (!check.ok) {
+      this.errorMessage = check.error;
       return;
     }
     this.source = 'file';
     const url = URL.createObjectURL(file);
-    await this.loadImage(
-      url,
-      isHeic
-        ? "This browser can't open HEIC photos. Try a JPG or PNG, or a screenshot of the photo."
-        : "Couldn't open that image. Try a JPG, PNG, or WebP file.",
-    );
+    await this.loadImage(url, check.failMessage);
     URL.revokeObjectURL(url);
   }
 
@@ -317,11 +314,9 @@ export class ImagePaletteState {
     this.loading = true;
     this.errorMessage = null;
     this.infoMessage = null;
-    const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.src = src;
+    let image: HTMLImageElement;
     try {
-      await image.decode();
+      image = await decodeImage(src);
       await this.#ready;
     } catch {
       if (id !== this.#loadId) return;
@@ -333,19 +328,10 @@ export class ImagePaletteState {
     // A newer image was requested while this one loaded
     if (id !== this.#loadId || this.#destroyed) return;
 
-    const scale = Math.min(
-      1,
-      MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight),
-    );
-    const width = Math.max(1, Math.round(image.naturalWidth * scale));
-    const height = Math.max(1, Math.round(image.naturalHeight * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
-    ctx.drawImage(image, 0, 0, width, height);
-    const pixels = ctx.getImageData(0, 0, width, height);
+    const drawn = imageToPixels(image);
+    if (!drawn) return;
+    const { pixels, canvas } = drawn;
+    const { width, height } = pixels;
 
     await this.#engine!.setImage({ data: pixels.data, width, height });
     if (id !== this.#loadId || this.#destroyed) return;
@@ -866,13 +852,4 @@ export class ImagePaletteState {
     const n = this.points.length;
     this.infoMessage = `This image only has ${n} distinct ${n === 1 ? 'color' : 'colors'}${this.mode === 'yarn' ? ' for this yarn' : ''}.`;
   }
-}
-
-function makeThumbnail(source: HTMLCanvasElement): string {
-  const scale = Math.min(1, 240 / Math.max(source.width, source.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(source.width * scale));
-  canvas.height = Math.max(1, Math.round(source.height * scale));
-  canvas.getContext('2d')?.drawImage(source, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL('image/jpeg', 0.8);
 }
