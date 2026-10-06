@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
+  import type { PaletteSort } from '$lib/utils/color-utils';
+
   class YarnColorwayFinderState {
     selectedBrandId = $state('');
     selectedYarnId = $state('');
@@ -22,7 +24,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     hex = $state('');
     inputTypeTextValue = $state('');
     inputTypeColorElement: HTMLInputElement | null = $state(null);
-    sortColors = $state('default');
+    /** 'default' is best match during a color search, catalog order otherwise */
+    sortColors = $state<'default' | Exclude<PaletteSort, 'custom'> | 'shuffle'>(
+      'default',
+    );
+    reversed = $state(false);
   }
 
   const yarnColorwayFinderState = new YarnColorwayFinderState();
@@ -36,6 +42,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import SortMenu from '$lib/components/SortMenu.svelte';
+  import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
+  import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
   import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
@@ -54,23 +63,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { Color, YarnWeight } from '$lib/types/yarn-types';
   import {
+    getSortedPalette,
     getTextColor,
-    sortColorsByName,
-    sortColorsByNameZtoA,
-    sortColorsDarktoLight,
-    sortColorsLightToDark,
-    sortColorsWarmToCool,
-    sortColorsByHue,
+    PALETTE_SORTS,
     shuffleColorsWithSeed,
   } from '$lib/utils/color-utils';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
-    ArrowDownWideNarrowIcon,
     ChevronDownIcon,
     CircleQuestionMarkIcon,
-    ClipboardCheckIcon,
-    ExternalLinkIcon,
     PlusIcon,
     SearchIcon,
     ShoppingCartIcon,
@@ -89,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
   /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
-  let shuffleSeed = Math.random();
+  let shuffleSeed = $state(Math.random());
 
   let results: ColorWithDelta[] = $state([]);
   let gettingResults = $state(true);
@@ -221,6 +222,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarnColorwayFinderState.selectedYarnId = yarnId;
   }
 
+  /** Put results in the chosen sort; 'default' leaves them as they are */
+  function arrange(colors: ColorWithDelta[]): ColorWithDelta[] {
+    switch (yarnColorwayFinderState.sortColors) {
+      case 'shuffle':
+        return shuffleColorsWithSeed(colors, shuffleSeed);
+      case 'default':
+        return [...colors];
+      default:
+        // The sorts copy each color, so match deltas come along
+        return getSortedPalette({
+          palette: colors,
+          sortColors: yarnColorwayFinderState.sortColors,
+        }) as ColorWithDelta[];
+    }
+  }
+
   function getResults() {
     if (!isLoaded || !browser) return;
     gettingResults = true;
@@ -250,7 +267,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
 
-    if (yarnColorwayFinderState.hex)
+    if (yarnColorwayFinderState.hex) {
+      // A color search keeps its closest matches, then arranges just those,
+      // so another sort never trades the matches for the rest of the catalog
       _results = _results
         .map((color) => {
           return {
@@ -261,45 +280,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ),
           };
         })
-        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
-
-    switch (yarnColorwayFinderState.sortColors) {
-      case 'warm-to-cool':
-      case 'cool-to-warm':
-        _results = sortColorsWarmToCool({
-          colors: _results,
-          warmFirst: yarnColorwayFinderState.sortColors === 'warm-to-cool',
-        });
-        break;
-      case 'rainbow':
-        _results = sortColorsByHue({ colors: _results });
-        break;
-      case 'shuffle':
-        _results = shuffleColorsWithSeed(_results, shuffleSeed);
-        break;
-      case 'light-to-dark':
-        _results = sortColorsLightToDark({
-          colors: _results,
-        });
-        break;
-      case 'dark-to-light':
-        _results = sortColorsDarktoLight({
-          colors: _results,
-        });
-        break;
-      case 'name':
-        _results = sortColorsByName({
-          colors: _results,
-        });
-        break;
-      case 'name-z-to-a':
-        _results = sortColorsByNameZtoA({
-          colors: _results,
-        });
-        break;
-      default:
-        break;
+        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
+        .slice(0, itemsToShow);
     }
+
+    _results = arrange(_results);
+    if (yarnColorwayFinderState.reversed) _results.reverse();
 
     if (_results.length > itemsToShow) _results.length = itemsToShow;
     results = _results;
@@ -394,6 +380,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarnColorwayFinderState.search,
       yarns,
       yarnColorwayFinderState.sortColors,
+      yarnColorwayFinderState.reversed,
+      shuffleSeed,
       itemsToShow,
       yarnColorwayFinderState.hex);
 
@@ -401,6 +389,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       getResults();
     });
   });
+
+  let defaultSortLabel = $derived(
+    yarnColorwayFinderState.hex ? 'Best match' : 'Catalog order',
+  );
+  let sortLabel = $derived(
+    yarnColorwayFinderState.sortColors === 'default'
+      ? defaultSortLabel
+      : yarnColorwayFinderState.sortColors === 'shuffle'
+        ? 'Shuffled'
+        : (PALETTE_SORTS.find(
+            (sort) => sort.value === yarnColorwayFinderState.sortColors,
+          )?.label ?? ''),
+  );
 
   let areAnyResultsAffiliate = $derived(
     results.some((result) => result.affiliate_variant_href),
@@ -550,9 +551,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/key}
               {/if}
 
-              <div
-                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-4"
-              >
+              <div class="col-span-12 flex w-full flex-col justify-start gap-1">
                 <div class="label">
                   <span class="label-text"> Colorway Name </span>
                   <div class="input-group w-full grid-cols-[auto_1fr_auto]">
@@ -594,36 +593,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
                 </div>
               </div>
-
-              <label class="label col-span-8 w-full md:col-span-3">
-                <span class="label-text">Sort By</span>
-
-                <div class="relative flex items-center">
-                  <ArrowDownWideNarrowIcon
-                    class="pointer-events-none absolute left-2"
-                  />
-                  <select
-                    class="select truncate pl-10"
-                    id="sort-colors-by"
-                    bind:value={yarnColorwayFinderState.sortColors}
-                    onchange={() => {
-                      if (yarnColorwayFinderState.sortColors === 'shuffle')
-                        shuffleSeed = Math.random();
-                    }}
-                    disabled={gettingResults}
-                  >
-                    <option value="default">Default</option>
-                    <option value="warm-to-cool">Warm to Cool</option>
-                    <option value="cool-to-warm">Cool to Warm</option>
-                    <option value="rainbow">Rainbow</option>
-                    <option value="light-to-dark">Light to Dark</option>
-                    <option value="dark-to-light">Dark to Light</option>
-                    <option value="name">Name A-Z</option>
-                    <option value="name-z-to-a">Name Z-A</option>
-                    <option value="shuffle">Shuffle</option>
-                  </select>
-                </div>
-              </label>
             </div>
 
             {#if areAnyResultsAffiliate}
@@ -644,100 +613,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
                 {pluralize('Colorway', totalResults)}
               </p>
-              <ViewToggleBindable bind:value={layout} />
+              <div class="flex flex-wrap items-center justify-center gap-2">
+                <div class="flex items-center gap-1">
+                  <SortMenu
+                    colors={results}
+                    current={yarnColorwayFinderState.sortColors === 'shuffle'
+                      ? null
+                      : yarnColorwayFinderState.sortColors}
+                    leadingSorts={[
+                      { value: 'default', label: defaultSortLabel },
+                    ]}
+                    onleadingsort={() => {
+                      yarnColorwayFinderState.sortColors = 'default';
+                      yarnColorwayFinderState.reversed = false;
+                    }}
+                    onsort={(sort) => {
+                      if (sort === 'reverse') {
+                        yarnColorwayFinderState.reversed =
+                          !yarnColorwayFinderState.reversed;
+                        return;
+                      }
+                      if (sort === 'shuffle') shuffleSeed = Math.random();
+                      yarnColorwayFinderState.sortColors = sort;
+                      yarnColorwayFinderState.reversed = false;
+                    }}
+                    disabled={gettingResults}
+                  />
+                  <p class="text-surface-700-300 text-sm" aria-live="polite">
+                    {sortLabel}{yarnColorwayFinderState.reversed
+                      ? ', reversed'
+                      : ''}
+                  </p>
+                </div>
+                <ViewToggleBindable bind:value={layout} />
+              </div>
             {/if}
 
             {#if results?.length && !loadingAllColors}
-              <div
-                class="rounded-container my-4 w-full justify-center gap-2 {layout ===
-                'grid'
-                  ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
-                  : 'flex flex-col'}"
-              >
-                {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable } ((hex ?? '') + (name ?? '') + (brandName ?? '') + (yarnName ?? ''))}
-                  {@const percentMatch = Math.floor(100 - Number(delta))}
-                  <!-- svelte-ignore a11y_click_events_have_key_events -->
-                  <!-- svelte-ignore a11y_no_static_element_interactions -->
-                  <div
-                    class="rounded-container relative flex min-w-fit flex-1 cursor-pointer items-center gap-x-2 p-2 shadow-sm transition-transform hover:z-10 hover:scale-[1.02] active:scale-95 {layout ===
-                    'grid'
-                      ? 'justify-center'
-                      : ''}"
-                    style="background:{hex}; color:{getTextColor(
-                      hex ?? '#ffffff',
-                    )};"
-                    onclick={() =>
-                      copyToClipboard(name ?? '', {
-                        message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
-                        icon: ClipboardCheckIcon,
-                      })}
-                    title="Copy {name} to clipboard"
-                  >
-                    <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
-                    <div class="min-h-[43px] min-w-[43px]">
-                      {#if !unavailable}
-                        {#if affiliate_variant_href}
-                          <a
-                            aria-label="Buy this yarn colorway"
-                            title="Buy this yarn colorway"
-                            class="btn-icon hover-on-color"
-                            href={affiliate_variant_href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onclick={(e) => e.stopPropagation()}
-                          >
-                            <ShoppingCartIcon />
-                          </a>
-                        {:else}
-                          <a
-                            aria-label="Open link to this yarn colorway"
-                            class="btn-icon hover-on-color"
-                            href={variant_href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Open link to this yarn colorway"
-                            onclick={(e) => e.stopPropagation()}
-                          >
-                            <ExternalLinkIcon />
-                          </a>
-                        {/if}
-                      {/if}
-                    </div>
-                    <div class="flex flex-col items-start gap-1 text-pretty">
-                      <span class="pointer-events-none text-left text-xs">
-                        {brandName} - {yarnName}
-                      </span>
-
-                      <span
-                        class="pointer-events-none text-left text-lg leading-tight"
-                      >
-                        {name}
-                      </span>
-
-                      {#if typeof percentMatch == 'number' && !isNaN(percentMatch)}
-                        <p class="pointer-events-none text-xs">
-                          {percentMatch}% Match
-                        </p>
-                      {/if}
-
-                      <!-- svelte-ignore a11y_click_events_have_key_events -->
-                      <span
-                        role="button"
-                        tabindex="0"
-                        class="text-xs select-all hover:opacity-80"
-                        aria-label="Copy {hex} to clipboard"
-                        title="Copy {hex} to clipboard"
-                        onclick={(e) => {
-                          e.stopPropagation();
-                          copyToClipboard(hex ?? '', {
-                            message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
-                            icon: ClipboardCheckIcon,
-                          });
-                        }}>{hex}</span
-                      >
-                    </div>
-                  </div>
-                {/each}
+              <div class="my-4 w-full">
+                {#if layout === 'grid'}
+                  <ColorwayCards colorways={results} />
+                {:else}
+                  <ColorwayRows colorways={results} />
+                {/if}
               </div>
             {:else if gettingResults}
               <div class="mx-auto my-6">

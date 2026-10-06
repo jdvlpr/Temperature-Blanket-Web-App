@@ -1,4 +1,8 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+/** Each colorway's name, a button that copies it, in cards and list rows */
+const colorwayNames = (page: Page) =>
+  page.locator('button[aria-label^="Copy name"]');
 
 test.describe('Yarn Colorway Finder', () => {
   test.beforeEach(async ({ page }) => {
@@ -18,7 +22,7 @@ test.describe('Yarn Colorway Finder', () => {
 
     // Wait for results to update - looking for a result that contains "Cream"
     await expect(
-      page.locator('.rounded-container').filter({ hasText: 'Cream' }).first(),
+      colorwayNames(page).filter({ hasText: 'Cream' }).first(),
     ).toBeVisible();
   });
 
@@ -34,10 +38,28 @@ test.describe('Yarn Colorway Finder', () => {
     // Verify results are filtered/sorted by color match
     // We expect "Cream" to be one of the top results
     await expect(
-      page.locator('.rounded-container').filter({ hasText: 'Cream' }).first(),
+      colorwayNames(page).filter({ hasText: 'Cream' }).first(),
     ).toBeVisible();
 
     // Also check for the match percentage text which appears when searching by hex
     // await expect(page.getByText(/Match/).first()).toBeVisible();
+  });
+
+  test('Cards have a button to copy the hex code', async ({ page }) => {
+    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await expect(
+      page.getByRole('button', { name: /Copy hex code #/ }).first(),
+    ).toBeVisible();
+  });
+
+  test('List view shows actions on each row', async ({ page }) => {
+    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await page.getByText('List', { exact: true }).click();
+    await expect(
+      page.getByRole('button', { name: /Copy name .*Cream/ }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /Copy hex code #/ }).first(),
+    ).toBeVisible();
   });
 });
