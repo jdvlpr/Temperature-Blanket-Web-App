@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   How a list is ordered: one sort from `options`, and, when `onreverse` is
   given, Reverse, which stays on across sorts (except ones `canReverse` rules
   out). The button names the sort; its icon flips upside down when reversed.
+  Options can have a few words under them, as in the app's other menus.
   For a sort that stays chosen, unlike SortMenu, which reorders a palette once.
 -->
 <script lang="ts" generics="T extends string">
@@ -33,7 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
   interface Props {
-    options: readonly { value: T; label: string }[];
+    /** Each sort, with a few words under it on what it does, if any */
+    options: readonly { value: T; label: string; details?: string }[];
     current: T;
     onsort: (sort: T) => void;
     reversed?: boolean;
@@ -63,6 +65,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
+{#snippet item(label: string, details?: string)}
+  <span class="flex min-w-0 flex-1 flex-col">
+    <span>{label}</span>
+    {#if details}
+      <span class="text-surface-700-300 text-xs">{details}</span>
+    {/if}
+  </span>
+{/snippet}
+
 <Menu positioning={{ placement: 'bottom-start' }}>
   <Menu.Trigger class={menuTriggerClass} {disabled}>
     <!-- Flipped upside down when reversed; screen readers hear "reversed" -->
@@ -91,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onCheckedChange={() => onsort(option.value)}
             class={menuItemClass}
           >
-            <span class="min-w-0 flex-1">{option.label}</span>
+            {@render item(option.label, option.details)}
             <CheckIcon
               size={18}
               class="shrink-0 {option.value === current ? '' : 'invisible'}"
@@ -111,7 +122,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onCheckedChange={(checked) => onreverse(checked)}
             class={menuItemClass}
           >
-            <span class="min-w-0 flex-1">Reverse</span>
+            {@render item(
+              'Reverse',
+              options.some((option) => option.details)
+                ? 'The other way round'
+                : undefined,
+            )}
             <CheckIcon
               size={18}
               class="shrink-0 {isReversed ? '' : 'invisible'}"

@@ -19,6 +19,8 @@ import { defaultYarn } from '$lib/state/page-state.svelte';
 import type { Color } from '$lib/types/yarn-types';
 import {
   getSortedPalette,
+  reversedSort,
+  reverseColors,
   shuffleColors,
   type PaletteSort,
 } from '$lib/utils/color-utils';
@@ -645,9 +647,14 @@ export class ImagePaletteState {
     ).map((color) => byId.get(color.pointId)!);
   }
 
+  /** The other way round, keeping locked colors where they are: a sort
+   * becomes that sort's other direction (Gradient cool to warm, and so on) */
   reverse() {
-    this.points = [...this.points].reverse();
-    this.sortOrder = 'custom';
+    const byId = new Map(this.points.map((point) => [point.id, point]));
+    this.points = reverseColors(this.paletteColors()).map((color) =>
+      byId.get(color.pointId)!,
+    );
+    this.sortOrder = reversedSort(this.sortOrder);
   }
 
   /** Put the colors in a random order, keeping locked colors where they are */

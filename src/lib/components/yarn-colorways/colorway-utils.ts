@@ -72,14 +72,20 @@ export const colorwayLink = (
  * since any but Best match can be reversed: unreversed, Lightness runs light
  * to dark and Name A to Z. */
 export const COLORWAY_SORTS = [
-  { value: 'best-match', label: 'Best match', needsColor: true },
-  { value: 'rainbow', label: 'Hue' },
-  { value: 'light-to-dark', label: 'Lightness' },
-  { value: 'name', label: 'Name' },
-  { value: 'by-yarn', label: 'Yarn' },
+  {
+    value: 'best-match',
+    label: 'Best match',
+    details: 'Closest to your color',
+    needsColor: true,
+  },
+  { value: 'rainbow', label: 'Hue', details: 'Rainbow order, grays last' },
+  { value: 'light-to-dark', label: 'Lightness', details: 'Light to dark' },
+  { value: 'name', label: 'Name', details: 'A to Z' },
+  { value: 'by-yarn', label: 'Yarn', details: 'By brand, then yarn' },
 ] as const satisfies readonly {
   value: string;
   label: string;
+  details: string;
   needsColor?: boolean;
 }[];
 

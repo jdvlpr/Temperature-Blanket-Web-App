@@ -8,7 +8,10 @@ import {
   readPastedColors,
   getPaletteFallbackName,
   getTextColor,
+  getSortedPalette,
   getYarnPageURL,
+  reverseColors,
+  reversedSort,
   sortColorsByName,
   sortColorsByNameZtoA,
   sortColorsDarktoLight,
@@ -397,6 +400,50 @@ describe('color-utils', () => {
         ]),
       ).toBe('Bernat Super Value + 2 more yarns, 3 colors');
     });
+  });
+});
+
+describe('reverseColors', () => {
+  const hexes = (colors: { hex?: string }[]) => colors.map((n) => n.hex);
+
+  it('keeps locked colors where they are', () => {
+    const colors = [
+      { hex: '#111111' },
+      { hex: '#222222', locked: true },
+      { hex: '#333333' },
+      { hex: '#444444' },
+    ];
+    expect(hexes(reverseColors(colors))).toEqual([
+      '#444444',
+      '#222222',
+      '#333333',
+      '#111111',
+    ]);
+  });
+
+  it('turns a sort into that sort the other way round', () => {
+    const colors = [
+      { hex: '#808080' },
+      { hex: '#000000', locked: true },
+      { hex: '#ffffff' },
+      { hex: '#404040' },
+    ];
+    const lightFirst = getSortedPalette({
+      palette: colors,
+      sortColors: 'light-to-dark',
+    });
+    expect(hexes(reverseColors(lightFirst))).toEqual(
+      hexes(getSortedPalette({ palette: colors, sortColors: 'dark-to-light' })),
+    );
+  });
+});
+
+describe('reversedSort', () => {
+  it('pairs each sort with its other direction', () => {
+    expect(reversedSort('warm-to-cool')).toBe('cool-to-warm');
+    expect(reversedSort('dark-to-light')).toBe('light-to-dark');
+    expect(reversedSort('name')).toBe('name-z-to-a');
+    expect(reversedSort('rainbow')).toBe('custom');
   });
 });
 

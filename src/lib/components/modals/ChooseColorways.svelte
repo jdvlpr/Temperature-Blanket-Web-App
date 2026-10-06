@@ -22,7 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
   import type { Color } from '$lib/types/yarn-types';
-  import { getSortedPalette, shuffleColors } from '$lib/utils/color-utils';
+  import {
+    getSortedPalette,
+    reverseColors,
+    shuffleColors,
+  } from '$lib/utils/color-utils';
   import { dialog } from '$lib/state/page-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { yarnUses } from '$lib/storage/yarn-uses.svelte';
@@ -120,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 const colors = $state.snapshot(selectedColors);
                 selectedColors =
                   sort === 'reverse'
-                    ? colors.reverse()
+                    ? reverseColors(colors)
                     : sort === 'shuffle'
                       ? shuffleColors(colors)
                       : getSortedPalette({ palette: colors, sortColors: sort });

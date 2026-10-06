@@ -14,15 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  A Sort menu for a palette: the usual sorts, plus a smooth blend from warm
-  to cool (or back), Reverse, and Shuffle. Choosing one calls `onsort`. Without a
-  `current` sort, the menu checks the sort the colors are already in.
+  A Sort menu for a palette: Gradient, Hue, Lightness and Name, each one way
+  round, then Reverse (for the other way) and Shuffle, each with a few words
+  on what it does. Choosing one calls `onsort`. The menu checks the sort the
+  colors are in, either way round: `current`, or else worked out from them.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import {
     getSortedPalette,
     PALETTE_SORTS,
+    reverseColors,
+    reversedSort,
     type PaletteSort,
   } from '$lib/utils/color-utils';
   import {
@@ -70,27 +73,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** The sort last chosen here, preferred when the colors fit more than one */
   let lastChosen = $state<string | null>(null);
 
-  /** The one sort the colors are already in, worked out only while the menu
-   * is open, since some sorts take a moment on long palettes */
+  /** The one sort the colors are already in, either way round, worked out
+   * only while the menu is open, since some sorts take a moment on long
+   * palettes */
   let alreadySorted = $derived.by(() => {
     if (current !== undefined || !open || colors.length < 2) return null;
     const key = (list: Color[]) =>
       list.map((color) => `${color?.hex}|${color?.name ?? ''}`).join(',');
     const now = key(colors);
-    const matches = PALETTE_SORTS.filter(
-      (sort) =>
-        (allColorsHaveNames || !sort.needsNames) &&
-        key(
-          getSortedPalette({ palette: [...colors], sortColors: sort.value }),
-        ) === now,
-    ).map((sort) => sort.value as string);
+    const matches = PALETTE_SORTS.filter((sort) => {
+      if (!allColorsHaveNames && sort.needsNames) return false;
+      const sorted = getSortedPalette({
+        palette: [...colors],
+        sortColors: sort.value,
+      });
+      return key(sorted) === now || key(reverseColors(sorted)) === now;
+    }).map((sort) => sort.value as string);
     if (lastChosen && matches.includes(lastChosen)) return lastChosen;
     return matches[0] ?? null;
   });
 
   const isCurrent = (sort: PaletteSort) =>
-    current !== undefined ? current === sort : alreadySorted === sort;
+    current !== undefined
+      ? current === sort ||
+        (current !== 'custom' && current === reversedSort(sort))
+      : alreadySorted === sort;
 </script>
+
+<!-- A label with a few words under it, as in the palette's other menus -->
+{#snippet item(label: string, details: string)}
+  <div class="flex min-w-0 flex-1 flex-col text-left">
+    <p>{label}</p>
+    <p class="text-surface-700-300 text-xs">{details}</p>
+  </div>
+{/snippet}
 
 <Menu
   positioning={{ placement }}
@@ -113,20 +129,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Menu.Content class={menuContentClass}>
         {#each PALETTE_SORTS.filter((sort) => allColorsHaveNames || !sort.needsNames) as sort (sort.value)}
           <Menu.Item value={sort.value} class={menuItemClass}>
-            <p class="min-w-0 flex-1 text-left">{sort.label}</p>
-            {#if isCurrent(sort.value)}
-              <CheckIcon class="shrink-0" aria-label="Current" />
-            {/if}
+            {@render item(sort.label, sort.details)}
+            <CheckIcon
+              class="shrink-0 {isCurrent(sort.value) ? '' : 'invisible'}"
+              aria-label={isCurrent(sort.value) ? 'Current' : undefined}
+              aria-hidden={isCurrent(sort.value) ? undefined : 'true'}
+            />
           </Menu.Item>
         {/each}
         <Menu.Separator />
         <Menu.Item value="reverse" class={menuItemClass}>
-          <ArrowLeftRightIcon class="shrink-0" />
-          <p class="min-w-0 flex-1 text-left">Reverse</p>
+          <ArrowLeftRightIcon class="shrink-0" aria-hidden="true" />
+          {@render item('Reverse', 'The other way round')}
         </Menu.Item>
         <Menu.Item value="shuffle" class={menuItemClass}>
-          <ShuffleIcon class="shrink-0" />
-          <p class="min-w-0 flex-1 text-left">Shuffle</p>
+          <ShuffleIcon class="shrink-0" aria-hidden="true" />
+          {@render item('Shuffle', 'A random order')}
         </Menu.Item>
       </Menu.Content>
     </Menu.Positioner>

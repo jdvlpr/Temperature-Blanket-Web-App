@@ -26,7 +26,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
-  import { getSortedPalette, PALETTE_SORTS } from '$lib/utils/color-utils';
+  import {
+    getSortedPalette,
+    PALETTE_SORTS,
+    reverseColors,
+  } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
   import { ShuffleIcon } from '@lucide/svelte';
@@ -54,12 +58,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let selectedYarnWeightId = $state('');
   /** Each new palette is sorted this way, or left as picked */
   const RANDOM_PALETTE_SORTS = [
-    { value: 'none', label: 'None' },
+    { value: 'none', label: 'None', details: 'In the order picked' },
     ...PALETTE_SORTS,
   ] as const;
 
   let sortColors =
     $state<(typeof RANDOM_PALETTE_SORTS)[number]['value']>('light-to-dark');
+  /** The sort the other way round (not None); stays on across sorts */
+  let reversed = $state(false);
+
+  const canReverse = (sort: string) => sort !== 'none';
+
+  /** Colors in the chosen sort, the other way round if asked */
+  function sortPalette(palette: Color[]) {
+    const sorted = getSortedPalette({ palette, sortColors });
+    return reversed && canReverse(sortColors) ? reverseColors(sorted) : sorted;
+  }
 
   function getRandomColors() {
     debounce(() => {
@@ -109,10 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
       }
-      randomPalette = getSortedPalette({
-        palette: tempYarnColorways,
-        sortColors,
-      });
+      randomPalette = sortPalette(tempYarnColorways);
     }, 10);
   }
   let filteredYarnsList = $derived(
@@ -197,12 +208,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SortSelectMenu
         options={RANDOM_PALETTE_SORTS}
         current={sortColors}
+        {canReverse}
+        {reversed}
         onsort={(sort) => {
           sortColors = sort;
-          randomPalette = getSortedPalette({
-            palette: randomPalette,
-            sortColors,
-          });
+          randomPalette = sortPalette(randomPalette);
+        }}
+        onreverse={(value) => {
+          reversed = value;
+          if (canReverse(sortColors))
+            randomPalette = reverseColors(randomPalette);
         }}
       />
     </div>

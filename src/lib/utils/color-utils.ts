@@ -720,20 +720,55 @@ export type PaletteSort =
   | 'name'
   | 'name-z-to-a';
 
+/**
+ * The sorts sort menus offer, each one way round; Reverse gives the other
+ * (Gradient reversed is cool to warm, Lightness dark to light, Name Z to A).
+ */
 export const PALETTE_SORTS: {
   value: Exclude<PaletteSort, 'custom'>;
   label: string;
+  /** A few words on what it does, under its label */
+  details: string;
   /** Only offered when every color has a name */
   needsNames?: boolean;
 }[] = [
-  { value: 'warm-to-cool', label: 'Warm to Cool' },
-  { value: 'cool-to-warm', label: 'Cool to Warm' },
-  { value: 'rainbow', label: 'Rainbow' },
-  { value: 'light-to-dark', label: 'Light to Dark' },
-  { value: 'dark-to-light', label: 'Dark to Light' },
-  { value: 'name', label: 'Name A-Z', needsNames: true },
-  { value: 'name-z-to-a', label: 'Name Z-A', needsNames: true },
+  {
+    value: 'warm-to-cool',
+    label: 'Gradient',
+    details: 'A smooth blend, warm to cool',
+  },
+  { value: 'rainbow', label: 'Hue', details: 'Rainbow order, grays last' },
+  { value: 'light-to-dark', label: 'Lightness', details: 'Light to dark' },
+  { value: 'name', label: 'Name', details: 'A to Z', needsNames: true },
 ];
+
+/** The same sort the other way round; Hue (rainbow) has none */
+export const reversedSort = (sort: PaletteSort): PaletteSort => {
+  switch (sort) {
+    case 'warm-to-cool':
+      return 'cool-to-warm';
+    case 'cool-to-warm':
+      return 'warm-to-cool';
+    case 'light-to-dark':
+      return 'dark-to-light';
+    case 'dark-to-light':
+      return 'light-to-dark';
+    case 'name':
+      return 'name-z-to-a';
+    case 'name-z-to-a':
+      return 'name';
+    default:
+      return 'custom';
+  }
+};
+
+/** Colors in the opposite order. Locked colors stay where they are, as in
+ * the sorts, so a sort reversed is that sort the other way round. */
+export const reverseColors = <T extends Color>(colors: T[]): T[] => {
+  const unlocked = colors.filter((color) => !color?.locked).reverse();
+  let next = 0;
+  return colors.map((color) => (color?.locked ? color : unlocked[next++]));
+};
 
 /**
  * Order colors so each blends into the next (the shortest path through

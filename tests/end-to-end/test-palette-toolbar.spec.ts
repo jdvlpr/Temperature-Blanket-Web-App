@@ -93,6 +93,28 @@ test.describe('Palette toolbar', () => {
     ).toBeFocused();
   });
 
+  test('Sort offers each sort one way round, with Reverse for the other', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Sort', exact: true }).click();
+    for (const name of ['Gradient', 'Hue', 'Lightness', 'Reverse', 'Shuffle'])
+      await expect(
+        page.getByRole('menuitem', { name: new RegExp(`^${name}`) }),
+      ).toBeVisible();
+    await expect(
+      page.getByRole('menuitem', { name: /Warm to Cool|Dark to Light/ }),
+    ).toHaveCount(0);
+
+    // Lightness, then Reverse: still Lightness, the other way round
+    await page.getByRole('menuitem', { name: /^Lightness/ }).click();
+    await page.getByRole('button', { name: 'Sort', exact: true }).click();
+    await page.getByRole('menuitem', { name: /^Reverse/ }).click();
+    await page.getByRole('button', { name: 'Sort', exact: true }).click();
+    await expect(
+      page.getByRole('menuitem', { name: /^Lightness/ }).getByLabel('Current'),
+    ).toBeVisible();
+  });
+
   test('Save & Export lists saving and every export', async ({ page }) => {
     await page.getByRole('button', { name: 'Save & Export' }).click();
     for (const name of ['Save Palette', 'Link', 'HTML Color Codes', 'Image']) {

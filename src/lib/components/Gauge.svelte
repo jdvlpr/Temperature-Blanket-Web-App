@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPaletteFallbackName,
     getSortedPalette,
     getYarnPageURL,
+    reverseColors,
     shuffleColors,
   } from '$lib/utils/color-utils';
   import { drawerState, dialog } from '$lib/state/page-state.svelte';
@@ -392,7 +393,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         updateGauge({
           _colors:
             sort === 'reverse'
-              ? colors.reverse()
+              ? reverseColors(colors)
               : sort === 'shuffle'
                 ? shuffleColors(colors)
                 : getSortedPalette({
