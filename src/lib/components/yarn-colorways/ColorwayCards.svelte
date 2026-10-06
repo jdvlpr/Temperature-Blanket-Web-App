@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => selection.ontoggle(colorway)}
         >
           <span
-            class="flex h-20 w-full flex-wrap content-start items-center gap-1 p-1.5 pr-9 sm:h-24"
+            class="flex h-20 w-full flex-wrap content-start items-center gap-1 p-1.5 pt-2 pr-11 sm:h-24"
             style="background:{colorway.hex};color:{iconColorOn(colorway.hex)}"
           >
             {#if selected}
@@ -106,8 +106,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@render details(colorway)}
           </span>
         </button>
-        <!-- Level with the check circle: the same 28px box, the same inset -->
-        <div class="absolute top-1.5 right-1.5">
+        <!-- Centered on the check circle's line: the circle's 28px box starts
+        8px down and this 44px touch target at the top, both centered 22px down -->
+        <div class="absolute top-0 right-0">
           <ColorwayMoreMenu {colorway} />
         </div>
       </li>
