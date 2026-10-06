@@ -52,6 +52,47 @@ test.describe('Palette toolbar', () => {
     await expect(dialog.getByText('1 Colorway', { exact: true })).toBeVisible();
   });
 
+  test('Choose Colorways on a phone: Escape leaves Photo, badges clear the menu', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole('button', { name: 'Get Colors' }).click();
+    await page.getByRole('menuitem', { name: /Choose Colorways/ }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByPlaceholder('e.g., pink, #c3f4d2').fill('#ff0000');
+
+    // The match badge wraps below the check circle rather than under the ⋮
+    const card = dialog.getByRole('listitem').first();
+    const badge = await card.getByText(/% match/).boundingBox();
+    const more = await card
+      .getByRole('button', { name: /^More for / })
+      .boundingBox();
+    expect(badge && more).toBeTruthy();
+    const overlaps =
+      badge!.x < more!.x + more!.width &&
+      more!.x < badge!.x + badge!.width &&
+      badge!.y < more!.y + more!.height &&
+      more!.y < badge!.y + badge!.height;
+    expect(overlaps).toBe(false);
+
+    const toggle = card.getByRole('button').first();
+    await toggle.click();
+
+    // Escape in the photo picker goes back, keeping what's chosen
+    await dialog
+      .getByRole('button', { name: 'Pick color from a photo' })
+      .click();
+    await expect(
+      dialog.getByRole('region', { name: 'Pick a color from a photo' }),
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      dialog.getByRole('button', { name: 'Pick color from a photo' }),
+    ).toBeFocused();
+  });
+
   test('Save & Export lists saving and every export', async ({ page }) => {
     await page.getByRole('button', { name: 'Save & Export' }).click();
     for (const name of ['Save Palette', 'Link', 'HTML Color Codes', 'Image']) {

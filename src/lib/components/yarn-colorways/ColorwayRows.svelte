@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   Yarn colorways as rows, the cards laid out sideways: swatch, name and yarn,
   match, and the same "more" menu (⋮) with the link to buy or view it and the
-  copy options. Each row stays on one line at every width.
+  copy options. The match sits at the row's end, or under the name where the
+  list is narrow.
 
   With `selection`, each row (but its ⋮ menu) is one toggle button, led by a
   circle that's checked when it's selected.
@@ -40,6 +41,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <!-- Spans, since in a selectable row they're inside its button -->
+{#snippet matchPill(match: number, extra: string)}
+  <span
+    class="bg-surface-200-800 text-surface-950-50 w-fit shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums {extra}"
+  >
+    {match}% match
+  </span>
+{/snippet}
+
 {#snippet row(colorway: Color & { delta?: number })}
   {@const match = matchPercent(colorway)}
   <span
@@ -56,18 +65,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         No longer available
       </span>
     {/if}
+    <!-- Under the name where the list is narrow, so the name keeps its room -->
+    {#if match !== undefined}{@render matchPill(
+        match,
+        'mt-0.5 @md:hidden',
+      )}{/if}
   </span>
-  {#if match !== undefined}
-    <span
-      class="bg-surface-200-800 text-surface-950-50 shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums"
-    >
-      {match}% match
-    </span>
-  {/if}
+  {#if match !== undefined}{@render matchPill(match, 'hidden @md:inline')}{/if}
 {/snippet}
 
 <ul
-  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 w-full divide-y overflow-hidden border"
+  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 @container w-full divide-y overflow-hidden border"
 >
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}

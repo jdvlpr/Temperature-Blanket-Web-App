@@ -123,6 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     cancelAnimationFrame(frameRequest);
     if (pixels && last) last.at = at;
     dialog.backAction = null;
+    dialog.escapeAction = null;
   });
 
   // The dialog's Back button returns to choosing a photo, then (shown inside
@@ -130,6 +131,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     dialog.backAction =
       step === 'picker' ? () => (step = 'start') : (onBack ?? null);
+  });
+
+  // Shown inside another dialog, Escape leaves the photo for it, rather than
+  // closing it and losing what's chosen there
+  $effect(() => {
+    dialog.escapeAction = onBack ?? null;
   });
 
   $effect(() => {

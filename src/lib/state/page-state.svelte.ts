@@ -84,6 +84,10 @@ class DialogClass {
    * for them. Cleared whenever another dialog opens. */
   backAction = $state<(() => void) | null>(null);
 
+  /** Set by a view shown inside a dialog, for Escape to leave just that view
+   * rather than close the dialog. Cleared whenever another dialog opens. */
+  escapeAction = $state<(() => void) | null>(null);
+
   /** Which way the last change of view went, for its slide */
   direction = $state<'forward' | 'back' | 'none'>('none');
 
@@ -124,6 +128,7 @@ class DialogClass {
       this.stack = [];
     }
     this.backAction = null;
+    this.escapeAction = null;
     this.direction = fromReturnable ? 'forward' : 'none';
 
     // Every dialog starts from the defaults, so nothing carries over from

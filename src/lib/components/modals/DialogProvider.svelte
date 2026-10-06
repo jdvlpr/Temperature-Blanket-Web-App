@@ -391,6 +391,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Dialog
   open={dialog.opened}
   onOpenChange={(e) => (dialog.opened = e.open)}
+  onEscapeKeyDown={(e) => {
+    if (!dialog.escapeAction) return;
+    e.preventDefault();
+    dialog.escapeAction();
+  }}
   initialFocusEl={undefined}
 >
   <Portal>

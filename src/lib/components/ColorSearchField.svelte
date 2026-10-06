@@ -23,7 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getTextColor } from '$lib/utils/color-utils';
-  import { ImageIcon, XIcon } from '@lucide/svelte';
+  import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  import { ImageIcon, PipetteIcon, XIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
   import { untrack } from 'svelte';
 
@@ -74,23 +75,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="label w-full">
+<!-- Where the field is narrow (a phone, a dialog), Photo is just its icon,
+so the text box keeps its room -->
+<div class="label @container w-full">
   <label class="label-text" for="{id}-text">{label}</label>
   <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
-    <input
-      type="color"
-      class="input ig-cell m-2 rounded-full! p-0"
-      aria-label="Choose a color"
-      value={hex || '#000000'}
-      onchange={(e) => {
-        text = e.currentTarget.value;
-        setColor(text);
-      }}
-    />
+    <span class="ig-cell relative p-1.5">
+      <input
+        type="color"
+        class="input size-8 cursor-pointer rounded-full! p-0"
+        aria-label="Choose a color"
+        value={hex || '#000000'}
+        onchange={(e) => {
+          text = e.currentTarget.value;
+          setColor(text);
+        }}
+      />
+      <!-- Shows the circle picks a color; clicks go through to it -->
+      <PipetteIcon
+        size={16}
+        aria-hidden="true"
+        class="pointer-events-none absolute top-1/2 left-1/2 -translate-1/2"
+        style="color:{iconColorOn(hex || '#000000')}"
+      />
+    </span>
     <input
       id="{id}-text"
       type="text"
-      class="ig-input"
+      class="ig-input min-w-0"
       autocomplete="off"
       placeholder="e.g., pink, #c3f4d2"
       style="background:{hex || 'none'} !important;color:{getTextColor(hex)}"
@@ -116,7 +128,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="ig-btn gap-1"
       data-photo-button
       onclick={photo}
-      ><ImageIcon /> Photo
+      ><ImageIcon aria-hidden="true" />
+      <span class="hidden @sm:inline">Photo</span>
     </button>
   </div>
 </div>

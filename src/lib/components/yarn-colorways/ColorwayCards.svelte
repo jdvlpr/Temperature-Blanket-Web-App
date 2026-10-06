@@ -21,7 +21,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   too narrow for both.
 
   With `selection`, each card's swatch and name are one toggle button (a
-  circle, checked when selected); the ⋮ menu stays its own button beside it.
+  circle, checked when selected); the ⋮ menu stays its own button beside it,
+  level with the circle. The match sits beside the circle, or wraps below it
+  on a card too narrow for all three.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
@@ -86,13 +88,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => selection.ontoggle(colorway)}
         >
           <span
-            class="flex h-20 w-full items-start gap-1 p-2 pr-10 sm:h-24"
+            class="flex h-20 w-full flex-wrap content-start items-center gap-1 p-1.5 pr-9 sm:h-24"
             style="background:{colorway.hex};color:{iconColorOn(colorway.hex)}"
           >
             {#if selected}
-              <CircleCheckIcon class="shrink-0" aria-hidden="true" />
+              <span class="flex size-7 shrink-0 items-center justify-center"
+                ><CircleCheckIcon size={22} aria-hidden="true" /></span
+              >
             {:else}
-              <CircleIcon class="shrink-0" aria-hidden="true" />
+              <span class="flex size-7 shrink-0 items-center justify-center"
+                ><CircleIcon size={22} aria-hidden="true" /></span
+              >
             {/if}
             {#if match !== undefined}{@render matchPill(match)}{/if}
           </span>
@@ -100,7 +106,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@render details(colorway)}
           </span>
         </button>
-        <div class="absolute top-1 right-1">
+        <!-- Level with the check circle: the same 28px box, the same inset -->
+        <div class="absolute top-1.5 right-1.5">
           <ColorwayMoreMenu {colorway} />
         </div>
       </li>
