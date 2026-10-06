@@ -16,11 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   Yarn colorways as swatch cards: the color on its own, uncovered, with the
   name and yarn below it on the card, so text reads the same on every color.
-  A copy menu (name or hex) and the shop link sit under them.
+  The name links to where to buy or view it; a copy menu (name or hex)
+  sits on the swatch's corner.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
-  import ColorwayActions from './ColorwayActions.svelte';
+  import ColorwayName from './ColorwayName.svelte';
+  import CopyColorwayMenu from './CopyColorwayMenu.svelte';
   import { colorwayKey, matchPercent } from './colorway-utils';
 
   interface Props {
@@ -39,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="card bg-surface-50-950 border-surface-200-800 flex min-w-0 flex-col overflow-hidden border"
     >
       <div
-        class="flex h-24 items-start p-2 sm:h-28"
+        class="relative flex h-24 items-start p-2 sm:h-28"
         style="background:{colorway.hex}"
       >
         {#if match !== undefined}
@@ -49,11 +51,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {match}% match
           </p>
         {/if}
+        <div class="absolute right-2 bottom-2">
+          <CopyColorwayMenu {colorway} variant="swatch" />
+        </div>
       </div>
       <div class="flex flex-1 flex-col gap-2 p-2 sm:p-3">
         <div class="flex min-w-0 flex-col gap-0.5">
           <p class="leading-tight font-semibold text-pretty">
-            {colorway.name}
+            <ColorwayName {colorway} />
           </p>
           <p class="text-surface-700-300 text-xs text-pretty">
             {colorway.brandName} · {colorway.yarnName}
@@ -64,9 +69,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           {/if}
         </div>
-        <div class="mt-auto">
-          <ColorwayActions {colorway} layout="card" />
-        </div>
+        {#if colorway.unavailable}
+          <p class="text-surface-700-300 mt-auto text-xs leading-tight">
+            No longer available
+          </p>
+        {/if}
       </div>
     </li>
   {/each}

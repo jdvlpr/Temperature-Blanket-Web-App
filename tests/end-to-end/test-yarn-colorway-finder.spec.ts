@@ -70,4 +70,13 @@ test.describe('Yarn Colorway Finder', () => {
     await expect(row).toBeVisible();
     await expect(copyMenuButtons(page).first()).toBeVisible();
   });
+
+  test('Colorway names link to where to buy or view them', async ({ page }) => {
+    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    const link = page
+      .getByRole('link', { name: /Cream.*opens in a new tab/ })
+      .first();
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('target', '_blank');
+  });
 });

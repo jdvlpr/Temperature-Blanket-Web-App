@@ -14,13 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Yarn colorways as detailed rows: swatch, name, yarn, match, and every
-  action in reach without opening anything. On a phone the actions wrap onto
+  Yarn colorways as detailed rows: swatch, name (a link to buy or view it),
+  yarn, match, and the copy menu. On a phone the actions wrap onto
   their own line under the colorway.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import ColorwayActions from './ColorwayActions.svelte';
+  import ColorwayName from './ColorwayName.svelte';
   import { colorwayKey, matchPercent } from './colorway-utils';
 
   interface Props {
@@ -41,7 +42,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         style="background:{colorway.hex}"
       ></span>
       <div class="flex min-w-0 flex-1 flex-col">
-        <p class="leading-tight font-semibold">{colorway.name}</p>
+        <p class="leading-tight font-semibold">
+          <ColorwayName {colorway} />
+        </p>
         <p class="text-surface-700-300 text-xs">
           {colorway.brandName} · {colorway.yarnName}{#if colorway.hex}
             · <span class="font-mono">{colorway.hex}</span>{/if}
@@ -53,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       {/if}
       <div class="w-full md:w-auto">
-        <ColorwayActions {colorway} layout="row" />
+        <ColorwayActions {colorway} />
       </div>
     </li>
   {/each}
