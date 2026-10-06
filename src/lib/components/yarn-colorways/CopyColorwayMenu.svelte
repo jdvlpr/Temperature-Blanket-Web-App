@@ -21,22 +21,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types/yarn-types';
   import { CopyIcon } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { copyColorwayText, iconColorOn } from './colorway-utils';
+  import { copyColorwayText } from './colorway-utils';
 
   interface Props {
     colorway: Color;
-    /** `labeled` shows the word "Copy" on wider screens; `swatch` sits right
-     * on the yarn swatch: just a black or white icon, tinted on hover */
-    variant?: 'icon' | 'labeled' | 'swatch';
+    /** `labeled` shows the word "Copy" on wider screens */
+    variant?: 'icon' | 'labeled';
   }
 
   let { colorway, variant = 'icon' }: Props = $props();
 
   const triggerClasses = {
     icon: 'btn-icon hover:preset-tonal-surface size-8 shrink-0',
-    labeled: 'btn hover:preset-tonal-surface shrink-0 px-2 sm:px-3',
-    swatch:
-      'btn-icon hover-on-color size-8 shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-current',
+    labeled: 'btn-icon hover:preset-tonal-surface shrink-0 px-2 sm:px-3',
   };
 
   let choices = $derived(
@@ -54,9 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if choices.length}
   <Menu
-    positioning={{
-      placement: variant === 'swatch' ? 'bottom-end' : 'bottom-start',
-    }}
+    positioning={{ placement: 'bottom-start' }}
     onSelect={(details) => {
       const choice = choices.find((c) => c.value === details.value);
       if (choice) copyColorwayText(choice.text);
@@ -64,9 +59,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <Menu.Trigger
       class={triggerClasses[variant]}
-      style={variant === 'swatch'
-        ? `color:${iconColorOn(colorway.hex)}`
-        : undefined}
       aria-label="Copy {colorway.name ?? colorway.hex}: name or hex code"
       title="Copy"
     >

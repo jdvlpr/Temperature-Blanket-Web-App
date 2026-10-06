@@ -32,3 +32,13 @@ export const iconColorOn = (hex: string | undefined): 'black' | 'white' => {
     ? 'black'
     : 'white';
 };
+
+/** The site a link goes to, for naming it ("hobbii.com"), or undefined
+ * when the link isn't a web address */
+export const linkSite = (href: string): string | undefined => {
+  try {
+    return new URL(href).hostname.replace(/^www\./, '') || undefined;
+  } catch {
+    return undefined;
+  }
+};

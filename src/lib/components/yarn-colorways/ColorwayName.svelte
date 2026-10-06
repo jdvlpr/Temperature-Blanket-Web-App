@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A yarn colorway's name, linking to where to buy it (a shopping cart) or to
-  its maker's page. The icon shows on hover and keyboard focus, and always on
+  the page it's listed on. The icon shows on hover and keyboard focus, and always on
   touch screens, which can't hover, so the cart that marks affiliate links is
   never hidden from anyone. It sits in a zero-width slot, so showing it never
   changes the name's size or wrapping. Not sold anymore, the name is plain text.
@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
+  import { linkSite } from './colorway-utils';
 
   interface Props {
     colorway: Color;
@@ -48,11 +49,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     target="_blank"
     rel="noopener noreferrer"
     class="group rounded-sm underline-offset-2 hover:underline focus-visible:underline {className}"
-    title={isAffiliate ? `Buy ${colorway.name}` : `View ${colorway.name}`}
+    title={isAffiliate
+      ? `Buy ${colorway.name}`
+      : `View ${colorway.name} on ${linkSite(href) ?? 'its site'}`}
   >
     {colorway.name}<span class="sr-only"
-      >{isAffiliate ? ', buy this colorway' : ", on the maker's site"} (opens in a
-      new tab)</span
+      >{isAffiliate
+        ? ', buy this colorway'
+        : `, on ${linkSite(href) ?? 'its site'}`} (opens in a new tab)</span
     ><span
       class="relative inline-block h-[1lh] w-0 align-top"
       aria-hidden="true"

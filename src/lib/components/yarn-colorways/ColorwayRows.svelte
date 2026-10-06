@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#if match !== undefined}
         <p class="shrink-0 text-sm font-semibold tabular-nums">
-          {match}%<span class="sr-only"> match</span>
+          {match}% match
         </p>
       {/if}
       <div class="w-full md:w-auto">

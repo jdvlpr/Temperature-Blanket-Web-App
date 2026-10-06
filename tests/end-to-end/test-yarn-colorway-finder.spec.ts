@@ -3,7 +3,11 @@ import { expect, test, type Page } from '@playwright/test';
 /** The colorway results, as cards or list rows */
 const colorways = (page: Page) => page.getByRole('listitem');
 
-/** A colorway's copy button, which opens a menu: copy the name or hex code */
+/** A card's "more" (⋮) button, which opens its link and copy options */
+const moreMenuButtons = (page: Page) =>
+  page.getByRole('button', { name: /^More for / });
+
+/** A list row's copy button, which opens a menu: copy the name or hex code */
 const copyMenuButtons = (page: Page) =>
   page.getByRole('button', { name: /name or hex code/ });
 
@@ -48,19 +52,43 @@ test.describe('Yarn Colorway Finder', () => {
     // await expect(page.getByText(/Match/).first()).toBeVisible();
   });
 
-  test('The copy menu offers the name and hex code', async ({ page }) => {
+  test("A card's more menu has its link and copy options", async ({ page }) => {
     await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
-    await copyMenuButtons(page).first().click();
+    const more = moreMenuButtons(page).first();
+    await more.click();
+
+    const link = page.getByRole('menuitem', {
+      name: /Buy this colorway|View on |View this colorway/,
+    });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('target', '_blank');
     await expect(
-      page.getByRole('menuitem', { name: /Copy Name/ }),
+      page.getByRole('menuitem', { name: /Copy name/ }),
     ).toBeVisible();
     await expect(
-      page.getByRole('menuitem', { name: /Copy Hex #/ }),
+      page.getByRole('menuitem', { name: /Copy hex #/ }),
     ).toBeVisible();
+
     await page.keyboard.press('Escape');
-    await expect(
-      page.getByRole('menuitem', { name: /Copy Name/ }),
-    ).toBeHidden();
+    await expect(link).toBeHidden();
+    await expect(more).toBeFocused();
+  });
+
+  test("The more menu's link opens by keyboard", async ({ page, context }) => {
+    // Don't load the shop itself, just see that the new tab opens
+    await context.route(/^https?:\/\/(?!localhost)/, (route) => route.abort());
+    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await moreMenuButtons(page).first().focus();
+    await page.keyboard.press('Enter');
+    const link = page.getByRole('menuitem', {
+      name: /Buy this colorway|View on |View this colorway/,
+    });
+    await expect(link).toBeVisible();
+
+    const popup = context.waitForEvent('page');
+    await link.focus();
+    await page.keyboard.press('Enter');
+    await popup;
   });
 
   test('List view shows the copy menu on each row', async ({ page }) => {
@@ -71,8 +99,11 @@ test.describe('Yarn Colorway Finder', () => {
     await expect(copyMenuButtons(page).first()).toBeVisible();
   });
 
-  test('Colorway names link to where to buy or view them', async ({ page }) => {
+  test('In the list, colorway names link to where to buy or view them', async ({
+    page,
+  }) => {
     await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await page.getByText('List', { exact: true }).click();
     const link = page
       .getByRole('link', { name: /Cream.*opens in a new tab/ })
       .first();
