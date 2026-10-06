@@ -50,6 +50,18 @@ test.describe('Palette toolbar', () => {
       card.getByRole('button', { name: /^More for / }),
     ).toBeVisible();
     await expect(dialog.getByText('1 Colorway', { exact: true })).toBeVisible();
+
+    // Clear empties the picks, and Undo (focused) brings them back
+    await dialog.getByRole('button', { name: 'Clear', exact: true }).click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(dialog.getByText('Cleared 1 colorway')).toBeVisible();
+    const undo = dialog.getByRole('button', { name: 'Undo' });
+    await expect(undo).toBeFocused();
+    await undo.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      dialog.getByRole('button', { name: 'Clear', exact: true }),
+    ).toBeFocused();
   });
 
   test('Choose Colorways on a phone: Escape leaves Photo, badges clear the menu', async ({

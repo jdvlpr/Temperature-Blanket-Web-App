@@ -30,7 +30,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '$lib/state/page-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { yarnUses } from '$lib/storage/yarn-uses.svelte';
+  import { Trash2Icon, Undo2Icon } from '@lucide/svelte';
   import { tick } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
 
   interface Props {
     updateGauge: any;
@@ -46,6 +48,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** Picking a color from a photo, shown in this dialog's place so nothing
    * chosen here is lost */
   let pickingFromPhoto = $state(false);
+  /** The colorways just cleared, for Undo, until another is chosen */
+  let cleared = $state<Color[] | null>(null);
+  let clearButton: HTMLButtonElement | undefined = $state();
+
+  function clear() {
+    cleared = $state.snapshot(selectedColors);
+    selectedColors = [];
+  }
+
+  async function undoClear() {
+    if (!cleared) return;
+    selectedColors = cleared;
+    cleared = null;
+    // Back to Clear, as the Undo button that was pressed is gone
+    await tick();
+    clearButton?.focus({ preventScroll: true });
+  }
+
+  /** Undo takes the focus, as the Clear button that was pressed is disabled */
+  const takeFocus: Attachment<HTMLButtonElement> = (button) => {
+    button.focus({ preventScroll: true });
+  };
 
   async function closePhoto() {
     pickingFromPhoto = false;
@@ -91,6 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:selectedBrandId
     bind:selectedYarnId
     {matchHex}
+    onSelection={() => (cleared = null)}
     onClickScrollToTop={() => {
       container?.scrollIntoView({
         behavior: 'smooth',
@@ -104,6 +129,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if !pickingFromPhoto}
   <StickyPart position="bottom">
     <div class="p-2" bind:clientHeight={footerHeight}>
+      {#if cleared && !selectedColors.length}
+        <div
+          class="card preset-tonal-surface mb-2 flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
+          role="status"
+        >
+          <span class="line-clamp-1"
+            >Cleared {cleared.length}
+            {pluralize('colorway', cleared.length)}</span
+          >
+          <button
+            type="button"
+            class="btn btn-sm hover:preset-tonal-surface"
+            onclick={undoClear}
+            {@attach takeFocus}
+          >
+            <Undo2Icon aria-hidden="true" />
+            Undo
+          </button>
+        </div>
+      {/if}
       {#if selectedColors.length}
         <div class="">
           {#key selectedColors.length}
@@ -115,21 +160,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           <div class="mt-2 flex items-center justify-between gap-2">
             <p class="text-xs">{paletteTitleText}</p>
-            <SortMenu
-              colors={selectedColors}
-              placement="top"
-              triggerClass="btn btn-sm hover:bg-surface-200-800"
-              disabled={selectedColors.length < 2}
-              onsort={(sort) => {
-                const colors = $state.snapshot(selectedColors);
-                selectedColors =
-                  sort === 'reverse'
-                    ? reverseColors(colors)
-                    : sort === 'shuffle'
-                      ? shuffleColors(colors)
-                      : getSortedPalette({ palette: colors, sortColors: sort });
-              }}
-            />
+            <div class="flex items-center gap-1">
+              <SortMenu
+                colors={selectedColors}
+                placement="top"
+                triggerClass="btn btn-sm hover:bg-surface-200-800"
+                disabled={selectedColors.length < 2}
+                onsort={(sort) => {
+                  const colors = $state.snapshot(selectedColors);
+                  selectedColors =
+                    sort === 'reverse'
+                      ? reverseColors(colors)
+                      : sort === 'shuffle'
+                        ? shuffleColors(colors)
+                        : getSortedPalette({
+                            palette: colors,
+                            sortColors: sort,
+                          });
+                }}
+              />
+              <button
+                type="button"
+                class="btn btn-sm hover:bg-surface-200-800"
+                title="Remove all colorways"
+                bind:this={clearButton}
+                onclick={clear}
+              >
+                <Trash2Icon aria-hidden="true" />
+                <!-- Just the icon on small screens, as in From an Image -->
+                <span class="max-sm:sr-only">Clear</span>
+              </button>
+            </div>
           </div>
         </div>
       {/if}
