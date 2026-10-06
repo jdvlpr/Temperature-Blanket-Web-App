@@ -43,7 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex min-w-0 flex-1 flex-col">
         <p class="leading-tight font-semibold">{colorway.name}</p>
         <p class="text-surface-700-300 text-xs">
-          {colorway.brandName} · {colorway.yarnName}
+          {colorway.brandName} · {colorway.yarnName}{#if colorway.hex}
+            · <span class="font-mono">{colorway.hex}</span>{/if}
         </p>
       </div>
       {#if match !== undefined}

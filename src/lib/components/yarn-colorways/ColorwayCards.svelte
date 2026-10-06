@@ -16,16 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   Yarn colorways as swatch cards: the color on its own, uncovered, with the
   name and yarn below it on the card, so text reads the same on every color.
-  The name copies itself; the hex code and shop link sit under it.
+  A copy menu (name or hex) and the shop link sit under them.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import ColorwayActions from './ColorwayActions.svelte';
-  import {
-    colorwayKey,
-    copyColorwayText,
-    matchPercent,
-  } from './colorway-utils';
+  import { colorwayKey, matchPercent } from './colorway-utils';
 
   interface Props {
     colorways: (Color & { delta?: number })[];
@@ -56,18 +52,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <div class="flex flex-1 flex-col gap-2 p-2 sm:p-3">
         <div class="flex min-w-0 flex-col gap-0.5">
-          <button
-            type="button"
-            class="cursor-pointer rounded-sm text-left leading-tight font-semibold text-pretty hover:underline"
-            aria-label="Copy name {colorway.name}"
-            title="Copy name"
-            onclick={() => copyColorwayText(colorway.name ?? '')}
-          >
+          <p class="leading-tight font-semibold text-pretty">
             {colorway.name}
-          </button>
+          </p>
           <p class="text-surface-700-300 text-xs text-pretty">
             {colorway.brandName} · {colorway.yarnName}
           </p>
+          {#if colorway.hex}
+            <p class="text-surface-700-300 font-mono text-xs">
+              {colorway.hex}
+            </p>
+          {/if}
         </div>
         <div class="mt-auto">
           <ColorwayActions {colorway} layout="card" />
