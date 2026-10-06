@@ -42,10 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ) => void;
     /** The palette's current sort, to check in the menu. Left out, the
      * menu works it out from the colors' order when it opens. */
-    current?: PaletteSort | (string & {}) | null;
-    /** Extra sorts listed before the usual ones, chosen through `onleadingsort` */
-    leadingSorts?: { value: string; label: string }[];
-    onleadingsort?: (value: string) => void;
+    current?: PaletteSort | null;
     triggerClass?: string;
     disabled?: boolean;
     placement?: 'top' | 'bottom-start';
@@ -58,8 +55,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     triggerClass = 'btn hover:bg-surface-200-800 justify-start',
     disabled = false,
     placement = 'bottom-start',
-    leadingSorts = [],
-    onleadingsort,
   }: Props = $props();
 
   let allColorsHaveNames = $derived(
@@ -88,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return matches[0] ?? null;
   });
 
-  const isCurrent = (sort: string) =>
+  const isCurrent = (sort: PaletteSort) =>
     current !== undefined ? current === sort : alreadySorted === sort;
 
   const itemClass =
@@ -100,10 +95,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onOpenChange={(details) => (open = details.open)}
   onSelect={(details) => {
     lastChosen = details.value;
-    if (leadingSorts.some((sort) => sort.value === details.value)) {
-      onleadingsort?.(details.value);
-      return;
-    }
     onsort(
       details.value as Exclude<PaletteSort, 'custom'> | 'reverse' | 'shuffle',
     );
@@ -118,14 +109,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Portal>
     <Menu.Positioner>
       <Menu.Content class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]">
-        {#each leadingSorts as sort (sort.value)}
-          <Menu.Item value={sort.value} class={itemClass}>
-            <p class="min-w-0 flex-1 text-left">{sort.label}</p>
-            {#if isCurrent(sort.value)}
-              <CheckIcon class="shrink-0" aria-label="Current" />
-            {/if}
-          </Menu.Item>
-        {/each}
         {#each PALETTE_SORTS.filter((sort) => allColorsHaveNames || !sort.needsNames) as sort (sort.value)}
           <Menu.Item value={sort.value} class={itemClass}>
             <p class="min-w-0 flex-1 text-left">{sort.label}</p>

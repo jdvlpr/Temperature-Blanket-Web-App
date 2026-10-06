@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import type { PaletteSort } from '$lib/utils/color-utils';
+  import type { ColorwaySort } from '$lib/components/yarn-colorways/colorway-utils';
 
   class YarnColorwayFinderState {
     selectedBrandId = $state('');
@@ -24,10 +24,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     hex = $state('');
     inputTypeTextValue = $state('');
     inputTypeColorElement: HTMLInputElement | null = $state(null);
-    /** 'default' is best match during a color search, catalog order otherwise */
-    sortColors = $state<'default' | Exclude<PaletteSort, 'custom'> | 'shuffle'>(
-      'default',
-    );
+    /** The chosen sort; null follows the search (best match with a color) */
+    sort = $state<ColorwaySort | null>(null);
+    /** Reverse the sort (any but Best match); stays on across sorts */
     reversed = $state(false);
   }
 
@@ -42,15 +41,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import SortMenu from '$lib/components/SortMenu.svelte';
   import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
   import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
+  import ColorwaySortMenu from '$lib/components/yarn-colorways/ColorwaySortMenu.svelte';
+  import ColorwayViewMenu from '$lib/components/yarn-colorways/ColorwayViewMenu.svelte';
+  import {
+    canReverse,
+    closeMatches,
+    defaultColorwaySort,
+    isColorwaySort,
+    sortColorways,
+  } from '$lib/components/yarn-colorways/colorway-utils';
   import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
   import {
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
@@ -62,12 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { Color, YarnWeight } from '$lib/types/yarn-types';
-  import {
-    getSortedPalette,
-    getTextColor,
-    PALETTE_SORTS,
-    shuffleColorsWithSeed,
-  } from '$lib/utils/color-utils';
+  import { getTextColor } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ChevronDownIcon,
@@ -79,24 +80,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
 
-  type ColorWithDelta = Color & { delta?: number };
-
-  let loadMoreSpinner = $state<HTMLButtonElement>();
   let urlParams: URLSearchParams | undefined;
   let isLoaded = $state(false);
   let filtersContainer: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
-  /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
-  let shuffleSeed = $state(Math.random());
 
-  let results: ColorWithDelta[] = $state([]);
-  let gettingResults = $state(true);
-  let loadingAllColors = $state(false);
-
-  let layout = $state('grid');
+  let layout = $state<'grid' | 'list'>('grid');
 
   let accordionState: string[] = $state([]);
 
@@ -138,6 +130,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     if (urlParams.has('n'))
       yarnColorwayFinderState.search = urlParams.get('n') ?? '';
+    const sort = urlParams.get('s');
+    if (isColorwaySort(sort)) yarnColorwayFinderState.sort = sort;
+    yarnColorwayFinderState.reversed = urlParams.get('r') === '1';
 
     const scrollObserver = new IntersectionObserver(
       (entries) => {
@@ -153,7 +148,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
     if (filtersContainer) scrollObserver.observe(filtersContainer);
     isLoaded = true;
-    getResults();
   }
 
   function getShareableURL({
@@ -162,12 +156,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedYarnWeightId,
     search,
     hex,
+    sort,
+    reversed,
   }: {
     selectedBrandId: string;
     selectedYarnId: string;
     selectedYarnWeightId: YarnWeight['id'] | '';
     search: string;
     hex: string;
+    sort: ColorwaySort | null;
+    reversed: boolean;
   }) {
     if (!browser) return;
 
@@ -184,8 +182,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (hex) params.c = hex.includes('#') ? hex.substring(1) : hex;
     if (search) params.n = search;
+    if (sort && sort !== defaultColorwaySort(!!hex)) params.s = sort;
+    if (reversed) params.r = '1';
 
-    if (params.f || params.fw || params.c || params.n) {
+    if (params.f || params.fw || params.c || params.n || params.s || params.r) {
       params.v = version;
       url += '?';
       url += new URLSearchParams(params).toString();
@@ -222,76 +222,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarnColorwayFinderState.selectedYarnId = yarnId;
   }
 
-  /** Put results in the chosen sort; 'default' leaves them as they are */
-  function arrange(colors: ColorWithDelta[]): ColorWithDelta[] {
-    switch (yarnColorwayFinderState.sortColors) {
-      case 'shuffle':
-        return shuffleColorsWithSeed(colors, shuffleSeed);
-      case 'default':
-        return [...colors];
-      default:
-        // The sorts copy each color, so match deltas come along
-        return getSortedPalette({
-          palette: colors,
-          sortColors: yarnColorwayFinderState.sortColors,
-        }) as ColorWithDelta[];
-    }
-  }
+  /** The colorways that pass the filters and the name search, in catalog order */
+  let filtered = $derived.by(() => {
+    if (!isLoaded) return [];
+    const { selectedBrandId, selectedYarnId, selectedYarnWeightId } =
+      yarnColorwayFinderState;
+    const find = yarnColorwayFinderState.search.toLowerCase();
+    return getColorwaysWithAffiliateLinks().filter(
+      (colorway) =>
+        (!selectedBrandId || colorway.brandId === selectedBrandId) &&
+        (!selectedYarnId || colorway.yarnId === selectedYarnId) &&
+        (!selectedYarnWeightId ||
+          colorway.yarnWeightId === selectedYarnWeightId) &&
+        (!find || (colorway.name ?? '').toLowerCase().includes(find)),
+    );
+  });
 
-  function getResults() {
-    if (!isLoaded || !browser) return;
-    gettingResults = true;
-    let _results = getColorwaysWithAffiliateLinks()
-      .filter((colorway) =>
-        yarnColorwayFinderState.selectedBrandId
-          ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
-          : true,
-      )
-      .filter((colorway) =>
-        yarnColorwayFinderState.selectedYarnId
-          ? colorway.yarnId === yarnColorwayFinderState.selectedYarnId
-          : true,
-      )
-      .filter((colorway) =>
-        yarnColorwayFinderState.selectedYarnWeightId
-          ? colorway.yarnWeightId ===
-            yarnColorwayFinderState.selectedYarnWeightId
-          : true,
-      );
+  /** During a color search, just its close matches, each with its delta */
+  let matched = $derived<(Color & { delta?: number })[]>(
+    yarnColorwayFinderState.hex
+      ? closeMatches(filtered, yarnColorwayFinderState.hex)
+      : filtered,
+  );
 
-    // filter by search text
-    if (yarnColorwayFinderState.search !== '') {
-      _results = _results.filter((color) => {
-        let find = yarnColorwayFinderState.search.toLowerCase();
-        return (color.name ?? '').toLowerCase().includes(find);
-      });
-    }
+  let sort = $derived(
+    yarnColorwayFinderState.sort === 'best-match' &&
+      !yarnColorwayFinderState.hex
+      ? defaultColorwaySort(false)
+      : (yarnColorwayFinderState.sort ??
+          defaultColorwaySort(!!yarnColorwayFinderState.hex)),
+  );
 
-    if (yarnColorwayFinderState.hex) {
-      // A color search keeps its closest matches, then arranges just those,
-      // so another sort never trades the matches for the rest of the catalog
-      _results = _results
-        .map((color) => {
-          return {
-            ...color,
-            delta: chroma.deltaE(
-              yarnColorwayFinderState.hex,
-              color.hex ?? '#ffffff',
-            ),
-          };
-        })
-        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
-        .slice(0, itemsToShow);
-    }
+  /** Sorted once per search and sort, so Show More only adds to the end */
+  let sorted = $derived(
+    sortColorways(matched, sort, yarnColorwayFinderState.reversed),
+  );
+  let results = $derived(sorted.slice(0, itemsToShow));
 
-    _results = arrange(_results);
-    if (yarnColorwayFinderState.reversed) _results.reverse();
-
-    if (_results.length > itemsToShow) _results.length = itemsToShow;
-    results = _results;
-    gettingResults = false;
-    loadingAllColors = false;
-  }
+  // A new search or sort starts again from the first page
+  $effect.pre(() => {
+    void matched;
+    void sort;
+    void yarnColorwayFinderState.reversed;
+    itemsToShow = YARN_COLORWAYS_PER_PAGE;
+  });
 
   function inputTypeColorOnChange({ value }: { value: string }) {
     let __color = value;
@@ -321,88 +295,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
   }
-  let yarns = $derived(
-    yarnColorwayFinderState.selectedBrandId === ''
-      ? getBrands()
-          .flatMap((n, i) =>
-            n.yarns.map((n) => {
-              return {
-                ...n,
-                brandId: getBrands()[i].id,
-                brandName: getBrands()[i].name,
-              };
-            }),
-          )
-          .sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA > nameB) {
-              return 1;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            // names must be equal
-            return 0;
-          })
-      : getBrands()
-          ?.filter(
-            (brand) => brand.id === yarnColorwayFinderState.selectedBrandId,
-          )
-          ?.flatMap((n) => {
-            return n.yarns.map((yarn) => {
-              return {
-                ...yarn,
-                brandId: n.id,
-                brandName: n.name,
-              };
-            });
-          }),
-  );
-  let totalResults = $derived(
-    yarns
-      .filter((yarn) => {
-        if (!yarnColorwayFinderState.selectedYarnId) return true;
-        return yarn.id === yarnColorwayFinderState.selectedYarnId;
-      })
-      .filter((yarn) => {
-        if (!yarnColorwayFinderState.selectedYarnWeightId) return true;
-        return yarn.weightId === yarnColorwayFinderState.selectedYarnWeightId;
-      })
-      .flatMap((n) => n.colorways.map((m) => m.colors.length))
-      .reduce((partialSum, a) => partialSum + a, 0),
-  );
-
-  $effect(() => {
-    (yarnColorwayFinderState.selectedBrandId,
-      yarnColorwayFinderState.selectedYarnId,
-      yarnColorwayFinderState.selectedYarnWeightId,
-      yarnColorwayFinderState.search,
-      yarns,
-      yarnColorwayFinderState.sortColors,
-      yarnColorwayFinderState.reversed,
-      shuffleSeed,
-      itemsToShow,
-      yarnColorwayFinderState.hex);
-
-    tick().then(() => {
-      getResults();
-    });
-  });
-
-  let defaultSortLabel = $derived(
-    yarnColorwayFinderState.hex ? 'Best match' : 'Catalog order',
-  );
-  let sortLabel = $derived(
-    yarnColorwayFinderState.sortColors === 'default'
-      ? defaultSortLabel
-      : yarnColorwayFinderState.sortColors === 'shuffle'
-        ? 'Shuffled'
-        : (PALETTE_SORTS.find(
-            (sort) => sort.value === yarnColorwayFinderState.sortColors,
-          )?.label ?? ''),
-  );
-
   let areAnyResultsAffiliate = $derived(
     results.some((result) => result.affiliate_variant_href),
   );
@@ -413,6 +305,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       selectedYarnWeightId: yarnColorwayFinderState.selectedYarnWeightId,
       search: yarnColorwayFinderState.search,
       hex: yarnColorwayFinderState.hex,
+      sort: yarnColorwayFinderState.sort,
+      reversed: yarnColorwayFinderState.reversed && canReverse(sort),
     }),
   );
 </script>
@@ -563,9 +457,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       type="text"
                       class="ig-input truncate"
                       bind:value={yarnColorwayFinderState.search}
-                      oninput={() => {
-                        itemsToShow = YARN_COLORWAYS_PER_PAGE;
-                      }}
                     />
                     {#if yarnColorwayFinderState.search}
                       <button
@@ -603,53 +494,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             {/if}
 
-            {#if results?.length && !loadingAllColors}
-              <p class=" my-2">
-                {#if totalResults === results.length}
-                  {totalResults}
-                {:else}
+            {#if results.length}
+              <p class="my-2">
+                {#if sorted.length > results.length}
                   Showing {results.length.toLocaleString()}
-                  of {totalResults.toLocaleString()}
+                  of
                 {/if}
-                {pluralize('Colorway', totalResults)}
+                {sorted.length.toLocaleString()}
+                {yarnColorwayFinderState.hex
+                  ? pluralize('close match', sorted.length, 'es')
+                  : pluralize('Colorway', sorted.length)}
               </p>
               <div class="flex flex-wrap items-center justify-center gap-2">
-                <div class="flex items-center gap-1">
-                  <SortMenu
-                    colors={results}
-                    current={yarnColorwayFinderState.sortColors === 'shuffle'
-                      ? null
-                      : yarnColorwayFinderState.sortColors}
-                    leadingSorts={[
-                      { value: 'default', label: defaultSortLabel },
-                    ]}
-                    onleadingsort={() => {
-                      yarnColorwayFinderState.sortColors = 'default';
-                      yarnColorwayFinderState.reversed = false;
-                    }}
-                    onsort={(sort) => {
-                      if (sort === 'reverse') {
-                        yarnColorwayFinderState.reversed =
-                          !yarnColorwayFinderState.reversed;
-                        return;
-                      }
-                      if (sort === 'shuffle') shuffleSeed = Math.random();
-                      yarnColorwayFinderState.sortColors = sort;
-                      yarnColorwayFinderState.reversed = false;
-                    }}
-                    disabled={gettingResults}
-                  />
-                  <p class="text-surface-700-300 text-sm" aria-live="polite">
-                    {sortLabel}{yarnColorwayFinderState.reversed
-                      ? ', reversed'
-                      : ''}
-                  </p>
-                </div>
-                <ViewToggleBindable bind:value={layout} />
+                <ColorwaySortMenu
+                  current={sort}
+                  hasColor={!!yarnColorwayFinderState.hex}
+                  reversed={yarnColorwayFinderState.reversed}
+                  onsort={(chosen) => (yarnColorwayFinderState.sort = chosen)}
+                  onreverse={(reversed) =>
+                    (yarnColorwayFinderState.reversed = reversed)}
+                />
+                <ColorwayViewMenu bind:value={layout} />
               </div>
             {/if}
 
-            {#if results?.length && !loadingAllColors}
+            {#if results.length}
               <div class="my-4 w-full">
                 {#if layout === 'grid'}
                   <ColorwayCards colorways={results} />
@@ -657,7 +526,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <ColorwayRows colorways={results} />
                 {/if}
               </div>
-            {:else if gettingResults}
+            {:else if !isLoaded}
               <div class="mx-auto my-6">
                 <Spinner />
               </div>
@@ -667,16 +536,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <p class="text-sm">Try changing the filters above</p>
               </div>
             {/if}
-            {#if results.length === itemsToShow}
+            {#if sorted.length > results.length}
               <div class="mx-auto flex w-full justify-center">
                 <button
                   class="btn rounded-container bg-primary-200-800 mb-2"
-                  bind:this={loadMoreSpinner}
-                  onclick={() => {
-                    if (itemsToShow <= results.length)
-                      itemsToShow += YARN_COLORWAYS_PER_PAGE;
-                    getResults();
-                  }}
+                  onclick={() => (itemsToShow += YARN_COLORWAYS_PER_PAGE)}
                 >
                   <PlusIcon />
                   Show More</button

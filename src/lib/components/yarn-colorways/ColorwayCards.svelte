@@ -17,7 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Yarn colorways as swatch cards: the color on its own, uncovered, with the
   name and yarn below it on the card, so text reads the same on every color.
   A "more" menu (⋮) in the swatch's top right holds the link to buy or view
-  it and the copy options.
+  it and the copy options. The match sits beside it, or below it on a card
+  too narrow for both.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
@@ -39,20 +40,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <li
       class="card bg-surface-50-950 border-surface-200-800 flex min-w-0 flex-col overflow-hidden border"
     >
-      <div
-        class="relative flex flex-col h-18 items-start justify-between p-2 sm:h-28"
-        style="background:{colorway.hex}"
-      >
-        <div class="-m-1 ml-auto">
-          <ColorwayMoreMenu {colorway} />
+      <div class="h-20 p-2 sm:h-24" style="background:{colorway.hex}">
+        <div
+          class="flex flex-row-reverse flex-wrap items-center justify-between gap-1"
+        >
+          <div class="-m-1"><ColorwayMoreMenu {colorway} /></div>
+          {#if match !== undefined}
+            <p
+              class="bg-surface-50-950 text-surface-950-50 mr-auto rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap"
+            >
+              {match}% match
+            </p>
+          {/if}
         </div>
-        {#if match !== undefined}
-          <p
-            class=" bg-surface-50-950 text-surface-950-50 rounded-full px-2 py-0.5 text-xs font-semibold"
-          >
-            {match}% match
-          </p>
-        {/if}
       </div>
       <div class="flex flex-1 flex-col gap-2 p-2 sm:p-3">
         <div class="flex min-w-0 flex-col gap-0.5">

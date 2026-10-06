@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { iconColorOn, linkSite } from './colorway-utils';
+import type { Color } from '$lib/types/yarn-types';
+import {
+  closeMatches,
+  iconColorOn,
+  linkSite,
+  MIN_CLOSE_MATCHES,
+  sortColorways,
+} from './colorway-utils';
 
 describe('iconColorOn', () => {
   it('picks black on mid-tone pinks, where white falls under 3:1', () => {
@@ -28,5 +35,88 @@ describe('linkSite', () => {
 
   it("is undefined for something that isn't a web address", () => {
     expect(linkSite('not a link')).toBeUndefined();
+  });
+});
+
+const swatch = (hex: string, name = hex): Color => ({ hex, name });
+
+describe('closeMatches', () => {
+  // 40 colors stepping away from white: the first few are close matches
+  const grays = Array.from({ length: 40 }, (_, i) =>
+    swatch(`#${(255 - i * 6).toString(16).padStart(2, '0').repeat(3)}`),
+  );
+
+  it('keeps every close match, closest first, with its delta', () => {
+    const near = Array.from({ length: 30 }, () => swatch('#fefefe'));
+    const matches = closeMatches([swatch('#000000'), ...near], '#ffffff');
+    expect(matches).toHaveLength(30);
+    expect(matches.every((m) => m.delta < 15)).toBe(true);
+  });
+
+  it('gives a rare color at least its nearest few', () => {
+    const matches = closeMatches(grays, '#ff0000');
+    expect(matches).toHaveLength(MIN_CLOSE_MATCHES);
+    const deltas = matches.map((m) => m.delta);
+    expect(deltas).toEqual([...deltas].sort((a, b) => a - b));
+  });
+
+  it('returns nothing for an invalid color', () => {
+    expect(closeMatches(grays, 'not a color')).toEqual([]);
+  });
+});
+
+describe('sortColorways', () => {
+  const colors = [
+    { ...swatch('#888888', 'Gray'), delta: 5 },
+    { ...swatch('#ffffff', 'White'), delta: 1 },
+    { ...swatch('#000000', 'Black'), delta: 9 },
+  ];
+  const names = (list: Color[]) => list.map((c) => c.name);
+
+  it('keeps the catalog order by yarn, without changing the list', () => {
+    const sorted = sortColorways(colors, 'by-yarn');
+    expect(names(sorted)).toEqual(['Gray', 'White', 'Black']);
+    expect(sorted).not.toBe(colors);
+  });
+
+  it('orders by best match, light to dark, and name', () => {
+    expect(names(sortColorways(colors, 'best-match'))).toEqual([
+      'White',
+      'Gray',
+      'Black',
+    ]);
+    expect(names(sortColorways(colors, 'light-to-dark'))).toEqual([
+      'White',
+      'Gray',
+      'Black',
+    ]);
+    expect(names(sortColorways(colors, 'name'))).toEqual([
+      'Black',
+      'Gray',
+      'White',
+    ]);
+  });
+
+  it('reverses any sort but best match', () => {
+    expect(names(sortColorways(colors, 'light-to-dark', true))).toEqual([
+      'Black',
+      'Gray',
+      'White',
+    ]);
+    expect(names(sortColorways(colors, 'by-yarn', true))).toEqual([
+      'Black',
+      'White',
+      'Gray',
+    ]);
+    expect(names(sortColorways(colors, 'best-match', true))).toEqual([
+      'White',
+      'Gray',
+      'Black',
+    ]);
+  });
+
+  it('keeps match deltas through the color sorts', () => {
+    const sorted = sortColorways(colors, 'rainbow');
+    expect(sorted.map((c) => c.delta).sort()).toEqual([1, 5, 9]);
   });
 });

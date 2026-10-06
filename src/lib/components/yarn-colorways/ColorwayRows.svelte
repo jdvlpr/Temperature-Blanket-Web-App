@@ -14,14 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Yarn colorways as detailed rows: swatch, name (a link to buy or view it),
-  yarn, match, and the copy menu. On a phone the actions wrap onto
-  their own line under the colorway.
+  Yarn colorways as rows, the cards laid out sideways: swatch, name and yarn,
+  match, and the same "more" menu (⋮) with the link to buy or view it and the
+  copy options. Each row stays on one line at every width.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
-  import ColorwayActions from './ColorwayActions.svelte';
-  import ColorwayName from './ColorwayName.svelte';
+  import ColorwayMoreMenu from './ColorwayMoreMenu.svelte';
   import { colorwayKey, matchPercent } from './colorway-utils';
 
   interface Props {
@@ -36,28 +35,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each colorways as colorway (colorwayKey(colorway))}
     {@const match = matchPercent(colorway)}
-    <li class="flex flex-wrap items-center gap-x-3 gap-y-2 p-2 md:flex-nowrap">
+    <li class="flex items-center gap-3 p-2">
       <span
         class="rounded-container size-12 shrink-0 ring-1 ring-black/10 ring-inset"
         style="background:{colorway.hex}"
       ></span>
-      <div class="flex min-w-0 flex-1 flex-col">
-        <p class="leading-tight font-semibold">
-          <ColorwayName {colorway} />
+      <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+        <p class="leading-tight font-semibold text-pretty">{colorway.name}</p>
+        <p class="text-surface-700-300 text-xs text-pretty">
+          {colorway.brandName} · {colorway.yarnName}
         </p>
-        <p class="text-surface-700-300 text-xs">
-          {colorway.brandName} · {colorway.yarnName}{#if colorway.hex}
-            · <span class="font-mono">{colorway.hex}</span>{/if}
-        </p>
+        {#if colorway.unavailable}
+          <p class="text-surface-700-300 text-xs leading-tight">
+            No longer available
+          </p>
+        {/if}
       </div>
       {#if match !== undefined}
-        <p class="shrink-0 text-sm font-semibold tabular-nums">
+        <p
+          class="bg-surface-200-800 text-surface-950-50 shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums"
+        >
           {match}% match
         </p>
       {/if}
-      <div class="w-full md:w-auto">
-        <ColorwayActions {colorway} />
-      </div>
+      <ColorwayMoreMenu {colorway} on="surface" />
     </li>
   {/each}
 </ul>

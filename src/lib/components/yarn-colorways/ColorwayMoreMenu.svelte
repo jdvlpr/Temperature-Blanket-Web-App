@@ -16,9 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A yarn colorway's "more" menu (⋮): buy it (a shopping cart, marking an
   affiliate link) or view it on the site it's listed on, then copy its name or hex
-  code, each showing what it copies. The trigger sits on the swatch with no
+  code, each showing what it copies. On a swatch, the trigger has no
   background: a black or white icon, whichever stands out on that color,
-  tinted on hover.
+  tinted on hover. On the page's surface (list rows) it's a plain icon button.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
@@ -30,32 +30,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
-  import { copyColorwayText, iconColorOn, linkSite } from './colorway-utils';
+  import {
+    colorwayLink,
+    copyColorwayText,
+    iconColorOn,
+  } from './colorway-utils';
 
   interface Props {
     colorway: Color;
+    /** What the trigger sits on: the colorway's swatch, or the page's surface */
+    on?: 'swatch' | 'surface';
   }
 
-  let { colorway }: Props = $props();
+  let { colorway, on = 'swatch' }: Props = $props();
 
   let link = $derived.by(() => {
-    if (colorway.unavailable) return null;
-    if (colorway.affiliate_variant_href)
-      return {
-        href: colorway.affiliate_variant_href,
-        label: 'Buy this colorway',
-        isAffiliate: true,
-      };
-    if (colorway.variant_href)
-      return {
-        href: colorway.variant_href,
-        // Often a shop rather than the maker, so name the site itself
-        label: linkSite(colorway.variant_href)
-          ? `View on ${linkSite(colorway.variant_href)}`
+    const link = colorwayLink(colorway);
+    if (!link) return null;
+    return {
+      ...link,
+      label: link.isAffiliate
+        ? 'Buy this colorway'
+        : link.site
+          ? `View on ${link.site}`
           : 'View this colorway',
-        isAffiliate: false,
-      };
-    return null;
+    };
   });
 
   let copies = $derived(
@@ -79,8 +78,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 >
   <Menu.Trigger
-    class="btn-icon hover-on-color size-7 rounded-full focus-visible:outline-2 focus-visible:outline-current"
-    style="color:{iconColorOn(colorway.hex)}"
+    class={on === 'swatch'
+      ? 'btn-icon hover-on-color size-7 rounded-full focus-visible:outline-2 focus-visible:outline-current'
+      : 'btn-icon hover:preset-tonal-surface size-8 shrink-0'}
+    style={on === 'swatch' ? `color:${iconColorOn(colorway.hex)}` : undefined}
     aria-label="More for {colorway.name}"
     title="More"
   >
