@@ -316,3 +316,11 @@ export const popularToGalleryNodes = (popular: PopularProject[]) =>
           locations: post.meta.locations,
         },
   );
+
+/** The orders a gallery can show in, newest first by default */
+export const GALLERY_ORDERS = [
+  { value: 'DESC', label: 'Newest' },
+  { value: 'ASC', label: 'Oldest' },
+] as const;
+
+export type GalleryOrder = (typeof GALLERY_ORDERS)[number]['value'];

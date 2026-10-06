@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import type { Color } from '$lib/types/yarn-types';
 import {
   closeMatches,
+  colorwaySortOptions,
   iconColorOn,
   linkSite,
   MIN_CLOSE_MATCHES,
   sortColorways,
+  withDeltas,
 } from './colorway-utils';
 
 describe('iconColorOn', () => {
@@ -62,6 +64,29 @@ describe('closeMatches', () => {
 
   it('returns nothing for an invalid color', () => {
     expect(closeMatches(grays, 'not a color')).toEqual([]);
+  });
+});
+
+describe('withDeltas', () => {
+  it('keeps every colorway, in order, each with its delta', () => {
+    const colorways = [swatch('#000000'), swatch('#ffffff'), swatch('#fefefe')];
+    const ranked = withDeltas(colorways, '#ffffff');
+    expect(ranked.map((c) => c.hex)).toEqual(['#000000', '#ffffff', '#fefefe']);
+    expect(ranked[1].delta).toBe(0);
+    expect(ranked[0].delta).toBeGreaterThan(ranked[2].delta);
+  });
+
+  it('returns nothing for an invalid color', () => {
+    expect(withDeltas([swatch('#000000')], 'not a color')).toEqual([]);
+  });
+});
+
+describe('colorwaySortOptions', () => {
+  it('offers Best match only with a color', () => {
+    const values = (hasColor: boolean) =>
+      colorwaySortOptions(hasColor).map((sort) => sort.value);
+    expect(values(true)).toContain('best-match');
+    expect(values(false)).not.toContain('best-match');
   });
 });
 

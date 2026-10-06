@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { page } from '$app/state';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
+  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
   import ColorRange from '$lib/components/ColorRange.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
@@ -232,7 +232,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if !attributes.hidden}
                 <div {...attributes} in:safeSlide>
                   <Popover.Description class="flex flex-col gap-4 p-2">
-                    <div class="w-fit"><ViewToggle /></div>
+                    <div class="w-fit">
+                      <ViewMenu bind:value={preferences.value.layout} />
+                    </div>
                     <div class="w-fit">
                       <ToggleSwitch
                         bind:checked={showDaysInRange.value}
@@ -253,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Portal>
     </Popover>
   {:else}
-    <ViewToggle />
+    <ViewMenu bind:value={preferences.value.layout} />
   {/if}
 </div>
 

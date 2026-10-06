@@ -13,39 +13,37 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<!-- @component
+  Choose yarn colorways from the catalog, laid out like the Yarn Colorway
+  Finder: filters, then a Sort and View menu over the colorways as cards or
+  rows, with Show More. With `matchHex`, every colorway shows its match and
+  Best match comes first. `limit` keeps just the last one chosen.
+-->
 <script lang="ts">
   import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
+  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
+  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
+  import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
+  import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
+  import {
+    canReverse,
+    colorwaySortOptions,
+    defaultColorwaySort,
+    sortColorways,
+    withDeltas,
+    type ColorwaySort,
+  } from '$lib/components/yarn-colorways/colorway-utils';
   import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants/color-constants';
-  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
-  import { defaultYarn } from '$lib/state/page-state.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import type { Color } from '$lib/types/yarn-types';
-  import {
-    getTextColor,
-    sortColorsByName,
-    sortColorsByNameZtoA,
-    sortColorsDarktoLight,
-    sortColorsLightToDark,
-    sortColorsWarmToCool,
-    sortColorsByHue,
-    shuffleColorsWithSeed,
-  } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
-  import {
-    getColorways,
-    stringToBrandAndYarnDetails,
-  } from '$lib/utils/yarn-utils';
-  import {
-    ArrowDownWideNarrowIcon,
-    CircleCheckIcon,
-    CircleIcon,
-    SearchIcon,
-  } from '@lucide/svelte';
-  import chroma from 'chroma-js';
-  import { onMount, tick } from 'svelte';
-  import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import { getColorways } from '$lib/utils/yarn-utils';
+  import { PlusIcon, SearchIcon, XIcon } from '@lucide/svelte';
+  import { onMount } from 'svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -53,9 +51,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     search?: string;
     selectedColors: Color[];
     limit?: boolean;
-    incomingColor?: Color;
-    onClickScrollToTop: any;
-    onSelection?: any;
+    /** A color to match colorways to, or '' for none */
+    matchHex?: string;
+    onClickScrollToTop: () => void;
+    onSelection?: (colors: Color[]) => void;
     scrollToTopButtonBottom?: string;
   }
 
@@ -65,285 +64,133 @@ If not, see <https://www.gnu.org/licenses/>. -->
     search = $bindable(''),
     selectedColors = $bindable(),
     limit = false,
-    incomingColor = { hex: '#ffffff' },
+    matchHex = '',
     onClickScrollToTop,
     onSelection,
     scrollToTopButtonBottom = '100px',
   }: Props = $props();
 
-  let loadMoreSpinner = $state<HTMLDivElement>();
-
-  let loadMoreColors = $state<IntersectionObserver>();
-
   let selectedYarnWeightId = $state('');
-
   let filtersContainer = $state<HTMLDivElement>();
-
   let showScrollToTopButton = $state(false);
-
-  let scrollObserver = new IntersectionObserver(
-    (entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.intersectionRatio != 1) {
-          showScrollToTopButton = true;
-        } else {
-          showScrollToTopButton = false;
-        }
-      });
-    },
-    { threshold: 1 },
-  );
-
-  let hasIncomingColor = $state(selectedColors.length);
-
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
-
-  // This is for preview extra colors, so that they can be marked as selected even though their color object only has a hex
-  let canMarkIfHexMatches = $state(
-    selectedColors.length === 1 &&
-      !selectedColors?.[0].name &&
-      !selectedColors?.[0].brandId &&
-      !selectedColors?.[0].yarnId,
-  );
-
-  let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
-  /** Keeps the Shuffle order steady while showing more; new each time Shuffle is chosen */
-  let shuffleSeed = Math.random();
-
-  let results = $state<(Color & { delta?: number })[]>([]);
-
-  let gettingResults = $state(true);
-
-  let loadingAllColors = $state(false);
-
-  let yarns = $derived(
-    selectedBrandId === ''
-      ? getBrands()
-          .flatMap((n, i) =>
-            n.yarns.map((n) => {
-              return {
-                ...n,
-                brandId: getBrands()[i].id,
-                brandName: getBrands()[i].name,
-              };
-            }),
-          )
-          .sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA > nameB) {
-              return 1;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            // names must be equal
-            return 0;
-          })
-      : getBrands()
-          ?.filter((brand) => brand.id === selectedBrandId)
-          ?.flatMap((n) => {
-            return n.yarns.map((yarn) => {
-              return {
-                ...yarn,
-                brandId: n.id,
-                brandName: n.name,
-              };
-            });
-          }),
-  );
-
-  let totalResults = $derived(
-    yarns
-      .filter((yarn) => {
-        if (!selectedYarnId) return true;
-        return yarn.id === selectedYarnId;
-      })
-      .filter((yarn) => {
-        if (!selectedYarnWeightId) return true;
-        return yarn.weightId === selectedYarnWeightId;
-      })
-      .flatMap((n) => n.colorways.map((m) => m.colors.length))
-      .reduce((partialSum, a) => partialSum + a, 0),
-  );
-
-  let selectedIds = $derived(
-    selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
-  );
-
+  let layout = $state<'grid' | 'list'>('grid');
+  /** The chosen sort; null follows the color (best match with one) */
+  let chosenSort = $state<ColorwaySort | null>(null);
+  /** Reverse the sort (any but Best match); stays on across sorts */
+  let reversed = $state(false);
   let yarnDataReady = $state(false);
 
+  /** Tells colorways apart for choosing, as the palette stores them */
+  const selectionId = ({ hex, name, brandId, yarnId }: Color) =>
+    `${hex}${name}${brandId}${yarnId}`;
+
+  // A preview's extra color is only a hex code: until another is chosen,
+  // colorways of that color show as chosen
+  let canMarkIfHexMatches = $state(
+    selectedColors.length === 1 &&
+      !selectedColors[0].name &&
+      !selectedColors[0].brandId &&
+      !selectedColors[0].yarnId,
+  );
+
+  let selectedIds = $derived(new Set(selectedColors.map(selectionId)));
+
   onMount(() => {
-    ensureYarnData().then(() => {
-      yarnDataReady = true;
-    });
+    ensureYarnData().then(() => (yarnDataReady = true));
   });
 
-  function getResults() {
-    gettingResults = true;
-    let _results = getColorways({
+  $effect(() => {
+    if (!filtersContainer) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => (showScrollToTopButton = entry.intersectionRatio != 1),
+      { threshold: 1 },
+    );
+    observer.observe(filtersContainer);
+    return () => observer.disconnect();
+  });
+
+  /** The colorways that pass the filters and the name search */
+  let filtered = $derived.by(() => {
+    if (!yarnDataReady) return [];
+    const find = search.toLowerCase();
+    return getColorways({
       selectedBrandId,
       selectedYarnId,
       selectedYarnWeightId,
-    });
+    }).filter(
+      (colorway) => !find || (colorway.name ?? '').toLowerCase().includes(find),
+    );
+  });
 
-    // filter by search text
-    if (search !== '') {
-      _results = _results.filter((color: Color) => {
-        let find = search.toLowerCase();
-        return color.name ? color.name.toLowerCase().includes(find) : false;
-      });
-    }
+  /** With a color, all of them, each with its match */
+  let matched = $derived<(Color & { delta?: number })[]>(
+    matchHex ? withDeltas(filtered, matchHex) : filtered,
+  );
 
-    switch (sortColors) {
-      case 'best-match':
-        _results = _results
-          .map((color: Color) => {
-            return {
-              ...color,
-              delta: chroma.deltaE(
-                incomingColor.hex ?? '#ffffff',
-                color.hex ?? '#ffffff',
-              ),
-            };
-          })
-          .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
-        break;
-      case 'warm-to-cool':
-      case 'cool-to-warm':
-        _results = sortColorsWarmToCool({
-          colors: _results,
-          warmFirst: sortColors === 'warm-to-cool',
-        });
-        break;
-      case 'rainbow':
-        _results = sortColorsByHue({ colors: _results });
-        break;
-      case 'shuffle':
-        _results = shuffleColorsWithSeed(_results, shuffleSeed);
-        break;
-      case 'light-to-dark':
-        _results = sortColorsLightToDark({
-          colors: _results,
-        });
-        break;
-      case 'dark-to-light':
-        _results = sortColorsDarktoLight({
-          colors: _results,
-        });
-        break;
-      case 'name':
-        _results = sortColorsByName({
-          colors: _results,
-        });
-        break;
-      case 'name-z-to-a':
-        _results = sortColorsByNameZtoA({
-          colors: _results,
-        });
-        break;
-      default:
-        break;
-    }
+  let sort = $derived(
+    chosenSort === 'best-match' && !matchHex
+      ? defaultColorwaySort(false)
+      : (chosenSort ?? defaultColorwaySort(!!matchHex)),
+  );
 
-    if (_results.length > itemsToShow) _results.length = itemsToShow;
+  let sorted = $derived(sortColorways(matched, sort, reversed));
+  let results = $derived(sorted.slice(0, itemsToShow));
 
-    results = _results;
-    gettingResults = false;
-    loadingAllColors = false;
+  // A new search or sort starts again from the first page
+  $effect.pre(() => {
+    void matched;
+    void sort;
+    void reversed;
+    itemsToShow = YARN_COLORWAYS_PER_PAGE;
+  });
+
+  function isSelected(colorway: Color) {
+    return (
+      (selectedIds.has(selectionId(colorway)) &&
+        (!limit || matchHex === colorway.hex)) ||
+      (canMarkIfHexMatches && matchHex === colorway.hex)
+    );
   }
 
-  function toggleSelected({
-    brandId,
-    yarnId,
-    hex,
-    name,
-    brandName,
-    yarnName,
-    variant_href,
-    affiliate_variant_href,
-  }: Color) {
-    if (canMarkIfHexMatches) canMarkIfHexMatches = false;
+  function toggleSelected(colorway: Color) {
+    canMarkIfHexMatches = false;
+    const {
+      hex,
+      name,
+      brandId,
+      yarnId,
+      brandName,
+      yarnName,
+      variant_href,
+      affiliate_variant_href,
+    } = colorway;
+    const id = selectionId(colorway);
 
-    const matchId = `${hex}${name}${brandId}${yarnId}`;
-    const doesMatch = selectedIds.includes(matchId);
-
-    if (doesMatch && selectedColors.length > 0 && !limit) {
-      //remove the color
-      const index = selectedIds.indexOf(matchId);
-      selectedColors.splice(index, 1);
-      selectedColors = selectedColors;
+    if (!limit && selectedIds.has(id)) {
+      selectedColors = selectedColors.filter((n) => selectionId(n) !== id);
     } else {
-      // add the the color
-      selectedColors = [
-        ...selectedColors,
-        {
-          hex,
-          name,
-          brandId,
-          yarnId,
-          brandName,
-          yarnName,
-          variant_href,
-          affiliate_variant_href,
-        },
-      ];
-    }
-
-    if (limit && selectedColors.length) {
-      selectedColors = selectedColors.slice(selectedColors.length - 1);
-      if (sortColors === 'best-match')
+      const color = {
+        hex,
+        name,
+        brandId,
+        yarnId,
+        brandName,
+        yarnName,
+        variant_href,
+        affiliate_variant_href,
+      };
+      selectedColors = limit ? [color] : [...selectedColors, color];
+      // Choosing one changes the color to match, which reorders the list
+      if (limit && sort === 'best-match')
         filtersContainer?.parentElement?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
     }
 
-    if (onSelection) onSelection(selectedColors);
+    onSelection?.(selectedColors);
   }
-
-  $effect(() => {
-    if (filtersContainer) {
-      scrollObserver.observe(filtersContainer);
-    }
-    loadMoreColors = new IntersectionObserver(
-      function (element) {
-        // isIntersecting is true when element and viewport are overlapping
-        // isIntersecting is false when element and viewport don't overlap
-        if (element[0].isIntersecting === true) {
-          if (itemsToShow <= results.length)
-            itemsToShow += YARN_COLORWAYS_PER_PAGE;
-          getResults;
-        }
-      },
-      { threshold: [0] },
-    );
-    if (!selectedBrandId && !selectedYarnId && defaultYarn.value) {
-      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
-      if (brandId) selectedBrandId = brandId;
-      if (yarnId) selectedYarnId = yarnId;
-    }
-  });
-
-  $effect(() => {
-    if (loadMoreSpinner && loadMoreColors) {
-      loadMoreColors.observe(loadMoreSpinner);
-    }
-  });
-
-  $effect(() => {
-    selectedBrandId;
-    selectedYarnId;
-    selectedYarnWeightId;
-    search;
-    yarns;
-    sortColors;
-    incomingColor;
-    itemsToShow;
-    tick().then(() => {
-      getResults();
-    });
-  });
 </script>
 
 <div
@@ -378,132 +225,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/key}
   {/if}
 
-  <div
-    class="label order-4 col-span-full flex w-full flex-col items-start md:col-span-5"
-  >
-    <p class="label-text">Colorway Name</p>
-    <div class="input-group grid-cols-[auto_1fr]">
-      <div class="ig-cell">
-        <SearchIcon />
-      </div>
+  <div class="label order-4 col-span-full w-full">
+    <label class="label-text" for="yarn-select-search-input"
+      >Colorway Name</label
+    >
+    <div class="input-group w-full grid-cols-[auto_1fr_auto]">
+      <span class="ig-cell"><SearchIcon /></span>
       <input
         id="yarn-select-search-input"
         autocomplete="off"
         placeholder="e.g., Wisteria, Cream"
         type="text"
-        class="ig-input"
+        class="ig-input truncate"
         bind:value={search}
-        oninput={() => {
-          itemsToShow = YARN_COLORWAYS_PER_PAGE;
-        }}
       />
+      {#if search}
+        <button
+          type="button"
+          aria-label="Clear Search"
+          class="ig-btn hover:preset-tonal-surface"
+          onclick={() => (search = '')}><XIcon /></button
+        >
+      {/if}
     </div>
   </div>
-
-  <label class="label order-5 col-span-8 w-full md:col-span-3 md:col-start-10">
-    <span class="label-text"> Sort By </span>
-    <div class="relative flex items-center">
-      <ArrowDownWideNarrowIcon class="absolute left-2" />
-      <select
-        class="select truncate pl-10"
-        id="sort-colors-by"
-        bind:value={sortColors}
-        onchange={() => {
-          if (sortColors === 'shuffle') shuffleSeed = Math.random();
-        }}
-        disabled={gettingResults}
-      >
-        {#if hasIncomingColor}
-          <option value="best-match">Best Match</option>
-        {/if}
-        <option value="default">Default</option>
-        <option value="warm-to-cool">Warm to Cool</option>
-        <option value="cool-to-warm">Cool to Warm</option>
-        <option value="rainbow">Rainbow</option>
-        <option value="light-to-dark">Light to Dark</option>
-        <option value="dark-to-light">Dark to Light</option>
-        <option value="name">Name A-Z</option>
-        <option value="name-z-to-a">Name Z-A</option>
-        <option value="shuffle">Shuffle</option>
-      </select>
-    </div>
-  </label>
 </div>
 
-{#if results?.length && !loadingAllColors}
-  <p class="mt-2 text-sm">
-    {#if totalResults === results.length}
-      {totalResults}
+{#if results.length}
+  <div class="my-2 flex flex-wrap items-center justify-between gap-2">
+    <p class="text-sm">
+      {#if sorted.length > results.length}
+        Showing {results.length.toLocaleString()} of
+      {/if}
+      {sorted.length.toLocaleString()}
+      {pluralize('Colorway', sorted.length)}
+    </p>
+    <div class="flex flex-wrap items-center gap-2">
+      <SortSelectMenu
+        options={colorwaySortOptions(!!matchHex)}
+        current={sort}
+        {canReverse}
+        {reversed}
+        onsort={(chosen) => (chosenSort = chosen)}
+        onreverse={(value) => (reversed = value)}
+      />
+      <ViewMenu bind:value={layout} />
+    </div>
+  </div>
+  <div class="my-2 w-full">
+    {#if layout === 'grid'}
+      <ColorwayCards
+        colorways={results}
+        selection={{ isSelected, ontoggle: toggleSelected }}
+      />
     {:else}
-      Showing {results.length.toLocaleString()} of {totalResults.toLocaleString()}
+      <ColorwayRows
+        colorways={results}
+        selection={{ isSelected, ontoggle: toggleSelected }}
+      />
     {/if}
-    {pluralize('Colorway', totalResults)}
-  </p>
-{/if}
-
-<div
-  class="my-4 grid grid-cols-1 justify-center gap-1 sm:grid-cols-2 md:grid-cols-3"
->
-  {#if results?.length && !loadingAllColors}
-    {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href }}
-      {@const isSelected =
-        (selectedIds.includes(`${hex}${name}${brandId}${yarnId}`) &&
-          (hasIncomingColor ? incomingColor.hex === hex : true)) ||
-        (canMarkIfHexMatches && incomingColor.hex === hex)}
-      {@const percentMatch =
-        delta !== undefined ? Math.floor(100 - delta) : undefined}
+  </div>
+  {#if sorted.length > results.length}
+    <div class="flex w-full justify-center">
       <button
         type="button"
-        class="rounded-container flex min-w-fit flex-1 cursor-pointer flex-col items-start justify-start gap-2 p-1 shadow-xs sm:p-2"
-        style="background:{hex ?? '#ffffff'}; color:{getTextColor(
-          hex ?? '#ffffff',
-        )};"
-        onclick={() =>
-          toggleSelected({
-            brandId,
-            yarnId,
-            hex,
-            name,
-            brandName,
-            yarnName,
-            variant_href,
-            affiliate_variant_href,
-          })}
+        class="btn rounded-container bg-primary-200-800 mb-2"
+        onclick={() => (itemsToShow += YARN_COLORWAYS_PER_PAGE)}
       >
-        <div class="flex items-center gap-2">
-          {#if isSelected}
-            <CircleCheckIcon />
-          {:else}
-            <CircleIcon />
-          {/if}
-          <div
-            class="flex flex-col items-start justify-start text-left break-all"
-          >
-            <span class="text-xs">
-              <span>{brandName} - {yarnName}</span>
-            </span>
-            <span class="text-lg leading-tight">{name}</span>
-            {#if percentMatch}
-              <span class="text-xs">
-                {percentMatch}% Match
-              </span>
-            {/if}
-          </div>
-        </div>
-      </button>
-    {/each}
-    {#if results.length === itemsToShow}
-      <div class="mt-4 w-full" bind:this={loadMoreSpinner}>
-        <Spinner />
-      </div>
-    {/if}
+        <PlusIcon />
+        Show More</button
+      >
+    </div>
   {/if}
-</div>
-{#if !yarnDataReady}
+{:else if !yarnDataReady}
   <div class="mx-auto my-6">
     <Spinner />
   </div>
-{:else if !results?.length && !loadingAllColors}
+{:else}
   <p class="text-center italic">No Matching Colorways</p>
 {/if}
 {#if showScrollToTopButton}

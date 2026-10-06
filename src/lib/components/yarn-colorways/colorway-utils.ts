@@ -8,6 +8,12 @@ import chroma from 'chroma-js';
 export const colorwayKey = (colorway: Color) =>
   `${colorway.hex ?? ''}${colorway.name ?? ''}${colorway.brandName ?? ''}${colorway.yarnName ?? ''}`;
 
+/** For choosing colorways from a list: which are chosen, and choosing one */
+export type ColorwaySelection = {
+  isSelected: (colorway: Color) => boolean;
+  ontoggle: (colorway: Color) => void;
+};
+
 /** How closely a colorway matches the searched color, as a whole percent,
  * or undefined when there's no color search */
 export const matchPercent = (colorway: { delta?: number }) =>
@@ -85,6 +91,10 @@ export type ColorwaySort = (typeof COLORWAY_SORTS)[number]['value'];
 export const isColorwaySort = (value: unknown): value is ColorwaySort =>
   COLORWAY_SORTS.some((sort) => sort.value === value);
 
+/** The sorts to offer: Best match only during a color search */
+export const colorwaySortOptions = (hasColor: boolean) =>
+  COLORWAY_SORTS.filter((sort) => hasColor || !('needsColor' in sort));
+
 /** The sort to use when none is chosen: best match during a color search,
  * otherwise by color */
 export const defaultColorwaySort = (hasColor: boolean): ColorwaySort =>
@@ -95,6 +105,19 @@ export const defaultColorwaySort = (hasColor: boolean): ColorwaySort =>
 export const CLOSE_MATCH_DELTA = 15;
 /** A rare color still gets this many of its nearest colorways */
 export const MIN_CLOSE_MATCHES = 24;
+
+/** Every colorway, in the same order, with its `delta` (distance) from a
+ * color; none when the color isn't valid */
+export const withDeltas = <T extends Color>(
+  colorways: T[],
+  hex: string,
+): (T & { delta: number })[] => {
+  if (!chroma.valid(hex)) return [];
+  return colorways.map((colorway) => ({
+    ...colorway,
+    delta: chroma.deltaE(hex, colorway.hex ?? '#ffffff'),
+  }));
+};
 
 /**
  * The colorways close to a color, each with its `delta` (distance) from it,
@@ -107,12 +130,7 @@ export const closeMatches = <T extends Color>(
   hex: string,
 ): (T & { delta: number })[] => {
   if (!chroma.valid(hex)) return [];
-  const ranked = colorways
-    .map((colorway) => ({
-      ...colorway,
-      delta: chroma.deltaE(hex, colorway.hex ?? '#ffffff'),
-    }))
-    .sort((a, b) => a.delta - b.delta);
+  const ranked = withDeltas(colorways, hex).sort((a, b) => a.delta - b.delta);
   const close = ranked.findIndex(
     (colorway) => colorway.delta > CLOSE_MATCH_DELTA,
   );

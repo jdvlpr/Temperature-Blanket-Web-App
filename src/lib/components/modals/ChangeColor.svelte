@@ -14,13 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import ColorSearchField from '$lib/components/ColorSearchField.svelte';
+  import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
-  import chroma from 'chroma-js';
+  import { tick } from 'svelte';
 
   interface Props {
     index?: any;
@@ -50,19 +52,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let container: HTMLElement | undefined = $state();
 
-  let valid = $state(true);
+  // Copies, so that choosing a colorway doesn't change the filters
+  // svelte-ignore state_referenced_locally
+  const brandIdCopy = brandId;
+  // svelte-ignore state_referenced_locally
+  const yarnIdCopy = yarnId;
 
-  // A copy is necessary so that selecting a yarn colorway doesn't update the results
-  let brandIdCopy = $state(getInitialValue('brandId'));
-
-  // A copy is necessary so that selecting a yarn colorway doesn't update the results
-  let yarnIdCopy = $state(getInitialValue('yarnId'));
-
-  let inputTypeColorValue = $derived(hex);
-
-  let inputTypeTextValue = $derived(hex);
-
-  let currentColor = $derived({ hex });
+  /** Picking a color from a photo, shown in this dialog's place */
+  let pickingFromPhoto = $state(false);
 
   let selectedColors = $derived([
     {
@@ -79,18 +76,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let href = $derived(affiliate_variant_href || variant_href);
 
-  function getInitialValue(prop: string) {
-    if (prop === 'brandId') return brandId;
-    if (prop === 'yarnId') return yarnId;
-  }
-
-  function inputTypeColorOnChange({
-    value,
-    color,
-  }: {
-    value: string;
-    color?: Color;
-  }) {
+  /** Use a colorway, or (without one) a color of the user's own */
+  function setColor(value: string, color?: Color) {
     name = color?.name;
     brandId = color?.brandId;
     yarnId = color?.yarnId;
@@ -98,43 +85,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnName = color?.yarnName;
     variant_href = color?.variant_href;
     affiliate_variant_href = color?.affiliate_variant_href;
-
-    let __color = value;
-
-    if (!chroma.valid(__color)) {
-      valid = false;
-      return;
-    }
-    valid = true;
-    inputTypeColorValue = __color;
-    inputTypeTextValue = __color;
-    hex = chroma(inputTypeColorValue).hex('rgb'); // use 'rgb' to prevent alpha hex codes
+    hex = value;
   }
 
-  function inputTypeTextOnChange({
-    value,
-    color,
-  }: {
-    value: string;
-    color?: Color;
-  }) {
-    name = color?.name;
-    brandId = color?.brandId;
-    yarnId = color?.yarnId;
-    brandName = color?.brandName;
-    yarnName = color?.yarnName;
-    variant_href = color?.variant_href;
-    affiliate_variant_href = color?.affiliate_variant_href;
-
-    let __color = value;
-    if (!chroma.valid(__color)) {
-      valid = false;
-      return;
-    }
-    valid = true;
-    inputTypeTextValue = __color;
-    inputTypeColorValue = chroma(inputTypeTextValue).hex('rgb'); // use 'rgb' to prevent alpha hex codes
-    hex = chroma(inputTypeTextValue).hex('rgb'); // use 'rgb' to prevent alpha hex codes
+  async function closePhoto() {
+    pickingFromPhoto = false;
+    await tick();
+    container
+      ?.querySelector<HTMLElement>('[data-photo-button]')
+      ?.focus({ preventScroll: true });
   }
 
   function _onOkay() {
@@ -153,101 +112,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-4 text-center" bind:this={container}>
+{#if pickingFromPhoto}
+  <PickColorFromImage
+    onPick={(picked: string) => setColor(picked)}
+    onBack={closePhoto}
+  />
+{/if}
+
+<div class="p-4" bind:this={container} hidden={pickingFromPhoto}>
   {#if href}
+    <!-- eslint-disable svelte/no-navigation-without-resolve -- yarn shops' and makers' own pages -->
     <a
-      class="mx-auto flex w-fit flex-wrap items-center justify-center gap-2 underline"
+      class="mx-auto mb-2 flex w-fit items-center justify-center gap-2 underline"
       {href}
       target="_blank"
       rel="noreferrer nofollow"
     >
       {#if affiliate_variant_href}
-        <ShoppingCartIcon />
+        <ShoppingCartIcon aria-hidden="true" />
       {:else}
-        <ExternalLinkIcon />
+        <ExternalLinkIcon aria-hidden="true" />
       {/if}
-      <span class="flex flex-col items-start">
-        <p class="text-xs">
-          {#if brandName}
-            {brandName}
-            -
-          {/if}
-          {#if yarnName}
-            {yarnName}
-          {/if}
-        </p>
+      <span class="flex flex-col items-start text-left">
         {#if name}
-          <p class="text-2xl">{name}</p>
+          <span class="text-lg leading-tight font-semibold">{name}</span>
+        {/if}
+        {#if brandName || yarnName}
+          <span class="text-surface-700-300 text-xs">
+            {[brandName, yarnName].filter(Boolean).join(' · ')}
+          </span>
         {/if}
       </span>
+      <span class="sr-only">(opens in a new tab)</span>
     </a>
+    <!-- eslint-enable svelte/no-navigation-without-resolve -->
   {/if}
 
-  <div class="flex flex-col justify-start gap-1">
-    <p class="label-text text-left">Color</p>
-    <div class="flex w-full flex-wrap items-center justify-center gap-x-2">
-      <label class="label" title="Choose a Color">
-        <input
-          type="color"
-          class="input"
-          value={inputTypeColorValue}
-          onchange={(e) => {
-            if (e.currentTarget instanceof HTMLInputElement) {
-              inputTypeColorOnChange({
-                value: e.currentTarget.value,
-              });
-            }
-          }}
-        />
-      </label>
-      <label class=" flex-1" title="Enter a Color">
-        <input
-          type="text"
-          class="input w-full grow"
-          value={inputTypeTextValue}
-          onkeyup={(e) => {
-            if (e.currentTarget instanceof HTMLInputElement) {
-              inputTypeTextOnChange({
-                value: e.currentTarget.value,
-              });
-            }
-          }}
-        />
-      </label>
-    </div>
-  </div>
+  <ColorSearchField
+    label="Color"
+    bind:hex={() => hex ?? '', (value: string) => setColor(value)}
+    onphoto={() => (pickingFromPhoto = true)}
+  />
 
   <YarnGridSelect
     limit={true}
     bind:selectedColors
     selectedBrandId={brandIdCopy}
     selectedYarnId={yarnIdCopy}
-    incomingColor={currentColor}
+    matchHex={hex ?? ''}
     onClickScrollToTop={() => {
       container?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
     }}
-    onSelection={(e: Color[]) => {
-      const color = e[0];
-      inputTypeColorOnChange({ value: color.hex ?? '#ffffff', color });
+    onSelection={(colors: Color[]) => {
+      const color = colors[0];
+      setColor(color.hex ?? '#ffffff', color);
     }}
     scrollToTopButtonBottom="4rem"
   />
 </div>
 
-<StickyPart position="bottom">
-  <div class="p-2">
-    {#if !valid}
-      <p class="card bg-warning-500/20 my-2 p-4">Please enter a valid color</p>
-    {/if}
-    <div class="max-sm:pb-2">
-      <SaveAndCloseButtons
-        onSave={_onOkay}
-        onClose={dialog.close}
-        disabled={!valid}
-      />
+{#if !pickingFromPhoto}
+  <StickyPart position="bottom">
+    <div class="p-2">
+      {#if !hex}
+        <p class="card bg-warning-500/20 my-2 p-4">
+          Please enter a valid color
+        </p>
+      {/if}
+      <div class="max-sm:pb-2">
+        <SaveAndCloseButtons
+          onSave={_onOkay}
+          onClose={dialog.close}
+          disabled={!hex}
+        />
+      </div>
     </div>
-  </div>
-</StickyPart>
+  </StickyPart>
+{/if}

@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShoppingCartIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { menuContentClass, menuItemClass } from '$lib/components/menu-styles';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
   import {
     colorwayLink,
@@ -65,9 +66,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Boolean(copy.text),
     ),
   );
-
-  const itemClass =
-    'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left data-highlighted:text-inherit';
 </script>
 
 <Menu
@@ -89,9 +87,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
-      <Menu.Content class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]">
+      <Menu.Content class={menuContentClass}>
         {#if link}
-          <Menu.Item value="link" class={itemClass}>
+          <Menu.Item value="link" class={menuItemClass}>
             {#snippet element(attributes)}
               <!-- eslint-disable svelte/no-navigation-without-resolve -- yarn shops' and makers' own pages -->
               <!-- The item's menu behavior, typed for its default div -->
@@ -115,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <Menu.Separator />
         {/if}
         {#each copies as copy (copy.value)}
-          <Menu.Item value={copy.value} class={itemClass}>
+          <Menu.Item value={copy.value} class={menuItemClass}>
             <CopyIcon size={16} aria-hidden="true" />
             <span>{copy.label}</span>
             <span

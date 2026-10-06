@@ -14,11 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Whether the yarn colorway finder shows its results as a grid of cards or a
-  list of rows, as a menu styled like the Sort menu beside it. The button
-  names the view and shows its icon.
+  Whether a list shows as a grid or as rows, as a menu styled like the Sort
+  menu it often sits beside. The button names the view and shows its icon.
 -->
 <script lang="ts">
+  import {
+    menuContentClass,
+    menuItemClass,
+    menuTriggerClass,
+  } from '$lib/components/menu-styles';
+  import type { PageLayout } from '$lib/types/page-types';
   import {
     CheckIcon,
     ChevronDownIcon,
@@ -27,9 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
-  type View = 'grid' | 'list';
-
-  let { value = $bindable('grid') }: { value: View } = $props();
+  let { value = $bindable('grid') }: { value: PageLayout } = $props();
 
   const views = [
     { value: 'grid', label: 'Grid', icon: LayoutGridIcon },
@@ -39,33 +42,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let current = $derived(
     views.find((view) => view.value === value) ?? views[0],
   );
-
-  const itemClass =
-    'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left data-highlighted:text-inherit';
 </script>
 
 <Menu positioning={{ placement: 'bottom-start' }}>
-  <Menu.Trigger class="btn hover:bg-surface-200-800">
+  <Menu.Trigger class={menuTriggerClass}>
     <current.icon size={18} aria-hidden="true" />
     <span>View: {current.label}</span>
     <ChevronDownIcon size={18} aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
-      <Menu.Content class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]">
+      <Menu.Content class={menuContentClass}>
         {#each views as view (view.value)}
           <Menu.OptionItem
             type="radio"
             value={view.value}
-            checked={view.value === value}
+            checked={view.value === current.value}
             onCheckedChange={() => (value = view.value)}
-            class={itemClass}
+            class={menuItemClass}
           >
             <view.icon size={18} class="shrink-0" aria-hidden="true" />
             <span class="min-w-0 flex-1">{view.label}</span>
             <CheckIcon
               size={18}
-              class="shrink-0 {view.value === value ? '' : 'invisible'}"
+              class="shrink-0 {view.value === current.value ? '' : 'invisible'}"
               aria-hidden="true"
             />
           </Menu.OptionItem>

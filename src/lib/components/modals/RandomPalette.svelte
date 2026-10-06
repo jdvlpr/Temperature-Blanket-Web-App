@@ -25,10 +25,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
-  import { getSortedPalette } from '$lib/utils/color-utils';
+  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
+  import { getSortedPalette, PALETTE_SORTS } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
-  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
+  import { ShuffleIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
@@ -51,7 +52,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let selectedBrandId = $state<string | undefined>();
   let selectedYarnId = $state<string | undefined>();
   let selectedYarnWeightId = $state('');
-  let sortColors = $state('light-to-dark');
+  /** Each new palette is sorted this way, or left as picked */
+  const RANDOM_PALETTE_SORTS = [
+    { value: 'none', label: 'None' },
+    ...PALETTE_SORTS,
+  ] as const;
+
+  let sortColors =
+    $state<(typeof RANDOM_PALETTE_SORTS)[number]['value']>('light-to-dark');
 
   function getRandomColors() {
     debounce(() => {
@@ -185,32 +193,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    <label class="label order-6 col-span-full w-full sm:col-span-4">
-      <span class="label-text"> Sort By</span>
-      <div class="relative flex items-center">
-        <ArrowDownWideNarrowIcon class="absolute left-2" />
-        <select
-          class="select truncate pl-10"
-          id="sort-colors-by"
-          bind:value={sortColors}
-          onchange={() => {
-            randomPalette = getSortedPalette({
-              palette: randomPalette,
-              sortColors,
-            });
-          }}
-        >
-          <option value="none">None</option>
-          <option value="warm-to-cool">Warm to Cool</option>
-          <option value="cool-to-warm">Cool to Warm</option>
-          <option value="rainbow">Rainbow</option>
-          <option value="light-to-dark">Light to Dark</option>
-          <option value="dark-to-light">Dark to Light</option>
-          <option value="name">Name A-Z</option>
-          <option value="name-z-to-a">Name Z-A</option>
-        </select>
-      </div>
-    </label>
+    <div class="order-6 col-span-full sm:col-span-4">
+      <SortSelectMenu
+        options={RANDOM_PALETTE_SORTS}
+        current={sortColors}
+        onsort={(sort) => {
+          sortColors = sort;
+          randomPalette = getSortedPalette({
+            palette: randomPalette,
+            sortColors,
+          });
+        }}
+      />
+    </div>
 
     <button
       class="btn preset-filled order-7 col-span-full sm:col-span-4 sm:col-start-9"

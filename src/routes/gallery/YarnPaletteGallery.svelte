@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
+  import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
@@ -27,7 +29,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils/gallery-utils';
   import { getPalettesFromProjects } from '$lib/utils/color-utils';
   import {
-    ArrowUpDownIcon,
     ChevronRightIcon,
     ClockIcon,
     EarthIcon,
@@ -272,23 +273,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
           </div>
         </div>
-
-        <label class="label col-span-6 w-full md:col-span-2">
-          <span class="label-text"> Order By </span>
-          <div class="relative flex items-center">
-            <ArrowUpDownIcon class="pointer-events-none absolute left-2" />
-            <select
-              class="select w-full truncate pl-10"
-              bind:value={yarnPaletteGalleryState.orderBy}
-              onchange={debouncedSearch}
-              disabled={loading}
-            >
-              <option value="DESC" selected>Newest First</option>
-              <option value="ASC">Oldest First</option>
-            </select>
-          </div>
-        </label>
       </div>
+    </div>
+    <div class="mb-2 flex justify-center">
+      <SortSelectMenu
+        options={GALLERY_ORDERS}
+        current={yarnPaletteGalleryState.orderBy}
+        disabled={loading}
+        onsort={(order) => {
+          yarnPaletteGalleryState.orderBy = order;
+          debouncedSearch();
+        }}
+      />
     </div>
     <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
       {#each yarnPaletteGalleryState.palettes as { colors, schemeName, postId }}

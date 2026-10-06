@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
   import type {
+    GalleryOrder,
     PaletteGalleryNode,
     GalleryPageInfo,
   } from '$lib/utils/gallery-utils';
@@ -25,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     filteredBrandId = $state('');
     filteredYarnId = $state('');
     palettesContainOnlyFilteredYarn = $state(false);
-    orderBy = $state('DESC');
+    orderBy = $state<GalleryOrder>('DESC');
     projects = $state<PaletteGalleryNode[]>([]);
     palettes = $state<GalleryPalette[]>([]);
     gallery = $state<{ pageInfo?: GalleryPageInfo }>({});
@@ -61,7 +62,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fetchPaletteGallery,
     recordPageView,
   } from '$lib/utils/gallery-utils';
-  import { ArrowUpDownIcon, EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
+  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
+  import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
+  import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   interface Props {
@@ -212,26 +215,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </div>
       </div>
-
-      <label class="label col-span-6 w-full md:col-span-2">
-        <span class="label-text flex items-center"> Order By </span>
-        <div class="relative flex items-center">
-          <ArrowUpDownIcon class="absolute left-2" />
-          <select
-            class="select truncate pl-10"
-            bind:value={galleryPalettesState.orderBy}
-            onchange={debouncedSearch}
-            disabled={loading}
-          >
-            <option value="DESC" selected>Newest First</option>
-            <option value="ASC">Oldest First</option>
-          </select>
-        </div>
-      </label>
     </div>
   {/if}
 </div>
 <div class="flex flex-col items-center px-2" bind:this={projectsList}>
+  <div class="mb-2 flex justify-center">
+    <SortSelectMenu
+      options={GALLERY_ORDERS}
+      current={galleryPalettesState.orderBy}
+      disabled={loading}
+      onsort={(order) => {
+        galleryPalettesState.orderBy = order;
+        debouncedSearch();
+      }}
+    />
+  </div>
   {#if loading && !galleryPalettesState.palettes.length}
     <div class="my-1"></div>
     <PlaceholderPalettes items={20} maxWFull={true} />

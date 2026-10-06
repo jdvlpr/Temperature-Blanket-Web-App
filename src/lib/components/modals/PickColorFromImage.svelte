@@ -48,9 +48,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   interface Props {
     /** Called with the chosen color when the user confirms it */
     onPick: (hex: string) => void;
+    /** Shown inside another dialog rather than as its own: back to that one,
+     * by Back, Cancel, or once a color is used */
+    onBack?: () => void;
   }
 
-  let { onPick }: Props = $props();
+  let { onPick, onBack }: Props = $props();
+
+  /** Leave: back to the dialog this is shown in, or else close */
+  const leave = () => (onBack ? onBack() : dialog.close());
 
   // As in the image palette's photo
   const LOUPE_SIZE = 112;
@@ -119,9 +125,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dialog.backAction = null;
   });
 
-  // The dialog's Back button returns to choosing a photo
+  // The dialog's Back button returns to choosing a photo, then (shown inside
+  // another dialog) to that one
   $effect(() => {
-    dialog.backAction = step === 'picker' ? () => (step = 'start') : null;
+    dialog.backAction =
+      step === 'picker' ? () => (step = 'start') : (onBack ?? null);
   });
 
   $effect(() => {
@@ -260,7 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!hex) return;
     if (last) last.at = at;
     onPick(hex);
-    dialog.close();
+    leave();
   }
 
   function onPaste(e: ClipboardEvent) {
@@ -458,7 +466,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           saveText="Use Color"
           disabled={!hex || loading}
           onSave={use}
-          onClose={dialog.close}
+          onClose={leave}
         />
       </div>
     </StickyPart>

@@ -1,5 +1,6 @@
 import type { GalleryPalette } from '$lib/utils/color-utils';
 import type {
+  GalleryOrder,
   GalleryPageInfo,
   GalleryProjectNode,
   PaletteGalleryNode,
@@ -13,7 +14,7 @@ class GalleryState {
   filteredYarnId = $state('');
   palettesContainOnlyFilteredYarn = $state(false);
   filteredPatternType = $state('');
-  orderBy = $state('DESC');
+  orderBy = $state<GalleryOrder>('DESC');
   projects: GalleryProjectNode[] = $state([]);
   displayedProjects: GalleryProjectNode[] = $state([]);
   popularProjects: PopularProject[] = $state([]);
@@ -39,7 +40,7 @@ class YarnPaletteGalleryState {
   filteredBrandId = $state('');
   filteredYarnId = $state('');
   palettesContainOnlyFilteredYarn = $state(false);
-  orderBy = $state('DESC');
+  orderBy = $state<GalleryOrder>('DESC');
   projects: PaletteGalleryNode[] = $state([]);
   palettes: GalleryPalette[] = $state([]);
   popularPalettes: GalleryPalette[] = $state([]);

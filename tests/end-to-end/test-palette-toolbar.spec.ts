@@ -29,6 +29,29 @@ test.describe('Palette toolbar', () => {
     }
   });
 
+  test('Choose Colorways picks from colorway cards', async ({ page }) => {
+    await page.getByRole('button', { name: 'Get Colors' }).click();
+    await page.getByRole('menuitem', { name: /Choose Colorways/ }).click();
+    const dialog = page.getByRole('dialog');
+
+    // A color to match ranks them, best match first
+    await dialog.getByPlaceholder('e.g., pink, #c3f4d2').fill('#ff0000');
+    await expect(
+      dialog.getByRole('button', { name: /^Sort: Best match/ }),
+    ).toBeVisible();
+
+    // The card itself toggles; its ⋮ menu is a separate button
+    const card = dialog.getByRole('listitem').first();
+    const toggle = card.getByRole('button').first();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      card.getByRole('button', { name: /^More for / }),
+    ).toBeVisible();
+    await expect(dialog.getByText('1 Colorway', { exact: true })).toBeVisible();
+  });
+
   test('Save & Export lists saving and every export', async ({ page }) => {
     await page.getByRole('button', { name: 'Save & Export' }).click();
     for (const name of ['Save Palette', 'Link', 'HTML Color Codes', 'Image']) {

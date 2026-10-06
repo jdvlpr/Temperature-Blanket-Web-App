@@ -22,8 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedYarnWeightId: YarnWeight['id'] | '' = $state('');
     search = $state('');
     hex = $state('');
-    inputTypeTextValue = $state('');
-    inputTypeColorElement: HTMLInputElement | null = $state(null);
     /** The chosen sort; null follows the search (best match with a color) */
     sort = $state<ColorwaySort | null>(null);
     /** Reverse the sort (any but Best match); stays on across sorts */
@@ -40,15 +38,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
+  import ColorSearchField from '$lib/components/ColorSearchField.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
   import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
-  import ColorwaySortMenu from '$lib/components/yarn-colorways/ColorwaySortMenu.svelte';
-  import ColorwayViewMenu from '$lib/components/yarn-colorways/ColorwayViewMenu.svelte';
+  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
+  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
   import {
     canReverse,
     closeMatches,
+    colorwaySortOptions,
     defaultColorwaySort,
     isColorwaySort,
     sortColorways,
@@ -68,18 +67,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorwaysWithAffiliateLinks,
   } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog } from '$lib/state/page-state.svelte';
   import type { Color, YarnWeight } from '$lib/types/yarn-types';
-  import { getTextColor } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     ChevronDownIcon,
     CircleQuestionMarkIcon,
-    ImageIcon,
     PlusIcon,
     SearchIcon,
     ShoppingCartIcon,
-    XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
@@ -119,17 +114,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (urlParams.has('c')) {
       const color = urlParams.get('c');
-      if (color && chroma.valid(color)) {
+      if (color && chroma.valid(color))
         yarnColorwayFinderState.hex = chroma(color).hex('rgb');
-        yarnColorwayFinderState.inputTypeTextValue = color;
-        if (yarnColorwayFinderState.inputTypeColorElement) {
-          yarnColorwayFinderState.inputTypeColorElement.value =
-            chroma(color).hex('rgb');
-          yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
-            new Event('change'),
-          );
-        }
-      }
     }
     if (urlParams.has('n'))
       yarnColorwayFinderState.search = urlParams.get('n') ?? '';
@@ -270,47 +256,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     itemsToShow = YARN_COLORWAYS_PER_PAGE;
   });
 
-  function inputTypeColorOnChange({ value }: { value: string }) {
-    let __color = value;
-    if (!chroma.valid(__color)) {
-      return;
-    }
-    yarnColorwayFinderState.inputTypeTextValue = __color;
-    yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
-    if (browser && yarnColorwayFinderState.inputTypeColorElement) {
-      yarnColorwayFinderState.inputTypeColorElement.value =
-        chroma(__color).hex('rgb');
-    }
-  }
-
-  function inputTypeTextOnChange({ value }: { value: string }) {
-    let __color = value;
-    if (!chroma.valid(__color)) {
-      return;
-    }
-    yarnColorwayFinderState.inputTypeTextValue = __color;
-    if (browser && yarnColorwayFinderState.inputTypeColorElement) {
-      yarnColorwayFinderState.inputTypeColorElement.value =
-        chroma(__color).hex('rgb');
-      yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
-        new Event('change'),
-      );
-    }
-    yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
-  }
-  function pickFromImage() {
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: PickColorFromImage,
-        props: {
-          onPick: (hex: string) => inputTypeColorOnChange({ value: hex }),
-        },
-      },
-      options: { size: 'medium', title: 'Pick a Color from a Photo' },
-    });
-  }
-
   let areAnyResultsAffiliate = $derived(
     results.some((result) => result.affiliate_variant_href),
   );
@@ -372,66 +317,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:this={filtersContainer}
               class="my-2 grid w-full scroll-mt-[66px] grid-cols-12 items-end justify-between gap-4"
             >
-              <div class="label col-span-full w-full">
-                <span class="label-text"> Search by Color</span>
-                <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
-                  <input
-                    type="color"
-                    class="input ig-cell m-2 rounded-full! p-0"
-                    bind:this={yarnColorwayFinderState.inputTypeColorElement}
-                    onchange={(e) => {
-                      inputTypeColorOnChange({
-                        value: e.currentTarget.value,
-                      });
-                    }}
-                  />
-                  <input
-                    type="text"
-                    class="ig-input"
-                    placeholder="e.g., pink, #c3f4d2"
-                    style="background:{yarnColorwayFinderState.hex ||
-                      'none'} !important;color:{getTextColor(
-                      yarnColorwayFinderState.hex,
-                    )}"
-                    value={yarnColorwayFinderState.inputTypeTextValue}
-                    onkeyup={(e) =>
-                      inputTypeTextOnChange({
-                        value: e.currentTarget.value,
-                      })}
-                    onpaste={(e) => {
-                      if (e.cancelable) e.preventDefault();
-                      const _tempInputValue =
-                        e.clipboardData?.getData('text') || '';
-                      inputTypeColorOnChange({
-                        value: _tempInputValue,
-                      });
-                    }}
-                  />
-                  {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
-                    <button
-                      aria-label="Clear Color"
-                      class="ig-btn"
-                      onclick={() => {
-                        yarnColorwayFinderState.hex = '';
-                        yarnColorwayFinderState.inputTypeTextValue = '';
-                        if (
-                          browser &&
-                          yarnColorwayFinderState.inputTypeColorElement
-                        )
-                          yarnColorwayFinderState.inputTypeColorElement.value =
-                            '#000000';
-                      }}
-                      ><XIcon />
-                    </button>
-                  {/if}
-                  <button
-                    aria-label="Pick color from a photo"
-                    title="Pick color from a photo"
-                    class="ig-btn gap-1"
-                    onclick={pickFromImage}
-                    ><ImageIcon /> Photo
-                  </button>
-                </div>
+              <div class="col-span-full">
+                <ColorSearchField bind:hex={yarnColorwayFinderState.hex} />
               </div>
 
               {#key isLoaded}
@@ -529,15 +416,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : pluralize('Colorway', sorted.length)}
               </p>
               <div class="flex flex-wrap items-center justify-center gap-2">
-                <ColorwaySortMenu
+                <SortSelectMenu
+                  options={colorwaySortOptions(!!yarnColorwayFinderState.hex)}
                   current={sort}
-                  hasColor={!!yarnColorwayFinderState.hex}
+                  {canReverse}
                   reversed={yarnColorwayFinderState.reversed}
                   onsort={(chosen) => (yarnColorwayFinderState.sort = chosen)}
                   onreverse={(reversed) =>
                     (yarnColorwayFinderState.reversed = reversed)}
                 />
-                <ColorwayViewMenu bind:value={layout} />
+                <ViewMenu bind:value={layout} />
               </div>
             {/if}
 

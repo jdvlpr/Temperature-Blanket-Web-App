@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
+  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
@@ -421,7 +421,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             </p>
                           {/if}
                           <div class="mx-auto mt-4 w-fit">
-                            <ViewToggle />
+                            <ViewMenu bind:value={preferences.value.layout} />
                           </div>
                           <div
                             class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences

@@ -33,6 +33,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShuffleIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
+  import {
+    menuContentClass,
+    menuItemClass,
+    menuTriggerClass,
+  } from '$lib/components/menu-styles';
 
   interface Props {
     /** The palette, to tell whether sorting by name makes sense */
@@ -52,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors,
     onsort,
     current,
-    triggerClass = 'btn hover:bg-surface-200-800 justify-start',
+    triggerClass = `${menuTriggerClass} justify-start`,
     disabled = false,
     placement = 'bottom-start',
   }: Props = $props();
@@ -85,9 +90,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const isCurrent = (sort: PaletteSort) =>
     current !== undefined ? current === sort : alreadySorted === sort;
-
-  const itemClass =
-    'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 </script>
 
 <Menu
@@ -108,9 +110,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
-      <Menu.Content class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]">
+      <Menu.Content class={menuContentClass}>
         {#each PALETTE_SORTS.filter((sort) => allColorsHaveNames || !sort.needsNames) as sort (sort.value)}
-          <Menu.Item value={sort.value} class={itemClass}>
+          <Menu.Item value={sort.value} class={menuItemClass}>
             <p class="min-w-0 flex-1 text-left">{sort.label}</p>
             {#if isCurrent(sort.value)}
               <CheckIcon class="shrink-0" aria-label="Current" />
@@ -118,11 +120,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Menu.Item>
         {/each}
         <Menu.Separator />
-        <Menu.Item value="reverse" class={itemClass}>
+        <Menu.Item value="reverse" class={menuItemClass}>
           <ArrowLeftRightIcon class="shrink-0" />
           <p class="min-w-0 flex-1 text-left">Reverse</p>
         </Menu.Item>
-        <Menu.Item value="shuffle" class={itemClass}>
+        <Menu.Item value="shuffle" class={menuItemClass}>
           <ShuffleIcon class="shrink-0" />
           <p class="min-w-0 flex-1 text-left">Shuffle</p>
         </Menu.Item>

@@ -18,7 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
+  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
+  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
+  import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
   import { previews } from '$lib/state/preview-state.svelte';
   import {
     fetchPopularProjects,
@@ -27,7 +29,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
   import {
-    ArrowUpDownIcon,
     ChevronRightIcon,
     ClockIcon,
     EarthIcon,
@@ -44,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectsList = $state();
   let totalProjects: number | string | undefined = $state(0);
   let featuredProjectsEl: HTMLDivElement | undefined = $state();
-  let layout = $state('grid');
+  let layout = $state<'grid' | 'list'>('grid');
 
   onMount(async () => {
     if (!galleryState.projects.length) {
@@ -324,7 +325,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </div>
 
-        <label class="label col-span-6 w-full md:col-span-3">
+        <label class="label col-span-12 w-full md:col-span-7">
           <span class="label-text"> Pattern Type </span>
           <div class="relative flex items-center">
             <Grid3x3 class="pointer-events-none absolute left-2" />
@@ -342,31 +343,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </select>
           </div>
         </label>
-
-        <label class="label col-span-6 w-full md:col-span-3">
-          <span class="label-text"> Order By </span>
-          <div class="relative flex items-center">
-            <ArrowUpDownIcon class="pointer-events-none absolute left-2" />
-            <select
-              class="select truncate pl-10"
-              bind:value={galleryState.orderBy}
-              onchange={debouncedSearch}
-              disabled={loading}
-            >
-              <option value="DESC" selected>Newest First</option>
-              <option value="ASC">Oldest First</option>
-            </select>
-            <div class="relative flex items-center"></div>
-          </div></label
-        >
       </div>
     </div>
     <div
       class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}
     >
-      <div class="mx-auto my-2">
-        <ViewToggleBindable bind:value={layout} />
+      <div
+        class="mx-auto my-2 flex flex-wrap items-center justify-center gap-2"
+      >
+        <SortSelectMenu
+          options={GALLERY_ORDERS}
+          current={galleryState.orderBy}
+          disabled={loading}
+          onsort={(order) => {
+            galleryState.orderBy = order;
+            debouncedSearch();
+          }}
+        />
+        <ViewMenu bind:value={layout} />
       </div>
 
       <div
