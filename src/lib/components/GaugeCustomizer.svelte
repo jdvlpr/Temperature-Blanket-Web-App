@@ -92,7 +92,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CheckIcon,
     GripVerticalIcon,
     SearchIcon,
-    ShoppingCartIcon,
     XIcon,
   } from '@lucide/svelte';
   import { Menu } from '@skeletonlabs/skeleton-svelte';
@@ -117,10 +116,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isStaticGauge = $derived(gauge.isStatic);
 
   let movable = $derived(gauge.colors?.length > 1);
-
-  let hasAnyAffiliateURLs = $derived(
-    gauge.colors?.some((color: Color) => color?.affiliate_variant_href),
-  );
 
   let sortableColors: Color[] = $state(getSortableColors());
 
@@ -1034,15 +1029,6 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     removeLabel="Remove color {index + 1}"
   />
 {/snippet}
-
-{#if hasAnyAffiliateURLs}
-  <p class="mt-4 px-2 text-sm">
-    Purchases via links with a shopping cart icon <ShoppingCartIcon
-      class="relative -top-px inline size-4"
-    /> (in each color's ⋮ menu) support the developer of this web app at no extra
-    cost to you.
-  </p>
-{/if}
 
 <div class={['mt-4 flex flex-wrap items-center justify-center gap-4']}>
   {#if isProjectPlannerPage}

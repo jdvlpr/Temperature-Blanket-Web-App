@@ -130,7 +130,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {:else}
                   <ExternalLinkIcon size={16} aria-hidden="true" />
                 {/if}
-                <span>{link.label}</span>
+                {#if link.isAffiliate}
+                  <span class="flex flex-col">
+                    <span>{link.label}</span>
+                    <span class="text-surface-700-300 text-xs">
+                      Supports the developer at no extra cost
+                    </span>
+                  </span>
+                {:else}
+                  <span>{link.label}</span>
+                {/if}
                 <span class="sr-only">(opens in a new tab)</span>
               </a>
               <!-- eslint-enable svelte/no-navigation-without-resolve -->

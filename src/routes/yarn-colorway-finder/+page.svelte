@@ -74,7 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CircleQuestionMarkIcon,
     PlusIcon,
     SearchIcon,
-    ShoppingCartIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
@@ -256,9 +255,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     itemsToShow = YARN_COLORWAYS_PER_PAGE;
   });
 
-  let areAnyResultsAffiliate = $derived(
-    results.some((result) => result.affiliate_variant_href),
-  );
   let shareableURL = $derived(
     getShareableURL({
       selectedBrandId: yarnColorwayFinderState.selectedBrandId,
@@ -395,14 +391,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
             </div>
-
-            {#if areAnyResultsAffiliate}
-              <p class="mt-2 text-center text-sm">
-                Purchases via links with a shopping cart icon <ShoppingCartIcon
-                  class="relative -top-px inline size-4"
-                /> support the developer of this web app at no extra cost to you.
-              </p>
-            {/if}
 
             {#if results.length}
               <p class="my-2">

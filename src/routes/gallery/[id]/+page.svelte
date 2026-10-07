@@ -53,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GlobeIcon,
     InfoIcon,
     NotebookPenIcon,
-    ShoppingCartIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
   import {
@@ -372,11 +371,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           allGaugesAttributes.find((item) => item.id === id)
                             ?.label
                         } Yarn Palette`}
-                        {@const hasAffiliateLinks = colors
-                          ? colors?.some(
-                              (color: Color) => !!color.affiliate_variant_href,
-                            )
-                          : false}
                         <div class="flex flex-col">
                           <div class="flex flex-col">
                             <PaletteStrip
@@ -411,14 +405,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               </svg>
                             </a>
                           </div>
-                          {#if hasAffiliateLinks}
-                            <p class="mt-4 px-2 text-sm">
-                              Purchases via links with a shopping cart icon <ShoppingCartIcon
-                                class="relative -top-px inline size-4"
-                              /> (in each color's ⋮ menu) support the developer of
-                              this web app at no extra cost to you.
-                            </p>
-                          {/if}
                           <div class="mx-auto mt-4 w-fit">
                             <ViewMenu
                               bind:value={preferences.value.layout}
