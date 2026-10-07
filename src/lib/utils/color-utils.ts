@@ -1028,3 +1028,25 @@ export const getPalettesFromProjects = ({
   });
   return _palettes;
 };
+
+/** Whether two palettes hold the same yarn colors in the same order (ignoring
+ * extra fields, like the ids a sortable list adds) */
+export function sameColorList(a: Color[], b: Color[]) {
+  const fields = [
+    'hex',
+    'name',
+    'brandId',
+    'yarnId',
+    'variant_href',
+    'affiliate_variant_href',
+    'locked',
+  ] as const;
+  return (
+    a.length === b.length &&
+    a.every((color, i) =>
+      fields.every(
+        (field) => (color?.[field] ?? null) === (b[i]?.[field] ?? null),
+      ),
+    )
+  );
+}

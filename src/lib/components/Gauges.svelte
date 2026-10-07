@@ -167,9 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Gauge bind:gauge={gauges.activeGauge} inProject />
   </div>
 
-  {#key gauges.activeGauge.colors}
-    <div class="px-2">
-      <GaugeCustomizer bind:gauge={gauges.activeGauge} />
-    </div>
-  {/key}
+  <div class="px-2">
+    <GaugeCustomizer bind:gauge={gauges.activeGauge} />
+  </div>
 {/if}

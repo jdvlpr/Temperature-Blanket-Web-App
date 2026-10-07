@@ -313,20 +313,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ]}
 >
   <div class="w-full">
-    {#key gauge.colors}
-      <ColorPaletteEditable
-        bind:colors={gauge.colors}
-        schemeName={gauge.schemeId}
-        showSchemeName={false}
-        roundedBottom={false}
-        isStaticGauge={gauge.isStatic}
-        {flashIndices}
-        onhover={(index: number | null) => (highlightIndex = index)}
-        onchanged={() => {
-          updateGauge({ _colors: gauge.colors });
-        }}
-      />
-    {/key}
+    <ColorPaletteEditable
+      bind:colors={gauge.colors}
+      schemeName={gauge.schemeId}
+      showSchemeName={false}
+      roundedBottom={false}
+      isStaticGauge={gauge.isStatic}
+      {flashIndices}
+      onhover={(index: number | null) => (highlightIndex = index)}
+      onchanged={() => {
+        updateGauge({ _colors: gauge.colors });
+      }}
+    />
   </div>
 
   <div

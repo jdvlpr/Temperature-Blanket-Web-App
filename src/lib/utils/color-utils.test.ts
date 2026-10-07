@@ -18,6 +18,7 @@ import {
   sortColorsLightToDark,
   sortColorsWarmToCool,
   yarnDetailsToColors,
+  sameColorList,
 } from './color-utils';
 
 // Mocking $lib modules
@@ -475,5 +476,27 @@ describe('sortColorsWarmToCool', () => {
     const sorted = sortColorsWarmToCool({ colors });
     expect(sorted[0]).toEqual({ hex: '#0000ff', locked: true });
     expect(sorted).toHaveLength(colors.length);
+  });
+});
+
+describe('sameColorList', () => {
+  const colors = [
+    { hex: '#ff0000', name: 'Red', brandId: 'b', yarnId: 'y' },
+    { hex: '#00ff00' },
+  ];
+
+  it('ignores ids a sortable list adds', () => {
+    expect(
+      sameColorList(
+        colors,
+        colors.map((color, id) => ({ ...color, id })),
+      ),
+    ).toBe(true);
+  });
+
+  it('sees a new order, color or length', () => {
+    expect(sameColorList(colors, [...colors].reverse())).toBe(false);
+    expect(sameColorList(colors, [colors[0], { hex: '#0000ff' }])).toBe(false);
+    expect(sameColorList(colors, colors.slice(1))).toBe(false);
   });
 });

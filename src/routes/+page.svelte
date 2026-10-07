@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ProjectMenuButton from '$lib/components/buttons/ProjectMenuButton.svelte';
   import SaveButton from '$lib/components/buttons/SaveButton.svelte';
   import ProjectTitle from '$lib/components/ProjectTitle.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import {
     dialog,
@@ -336,7 +337,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[3].active === false}
         >
-          {#key project.history.length}
+          <!-- Rebuilt when a gauge is added or removed, not on every edit:
+          rebuilding the colors under a drop made iOS jump the page -->
+          {#key gauges.allCreated.map((gauge) => gauge.id).join()}
             <Gauges />
           {/key}
           {#if weather.data.length}

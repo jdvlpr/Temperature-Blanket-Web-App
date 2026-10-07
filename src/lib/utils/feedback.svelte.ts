@@ -242,6 +242,11 @@ export function feedback(event: FeedbackEvent) {
 /** Lifts a dragged item off the page with a shadow. Use as svelte-dnd-action's `transformDraggedElement` (or call from it). */
 export function liftDraggedElement(draggedEl: HTMLElement | undefined) {
   if (!draggedEl) return;
+  // svelte-dnd-action focuses the dragged copy (fixed, at the end of the
+  // page) only to keep an outline, which the shadow already stands in for.
+  // On iOS a focused copy makes the page jump: to it when focused, and again
+  // when it's dropped and removed. So it never takes focus.
+  draggedEl.focus = () => {};
   draggedEl.style.boxShadow =
     '0 12px 28px rgb(0 0 0 / 0.28), 0 2px 6px rgb(0 0 0 / 0.18)';
 }

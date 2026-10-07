@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   code, each showing what it copies. On a swatch, the trigger has no
   background: a black or white icon, whichever stands out on that color,
   tinted on hover. On the page's surface (list rows) it's a plain icon button.
+  With `onremove`, it ends with Remove, for a color in a palette.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
@@ -27,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     EllipsisVerticalIcon,
     ExternalLinkIcon,
     ShoppingCartIcon,
+    Trash2Icon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import { menuContentClass, menuItemClass } from '$lib/components/menu-styles';
@@ -41,9 +43,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorway: Color;
     /** What the trigger sits on: the colorway's swatch, or the page's surface */
     on?: 'swatch' | 'surface';
+    /** Offers Remove, e.g. "Remove color 3" */
+    onremove?: () => void;
+    removeLabel?: string;
   }
 
-  let { colorway, on = 'swatch' }: Props = $props();
+  let {
+    colorway,
+    on = 'swatch',
+    onremove,
+    removeLabel = 'Remove',
+  }: Props = $props();
 
   let link = $derived.by(() => {
     const link = colorwayLink(colorway);
@@ -73,6 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onSelect={(details) => {
     const copy = copies.find((c) => c.value === details.value);
     if (copy) copyColorwayText(copy.text);
+    else if (details.value === 'remove') onremove?.();
   }}
 >
   <Menu.Trigger
@@ -80,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? 'btn-icon hover-on-color size-7 rounded-full focus-visible:outline-2 focus-visible:outline-current'
       : 'btn-icon hover:preset-tonal-surface size-8 shrink-0'}
     style={on === 'swatch' ? `color:${iconColorOn(colorway.hex)}` : undefined}
-    aria-label="More for {colorway.name}"
+    aria-label="More for {colorway.name || colorway.hex}"
     title="More"
   >
     <EllipsisVerticalIcon size={16} aria-hidden="true" />
@@ -124,6 +135,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </Menu.Item>
         {/each}
+        {#if onremove}
+          <Menu.Separator />
+          <Menu.Item value="remove" class={menuItemClass}>
+            <Trash2Icon size={16} aria-hidden="true" />
+            <span>{removeLabel}</span>
+          </Menu.Item>
+        {/if}
       </Menu.Content>
     </Menu.Positioner>
   </Portal>

@@ -31,8 +31,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LayoutListIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
+  import type { Snippet } from 'svelte';
 
-  let { value = $bindable('grid') }: { value: PageLayout } = $props();
+  let {
+    value = $bindable('grid'),
+    children,
+  }: { value: PageLayout; children?: Snippet } = $props();
 
   const views = [
     { value: 'grid', label: 'Grid', icon: LayoutGridIcon },
@@ -70,6 +74,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           </Menu.OptionItem>
         {/each}
+        {#if children}
+          <Menu.Separator />
+          {@render children()}
+        {/if}
       </Menu.Content>
     </Menu.Positioner>
   </Portal>

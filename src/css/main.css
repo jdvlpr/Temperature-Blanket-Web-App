@@ -404,6 +404,12 @@ icon for their hover background (Skeleton's are squarer and tighter) */
   flex-shrink: 0 !important;
 }
 
+/* Corners for a button that can hold two lines of text: as round as the
+theme's, but never so round (a pill) that the corners cut into the text */
+@utility rounded-tile {
+  border-radius: min(var(--radius-base), calc(var(--radius-container) / 2));
+}
+
 /* For buttons on a color: a tint of their text's color, which is black or
 white for contrast, shows on any color where a surface tint looks muddy */
 @utility hover-on-color {

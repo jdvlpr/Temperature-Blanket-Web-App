@@ -113,9 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class=" mt-4">
               <Gauge bind:gauge={yarnPageState.gauge} />
 
-              {#key yarnPageState.gauge.colors}
-                <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
-              {/key}
+              <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
             </div>
           {/snippet}
         </Card>

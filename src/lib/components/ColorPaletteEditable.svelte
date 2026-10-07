@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '$lib/state/page-state.svelte';
   import { InteractivePopoverInstance } from '$lib/state/attachments/floating-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
-  import { getTextColor } from '$lib/utils/color-utils';
+  import { getTextColor, sameColorList } from '$lib/utils/color-utils';
   import {
     dragConsiderFeedback,
     dragFinalizeFeedback,
@@ -107,7 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     void colors;
     untrack(() => {
-      if (!isDragging.value) sortableColors = getSortableColors();
+      if (!isDragging.value && !sameColorList(colors, sortableColors))
+        sortableColors = getSortableColors();
     });
   });
 
