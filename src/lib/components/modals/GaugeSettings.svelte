@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
   import ChooseRangeDirection from '$lib/components/ChooseRangeDirection.svelte';
-  import DaysInRange from '$lib/components/DaysInRange.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
@@ -28,13 +27,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { preferences } from '$lib/storage/preferences.svelte';
   import { displayNumber } from '$lib/utils/number-utils';
   import {
+    getDaysInRange,
     getIncrement,
     getRangeExample,
     getStart,
   } from '$lib/utils/range-utils.svelte';
-  import { getTextColor } from '$lib/utils/color-utils';
+  import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { targetArrow } from '@lucide/lab';
   import {
+    ArrowRightIcon,
     CalculatorIcon,
     ChevronUpIcon,
     CogIcon,
@@ -74,11 +76,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ranges: GaugeRange[];
       rangeOptions: GaugeRangeOptions;
     }) => void;
-    index?: number | null;
-    focusOn?: 'to' | 'from' | null;
   }
 
-  let { onSave, index = null, focusOn = null }: Props = $props();
+  let { onSave }: Props = $props();
 
   let _gauge = $state(
     gauges.getSnapshot(
@@ -213,32 +213,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     if (setupContainer) scrollObserver.observe(setupContainer);
-
-    if (index !== null) {
-      setTimeout(() => {
-        // small delay to allow the modal to open
-        // then scroll to and focus on the number input
-        if (focusOn === 'to') {
-          document
-            .getElementById(`settings-range-${index}-to`)
-            ?.scrollIntoView({
-              behavior: 'smooth',
-            });
-          document
-            .getElementById(`settings-range-${index}-to`)
-            ?.getElementsByTagName('input')[0]
-            .focus();
-        } else {
-          document
-            .getElementById(`settings-range-${index}-from`)
-            ?.scrollIntoView({ behavior: 'smooth' });
-          document
-            .getElementById(`settings-range-${index}-from`)
-            ?.getElementsByTagName('input')[0]
-            .focus();
-        }
-      }, 0);
-    }
   });
 </script>
 
@@ -588,128 +562,69 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="flex w-full max-w-(--breakpoint-md) flex-col items-start justify-start max-lg:mb-10"
     >
-      <h3 class="mb-2 text-base font-bold">Edit Ranges</h3>
+      <h3 class="mb-2 text-base font-bold">Preview</h3>
+      <p class="text-surface-700-300 mb-2 text-left text-sm">
+        To change one range, save and tap it in the list of colors.
+      </p>
 
-      <div class=" rounded-container w-full">
-        <div class="rounded-container flex flex-col overflow-hidden">
-          {#if _gauge.ranges.length && _gauge.colors.length}
-            {#each _gauge.ranges as { from, to }, index}
-              {@const { hex } = _gauge.colors[index]}
-              <div
-                class="w-full items-center gap-2 p-2 max-xl:flex max-xl:flex-col max-xl:justify-center xl:grid xl:grid-cols-12"
-                style="background:{hex};color:{getTextColor(hex ?? '#ffffff')}"
+      <!-- Laid out like the list of colors, without the controls -->
+      {#if _gauge.ranges.length && _gauge.colors.length}
+        <ol
+          class="rounded-container border-surface-200-800 bg-surface-50-950 flex w-full flex-col border"
+        >
+          {#each _gauge.ranges as range, index (index)}
+            {@const color = _gauge.colors[index]}
+            <li
+              class="border-surface-200-800 flex flex-wrap items-center gap-x-3 gap-y-1 border-b p-2 text-left last:border-b-0"
+            >
+              <span
+                class="rounded-base grid size-10 shrink-0 place-items-center text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+                style="background:{color?.hex};color:{iconColorOn(
+                  color?.hex ?? '#fff',
+                )}"><span class="sr-only">Color</span> {index + 1}</span
               >
-                <p class="col-span-1 text-xs">
-                  {index + 1}
-                </p>
-
-                <div
-                  class="col-span-4 col-start-2 flex min-w-[220px] flex-wrap items-start gap-2 max-xl:justify-center xl:justify-start"
+              <span class="min-w-[8rem] flex-1 truncate text-sm font-semibold"
+                >{color?.name || color?.hex}</span
+              >
+              <span class="flex items-center gap-1 text-sm tabular-nums">
+                <span class="w-[5ch] text-right">{range.from}</span><span
+                  class="text-xs opacity-70">{unitLabel}</span
                 >
-                  <label
-                    class="label flex w-fit flex-col items-start justify-start"
-                    id="settings-range-{index}-from"
-                  >
-                    <div class="flex flex-col">
-                      <p class="text-xs">From ({unitLabel})</p>
-                      <p class="-mt-1 text-xs opacity-50">
-                        {_gauge.rangeOptions.includeFromValue
-                          ? 'Including'
-                          : 'Excluding'}
-                      </p>
-                    </div>
-                    <input
-                      type="number"
-                      class="input max-w-[100px] text-lg"
-                      value={from}
-                      onchange={(e) => {
-                        const value = +(e.target as HTMLInputElement).value;
-                        _gauge.rangeOptions.isCustomRanges = true;
-
-                        _gauge.ranges[index].from = value;
-                        if (_gauge.rangeOptions.linked) {
-                          if (index !== 0) _gauge.ranges[index - 1].to = value;
-                        }
-                        incrementMode = null;
-                      }}
-                      onkeyup={(e) => {
-                        const value = +(e.target as HTMLInputElement).value;
-                        _gauge.rangeOptions.isCustomRanges = true;
-
-                        _gauge.ranges[index].from = value;
-                        if (_gauge.rangeOptions.linked) {
-                          if (index !== 0) _gauge.ranges[index - 1].to = value;
-                        }
-                        incrementMode = null;
-                        // _ranges = customRanges;
-                      }}
-                    />
-                  </label>
-                  <label
-                    class="label flex w-fit flex-col items-start justify-start"
-                    id="settings-range-{index}-to"
-                  >
-                    <div class="flex flex-col">
-                      <p class="text-xs">To ({unitLabel})</p>
-                      <p class="-mt-1 text-xs opacity-50">
-                        {_gauge.rangeOptions?.includeToValue
-                          ? 'Including'
-                          : 'Excluding'}
-                      </p>
-                    </div>
-                    <input
-                      type="number"
-                      class="input max-w-[100px] text-lg"
-                      value={to}
-                      onchange={(e) => {
-                        const value = +(e.target as HTMLInputElement).value;
-
-                        _gauge.rangeOptions.isCustomRanges = true;
-
-                        _gauge.ranges[index].to = value;
-                        if (
-                          _gauge.rangeOptions.linked &&
-                          index !== _gauge.ranges.length - 1
-                        ) {
-                          _gauge.ranges[index + 1].from = value;
-                        }
-
-                        incrementMode = null;
-                      }}
-                      onkeyup={(e) => {
-                        const value = +(e.target as HTMLInputElement).value;
-
-                        _gauge.rangeOptions.isCustomRanges = true;
-
-                        _gauge.ranges[index].to = value;
-                        if (
-                          _gauge.rangeOptions.linked &&
-                          index !== _gauge.ranges.length - 1
-                        ) {
-                          _gauge.ranges[index + 1].from = value;
-                        }
-
-                        incrementMode = null;
-                      }}
-                    />
-                  </label>
-                </div>
-
-                <div
-                  class="col-span-7 col-start-6 flex flex-wrap justify-center gap-2"
+                <ArrowRightIcon
+                  size={14}
+                  class="shrink-0 opacity-60"
+                  aria-hidden="true"
+                />
+                <span class="sr-only">to</span>
+                <span class="w-[8ch] whitespace-nowrap"
+                  >{range.to}<span class="text-xs opacity-70">{unitLabel}</span
+                  ></span
                 >
-                  <DaysInRange
-                    range={_gauge.ranges[index]}
-                    rangeOptions={_gauge.rangeOptions}
-                    targets={_gauge.targets}
-                    gaugeUnitType={_gauge.unit.type}
-                  />
-                </div>
-              </div>
-            {/each}
-          {/if}
-        </div>
-      </div>
+              </span>
+              <span class="flex gap-3 text-xs tabular-nums">
+                {#each _gauge.targets as target (target.id)}
+                  {@const count = getDaysInRange({
+                    id: target.id,
+                    range,
+                    direction: _gauge.rangeOptions.direction,
+                    includeFromValue: _gauge.rangeOptions.includeFromValue,
+                    includeToValue: _gauge.rangeOptions.includeToValue,
+                    gaugeUnitType: _gauge.unit.type,
+                  }).length}
+                  <span class="whitespace-nowrap" class:opacity-50={!count}>
+                    <span class="text-surface-700-300"
+                      >{target.icon} {target.gaugeLabel}</span
+                    >
+                    <span class="font-semibold"
+                      >{count} {pluralize(weather.grouping, count)}</span
+                    >
+                  </span>
+                {/each}
+              </span>
+            </li>
+          {/each}
+        </ol>
+      {/if}
     </div>
   </div>
 </div>

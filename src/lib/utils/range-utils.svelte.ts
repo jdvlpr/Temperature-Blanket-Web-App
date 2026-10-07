@@ -319,3 +319,37 @@ export const getRangeExample = ({
     return '<span class="">From</span> <span class="">&#60; Range &#60;</span> <span class="">To</span>';
   }
 };
+
+/**
+ * Sets one range's From or To. With linked ranges, the neighbor that shares
+ * that edge moves too: the previous range's To, or the next range's From.
+ * Callers should then mark the ranges custom, so they aren.t regenerated.
+ *
+ * @returns new ranges, and the index of the neighbor that moved, if any
+ */
+export const setRangeValue = ({
+  ranges,
+  rangeOptions,
+  index,
+  edge,
+  value,
+}: {
+  ranges: GaugeRange[];
+  rangeOptions: Pick<GaugeRangeOptions, 'linked'>;
+  index: number;
+  edge: 'from' | 'to';
+  value: number;
+}): { ranges: GaugeRange[]; neighbor: number | null } => {
+  const next = ranges.map((range) => ({ ...range }));
+  next[index][edge] = value;
+  let neighbor: number | null = null;
+  if (rangeOptions.linked) {
+    const n = edge === 'from' ? index - 1 : index + 1;
+    if (n >= 0 && n < next.length) {
+      const other = edge === 'from' ? 'to' : 'from';
+      if (next[n][other] !== value) neighbor = n;
+      next[n][other] = value;
+    }
+  }
+  return { ranges: next, neighbor };
+};

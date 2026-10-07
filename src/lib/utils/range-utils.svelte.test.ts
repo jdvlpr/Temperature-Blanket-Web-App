@@ -15,7 +15,10 @@
 
 import type { WeatherDay } from '$lib/types/weather-types';
 import { describe, expect, it } from 'vitest';
-import { getEvenlyDistributedRangeValuesWithEqualDayCount } from './range-utils.svelte';
+import {
+  getEvenlyDistributedRangeValuesWithEqualDayCount,
+  setRangeValue,
+} from './range-utils.svelte';
 
 function day(tmin: number, tmax: number): WeatherDay {
   const pair = (n: number) => ({ metric: n, imperial: n });
@@ -101,5 +104,85 @@ describe('getEvenlyDistributedRangeValuesWithEqualDayCount', () => {
     });
 
     expect(ranges).toHaveLength(8);
+  });
+});
+
+describe('setRangeValue', () => {
+  const ranges = [
+    { from: 0, to: 10 },
+    { from: 10, to: 20 },
+    { from: 20, to: 30 },
+  ];
+
+  it('moves the previous range when a linked From changes', () => {
+    const result = setRangeValue({
+      ranges,
+      rangeOptions: { linked: true },
+      index: 1,
+      edge: 'from',
+      value: 12,
+    });
+    expect(result.ranges).toEqual([
+      { from: 0, to: 12 },
+      { from: 12, to: 20 },
+      { from: 20, to: 30 },
+    ]);
+    expect(result.neighbor).toBe(0);
+  });
+
+  it('moves the next range when a linked To changes', () => {
+    const result = setRangeValue({
+      ranges,
+      rangeOptions: { linked: true },
+      index: 1,
+      edge: 'to',
+      value: 18,
+    });
+    expect(result.ranges[2]).toEqual({ from: 18, to: 30 });
+    expect(result.neighbor).toBe(2);
+  });
+
+  it('has no neighbor at the ends', () => {
+    expect(
+      setRangeValue({
+        ranges,
+        rangeOptions: { linked: true },
+        index: 0,
+        edge: 'from',
+        value: -5,
+      }).neighbor,
+    ).toBeNull();
+    expect(
+      setRangeValue({
+        ranges,
+        rangeOptions: { linked: true },
+        index: 2,
+        edge: 'to',
+        value: 35,
+      }).neighbor,
+    ).toBeNull();
+  });
+
+  it('leaves the neighbors alone when unlinked', () => {
+    const result = setRangeValue({
+      ranges,
+      rangeOptions: { linked: false },
+      index: 1,
+      edge: 'from',
+      value: 12,
+    });
+    expect(result.ranges[0]).toEqual({ from: 0, to: 10 });
+    expect(result.neighbor).toBeNull();
+  });
+
+  it("doesn't change the ranges it was given", () => {
+    setRangeValue({
+      ranges,
+      rangeOptions: { linked: true },
+      index: 1,
+      edge: 'from',
+      value: 12,
+    });
+    expect(ranges[1]).toEqual({ from: 10, to: 20 });
   });
 });

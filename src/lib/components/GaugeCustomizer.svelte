@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
   import { menuItemClass } from '$lib/components/menu-styles';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
   import ColorwayMoreMenu from '$lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
@@ -27,11 +26,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gauges, showDaysInRange } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import type { GaugeRange, GaugeRangeOptions } from '$lib/types/gauge-types';
+  import type { GaugeRange } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
   import {
     getDaysInRange,
     getDaysPercent,
+    setRangeValue,
   } from '$lib/utils/range-utils.svelte';
   import { sameColorList } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
@@ -42,6 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     markDragged,
     motionDuration,
     Pop,
+    showHistoryChange,
   } from '$lib/utils/feedback.svelte';
   import {
     ArrowRightIcon,
@@ -49,6 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GripVerticalIcon,
     SearchIcon,
     ShoppingCartIcon,
+    XIcon,
   } from '@lucide/svelte';
   import { Menu } from '@skeletonlabs/skeleton-svelte';
   import {
@@ -57,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SOURCES,
     TRIGGERS,
   } from 'svelte-dnd-action';
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { flip } from 'svelte/animate';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
 
@@ -123,11 +125,100 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showRanges && showDaysInRange.value && !!weather.data?.length,
   );
 
+  // A range being edited in place: its From and To as typed (null while
+  // empty). Nothing is saved until Enter or leaving it, so one edit is one
+  // undo step; until then, the numbers and days follow the draft.
+  let editing: {
+    index: number;
+    edge: 'from' | 'to';
+    from: number | null;
+    to: number | null;
+  } | null = $state(null);
+
+  // The ranges with the draft applied, and which neighbors it moved
+  let draft = $derived.by(() => {
+    let ranges: GaugeRange[] = gauge.ranges ?? [];
+    const moved: number[] = [];
+    if (!editing || isCategory) return { ranges, moved };
+    const original = ranges[editing.index];
+    for (const edge of ['from', 'to'] as const) {
+      const value = editing[edge];
+      if (value === null || !Number.isFinite(value)) continue;
+      if (value === original?.[edge]) continue;
+      const result = setRangeValue({
+        ranges,
+        rangeOptions: { linked: !!gauge.rangeOptions?.linked },
+        index: editing.index,
+        edge,
+        value,
+      });
+      ranges = result.ranges;
+      if (result.neighbor !== null) moved.push(result.neighbor);
+    }
+    return { ranges, moved };
+  });
+
+  // Says what else an edit moved, for screen readers
+  let announcement = $state('');
+
+  function editRange(index: number, edge: 'from' | 'to') {
+    const r = gauge.ranges?.[index];
+    if (!r) return;
+    editing = { index, edge, from: r.from, to: r.to };
+  }
+
+  function saveRange({ refocus }: { refocus: boolean }) {
+    if (!editing) return;
+    const { index } = editing;
+    const { ranges, moved } = draft;
+    const changed = ranges !== gauge.ranges;
+    editing = null;
+    if (changed) {
+      gauge.ranges = ranges;
+      // Set by hand, so they're kept when colors are added or removed
+      gauge.rangeOptions = {
+        ...$state.snapshot(gauge.rangeOptions),
+        isCustomRanges: true,
+      };
+      if (moved.length)
+        showHistoryChange({
+          gaugeId: gauge.id,
+          indices: moved,
+          preview: false,
+        });
+      announcement = moved
+        .map((n) =>
+          n < index
+            ? `Color ${n + 1} now ends at ${ranges[n].to} ${unitLabel}`
+            : `Color ${n + 1} now starts at ${ranges[n].from} ${unitLabel}`,
+        )
+        .join('. ');
+    }
+    if (refocus) focusRange(index);
+  }
+
+  function cancelRange() {
+    if (!editing) return;
+    const { index } = editing;
+    editing = null;
+    focusRange(index);
+  }
+
+  function focusRange(index: number) {
+    tick().then(() =>
+      listElement
+        ?.querySelector<HTMLElement>(
+          `[data-color-id="${sortableColors[index]?.id}"] .range-button`,
+        )
+        ?.focus(),
+    );
+  }
+
   // Each color's days in its range, one list per target (e.g. high, average, low)
   let days = $derived.by(() => {
     if (!showDays) return [];
     return gauge.colors.map((_: Color, index: number) => {
-      const range = gauge.ranges?.[index];
+      const range = draft.ranges[index];
       return gauge.targets.map(
         (target: { id: Parameters<typeof getDaysInRange>[0]['id'] }) =>
           range
@@ -145,27 +236,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let periods = $derived(pluralize(weather.grouping, 2));
-
-  function openRanges(index: number, focusOn: 'from' | 'to') {
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: GaugeSettings,
-        props: {
-          index,
-          focusOn,
-          onSave: (e: {
-            ranges: GaugeRange[];
-            rangeOptions: GaugeRangeOptions;
-          }) => {
-            gauge.ranges = e.ranges;
-            gauge.rangeOptions = e.rangeOptions;
-          },
-        },
-      },
-      options: { size: 'large', title: 'Configure Ranges' },
-    });
-  }
 
   function openChangeColor(index: number, color: Color) {
     dialog.trigger({
@@ -360,22 +430,114 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 {#snippet range(index: number, column: boolean)}
-  {@const r = gauge.ranges?.[index]}
+  {@const r = isCategory ? gauge.ranges?.[index] : draft.ranges[index]}
   {#if r}
     {#if isCategory}
       <span class="truncate px-2 text-sm">{r.label}</span>
+    {:else if editing?.index === index}
+      {@const label = (edge: string) =>
+        `Color ${index + 1} ${edge}${unitLabel ? `, ${unitLabel}` : ''}`}
+      <!-- Saved with ✓ or Enter, or on leaving it; ✕ or Escape puts it back.
+      In a narrow card, To goes under From. -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="flex flex-wrap items-center gap-1 px-1 @max-[13rem]:flex-col @max-[13rem]:items-start"
+        onfocusout={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+            saveRange({ refocus: false });
+        }}
+        onkeydown={(e) => {
+          // From the numbers; on the buttons, Enter presses them
+          if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+            e.preventDefault();
+            saveRange({ refocus: true });
+          } else if (e.key === 'Escape') {
+            // Only the edit, not a dialog around it
+            e.preventDefault();
+            e.stopPropagation();
+            cancelRange();
+          }
+        }}
+      >
+        <!-- type="number" keeps the minus key on phones; 16px text keeps iOS from zooming in -->
+        <input
+          type="number"
+          step="any"
+          class="input h-9 w-20 px-2 text-base tabular-nums"
+          aria-label={label('from')}
+          bind:value={editing.from}
+          {@attach (el) => {
+            // Once, when it opens, not on every keystroke
+            if (untrack(() => editing?.edge) === 'from') {
+              el.focus();
+              el.select();
+            }
+          }}
+        />
+        <ArrowRightIcon
+          size={14}
+          class="shrink-0 opacity-60 @max-[13rem]:mx-8 @max-[13rem]:rotate-90"
+          aria-hidden="true"
+        />
+        <span class="flex items-center gap-1">
+          <input
+            type="number"
+            step="any"
+            class="input h-9 w-20 px-2 text-base tabular-nums"
+            aria-label={label('to')}
+            bind:value={editing.to}
+            {@attach (el) => {
+              // Once, when it opens, not on every keystroke
+              if (untrack(() => editing?.edge) === 'to') {
+                el.focus();
+                el.select();
+              }
+            }}
+          />
+          {@render unit()}
+        </span>
+        <!-- Pressing them mustn't take the focus first: on iOS that would
+        leave the numbers, which saves before Cancel is tapped -->
+        <span class="flex items-center">
+          <button
+            type="button"
+            class="btn-icon hover:preset-tonal-surface"
+            title="Save Range"
+            aria-label="Save range for color {index + 1}"
+            onpointerdown={(e) => e.preventDefault()}
+            onclick={() => saveRange({ refocus: true })}
+          >
+            <CheckIcon aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            class="btn-icon hover:preset-tonal-surface"
+            title="Cancel"
+            aria-label="Cancel editing range for color {index + 1}"
+            onpointerdown={(e) => e.preventDefault()}
+            onclick={cancelRange}
+          >
+            <XIcon aria-hidden="true" />
+          </button>
+        </span>
+      </div>
     {:else}
       <button
         type="button"
-        class="btn rounded-tile hover:preset-tonal-surface h-9 gap-1 px-2 tabular-nums"
-        title="Adjust Range"
+        class="range-button btn rounded-tile hover:preset-tonal-surface h-9 gap-1 px-2 tabular-nums"
+        class:history-flash={historyChange.gaugeId === gauge.id &&
+          historyChange.indices.includes(index)}
+        title="Edit Range"
         aria-label="Range for color {index +
-          1}: from {r.from} to {r.to} {unitLabel}"
-        onclick={(e) =>
-          openRanges(
+          1}: from {r.from} to {r.to} {unitLabel}. Edit"
+        onclick={(e) => {
+          // Saves one being edited first
+          saveRange({ refocus: false });
+          editRange(
             index,
             (e.target as Element).closest('[data-to]') ? 'to' : 'from',
-          )}
+          );
+        }}
       >
         <span class="whitespace-nowrap"
           ><span class={['inline-block', column && 'w-[5ch] text-right']}
@@ -490,14 +652,19 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 </div>
 
 {#if showRanges && !isCategory && gauge.rangeOptions}
+  <!-- Says when hand-set numbers have replaced Automatic or Manual ones -->
   <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
-    Ranges: From is {gauge.rangeOptions.includeFromValue
+    {gauge.rangeOptions.isCustomRanges ? 'Custom ranges' : 'Ranges'}: From is {gauge
+      .rangeOptions.includeFromValue
       ? 'included'
       : 'excluded'}, To is {gauge.rangeOptions.includeToValue
       ? 'included'
-      : 'excluded'}.{showDays ? ` Tap a count to see those ${periods}.` : ''}
+      : 'excluded'}. Tap a range to change it{gauge.rangeOptions.linked
+      ? '; the next or previous one follows'
+      : ''}.{showDays ? ` Tap a count to see those ${periods}.` : ''}
   </p>
 {/if}
+<p class="sr-only" aria-live="polite">{announcement}</p>
 
 <div
   class="mt-3 mb-2 lg:mb-4 {preferences.value.layout === 'grid'
