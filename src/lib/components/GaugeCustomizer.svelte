@@ -177,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function saveRange({ refocus }: { refocus: boolean }) {
     if (!editing) return;
-    const { index } = editing;
+    const { index, edge } = editing;
     const { ranges, moved } = draft;
     const changed = ranges !== gauge.ranges;
     editing = null;
@@ -202,21 +202,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         )
         .join('. ');
     }
-    if (refocus) focusRange(index);
+    if (refocus) focusRange(index, edge);
   }
 
   function cancelRange() {
     if (!editing) return;
-    const { index } = editing;
+    const { index, edge } = editing;
     editing = null;
-    focusRange(index);
+    focusRange(index, edge);
   }
 
-  function focusRange(index: number) {
+  function focusRange(index: number, edge: 'from' | 'to') {
     tick().then(() =>
       listElement
         ?.querySelector<HTMLElement>(
-          `[data-color-id="${sortableColors[index]?.id}"] .range-button`,
+          `[data-color-id="${sortableColors[index]?.id}"] .range-${edge}`,
         )
         ?.focus(),
     );
@@ -244,6 +244,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let periods = $derived(pluralize(weather.grouping, 2));
+
+  // The gauge's range options aren't reactive state, but they only change
+  // along with its ranges (a save here, Configure Ranges, undo), so they're
+  // read again whenever the ranges change
+  let rules = $derived.by(() => {
+    void gauge.ranges;
+    const options = gauge.rangeOptions;
+    return options ? { ...options } : null;
+  });
+
+  // In the list, every row's From and To are as wide as the widest of them,
+  // so the ranges line up and their buttons are no wider than the numbers.
+  // Digits are about 1ch each (tabular), and the small unit's letters less.
+  let rangeChars = $derived.by(() => {
+    if (isCategory) return { from: 0, to: 0 };
+    const widest = (edge: 'from' | 'to') =>
+      Math.max(0, ...draft.ranges.map((r) => String(r[edge]).length));
+    return {
+      from: widest('from') + unitLabel.length,
+      to: widest('to') + unitLabel.length,
+    };
+  });
 
   function openChangeColor(index: number, color: Color) {
     dialog.trigger({
@@ -437,6 +459,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if unitLabel}<span class="text-xs opacity-70">{unitLabel}</span>{/if}
 {/snippet}
 
+{#snippet rangeValue(
+  index: number,
+  r: GaugeRange,
+  edge: 'from' | 'to',
+  column: boolean,
+)}
+  <span
+    class="flex {edge === 'from' ? 'justify-end' : ''}"
+    style:width={column ? `calc(${rangeChars[edge]}ch + 1rem)` : undefined}
+  >
+    <button
+      type="button"
+      class="range-{edge} btn rounded-tile hover:preset-tonal-surface h-9 min-w-9 gap-0 px-2 whitespace-nowrap tabular-nums {unsaved.includes(
+        index,
+      )
+        ? 'text-primary-700-300'
+        : ''}"
+      title="Edit {edge === 'from' ? 'From' : 'To'}"
+      aria-label="Color {index + 1} {edge} {r[
+        edge
+      ]} {unitLabel}{unsaved.includes(index) ? ', not saved' : ''}. Edit"
+      onclick={() => {
+        // Saves one being edited first
+        saveRange({ refocus: false });
+        editRange(index, edge);
+      }}
+    >
+      {r[edge]}{@render unit()}
+    </button>
+  </span>
+{/snippet}
+
 {#snippet range(index: number, column: boolean)}
   {@const r = isCategory ? gauge.ranges?.[index] : draft.ranges[index]}
   {#if r}
@@ -541,45 +595,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
       </div>
     {:else}
-      <button
-        type="button"
-        class="range-button btn rounded-tile hover:preset-tonal-surface h-9 gap-1 px-2 tabular-nums {unsaved.includes(
-          index,
-        )
-          ? 'text-primary-700-300'
-          : ''}"
+      <!-- From and To are each a button, just around the number. In the
+      list, each sits in a slot as wide as the widest, so they line up. -->
+      <span
+        class="flex items-center gap-0.5 rounded-[inherit]"
         class:history-flash={historyChange.gaugeId === gauge.id &&
           historyChange.indices.includes(index)}
-        title="Edit Range"
-        aria-label="Range for color {index +
-          1}: from {r.from} to {r.to} {unitLabel}{unsaved.includes(index)
-          ? ', not saved'
-          : ''}. Edit"
-        onclick={(e) => {
-          // Saves one being edited first
-          saveRange({ refocus: false });
-          editRange(
-            index,
-            (e.target as Element).closest('[data-to]') ? 'to' : 'from',
-          );
-        }}
       >
-        <span class="whitespace-nowrap"
-          ><span class={['inline-block', column && 'w-[5ch] text-right']}
-            >{r.from}</span
-          >{@render unit()}</span
-        >
+        {@render rangeValue(index, r, 'from', column)}
         <ArrowRightIcon
           size={14}
           class="shrink-0 opacity-60"
           aria-hidden="true"
         />
-        <!-- Wide enough for a number and a unit, e.g. "105min", so every row's is the same width -->
-        <span
-          class={['text-left whitespace-nowrap', column && 'w-[8ch]']}
-          data-to>{r.to}{@render unit()}</span
-        >
-      </button>
+        {@render rangeValue(index, r, 'to', column)}
+      </span>
     {/if}
   {/if}
 {/snippet}
@@ -595,7 +625,8 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       type="button"
       class="rounded-tile hover:preset-tonal-surface flex flex-col px-1.5 py-1 text-left tabular-nums disabled:opacity-50 {fill
         ? 'min-w-0 @max-[15rem]:flex-row @max-[15rem]:items-baseline @max-[15rem]:gap-2'
-        : ''}"
+        : // Room for the longest count, e.g. "365 days", so a short one doesn't shift the range beside it
+          'min-w-[calc(8ch+0.75rem)]'}"
       disabled={!list.length}
       title="{target.gaugeLabel}: {count}, {percent}"
       aria-label="{target.gaugeLabel}: {count}, {percent}{unsaved.includes(
@@ -684,15 +715,13 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   {/if}
 </div>
 
-{#if showRanges && !isCategory && gauge.rangeOptions}
+{#if showRanges && !isCategory && rules}
   <!-- Says when hand-set numbers have replaced Automatic or Manual ones -->
   <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
-    {gauge.rangeOptions.isCustomRanges ? 'Custom ranges' : 'Ranges'}: From is {gauge
-      .rangeOptions.includeFromValue
+    {rules.isCustomRanges ? 'Custom ranges' : 'Ranges'}: From is {rules.includeFromValue
       ? 'included'
-      : 'excluded'}, To is {gauge.rangeOptions.includeToValue
-      ? 'included'
-      : 'excluded'}. Tap a range to change it{gauge.rangeOptions.linked
+      : 'excluded'}, To is {rules.includeToValue ? 'included' : 'excluded'}. Tap
+    a range to change it{rules.linked
       ? '; the next or previous one follows'
       : ''}.{showDays ? ` Tap a count to see those ${periods}.` : ''}
   </p>
