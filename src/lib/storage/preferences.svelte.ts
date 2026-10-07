@@ -36,7 +36,8 @@ type LocalStatePreferencesType = {
   };
   units: Unit | null;
   /** The palette image export's last settings; missing until first changed */
-  paletteImage?: PaletteImageSettings;
+  /** The export's last choices; its layout always starts as the View menu's */
+  paletteImage?: Omit<PaletteImageSettings, 'layout'>;
   /** Motion settings; missing until first changed */
   effects?: EffectsPreferences;
   /** The yarn chosen first where none is, as `{brandId}-{yarnId}`; missing or `''` for none */

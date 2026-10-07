@@ -40,14 +40,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
   import type { Color } from '$lib/types/yarn-types';
   import {
-    Columns3Icon,
     DownloadIcon,
     LayoutGridIcon,
+    LayoutListIcon,
     LoaderCircleIcon,
     MoonIcon,
     RectangleHorizontalIcon,
     RectangleVerticalIcon,
-    Rows3Icon,
     ShareIcon,
     SquareIcon,
     SunIcon,
@@ -95,6 +94,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ...DEFAULT_PALETTE_IMAGE_SETTINGS,
     fill: fillWithColor.on,
     ...saved,
+    // As the View menu is, each time
+    layout: preferences.value.layout,
     labels: { ...DEFAULT_PALETTE_IMAGE_SETTINGS.labels, ...saved?.labels },
   });
 
@@ -103,29 +104,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!hasYarn && !hasNames && !hasRanges) settings.labels.hex = true;
   });
 
-  /** Remember a choice for next time */
+  /** Remember a choice for next time (but not the layout: it follows the View menu) */
   function remember() {
-    preferences.value.paletteImage = $state.snapshot(settings);
+    const { layout: _layout, ...rest } = $state.snapshot(settings);
+    preferences.value.paletteImage = rest;
   }
 
   let title = $state('');
 
   const LAYOUTS = [
     {
-      value: 'rows',
-      label: 'Rows',
+      value: 'list',
+      label: 'List',
       details: 'A band for each color',
-      icon: Rows3Icon,
+      icon: LayoutListIcon,
     },
     {
-      value: 'stripes',
-      label: 'Stripes',
-      details: 'Side by side',
-      icon: Columns3Icon,
-    },
-    {
-      value: 'swatches',
-      label: 'Swatches',
+      value: 'grid',
+      label: 'Grid',
       details: 'A grid of tiles',
       icon: LayoutGridIcon,
     },
@@ -169,6 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       hasNames && { key: 'colorway', label: 'Colorway Names' },
       hasYarn && { key: 'yarn', label: 'Brand and Yarn' },
       { key: 'hex', label: 'HTML Color Codes' },
+      { key: 'number', label: 'Color Numbers' },
     ].filter(Boolean) as { key: keyof PaletteImageLabels; label: string }[],
   );
 
@@ -412,20 +409,11 @@ choice's icon beside it, and what it's for below -->
             onchange={remember}
           />
         {/each}
-        <!-- A stripe is the color itself, so it can't be unfilled -->
         <ToggleSwitch
           bare
           label="Fill with Color"
-          checked={settings.fill || settings.layout === 'stripes'}
-          disabled={settings.layout === 'stripes'}
-          details={settings.layout === 'stripes'
-            ? 'Stripes are always filled'
-            : ''}
-          detailsTextSize="text-xs"
-          onchange={(e) => {
-            settings.fill = (e.target as HTMLInputElement).checked;
-            remember();
-          }}
+          bind:checked={settings.fill}
+          onchange={remember}
         />
         <ToggleSwitch
           bare

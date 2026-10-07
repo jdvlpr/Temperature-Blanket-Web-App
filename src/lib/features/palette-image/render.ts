@@ -291,15 +291,14 @@ function drawLines({
 
 /** The labels' preferred size, from the size of a color */
 function getPrimarySize(cell: Rect, layout: PaletteImageSettings['layout']) {
-  if (layout === 'rows') return Math.min(40, cell.height * 0.3);
-  if (layout === 'swatches')
-    return Math.min(34, Math.min(cell.width, cell.height) * 0.13);
-  return Math.min(34, cell.width * 0.28);
+  if (layout === 'list') return Math.min(40, cell.height * 0.3);
+  return Math.min(34, Math.min(cell.width, cell.height) * 0.13);
 }
 
 function drawCell({
   ctx,
   cell,
+  index,
   color,
   range,
   settings,
@@ -308,6 +307,8 @@ function drawCell({
 }: {
   ctx: CanvasRenderingContext2D;
   cell: Rect;
+  /** Its place in the palette, from 0 */
+  index: number;
   color: PaletteImageColor;
   range?: PaletteImageRange;
   settings: PaletteImageSettings;
@@ -321,7 +322,7 @@ function drawCell({
       { text: getTextColor(color.hex), muted: getTextColor(color.hex) }
     : { text: theme.title, muted: theme.muted };
   // A row shows its range at the end, as the list does; the rest, first
-  const rangeAtEnd = layout === 'rows' && labels.range && !!range;
+  const rangeAtEnd = layout === 'list' && labels.range && !!range;
   const lines = getLines({
     ctx,
     color,
@@ -331,10 +332,11 @@ function drawCell({
     filled,
   });
 
-  // The box for the text: all of the cell on a color, or what's left by the swatch
+  // The box for the text: all of the cell on a color, or what's left by the
+  // swatch, which an unfilled color has, and a number goes on
   let box: Rect;
-  if (filled) {
-    if (layout === 'rows') {
+  if (filled && !labels.number) {
+    if (layout === 'list') {
       const insetX = 28;
       const insetY = Math.max(6, cell.height * 0.12);
       box = {
@@ -354,17 +356,43 @@ function drawCell({
     }
   } else {
     const { cx, cy, r, text } = getSwatchPlacement(cell, layout);
-    ctx.fillStyle = color.hex;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-    // A ring just inside, so a color as light as the card still shows
-    ctx.strokeStyle = theme.line;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r - 1, 0, Math.PI * 2);
-    ctx.stroke();
-    const insetY = layout === 'rows' ? Math.max(6, cell.height * 0.12) : 0;
+    if (!filled) {
+      ctx.fillStyle = color.hex;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      // A ring just inside, so a color as light as the card still shows
+      ctx.strokeStyle = theme.line;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r - 1, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    if (labels.number) {
+      // On the color, so black or white as the color needs; filled, there's
+      // no circle, just the number
+      const text1 = `${index + 1}`;
+      const size = fitFontSize({
+        text: text1,
+        preferred: r * 0.95,
+        maxWidth: r * 1.5,
+        measure: measurer(ctx, 600),
+      });
+      ctx.font = font(600, size);
+      ctx.fillStyle = getTextColor(color.hex);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      const glyphs = ctx.measureText(text1);
+      ctx.fillText(
+        text1,
+        cx,
+        cy +
+          (glyphs.actualBoundingBoxAscent - glyphs.actualBoundingBoxDescent) /
+            2,
+      );
+      ctx.textAlign = 'left';
+    }
+    const insetY = layout === 'list' ? Math.max(6, cell.height * 0.12) : 0;
     box = {
       x: text.x,
       y: text.y + insetY,
@@ -395,33 +423,13 @@ function drawCell({
     box = { ...box, width: Math.max(box.width - width - 24, 0) };
   }
 
-  if (layout === 'stripes') {
-    // Stripes read from the bottom up, along the stripe
-    const along = 28;
-    const across = Math.max(4, cell.width * 0.12);
-    ctx.save();
-    ctx.translate(cell.x + across, cell.y + cell.height - along);
-    ctx.rotate(-Math.PI / 2);
-    drawLines({
-      ctx,
-      lines,
-      x: 0,
-      y: 0,
-      width: cell.height - along * 2,
-      height: cell.width - across * 2,
-      align: 'center',
-      colors,
-    });
-    ctx.restore();
-  } else {
-    drawLines({
-      ctx,
-      lines,
-      ...box,
-      align: layout === 'rows' ? 'center' : 'end',
-      colors,
-    });
-  }
+  drawLines({
+    ctx,
+    lines,
+    ...box,
+    align: layout === 'list' ? 'center' : 'end',
+    colors,
+  });
 }
 
 export function renderPaletteImage({
@@ -449,8 +457,7 @@ export function renderPaletteImage({
     hasTitle: !!heading,
   });
   const theme = THEMES[settings.background];
-  // A stripe is the color itself, so it's always filled
-  const filled = settings.fill || settings.layout === 'stripes';
+  const filled = settings.fill;
 
   canvas.width = geometry.width;
   canvas.height = Math.round(geometry.height);
@@ -486,6 +493,7 @@ export function renderPaletteImage({
     drawCell({
       ctx,
       cell,
+      index: i,
       color,
       range: ranges?.[i],
       settings,

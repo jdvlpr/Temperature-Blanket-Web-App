@@ -195,16 +195,15 @@ Settings and user preferences are stored in the browser's Local Storage.
 | `textScale`    | Typographic scale ratio         | `'normal'`  | `'small'`, `'normal'`, `'large'`                                             |
 | `headingStyle` | Heading font-variation-settings | `'classic'` | `'classic'`, `'playful'`, `'refined'`                                        |
 
-**`preferences.paletteImage` fields** (the palette image export's last settings; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
+**`preferences.paletteImage` fields** (the palette image export's last settings, except its layout, which starts as the View menu's each time; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
 
-| Field        | Description                                                          | Default                                                   | Options                                          |
-| ------------ | -------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------ |
-| `layout`     | How the colors are arranged                                          | `'rows'`                                                  | `'rows'`, `'stripes'`, `'swatches'`              |
-| `shape`      | The image's size                                                     | `'fit'`                                                   | `'fit'`, `'square'`, `'portrait'`, `'landscape'` |
-| `background` | Background color                                                     | `'light'`                                                 | `'light'`, `'dark'`                              |
-| `fill`       | Colors fill their cell (stripes always do); off shows a round swatch | the View › Fill with color setting when first opened      | `true`, `false`                                  |
-| `gaps`       | Space between colors                                                 | `false`                                                   | `true`, `false`                                  |
-| `labels`     | What's written on each color                                         | `{ yarn: true, colorway: true, hex: false, range: true }` | booleans                                         |
+| Field        | Description                                      | Default                                                                  | Options                                          |
+| ------------ | ------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------ |
+| `shape`      | The image's size                                 | `'fit'`                                                                  | `'fit'`, `'square'`, `'portrait'`, `'landscape'` |
+| `background` | Background color                                 | `'light'`                                                                | `'light'`, `'dark'`                              |
+| `fill`       | Colors fill their cell; off shows a round swatch | the View › Fill with color setting when first opened                     | `true`, `false`                                  |
+| `gaps`       | Space between colors                             | `false`                                                                  | `true`, `false`                                  |
+| `labels`     | What's written on each color                     | `{ yarn: true, colorway: true, hex: false, range: true, number: false }` | booleans                                         |
 
 **`preferences.effects` fields** (motion, set in the Preferences dialog; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
 

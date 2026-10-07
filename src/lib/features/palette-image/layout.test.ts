@@ -163,7 +163,7 @@ describe('getPaletteImageGeometry', () => {
   it('grows a Fit image of rows with its colors, and makes room for a title', () => {
     const geometry = getPaletteImageGeometry({
       count: 5,
-      layout: 'rows',
+      layout: 'list',
       shape: 'fit',
       gaps: false,
       hasTitle: true,
@@ -179,7 +179,7 @@ describe('getPaletteImageGeometry', () => {
   it('makes square swatches in a Fit image', () => {
     const { cells } = getPaletteImageGeometry({
       count: 6,
-      layout: 'swatches',
+      layout: 'grid',
       shape: 'fit',
       gaps: true,
       hasTitle: false,
@@ -217,7 +217,7 @@ describe('getSwatchPlacement', () => {
   const rect = { x: 48, y: 100, width: 984, height: 140 };
 
   it("puts a row's swatch beside its text, inside the cell", () => {
-    const { cx, cy, r, text } = getSwatchPlacement(rect, 'rows');
+    const { cx, cy, r, text } = getSwatchPlacement(rect, 'list');
     expect(cx - r).toBeGreaterThanOrEqual(rect.x);
     expect(cy - r).toBeGreaterThanOrEqual(rect.y);
     expect(cy + r).toBeLessThanOrEqual(rect.y + rect.height);
@@ -227,14 +227,14 @@ describe('getSwatchPlacement', () => {
 
   it("puts a card's swatch above its text", () => {
     const card = { x: 0, y: 0, width: 300, height: 300 };
-    const { cy, r, text } = getSwatchPlacement(card, 'swatches');
+    const { cy, r, text } = getSwatchPlacement(card, 'grid');
     expect(text.y).toBeGreaterThan(cy + r);
     expect(text.y + text.height).toBeLessThanOrEqual(card.height);
     expect(text.width).toBeGreaterThan(0);
   });
 
   it('leaves no negative room in a tiny cell', () => {
-    for (const layout of ['rows', 'swatches'] as const) {
+    for (const layout of ['list', 'grid'] as const) {
       const { text } = getSwatchPlacement(
         { x: 0, y: 0, width: 20, height: 20 },
         layout,

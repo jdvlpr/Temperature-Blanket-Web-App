@@ -16,7 +16,8 @@
 // Where everything goes in a palette image, without drawing anything, so it
 // can be tested. Sizes are in the image's own pixels.
 
-export const PALETTE_IMAGE_LAYOUTS = ['rows', 'stripes', 'swatches'] as const;
+/** As the View menu's list and grid */
+export const PALETTE_IMAGE_LAYOUTS = ['list', 'grid'] as const;
 export type PaletteImageLayout = (typeof PALETTE_IMAGE_LAYOUTS)[number];
 
 export const PALETTE_IMAGE_SHAPES = [
@@ -36,6 +37,8 @@ export type PaletteImageLabels = {
   hex: boolean;
   /** A project gauge's range, like 50–59 °F */
   range: boolean;
+  /** The color's place in the palette, starting at 1 */
+  number: boolean;
 };
 
 export type PaletteImageSettings = {
@@ -43,19 +46,25 @@ export type PaletteImageSettings = {
   shape: PaletteImageShape;
   background: PaletteImageBackground;
   /** Each color fills its cell, as View › Fill with color does; otherwise
-   * it's a round swatch beside its text. Stripes are always filled. */
+   * it's a round swatch beside its text */
   fill: boolean;
   gaps: boolean;
   labels: PaletteImageLabels;
 };
 
 export const DEFAULT_PALETTE_IMAGE_SETTINGS: PaletteImageSettings = {
-  layout: 'rows',
+  layout: 'list',
   shape: 'fit',
   background: 'light',
   fill: true,
   gaps: false,
-  labels: { yarn: true, colorway: true, hex: false, range: true },
+  labels: {
+    yarn: true,
+    colorway: true,
+    hex: false,
+    range: true,
+    number: false,
+  },
 };
 
 /** Images are this wide, whatever the screen they're made on (Landscape is wider) */
@@ -69,10 +78,8 @@ export const SHAPE_SIZES = {
 export const PADDING = 48;
 export const GAP = 16;
 export const TITLE_HEIGHT = 96;
-/** A row's height in a Fit image of rows */
+/** A row's height in a Fit image of a list */
 export const FIT_ROW_HEIGHT = 140;
-/** The stripes' height in a Fit image of stripes */
-export const FIT_STRIPES_HEIGHT = 900;
 
 export type Rect = { x: number; y: number; width: number; height: number };
 
@@ -139,17 +146,15 @@ export function getPaletteImageGeometry({
   let columns = 1;
   if (shape !== 'fit') {
     contentHeight = SHAPE_SIZES[shape].height - top - PADDING;
-    if (layout === 'swatches')
+    if (layout === 'grid')
       columns = getSwatchColumns({
         count: n,
         width: contentWidth,
         height: contentHeight,
         gap,
       });
-  } else if (layout === 'rows') {
+  } else if (layout === 'list') {
     contentHeight = n * FIT_ROW_HEIGHT + gap * (n - 1);
-  } else if (layout === 'stripes') {
-    contentHeight = FIT_STRIPES_HEIGHT;
   } else {
     columns = getSwatchColumns({ count: n, width: contentWidth, gap });
     const rows = Math.ceil(n / columns);
@@ -166,7 +171,7 @@ export function getPaletteImageGeometry({
   };
 
   const cells: Rect[] = [];
-  if (layout === 'rows') {
+  if (layout === 'list') {
     const rowHeight = (contentHeight - gap * (n - 1)) / n;
     for (let i = 0; i < count; i++)
       cells.push({
@@ -174,15 +179,6 @@ export function getPaletteImageGeometry({
         y: bounds.y + i * (rowHeight + gap),
         width: contentWidth,
         height: rowHeight,
-      });
-  } else if (layout === 'stripes') {
-    const stripeWidth = (contentWidth - gap * (n - 1)) / n;
-    for (let i = 0; i < count; i++)
-      cells.push({
-        x: bounds.x + i * (stripeWidth + gap),
-        y: bounds.y,
-        width: stripeWidth,
-        height: contentHeight,
       });
   } else {
     const rows = Math.ceil(n / columns);
@@ -290,12 +286,12 @@ export const rangeToText = (range: PaletteImageRange): string =>
     : formatRangeLabel(range.from, range.to, range.unit);
 
 /** Where an unfilled color's round swatch goes in its cell, and the box left
- * for its text: beside the text in a row, above it in a swatch card */
+ * for its text: beside the text in a list, above it in a grid card */
 export function getSwatchPlacement(
   cell: Rect,
   layout: PaletteImageLayout,
 ): { cx: number; cy: number; r: number; text: Rect } {
-  if (layout === 'rows') {
+  if (layout === 'list') {
     const inset = 28;
     const r = Math.max(8, Math.min(cell.height * 0.31, 40));
     const gap = Math.max(12, r * 0.6);
