@@ -94,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }[] = [
       {
         value: 'ranges',
-        label: 'Optimize for even steps',
+        label: 'Even steps',
         icon: RulerIcon,
         note: `${step} ${unitLabel} each (auto-calculated from your weather)`,
         generation: { mode: 'auto', optimization: 'ranges' },
@@ -110,9 +110,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           continue;
         list.push({
           value: target.id,
-          label: `Optimize for even days · ${target.gaugeLabel}`,
+          label: `Even days · ${target.label}`,
           icon: target.icon,
-          note: `Similar number of ${target.label.toLowerCase()} days each`,
+          note: `Approximately equal number of ${target.label.toLowerCase()} days in each range`,
           generation: { mode: 'auto', optimization: target.id },
         });
       }

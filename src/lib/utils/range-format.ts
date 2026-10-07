@@ -46,7 +46,7 @@ export function rangeRuleSentence({
   if (includeFromValue && includeToValue)
     return 'Each range includes both its From and To numbers.';
   if (includeFromValue)
-    return 'Each range includes its From number, not its To.';
-  if (includeToValue) return 'Each range includes its To number, not its From.';
+    return 'Each range includes its From number, not its To number.';
+  if (includeToValue) return 'Each range includes its To number, not its From number.';
   return 'Each range includes neither its From nor its To number.';
 }

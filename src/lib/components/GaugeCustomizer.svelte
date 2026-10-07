@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
@@ -504,15 +504,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!rules || isCategory) return '';
     if (rules.isCustomRanges) return 'Custom ranges';
     if (rules.mode === 'manual')
-      return `Manual steps: every ${rules.manual.increment} ${unitLabel} from ${rules.manual.start} ${unitLabel}`;
+      return `Manual ranges: every ${rules.manual.increment} ${unitLabel} from ${rules.manual.start} ${unitLabel}`;
     if (rules.auto.optimization === 'ranges')
       return gauge.autoRangeOptions
-        ? `Even steps of ${describeIncrement(rules, gauge.autoRangeOptions)} ${unitLabel}`
-        : 'Even steps';
+        ? `Auto ranges: ${describeIncrement(rules, gauge.autoRangeOptions)} ${unitLabel} steps`
+        : 'Auto ranges: equal steps';
     const target = gauge.targets?.find(
       (t: { id: string }) => t.id === rules?.auto.optimization,
     );
-    return `Even days by ${target?.label.toLowerCase() ?? 'temperature'}`;
+    return `Auto ranges: similar number of ${target?.label.toLowerCase() ?? 'temperature'} days in each range`;
   });
 
   // With both ends included or neither, rounded or manual steps can't make
@@ -1134,10 +1134,8 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   {/if}
   <!-- How the ranges were made, and how to change one -->
   <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
-    {generatedAs}. Tap a range to change it{rules.linked
-      ? '; the next or previous one follows'
-      : ''}.{showDays
-      ? ` Tap a count to see those ${periods}.`
+    {generatedAs}. {rules.linked
+      ? 'Editing a range number also automatically updates the next or previous one.'
       : ''}{endsDontMeet
       ? ' With both ends included or neither, these steps leave gaps or overlaps: try Round numbers off or another choice in the Ranges menu.'
       : ''}

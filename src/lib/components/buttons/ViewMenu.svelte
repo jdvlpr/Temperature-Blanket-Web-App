@@ -98,9 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class={menuItemClass}
           >
             <span class="flex min-w-0 flex-1 flex-col">
-              <span>Filled backgrounds</span>
+              <span>Fill backgrounds</span>
               <span class="text-surface-700-300 text-xs"
-                >Fill items with colors</span
+                >Colored background</span
               >
             </span>
             <MenuCheckbox checked={fillWithColor.on} />
