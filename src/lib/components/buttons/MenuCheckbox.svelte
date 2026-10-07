@@ -29,9 +29,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if checked}
   <CircleCheckIcon
 
-    class="shrink-0 size-5"
+    class="text-primary-700-300 shrink-0 size-6"
     aria-hidden="true"
   />
 {:else}
-  <CircleIcon class="shrink-0 size-5" aria-hidden="true" />
+  <CircleIcon class="shrink-0 size-6" aria-hidden="true" />
 {/if}
