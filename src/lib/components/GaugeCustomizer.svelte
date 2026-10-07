@@ -213,11 +213,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (refocus) focusRange(index, edge);
   }
 
-  function cancelRange() {
+  function cancelRange({ refocus }: { refocus: boolean }) {
     if (!editing) return;
     const { index, edge } = editing;
     editing = null;
-    focusRange(index, edge);
+    if (refocus) focusRange(index, edge);
   }
 
   // On a phone, the keyboard opening can cover the number being edited. The
@@ -289,10 +289,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // In the list, every row's From and To are as wide as the widest of them,
   // so the ranges line up and their buttons are no wider than the numbers.
   // Digits are about 1ch each (tabular), and the small unit's letters less.
+  // From the saved numbers, so typing a long one doesn't widen every row.
   let rangeChars = $derived.by(() => {
     if (isCategory) return { from: 0, to: 0 };
+    const ranges = (gauge.ranges ?? []) as GaugeRange[];
     const widest = (edge: 'from' | 'to') =>
-      Math.max(0, ...draft.ranges.map((r) => String(r[edge]).length));
+      Math.max(0, ...ranges.map((r) => String(r[edge]).length));
     return {
       from: widest('from') + unitLabel.length,
       to: widest('to') + unitLabel.length,
@@ -518,8 +520,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? ', not saved'
         : ''}. Edit"
       onclick={() => {
-        // Saves one being edited first
-        saveRange({ refocus: false });
+        // Drops one being edited first: only Save keeps it
+        cancelRange({ refocus: false });
         editRange(index, edge);
       }}
     >
@@ -534,12 +536,11 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
   {#if editing}
     <span class="input-group w-fit grid-cols-[minmax(0,1fr)_auto]">
       <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
-      from zooming in. No spinners: they crowd the field, and the arrow keys
-      still step. -->
+      from zooming in. Room for the up and down buttons a computer shows. -->
       <input
         type="number"
         step="any"
-        class="ig-input w-[7ch] [appearance:textfield] px-2 text-base tabular-nums @max-[13rem]:w-[6ch] @max-[13rem]:px-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        class="ig-input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
         aria-label="Color {index + 1} {edge}{unitLabel ? `, ${unitLabel}` : ''}"
         bind:value={editing[edge]}
         {@attach (el) => {
@@ -555,7 +556,7 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
         title="Cancel"
         aria-label="Cancel editing range for color {index + 1}"
         onmousedown={(e) => e.preventDefault()}
-        onclick={cancelRange}
+        onclick={() => cancelRange({ refocus: true })}
       >
         <XIcon size={18} aria-hidden="true" />
       </button>
@@ -573,8 +574,8 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
       <!-- From and To are each a button, just around the number. In the
       list, each sits in a slot as wide as the widest, so they line up.
       Tapping one turns just it into a field, with Save after the range.
-      Saved with Save or Enter, or by pressing or tabbing elsewhere (the
-      other number too); ✕ or Escape puts it back. -->
+      Only Save (or Enter, from the keyboard) keeps it; ✕, Escape, or
+      pressing or tabbing anywhere else (the other number too) puts it back. -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <span
         class="flex flex-wrap items-center gap-x-0.5 gap-y-2 rounded-[inherit]"
@@ -582,11 +583,12 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
           historyChange.indices.includes(index)}
         onfocusout={(e) => {
           if (!isEditing) return;
-          // Tabbing away saves. Focus going nowhere doesn't: that's also
-          // what pressing ✕ does in some browsers, before its click.
+          // Tabbing away puts it back. Focus going nowhere is left to the
+          // press that caused it: that's also what pressing Save does in
+          // some browsers, before its click.
           const to = e.relatedTarget as Node | null;
           if (to && !e.currentTarget.contains(to))
-            saveRange({ refocus: false });
+            cancelRange({ refocus: false });
         }}
         onkeydown={(e) => {
           if (!isEditing) return;
@@ -598,15 +600,15 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
             // Only the edit, not a dialog around it
             e.preventDefault();
             e.stopPropagation();
-            cancelRange();
+            cancelRange({ refocus: true });
           }
         }}
         {@attach isEditing
           ? (el) => {
-              // Pressing anywhere else saves
+              // Pressing anywhere else puts it back
               const onPointerDown = (e: PointerEvent) => {
                 if (!el.contains(e.target as Node))
-                  saveRange({ refocus: false });
+                  cancelRange({ refocus: false });
               };
               document.addEventListener('pointerdown', onPointerDown, true);
               return () =>
@@ -860,7 +862,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
                 : '@lg:contents'}"
             >
               <span
-                class="flex shrink-0 {showDays
+                class="flex max-w-full min-w-0 {showDays
                   ? '@2xl:col-start-3 @2xl:row-start-1'
                   : '@lg:col-start-3 @lg:row-start-1'}"
               >
