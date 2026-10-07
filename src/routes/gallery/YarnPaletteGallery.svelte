@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
   import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import GalleryPaletteCard from '$lib/components/GalleryPaletteCard.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
@@ -182,20 +182,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !yarnPaletteGalleryState.popularPalettes.length}
         <PlaceholderPalettes items={5} maxWFull={true} wFull={true} />
       {:else}
-        {#each yarnPaletteGalleryState.popularPalettes as { colors, schemeName, postId }}
-          <!-- {@const href = `/yarn?s=${colorsToCode(colors, {
-                          includePrefixes: false,
-                      })}&f=${colorsToYarnDetails({ colors })}&v=${version}`} -->
-          <a
+        {#each yarnPaletteGalleryState.popularPalettes as palette}
+          <GalleryPaletteCard
+            {palette}
+            toYarnPage
             onclick={async () => {
-              yarnPageState.gauge.colors = colors;
-              await recordPageView(postId);
+              yarnPageState.gauge.colors = palette.colors;
+              await recordPageView(palette.postId);
             }}
-            href="/yarn"
-            class="flex w-full flex-col gap-y-1 text-left"
-          >
-            <ColorPalette {colors} {schemeName} />
-          </a>
+          />
         {/each}
       {/if}
     </div>
@@ -287,17 +282,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
     <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
-      {#each yarnPaletteGalleryState.palettes as { colors, schemeName, postId }}
-        <a
+      {#each yarnPaletteGalleryState.palettes as palette}
+        <GalleryPaletteCard
+          {palette}
+          toYarnPage
           onclick={async () => {
-            yarnPageState.gauge.colors = colors;
-            await recordPageView(postId);
+            yarnPageState.gauge.colors = palette.colors;
+            await recordPageView(palette.postId);
           }}
-          href="/yarn"
-          class="flex w-full flex-col gap-y-1 text-left"
-        >
-          <ColorPalette {colors} {schemeName} />
-        </a>
+        />
       {/each}
       {#if !yarnPaletteGalleryState.palettes.length && !loading}
         <p class="my-8 text-center">

@@ -24,7 +24,7 @@ included it on their public gallery. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { recordPageView } from '$lib/utils/gallery-utils';
@@ -121,7 +121,7 @@ included it on their public gallery. -->
                 class="placeholder rounded-container h-[70px] w-full animate-pulse"
               ></div>
             {:else if palette}
-              <ColorPalette colors={palette.colors} schemeName=" " />
+              <PaletteStrip colors={palette.colors} />
               <ul
                 class="flex flex-col gap-2 text-left"
                 aria-label="Colors in this palette"

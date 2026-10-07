@@ -18,7 +18,7 @@ signed in. It goes live at once and is linked to the account. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import { getGalleryPages, sharePalette } from '$lib/accounts/gallery';
   import { account } from '$lib/accounts/summary.svelte';
   import ShowOwnerToggle from '$lib/components/account/ShowOwnerToggle.svelte';
@@ -79,7 +79,7 @@ signed in. It goes live at once and is linked to the account. -->
 </script>
 
 <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
-  <ColorPalette {colors} schemeName=" " />
+  <PaletteStrip {colors} />
   {#if shared}
     <div class="flex flex-col items-center gap-2 text-center" role="status">
       <CheckIcon class="text-success-700-300 size-8" />

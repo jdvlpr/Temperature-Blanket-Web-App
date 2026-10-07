@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import GalleryPaletteCard from '$lib/components/GalleryPaletteCard.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
@@ -235,21 +235,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
     <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
-      {#each galleryPalettesState.palettes as { colors, schemeName, postId }}
-        <button
-          type="button"
-          class="w-full cursor-pointer"
+      {#each galleryPalettesState.palettes as palette}
+        <GalleryPaletteCard
+          {palette}
           onclick={() => {
-            recordPageView(postId);
+            recordPageView(palette.postId);
             updateGauge({
-              _colors: colors,
+              _colors: palette.colors,
               _schemeId: 'Custom',
             });
           }}
-          title="Use This Palette"
-        >
-          <ColorPalette {colors} {schemeName} />
-        </button>
+        />
       {/each}
     </div>
   {/if}

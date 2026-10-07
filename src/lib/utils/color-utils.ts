@@ -25,14 +25,10 @@ import { capitalizeFirstLetter } from '$lib/utils/other-utils';
 import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
 import {
   getProjectParametersFromURLHash,
-  getTitleFromLocationsMeta,
+  getTitleTextFromLocationsMeta,
 } from '$lib/utils/project-utils.svelte';
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
-import {
-  decodeHtmlEntities,
-  escapeHtml,
-  pluralize,
-} from '$lib/utils/string-utils';
+import { decodeHtmlEntities, pluralize } from '$lib/utils/string-utils';
 import { getBrands } from '$lib/data/yarns/colorways.svelte';
 import { hexToOklab } from '$lib/features/image-palette/color-space';
 import {
@@ -942,10 +938,11 @@ export type GalleryPalette = {
   colors: Color[];
   /** The gallery post it came from (a project, or a palette shared on its own), for counting views */
   postId: string | number;
-  schemeName: string;
+  /** Each yarn in it once, like "Red Heart - Super Saver" */
+  yarns: string[];
+  /** The palette's own gallery page, or its project's */
+  page: { id: number; title: string; kind: 'palette' | 'project' };
 };
-
-const EXTERNAL_LINK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
 
 export const getPalettesFromProjects = ({
   projects,
@@ -1025,42 +1022,35 @@ export const getPalettesFromProjects = ({
         colors &&
         colors.length > minColors
       ) {
-        let schemeName =
-          "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
-        schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
-        schemeName += `<span class="mr-4">${colors.length} ${pluralize('color', colors.length)}</span>`;
-        let yarnDetails = colors
-          .filter((color) => color?.brandId && color?.yarnId)
-          .map((color) => {
-            return color.brandName + ' - ' + color.yarnName;
-          });
-        if (yarnDetails.length) {
-          yarnDetails = [...new Set([...yarnDetails])];
-          yarnDetails.forEach((yarnDetail, index, allitems) => {
-            schemeName += `${yarnDetail}`;
-            if (index + 1 !== allitems.length) schemeName += ', ';
-          });
-        }
-        schemeName += '</p>'; // end line-clamp-1
+        const yarns = [
+          ...new Set(
+            colors
+              .filter((color) => color?.brandId && color?.yarnId)
+              .map((color) => color.brandName + ' - ' + color.yarnName),
+          ),
+        ];
 
-        // The card itself opens the colors in the Yarn Palette Creator; the
-        // link opens the palette's or project's gallery page. Names are
-        // anyone's text, so they're escaped
         const id = Number(project.databaseId);
+        let page: GalleryPalette['page'];
         if (sharedPalette)
-          schemeName += `<a href="/gallery/palette/${id}" target="_blank" rel="noreferrer" class="underline line-clamp-1 font-semibold" title="Open Palette Page" onclick="event.stopPropagation()">${EXTERNAL_LINK_ICON}
-<span class="whitespace-pre-wrap">${escapeHtml(decodeHtmlEntities(sharedPalette.title))}</span></a>`;
+          page = {
+            id,
+            title: decodeHtmlEntities(sharedPalette.title ?? '').trim(),
+            kind: 'palette',
+          };
         else {
           const { projectName, locations } = project as GalleryProjectSummary;
           const title = projectName
-            ? escapeHtml(projectName)
-            : getTitleFromLocationsMeta(locations);
-          schemeName += `<a href="/gallery/${id}" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()">${EXTERNAL_LINK_ICON}
-<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+            ? decodeHtmlEntities(projectName).trim()
+            : getTitleTextFromLocationsMeta(locations);
+          page = {
+            id,
+            title: i > 0 ? `${title} - ${i + 1}` : title,
+            kind: 'project',
+          };
         }
-        schemeName += '</div>';
 
-        _palettes.push({ colors, postId: id, schemeName });
+        _palettes.push({ colors, postId: id, yarns, page });
       }
     });
   });

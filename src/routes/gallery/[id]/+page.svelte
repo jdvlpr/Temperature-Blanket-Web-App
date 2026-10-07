@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
   import GaugeColorsView from '$lib/components/GaugeColorsView.svelte';
@@ -379,9 +379,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           : false}
                         <div class="flex flex-col">
                           <div class="flex flex-col">
-                            <ColorPalette
+                            <PaletteStrip
                               colors={colors ?? []}
-                              schemeName={gaugeLabel}
+                              label={gaugeLabel}
                             />
                             <a
                               class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"

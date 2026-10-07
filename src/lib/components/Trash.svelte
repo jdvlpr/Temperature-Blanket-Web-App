@@ -19,7 +19,7 @@ TRASH_DAYS anyway. Signed in, it's the account's Trash: what was deleted on any
 device, restored everywhere (see $lib/storage/account-trash). -->
 
 <script lang="ts">
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { toast } from '$lib/state/page-state.svelte';
   import {
@@ -160,7 +160,8 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 
 <div class="flex w-full flex-col gap-2 px-4 pb-4 md:min-w-[40rem]">
   <p class="text-surface-700-300 text-center text-sm">
-    Deleted projects and palettes stay here for {TRASH_DAYS} days before they're permanently removed.
+    Deleted projects and palettes stay here for {TRASH_DAYS} days before they're permanently
+    removed.
   </p>
 
   {#if !entries.length}
@@ -181,10 +182,10 @@ device, restored everywhere (see $lib/storage/account-trash). -->
             </span>
             <span class="font-bold">{entry.label}</span>
           </div>
-          <ColorPalette
+          <PaletteStrip
             colors={entry.colors}
             height="24px"
-            schemeName="Deleted {formatDateTime(entry.deletedAt)}"
+            label="Deleted {formatDateTime(entry.deletedAt)}"
           />
           {#if confirming === key}
             <div class="flex flex-wrap items-center gap-2" role="group">
@@ -202,7 +203,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
                 class="btn hover:preset-tonal-surface"
                 onclick={() => (confirming = null)}
               >
-                  <XIcon/>
+                <XIcon />
                 Cancel
               </button>
             </div>

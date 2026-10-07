@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PUBLIC_COOLORS_LINK } from '$env/static/public';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
@@ -73,9 +73,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 
   {#if count}
-    <ColorPalette
+    <PaletteStrip
       colors={read.colors}
-      schemeName={`${count} ${pluralize('Color', count)}`}
+      label={`${count} ${pluralize('Color', count)}`}
     />
   {/if}
 

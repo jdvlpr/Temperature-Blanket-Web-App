@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '$lib/constants/color-constants';
   import { dialog } from '$lib/state/page-state.svelte';
@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Use This Palette"
       >
-        <ColorPalette {colors} schemeName={label} />
+        <PaletteStrip {colors} {label} insideControl />
       </button>
     {/each}
   </div>

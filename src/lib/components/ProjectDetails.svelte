@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import ProjectNameField from '$lib/components/ProjectNameField.svelte';
   import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import { extraColorsFromProjectHref } from '$lib/utils/extra-colors-utils';
-  import { escapeHtml, pluralize } from '$lib/utils/string-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
   import SyncIcon from '$lib/components/sync/SyncIcon.svelte';
   import type { SyncLabel } from '$lib/sync/status.svelte';
@@ -71,44 +71,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     extraColorsFromProjectHref(href).map((extra) => extra.color),
   );
 
-  function getProjectDescription({
-    colors,
-    date,
-  }: {
-    colors: Color[];
-    date: string;
-  }) {
-    let schemeName =
-      "<p class='flex flex-wrap justify-start items-center gap-x-4'>";
-    if (name && title) schemeName += `<span>${escapeHtml(title)}</span>`;
-    schemeName += `<span class="inline-flex items-center justify-center gap-1"> Saved ${date}</span>`;
-    if (isCustomWeatherData)
-      schemeName += `<span class="">Custom Weather Data</span>`;
-    const colorsCount = colors.length + extraColors.length;
-    schemeName += `<span class="">${colorsCount} ${pluralize('color', colorsCount)}</span>`;
+  const colorsCount = $derived(colors ? colors.length + extraColors.length : 0);
 
-    let yarnDetails = [...colors, ...extraColors]
-      .filter((color) => color?.brandId && color?.yarnId)
-      .map((color) => {
-        return (color.brandName ?? '') + ' - ' + (color.yarnName ?? '');
-      });
-    if (yarnDetails.length) {
-      yarnDetails = [...new Set([...yarnDetails])];
-      let hasMore = false;
-      if (yarnDetails.length > MAXIMUM_YARN_DETAILS_DESCRIPTIONS) {
-        yarnDetails.length = MAXIMUM_YARN_DETAILS_DESCRIPTIONS;
-        hasMore = true;
-      }
-      yarnDetails.forEach((yarnDetail: string) => {
-        schemeName += `<span class="">${yarnDetail}</span>`;
-      });
-
-      if (hasMore) schemeName += `<span>...</span>`;
-    }
-
-    schemeName += '</p>';
-    return schemeName;
-  }
+  // Each yarn once, up to a few
+  const yarnDetails = $derived.by(() => {
+    const all = [
+      ...new Set(
+        [...(colors || []), ...extraColors]
+          .filter((color) => color?.brandId && color?.yarnId)
+          .map(
+            (color) => (color.brandName ?? '') + ' - ' + (color.yarnName ?? ''),
+          ),
+      ),
+    ];
+    return {
+      shown: all.slice(0, MAXIMUM_YARN_DETAILS_DESCRIPTIONS),
+      hasMore: all.length > MAXIMUM_YARN_DETAILS_DESCRIPTIONS,
+    };
+  });
 </script>
 
 <div
@@ -144,11 +124,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="text-error-700-300 text-sm">{syncLabel.text}</p>
     {/if}
     {#if colors !== false}
-      <ColorPalette
-        {colors}
-        height="24px"
-        schemeName={getProjectDescription({ colors, date })}
-      />
+      {#snippet description()}
+        <span class="flex flex-wrap items-center justify-start gap-x-4 text-xs">
+          {#if name && title}<span>{title}</span>{/if}
+          <span>Saved {date}</span>
+          {#if isCustomWeatherData}<span>Custom Weather Data</span>{/if}
+          <span>{colorsCount} {pluralize('color', colorsCount)}</span>
+          {#each yarnDetails.shown as yarnDetail (yarnDetail)}
+            <span>{yarnDetail}</span>
+          {/each}
+          {#if yarnDetails.hasMore}<span>...</span>{/if}
+        </span>
+      {/snippet}
+      <PaletteStrip {colors} height="24px" label={description} />
     {/if}
   </div>
   {#if onrename && !editing}

@@ -273,48 +273,56 @@ export const sendToProjectGallery = async (
 
 // In the backend db, each project has a locations meta key
 // locations is a stringified array of objects `{ label: '', from: '', to: '', latlong: '' }`
-export const getTitleFromLocationsMeta = (locations: string | null): string => {
+/** A gallery project's locations as text, each with its dates in the user's locale */
+export const getLocationsFromMeta = (
+  locations: string | null,
+): { label: string; from: string; to: string }[] => {
   const _locations: { label: string; from: string; to: string }[] | null =
     locations ? JSON.parse(locations) : null;
-  if (!locations) return '';
+  if (!_locations) return [];
 
   // Older project gallery items didn't always use the standard ISO 8601 date format, so we need to be able to check if it's a valid date.
   const isValidDate = (string: string): boolean => {
     return !isNaN(new Date(string).getTime());
   };
 
-  let title;
-  title = _locations
-    ? _locations
-        .flatMap((item) => {
-          // Some locations have a missing city name `, ,`, so replace that with just one comma `,`
-          // Anyone can send any label to the gallery, and this is shown as HTML: escape it
-          const label = escapeHtml(
-            String(item.label ?? '').replace(', ,', ','),
-          );
+  return _locations.map((item) => {
+    // Some locations have a missing city name `, ,`, so replace that with just one comma `,`
+    const label = String(item.label ?? '').replace(', ,', ',');
 
-          let from: string = String(item.from ?? '');
-          let to: string = String(item.to ?? '');
+    let from: string = String(item.from ?? '');
+    let to: string = String(item.to ?? '');
 
-          // Before version 3.36.0, projects' location from and to dates were saved in the user's locale format,
-          // which means different project's displayed other locale's formats, not always the user's locale formate.
-          // So if possible, we convert non-user locale dates into the user's locale format.
-          if (isValidDate(from) && isValidDate(to)) {
-            from = new Date(from).toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            });
-            to = new Date(to).toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            });
-          }
+    // Before version 3.36.0, projects' location from and to dates were saved in the user's locale format,
+    // which means different project's displayed other locale's formats, not always the user's locale formate.
+    // So if possible, we convert non-user locale dates into the user's locale format.
+    if (isValidDate(from) && isValidDate(to)) {
+      from = new Date(from).toLocaleDateString(undefined, {
+        timeZone: 'UTC',
+      });
+      to = new Date(to).toLocaleDateString(undefined, {
+        timeZone: 'UTC',
+      });
+    }
 
-          return `<span class="font-bold">${label}</span> from ${escapeHtml(from)} to ${escapeHtml(to)}`;
-        })
-        .join('; ')
-    : null;
-
-  return title || '';
+    return { label, from, to };
+  });
 };
+
+/** A gallery project's locations as plain text, like "Paris, France from 1/1/2024 to 12/31/2024" */
+export const getTitleTextFromLocationsMeta = (locations: string | null) =>
+  getLocationsFromMeta(locations)
+    .map(({ label, from, to }) => `${label} from ${from} to ${to}`)
+    .join('; ');
+
+export const getTitleFromLocationsMeta = (locations: string | null): string =>
+  getLocationsFromMeta(locations)
+    // Anyone can send any label to the gallery, and this is shown as HTML: escape it
+    .map(
+      ({ label, from, to }) =>
+        `<span class="font-bold">${escapeHtml(label)}</span> from ${escapeHtml(from)} to ${escapeHtml(to)}`,
+    )
+    .join('; ');
 
 // Temporariy diagnostics
 function getDebugData() {

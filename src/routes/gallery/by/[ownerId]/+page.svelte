@@ -22,18 +22,14 @@ linked from "By <name>" on their gallery pages. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
   import {
     galleryTitleText,
     sharedPaletteFrom,
   } from '$lib/utils/shared-palette-utils';
-  import {
-    decodeHtmlEntities,
-    escapeHtml,
-    stripHTMLTags,
-  } from '$lib/utils/string-utils';
+  import { decodeHtmlEntities, stripHTMLTags } from '$lib/utils/string-utils';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -138,10 +134,13 @@ linked from "By <name>" on their gallery pages. -->
                   class="flex w-full flex-col gap-y-1 text-left"
                   title="Open the palette's page"
                 >
-                  <ColorPalette
-                    colors={palette.colors}
-                    schemeName={`<span class="font-semibold">${escapeHtml(galleryTitleText(title))}</span>`}
-                  />
+                  <PaletteStrip colors={palette.colors} insideControl>
+                    {#snippet label()}
+                      <span class="line-clamp-2 text-xs font-semibold"
+                        >{galleryTitleText(title)}</span
+                      >
+                    {/snippet}
+                  </PaletteStrip>
                 </a>
               </li>
             {/if}

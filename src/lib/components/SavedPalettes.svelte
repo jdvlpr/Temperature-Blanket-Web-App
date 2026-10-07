@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TrashUndos } from '$lib/utils/trash-undo.svelte';
   import TrashUndo from '$lib/components/TrashUndo.svelte';
   import { version } from '$app/environment';
-  import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { toast } from '$lib/state/page-state.svelte';
@@ -34,7 +34,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getYarnPageURL,
   } from '$lib/utils/color-utils';
   import { formatDateTime } from '$lib/utils/date-utils';
-  import { escapeHtml } from '$lib/utils/string-utils';
   import {
     CheckIcon,
     PencilIcon,
@@ -137,17 +136,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   }
 
-  // Laid out like a saved project's details: name, then when it was saved.
-  // The name is the palette's link (My Projects) or button (Browse Palettes).
-  // The button has no handler of its own: its click reaches choose()
-  function paletteDetails(label: string, saved: string, colors: Color[]) {
-    const name = escapeHtml(label);
-    const control = updateGauge
-      ? `<button type="button" class="underline cursor-pointer text-left"><span class="sr-only">Use </span>${name}</button>`
-      : `<a href="${escapeHtml(getYarnPageURL({ colors, origin: window.location.origin, version }))}" class="underline" title="Open in Yarn Palette Creator"><span class="sr-only">Open </span>${name}<span class="sr-only"> in Yarn Palette Creator</span></a>`;
-    return `<span class="flex flex-wrap items-center justify-start gap-x-4">${control}<span>Saved ${saved}</span></span>`;
-  }
-
   // A click on the palette: links handle themselves, everything else uses the
   // palette or follows its link
   function choose(event: MouseEvent, colors: Color[]) {
@@ -214,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <li class="flex w-full items-start gap-2">
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
-              <ColorPalette {colors} schemeName=" " />
+              <PaletteStrip {colors} />
               <div class="input-group grid-cols-[1fr_auto_auto]">
                 <input
                   type="text"
@@ -253,16 +241,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {:else}
             <!-- The name in the label is the real link or button, for keyboards and
             screen readers; a click anywhere else on the palette does the same,
-            and the swatches keep their colorway popovers -->
+            and pointing at a color still names its yarn -->
             <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
             <div
               class="w-full min-w-0 cursor-pointer"
               onclick={(event) => choose(event, colors)}
             >
-              <ColorPalette
-                {colors}
-                schemeName={paletteDetails(label, saved, colors)}
-              />
+              <!-- Laid out like a saved project's details: name, then when it was saved.
+              The name is the palette's link (My Projects) or button (Browse Palettes).
+              The button has no handler of its own: its click reaches choose() -->
+              {#snippet details()}
+                <span
+                  class="flex flex-wrap items-center justify-start gap-x-4 text-xs"
+                >
+                  {#if updateGauge}
+                    <button
+                      type="button"
+                      class="cursor-pointer text-left underline"
+                      ><span class="sr-only">Use </span>{label}</button
+                    >
+                  {:else}
+                    <!-- eslint-disable svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
+                    <a
+                      href={getYarnPageURL({
+                        colors,
+                        origin: window.location.origin,
+                        version,
+                      })}
+                      class="underline"
+                      title="Open in Yarn Palette Creator"
+                      ><span class="sr-only">Open </span>{label}<span
+                        class="sr-only"
+                      >
+                        in Yarn Palette Creator</span
+                      ></a
+                    >
+                    <!-- eslint-enable svelte/no-navigation-without-resolve -->
+                  {/if}
+                  <span>Saved {saved}</span>
+                </span>
+              {/snippet}
+              <PaletteStrip {colors} insideControl label={details} />
             </div>
             <!-- Centered on the 70px color bar, not the label under it -->
             <div class="flex h-[70px] shrink-0 items-center gap-1">
