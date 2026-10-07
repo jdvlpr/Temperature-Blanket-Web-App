@@ -445,14 +445,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else if editing?.index === index}
       {@const label = (edge: string) =>
         `Color ${index + 1} ${edge}${unitLabel ? `, ${unitLabel}` : ''}`}
-      <!-- Saved with ✓ or Enter, or on leaving it; ✕ or Escape puts it back.
+      <!-- Saved with ✓ or Enter, or by pressing or tabbing elsewhere; ✕ or Escape puts it back.
       In a narrow card, To goes under From. -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
         class="flex flex-wrap items-center gap-1 px-1 @max-[13rem]:flex-col @max-[13rem]:items-start"
         onfocusout={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+          // Tabbing away saves. Focus going nowhere doesn't: that's also
+          // what pressing ✕ does in some browsers, before its click.
+          const to = e.relatedTarget as Node | null;
+          if (to && !e.currentTarget.contains(to))
             saveRange({ refocus: false });
+        }}
+        {@attach (el) => {
+          // Pressing anywhere else saves
+          const onPointerDown = (e: PointerEvent) => {
+            if (!el.contains(e.target as Node)) saveRange({ refocus: false });
+          };
+          document.addEventListener('pointerdown', onPointerDown, true);
+          return () =>
+            document.removeEventListener('pointerdown', onPointerDown, true);
         }}
         onkeydown={(e) => {
           // From the numbers; on the buttons, Enter presses them
@@ -504,15 +516,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
           {@render unit()}
         </span>
-        <!-- Pressing them mustn't take the focus first: on iOS that would
-        leave the numbers, which saves before Cancel is tapped -->
+        <!-- Pressing them keeps the focus in the numbers, so the keyboard stays up -->
         <span class="flex items-center">
           <button
             type="button"
             class="btn-icon hover:preset-tonal-surface"
             title="Save Range"
             aria-label="Save range for color {index + 1}"
-            onpointerdown={(e) => e.preventDefault()}
+            onmousedown={(e) => e.preventDefault()}
             onclick={() => saveRange({ refocus: true })}
           >
             <CheckIcon aria-hidden="true" />
@@ -522,7 +533,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn-icon hover:preset-tonal-surface"
             title="Cancel"
             aria-label="Cancel editing range for color {index + 1}"
-            onpointerdown={(e) => e.preventDefault()}
+            onmousedown={(e) => e.preventDefault()}
             onclick={cancelRange}
           >
             <XIcon aria-hidden="true" />
