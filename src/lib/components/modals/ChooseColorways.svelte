@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import SortMenu from '$lib/components/SortMenu.svelte';
+  import { menuTriggerClass } from '$lib/components/menu-styles';
   import type { Color } from '$lib/types/yarn-types';
   import {
     getSortedPalette,
@@ -152,10 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if selectedColors.length}
         <div class="">
           <!-- Sort and Clear, or the bar for a color pressed in the strip -->
-          <PaletteStripEditor
-            bind:colors={selectedColors}
-            buttonClass="btn btn-sm hover:bg-surface-200-800"
-          >
+          <PaletteStripEditor bind:colors={selectedColors}>
             {#snippet toolbar()}
               <div class="flex items-center justify-between gap-2">
                 <p class="text-xs">{paletteTitleText}</p>
@@ -163,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <SortMenu
                     colors={selectedColors}
                     placement="top"
-                    triggerClass="btn btn-sm hover:bg-surface-200-800"
+                    triggerClass={menuTriggerClass}
                     disabled={selectedColors.length < 2}
                     onsort={(sort) => {
                       const colors = $state.snapshot(selectedColors);
@@ -180,14 +178,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                   <button
                     type="button"
-                    class="btn btn-sm hover:bg-surface-200-800"
+                    class={menuTriggerClass}
                     title="Remove all colorways"
                     bind:this={clearButton}
                     onclick={clear}
                   >
                     <Trash2Icon aria-hidden="true" />
-                    <!-- Just the icon on small screens, as in From an Image -->
-                    <span class="max-sm:sr-only">Clear</span>
+                    <span>Clear</span>
                   </button>
                 </div>
               </div>

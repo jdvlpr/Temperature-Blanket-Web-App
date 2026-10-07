@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import ColorSwatch from '$lib/components/ColorSwatch.svelte';
   import PaletteStrip from '$lib/components/PaletteStrip.svelte';
+  import { menuTriggerClass } from '$lib/components/menu-styles';
   import type { Color } from '$lib/types/yarn-types';
   import { sameColorList } from '$lib/utils/color-utils';
   import { tick, type Snippet } from 'svelte';
@@ -48,8 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     staggerIn?: boolean;
     /** The pop-up's own tools under the strip (Sort, Clear…); the color's bar takes their place while it's open */
     toolbar?: Snippet;
-    /** The pop-up's toolbar button class, so the bar's buttons match them */
-    buttonClass?: string;
   }
 
   let {
@@ -61,7 +60,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onhover,
     staggerIn = false,
     toolbar,
-    buttonClass = 'btn hover:preset-tonal-surface',
   }: Props = $props();
 
   let strip: ReturnType<typeof PaletteStrip> | undefined = $state();
@@ -131,11 +129,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     announcement = `Removed. ${next.length} colors left`;
   }
 
-  // Buttons that can't do anything right now say so, but keep the focus
-  let barButtonClass = $derived([
-    buttonClass,
+  // The app's toolbar buttons, like the pop-ups' own tools. Ones that can't
+  // do anything right now say so, but keep the focus.
+  const barButtonClass = [
+    menuTriggerClass,
     'aria-disabled:opacity-40 aria-disabled:hover:bg-transparent',
-  ]);
+  ];
   // Hidden on a phone, but still the button's name for screen readers
   const phoneHidden = 'sr-only sm:not-sr-only';
 </script>

@@ -611,7 +611,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     colors as Parameters<typeof palette.syncFromColors>[0],
                   )}
                 toolbar={tools}
-                buttonClass={toolbarButtonClass}
               />
             {:else}
               <div
