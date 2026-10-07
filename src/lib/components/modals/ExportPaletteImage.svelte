@@ -25,7 +25,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import {
     DEFAULT_PALETTE_IMAGE_SETTINGS,
+    rangeToText,
     type PaletteImageLabels,
+    type PaletteImageRange,
     type PaletteImageSettings,
   } from '$lib/features/palette-image/layout';
   import {
@@ -35,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/features/palette-image/render';
   import { toast } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
   import type { Color } from '$lib/types/yarn-types';
   import {
     Columns3Icon,
@@ -60,8 +63,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   interface Props {
     colors: Color[];
-    /** A label for each color's range, when the palette is a project's gauge */
-    ranges?: string[];
+    /** Each color's range, when the palette is a project's gauge */
+    ranges?: PaletteImageRange[];
     /** The file's name when there's no title */
     fallbackName: string;
   }
@@ -83,12 +86,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     paletteColors.some((color) => color.brandName || color.yarnName),
   );
   let hasNames = $derived(paletteColors.some((color) => color.name));
-  let hasRanges = $derived(!!ranges?.some(Boolean));
+  let hasRanges = $derived(!!ranges?.some((range) => rangeToText(range)));
 
-  // Saved settings, filled in from the defaults for anything not saved yet
+  // Saved settings, filled in from the defaults for anything not saved yet;
+  // Fill with Color starts as it is in the editor
   const saved = preferences.value.paletteImage;
   let settings = $state<PaletteImageSettings>({
     ...DEFAULT_PALETTE_IMAGE_SETTINGS,
+    fill: fillWithColor.on,
     ...saved,
     labels: { ...DEFAULT_PALETTE_IMAGE_SETTINGS.labels, ...saved?.labels },
   });
@@ -407,6 +412,21 @@ choice's icon beside it, and what it's for below -->
             onchange={remember}
           />
         {/each}
+        <!-- A stripe is the color itself, so it can't be unfilled -->
+        <ToggleSwitch
+          bare
+          label="Fill with Color"
+          checked={settings.fill || settings.layout === 'stripes'}
+          disabled={settings.layout === 'stripes'}
+          details={settings.layout === 'stripes'
+            ? 'Stripes are always filled'
+            : ''}
+          detailsTextSize="text-xs"
+          onchange={(e) => {
+            settings.fill = (e.target as HTMLInputElement).checked;
+            remember();
+          }}
+        />
         <ToggleSwitch
           bare
           label="Space Between Colors"

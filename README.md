@@ -197,13 +197,14 @@ Settings and user preferences are stored in the browser's Local Storage.
 
 **`preferences.paletteImage` fields** (the palette image export's last settings; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
 
-| Field        | Description                  | Default                                                   | Options                                          |
-| ------------ | ---------------------------- | --------------------------------------------------------- | ------------------------------------------------ |
-| `layout`     | How the colors are arranged  | `'rows'`                                                  | `'rows'`, `'stripes'`, `'swatches'`              |
-| `shape`      | The image's size             | `'fit'`                                                   | `'fit'`, `'square'`, `'portrait'`, `'landscape'` |
-| `background` | Background color             | `'light'`                                                 | `'light'`, `'dark'`                              |
-| `gaps`       | Space between colors         | `false`                                                   | `true`, `false`                                  |
-| `labels`     | What's written on each color | `{ yarn: true, colorway: true, hex: false, range: true }` | booleans                                         |
+| Field        | Description                                                          | Default                                                   | Options                                          |
+| ------------ | -------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------ |
+| `layout`     | How the colors are arranged                                          | `'rows'`                                                  | `'rows'`, `'stripes'`, `'swatches'`              |
+| `shape`      | The image's size                                                     | `'fit'`                                                   | `'fit'`, `'square'`, `'portrait'`, `'landscape'` |
+| `background` | Background color                                                     | `'light'`                                                 | `'light'`, `'dark'`                              |
+| `fill`       | Colors fill their cell (stripes always do); off shows a round swatch | the View › Fill with color setting when first opened      | `true`, `false`                                  |
+| `gaps`       | Space between colors                                                 | `false`                                                   | `true`, `false`                                  |
+| `labels`     | What's written on each color                                         | `{ yarn: true, colorway: true, hex: false, range: true }` | booleans                                         |
 
 **`preferences.effects` fields** (motion, set in the Preferences dialog; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
 

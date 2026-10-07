@@ -10,6 +10,8 @@ import {
   TITLE_HEIGHT,
   fitFontSize,
   formatRangeLabel,
+  getSwatchPlacement,
+  rangeToText,
   fitLines,
   getPaletteImageGeometry,
   getSwatchColumns,
@@ -201,5 +203,44 @@ describe('formatRangeLabel', () => {
 
   it('leaves out a missing unit', () => {
     expect(formatRangeLabel(0, 10)).toBe('0\u201310');
+  });
+});
+
+describe('rangeToText', () => {
+  it('writes numbers with their unit, or a label as it is', () => {
+    expect(rangeToText({ from: 50, to: 59, unit: '°F' })).toBe('50\u201359 °F');
+    expect(rangeToText({ label: 'Rain' })).toBe('Rain');
+  });
+});
+
+describe('getSwatchPlacement', () => {
+  const rect = { x: 48, y: 100, width: 984, height: 140 };
+
+  it("puts a row's swatch beside its text, inside the cell", () => {
+    const { cx, cy, r, text } = getSwatchPlacement(rect, 'rows');
+    expect(cx - r).toBeGreaterThanOrEqual(rect.x);
+    expect(cy - r).toBeGreaterThanOrEqual(rect.y);
+    expect(cy + r).toBeLessThanOrEqual(rect.y + rect.height);
+    expect(text.x).toBeGreaterThan(cx + r);
+    expect(text.x + text.width).toBeLessThanOrEqual(rect.x + rect.width);
+  });
+
+  it("puts a card's swatch above its text", () => {
+    const card = { x: 0, y: 0, width: 300, height: 300 };
+    const { cy, r, text } = getSwatchPlacement(card, 'swatches');
+    expect(text.y).toBeGreaterThan(cy + r);
+    expect(text.y + text.height).toBeLessThanOrEqual(card.height);
+    expect(text.width).toBeGreaterThan(0);
+  });
+
+  it('leaves no negative room in a tiny cell', () => {
+    for (const layout of ['rows', 'swatches'] as const) {
+      const { text } = getSwatchPlacement(
+        { x: 0, y: 0, width: 20, height: 20 },
+        layout,
+      );
+      expect(text.width).toBeGreaterThanOrEqual(0);
+      expect(text.height).toBeGreaterThanOrEqual(0);
+    }
   });
 });

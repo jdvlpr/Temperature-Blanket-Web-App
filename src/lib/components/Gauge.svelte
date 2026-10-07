@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
   import ExportPaletteImage from '$lib/components/modals/ExportPaletteImage.svelte';
-  import { formatRangeLabel } from '$lib/features/palette-image/layout';
+  import type { PaletteImageRange } from '$lib/features/palette-image/layout';
   import ChooseColorways from '$lib/components/modals/ChooseColorways.svelte';
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
@@ -88,15 +88,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : [],
   );
 
-  /** Each color's range, as the gauge shows it, like "50–59 °F" */
-  function getRangeLabels(): string[] | undefined {
+  /** Each color's range, as the gauge shows it, like 50 → 59 °F */
+  function getRangeLabels(): PaletteImageRange[] | undefined {
     if (!inProject || !gauge.ranges?.length) return undefined;
     const unit = gauge.unit.label?.[preferences.value.units ?? 'metric'] ?? '';
     return gauge.ranges.map(
       (range: { label?: string; from?: number; to?: number }) =>
         gauge.unit.type === 'category' || range.label
-          ? (range.label ?? '')
-          : formatRangeLabel(range.from ?? 0, range.to ?? 0, unit),
+          ? { label: range.label ?? '' }
+          : {
+              from: range.from ?? 0,
+              to: range.to ?? 0,
+              unit,
+              raised: gauge.unit.type === 'temperature',
+            },
     );
   }
 

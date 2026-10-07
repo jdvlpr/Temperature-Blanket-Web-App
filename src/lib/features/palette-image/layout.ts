@@ -42,6 +42,9 @@ export type PaletteImageSettings = {
   layout: PaletteImageLayout;
   shape: PaletteImageShape;
   background: PaletteImageBackground;
+  /** Each color fills its cell, as View › Fill with color does; otherwise
+   * it's a round swatch beside its text. Stripes are always filled. */
+  fill: boolean;
   gaps: boolean;
   labels: PaletteImageLabels;
 };
@@ -50,6 +53,7 @@ export const DEFAULT_PALETTE_IMAGE_SETTINGS: PaletteImageSettings = {
   layout: 'rows',
   shape: 'fit',
   background: 'light',
+  fill: true,
   gaps: false,
   labels: { yarn: true, colorway: true, hex: false, range: true },
 };
@@ -267,11 +271,69 @@ export function fitLines({
   );
 }
 
-const formatNumber = (n: number) => (n < 0 ? `\u2212${Math.abs(n)}` : `${n}`);
+/** A project gauge's range for a color: numbers with a unit, or a label
+ * (a category, or a range someone named) */
+export type PaletteImageRange =
+  | { label: string }
+  | {
+      from: number;
+      to: number;
+      unit: string;
+      /** The unit sits up by the top of the numbers, as in 72°F */
+      raised?: boolean;
+    };
+
+/** A range as one line of text, for the image's description */
+export const rangeToText = (range: PaletteImageRange): string =>
+  'label' in range
+    ? range.label
+    : formatRangeLabel(range.from, range.to, range.unit);
+
+/** Where an unfilled color's round swatch goes in its cell, and the box left
+ * for its text: beside the text in a row, above it in a swatch card */
+export function getSwatchPlacement(
+  cell: Rect,
+  layout: PaletteImageLayout,
+): { cx: number; cy: number; r: number; text: Rect } {
+  if (layout === 'rows') {
+    const inset = 28;
+    const r = Math.max(8, Math.min(cell.height * 0.31, 40));
+    const gap = Math.max(12, r * 0.6);
+    const left = inset + r * 2 + gap;
+    return {
+      cx: cell.x + inset + r,
+      cy: cell.y + cell.height / 2,
+      r,
+      text: {
+        x: cell.x + left,
+        y: cell.y,
+        width: Math.max(cell.width - left - inset, 0),
+        height: cell.height,
+      },
+    };
+  }
+  const inset = Math.max(8, Math.min(cell.width, cell.height) * 0.08);
+  const r = Math.max(6, Math.min(Math.min(cell.width, cell.height) * 0.16, 44));
+  const top = inset + r * 2 + inset / 2;
+  return {
+    cx: cell.x + inset + r,
+    cy: cell.y + inset + r,
+    r,
+    text: {
+      x: cell.x + inset,
+      y: cell.y + top,
+      width: Math.max(cell.width - inset * 2, 0),
+      height: Math.max(cell.height - top - inset, 0),
+    },
+  };
+}
+
+export const formatRangeNumber = (n: number) =>
+  n < 0 ? `\u2212${Math.abs(n)}` : `${n}`;
 
 /** A range for a color's label, like "50–59 °F". A negative number gets a
  * minus sign, and "to" keeps it from running into the dash: "−15 to −5 °F". */
 export function formatRangeLabel(from: number, to: number, unit = ''): string {
   const between = to < 0 ? ' to ' : '\u2013';
-  return `${formatNumber(from)}${between}${formatNumber(to)} ${unit}`.trim();
+  return `${formatRangeNumber(from)}${between}${formatRangeNumber(to)} ${unit}`.trim();
 }
