@@ -127,7 +127,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Buttons that can't do anything right now say so, but keep the focus
   const barButtonClass =
-    'btn-icon btn-icon-sm hover:preset-tonal-surface aria-disabled:opacity-40 aria-disabled:hover:bg-transparent';
+    'btn hover:preset-tonal-surface gap-1 px-3 aria-disabled:opacity-40 aria-disabled:hover:bg-transparent';
+  // Hidden on a phone, but still the button's name for screen readers
+  const phoneHidden = 'sr-only sm:not-sr-only';
 </script>
 
 <div class="flex w-full flex-col">
@@ -167,61 +169,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
         {/if}
       </span>
-      <span class="flex items-center gap-1">
+      <!-- Each button's name is its text; the bar is named for its color.
+      On a phone, the arrows and Close show only their icons. -->
+      <span
+        class="flex w-full flex-wrap items-center justify-end gap-1 sm:w-auto"
+      >
         <button
           type="button"
           class={barButtonClass}
           title="Move Left"
-          aria-label="Move color {selected + 1} left"
           aria-disabled={selected === 0 || undefined}
           onclick={() => move(-1)}
         >
-          <ArrowLeftIcon size={18} aria-hidden="true" />
+          <ArrowLeftIcon aria-hidden="true" />
+          <span class={phoneHidden}>Move Left</span>
         </button>
         <button
           type="button"
           class={barButtonClass}
           title="Move Right"
-          aria-label="Move color {selected + 1} right"
           aria-disabled={selected === colors.length - 1 || undefined}
           onclick={() => move(1)}
         >
-          <ArrowRightIcon size={18} aria-hidden="true" />
+          <ArrowRightIcon aria-hidden="true" />
+          <span class={phoneHidden}>Move Right</span>
         </button>
         {#if lockable}
           <button
             type="button"
             class={barButtonClass}
-            title={color.locked ? 'Unlock' : 'Lock'}
-            aria-label="Lock color {selected + 1}"
+            title={color.locked
+              ? 'Locked: kept when the other colors change'
+              : 'Lock, to keep it when the other colors change'}
             aria-pressed={!!color.locked}
             onclick={toggleLock}
           >
             {#if color.locked}
-              <LockKeyholeIcon size={18} aria-hidden="true" />
+              <LockKeyholeIcon aria-hidden="true" />
             {:else}
-              <LockOpenIcon size={18} aria-hidden="true" />
+              <LockOpenIcon aria-hidden="true" />
             {/if}
+            <span>Lock</span>
           </button>
         {/if}
         <button
           type="button"
           class={barButtonClass}
-          title="Remove"
-          aria-label="Remove color {selected + 1}"
+          title="Remove This Color"
           aria-disabled={colors.length < 2 || undefined}
           onclick={remove}
         >
-          <Trash2Icon size={18} aria-hidden="true" />
+          <Trash2Icon aria-hidden="true" />
+          <span>Remove</span>
         </button>
         <button
           type="button"
           class={barButtonClass}
           title="Close"
-          aria-label="Close color {selected + 1}"
           onclick={close}
         >
-          <XIcon size={18} aria-hidden="true" />
+          <XIcon aria-hidden="true" />
+          <span class={phoneHidden}>Close</span>
         </button>
       </span>
     </div>
