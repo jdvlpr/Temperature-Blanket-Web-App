@@ -199,7 +199,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {#if shown}
         <ColorSwatch hex={shown.hex} number={selected + 1} small />
-        <span class="flex min-w-0 flex-1 flex-col">
+        <!-- Room for the name, at least: the buttons go to their own line
+        rather than squeezing it out -->
+        <span class="flex min-w-0 flex-1 basis-48 flex-col">
           <span class="truncate text-sm leading-tight font-semibold">
             {shown.name || shown.hex}
           </span>
@@ -213,7 +215,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <!-- Each button's name is its text; the bar is named for its color.
       On a phone, the arrows show only their icons; Done always says so. -->
       <span
-        class="flex w-full flex-wrap items-center justify-end gap-1 sm:w-auto"
+        class="flex w-full flex-wrap items-center justify-end gap-1 sm:ml-auto sm:w-auto"
       >
         <button
           type="button"
