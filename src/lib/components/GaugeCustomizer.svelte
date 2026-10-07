@@ -162,13 +162,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Says what else an edit moved, for screen readers
   let announcement = $state('');
 
-  // The colors whose numbers show the draft but aren't saved yet: the one
-  // being edited and any neighbor it moves. They're colored until ✓ or ✕.
+  // The colors whose days show the draft but aren't saved yet: the one
+  // being edited and any neighbor it moves. They're colored until saved.
   let unsaved: number[] = $derived.by(() => {
     const index = editing?.index;
     if (index === undefined || draft.ranges === gauge.ranges) return [];
     return [index, ...draft.moved];
   });
+
+  // Whether a neighbor's number moved with the edit: the previous color's To,
+  // or the next one's From. The other number beside it hasn't changed.
+  function movedValue(index: number, edge: 'from' | 'to') {
+    if (!editing || !draft.moved.includes(index)) return false;
+    return edge === (index < editing.index ? 'to' : 'from');
+  }
 
   function editRange(index: number, edge: 'from' | 'to') {
     const r = gauge.ranges?.[index];
@@ -497,15 +504,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <button
       type="button"
-      class="range-{edge} btn rounded-tile hover:preset-tonal-surface h-9 min-w-9 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {unsaved.includes(
+      class="range-{edge} btn rounded-tile hover:preset-tonal-surface h-9 min-w-9 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {movedValue(
         index,
+        edge,
       )
         ? 'text-primary-700-300'
         : ''}"
       title="Edit {edge === 'from' ? 'From' : 'To'}"
-      aria-label="Color {index + 1} {edge} {r[
-        edge
-      ]} {unitLabel}{unsaved.includes(index) ? ', not saved' : ''}. Edit"
+      aria-label="Color {index + 1} {edge} {r[edge]} {unitLabel}{movedValue(
+        index,
+        edge,
+      )
+        ? ', not saved'
+        : ''}. Edit"
       onclick={() => {
         // Saves one being edited first
         saveRange({ refocus: false });
