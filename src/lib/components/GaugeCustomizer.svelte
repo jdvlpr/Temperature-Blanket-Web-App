@@ -129,6 +129,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let dragging = false;
   let listElement: HTMLElement | undefined = $state();
 
+  let flashTimer: ReturnType<typeof setTimeout> | undefined;
+
   // Pressing a color in the strip above goes to its row or card here, which
   // glows for a moment so it's easy to find
   $effect(() => {
@@ -145,14 +147,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     item.querySelector<HTMLElement>('.yarn-button')?.focus({
       preventScroll: true,
     });
-    item.classList.remove('history-flash-card');
+    // Above the rows around it, so the next row doesn't cover its outline.
+    // Taken off after the glow's 1.4s on a timer: with reduced motion
+    // there's no animation to end.
+    const flash = ['history-flash-card', 'z-10'];
+    clearTimeout(flashTimer);
+    listElement
+      .querySelectorAll('.history-flash-card')
+      .forEach((el) => el.classList.remove(...flash));
     void item.offsetWidth; // restarts the glow
-    item.classList.add('history-flash-card');
-    item.addEventListener(
-      'animationend',
-      () => item.classList.remove('history-flash-card'),
-      { once: true },
-    );
+    item.classList.add(...flash);
+    flashTimer = setTimeout(() => item.classList.remove(...flash), 1400);
   });
   $effect.pre(() => {
     const colors = gauge.colors;
