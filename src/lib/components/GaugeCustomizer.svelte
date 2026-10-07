@@ -1195,7 +1195,18 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         <!-- The handle, the color (as in the list), and ⋮ on one line at the top, so the yarn and range below get the card's full width -->
         <div class="flex items-center gap-1 px-2 pt-2">
           {@render handle(index, filled)}
-          {@render colorSwatch(index, color)}
+          <!-- Opens Change Color, as the swatch does in a row. For a pointer
+          only: the yarn button below does the same from the keyboard. -->
+          <button
+            type="button"
+            class="rounded-full {hoverTint} p-0.5"
+            tabindex="-1"
+            aria-hidden="true"
+            title="Choose a Color"
+            onclick={() => openChangeColor(index, gauge.colors[index])}
+          >
+            {@render colorSwatch(index, color)}
+          </button>
           <span class="ml-auto">{@render more(index, color)}</span>
         </div>
         <div class="@container flex flex-1 flex-col gap-1 p-2 text-left">

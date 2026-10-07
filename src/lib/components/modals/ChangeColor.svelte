@@ -52,6 +52,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let container: HTMLElement | undefined = $state();
 
+  /** The color the colorways are matched to. Choosing one of them doesn't
+   * change it, so the list stays where it is while they're compared; typing
+   * a color or picking one from a photo does. */
+  // svelte-ignore state_referenced_locally
+  let matchTarget = $state<string>(hex ?? '');
+
   // Copies, so that choosing a colorway doesn't change the filters
   // svelte-ignore state_referenced_locally
   const brandIdCopy = brandId;
@@ -114,7 +120,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if pickingFromPhoto}
   <PickColorFromImage
-    onPick={(picked: string) => setColor(picked)}
+    onPick={(picked: string) => {
+      setColor(picked);
+      matchTarget = picked;
+    }}
     onBack={closePhoto}
   />
 {/if}
@@ -150,7 +159,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <ColorSearchField
     label="Color"
-    bind:hex={() => hex ?? '', (value: string) => setColor(value)}
+    bind:hex={
+      () => hex ?? '',
+      (value: string) => {
+        setColor(value);
+        matchTarget = value;
+      }
+    }
     onphoto={() => (pickingFromPhoto = true)}
   />
 
@@ -159,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:selectedColors
     selectedBrandId={brandIdCopy}
     selectedYarnId={yarnIdCopy}
-    matchHex={hex ?? ''}
+    matchHex={matchTarget}
     onClickScrollToTop={() => {
       container?.scrollIntoView({
         behavior: 'smooth',

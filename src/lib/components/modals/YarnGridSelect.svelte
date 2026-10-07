@@ -147,8 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function isSelected(colorway: Color) {
     return (
-      (selectedIds.has(selectionId(colorway)) &&
-        (!limit || matchHex === colorway.hex)) ||
+      selectedIds.has(selectionId(colorway)) ||
       (canMarkIfHexMatches && matchHex === colorway.hex)
     );
   }
@@ -181,12 +180,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       };
       selectedColors = limit ? [color] : [...selectedColors, color];
-      // Choosing one changes the color to match, which reorders the list
-      if (limit && sort === 'best-match')
-        filtersContainer?.parentElement?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
     }
 
     onSelection?.(selectedColors);
