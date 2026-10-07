@@ -454,7 +454,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#if swatch}
       <span
-        class="rounded-base grid size-10 shrink-0 place-items-center text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+        class="grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
         class:feedback-pop={pop.index === index}
         class:history-flash={historyChange.gaugeId === gauge.id &&
           historyChange.indices.includes(index)}
@@ -598,7 +598,8 @@ cancel, then Save -->
       list, each sits in a slot as wide as the widest, so they line up.
       Tapping one turns just it into a field, with Save right after it.
       Only Save (or Enter, from the keyboard) keeps it; ✕, Escape, or
-      pressing or tabbing anywhere else (the other number too) puts it back. -->
+      tapping or tabbing anywhere else (the other number too) puts it back;
+      scrolling doesn't. -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <span
         class="flex flex-wrap items-center gap-x-0.5 gap-y-2 rounded-[inherit]"
@@ -628,18 +629,40 @@ cancel, then Save -->
         }}
         {@attach isEditing
           ? (el) => {
-              // Pressing anywhere else puts it back
+              // A tap or click anywhere else puts it back, but not a scroll:
+              // a touch that scrolls ends in pointercancel, and a drag (the
+              // scrollbar, a mouse) moves too far to count as a press
+              let press: { id: number; x: number; y: number } | null = null;
               const onPointerDown = (e: PointerEvent) => {
-                if (!el.contains(e.target as Node))
-                  cancelRange({ refocus: false });
+                press = el.contains(e.target as Node)
+                  ? null
+                  : { id: e.pointerId, x: e.clientX, y: e.clientY };
               };
+              const onPointerUp = (e: PointerEvent) => {
+                if (
+                  press?.id === e.pointerId &&
+                  Math.hypot(e.clientX - press.x, e.clientY - press.y) < 10
+                )
+                  cancelRange({ refocus: false });
+                press = null;
+              };
+              const onPointerCancel = () => (press = null);
               document.addEventListener('pointerdown', onPointerDown, true);
-              return () =>
+              document.addEventListener('pointerup', onPointerUp, true);
+              document.addEventListener('pointercancel', onPointerCancel, true);
+              return () => {
                 document.removeEventListener(
                   'pointerdown',
                   onPointerDown,
                   true,
                 );
+                document.removeEventListener('pointerup', onPointerUp, true);
+                document.removeEventListener(
+                  'pointercancel',
+                  onPointerCancel,
+                  true,
+                );
+              };
             }
           : null}
       >
@@ -816,22 +839,20 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       animate:flip={{ duration: flipDurationMs }}
     >
       {#if preferences.value.layout === 'grid'}
-        <!-- The color on top, with the handle and number left and ⋮ right, all on one line -->
-        <div
-          class="flex h-14 items-center justify-between px-2"
-          class:feedback-pop={pop.index === index}
-          class:history-flash={historyChange.gaugeId === gauge.id &&
-            historyChange.indices.includes(index)}
-          style:--pop-scale="1.03"
-          style="background:{color.hex};color:{iconColorOn(
-            color.hex ?? '#fff',
-          )}"
-        >
-          <span class="flex items-center">
-            {@render handle(index, true)}
-            <span class="text-sm font-semibold">{index + 1}</span>
-          </span>
-          {@render more(index, color, 'swatch')}
+        <!-- The handle, the color (as in the list), and ⋮ on one line at the top, so the yarn and range below get the card's full width -->
+        <div class="flex items-center gap-1 px-2 pt-2">
+          {@render handle(index)}
+          <span
+            class="grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+            class:feedback-pop={pop.index === index}
+            class:history-flash={historyChange.gaugeId === gauge.id &&
+              historyChange.indices.includes(index)}
+            style:--pop-scale="1.12"
+            style="background:{color.hex};color:{iconColorOn(
+              color.hex ?? '#fff',
+            )}"><span class="sr-only">Color</span> {index + 1}</span
+          >
+          <span class="ml-auto">{@render more(index, color, 'surface')}</span>
         </div>
         <div class="@container flex flex-1 flex-col gap-1 p-2 text-left">
           {@render yarn(index, color, false)}

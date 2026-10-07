@@ -228,7 +228,6 @@ button to it. -->
         </span>
       </p>
     {:else if hasProject}
-      <p class="text-sm opacity-70">Not saved yet</p>
       <button
         type="button"
         class="btn preset-tonal-primary self-start"
