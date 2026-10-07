@@ -21,6 +21,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { onMount } from 'svelte';
+  import { MediaQuery } from 'svelte/reactivity';
+
+  // While typing on a touch screen, the keyboard takes the bottom of the
+  // screen, so the bar steps aside for the field being typed in
+  const touch = new MediaQuery('(pointer: coarse)');
+  let typing = $state(false);
+  const typingField =
+    'input:not([type=checkbox],[type=radio],[type=range],[type=color],[type=button],[type=submit],[type=file]),textarea,[contenteditable=true]';
+  function updateTyping() {
+    typing = !!document.activeElement?.matches(typingField);
+  }
+  onMount(() => {
+    // After focus lands, so moving from one field to the next doesn't flash the bar
+    const onFocusChange = () => setTimeout(updateTyping);
+    document.addEventListener('focusin', onFocusChange);
+    document.addEventListener('focusout', onFocusChange);
+    return () => {
+      document.removeEventListener('focusin', onFocusChange);
+      document.removeEventListener('focusout', onFocusChange);
+    };
+  });
+  let hidden = $derived(touch.current && typing);
 
   let indicator = $state({ left: 0, width: 0 });
   let activeIndex = $derived(
@@ -97,7 +119,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showNavigationSideBar.value
       ? `lg:left-[284px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-302px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+278px)] xl:max-w-[calc(min(100vw,var(--breakpoint-xl))-278px)]`
       : 'lg:left-[78px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+78px)]',
+    hidden && 'translate-y-full opacity-0',
   ]}
+  inert={hidden}
   id="bottom-section-nav"
 >
   <div
