@@ -456,7 +456,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- e.g. "105 → 92"; the unit and what's included are said once, above -->
 <!-- `column` pads the numbers so they line up down a list -->
 {#snippet unit()}
-  {#if unitLabel}<span class="text-xs opacity-70">{unitLabel}</span>{/if}
+  {#if unitLabel}<span class="text-xs font-normal opacity-70">{unitLabel}</span
+    >{/if}
 {/snippet}
 
 {#snippet rangeValue(
@@ -471,7 +472,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <button
       type="button"
-      class="range-{edge} btn rounded-tile hover:preset-tonal-surface h-9 min-w-9 gap-0 px-2 whitespace-nowrap tabular-nums {unsaved.includes(
+      class="range-{edge} btn rounded-tile hover:preset-tonal-surface h-9 min-w-9 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {unsaved.includes(
         index,
       )
         ? 'text-primary-700-300'
@@ -499,11 +500,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else if editing?.index === index}
       {@const label = (edge: string) =>
         `Color ${index + 1} ${edge}${unitLabel ? `, ${unitLabel}` : ''}`}
-      <!-- Saved with ✓ or Enter, or by pressing or tabbing elsewhere; ✕ or Escape puts it back.
-      In a narrow card, To goes under From. -->
+      <!-- One field, like the search fields: From → To, the unit, and ✕ to cancel,
+      then a filled Save. Saved with Save or Enter, or by pressing or tabbing
+      elsewhere; ✕ or Escape puts it back. In a narrow card, the field fills
+      it, without the unit, and Save goes under it. -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div
-        class="flex flex-wrap items-center gap-1 px-1 @max-[13rem]:flex-col @max-[13rem]:items-start"
+        class="flex flex-wrap items-center gap-2 px-1"
         onfocusout={(e) => {
           // Tabbing away saves. Focus going nowhere doesn't: that's also
           // what pressing ✕ does in some browsers, before its click.
@@ -533,66 +536,71 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }}
       >
-        <!-- type="number" keeps the minus key on phones; 16px text keeps iOS from zooming in -->
-        <input
-          type="number"
-          step="any"
-          class="input h-9 w-20 px-2 text-base tabular-nums"
-          aria-label={label('from')}
-          bind:value={editing.from}
-          {@attach (el) => {
-            // Once, when it opens, not on every keystroke
-            if (untrack(() => editing?.edge) === 'from') {
-              el.focus();
-              el.select();
-            }
-          }}
-        />
-        <ArrowRightIcon
-          size={14}
-          class="shrink-0 opacity-60 @max-[13rem]:mx-8 @max-[13rem]:rotate-90"
-          aria-hidden="true"
-        />
-        <span class="flex items-center gap-1">
+        <div
+          class="input-group w-fit grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_auto] @max-[13rem]:w-full"
+        >
+          <!-- type="number" keeps the minus key on phones; 16px text keeps
+          iOS from zooming in. No spinners: they crowd the field, and the
+          arrow keys still step. -->
           <input
             type="number"
             step="any"
-            class="input h-9 w-20 px-2 text-base tabular-nums"
+            class="ig-input w-[7ch] [appearance:textfield] px-2 text-base tabular-nums @max-[13rem]:w-full @max-[13rem]:px-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            aria-label={label('from')}
+            bind:value={editing.from}
+            {@attach (el) => {
+              // Once, when it opens, not on every keystroke
+              if (untrack(() => editing?.edge) === 'from') {
+                el.focus();
+                el.select();
+              }
+            }}
+          />
+          <span class="ig-cell px-0.5" aria-hidden="true">
+            <ArrowRightIcon size={14} class="opacity-60" />
+          </span>
+          <input
+            type="number"
+            step="any"
+            class="ig-input w-[7ch] [appearance:textfield] px-2 text-base tabular-nums @max-[13rem]:w-full @max-[13rem]:px-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             aria-label={label('to')}
             bind:value={editing.to}
             {@attach (el) => {
-              // Once, when it opens, not on every keystroke
               if (untrack(() => editing?.edge) === 'to') {
                 el.focus();
                 el.select();
               }
             }}
           />
-          {@render unit()}
-        </span>
-        <!-- Pressing them keeps the focus in the numbers, so the keyboard stays up -->
-        <span class="flex items-center">
+          {#if unitLabel}
+            <span
+              class="ig-cell pl-0 text-xs opacity-70 @max-[13rem]:hidden"
+              aria-hidden="true">{unitLabel}</span
+            >
+          {/if}
+          <!-- Pressing it, or Save, keeps the focus in the numbers, so the keyboard stays up -->
           <button
             type="button"
-            class="btn-icon hover:preset-tonal-surface"
-            title="Save Range"
-            aria-label="Save range for color {index + 1}"
-            onmousedown={(e) => e.preventDefault()}
-            onclick={() => saveRange({ refocus: true })}
-          >
-            <CheckIcon aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            class="btn-icon hover:preset-tonal-surface"
+            class="ig-btn"
             title="Cancel"
             aria-label="Cancel editing range for color {index + 1}"
             onmousedown={(e) => e.preventDefault()}
             onclick={cancelRange}
           >
-            <XIcon aria-hidden="true" />
+            <XIcon size={18} aria-hidden="true" />
           </button>
-        </span>
+        </div>
+        <button
+          type="button"
+          class="btn preset-filled-primary-500 h-9 px-3 @max-[13rem]:w-full"
+          title="Save Range"
+          aria-label="Save range for color {index + 1}"
+          onmousedown={(e) => e.preventDefault()}
+          onclick={() => saveRange({ refocus: true })}
+        >
+          <CheckIcon size={18} aria-hidden="true" />
+          Save
+        </button>
       </div>
     {:else}
       <!-- From and To are each a button, just around the number. In the
