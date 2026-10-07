@@ -126,9 +126,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   // A range being edited in place: its From and To as typed (null while
-  // empty). Nothing is saved until ✓, Enter or leaving it, so one edit is one
-  // undo step. Until then, only the two numbers show it; the neighbor
-  // and the days change when it's saved.
+  // empty). Nothing is saved until Enter or leaving it, so one edit is one
+  // undo step; until then, the numbers and days follow the draft.
   let editing: {
     index: number;
     edge: 'from' | 'to';
@@ -136,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     to: number | null;
   } | null = $state(null);
 
-  // The ranges with the draft applied, and which neighbors it moves, for saving
+  // The ranges with the draft applied, and which neighbors it moved
   let draft = $derived.by(() => {
     let ranges: GaugeRange[] = gauge.ranges ?? [];
     const moved: number[] = [];
@@ -161,6 +160,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Says what else an edit moved, for screen readers
   let announcement = $state('');
+
+  // The colors whose numbers show the draft but aren't saved yet: the one
+  // being edited and any neighbor it moves. They're colored until ✓ or ✕.
+  let unsaved: number[] = $derived.by(() => {
+    const index = editing?.index;
+    if (index === undefined || draft.ranges === gauge.ranges) return [];
+    return [index, ...draft.moved];
+  });
 
   function editRange(index: number, edge: 'from' | 'to') {
     const r = gauge.ranges?.[index];
@@ -219,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let days = $derived.by(() => {
     if (!showDays) return [];
     return gauge.colors.map((_: Color, index: number) => {
-      const range = gauge.ranges?.[index];
+      const range = draft.ranges[index];
       return gauge.targets.map(
         (target: { id: Parameters<typeof getDaysInRange>[0]['id'] }) =>
           range
@@ -431,7 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 {#snippet range(index: number, column: boolean)}
-  {@const r = gauge.ranges?.[index]}
+  {@const r = isCategory ? gauge.ranges?.[index] : draft.ranges[index]}
   {#if r}
     {#if isCategory}
       <span class="truncate px-2 text-sm">{r.label}</span>
@@ -525,12 +532,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else}
       <button
         type="button"
-        class="range-button btn rounded-tile hover:preset-tonal-surface h-9 gap-1 px-2 tabular-nums"
+        class="range-button btn rounded-tile hover:preset-tonal-surface h-9 gap-1 px-2 tabular-nums {unsaved.includes(
+          index,
+        )
+          ? 'text-primary-700-300'
+          : ''}"
         class:history-flash={historyChange.gaugeId === gauge.id &&
           historyChange.indices.includes(index)}
         title="Edit Range"
         aria-label="Range for color {index +
-          1}: from {r.from} to {r.to} {unitLabel}. Edit"
+          1}: from {r.from} to {r.to} {unitLabel}{unsaved.includes(index)
+          ? ', not saved'
+          : ''}. Edit"
         onclick={(e) => {
           // Saves one being edited first
           saveRange({ refocus: false });
@@ -574,7 +587,11 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         : ''}"
       disabled={!list.length}
       title="{target.gaugeLabel}: {count}, {percent}"
-      aria-label="{target.gaugeLabel}: {count}, {percent}"
+      aria-label="{target.gaugeLabel}: {count}, {percent}{unsaved.includes(
+        index,
+      )
+        ? ', not saved'
+        : ''}"
       onclick={() =>
         dialog.trigger({
           type: 'component',
@@ -589,8 +606,12 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         {target.icon}
         {target.gaugeLabel}
       </span>
-      <span class="text-sm leading-tight font-semibold whitespace-nowrap"
-        >{count}</span
+      <span
+        class="text-sm leading-tight font-semibold whitespace-nowrap {unsaved.includes(
+          index,
+        )
+          ? 'text-primary-700-300'
+          : ''}">{count}</span
       >
       <span class="text-surface-700-300 text-xs whitespace-nowrap"
         >{percent}</span
