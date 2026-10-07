@@ -1206,7 +1206,9 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       ></span>
       {#if preferences.value.layout === 'grid'}
         <!-- The handle, the color (as in the list), and ⋮ on one line at the top, so the yarn and range below get the card's full width -->
-        <div class="flex items-center gap-1 px-2 pt-2">
+        <!-- As tall as the swatch's button, so a card is the same height
+        filled (with no swatch) or not -->
+        <div class="flex min-h-[3.75rem] items-center gap-1 px-2 pt-2">
           {@render handle(index, filled)}
           <!-- Opens Change Color, as the swatch does in a row. For a pointer
           only: the yarn button below does the same from the keyboard.
@@ -1252,7 +1254,11 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           <span class="col-start-1 row-start-1 flex justify-center">
             {@render handle(index, filled)}
           </span>
-          <span class="col-start-2 row-start-1 flex min-w-0">
+          <!-- As tall as the yarn with its swatch, so a row is the same
+          height filled (with no swatch) or not -->
+          <span
+            class="col-start-2 row-start-1 flex min-h-14 min-w-0 items-center"
+          >
             {@render yarn(index, color, !filled)}
           </span>
           {#if showRanges}
