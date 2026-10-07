@@ -1385,102 +1385,85 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Range Calculation Methods</h3>
 
             <p>
-              There are four possible options used to determine which range a
-              day’s weather value gets assigned to. Each method handles the
-              inclusion or exclusion of specific temperature values differently.
+              Each range goes From one number → To another, in the gauge’s
+              direction: 30° → 20° in a High to Low gauge. Ranges share their
+              ends, so the setting <span class="font-bold"
+                >Each range includes</span
+              >
+              in the Ranges menu decides which range a day’s weather value gets when
+              it’s exactly on an end. The palette says which one you chose just above
+              its ranges.
             </p>
             <ol class="flex flex-col gap-2">
               <li>
-                <span class="font-bold"
-                  >Include From, don’t include To (default)</span
-                >: This method considers the temperature values starting from
-                the specified From value, up to, but excluding, the specified To
-                value. For example, if you set the range from 30 to 20 degrees,
-                the range will include temperatures equal to or greater than 20
-                degrees, but not temperatures equal to or greater than 30
-                degrees. Ranges in a gauge using this method could look like
-                this: 30 to 20, 20 to 10, 10 to 0…
+                <span class="font-bold">From, not To (default)</span>: A range
+                30° → 20° includes 30° and everything down to, but not, 20°. A
+                day of exactly 20° goes to the next range, 20° → 10°. Ranges
+                could look like this: 30° → 20°, 20° → 10°, 10° → 0°…
               </li>
               <li>
-                <span class="font-bold">Include To, don’t include From</span>:
-                In contrast to the previous method, this approach includes
-                temperature values up to and including the specified To value,
-                but excludes temperatures equal to or less than the specified
-                From value. For instance, if you set the range from 30 to 20
-                degrees, the calculation will include temperatures less than or
-                equal to 30 degrees, but not temperatures less than or equal to
-                20 degrees. Ranges in a gauge using this method could look like
-                this: 30 to 20, 20 to 10, 10 to 0…
+                <span class="font-bold">To, not From</span>: A range 30° → 20°
+                includes 20° and everything up to, but not, 30°. A day of
+                exactly 30° goes to the range before it. Ranges could look like
+                this: 30° → 20°, 20° → 10°, 10° → 0°…
               </li>
               <li>
-                <span class="font-bold">Include both From and To</span>: This
-                method includes temperature values starting from the specified
-                From value and includes temperatures up to and including the
-                specified To value. If you set the range from 30 to 20 degrees,
-                the calculation will include temperatures equal to or greater
-                than 20 degrees and temperatures equal to or less than 30
-                degrees. Ranges in a gauge using this method could look like
-                this: 30 to 20.01, 20 to 10.01, 10 to 0.01…
+                <span class="font-bold">Both From and To</span>: A range 30° →
+                20° includes both 30° and 20°. So that no value fits two ranges,
+                ranges could look like this: 30° → 20.01°, 20° → 10.01°, 10° →
+                0.01°…
               </li>
               <li>
-                <span class="font-bold">Don’t include From and To</span>: As the
-                name suggests, this method excludes both the specified From and
-                To values from the calculation. If you set the range from 20 to
-                30 degrees, the calculation will exclude temperatures equal to
-                or less than 20 degrees and temperatures equal to or greater
-                than 30 degrees. Ranges in a gauge using this method could look
-                like this: 30.01 to 20, 20.01 to 10, 10.01 to 0…
+                <span class="font-bold">Neither</span>: A range 30° → 20°
+                includes everything between them, but not 30° or 20° themselves.
+                So that no value is left out, ranges could look like this:
+                30.01° → 20°, 20.01° → 10°, 10.01° → 0°…
               </li>
             </ol>
-            <p>
-              Here’s a table showing which values would be included in an
-              example range from 13 degrees to 12 degrees.
-            </p>
+            <p>Here’s which values would be in an example range 13° → 12°.</p>
             <figure class="overflow-x-auto">
               <table
                 class="border-surface-300-700 w-full border-separate border-spacing-0 overflow-hidden border text-left"
               >
                 <thead>
                   <tr
-                    ><th class="p-2">Option</th><th class="p-2">Expression</th
-                    ><th class="p-2">Values in Range?</th></tr
+                    ><th class="p-2">Each range includes</th><th class="p-2"
+                      >13° → 12°</th
+                    ></tr
                   >
                 </thead>
                 <tbody
                   class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                   ><tr
-                    ><td class="p-2"
-                      >Include From, don’t include To (default)</td
-                    ><td class="p-2">From ≥ Range > To</td><td class="p-2"
+                    ><td class="p-2">From, not To (default)</td><td class="p-2"
                       >13 ✅<br />12.5 ✅<br />12 ❌</td
                     ></tr
                   ><tr
-                    ><td class="p-2">Include To, don’t include From</td><td
-                      class="p-2">From > Range ≥ To</td
-                    ><td class="p-2">13 ❌<br />12.5 ✅<br />12 ✅</td></tr
+                    ><td class="p-2">To, not From</td><td class="p-2"
+                      >13 ❌<br />12.5 ✅<br />12 ✅</td
+                    ></tr
                   ><tr
-                    ><td class="p-2">Include both From and To</td><td
-                      >From ≥ Range ≥ To</td
-                    ><td class="p-2">13 ✅<br />12.5 ✅<br />12 ✅</td></tr
+                    ><td class="p-2">Both From and To</td><td class="p-2"
+                      >13 ✅<br />12.5 ✅<br />12 ✅</td
+                    ></tr
                   ><tr
-                    ><td class="p-2">Don’t include From and To</td><td
-                      class="p-2">From > Range > To</td
-                    ><td class="p-2">13 ❌<br />12.5 ✅<br />12 ❌</td></tr
+                    ><td class="p-2">Neither</td><td class="p-2"
+                      >13 ❌<br />12.5 ✅<br />12 ❌</td
+                    ></tr
                   ></tbody
                 >
               </table>
             </figure>
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                If you choose the third or fourth Range Calculation Method but
-                don’t have Automatic Increments set or choose Round Increment
-                (see below), temperature-blanket.com doesn’t currently
-                auto-calculate optimal range From and To values. This may be
-                addressed in a future update.
+                With Both From and To or Neither, rounded or manual steps can’t
+                make ranges that meet exactly, so some values may fit two ranges
+                or none. Check your ranges, or try another choice.
               </p>
               <p>
-                If a day’s weather value would fit in two or more ranges, the
-                first-matching range (highest on the gauge) is used.
+                If a day’s weather value fits two or more ranges, it takes the
+                color of the first one (highest on the gauge). Its days still
+                count in each range it fits.
               </p>
             </div>
           </section>

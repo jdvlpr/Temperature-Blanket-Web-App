@@ -17,6 +17,7 @@ import type { WeatherDay } from '$lib/types/weather-types';
 import { describe, expect, it } from 'vitest';
 import {
   getEvenlyDistributedRangeValuesWithEqualDayCount,
+  isValueInRange,
   setRangeValue,
 } from './range-utils.svelte';
 
@@ -185,4 +186,39 @@ describe('setRangeValue', () => {
     });
     expect(ranges[1]).toEqual({ from: 10, to: 20 });
   });
+});
+
+describe('isValueInRange', () => {
+  // Whether each range includes its From and To
+  const cases = [
+    { from: true, to: true },
+    { from: true, to: false },
+    { from: false, to: true },
+    { from: false, to: false },
+  ];
+
+  for (const direction of ['high-to-low', 'low-to-high'] as const) {
+    // High to low runs 20 → 10; low to high runs 10 → 20
+    const range =
+      direction === 'high-to-low' ? { from: 20, to: 10 } : { from: 10, to: 20 };
+    const fromValue = range.from;
+    const toValue = range.to;
+    for (const c of cases) {
+      it(`${direction}, From ${c.from ? 'in' : 'out'}, To ${c.to ? 'in' : 'out'}`, () => {
+        const check = (value: number) =>
+          isValueInRange({
+            value,
+            range,
+            direction,
+            includeFromValue: c.from,
+            includeToValue: c.to,
+          });
+        expect(check(15)).toBe(true);
+        expect(check(fromValue)).toBe(c.from);
+        expect(check(toValue)).toBe(c.to);
+        expect(check(25)).toBe(false);
+        expect(check(5)).toBe(false);
+      });
+    }
+  }
 });

@@ -18,6 +18,7 @@ import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
+  MoveRightIcon,
   FolderHeartIcon,
   PaletteIcon,
   ShieldCheckIcon,
@@ -74,6 +75,11 @@ export const entries: ChangelogItemGroup[] = [
                 IconComponent: CogIcon,
                 text: `Preferences have been redesigned with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn off motion touches with Reduce Motion.`,
                 title: 'Preferences',
+              },
+              {
+                IconComponent: MoveRightIcon,
+                text: `Ranges are written the same way everywhere (Project Planner, gallery, palette images, PDFs and Google Sheets): From → To, with which ends each range includes said once above them. <span class="font-bold">Changed:</span> if a day fits two overlapping ranges, it now takes the first range's color (the highest on the gauge), as the documentation says, instead of the last one's, so some previews with overlapping ranges may change. Day counts still include every day in each range. Fixed: with Low to High and Neither, a range included its To number.`,
+                title: 'Ranges',
               },
               {
                 IconComponent: SmartphoneIcon,

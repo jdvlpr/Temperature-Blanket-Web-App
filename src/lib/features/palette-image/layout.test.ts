@@ -9,7 +9,6 @@ import {
   SHAPE_SIZES,
   TITLE_HEIGHT,
   fitFontSize,
-  formatRangeLabel,
   getSwatchPlacement,
   rangeToText,
   fitLines,
@@ -188,27 +187,11 @@ describe('getPaletteImageGeometry', () => {
   });
 });
 
-describe('formatRangeLabel', () => {
-  it('joins a range with a dash', () => {
-    expect(formatRangeLabel(50, 59, '°F')).toBe('50\u201359 °F');
-  });
-
-  it('gives negative numbers a minus sign', () => {
-    expect(formatRangeLabel(-10, 19, '°F')).toBe('\u221210\u201319 °F');
-  });
-
-  it('keeps a negative end from running into the dash', () => {
-    expect(formatRangeLabel(-15, -5, '°C')).toBe('\u221215 to \u22125 °C');
-  });
-
-  it('leaves out a missing unit', () => {
-    expect(formatRangeLabel(0, 10)).toBe('0\u201310');
-  });
-});
-
 describe('rangeToText', () => {
   it('writes numbers with their unit, or a label as it is', () => {
-    expect(rangeToText({ from: 50, to: 59, unit: '°F' })).toBe('50\u201359 °F');
+    expect(rangeToText({ from: 50, to: 59, unit: '°F' })).toBe(
+      '50°F \u2192 59°F',
+    );
     expect(rangeToText({ label: 'Rain' })).toBe('Rain');
   });
 });

@@ -164,6 +164,24 @@ describe('color-utils', () => {
       const result = getColorInfo({ param: 'tmax', value: null });
       expect(result.hex).toBe('#ffffff');
     });
+
+    it("gives a value in overlapping ranges the first range's color", async () => {
+      const { gauges } = await import('$lib/state/gauges-state.svelte');
+      vi.mocked(gauges.getSnapshot).mockReturnValueOnce({
+        unit: { type: 'number' },
+        ranges: [
+          { from: 0, to: 10 },
+          { from: 5, to: 15 },
+        ],
+        colors: [{ hex: '#111111' }, { hex: '#222222' }],
+        rangeOptions: {
+          direction: 'low-to-high',
+          includeFromValue: true,
+          includeToValue: false,
+        },
+      } as any);
+      expect(getColorInfo({ param: 'tmax', value: 7 }).hex).toBe('#111111');
+    });
   });
 
   describe('colorsToYarnDetails', () => {

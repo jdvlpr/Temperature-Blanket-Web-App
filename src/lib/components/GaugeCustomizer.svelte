@@ -30,6 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { page } from '$app/state';
   import ColorSwatch from '$lib/components/ColorSwatch.svelte';
+  import RangeArrow from '$lib/components/RangeArrow.svelte';
+  import RangeUnit from '$lib/components/RangeUnit.svelte';
   import {
     paletteCardClass,
     paletteGridClass,
@@ -76,6 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     removeRange,
     withGeneratedRanges,
   } from '$lib/utils/gauge-utils.svelte';
+  import { rangeRuleSentence } from '$lib/utils/range-format';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     growIn,
@@ -88,7 +91,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showHistoryChange,
   } from '$lib/utils/feedback.svelte';
   import {
-    ArrowRightIcon,
     CheckIcon,
     GripVerticalIcon,
     SearchIcon,
@@ -800,20 +802,8 @@ and glows on undo or redo. -->
   </button>
 {/snippet}
 
-<!-- e.g. "105 → 92"; the unit and what's included are said once, above -->
+<!-- e.g. "105 → 92"; what each range includes is said once, above the list -->
 <!-- `column` pads the numbers so they line up down a list -->
-<!-- A temperature's unit lines up with the top of the number, as in 72°F (its caps are about a quarter of its size shorter); others sit on its baseline -->
-{#snippet unit()}
-  {#if unitLabel}<span
-      class={[
-        'text-xs font-normal',
-        // Dimmed only on the surface: on a color it could lose its contrast
-        !filled && 'opacity-70',
-        gauge.unit?.type === 'temperature' && 'align-[0.25em] leading-none',
-      ]}>{unitLabel}</span
-    >{/if}
-{/snippet}
-
 {#snippet rangeValue(
   index: number,
   r: GaugeRange,
@@ -846,7 +836,13 @@ and glows on undo or redo. -->
       }}
     >
       <!-- One inline run, so the unit can sit up by the number -->
-      <span>{r[edge]}{@render unit()}</span>
+      <span
+        >{r[edge]}<RangeUnit
+          label={unitLabel}
+          type={gauge.unit?.type}
+          {filled}
+        /></span
+      >
     </button>
   </span>
 {/snippet}
@@ -954,11 +950,7 @@ cancel, then Save -->
         {:else}
           {@render rangeValue(index, r, 'from', column)}
         {/if}
-        <ArrowRightIcon
-          size={14}
-          class="mx-0.5 shrink-0 opacity-60"
-          aria-hidden="true"
-        />
+        <RangeArrow silent class="mx-0.5" />
         {#if isEditing && editing?.edge === 'to'}
           {@render rangeInput(index, 'to')}
         {:else}
@@ -1142,9 +1134,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   {/if}
   <!-- How the ranges were made, and how to change one -->
   <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
-    {generatedAs}. From is {rules.includeFromValue ? 'included' : 'excluded'},
-    To is {rules.includeToValue ? 'included' : 'excluded'}. Tap a range to
-    change it{rules.linked
+    {generatedAs}. Tap a range to change it{rules.linked
       ? '; the next or previous one follows'
       : ''}.{showDays
       ? ` Tap a count to see those ${periods}.`
@@ -1154,6 +1144,13 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   </p>
 {/if}
 <p class="sr-only" aria-live="polite">{announcement}</p>
+
+<!-- Which ends of each range are in it, said once, just above the ranges -->
+{#if showRanges && !isCategory && rules}
+  <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
+    {rangeRuleSentence(rules)}
+  </p>
+{/if}
 
 <div
   class="mt-3 mb-2 lg:mb-4 {preferences.value.layout === 'grid'

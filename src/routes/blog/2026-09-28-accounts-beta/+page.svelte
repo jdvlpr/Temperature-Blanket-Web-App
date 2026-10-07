@@ -232,6 +232,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
+            <p class="text-2xl font-bold">A change to how ranges work</p>
+
+            <p class="font-bold">Ranges read the same everywhere</p>
+            <p>
+              A gauge's ranges are now written the same way everywhere they
+              appear, in the Project Planner, the gallery, palette images, PDFs
+              and Google Sheets: From → To, like 105°F → 92°F. Which ends each
+              range includes (by default its From number, not its To) is said
+              once, just above the ranges.
+            </p>
+
+            <p class="font-bold">If your ranges overlap</p>
+            <p>
+              If a day's weather fits two ranges, it now takes the color of the
+              first one, the highest on the gauge, as the
+              <a href="/documentation#range-calculation-methods" class="link"
+                >documentation</a
+              >
+              has always said. Before, it took the color of the last one. This
+              only happens if you've typed in ranges that overlap, or chose
+              <span class="italic">Both From and To</span> under
+              <span class="italic">Each range includes</span> in the Ranges menu.
+              If so, some days in your preview may change color, so it's worth a look
+              before you keep going. The number of days shown for each range hasn't
+              changed: it still counts every day that fits it.
+            </p>
+            <p>
+              Also fixed: with <span class="italic">Low to High</span> and
+              <span class="italic">Neither</span>, a range wrongly included its
+              To number.
+            </p>
+
+            <hr class="hr my-2" />
+
             <p class="text-2xl font-bold">About the beta</p>
             <p>
               Accounts will be in beta for the next few weeks while I make sure

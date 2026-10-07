@@ -271,7 +271,7 @@ export const isValueInRange = ({
       return value >= range.from && value < range.to; // default
     if (!includeFromValue && includeToValue)
       return value > range.from && value <= range.to;
-    return value > range.from && value <= range.to;
+    return value > range.from && value < range.to;
   }
 };
 
@@ -289,28 +289,6 @@ export const getDaysPercent = (daysCount: number): number => {
     round = 1;
   }
   return round;
-};
-
-export const getRangeExample = ({
-  direction,
-  includeFromValue,
-  includeToValue,
-}: {
-  direction: GaugeRangeOptions['direction'] | undefined;
-  includeFromValue: boolean | undefined;
-  includeToValue: boolean | undefined;
-}): string => {
-  if (direction === 'high-to-low') {
-    if (includeFromValue && !includeToValue) return 'From ≥ Range > To';
-    if (!includeFromValue && includeToValue) return 'From > Range ≥ To';
-    if (includeFromValue && includeToValue) return 'From ≥ Range ≥ To';
-    return 'From > Range > To';
-  } else {
-    if (includeFromValue && !includeToValue) return 'From ≤ Range < To';
-    if (!includeFromValue && includeToValue) return 'From < Range ≤ To';
-    if (includeFromValue && includeToValue) return 'From ≤ Range ≤ To';
-    return 'From < Range < To';
-  }
 };
 
 /**

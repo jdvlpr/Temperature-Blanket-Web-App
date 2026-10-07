@@ -166,6 +166,10 @@ function createConditionalFormattingRules(
     moon: ['moon'],
   };
 
+  // Rules go in the order they're made, so for any cell the first range in
+  // the gauge's list that matches gives its color, as on the preview
+  let ruleIndex = 0;
+
   for (const gauge of gauges.allCreated) {
     const applyKey = gauge.id as keyof typeof options.gaugesToApply;
     if (!options.gaugesToApply[applyKey]) continue;
@@ -254,7 +258,7 @@ function createConditionalFormattingRules(
                   },
                 },
               },
-              index: rangeIdx,
+              index: ruleIndex++,
             },
           });
         }
@@ -381,11 +385,11 @@ function createGaugeLegendData(
 
   const rows: (string | number | boolean)[][] = [];
 
-  // Row 1: Range Start | Range End | Color | Yarn Info | Day Count\nLabel | Percentage\nLabel
+  // Row 1: From | To | Color | Yarn Info | Day Count\nLabel | Percentage\nLabel
 
   const headerRow = [
-    `Range Start\n(${includeFrom ? 'including' : 'excluding'})`,
-    `Range End\n(${includeTo ? 'including' : 'excluding'})`,
+    `From\n(${includeFrom ? 'included' : 'not included'})`,
+    `To\n(${includeTo ? 'included' : 'not included'})`,
     'Color\n(Hex)',
     'Yarn Info',
   ];

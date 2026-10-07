@@ -275,7 +275,7 @@ export function describeGaugeChange(
   );
   const oneRange =
     changed.length === 1
-      ? `range ${changed[0] + 1} is ${newRanges[changed[0]].from} to ${newRanges[changed[0]].to}`
+      ? `range ${changed[0] + 1} is from ${newRanges[changed[0]].from} to ${newRanges[changed[0]].to}`
       : '';
 
   const a = before.rangeOptions;

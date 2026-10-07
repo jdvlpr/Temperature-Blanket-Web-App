@@ -159,8 +159,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <CircleQuestionMarkIcon />
 
                   <p class="font-bold">
-                    Why do the range values repeat (0 to 10, 10 to 20…), and how
-                    can I make them not overlap (0 to 9, 10 to 19…)?
+                    Why do the range values repeat (0 → 10, 10 → 20…), and how
+                    can I make them not overlap (0 → 9, 10 → 19…)?
                   </p>
                 </div>
 
@@ -188,10 +188,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
 
                       <p>
-                        The default setting will include the first number up to
-                        but not including the second number, so there’s not
-                        actually any weather value that would be in two ranges
-                        at once. To make the range values not overlap, you will
+                        Each range goes From the first number → To the second.
+                        By default, each range includes its From number but not
+                        its To number (it says so just above the list), so
+                        there’s not actually any weather value that would be in
+                        two ranges at once. If ranges do overlap, a day takes
+                        the color of the first range it’s in, the highest on the
+                        gauge. To make the range values not overlap, you will
                         need to change the
                         <a
                           class="link"
@@ -201,8 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           >range calculation method</a
                         >. If you do, be careful to cover all weather values in
                         your ranges. For example, you might need to use decimals
-                        (0 to 9.99, 10 to 19.99, 20 to 29.99…). You can read
-                        this
+                        (0 → 9.99, 10 → 19.99, 20 → 29.99…). You can read this
                         <a
                           class="link"
                           rel="noreferrer noopener"
@@ -388,7 +390,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div {...attributes} transition:safeSlide>
                       <p class="mb-2">
                         This web app isn't designed for this specific use-case,
-                        so <span class="font-bold text-warning-600-400"
+                        so <span class="text-warning-600-400 font-bold"
                           >it's not recommended</span
                         >. There is a way you can do it, but it is a tedious
                         process, and you may experience performance issues when
@@ -404,7 +406,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         label="Reveal Instructions"
                       />
                       {#if isExpandedRevealInstructions}
-                        <ol class="ml-8 mt-2 list-decimal">
+                        <ol class="mt-2 ml-8 list-decimal">
                           <li>
                             Enter and select your location, then for the
                             location's duration, choose <span class="italic"

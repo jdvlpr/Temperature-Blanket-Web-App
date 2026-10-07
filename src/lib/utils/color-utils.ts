@@ -447,11 +447,13 @@ export const getColorInfo = ({
           includeToValue: rangeOptions.includeToValue,
         })
       ) {
+        // The first range a value is in gives its color, should ranges overlap
         color = {
           ...colors[i],
           index: i,
           gaugeLength,
         };
+        break;
       }
     }
   }

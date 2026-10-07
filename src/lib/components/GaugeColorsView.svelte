@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     paletteListClass,
     paletteRowClass,
   } from '$lib/components/palette-item-styles';
+  import RangeValue from '$lib/components/RangeValue.svelte';
   import ColorwayMoreMenu from '$lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
   import {
@@ -43,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GaugeRangeOptions,
   } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
-  import { ArrowRightIcon } from '@lucide/svelte';
+  import { rangeRuleSentence } from '$lib/utils/range-format';
 
   interface Item {
     color: Color;
@@ -57,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** e.g. °F; a temperature's sits up by the top of its number */
     unitLabel?: string;
     unitType?: string;
-    /** Whether ranges include their From and To, said once below them */
+    /** Whether ranges include their From and To, said once above them */
     rangeOptions?: GaugeRangeOptions;
   }
 
@@ -95,36 +96,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 {/snippet}
 
-{#snippet unit()}
-  {#if unitLabel}<span
-      class={[
-        'text-xs font-normal',
-        !filled && 'opacity-70',
-        unitType === 'temperature' && 'align-[0.25em] leading-none',
-      ]}>{unitLabel}</span
-    >{/if}
-{/snippet}
-
 <!-- e.g. "72°F → 80°F", or a category's name -->
 {#snippet range(r: GaugeRange | GaugeRangeCategory)}
   {#if 'from' in r}
-    <span
-      class="flex flex-wrap items-center gap-x-1.5 font-semibold whitespace-nowrap tabular-nums"
-    >
-      <span>{r.from}{@render unit()}</span>
-      <ArrowRightIcon
-        size={14}
-        class="shrink-0 opacity-60"
-        aria-hidden="true"
-      />
-      <span class="sr-only">to</span>
-      <span>{r.to}{@render unit()}</span>
-    </span>
+    <RangeValue from={r.from} to={r.to} {unitLabel} {unitType} {filled} />
   {:else}
     <span class="text-sm text-pretty">{r.label}</span>
   {/if}
 {/snippet}
 
+{#if hasRanges && rangeOptions}
+  <p class="text-surface-700-300 mb-2 px-2 text-center text-xs">
+    {rangeRuleSentence(rangeOptions)}
+  </p>
+{/if}
 <div class="text-left {grid ? paletteGridClass : paletteListClass}">
   {#each items as item, index (index)}
     <div
@@ -190,9 +175,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/each}
 </div>
-{#if hasRanges && rangeOptions}
-  <p class="text-surface-700-300 mt-2 px-2 text-center text-xs">
-    From is {rangeOptions.includeFromValue ? 'included' : 'excluded'}, To is
-    {rangeOptions.includeToValue ? 'included' : 'excluded'}.
-  </p>
-{/if}

@@ -334,7 +334,7 @@ describe('describeGaugeChange', () => {
         state(),
         state({ ranges: [{ from: 30, to: 25 }, ranges[1]] }),
       ),
-    ).toBe('range 1 is 30 to 25');
+    ).toBe('range 1 is from 30 to 25');
   });
 
   it('names the range edited by hand, not just that ranges are custom', () => {
@@ -346,7 +346,7 @@ describe('describeGaugeChange', () => {
           rangeOptions: options({ isCustomRanges: true }),
         }),
       ),
-    ).toBe('range 1 is 30 to 25');
+    ).toBe('range 1 is from 30 to 25');
   });
 
   it('says nothing when nothing it knows changed', () => {

@@ -16,6 +16,8 @@
 // Where everything goes in a palette image, without drawing anything, so it
 // can be tested. Sizes are in the image's own pixels.
 
+import { formatRangeLabel } from '$lib/utils/range-format';
+
 /** As the View menu's list and grid */
 export const PALETTE_IMAGE_LAYOUTS = ['list', 'grid'] as const;
 export type PaletteImageLayout = (typeof PALETTE_IMAGE_LAYOUTS)[number];
@@ -324,12 +326,5 @@ export function getSwatchPlacement(
   };
 }
 
-export const formatRangeNumber = (n: number) =>
-  n < 0 ? `\u2212${Math.abs(n)}` : `${n}`;
-
-/** A range for a color's label, like "50–59 °F". A negative number gets a
- * minus sign, and "to" keeps it from running into the dash: "−15 to −5 °F". */
-export function formatRangeLabel(from: number, to: number, unit = ''): string {
-  const between = to < 0 ? ' to ' : '\u2013';
-  return `${formatRangeNumber(from)}${between}${formatRangeNumber(to)} ${unit}`.trim();
-}
+// Ranges read the same here as everywhere else
+export { formatRangeLabel, formatRangeNumber } from '$lib/utils/range-format';
