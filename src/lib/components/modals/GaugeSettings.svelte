@@ -90,6 +90,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _gauge.unit.label[preferences.value.units ?? 'metric'],
   );
 
+  // A temperature's unit sits up by the top of the number, as in 72°F
+  let unitClass = $derived([
+    'text-xs font-normal opacity-70',
+    _gauge.unit.type === 'temperature' && 'align-[0.25em] leading-none',
+  ]);
+
   // The preview's From and To are as wide as the widest, so they line up
   let rangeChars = $derived.by(() => {
     const widest = (edge: 'from' | 'to') =>
@@ -600,9 +606,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="flex items-center gap-1 font-semibold whitespace-nowrap tabular-nums"
               >
                 <span class="text-right" style:width="{rangeChars.from}ch"
-                  >{range.from}<span class="text-xs font-normal opacity-70"
-                    >{unitLabel}</span
-                  ></span
+                  >{range.from}<span class={unitClass}>{unitLabel}</span></span
                 >
                 <ArrowRightIcon
                   size={14}
@@ -611,9 +615,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 <span class="sr-only">to</span>
                 <span style:width="{rangeChars.to}ch"
-                  >{range.to}<span class="text-xs font-normal opacity-70"
-                    >{unitLabel}</span
-                  ></span
+                  >{range.to}<span class={unitClass}>{unitLabel}</span></span
                 >
               </span>
               <span class="flex gap-3 text-xs tabular-nums">

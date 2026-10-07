@@ -489,8 +489,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- e.g. "105 → 92"; the unit and what's included are said once, above -->
 <!-- `column` pads the numbers so they line up down a list -->
+<!-- A temperature's unit lines up with the top of the number, as in 72°F (its caps are about a quarter of its size shorter); others sit on its baseline -->
 {#snippet unit()}
-  {#if unitLabel}<span class="text-xs font-normal opacity-70">{unitLabel}</span
+  {#if unitLabel}<span
+      class={[
+        'text-xs font-normal opacity-70',
+        gauge.unit?.type === 'temperature' && 'align-[0.25em] leading-none',
+      ]}>{unitLabel}</span
     >{/if}
 {/snippet}
 
@@ -525,7 +530,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         editRange(index, edge);
       }}
     >
-      {r[edge]}{@render unit()}
+      <!-- One inline run, so the unit can sit up by the number -->
+      <span>{r[edge]}{@render unit()}</span>
     </button>
   </span>
 {/snippet}
