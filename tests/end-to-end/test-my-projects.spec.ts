@@ -56,9 +56,9 @@ test.describe('My Projects', () => {
     const dialog = page.getByRole('dialog');
     // Retried: a click before the page finishes loading does nothing
     await expect(async () => {
-      await page
-        .getByRole('button', { name: 'Save Palette', exact: true })
-        .click();
+      // Save Palette is in the Save & Export menu
+      await page.getByRole('button', { name: 'Save & Export' }).click();
+      await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
       await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
         timeout: 1000,
       });
@@ -93,7 +93,7 @@ test.describe('My Projects', () => {
     // Name the project: the name shows, with its location title in the details
     await page.getByRole('button', { name: 'Rename Test Town, 2024' }).click();
     await page.getByLabel('Project name').fill('Gift Blanket');
-    await page.getByRole('button', { name: 'Save Name' }).click();
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
     const named = page.getByRole('link', { name: 'Gift Blanket' });
     await expect(named).toBeVisible();
     await expect(page.getByText('Test Town, 2024')).toBeVisible();
@@ -144,8 +144,8 @@ test.describe('My Projects', () => {
     await page.keyboard.press('Escape');
     await expect(palettes.getByText('Test Meadow')).toBeVisible();
 
-    // A click on a swatch, not just the name, opens the palette too
-    await palettes.getByRole('listitem').getByRole('button').first().click();
+    // A click anywhere on the palette, not just its name, opens it too
+    await palettes.getByText(/^Saved .+ at .+/).click();
     await expect(page).toHaveURL(/\/yarn\?s=/);
   });
 

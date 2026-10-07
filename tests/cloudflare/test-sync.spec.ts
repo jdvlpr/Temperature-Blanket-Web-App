@@ -307,9 +307,9 @@ test.describe('Sync in the browser', () => {
     const dialog = phone.getByRole('dialog');
     // Retried: a click before the page finishes loading does nothing
     await expect(async () => {
-      await phone
-        .getByRole('button', { name: 'Save Palette', exact: true })
-        .click();
+      // Save Palette is in the Save & Export menu
+      await phone.getByRole('button', { name: 'Save & Export' }).click();
+      await phone.getByRole('menuitem', { name: /^Save Palette/ }).click();
       await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
         timeout: 1000,
       });

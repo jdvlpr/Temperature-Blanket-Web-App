@@ -175,17 +175,26 @@ export function drawWeatherTable(pdf: Pdf, flow: Flow, targets: TableTarget[]) {
 
     values.forEach(({ lines, color, hasValue }, i) => {
       const cell = columns.data[i];
-      paragraph(
-        pdf,
-        lines,
-        cell.x + CELL_PAD,
-        middle(lineHeight(SIZE.body) * lines.length),
-        { size: SIZE.body },
+      // The value's color just before it, as one: "① 100"; values line up
+      // down the column whether or not a day has a color
+      const textX = cell.x + CELL_PAD + (withColor[i] ? DOT_R * 2 + 1.5 : 0);
+      // Centered on the row by the middle of the digits, as the color's
+      // number is centered on its circle, so the two line up
+      const cy = top + height / 2;
+      const step = lineHeight(SIZE.body);
+      lines.forEach((line, n) =>
+        text(
+          pdf,
+          line,
+          textX,
+          cy + ptToMm(SIZE.body) * 0.36 + step * (n - (lines.length - 1) / 2),
+          { size: SIZE.body },
+        ),
       );
       if (color && hasValue && color.index !== undefined && !isNaN(color.index))
         swatch(pdf, {
-          cx: cell.x + cell.width - CELL_PAD - DOT_R,
-          cy: top + height / 2,
+          cx: cell.x + CELL_PAD + DOT_R,
+          cy,
           r: DOT_R,
           hex: color.hex ?? '#ffffff',
           number: color.index + 1,
