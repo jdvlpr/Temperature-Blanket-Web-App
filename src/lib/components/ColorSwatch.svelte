@@ -15,8 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A color's round swatch in a palette's list or grid, with its number on it.
-  It's where View › Fill with color grows from, and it pops when its color
-  changes and glows when undo or redo changes it.
+  It's where View › Fill with color grows from (filled, it's just the
+  number, with no circle around it), and it pops when its color changes and
+  glows when undo or redo changes it.
 -->
 <script lang="ts">
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
@@ -45,9 +46,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span
   class={[
-    'grid shrink-0 place-items-center rounded-full font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
+    'grid shrink-0 place-items-center rounded-full font-semibold',
     small ? 'size-9 text-xs' : 'size-12 text-sm',
-    filled && 'ring-2 ring-current/40',
+    !filled && 'shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
     pop && 'feedback-pop',
     flash && 'history-flash',
   ]}
