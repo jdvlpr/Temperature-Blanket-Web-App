@@ -90,6 +90,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _gauge.unit.label[preferences.value.units ?? 'metric'],
   );
 
+  // The preview's From and To are as wide as the widest, so they line up
+  let rangeChars = $derived.by(() => {
+    const widest = (edge: 'from' | 'to') =>
+      Math.max(0, ..._gauge.ranges.map((r) => String(r[edge]).length)) +
+      (unitLabel?.length ?? 0);
+    return { from: widest('from'), to: widest('to') };
+  });
+
   let incrementMode = $state<GaugeRangeOptions['mode'] | null>(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
   );
@@ -586,9 +594,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span class="min-w-[8rem] flex-1 truncate text-sm font-semibold"
                 >{color?.name || color?.hex}</span
               >
-              <span class="flex items-center gap-1 text-sm tabular-nums">
-                <span class="w-[5ch] text-right">{range.from}</span><span
-                  class="text-xs opacity-70">{unitLabel}</span
+              <!-- Like the numbers in the list of colors: semibold, with a regular
+              unit, each as wide as the widest so they line up -->
+              <span
+                class="flex items-center gap-1 font-semibold whitespace-nowrap tabular-nums"
+              >
+                <span class="text-right" style:width="{rangeChars.from}ch"
+                  >{range.from}<span class="text-xs font-normal opacity-70"
+                    >{unitLabel}</span
+                  ></span
                 >
                 <ArrowRightIcon
                   size={14}
@@ -596,8 +610,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   aria-hidden="true"
                 />
                 <span class="sr-only">to</span>
-                <span class="w-[8ch] whitespace-nowrap"
-                  >{range.to}<span class="text-xs opacity-70">{unitLabel}</span
+                <span style:width="{rangeChars.to}ch"
+                  >{range.to}<span class="text-xs font-normal opacity-70"
+                    >{unitLabel}</span
                   ></span
                 >
               </span>

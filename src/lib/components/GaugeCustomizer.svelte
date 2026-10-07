@@ -40,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     historyChange,
     liftDraggedElement,
     markDragged,
+    motion,
     motionDuration,
     Pop,
     showHistoryChange,
@@ -210,6 +211,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const { index, edge } = editing;
     editing = null;
     focusRange(index, edge);
+  }
+
+  // On a phone, the keyboard opening can cover the number being edited. The
+  // page doesn't shrink for it, only the visible part does, so once that
+  // happens the number is scrolled to the middle of what's left, if it's hidden.
+  function keepAboveKeyboard(el: HTMLElement) {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const reveal = () => {
+      const rect = el.getBoundingClientRect();
+      const top = viewport.offsetTop + 16;
+      const bottom = viewport.offsetTop + viewport.height - 16;
+      if (rect.top >= top && rect.bottom <= bottom) return;
+      window.scrollBy({
+        top:
+          rect.top +
+          rect.height / 2 -
+          (viewport.offsetTop + viewport.height / 2),
+        behavior: motion.reduced ? 'auto' : 'smooth',
+      });
+    };
+    viewport.addEventListener('resize', reveal, { once: true });
+    // If no keyboard opens (a hardware one, or a computer), stop waiting
+    setTimeout(() => viewport.removeEventListener('resize', reveal), 1000);
   }
 
   function focusRange(index: number, edge: 'from' | 'to') {
@@ -493,12 +518,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <!-- The number being edited, in its own field like the search fields: the
-number, its unit, and ✕ to cancel -->
+number (its unit is only in its label, to leave the number room) and ✕ to cancel -->
 {#snippet rangeInput(index: number, edge: 'from' | 'to')}
   {#if editing}
-    <span
-      class="input-group w-fit grid-cols-[minmax(0,1fr)_auto_auto] @max-[13rem]:grid-cols-[minmax(0,1fr)_auto]"
-    >
+    <span class="input-group w-fit grid-cols-[minmax(0,1fr)_auto]">
       <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
       from zooming in. No spinners: they crowd the field, and the arrow keys
       still step. -->
@@ -511,14 +534,9 @@ number, its unit, and ✕ to cancel -->
         {@attach (el) => {
           el.focus();
           el.select();
+          keepAboveKeyboard(el);
         }}
       />
-      {#if unitLabel}
-        <span
-          class="ig-cell pl-0 text-xs opacity-70 @max-[13rem]:hidden"
-          aria-hidden="true">{unitLabel}</span
-        >
-      {/if}
       <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
       <button
         type="button"
