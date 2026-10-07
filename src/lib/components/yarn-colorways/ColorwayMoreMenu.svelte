@@ -21,11 +21,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   size, with a black or white icon, whichever stands out on that color, and
   a tint of that on hover. Either way it stays tinted while its menu is open, so a tap on a
   phone (which has no hover) shows it too.
-  With `onremove`, it ends with Remove, for a color in a palette.
+  With `oninsert`, it offers Add Color Before / After, and with `onremove`,
+  it ends with Remove, for a color in a palette.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import {
+    BetweenHorizontalEndIcon,
+    BetweenHorizontalStartIcon,
+    BetweenVerticalEndIcon,
+    BetweenVerticalStartIcon,
     CopyIcon,
     EllipsisVerticalIcon,
     ExternalLinkIcon,
@@ -45,6 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorway: Color;
     /** What the trigger sits on: the page's surface, or the colorway's color */
     on?: 'surface' | 'color';
+    /** Offers Add Color Before and After, for a new color next to this one */
+    oninsert?: (where: 'before' | 'after') => void;
+    /** How the palette's colors run, for the Add items' icons: side by side (a grid) or one under another */
+    insertAxis?: 'row' | 'column';
     /** Offers Remove, e.g. "Remove color 3" */
     onremove?: () => void;
     removeLabel?: string;
@@ -53,6 +62,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     colorway,
     on = 'surface',
+    oninsert,
+    insertAxis = 'column',
     onremove,
     removeLabel = 'Remove',
   }: Props = $props();
@@ -85,6 +96,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onSelect={(details) => {
     const copy = copies.find((c) => c.value === details.value);
     if (copy) copyColorwayText(copy.text);
+    else if (details.value === 'insert-before') oninsert?.('before');
+    else if (details.value === 'insert-after') oninsert?.('after');
     else if (details.value === 'remove') onremove?.();
   }}
 >
@@ -137,8 +150,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </Menu.Item>
         {/each}
-        {#if onremove}
+        {#if oninsert}
+          {@const Before =
+            insertAxis === 'row'
+              ? BetweenVerticalStartIcon
+              : BetweenHorizontalStartIcon}
+          {@const After =
+            insertAxis === 'row'
+              ? BetweenVerticalEndIcon
+              : BetweenHorizontalEndIcon}
           <Menu.Separator />
+          <Menu.Item value="insert-before" class={menuItemClass}>
+            <Before size={16} aria-hidden="true" />
+            <span>Add Color Before</span>
+          </Menu.Item>
+          <Menu.Item value="insert-after" class={menuItemClass}>
+            <After size={16} aria-hidden="true" />
+            <span>Add Color After</span>
+          </Menu.Item>
+        {/if}
+        {#if onremove}
+          {#if !oninsert}<Menu.Separator />{/if}
           <Menu.Item value="remove" class={menuItemClass}>
             <Trash2Icon size={16} aria-hidden="true" />
             <span>{removeLabel}</span>

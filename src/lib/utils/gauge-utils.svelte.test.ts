@@ -16,7 +16,12 @@
 import type { GaugeRangeOptions } from '$lib/types/gauge-types';
 import type { Color } from '$lib/types/yarn-types';
 import { describe, expect, it } from 'vitest';
-import { withGeneratedRanges, withRangeOptions } from './gauge-utils.svelte';
+import {
+  insertRange,
+  removeRange,
+  withGeneratedRanges,
+  withRangeOptions,
+} from './gauge-utils.svelte';
 
 function options(change: Partial<GaugeRangeOptions> = {}): GaugeRangeOptions {
   return {
@@ -127,5 +132,105 @@ describe('withGeneratedRanges', () => {
       { from: 20, to: 10 },
       { from: 10, to: 0 },
     ]);
+  });
+});
+
+describe('insertRange', () => {
+  it('halves a range, high to low, no gap', () => {
+    const ranges = [
+      { from: 30, to: 20 },
+      { from: 20, to: 10 },
+    ];
+    expect(insertRange(ranges, 0)).toEqual([
+      { from: 30, to: 25 },
+      { from: 25, to: 20 },
+      { from: 20, to: 10 },
+    ]);
+  });
+
+  it('keeps a gap of 1 and whole numbers, low to high', () => {
+    const ranges = [
+      { from: 0, to: 9 },
+      { from: 10, to: 19 },
+    ];
+    expect(insertRange(ranges, 1)).toEqual([
+      { from: 0, to: 9 },
+      { from: 10, to: 15 },
+      { from: 16, to: 19 },
+    ]);
+  });
+
+  it('keeps a gap of 0.1, high to low', () => {
+    const ranges = [
+      { from: 30, to: 20.1 },
+      { from: 20, to: 10.1 },
+    ];
+    expect(insertRange(ranges, 1)).toEqual([
+      { from: 30, to: 20.1 },
+      { from: 20, to: 15.1 },
+      { from: 15, to: 10.1 },
+    ]);
+  });
+
+  it('keeps an open end with its half', () => {
+    const ranges = [
+      { from: -Infinity, to: 0 },
+      { from: 0.1, to: 20 },
+      { from: 20.1, to: Infinity },
+    ];
+    expect(insertRange(ranges, 0)).toEqual([
+      { from: -Infinity, to: -20 },
+      { from: -19.9, to: 0 },
+      { from: 0.1, to: 20 },
+      { from: 20.1, to: Infinity },
+    ]);
+    expect(insertRange(ranges, 2)?.slice(2)).toEqual([
+      { from: 20.1, to: 40 },
+      { from: 40.1, to: Infinity },
+    ]);
+  });
+
+  it("can't split a single value or a too-narrow range", () => {
+    expect(insertRange([{ from: 5, to: 5 }], 0)).toBeNull();
+    expect(
+      insertRange(
+        [
+          { from: 0, to: 1 },
+          { from: 2, to: 3 },
+        ],
+        0,
+      ),
+    ).toBeNull();
+  });
+});
+
+describe('removeRange', () => {
+  const ranges = [
+    { from: 30, to: 20 },
+    { from: 20, to: 10 },
+    { from: 10, to: 0 },
+  ];
+
+  it('gives a range to the next one', () => {
+    expect(removeRange(ranges, 0)).toEqual([
+      { from: 30, to: 10 },
+      { from: 10, to: 0 },
+    ]);
+    expect(removeRange(ranges, 1)).toEqual([
+      { from: 30, to: 20 },
+      { from: 20, to: 0 },
+    ]);
+  });
+
+  it('gives the last range to the one before', () => {
+    expect(removeRange(ranges, 2)).toEqual([
+      { from: 30, to: 20 },
+      { from: 20, to: 0 },
+    ]);
+  });
+
+  it("doesn't change the ranges it's given", () => {
+    removeRange(ranges, 0);
+    expect(ranges[1]).toEqual({ from: 20, to: 10 });
   });
 });

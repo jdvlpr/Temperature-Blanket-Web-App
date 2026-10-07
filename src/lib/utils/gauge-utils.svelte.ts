@@ -299,6 +299,74 @@ export function withGeneratedRanges(
   return { rangeOptions, ranges: result.ranges };
 }
 
+/** How many decimal places a number is written with */
+function decimalsOf(n: number) {
+  return Number.isFinite(n) ? (String(n).split('.')[1]?.length ?? 0) : 0;
+}
+
+/**
+ * Custom ranges with one more, for a color added before or after the one at
+ * `index`: that color's range is split in two, in place, so whichever color
+ * comes first gets the first half (the new one, added before; the old one,
+ * added after). The other ranges stay as they are. Halves keep the gap the
+ * ranges already have between them (0, 1, 0.1…) and their precision. An open
+ * end (±Infinity) stays with its half; the other half is as wide as a typical
+ * range. Null when the range can't be split, e.g. it's a single value.
+ */
+export function insertRange(
+  ranges: GaugeRange[],
+  index: number,
+): GaugeRange[] | null {
+  const range = ranges[index];
+  if (!range || range.from === range.to) return null;
+  const { from, to } = range;
+  const decimals = Math.max(
+    0,
+    ...ranges.flatMap((r) => [decimalsOf(r.from), decimalsOf(r.to)]),
+  );
+  const round = (n: number) => Number(n.toFixed(decimals));
+  const gap = ranges.length > 1 ? round(ranges[1].from - ranges[0].to) : 0;
+  // Which way the values run within this range: up (1) or down (-1)
+  const dir = Math.sign(to - from);
+
+  let split: number;
+  if (Number.isFinite(from) && Number.isFinite(to)) {
+    split = round((from + to) / 2);
+  } else {
+    const widths = ranges
+      .filter((r) => Number.isFinite(r.from) && Number.isFinite(r.to))
+      .map((r) => Math.abs(r.to - r.from))
+      .sort((a, b) => a - b);
+    if (!widths.length || !widths[0]) return null;
+    const width = widths[Math.floor(widths.length / 2)];
+    if (Number.isFinite(to)) split = round(to - dir * width - gap);
+    else if (Number.isFinite(from)) split = round(from + dir * width);
+    else return null;
+  }
+
+  const first = { from, to: split };
+  const second = { from: round(split + gap), to };
+  // Each half has to run the same way as the range, and not be empty
+  const runs = (r: GaugeRange) => Math.sign(r.to - r.from) * dir >= 0;
+  if (!runs(first) || !runs(second) || first.to === from) return null;
+
+  return [...ranges.slice(0, index), first, second, ...ranges.slice(index + 1)];
+}
+
+/**
+ * Custom ranges with one fewer, for a removed color: its neighbor (the next
+ * one, or the one before for the last) takes over its range, so the scale's
+ * ends stay the same.
+ */
+export function removeRange(ranges: GaugeRange[], index: number): GaugeRange[] {
+  if (ranges.length < 2 || !ranges[index]) return ranges;
+  const next = ranges.map((range) => ({ ...range }));
+  if (index < next.length - 1) next[index + 1].from = next[index].from;
+  else next[index - 1].to = next[index].to;
+  next.splice(index, 1);
+  return next;
+}
+
 export const createGaugeColors = ({
   schemeId,
   numberOfColors,

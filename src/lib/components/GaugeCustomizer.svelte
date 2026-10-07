@@ -72,6 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils/history-utils.svelte';
   import {
     describeIncrement,
+    insertRange,
+    removeRange,
     withGeneratedRanges,
   } from '$lib/utils/gauge-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
@@ -541,7 +543,53 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
+  /** The most colors a palette can have, as in the number of colors menu */
+  const MAX_COLORS = 99;
+
+  /** Opens the color picker for a new color next to this one, starting on its
+   * yarn; the new color goes in only when it's saved */
+  function insertColor(index: number, where: 'before' | 'after') {
+    const at = where === 'before' ? index : index + 1;
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: ChangeColor,
+        props: {
+          index: at,
+          ...gauge.colors[index],
+          onChangeColor: ({ index: at, ...color }: { index: number } & Color) =>
+            addColor(at, index, color),
+        },
+      },
+      options: { title: `New Color ${at + 1}`, size: 'large' },
+    });
+  }
+
+  function addColor(at: number, splitIndex: number, color: Color) {
+    const colors = [...gauge.colors];
+    colors.splice(at, 0, color);
+    // Custom ranges stay: the color's neighbor shares its range with it. With
+    // as many ranges as colors, updateColors keeps them.
+    const ranges =
+      gauge.rangeOptions?.isCustomRanges &&
+      insertRange(gauge.ranges, splitIndex);
+    if (ranges) gauge.ranges = ranges;
+    gauge.updateColors({ colors });
+    sortableColors = getSortableColors();
+    gauge.schemeId = 'Custom';
+    dialog.close();
+    pop.trigger(at);
+    announcement = `Added color ${at + 1}`;
+    // To the new color once the dialog has closed and given the focus back
+    setTimeout(() =>
+      requestAnimationFrame(() => focusGaugeColor(gauge.id, at)),
+    );
+  }
+
   function removeColor(index: number) {
+    // Custom ranges stay: a neighbor takes over this color's range
+    if (gauge.rangeOptions?.isCustomRanges)
+      gauge.ranges = removeRange(gauge.ranges, index);
     gauge.updateColors({
       colors: gauge.colors.filter((_: Color, i: number) => i !== index),
     });
@@ -952,6 +1000,10 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   <ColorwayMoreMenu
     colorway={color}
     on={filled ? 'color' : 'surface'}
+    oninsert={!isStaticGauge && !isCategory && gauge.colors.length < MAX_COLORS
+      ? (where: 'before' | 'after') => insertColor(index, where)
+      : undefined}
+    insertAxis={preferences.value.layout === 'grid' ? 'row' : 'column'}
     onremove={movable && !isStaticGauge ? () => removeColor(index) : undefined}
     removeLabel="Remove color {index + 1}"
   />
