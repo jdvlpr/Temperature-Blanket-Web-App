@@ -1,4 +1,5 @@
 import type { PaletteImageSettings } from '$lib/features/palette-image/layout';
+import type { SavedPdfSettings } from '$lib/features/pdf/options';
 import type { PageLayout } from '$lib/types/page-types';
 import type { Unit } from '$lib/types/weather-types';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
@@ -44,6 +45,8 @@ type LocalStatePreferencesType = {
   defaultYarn?: string;
   /** View › Fill with color: colorway cards and rows, and palette colors, take their yarn's color; missing until first changed (off) */
   fillColor?: boolean;
+  /** The PDF's last choices; its layout, fill and days start as the View menu's; missing until first downloaded */
+  pdf?: SavedPdfSettings;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(

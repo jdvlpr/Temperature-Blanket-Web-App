@@ -15,10 +15,9 @@
 
 import { API_SERVICES } from '$lib/constants/api-constants';
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { showDaysInRange } from '$lib/state/gauges-state.svelte';
 import { locations, signal } from '$lib/state/location-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { GaugeAttributes, WeatherParam } from '$lib/types/gauge-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
 import type { LocationType } from '$lib/types/location-types';
 import type {
   MoonPhasesId,
@@ -297,18 +296,6 @@ class WeatherClass {
   isUserEdited: boolean = $state(false);
 
   wasLoadedFromStorage: boolean = $state(false);
-
-  pdfOptions: {
-    gauges: GaugeAttributes['id'][];
-    showDaysInRange: boolean;
-    weatherDataParams: WeatherParam['id'][];
-    additionalColors: boolean;
-  } = $derived({
-    gauges: ['temp'],
-    showDaysInRange: showDaysInRange.value,
-    weatherDataParams: ['tmax', 'tavg', 'tmin'],
-    additionalColors: true,
-  });
 
   // ***************
   // Table

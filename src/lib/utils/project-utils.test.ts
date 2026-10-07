@@ -43,14 +43,6 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
   },
 }));
 
-vi.mock('$lib/pdf/sections/gauges.svelte', () => ({
-  default: { create: vi.fn() },
-}));
-
-vi.mock('$lib/pdf/sections/weather-data.svelte', () => ({
-  default: { create: vi.fn() },
-}));
-
 // Mock utils that are used in project-utils
 vi.mock('$lib/utils/color-utils', async (importOriginal) => {
   const actual = await importOriginal<any>();

@@ -18,6 +18,7 @@ import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
+  FileTextIcon,
   MoveRightIcon,
   FolderHeartIcon,
   PaletteIcon,
@@ -80,6 +81,11 @@ export const entries: ChangelogItemGroup[] = [
                 IconComponent: MoveRightIcon,
                 text: `Ranges are written the same way everywhere (Project Planner, gallery, palette images, PDFs and Google Sheets): From → To, with which ends each range includes said once above them. <span class="font-bold">Changed:</span> if a day fits two overlapping ranges, it now takes the first range's color (the highest on the gauge), as the documentation says, instead of the last one's, so some previews with overlapping ranges may change. Day counts still include every day in each range. Fixed: with Low to High and Neither, a range included its To number.`,
                 title: 'Ranges',
+              },
+              {
+                IconComponent: FileTextIcon,
+                text: `The PDF has been redesigned to match the site: each gauge's colors as a list or a grid of cards, with numbered round swatches, yarn names that are never cut off, and an option to fill each color in. A new summary page shows the project, its preview and palettes. Choose US Letter or A4 paper, and the PDF remembers your choices. Accented letters in yarn and place names now print correctly.`,
+                title: 'New PDF Design',
               },
               {
                 IconComponent: SmartphoneIcon,
