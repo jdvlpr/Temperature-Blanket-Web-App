@@ -6,7 +6,9 @@
 // when it isn't filled marks something else as a fallback
 // (`data-fill-origin="fallback"`), for when there's no swatch. Only then: moving the swatch
 // (another layout, another text size) never animates it. Items out of view,
-// and everything when motion is reduced, just change.
+// and everything when motion is reduced, just change. While the option
+// changes, `<html>` has `data-fill-changing`, so that only the item's own text
+// color eases (see main.css); its content follows by inheriting it.
 
 import { preferences } from '$lib/storage/preferences.svelte';
 import { motion } from '$lib/utils/feedback.svelte';
@@ -19,11 +21,20 @@ export const fillWithColor = {
     return preferences.value.fillColor ?? false;
   },
   set on(value: boolean) {
+    // Set before the items update, so no transition inside them starts
+    const root = document.documentElement;
+    root.setAttribute('data-fill-changing', '');
+    clearTimeout(changing);
+    changing = setTimeout(
+      () => root.removeAttribute('data-fill-changing'),
+      DURATION + 100,
+    );
     preferences.value.fillColor = value;
   },
 };
 
 const DURATION = 450;
+let changing: ReturnType<typeof setTimeout> | undefined;
 
 // Items in view; only they animate. One observer for every item.
 const inView = new WeakSet<Element>();
@@ -67,7 +78,16 @@ export const fillFromSwatch: Action<HTMLElement, boolean> = (item, filled) => {
     update(next) {
       if (next === current) return;
       current = next;
-      if (motion.reduced || !inView.has(item)) return;
+      if (motion.reduced || !inView.has(item)) {
+        // Until it's drawn the new way
+        item.setAttribute('data-fill-instant', '');
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() =>
+            item.removeAttribute('data-fill-instant'),
+          ),
+        );
+        return;
+      }
       // Growing, from the swatch as it is now (it may go once filled);
       // shrinking, into the swatch as it will be (it may only show unfilled),
       // once the item has updated but before it's drawn

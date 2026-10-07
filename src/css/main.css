@@ -265,9 +265,9 @@ and fade back while another gauge color is highlighted */
 contrasts with it), or an outline around the preview. Reduced motion shows the same ring, without the fade. */
 /* View › Fill with color (fill-with-color.ts): a layer in the yarn's color
 under a card's or row's content, which has `relative isolate overflow-hidden`.
-In layer components, so utilities still win. Text eases to its color on the
-fill, and a swatch that fades into it fades; the layer itself animates from
-script, only when the option changes. */
+In layer components, so utilities still win. The item's text color eases to
+its color on the fill, and its content follows by inheriting it; the layer
+itself animates from script, only when the option changes. */
 @layer components {
   .fill-layer {
     position: absolute;
@@ -279,19 +279,31 @@ script, only when the option changes. */
   [data-filled] > .fill-layer {
     clip-path: none;
   }
-  [data-fillable],
-  [data-fillable] :where(*) {
-    transition-property: color, opacity;
+  [data-fillable] {
+    transition-property: color;
     transition-duration: 450ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
+  /* While the option changes, only the item's color animates, and inside it
+  only what fades (a swatch that goes once filled). A color transition inside
+  (a button's own, say) would chase the item's color as it eases, restarting
+  every frame: seconds of lag on iOS. Important, to win over utilities. */
+  [data-fill-changing] [data-fillable] * {
+    transition-property: opacity !important;
+    transition-duration: 450ms !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  /* Out of view, or with reduced motion: it just changes */
+  [data-fill-instant],
+  [data-fill-instant] * {
+    transition: none !important;
+  }
   @media (prefers-reduced-motion: reduce) {
-    [data-fillable],
-    [data-fillable] :where(*) {
+    [data-fillable] {
       transition-duration: 0s;
     }
   }
-  [data-motion='reduce'] :is([data-fillable], [data-fillable] *) {
+  [data-motion='reduce'] [data-fillable] {
     transition-duration: 0s;
   }
 }
