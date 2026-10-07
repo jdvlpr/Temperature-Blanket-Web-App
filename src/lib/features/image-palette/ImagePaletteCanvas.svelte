@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getTextColor } from '$lib/utils/color-utils';
   import { LockKeyholeIcon } from '@lucide/svelte';
   import { Portal } from '@skeletonlabs/skeleton-svelte';
+  import { tick } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
   import { innerHeight, innerWidth } from 'svelte/reactivity/window';
   import type {
@@ -33,9 +34,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorBarId?: string;
     /** A color to show on the selected marker, as while another yarn for it is pointed at */
     preview?: string | null;
+    /** Called when a dot opens its color from the keyboard, which moves the focus into the bar */
+    onkeyboardopen?: (id: number) => void;
   }
 
-  let { palette, colorBarId, preview = null }: Props = $props();
+  let { palette, colorBarId, preview = null, onkeyboardopen }: Props = $props();
 
   const LOUPE_SIZE = 112;
   /** Space between the finger and the magnifier, so the finger never covers it */
@@ -303,7 +306,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       palette.removePoint(point.id);
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      palette.selectedId = palette.selectedId === point.id ? null : point.id;
+      const opening = palette.selectedId !== point.id;
+      palette.selectedId = opening ? point.id : null;
+      if (opening && colorBarId) {
+        onkeyboardopen?.(point.id);
+        // Into the bar, which is out of the way under the palette
+        tick().then(() => document.getElementById(colorBarId)?.focus());
+      }
     } else if (e.key === 'Escape' && palette.selectedId !== null) {
       e.preventDefault();
       e.stopPropagation();
@@ -422,7 +431,7 @@ make the magnifier's fixed position relative to the photo, not the screen -->
           aria-controls={palette.selectedId === point.id
             ? colorBarId
             : undefined}
-          data-marker
+          data-marker={point.id}
           onpointerdown={(e) => onMarkerDown(e, point)}
           onpointerenter={() => (palette.hoveredId = point.id)}
           onpointerleave={() => (palette.hoveredId = null)}

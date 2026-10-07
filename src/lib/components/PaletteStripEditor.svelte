@@ -61,6 +61,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     keepOpen?: boolean;
     /** An id for the bar, for whatever else opens it */
     barId?: string;
+    /** Called when the bar is closed with Escape or Done; return true to move the focus yourself, as back to a photo's dot */
+    onclose?: (index: number) => boolean;
   }
 
   let {
@@ -77,6 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     preview = null,
     keepOpen = false,
     barId,
+    onclose,
   }: Props = $props();
 
   let strip: ReturnType<typeof PaletteStrip> | undefined = $state();
@@ -115,6 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function close() {
     const index = selected ?? 0;
     selected = null;
+    if (onclose?.(index)) return;
     strip?.focusColor(index);
   }
 
@@ -176,6 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       bind:this={bar}
       id={barId}
+      tabindex="-1"
       class={[
         // Tinted, like the pop-ups' other notices, so it reads as its own
         // panel for this one color

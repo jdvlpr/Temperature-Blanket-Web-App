@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
   import { yarnBall } from '@lucide/lab';
-  import { onMount, untrack } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
 
   interface Props {
     updateGauge: (params: {
@@ -148,11 +148,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : [],
   );
 
+  /** The dot whose color was opened from the keyboard, to go back to after */
+  let openedFromDot: number | null = null;
+
   $effect(() => {
     // A different color was selected: stop previewing another yarn
-    void palette.selectedId;
+    if (palette.selectedId === null) openedFromDot = null;
     previewYarn = null;
   });
+
+  /** Back to the dot the color was opened from, if it was */
+  function returnToDot(index: number) {
+    const id = palette.points[index]?.id;
+    if (id === undefined || id !== openedFromDot) return false;
+    openedFromDot = null;
+    tick().then(() =>
+      document.querySelector<HTMLElement>(`[data-marker="${id}"]`)?.focus(),
+    );
+    return true;
+  }
 
   const percent = (color: MatchedColor) =>
     `${Math.floor(100 - (color.delta ?? 0))}% match`;
@@ -429,6 +443,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {palette}
               colorBarId={COLOR_BAR_ID}
               preview={previewYarn?.hex}
+              onkeyboardopen={(id) => (openedFromDot = id)}
             />
           </div>
 
@@ -687,6 +702,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 }
                 keepOpen
                 barId={COLOR_BAR_ID}
+                onclose={returnToDot}
                 details={yarnChoices}
                 preview={previewYarn}
                 staggerIn

@@ -181,6 +181,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         'grid h-full min-w-0 flex-1 place-items-center focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
         onselect && 'cursor-pointer',
         flashIndices.includes(index) && 'history-flash',
+        // The end colors round their outer corners like the strip, so their
+        // outline (hover, selected, focus) follows the curve instead of
+        // being clipped by it
+        index === 0 && 'rounded-tl-container',
+        index === 0 && roundedBottom && 'rounded-bl-container',
+        index === colors.length - 1 && 'rounded-tr-container',
+        index === colors.length - 1 && roundedBottom && 'rounded-br-container',
       ],
       style: `background:${hex};color:${getTextColor(hex)};${
         highlightIndex === index
