@@ -15,14 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import ChooseRangeDirection from '$lib/components/ChooseRangeDirection.svelte';
-  import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog } from '$lib/state/page-state.svelte';
-  import { gauges, getRanges } from '$lib/state/gauges-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { regenerateRanges } from '$lib/utils/gauge-utils.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { displayNumber } from '$lib/utils/number-utils';
@@ -30,14 +28,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getDaysInRange,
     getIncrement,
     getRangeExample,
-    getStart,
   } from '$lib/utils/range-utils.svelte';
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import { targetArrow } from '@lucide/lab';
   import {
     ArrowRightIcon,
-    CalculatorIcon,
     ChevronUpIcon,
     CogIcon,
     Icon,
@@ -59,10 +55,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
 
-  // GaugeSettings is only ever opened for range-type gauges (see
-  // GaugeCustomizer.svelte, which hides RangeOptionsButton for
-  // `isStatic` gauges - only the moon gauge is static), so these
-  // range-related fields are always populated here.
+  // Only ever opened for range-type gauges (GaugeCustomizer hides the
+  // Ranges menu for `isStatic` gauges - only the moon gauge is static), so
+  // these range-related fields are always populated here. The direction,
+  // what the ends include, and linking are in the Ranges menu.
   type RangeGaugeSnapshot = Omit<GaugeStateInterface, 'id'> & {
     id: 'temp' | 'prcp' | 'snow' | 'dayt';
     rangeOptions: GaugeRangeOptions;
@@ -110,24 +106,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let customRanges = $state(_gauge.ranges);
 
-  let showAdvancedControls = $state(true);
-
-  let changedGaugeDirectionOnCustomRanges = $state(false);
-
-  let initialValueSelectRangeCalculationMethod = `${_gauge.rangeOptions.includeFromValue.toString()}-${_gauge.rangeOptions.includeToValue.toString()}`;
-
-  let start = $derived.by(() => {
-    _gauge.rangeOptions.mode;
-    _gauge.rangeOptions?.direction;
-    _gauge.rangeOptions?.manual.start;
-    return getStart(_gauge.rangeOptions);
-  });
-
   let increment = $derived.by(() => {
-    _gauge.rangeOptions.mode;
-    _gauge.rangeOptions?.direction;
-    _gauge.rangeOptions?.isCustomRanges;
-    _gauge.rangeOptions.manual.increment;
+    void _gauge.rangeOptions.mode;
+    void _gauge.rangeOptions?.direction;
+    void _gauge.rangeOptions?.isCustomRanges;
+    void _gauge.rangeOptions.manual.increment;
 
     return getIncrement(_gauge.rangeOptions, _gauge.autoRangeOptions);
   });
@@ -177,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let showScrollToTopButton = $state(false);
 
-  let scrollObserver = new IntersectionObserver((entries, observer) => {
+  let scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       showScrollToTopButton =
         !entry.isIntersecting && entry.boundingClientRect.top < 0;
@@ -204,22 +187,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function autoUpdateRanges() {
-    const { ranges, mustUpdateCustomRanges } = getRanges({
+    const { ranges, mustUpdateCustomRanges } = regenerateRanges({
+      id: _gauge.id,
       rangeOptions: _gauge.rangeOptions,
+      autoRangeOptions: _gauge.autoRangeOptions,
       ranges: customRanges,
-      start,
-      increment,
       colors: _gauge.colors,
-      includeFromAndTo,
-      dontIncludeFromAndTo,
-      gaugeId: _gauge.id,
     });
     _gauge.ranges = ranges;
     if (mustUpdateCustomRanges) customRanges = ranges;
   }
 
   $effect(() => {
-    incrementMode;
+    void incrementMode;
     tick().then(() => {
       onChangeIncrementMode();
     });
@@ -236,34 +216,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex max-w-full flex-col items-start justify-start lg:max-w-[400px]"
       bind:this={setupContainer}
     >
-      <h3 class="mb-2 text-base font-bold">Setup Ranges</h3>
+      <h3 class="mb-2 text-base font-bold">Setup</h3>
 
       <div class="rounded-container flex w-full flex-col gap-2">
-        <div class="flex max-w-full flex-col items-start justify-start">
-          <ChooseRangeDirection
-            direction={_gauge.rangeOptions.direction}
-            onchange={(e: { value: GaugeRangeOptions['direction'] }) => {
-              _gauge.rangeOptions.direction = e.value;
-
-              changedGaugeDirectionOnCustomRanges =
-                _gauge.rangeOptions.isCustomRanges;
-              if (changedGaugeDirectionOnCustomRanges) {
-                _gauge.ranges = customRanges
-                  .map((n) => {
-                    return {
-                      from: n.to,
-                      to: n.from,
-                    };
-                  })
-                  .reverse();
-                customRanges = _gauge.ranges;
-              } else {
-                autoUpdateRanges();
-              }
-            }}
-          />
-        </div>
-
         <div
           class="card preset-filled-surface-200-800 flex flex-col items-start justify-start gap-2 p-4"
         >
@@ -341,7 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           class="select bg-surface-100 dark:bg-surface-900 pl-10"
                         >
                           <option value="ranges">Range Increments</option>
-                          {#each _gauge.targets as { id, label, icon }}
+                          {#each _gauge.targets as { id, label, icon } (id)}
                             <option value={id}>
                               {icon}
                               {label}
@@ -477,97 +432,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </div>
 
-        <div class="mx-auto">
-          <Expand
-            bind:isExpanded={showAdvancedControls}
-            label="Advanced Controls"
-          />
-        </div>
-        {#if showAdvancedControls}
-          <div
-            transition:safeSlide
-            class="rounded-container bg-surface-200 dark:bg-surface-800 flex w-full flex-col items-start justify-start gap-4 p-4 text-left"
-          >
-            <ToggleSwitch
-              bind:checked={_gauge.rangeOptions.linked}
-              label="Linked Ranges"
-              details="When editing an individual range's From or To value, update the next or previous range's corresponding value."
-            />
-            <div
-              class="bg-surface-100 dark:bg-surface-900 rounded-container p-2"
-            >
-              <label class="label">
-                <span class="label-text">
-                  Range Calculation Method:<span>{@html rangeExample}</span>
-                </span>
-
-                <div class="relative flex items-center">
-                  <CalculatorIcon class="pointer-events-none absolute left-2" />
-                  <select
-                    class="select max-w-[500px] truncate pl-10"
-                    value={initialValueSelectRangeCalculationMethod}
-                    onchange={(e) => {
-                      switch ((e.target as HTMLSelectElement).value) {
-                        case 'true-false':
-                          _gauge.rangeOptions.includeFromValue = true;
-                          _gauge.rangeOptions.includeToValue = false;
-                          break;
-                        case 'false-true':
-                          _gauge.rangeOptions.includeFromValue = false;
-                          _gauge.rangeOptions.includeToValue = true;
-                          break;
-                        case 'true-true':
-                          _gauge.rangeOptions.includeFromValue = true;
-                          _gauge.rangeOptions.includeToValue = true;
-                          break;
-                        case 'false-false':
-                          _gauge.rangeOptions.includeFromValue = false;
-                          _gauge.rangeOptions.includeToValue = false;
-                          break;
-
-                        default:
-                          break;
-                      }
-                      autoUpdateRanges();
-                    }}
-                    title="Change Range Calculation Method"
-                    id="select-range-calculation-method"
-                  >
-                    <option value="true-false"
-                      >Include From, don't include To (default)</option
-                    >
-                    <option value="false-true"
-                      >Include To, don't include From
-                    </option>
-                    <option value="true-true">Include both From and To</option>
-                    <option value="false-false"
-                      >Don't include From and To</option
-                    >
-                  </select>
-                </div>
-                <p class="text-surface-700-300 text-sm">
-                  If you change this setting,
-                  <a
-                    href="/documentation/#range-calculation-methods"
-                    target="_blank"
-                    class="link"
-                    rel="noopener noreferrer"
-                    >make sure your ranges are set up correctly.</a
-                  >
-                </p>
-              </label>
-            </div>
-          </div>
-        {/if}
         {#if isRangeCalculationUnavailable}
           <p class="card bg-warning-50 dark:bg-warning-950 px-4 py-4 text-left">
             <TriangleAlertIcon class="inline" />
             The Ranges Preview below doesn't yet auto-calculate optimal From and To
-            values using these options and this range calculation method ({@html rangeExample}).
+            values using these options and this range calculation method ({rangeExample}).
             To show the optimal From and To values, {#if isNotAutoIncrements}
               set Automatic Ranges above, then
             {/if} uncheck Round Numbers {#if !isNotAutoIncrements}
-              above{/if}, or change the Range Calculation Method.
+              above{/if}, or change what each range includes in the Ranges menu.
           </p>
         {/if}
       </div>

@@ -135,10 +135,9 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
   let currentTo = currentFrom;
   for (let i = 0; i < numRanges; i++) {
     // Find the to value for the current range.
-    let weatherIndex = (i + 1) * (daysPerRange - 1);
+    const weatherIndex = (i + 1) * (daysPerRange - 1);
     if (i === numRanges - 1) {
       // It's the last range, so use the highest or lowest value possible in order to include every day
-      weatherIndex = _weatherData.length - 1;
       let endValue: number;
       if (roundIncrement && gaugeDirection === 'high-to-low')
         endValue = Math.floor(minValue - 0.01);
@@ -302,21 +301,15 @@ export const getRangeExample = ({
   includeToValue: boolean | undefined;
 }): string => {
   if (direction === 'high-to-low') {
-    if (includeFromValue && !includeToValue)
-      return '<span class="">From</span> <span class="">≥ Range &#62;</span> <span class="">To</span>';
-    if (!includeFromValue && includeToValue)
-      return '<span class="">From</span> <span class="">&#62; Range ≥</span> <span class="">To</span>';
-    if (includeFromValue && includeToValue)
-      return '<span class="">From</span> <span class="">≥ Range ≥</span> <span class="">To</span>';
-    return '<span class="">From</span> <span class="">&#62; Range &#62;</span> <span class="">To</span>';
+    if (includeFromValue && !includeToValue) return 'From ≥ Range > To';
+    if (!includeFromValue && includeToValue) return 'From > Range ≥ To';
+    if (includeFromValue && includeToValue) return 'From ≥ Range ≥ To';
+    return 'From > Range > To';
   } else {
-    if (includeFromValue && !includeToValue)
-      return '<span class="">From</span> <span class="">≤ Range &#60;</span> <span class="">To</span>';
-    if (!includeFromValue && includeToValue)
-      return '<span class="">From</span> <span class="">&#60; Range ≤</span> <span class="">To</span>';
-    if (includeFromValue && includeToValue)
-      return '<span class="">From</span> <span class="">≤ Range ≤</span> <span class="">To</span>';
-    return '<span class="">From</span> <span class="">&#60; Range &#60;</span> <span class="">To</span>';
+    if (includeFromValue && !includeToValue) return 'From ≤ Range < To';
+    if (!includeFromValue && includeToValue) return 'From < Range ≤ To';
+    if (includeFromValue && includeToValue) return 'From ≤ Range ≤ To';
+    return 'From < Range < To';
   }
 };
 

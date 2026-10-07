@@ -32,6 +32,8 @@ import {
   getDaysInRange,
   getDaysPercent,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
+  getIncrement,
+  getStart,
 } from '$lib/utils/range-utils.svelte';
 import { pluralize } from '$lib/utils/string-utils';
 import chroma from 'chroma-js';
@@ -89,7 +91,7 @@ export function getRanges({
         includeFrom: rangeOptions.includeFromValue,
         includeTo: rangeOptions.includeToValue,
       });
-      mode === 'auto';
+      mode = 'auto';
       isCustomRanges = false;
       toast.trigger({
         message: `Updated ranges automatically. Custom ranges overridden`,
@@ -121,7 +123,7 @@ export function getRanges({
     newRanges = colors.map((n, i) => {
       const isLastRange = i === colors.length - 1;
 
-      let from = _start;
+      const from = _start;
       let to = _start + _increment;
 
       if (!isLastRange && rangeOptions.mode !== 'manual')
@@ -145,6 +147,91 @@ export function getRanges({
   }
 
   return { ranges: newRanges, mustUpdateCustomRanges, mode, isCustomRanges };
+}
+
+/**
+ * A gauge's ranges worked out again for its range options, the way Generate
+ * Ranges and the Ranges menu do: generated ranges follow the options, and
+ * custom ones are kept.
+ */
+export function regenerateRanges({
+  id,
+  rangeOptions,
+  autoRangeOptions,
+  ranges,
+  colors,
+}: {
+  id: 'temp' | 'prcp' | 'snow' | 'dayt';
+  rangeOptions: GaugeRangeOptions;
+  autoRangeOptions: GaugeRangeOptions;
+  ranges: GaugeRange[];
+  colors: Color[];
+}) {
+  const { includeFromValue: from, includeToValue: to } = rangeOptions;
+  return getRanges({
+    rangeOptions,
+    ranges,
+    start: getStart(rangeOptions),
+    increment: getIncrement(rangeOptions, autoRangeOptions),
+    colors,
+    includeFromAndTo: from && to,
+    dontIncludeFromAndTo: !from && !to,
+    gaugeId: id,
+  });
+}
+
+/**
+ * A gauge's range options with some changed, and its ranges to match: a new
+ * direction turns custom ranges around and regenerates the others, and what
+ * the ends include regenerates them. Plain copies, so nothing live is changed.
+ */
+export function withRangeOptions(
+  gauge: {
+    id: 'temp' | 'prcp' | 'snow' | 'dayt';
+    rangeOptions: GaugeRangeOptions;
+    autoRangeOptions: GaugeRangeOptions;
+    ranges: GaugeRange[];
+    colors: Color[];
+  },
+  change: Partial<
+    Pick<
+      GaugeRangeOptions,
+      'direction' | 'includeFromValue' | 'includeToValue' | 'linked'
+    >
+  >,
+): { rangeOptions: GaugeRangeOptions; ranges: GaugeRange[] } {
+  const copy = <T>(value: T) => structuredClone($state.snapshot(value)) as T;
+  const rangeOptions: GaugeRangeOptions = {
+    ...copy(gauge.rangeOptions),
+    ...change,
+  };
+  const ranges = copy(gauge.ranges);
+  const turned =
+    change.direction !== undefined &&
+    change.direction !== gauge.rangeOptions.direction;
+  const included =
+    (change.includeFromValue !== undefined &&
+      change.includeFromValue !== gauge.rangeOptions.includeFromValue) ||
+    (change.includeToValue !== undefined &&
+      change.includeToValue !== gauge.rangeOptions.includeToValue);
+
+  if (turned && rangeOptions.isCustomRanges)
+    return {
+      rangeOptions,
+      ranges: ranges.map(({ from, to }) => ({ from: to, to: from })).reverse(),
+    };
+  if (!turned && !included) return { rangeOptions, ranges };
+
+  const result = regenerateRanges({
+    id: gauge.id,
+    rangeOptions,
+    autoRangeOptions: copy(gauge.autoRangeOptions),
+    ranges,
+    colors: copy(gauge.colors),
+  });
+  rangeOptions.mode = result.mode;
+  rangeOptions.isCustomRanges = result.isCustomRanges;
+  return { rangeOptions, ranges: result.ranges };
 }
 
 export const createGaugeColors = ({

@@ -21,7 +21,7 @@ export default [
     },
   },
   {
-    files: ['**/*.svelte'],
+    files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
     languageOptions: {
       parserOptions: {
         parser: ts.parser,
@@ -29,6 +29,15 @@ export default [
     },
   },
   {
-    ignores: ['build/', '.svelte-kit/', 'dist/'],
+    rules: {
+      // `const { id, ...rest } = item` is how a key is left out of a copy
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true },
+      ],
+    },
+  },
+  {
+    ignores: ['build/', '.svelte-kit/', 'dist/', '.wrangler/'],
   },
 ];

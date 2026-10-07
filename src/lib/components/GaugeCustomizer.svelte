@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-dnd-action';
   import { tick, untrack } from 'svelte';
   import { flip } from 'svelte/animate';
-  import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
+  import RangesMenu from './buttons/RangesMenu.svelte';
 
   const flipDurationMs = $derived(motionDuration(150));
 
@@ -769,7 +769,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 <div class={['mt-4 flex flex-wrap items-center justify-center gap-4']}>
   {#if isProjectPlannerPage}
     <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
-      <RangeOptionsButton />
+      <RangesMenu />
     </div>
   {/if}
   <!-- Only the project page has more view options; elsewhere there's no separator -->
