@@ -49,6 +49,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     insideControl?: boolean;
     /** Called with a color's index when it's pressed; each color is then a button */
     onselect?: (index: number) => void;
+    /** With `onselect`, the color that's chosen (null for none), which its button says it is */
+    selectedIndex?: number | null;
     /** Called with a color's index when it's pointed at or focused from the keyboard, and null after */
     onhover?: (index: number | null) => void;
     /** A color to outline, as when its marker is pointed at on an image */
@@ -68,6 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom = true,
     insideControl = false,
     onselect,
+    selectedIndex,
     onhover,
     highlightIndex = null,
     flashIndices = [],
@@ -188,6 +191,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? undefined
         : `Color ${index + 1}: ${describe(color)}${color.locked ? ', locked' : ''}`,
       tabindex: insideControl ? undefined : index === tabStop ? 0 : -1,
+      'aria-pressed':
+        onselect && selectedIndex !== undefined
+          ? selectedIndex === index
+          : undefined,
       onpointerenter: (event: PointerEvent) => {
         if (event.pointerType === 'touch') {
           // A tap on a link or button uses it, so there's nothing to name

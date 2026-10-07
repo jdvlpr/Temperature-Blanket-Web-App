@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { sameColorList } from '$lib/utils/color-utils';
+  import { tick } from 'svelte';
   import {
     ArrowLeftIcon,
     ArrowRightIcon,
@@ -58,6 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   let strip: ReturnType<typeof PaletteStrip> | undefined = $state();
+  let bar: HTMLElement | undefined = $state();
   /** The color the bar is for */
   let selected: number | null = $state(null);
   /** What the bar last did, for screen readers */
@@ -67,19 +69,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let color = $derived(selected === null ? null : colors[selected]);
 
-  // A new palette from elsewhere (Randomize, a new photo) closes the bar
+  // A new palette from elsewhere (Randomize, a new photo, or Random
+  // Palette's re-roll after a removal) closes the bar; the focus, if it was
+  // in the bar, goes back to the strip
   $effect.pre(() => {
-    if (selected !== null && !sameColorList(colors, own)) selected = null;
+    if (selected === null || sameColorList(colors, own)) return;
+    const index = selected;
+    const hadFocus = !!bar?.contains(document.activeElement);
+    selected = null;
+    if (hadFocus) tick().then(() => strip?.focusColor(index));
   });
 
   function update(next: Color[]) {
-    own = next;
+    own = $state.snapshot(next);
     colors = next;
     onchange?.(next);
   }
 
   function select(index: number) {
-    own = colors;
+    own = $state.snapshot(colors);
     selected = selected === index ? null : index;
     announcement = '';
   }
@@ -131,11 +139,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {onhover}
     highlightIndex={selected ?? highlightIndex}
     onselect={select}
+    selectedIndex={selected}
   />
 
   {#if color && selected !== null}
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
+      bind:this={bar}
       class="flex flex-wrap items-center gap-x-2 gap-y-1 px-2 pt-2 text-left"
       role="group"
       aria-label="Color {selected + 1}"
