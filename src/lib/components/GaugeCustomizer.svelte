@@ -492,39 +492,76 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 {/snippet}
 
+<!-- The number being edited, in its own field like the search fields: the
+number, its unit, and ✕ to cancel -->
+{#snippet rangeInput(index: number, edge: 'from' | 'to')}
+  {#if editing}
+    <span
+      class="input-group w-fit grid-cols-[minmax(0,1fr)_auto_auto] @max-[13rem]:grid-cols-[minmax(0,1fr)_auto]"
+    >
+      <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
+      from zooming in. No spinners: they crowd the field, and the arrow keys
+      still step. -->
+      <input
+        type="number"
+        step="any"
+        class="ig-input w-[7ch] [appearance:textfield] px-2 text-base tabular-nums @max-[13rem]:w-[6ch] @max-[13rem]:px-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        aria-label="Color {index + 1} {edge}{unitLabel ? `, ${unitLabel}` : ''}"
+        bind:value={editing[edge]}
+        {@attach (el) => {
+          el.focus();
+          el.select();
+        }}
+      />
+      {#if unitLabel}
+        <span
+          class="ig-cell pl-0 text-xs opacity-70 @max-[13rem]:hidden"
+          aria-hidden="true">{unitLabel}</span
+        >
+      {/if}
+      <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
+      <button
+        type="button"
+        class="ig-btn"
+        title="Cancel"
+        aria-label="Cancel editing range for color {index + 1}"
+        onmousedown={(e) => e.preventDefault()}
+        onclick={cancelRange}
+      >
+        <XIcon size={18} aria-hidden="true" />
+      </button>
+    </span>
+  {/if}
+{/snippet}
+
 {#snippet range(index: number, column: boolean)}
   {@const r = isCategory ? gauge.ranges?.[index] : draft.ranges[index]}
   {#if r}
     {#if isCategory}
       <span class="truncate px-2 text-sm">{r.label}</span>
-    {:else if editing?.index === index}
-      {@const label = (edge: string) =>
-        `Color ${index + 1} ${edge}${unitLabel ? `, ${unitLabel}` : ''}`}
-      <!-- One field, like the search fields: From → To, the unit, and ✕ to cancel,
-      then a filled Save. Saved with Save or Enter, or by pressing or tabbing
-      elsewhere; ✕ or Escape puts it back. In a narrow card, the field fills
-      it, without the unit, and Save goes under it. -->
+    {:else}
+      {@const isEditing = editing?.index === index}
+      <!-- From and To are each a button, just around the number. In the
+      list, each sits in a slot as wide as the widest, so they line up.
+      Tapping one turns just it into a field, with Save after the range.
+      Saved with Save or Enter, or by pressing or tabbing elsewhere (the
+      other number too); ✕ or Escape puts it back. -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div
-        class="flex flex-wrap items-center gap-2 px-1"
+      <span
+        class="flex flex-wrap items-center gap-x-0.5 gap-y-2 rounded-[inherit]"
+        class:history-flash={historyChange.gaugeId === gauge.id &&
+          historyChange.indices.includes(index)}
         onfocusout={(e) => {
+          if (!isEditing) return;
           // Tabbing away saves. Focus going nowhere doesn't: that's also
           // what pressing ✕ does in some browsers, before its click.
           const to = e.relatedTarget as Node | null;
           if (to && !e.currentTarget.contains(to))
             saveRange({ refocus: false });
         }}
-        {@attach (el) => {
-          // Pressing anywhere else saves
-          const onPointerDown = (e: PointerEvent) => {
-            if (!el.contains(e.target as Node)) saveRange({ refocus: false });
-          };
-          document.addEventListener('pointerdown', onPointerDown, true);
-          return () =>
-            document.removeEventListener('pointerdown', onPointerDown, true);
-        }}
         onkeydown={(e) => {
-          // From the numbers; on the buttons, Enter presses them
+          if (!isEditing) return;
+          // From the number; on the buttons, Enter presses them
           if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
             e.preventDefault();
             saveRange({ refocus: true });
@@ -535,88 +572,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
             cancelRange();
           }
         }}
+        {@attach isEditing
+          ? (el) => {
+              // Pressing anywhere else saves
+              const onPointerDown = (e: PointerEvent) => {
+                if (!el.contains(e.target as Node))
+                  saveRange({ refocus: false });
+              };
+              document.addEventListener('pointerdown', onPointerDown, true);
+              return () =>
+                document.removeEventListener(
+                  'pointerdown',
+                  onPointerDown,
+                  true,
+                );
+            }
+          : null}
       >
-        <div
-          class="input-group w-fit grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_auto] @max-[13rem]:w-full"
-        >
-          <!-- type="number" keeps the minus key on phones; 16px text keeps
-          iOS from zooming in. No spinners: they crowd the field, and the
-          arrow keys still step. -->
-          <input
-            type="number"
-            step="any"
-            class="ig-input w-[7ch] [appearance:textfield] px-2 text-base tabular-nums @max-[13rem]:w-full @max-[13rem]:px-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            aria-label={label('from')}
-            bind:value={editing.from}
-            {@attach (el) => {
-              // Once, when it opens, not on every keystroke
-              if (untrack(() => editing?.edge) === 'from') {
-                el.focus();
-                el.select();
-              }
-            }}
-          />
-          <span class="ig-cell px-0.5" aria-hidden="true">
-            <ArrowRightIcon size={14} class="opacity-60" />
-          </span>
-          <input
-            type="number"
-            step="any"
-            class="ig-input w-[7ch] [appearance:textfield] px-2 text-base tabular-nums @max-[13rem]:w-full @max-[13rem]:px-1.5 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            aria-label={label('to')}
-            bind:value={editing.to}
-            {@attach (el) => {
-              if (untrack(() => editing?.edge) === 'to') {
-                el.focus();
-                el.select();
-              }
-            }}
-          />
-          {#if unitLabel}
-            <span
-              class="ig-cell pl-0 text-xs opacity-70 @max-[13rem]:hidden"
-              aria-hidden="true">{unitLabel}</span
-            >
-          {/if}
-          <!-- Pressing it, or Save, keeps the focus in the numbers, so the keyboard stays up -->
-          <button
-            type="button"
-            class="ig-btn"
-            title="Cancel"
-            aria-label="Cancel editing range for color {index + 1}"
-            onmousedown={(e) => e.preventDefault()}
-            onclick={cancelRange}
-          >
-            <XIcon size={18} aria-hidden="true" />
-          </button>
-        </div>
-        <button
-          type="button"
-          class="btn preset-filled-primary-500 h-9 px-3 @max-[13rem]:w-full"
-          title="Save Range"
-          aria-label="Save range for color {index + 1}"
-          onmousedown={(e) => e.preventDefault()}
-          onclick={() => saveRange({ refocus: true })}
-        >
-          <CheckIcon size={18} aria-hidden="true" />
-          Save
-        </button>
-      </div>
-    {:else}
-      <!-- From and To are each a button, just around the number. In the
-      list, each sits in a slot as wide as the widest, so they line up. -->
-      <span
-        class="flex items-center gap-0.5 rounded-[inherit]"
-        class:history-flash={historyChange.gaugeId === gauge.id &&
-          historyChange.indices.includes(index)}
-      >
-        {@render rangeValue(index, r, 'from', column)}
+        {#if isEditing && editing?.edge === 'from'}
+          {@render rangeInput(index, 'from')}
+        {:else}
+          {@render rangeValue(index, r, 'from', column)}
+        {/if}
         <ArrowRightIcon
           size={14}
-          class="shrink-0 opacity-60"
+          class="mx-0.5 shrink-0 opacity-60"
           aria-hidden="true"
         />
-        {@render rangeValue(index, r, 'to', column)}
+        {#if isEditing && editing?.edge === 'to'}
+          {@render rangeInput(index, 'to')}
+        {:else}
+          {@render rangeValue(index, r, 'to', column)}
+        {/if}
+        {#if isEditing}
+          <!-- Filled, like Save elsewhere; under the range in a narrow card -->
+          <button
+            type="button"
+            class="btn preset-filled-primary-500 ml-1.5 h-9 px-3 @max-[13rem]:ml-0 @max-[13rem]:w-full"
+            title="Save Range"
+            aria-label="Save range for color {index + 1}"
+            onmousedown={(e) => e.preventDefault()}
+            onclick={() => saveRange({ refocus: true })}
+          >
+            <CheckIcon size={18} aria-hidden="true" />
+            Save
+          </button>
+        {/if}
       </span>
     {/if}
   {/if}
