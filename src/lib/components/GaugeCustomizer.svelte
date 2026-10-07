@@ -434,7 +434,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tabindex="0"
     title="Move Color"
     aria-label="Drag handle to reorder color {index + 1}"
-    class="handle rounded-tile flex h-9 w-7 shrink-0 cursor-grab items-center justify-center focus-visible:outline-2 focus-visible:outline-current {onColor
+    class="handle flex size-8 shrink-0 cursor-grab items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-current {onColor
       ? 'hover-on-color'
       : 'hover:preset-tonal-surface'}"
     data-sheet-no-drag
@@ -852,10 +852,10 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         a second line under the yarn. Every row has the same columns, so they line up. -->
         <div
           class="grid items-center gap-x-2 gap-y-1 p-2 text-left {showDays
-            ? 'grid-cols-[1.75rem_minmax(0,1fr)_auto] @2xl:grid-cols-[1.75rem_minmax(0,1fr)_auto_auto_auto]'
+            ? 'grid-cols-[2rem_minmax(0,1fr)_auto] @2xl:grid-cols-[2rem_minmax(0,1fr)_auto_auto_auto]'
             : showRanges
-              ? 'grid-cols-[1.75rem_minmax(0,1fr)_auto] @lg:grid-cols-[1.75rem_minmax(0,1fr)_auto_auto]'
-              : 'grid-cols-[1.75rem_minmax(0,1fr)_auto]'}"
+              ? 'grid-cols-[2rem_minmax(0,1fr)_auto] @lg:grid-cols-[2rem_minmax(0,1fr)_auto_auto]'
+              : 'grid-cols-[2rem_minmax(0,1fr)_auto]'}"
         >
           <span class="col-start-1 row-start-1 flex justify-center">
             {@render handle(index)}
@@ -866,7 +866,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           {#if showRanges}
             <!-- Under the yarn's name on a phone; its own columns where there's room -->
             <span
-              class="col-span-3 col-start-1 row-start-2 flex flex-wrap items-center gap-1 pl-1 @sm:pl-[5.5rem] {showDays
+              class="col-span-3 col-start-1 row-start-2 flex flex-wrap items-center gap-1 pl-1 @sm:pl-[5.75rem] {showDays
                 ? '@2xl:contents'
                 : '@lg:contents'}"
             >
