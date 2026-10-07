@@ -226,7 +226,8 @@ function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
     );
   };
 
-  items.forEach((item, index) => {
+  // Every row measured first, so a row knows if it's the last on its page
+  const rows = items.map((item) => {
     const blocks = yarnBlocks(pdf, item, textWidth);
     let rangeLines = lineHeight(RANGE_SIZE);
     if (item.range && !isNumbers(item.range))
@@ -243,8 +244,16 @@ function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
         item.range ? rangeLines : 0,
       ) +
       PAD * 2;
+    return { blocks, rangeLines, height };
+  });
+  // As Flow does: a row that won't fit starts a page, unless the page is empty
+  const breaksBefore = (index: number, y: number) =>
+    rows[index].height > flow.box.bottom - y && y > flow.box.top;
 
-    if (height > flow.room && flow.y > flow.box.top) {
+  items.forEach((item, index) => {
+    const { blocks, rangeLines, height } = rows[index];
+
+    if (breaksBefore(index, flow.y)) {
       closeChunk();
       flow.newPage();
       chunkTop = flow.y;
@@ -253,8 +262,30 @@ function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
     const ink = colorsFor(item, filled);
 
     if (filled) {
+      // The list's first and last rows on a page take its rounded corners:
+      // the fill is clipped to the outline, reaching past it where the row
+      // goes on, so only the list's own ends are rounded
+      const first = top === chunkTop;
+      const last =
+        index === items.length - 1 || breaksBefore(index + 1, top + height);
+      const reach = RADIUS * 2;
+      const clipTop = first ? top : top - reach;
+      const clipBottom = last ? top + height : top + height + reach;
+      doc.saveGraphicsState();
+      doc.roundedRect(
+        left,
+        clipTop,
+        width,
+        clipBottom - clipTop,
+        RADIUS,
+        RADIUS,
+        null,
+      );
+      doc.clip();
+      doc.discardPath();
       doc.setFillColor(item.hex);
       doc.rect(left, top, width, height, 'F');
+      doc.restoreGraphicsState();
     }
     // A line between rows, as the site's list has
     if (index > 0 && top > chunkTop) {
