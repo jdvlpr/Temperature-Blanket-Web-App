@@ -14,25 +14,24 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  The box beside a menu item that turns something on or off: empty when off,
-  so it's clear choosing it adds a check, and filled with a check when on.
-  (Choices of one among several show just a check on the chosen one.) The
-  item itself tells screen readers whether it's checked.
+  The mark beside a menu item that turns something on or off, drawn like the
+  check circles on the Choose Colorways cards: an empty circle when off, so
+  it's clear choosing it adds a check, and a circle with a check, in the
+  primary color, when on. (Choices of one among several show just a check on
+  the chosen one.) The item itself tells screen readers whether it's checked.
 -->
 <script lang="ts">
-  import { CheckIcon } from '@lucide/svelte';
+  import { CircleCheckIcon, CircleIcon } from '@lucide/svelte';
 
   let { checked }: { checked: boolean } = $props();
 </script>
 
-<span
-  class={[
-    'rounded-base grid size-5 shrink-0 place-items-center border-2',
-    checked
-      ? 'border-primary-500 bg-primary-500 text-primary-contrast-500'
-      : 'border-surface-600-400',
-  ]}
-  aria-hidden="true"
->
-  {#if checked}<CheckIcon size={14} strokeWidth={3} />{/if}
-</span>
+{#if checked}
+  <CircleCheckIcon
+
+    class="text-primary-700-300 shrink-0 size-5"
+    aria-hidden="true"
+  />
+{:else}
+  <CircleIcon class="shrink-0 size-5" aria-hidden="true" />
+{/if}

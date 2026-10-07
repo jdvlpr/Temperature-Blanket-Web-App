@@ -625,7 +625,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#if swatch}
       <span
-        class="grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+        class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
         class:feedback-pop={pop.index === index}
         class:history-flash={historyChange.gaugeId === gauge.id &&
           historyChange.indices.includes(index)}
@@ -1056,7 +1056,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         <div class="flex items-center gap-1 px-2 pt-2">
           {@render handle(index)}
           <span
-            class="grid size-10 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+            class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
             class:feedback-pop={pop.index === index}
             class:history-flash={historyChange.gaugeId === gauge.id &&
               historyChange.indices.includes(index)}
@@ -1100,7 +1100,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           {#if showRanges}
             <!-- Under the yarn's name on a phone; its own columns where there's room -->
             <span
-              class="col-span-3 col-start-1 row-start-2 flex flex-wrap items-center gap-1 pl-1 @sm:pl-[5.75rem] {showDays
+              class="col-span-3 col-start-1 row-start-2 flex flex-wrap items-center gap-1 pl-1 @sm:pl-[6.25rem] {showDays
                 ? '@2xl:contents'
                 : '@lg:contents'}"
             >

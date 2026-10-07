@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Yarn colorways as rows, the cards laid out sideways: swatch, name and yarn,
+  Yarn colorways as rows, the cards laid out sideways: round swatch, name and yarn,
   match, and the same "more" menu (⋮) with the link to buy or view it and the
   copy options. The match sits at the row's end, or under the name where the
   list is narrow.
@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     colorwayKey,
     matchPercent,
+    swatchClass,
     type ColorwaySelection,
   } from './colorway-utils';
 
@@ -51,10 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet row(colorway: Color & { delta?: number })}
   {@const match = matchPercent(colorway)}
-  <span
-    class="rounded-container size-12 shrink-0 ring-1 ring-black/10 ring-inset"
-    style="background:{colorway.hex}"
-  ></span>
+  <span class={swatchClass} style="background:{colorway.hex}"></span>
   <span class="flex min-w-0 flex-1 flex-col gap-0.5">
     <span class="leading-tight font-semibold text-pretty">{colorway.name}</span>
     <span class="text-surface-700-300 text-xs text-pretty">

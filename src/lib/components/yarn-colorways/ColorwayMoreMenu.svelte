@@ -18,7 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   affiliate link) or view it on the site it's listed on, then copy its name or hex
   code, each showing what it copies. On a swatch, the trigger has no
   background: a black or white icon, whichever stands out on that color,
-  tinted on hover. On the page's surface (list rows) it's a plain icon button.
+  tinted on hover. On the page's surface (cards and rows) it's a plain icon
+  button. Either way it stays tinted while its menu is open, so a tap on a
+  phone (which has no hover) shows it too.
   With `onremove`, it ends with Remove, for a color in a palette.
 -->
 <script lang="ts">
@@ -88,8 +90,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <Menu.Trigger
     class={on === 'swatch'
-      ? 'btn-icon hover-on-color size-7 rounded-full focus-visible:outline-2 focus-visible:outline-current'
-      : 'btn-icon hover:preset-tonal-surface size-8 shrink-0'}
+      ? 'btn-icon hover-on-color size-7 rounded-full focus-visible:outline-2 focus-visible:outline-current active:bg-[color-mix(in_oklab,currentColor_18%,transparent)] data-[state=open]:bg-[color-mix(in_oklab,currentColor_18%,transparent)]'
+      : 'btn-icon hover:preset-tonal-surface active:bg-surface-200-800 data-[state=open]:bg-surface-200-800 size-8 shrink-0'}
     style={on === 'swatch' ? `color:${iconColorOn(colorway.hex)}` : undefined}
     aria-label="More for {colorway.name || colorway.hex}"
     title="More"

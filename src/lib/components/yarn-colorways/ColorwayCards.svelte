@@ -14,16 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Yarn colorways as swatch cards: the color on its own, uncovered, with the
-  name and yarn below it on the card, so text reads the same on every color.
-  A "more" menu (⋮) in the swatch's top right holds the link to buy or view
-  it and the copy options. The match sits beside it, or below it on a card
-  too narrow for both.
+  Yarn colorways as cards, like the palette's color cards: a round swatch on
+  the card's top line with a "more" menu (⋮) at its end, then the name, yarn
+  and match below it on the card, so text reads the same on every color. The
+  ⋮ menu holds the link to buy or view it and the copy options.
 
-  With `selection`, each card's swatch and name are one toggle button (a
-  circle, checked when selected); the ⋮ menu stays its own button beside it,
-  level with the circle. The match sits beside the circle, or wraps below it
-  on a card too narrow for all three.
+  With `selection`, each card (but its ⋮ menu) is one toggle button, led by a
+  circle that's checked when it's selected, beside the swatch.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
@@ -31,8 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorwayMoreMenu from './ColorwayMoreMenu.svelte';
   import {
     colorwayKey,
-    iconColorOn,
     matchPercent,
+    swatchClass,
     type ColorwaySelection,
   } from './colorway-utils';
 
@@ -44,16 +41,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { colorways, selection }: Props = $props();
 </script>
 
-{#snippet matchPill(match: number)}
-  <span
-    class="bg-surface-50-950 text-surface-950-50 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap"
-  >
-    {match}% match
-  </span>
+<!-- Spans, since in a selectable card they're inside its button -->
+{#snippet swatch(colorway: Color)}
+  <span class={swatchClass} style="background:{colorway.hex}"></span>
 {/snippet}
 
-<!-- Spans, since in a selectable card they're inside its button -->
-{#snippet details(colorway: Color)}
+{#snippet details(colorway: Color & { delta?: number })}
+  {@const match = matchPercent(colorway)}
   <span class="flex min-w-0 flex-col gap-0.5">
     <span class="leading-tight font-semibold text-pretty">
       {colorway.name}
@@ -62,6 +56,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {colorway.brandName} · {colorway.yarnName}
     </span>
   </span>
+  {#if match !== undefined}
+    <span
+      class="bg-surface-200-800 text-surface-950-50 w-fit rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums"
+    >
+      {match}% match
+    </span>
+  {/if}
   {#if colorway.unavailable}
     <span class="text-surface-700-300 mt-auto text-xs leading-tight">
       No longer available
@@ -73,7 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
 >
   {#each colorways as colorway (colorwayKey(colorway))}
-    {@const match = matchPercent(colorway)}
     {#if selection}
       {@const selected = selection.isSelected(colorway)}
       <li
@@ -83,50 +83,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           type="button"
-          class="flex flex-1 cursor-pointer flex-col text-left"
+          class="hover:bg-surface-200-800/50 flex flex-1 cursor-pointer flex-col text-left"
           aria-pressed={selected}
           onclick={() => selection.ontoggle(colorway)}
         >
-          <span
-            class="flex h-20 w-full flex-wrap content-start items-center gap-1 p-1.5 pt-2 pr-11 sm:h-24"
-            style="background:{colorway.hex};color:{iconColorOn(colorway.hex)}"
-          >
-            {#if selected}
-              <span class="flex size-7 shrink-0 items-center justify-center"
-                ><CircleCheckIcon size={22} aria-hidden="true" /></span
-              >
-            {:else}
-              <span class="flex size-7 shrink-0 items-center justify-center"
-                ><CircleIcon size={22} aria-hidden="true" /></span
-              >
-            {/if}
-            {#if match !== undefined}{@render matchPill(match)}{/if}
+          <!-- Room at the end for the ⋮ menu, which isn't part of the toggle -->
+          <span class="flex h-14 items-center gap-1 px-2 pt-2 pr-14">
+            <span class="flex size-8 shrink-0 items-center justify-center">
+              {#if selected}
+                <CircleCheckIcon
+                  class="text-primary-700-300"
+                  aria-hidden="true"
+                />
+              {:else}
+                <CircleIcon aria-hidden="true" />
+              {/if}
+            </span>
+            {@render swatch(colorway)}
           </span>
-          <span class="flex flex-1 flex-col gap-2 p-2 sm:p-3">
+          <span class="flex flex-1 flex-col gap-2 p-2">
             {@render details(colorway)}
           </span>
         </button>
-        <!-- Centered on the check circle's line: the circle's 28px box starts
-        8px down and this 44px touch target at the top, both centered 22px down -->
-        <div class="absolute top-0 right-0">
-          <ColorwayMoreMenu {colorway} />
+        <!-- Over the swatch's line, a box the same height and as far down,
+        so the button centers on that line whatever its own size -->
+        <div class="absolute top-2 right-2 flex h-12 items-center">
+          <ColorwayMoreMenu {colorway} on="surface" />
         </div>
       </li>
     {:else}
       <li
         class="card bg-surface-50-950 border-surface-200-800 flex min-w-0 flex-col overflow-hidden border"
       >
-        <div class="h-20 p-2 sm:h-24" style="background:{colorway.hex}">
-          <div
-            class="flex flex-row-reverse flex-wrap items-center justify-between gap-1"
+        <div class="flex h-14 items-center gap-1 px-2 pt-2">
+          {@render swatch(colorway)}
+          <span class="ml-auto flex items-center"
+            ><ColorwayMoreMenu {colorway} on="surface" /></span
           >
-            <div class="-m-1"><ColorwayMoreMenu {colorway} /></div>
-            {#if match !== undefined}
-              <div class="mr-auto">{@render matchPill(match)}</div>
-            {/if}
-          </div>
         </div>
-        <div class="flex flex-1 flex-col gap-2 p-2 sm:p-3">
+        <div class="flex flex-1 flex-col gap-2 p-2">
           {@render details(colorway)}
         </div>
       </li>
