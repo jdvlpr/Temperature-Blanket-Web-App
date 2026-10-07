@@ -79,10 +79,19 @@ describe('gridCells', () => {
 });
 
 describe('tableColumns', () => {
-  it('stays inside the width', () => {
-    const { data } = tableColumns(14, 182, 7);
+  it('grows the day column first, then shares the rest', () => {
+    const { day, data } = tableColumns(14, 182, { day: 30, data: [20, 20] });
+    expect(day.width).toBe(46);
+    expect(data[0].width).toBeCloseTo((182 - 46) / 2);
     const last = data[data.length - 1];
     expect(last.x + last.width).toBeCloseTo(14 + 182);
+  });
+
+  it('shrinks every column alike when short of room', () => {
+    const { day, data } = tableColumns(0, 100, { day: 40, data: [80, 80] });
+    expect(day.width).toBeCloseTo(20);
+    expect(data[1].width).toBeCloseTo(40);
+    expect(data[1].x + data[1].width).toBeCloseTo(100);
   });
 });
 

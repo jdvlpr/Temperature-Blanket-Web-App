@@ -120,20 +120,42 @@ export function gridCells(
   }));
 }
 
-/** Weather table columns: the day and place column, then the rest evenly */
+/** The most the day and place column grows to, so places wrap less */
+const DAY_COLUMN_MAX = 46;
+
+/**
+ * Weather table columns, from the width each would like (its widest value):
+ * with room to spare, the day and place column grows first, then the rest
+ * share what's left; short of room, every column gives up the same share.
+ */
 export function tableColumns(
   left: number,
   width: number,
-  count: number,
+  wants: { day: number; data: number[] },
 ): { day: { x: number; width: number }; data: { x: number; width: number }[] } {
-  const dayWidth = Math.min(46, width * 0.3);
-  const dataWidth = count ? (width - dayWidth) / count : 0;
+  const wanted = wants.day + wants.data.reduce((sum, w) => sum + w, 0);
+  let day = wants.day;
+  let data = [...wants.data];
+  if (wanted > width) {
+    const scale = width / wanted;
+    day *= scale;
+    data = data.map((w) => w * scale);
+  } else {
+    let spare = width - wanted;
+    const grow = Math.min(spare, Math.max(0, DAY_COLUMN_MAX - day));
+    day += grow;
+    spare -= grow;
+    if (data.length) data = data.map((w) => w + spare / data.length);
+    else day += spare;
+  }
+  let x = left + day;
   return {
-    day: { x: left, width: dayWidth },
-    data: Array.from({ length: count }, (_, i) => ({
-      x: left + dayWidth + i * dataWidth,
-      width: dataWidth,
-    })),
+    day: { x: left, width: day },
+    data: data.map((w) => {
+      const column = { x, width: w };
+      x += w;
+      return column;
+    }),
   };
 }
 

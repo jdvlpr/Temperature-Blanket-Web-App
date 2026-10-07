@@ -25,7 +25,16 @@ import type { WeatherParam } from '$lib/types/gauge-types';
 import type { WeatherDay } from '$lib/types/weather-types';
 import { getColorInfo } from '$lib/utils/color-utils';
 import { convertTime } from '$lib/utils/unit-utils.svelte';
-import { INK, SIZE, paragraph, swatch, text, wrap, type Pdf } from '../draw';
+import {
+  INK,
+  SIZE,
+  measure,
+  paragraph,
+  swatch,
+  text,
+  wrap,
+  type Pdf,
+} from '../draw';
 import { Flow, lineHeight, ptToMm, tableColumns } from '../layout';
 
 export type TableTarget = {
@@ -79,9 +88,64 @@ function header(target: TableTarget) {
 export function drawWeatherTable(pdf: Pdf, flow: Flow, targets: TableTarget[]) {
   const { doc } = pdf;
   const { left, width } = flow.box;
-  const columns = tableColumns(left, width, targets.length);
   const withColor = targets.map((target) =>
     gauges.allCreated.some((g) => g.id === getTargetParentGaugeId(target.id)),
+  );
+  const swatchSpace = (i: number) => (withColor[i] ? DOT_R * 2 + 1.5 : 0);
+  const labels = targets.map((target) =>
+    weather.data.map((day) => valueOf(day, target.id).label),
+  );
+  // Numbers never wrap; words (moon phases) wrap, but only between words
+  const wraps = targets.map((target) => target.id === 'moon');
+  const widest = labels.map((list, i) =>
+    Math.max(
+      0,
+      ...(wraps[i] ? list.flatMap((label) => label.split(' ')) : list).map(
+        (part) => measure(pdf, part, { size: SIZE.body }),
+      ),
+    ),
+  );
+  const headerWidths = targets.map((target) => {
+    const { title, unit } = header(target);
+    return Math.max(
+      measure(pdf, title, { size: SIZE.small, bold: true }),
+      measure(pdf, unit, { size: SIZE.small }),
+    );
+  });
+
+  // Each column as wide as its widest value (and its heading) would like
+  const numberWidth =
+    measure(pdf, String(weather.data.length), { size: SIZE.small }) + 2.5;
+  const dates = weather.data.map((day) =>
+    day.date.toLocaleDateString(undefined, { timeZone: 'UTC' }),
+  );
+  const columns = tableColumns(left, width, {
+    day:
+      CELL_PAD * 2 +
+      numberWidth +
+      Math.max(
+        20,
+        ...dates.map((date) =>
+          measure(pdf, date, { size: SIZE.small, bold: true }),
+        ),
+      ),
+    data: targets.map((_, i) =>
+      Math.max(
+        CELL_PAD * 2 + swatchSpace(i) + widest[i],
+        CELL_PAD * 2 + headerWidths[i],
+      ),
+    ),
+  });
+
+  // Room for a value beside its color, and the size that fits it there: a
+  // column's values all shrink together, if they must, so they match
+  const valueRoom = targets.map(
+    (_, i) => columns.data[i].width - CELL_PAD * 2 - swatchSpace(i),
+  );
+  const columnSize = targets.map((_, i) =>
+    widest[i] > valueRoom[i]
+      ? SIZE.body * (valueRoom[i] / widest[i])
+      : SIZE.body,
   );
 
   const drawHeader = () => {
@@ -116,32 +180,32 @@ export function drawWeatherTable(pdf: Pdf, flow: Flow, targets: TableTarget[]) {
   flow.onNewPage = drawHeader;
 
   weather.data.forEach((day, index) => {
-    const date = day.date.toLocaleDateString(undefined, { timeZone: 'UTC' });
+    const date = dates[index];
     let place =
       locations.all.find((l) => l.index === day.location)?.label ?? '';
     // Just the place's own name: "Lyon", not "Lyon, France"
     if (place.includes(',')) place = place.slice(0, place.indexOf(','));
 
-    const numberWidth = 9;
     const dayWidth = columns.day.width - CELL_PAD * 2 - numberWidth;
     const placeLines = place
       ? wrap(pdf, place, dayWidth, { size: SIZE.small })
       : [];
     const values = targets.map((target, i) => {
-      const { label, value } = valueOf(day, target.id);
-      const room =
-        columns.data[i].width -
-        CELL_PAD * 2 -
-        (withColor[i] ? DOT_R * 2 + 1.5 : 0);
+      const { value } = valueOf(day, target.id);
+      const label = labels[i][index];
       return {
-        lines: label ? wrap(pdf, label, room, { size: SIZE.body }) : [],
+        lines: !label
+          ? []
+          : wraps[i]
+            ? wrap(pdf, label, valueRoom[i], { size: columnSize[i] })
+            : [label],
         color: withColor[i] ? getColorInfo({ param: target.id, value }) : null,
         hasValue: value !== null,
       };
     });
     const contentHeight = Math.max(
       lineHeight(SIZE.small) * (1 + placeLines.length),
-      ...values.map((v) => lineHeight(SIZE.body) * v.lines.length),
+      ...values.map((v, i) => lineHeight(columnSize[i]) * v.lines.length),
       DOT_R * 2,
     );
     const height = contentHeight + CELL_PAD * 2;
@@ -181,14 +245,15 @@ export function drawWeatherTable(pdf: Pdf, flow: Flow, targets: TableTarget[]) {
       // Centered on the row by the middle of the digits, as the color's
       // number is centered on its circle, so the two line up
       const cy = top + height / 2;
-      const step = lineHeight(SIZE.body);
+      const size = columnSize[i];
+      const step = lineHeight(size);
       lines.forEach((line, n) =>
         text(
           pdf,
           line,
           textX,
-          cy + ptToMm(SIZE.body) * 0.36 + step * (n - (lines.length - 1) / 2),
-          { size: SIZE.body },
+          cy + ptToMm(size) * 0.36 + step * (n - (lines.length - 1) / 2),
+          { size },
         ),
       );
       if (color && hasValue && color.index !== undefined && !isNaN(color.index))

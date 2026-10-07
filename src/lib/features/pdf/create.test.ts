@@ -62,6 +62,26 @@ const targets = [
     pdfHeader: { metric: 'Low (°C)', imperial: 'Low (°F)' },
   },
 ];
+const otherTargets = [
+  {
+    id: 'prcp',
+    label: 'Rain',
+    gaugeLabel: 'Rain',
+    pdfHeader: { metric: 'Rain (mm)', imperial: 'Rain (in)' },
+  },
+  {
+    id: 'snow',
+    label: 'Snow',
+    gaugeLabel: 'Snow',
+    pdfHeader: { metric: 'Snow (mm)', imperial: 'Snow (in)' },
+  },
+  {
+    id: 'dayt',
+    label: 'Daytime',
+    gaugeLabel: 'Daytime',
+    pdfHeader: { metric: 'Daytime (h:m)', imperial: 'Daytime (h:m)' },
+  },
+];
 const moonTarget = {
   id: 'moon',
   label: 'Moon Phase',
@@ -75,12 +95,12 @@ const days = Array.from({ length: 70 }, (_, i) => {
   return {
     location: i < 40 ? 0 : 1,
     date: new Date(Date.UTC(2025, 0, 1 + i)),
-    tmax: pair(Math.round(t)),
+    tmax: pair(Math.round(t * 100) / 100),
     tavg: pair(Math.round(t - 8)),
     tmin: pair(Math.round(t - 16)),
-    prcp: pair(0),
+    prcp: pair(Math.round(i * 13.579) / 100),
     snow: pair(0),
-    dayt: pair(600),
+    dayt: pair(10.75),
     moon: i % 8,
   };
 });
@@ -113,7 +133,11 @@ vi.mock('$lib/state/gauges-state.svelte', () => {
     targets: [moonTarget],
   };
   return {
-    allGaugesAttributes: [{ targets }, { targets: [moonTarget] }],
+    allGaugesAttributes: [
+      { targets },
+      { targets: otherTargets },
+      { targets: [moonTarget] },
+    ],
     gauges: { allCreated: [temp, moon] },
     getTargetParentGaugeId: (id: string) => (id === 'moon' ? 'moon' : 'temp'),
   };
@@ -216,6 +240,20 @@ describe('createPdf', () => {
     ['list-letter', {}],
     ['grid-a4-fill', { layout: 'grid', fill: true, pageSize: 'a4' }],
     ['grid-letter', { layout: 'grid' }],
+    [
+      'all-columns',
+      {
+        weatherDataParams: [
+          'tmax',
+          'tavg',
+          'tmin',
+          'prcp',
+          'snow',
+          'dayt',
+          'moon',
+        ],
+      },
+    ],
     [
       'list-a4-fill-nodays',
       { fill: true, pageSize: 'a4', showDaysInRange: false, hex: false },
