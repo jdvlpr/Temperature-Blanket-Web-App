@@ -17,13 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A palette's colors side by side: an overview, to look at, not to edit. Pointing
   at, tapping, or focusing a color names its yarn in one tooltip the colors
   share. On its own the strip is one tab stop, and the arrow keys move between
-  its colors; inside a link or button (`insideControl`) the colors aren't tab
-  stops, and screen readers hear the control's name instead.
+  its colors; with `onselect`, each color is a button (as in the palette editor,
+  where it goes to the color's row). Inside a link or button (`insideControl`)
+  the colors aren't tab stops, and screen readers hear the control's name instead.
 -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
-  import { motionDuration } from '$lib/utils/feedback.svelte';
+  import { growIn, motionDuration } from '$lib/utils/feedback.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     arrow,
@@ -33,7 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     offset,
     shift,
   } from '@floating-ui/dom';
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
+  import { createAttachmentKey } from 'svelte/attachments';
   import { scale } from 'svelte/transition';
 
   interface Props {
@@ -41,8 +43,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Text, or markup, under the colors */
     label?: string | Snippet;
     height?: string;
+    roundedBottom?: boolean;
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
     insideControl?: boolean;
+    /** Called with a color's index when it's pressed; each color is then a button */
+    onselect?: (index: number) => void;
+    /** Called with a color's index when it's pointed at or focused from the keyboard, and null after */
+    onhover?: (index: number | null) => void;
+    /** A color to outline, as when its marker is pointed at on an image */
+    highlightIndex?: number | null;
+    /** Colors that just changed (by undo or redo), which glow for a moment */
+    flashIndices?: number[];
+    /** The first colors grow in one after another, e.g. a palette just taken from an image */
+    staggerIn?: boolean;
   }
 
   const WHITE = '#ffffff';
@@ -51,7 +64,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors,
     label,
     height = '70px',
+    roundedBottom = true,
     insideControl = false,
+    onselect,
+    onhover,
+    highlightIndex = null,
+    flashIndices = [],
+    staggerIn = false,
   }: Props = $props();
 
   /** The color named in the tooltip */
@@ -69,6 +88,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (tabStop >= colors.length) tabStop = 0;
     if (active !== null && active >= colors.length) active = null;
   });
+
+  // Colors added later grow in. The first colors just appear — unless
+  // `staggerIn`, when they grow in one after another.
+  let mounted = false;
+  onMount(() => {
+    requestAnimationFrame(() => (mounted = true));
+  });
+  function swatchIn(node: Element, { index }: { index: number }) {
+    if (!mounted && !staggerIn) return { duration: 0 };
+    return growIn(node, { delay: mounted ? 0 : index * 45 });
+  }
 
   function describe(color: Color) {
     return color.brandName && color.yarnName && color.name
@@ -129,6 +159,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tabStop = next;
     swatches[next]?.focus();
   }
+
+  /** What a color's span or button has either way */
+  function swatchAttributes(color: Color, index: number) {
+    const hex = color.hex ?? WHITE;
+    return {
+      [createAttachmentKey()]: (node: HTMLElement) => {
+        swatches[index] = node;
+      },
+      class: [
+        'block h-full min-w-0 flex-1 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
+        onselect && 'cursor-pointer',
+        flashIndices.includes(index) && 'history-flash',
+      ],
+      style: `background:${hex};color:${getTextColor(hex)};${
+        highlightIndex === index
+          ? `box-shadow:inset 0 0 0 4px ${getTextColor(hex)}`
+          : ''
+      }`,
+      'aria-label': insideControl
+        ? undefined
+        : `Color ${index + 1}: ${describe(color)}`,
+      tabindex: insideControl ? undefined : index === tabStop ? 0 : -1,
+      onpointerenter: (event: PointerEvent) => {
+        if (event.pointerType === 'touch') {
+          // A tap on a link or button uses it, so there's nothing to name
+          if (insideControl || onselect) return;
+        } else onhover?.(index);
+        active = index;
+      },
+      onfocus: (event: FocusEvent) => {
+        tabStop = index;
+        active = index;
+        // Keyboard focus only, not a click or tap
+        if ((event.target as Element).matches(':focus-visible'))
+          onhover?.(index);
+      },
+      onblur: () => {
+        active = null;
+        onhover?.(null);
+      },
+    };
+  }
 </script>
 
 <!-- Spans throughout, so the strip can sit inside a link or button -->
@@ -136,13 +208,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span
     class="relative block w-full"
     onpointerleave={(event) => {
+      onhover?.(null);
       // A tap leaves as soon as it lifts; its tooltip stays until focus moves
       if (event.pointerType !== 'touch') active = null;
     }}
     aria-hidden={insideControl || undefined}
   >
     <span
-      class="rounded-container flex w-full overflow-hidden"
+      class={[
+        'rounded-t-container flex w-full overflow-hidden',
+        roundedBottom && 'rounded-b-container',
+      ]}
       style:height
       role={insideControl ? undefined : 'group'}
       aria-label={insideControl
@@ -151,28 +227,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onkeydown={insideControl ? undefined : onkeydown}
     >
       {#each colors as color, index (index)}
-        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-        <span
-          bind:this={swatches[index]}
-          class="block h-full min-w-0 flex-1 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current"
-          style:background={color.hex ?? WHITE}
-          style:color={getTextColor(color.hex ?? WHITE)}
-          role={insideControl ? undefined : 'img'}
-          aria-label={insideControl
-            ? undefined
-            : `Color ${index + 1}: ${describe(color)}`}
-          tabindex={insideControl ? undefined : index === tabStop ? 0 : -1}
-          onpointerenter={(event) => {
-            // A tap on a link or button uses it, so there's nothing to name
-            if (event.pointerType === 'touch' && insideControl) return;
-            active = index;
-          }}
-          onfocus={() => {
-            tabStop = index;
-            active = index;
-          }}
-          onblur={() => (active = null)}
-        ></span>
+        {#if onselect}
+          <button
+            type="button"
+            {...swatchAttributes(color, index)}
+            onclick={() => {
+              active = null;
+              onselect(index);
+            }}
+            in:swatchIn|global={{ index }}
+          ></button>
+        {:else}
+          <span
+            {...swatchAttributes(color, index)}
+            role={insideControl ? undefined : 'img'}
+            in:swatchIn|global={{ index }}
+          ></span>
+        {/if}
       {/each}
     </span>
 

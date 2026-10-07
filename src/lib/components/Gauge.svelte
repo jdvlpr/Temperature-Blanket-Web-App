@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { copyToClipboard } from '$lib/utils/clipboard-utils';
   import { version } from '$app/environment';
-  import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
+  import { focusGaugeColor } from '$lib/components/GaugeCustomizer.svelte';
+  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
   import ExportPaletteImage from '$lib/components/modals/ExportPaletteImage.svelte';
@@ -313,17 +314,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ]}
 >
   <div class="w-full">
-    <ColorPaletteEditable
-      bind:colors={gauge.colors}
-      schemeName={gauge.schemeId}
-      showSchemeName={false}
+    <!-- The overview: pressing a color goes to it in the list below, where it's edited -->
+    <PaletteStrip
+      colors={gauge.colors}
       roundedBottom={false}
-      isStaticGauge={gauge.isStatic}
       {flashIndices}
-      onhover={(index: number | null) => (highlightIndex = index)}
-      onchanged={() => {
-        updateGauge({ _colors: gauge.colors });
-      }}
+      onhover={(index) => (highlightIndex = index)}
+      onselect={(index) => focusGaugeColor(gauge.id, index)}
     />
   </div>
 

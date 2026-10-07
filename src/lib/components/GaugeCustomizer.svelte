@@ -13,6 +13,20 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module lang="ts">
+  /** A color the palette's strip asked to go to: its gauge's list shows it */
+  const colorRequest: { gaugeId: string | null; index: number } = $state({
+    gaugeId: null,
+    index: 0,
+  });
+
+  /** Scrolls to a color's row or card in its gauge's list, and focuses its yarn */
+  export function focusGaugeColor(gaugeId: string, index: number) {
+    colorRequest.gaugeId = gaugeId;
+    colorRequest.index = index;
+  }
+</script>
+
 <script lang="ts">
   import { page } from '$app/state';
   import ColorSwatch from '$lib/components/ColorSwatch.svelte';
@@ -114,6 +128,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // the page.
   let dragging = false;
   let listElement: HTMLElement | undefined = $state();
+
+  // Pressing a color in the strip above goes to its row or card here, which
+  // glows for a moment so it's easy to find
+  $effect(() => {
+    if (colorRequest.gaugeId !== gauge.id || !listElement) return;
+    const index = colorRequest.index;
+    colorRequest.gaugeId = null;
+    const item =
+      listElement.querySelectorAll<HTMLElement>(':scope > .color')[index];
+    if (!item) return;
+    item.scrollIntoView({
+      block: 'nearest',
+      behavior: motion.reduced ? 'auto' : 'smooth',
+    });
+    item.querySelector<HTMLElement>('.yarn-button')?.focus({
+      preventScroll: true,
+    });
+    item.classList.remove('history-flash-card');
+    void item.offsetWidth; // restarts the glow
+    item.classList.add('history-flash-card');
+    item.addEventListener(
+      'animationend',
+      () => item.classList.remove('history-flash-card'),
+      { once: true },
+    );
+  });
   $effect.pre(() => {
     const colors = gauge.colors;
     untrack(() => {
@@ -655,7 +695,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet yarn(index: number, color: Color, swatch: boolean)}
   <button
     type="button"
-    class="btn rounded-tile {hoverTint} h-auto w-fit max-w-full min-w-0 justify-start gap-3 px-2 py-1 text-left"
+    class="yarn-button btn rounded-tile {hoverTint} h-auto w-fit max-w-full min-w-0 justify-start gap-3 px-2 py-1 text-left"
     title="Choose a Color"
     onclick={() => openChangeColor(index, gauge.colors[index])}
   >
