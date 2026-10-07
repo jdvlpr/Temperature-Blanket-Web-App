@@ -78,7 +78,7 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
   let contents = $derived.by(() => {
     const lines: string[] = [];
     if (settings.summary)
-      lines.push('A summary page with your preview and palettes');
+      lines.push('A summary page with your project and its preview');
     const chosen = gauges.allCreated.filter((g) => gaugeIds.includes(g.id));
     if (chosen.length) {
       const names = chosen.map((g) => g.label).join(' and ');
@@ -275,7 +275,7 @@ choice's icon beside it, and what it's for below -->
                 <p class="font-bold">Include</p>
                 {@render check(
                   'Summary page',
-                  'Project, places and dates, preview and palettes',
+                  'Project, places and dates, and preview',
                   settings.summary,
                   (checked) => (settings.summary = checked),
                 )}

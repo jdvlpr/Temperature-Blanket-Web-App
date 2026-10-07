@@ -207,13 +207,13 @@ Settings and user preferences are stored in the browser's Local Storage.
 
 **`preferences.pdf` fields** (the PDF's last choices, saved when it's downloaded; its layout, Fill with color and Days in ranges start as the View menu has them each time, and which gauges to include starts as all of them; missing until the first PDF, and filled in from the defaults when read — unreleased, after 6.3.2):
 
-| Field               | Description                                         | Default                                              | Options               |
-| ------------------- | --------------------------------------------------- | ---------------------------------------------------- | --------------------- |
-| `pageSize`          | Paper size                                          | `'letter'` in the US, Canada and nearby, else `'a4'` | `'a4'`, `'letter'`    |
-| `summary`           | A first page with the project, preview and palettes | `true`                                               | `true`, `false`       |
-| `additionalColors`  | The preview's border and accent colors              | `true`                                               | `true`, `false`       |
-| `hex`               | Each color's HTML color code                        | `false`                                              | `true`, `false`       |
-| `weatherDataParams` | The weather table's columns; none leaves it out     | `['tmax', 'tavg', 'tmin']`                           | weather parameter ids |
+| Field               | Description                                     | Default                                              | Options               |
+| ------------------- | ----------------------------------------------- | ---------------------------------------------------- | --------------------- |
+| `pageSize`          | Paper size                                      | `'letter'` in the US, Canada and nearby, else `'a4'` | `'a4'`, `'letter'`    |
+| `summary`           | A first page with the project and its preview   | `true`                                               | `true`, `false`       |
+| `additionalColors`  | The preview's border and accent colors          | `true`                                               | `true`, `false`       |
+| `hex`               | Each color's HTML color code                    | `false`                                              | `true`, `false`       |
+| `weatherDataParams` | The weather table's columns; none leaves it out | `['tmax', 'tavg', 'tmin']`                           | weather parameter ids |
 
 **`preferences.effects` fields** (motion, set in the Preferences dialog; missing until a setting is first changed, and filled in from the defaults when read — unreleased, after 6.3.2):
 

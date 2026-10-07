@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // The first page: the project at a glance. Its name, places and dates, the
-// weather in short, the preview, and each gauge's palette as a strip.
+// weather in short, and the preview.
 
 import { locations } from '$lib/state/location-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
@@ -24,26 +24,10 @@ import type { TISO8601DateString } from '$lib/types/weather-types';
 import { stringToDate } from '$lib/utils/date-utils';
 import { getAverage } from '$lib/utils/number-utils';
 import { svgToPNG } from '$lib/utils/preview-utils.svelte';
-import { formatRangeEnd, rangeRuleSentence } from '$lib/utils/range-format';
+import { formatRangeEnd } from '$lib/utils/range-format';
 import { pluralize } from '$lib/utils/string-utils';
-import {
-  INK,
-  SIZE,
-  inkOn,
-  measure,
-  paragraph,
-  text,
-  wrap,
-  type Pdf,
-} from '../draw';
-import { Flow, fitImage, lineHeight, ptToMm } from '../layout';
-
-export type SummaryGauge = {
-  label: string;
-  colors: { hex?: string }[];
-  isCategory: boolean;
-  rangeOptions?: { includeFromValue?: boolean; includeToValue?: boolean };
-};
+import { INK, SIZE, paragraph, wrap, type Pdf } from '../draw';
+import { Flow, fitImage } from '../layout';
 
 const formatDate = (date?: TISO8601DateString) =>
   date
@@ -92,39 +76,10 @@ async function previewImage() {
   }
 }
 
-/** A palette as one strip of its colors, numbered when there's room */
-function strip(pdf: Pdf, flow: Flow, colors: { hex?: string }[]) {
-  const { doc } = pdf;
-  const { left, width } = flow.box;
-  const height = 8;
-  flow.ensure(height);
-  const each = width / colors.length;
-  colors.forEach((color, i) => {
-    const hex = color.hex ?? '#ffffff';
-    doc.setFillColor(hex);
-    // A hair wider, so no paper shows between colors
-    doc.rect(left + each * i, flow.y, each + 0.05, height, 'F');
-    const label = String(i + 1);
-    if (measure(pdf, label, { size: SIZE.min, bold: true }) + 1 < each)
-      text(
-        pdf,
-        label,
-        left + each * i + each / 2,
-        flow.y + height / 2 + ptToMm(SIZE.min) * 0.36,
-        { size: SIZE.min, bold: true, color: inkOn(hex) },
-        'center',
-      );
-  });
-  doc.setDrawColor(INK.line);
-  doc.setLineWidth(0.3);
-  doc.rect(left, flow.y, width, height, 'S');
-  flow.y += height;
-}
-
 export async function drawSummary(
   pdf: Pdf,
   flow: Flow,
-  { name, gauges }: { name: string; gauges: SummaryGauge[] },
+  { name }: { name: string },
 ) {
   const { left, width } = flow.box;
 
@@ -171,11 +126,10 @@ export async function drawSummary(
   });
   flow.y += 6;
 
-  // The preview, as big as fits with the palettes still below it
+  // The preview, as big as fits on the page
   const image = await previewImage();
   if (image) {
-    const palettesHeight = gauges.length * 22;
-    const maxHeight = Math.max(60, Math.min(130, flow.room - palettesHeight));
+    const maxHeight = Math.max(60, flow.room);
     const size = fitImage(image.width, image.height, width, maxHeight);
     flow.ensure(size.height);
     pdf.doc.addImage(
@@ -187,32 +141,5 @@ export async function drawSummary(
       size.height,
     );
     flow.y += size.height + 6;
-  }
-
-  // Each palette, with how its ranges work
-  for (const gauge of gauges) {
-    if (!gauge.colors.length) continue;
-    flow.ensure(lineHeight(SIZE.body) + 8 + lineHeight(SIZE.small) * 2 + 4);
-    flow.y += paragraph(pdf, [gauge.label], left, flow.y, {
-      size: SIZE.body,
-      bold: true,
-    });
-    flow.y += 1;
-    strip(pdf, flow, gauge.colors);
-    if (!gauge.isCategory && gauge.rangeOptions) {
-      flow.y += paragraph(
-        pdf,
-        [
-          `${gauge.colors.length} colors. ${rangeRuleSentence({
-            includeFromValue: gauge.rangeOptions.includeFromValue,
-            includeToValue: gauge.rangeOptions.includeToValue,
-          })}`,
-        ],
-        left,
-        flow.y + 1,
-        { size: SIZE.small, color: INK.muted },
-      );
-    }
-    flow.y += 5;
   }
 }

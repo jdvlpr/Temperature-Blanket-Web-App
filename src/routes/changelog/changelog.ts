@@ -84,7 +84,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: FileTextIcon,
-                text: `The PDF has been redesigned to match the site: each gauge's colors as a list or a grid of cards, with numbered round swatches, yarn names that are never cut off, and an option to fill each color in. A new summary page shows the project, its preview and palettes. Choose US Letter or A4 paper, and the PDF remembers your choices. Accented letters in yarn and place names now print correctly.`,
+                text: `The PDF has been redesigned to match the site: each gauge's colors as a list or a grid of cards, with numbered round swatches, yarn names that are never cut off, and an option to fill each color in. A new summary page shows the project and its preview, and each gauge's page starts with its palette at a glance. Choose US Letter or A4 paper, and the PDF remembers your choices. Accented letters in yarn and place names now print correctly.`,
                 title: 'New PDF Design',
               },
               {

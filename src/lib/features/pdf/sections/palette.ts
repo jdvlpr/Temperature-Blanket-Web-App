@@ -394,3 +394,37 @@ export function drawPalette(
   if (layout === 'grid') drawGrid(pdf, flow, items, filled);
   else drawList(pdf, flow, items, filled);
 }
+
+const STRIP_HEIGHT = 3.5;
+
+/**
+ * A palette at a glance: its colors side by side in one thin, rounded strip,
+ * as the site shows a palette. No numbers; the rows or cards below have them.
+ */
+export function drawStrip(pdf: Pdf, flow: Flow, colors: { hex?: string }[]) {
+  if (!colors.length) return;
+  const { doc } = pdf;
+  const { left, width } = flow.box;
+  const radius = STRIP_HEIGHT / 2;
+  flow.ensure(STRIP_HEIGHT);
+  const top = flow.y;
+  const each = width / colors.length;
+
+  // The colors, clipped to the strip's rounded ends
+  doc.saveGraphicsState();
+  doc.roundedRect(left, top, width, STRIP_HEIGHT, radius, radius, null);
+  doc.clip();
+  doc.discardPath();
+  colors.forEach((color, i) => {
+    doc.setFillColor(color.hex ?? '#ffffff');
+    // A hair wider, so no paper shows between colors
+    doc.rect(left + each * i, top, each + 0.05, STRIP_HEIGHT, 'F');
+  });
+  doc.restoreGraphicsState();
+
+  // A faint edge, so white and pale colors keep their shape
+  doc.setDrawColor(INK.line);
+  doc.setLineWidth(0.25);
+  doc.roundedRect(left, top, width, STRIP_HEIGHT, radius, radius, 'S');
+  flow.y = top + STRIP_HEIGHT;
+}

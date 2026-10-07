@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // A project's PDF: a summary page, a page or more for each gauge's colors
-// (as the View menu's list or grid), the preview's other colors, and a table
+// (a strip of them, then the View menu's list or grid), the preview's other colors, and a table
 // of the weather, each day with its colors. Drawn with jsPDF, all as text
 // and shapes, so it can be searched and copied from.
 
@@ -34,7 +34,7 @@ import { addAppFont } from './fonts';
 import { Flow, lineHeight, pageBox } from './layout';
 import type { PdfSettings } from './options';
 import { drawFooters } from './sections/footer';
-import { drawPalette, type PaletteItem } from './sections/palette';
+import { drawPalette, drawStrip, type PaletteItem } from './sections/palette';
 import { drawSummary } from './sections/summary';
 import { drawWeatherTable } from './sections/weather-table';
 
@@ -153,16 +153,7 @@ export async function createPdf({
     gaugeIds.includes(gauge.id),
   );
 
-  if (settings.summary)
-    await drawSummary(pdf, flow, {
-      name,
-      gauges: chosen.map((gauge) => ({
-        label: gauge.label,
-        colors: gauge.colors,
-        isCategory: gauge.unit.type === 'category',
-        rangeOptions: gauge.rangeOptions,
-      })),
-    });
+  if (settings.summary) await drawSummary(pdf, flow, { name });
 
   for (const gauge of chosen) {
     startSection(flow);
@@ -177,6 +168,8 @@ export async function createPdf({
           ]
         : [`${gauge.colors.length} colors, in order.`],
     );
+    drawStrip(pdf, flow, gauge.colors ?? []);
+    flow.y += 4;
     drawPalette(pdf, flow, gaugeItems(gauge, settings), {
       layout: settings.layout,
       filled: settings.fill,
