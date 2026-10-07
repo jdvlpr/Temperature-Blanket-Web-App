@@ -269,7 +269,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onsort={(chosen) => (chosenSort = chosen)}
         onreverse={(value) => (reversed = value)}
       />
-      <ViewMenu bind:value={layout} />
+      <ViewMenu bind:value={layout} fillOption />
     </div>
   </div>
   <div class="my-2 w-full">

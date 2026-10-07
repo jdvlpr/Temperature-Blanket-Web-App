@@ -16,8 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   Whether a list shows as a grid or as rows, as a menu styled like the Sort
   menu it often sits beside. The button names the view and shows its icon.
+  With `fillOption`, it also has Fill with color, which fills each card or row
+  with its yarn's color everywhere it's offered.
 -->
 <script lang="ts">
+  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
+  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
   import {
     menuContentClass,
     menuItemClass,
@@ -35,8 +39,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     value = $bindable('grid'),
+    fillOption = false,
     children,
-  }: { value: PageLayout; children?: Snippet } = $props();
+  }: {
+    value: PageLayout;
+    /** Offer Fill with color (one setting, shared by every list that offers it) */
+    fillOption?: boolean;
+    children?: Snippet;
+  } = $props();
 
   const views = [
     { value: 'grid', label: 'Grid', icon: LayoutGridIcon },
@@ -74,10 +84,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           </Menu.OptionItem>
         {/each}
-        {#if children}
+        {#if fillOption || children}
           <Menu.Separator />
-          {@render children()}
         {/if}
+        {#if fillOption}
+          <!-- Stays open, so the check shows it took -->
+          <Menu.OptionItem
+            type="checkbox"
+            value="fill"
+            checked={fillWithColor.on}
+            closeOnSelect={false}
+            onCheckedChange={(checked) => (fillWithColor.on = checked)}
+            class={menuItemClass}
+          >
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span>Fill with color</span>
+              <span class="text-surface-700-300 text-xs"
+                >Each takes its yarn's color</span
+              >
+            </span>
+            <MenuCheckbox checked={fillWithColor.on} />
+          </Menu.OptionItem>
+        {/if}
+        {@render children?.()}
       </Menu.Content>
     </Menu.Positioner>
   </Portal>

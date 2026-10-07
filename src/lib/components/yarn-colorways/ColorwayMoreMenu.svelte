@@ -16,10 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A yarn colorway's "more" menu (⋮): buy it (a shopping cart, marking an
   affiliate link) or view it on the site it's listed on, then copy its name or hex
-  code, each showing what it copies. On a swatch, the trigger has no
-  background: a black or white icon, whichever stands out on that color,
-  tinted on hover. On the page's surface (cards and rows) it's a plain icon
-  button. Either way it stays tinted while its menu is open, so a tap on a
+  code, each showing what it copies. On the page's surface it's a plain icon
+  button. On the yarn's color (a card or row filled with it), it's the same
+  size, with a black or white icon, whichever stands out on that color, and
+  a tint of that on hover. Either way it stays tinted while its menu is open, so a tap on a
   phone (which has no hover) shows it too.
   With `onremove`, it ends with Remove, for a color in a palette.
 -->
@@ -43,8 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   interface Props {
     colorway: Color;
-    /** What the trigger sits on: the colorway's swatch, or the page's surface */
-    on?: 'swatch' | 'surface';
+    /** What the trigger sits on: the page's surface, or the colorway's color */
+    on?: 'surface' | 'color';
     /** Offers Remove, e.g. "Remove color 3" */
     onremove?: () => void;
     removeLabel?: string;
@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     colorway,
-    on = 'swatch',
+    on = 'surface',
     onremove,
     removeLabel = 'Remove',
   }: Props = $props();
@@ -89,10 +89,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 >
   <Menu.Trigger
-    class={on === 'swatch'
-      ? 'btn-icon hover-on-color size-7 rounded-full focus-visible:outline-2 focus-visible:outline-current active:bg-[color-mix(in_oklab,currentColor_18%,transparent)] data-[state=open]:bg-[color-mix(in_oklab,currentColor_18%,transparent)]'
+    class={on === 'color'
+      ? 'btn-icon hover-on-color size-8 shrink-0 focus-visible:outline-2 focus-visible:outline-current active:bg-[color-mix(in_oklab,currentColor_18%,transparent)] data-[state=open]:bg-[color-mix(in_oklab,currentColor_18%,transparent)]'
       : 'btn-icon hover:preset-tonal-surface active:bg-surface-200-800 data-[state=open]:bg-surface-200-800 size-8 shrink-0'}
-    style={on === 'swatch' ? `color:${iconColorOn(colorway.hex)}` : undefined}
+    style={on === 'color' ? `color:${iconColorOn(colorway.hex)}` : undefined}
     aria-label="More for {colorway.name || colorway.hex}"
     title="More"
   >

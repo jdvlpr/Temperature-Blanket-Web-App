@@ -22,6 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
   import ColorwayMoreMenu from '$lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  import {
+    fillFromSwatch,
+    fillWithColor,
+    mutedText,
+  } from '$lib/components/yarn-colorways/fill-with-color';
   import { dialog } from '$lib/state/page-state.svelte';
   import { previewHighlight } from '$lib/state/preview-state.svelte';
   import {
@@ -140,6 +145,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   let showDays = $derived(
     showRanges && showDaysInRange.value && !!weather.data?.length,
+  );
+  // View › Fill with color: each color's card or row takes its color
+  let filled = $derived(fillWithColor.on);
+  // A hover tint that shows on the page's surface, or on a color
+  let hoverTint = $derived(
+    filled ? 'hover-on-color' : 'hover:preset-tonal-surface',
+  );
+  // A changed number: in the primary color, or underlined on a color, where
+  // the primary color might not stand out
+  let changedText = $derived(
+    filled
+      ? 'underline decoration-2 underline-offset-2'
+      : 'text-primary-700-300',
   );
 
   // A range being edited in place: its From and To as typed (null while
@@ -619,13 +637,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet yarn(index: number, color: Color, swatch: boolean)}
   <button
     type="button"
-    class="btn rounded-tile hover:preset-tonal-surface h-auto w-fit max-w-full min-w-0 justify-start gap-3 px-2 py-1 text-left"
+    class="btn rounded-tile {hoverTint} h-auto w-fit max-w-full min-w-0 justify-start gap-3 px-2 py-1 text-left"
     title="Choose a Color"
     onclick={() => openChangeColor(index, gauge.colors[index])}
   >
     {#if swatch}
       <span
-        class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+        class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] {filled
+          ? 'ring-2 ring-current/40'
+          : ''}"
+        data-fill-origin
         class:feedback-pop={pop.index === index}
         class:history-flash={historyChange.gaugeId === gauge.id &&
           historyChange.indices.includes(index)}
@@ -643,7 +664,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {color.name || color.hex}
       </span>
       <span
-        class="text-surface-700-300 text-xs {swatch
+        class="{mutedText(filled)} text-xs {swatch
           ? 'truncate'
           : 'text-pretty'}"
       >
@@ -664,7 +685,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet unit()}
   {#if unitLabel}<span
       class={[
-        'text-xs font-normal opacity-70',
+        'text-xs font-normal',
+        // Dimmed only on the surface: on a color it could lose its contrast
+        !filled && 'opacity-70',
         gauge.unit?.type === 'temperature' && 'align-[0.25em] leading-none',
       ]}>{unitLabel}</span
     >{/if}
@@ -682,11 +705,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <button
       type="button"
-      class="range-{edge} btn rounded-tile hover:preset-tonal-surface h-9 min-w-9 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {movedValue(
+      class="range-{edge} btn rounded-tile {hoverTint} h-9 min-w-9 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {movedValue(
         index,
         edge,
       )
-        ? 'text-primary-700-300'
+        ? changedText
         : ''}"
       title="Edit {edge === 'from' ? 'From' : 'To'}"
       aria-label="Color {index + 1} {edge} {r[edge]} {unitLabel}{movedValue(
@@ -713,7 +736,10 @@ cancel, then Save -->
 {#snippet rangeInput(index: number, edge: 'from' | 'to')}
   {#if editing}
     <span class="flex flex-wrap items-center gap-1.5">
-      <span class="input-group w-fit grid-cols-[minmax(0,1fr)_auto]">
+      <!-- On the surface, even in a card filled with its color -->
+      <span
+        class="input-group bg-surface-50-950 text-surface-950-50 w-fit grid-cols-[minmax(0,1fr)_auto]"
+      >
         <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
       from zooming in. Room for the up and down buttons a computer shows. -->
         <input
@@ -831,7 +857,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     {@const percent = `${getDaysPercent(list.length)}%`}
     <button
       type="button"
-      class="rounded-tile hover:preset-tonal-surface flex flex-col px-1.5 py-1 text-left tabular-nums disabled:opacity-50 {fill
+      class="rounded-tile {hoverTint} flex flex-col px-1.5 py-1 text-left tabular-nums disabled:opacity-50 {fill
         ? 'min-w-0 @max-[15rem]:flex-row @max-[15rem]:items-baseline @max-[15rem]:gap-2'
         : // Room for the longest count, e.g. "365 days", so a short one doesn't shift the range beside it
           'min-w-[calc(8ch+0.75rem)]'}"
@@ -849,7 +875,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         })}
     >
       <span
-        class="text-surface-700-300 text-xs whitespace-nowrap {fill
+        class="{mutedText(filled)} text-xs whitespace-nowrap {fill
           ? '@max-[15rem]:flex-1'
           : ''}"
       >
@@ -860,20 +886,20 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         class="text-sm leading-tight font-semibold whitespace-nowrap {unsaved.includes(
           index,
         )
-          ? 'text-primary-700-300'
+          ? changedText
           : ''}">{count}</span
       >
-      <span class="text-surface-700-300 text-xs whitespace-nowrap"
+      <span class="{mutedText(filled)} text-xs whitespace-nowrap"
         >{percent}</span
       >
     </button>
   {/each}
 {/snippet}
 
-{#snippet more(index: number, color: Color, on: 'swatch' | 'surface')}
+{#snippet more(index: number, color: Color)}
   <ColorwayMoreMenu
     colorway={color}
-    {on}
+    on={filled ? 'color' : 'surface'}
     onremove={movable && !isStaticGauge ? () => removeColor(index) : undefined}
     removeLabel="Remove color {index + 1}"
   />
@@ -894,9 +920,9 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       <RangesMenu />
     </div>
   {/if}
-  <!-- Only the project page has more view options; elsewhere there's no separator -->
+  <!-- The project page also has Days in ranges -->
   {#if isProjectPlannerPage}
-    <ViewMenu bind:value={preferences.value.layout}>
+    <ViewMenu bind:value={preferences.value.layout} fillOption>
       <!-- Stays open, so the check shows it took -->
       <Menu.OptionItem
         type="checkbox"
@@ -915,7 +941,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       </Menu.OptionItem>
     </ViewMenu>
   {:else}
-    <ViewMenu bind:value={preferences.value.layout} />
+    <ViewMenu bind:value={preferences.value.layout} fillOption />
   {/if}
 </div>
 
@@ -1033,9 +1059,14 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       data-color-id={id}
-      class="color {preferences.value.layout === 'grid'
-        ? 'card border-surface-200-800 bg-surface-50-950 flex min-w-0 flex-col overflow-hidden border'
+      class="color relative isolate overflow-hidden {preferences.value
+        .layout === 'grid'
+        ? 'card border-surface-200-800 bg-surface-50-950 flex min-w-0 flex-col border'
         : 'bg-surface-50-950 border-surface-200-800 first:rounded-t-container last:rounded-b-container @container border-b last:border-b-0'}"
+      style:color={filled ? iconColorOn(color.hex ?? '#fff') : undefined}
+      data-fillable
+      data-filled={filled || undefined}
+      use:fillFromSwatch={filled}
       class:dnd-keyboard-lifted={keyboardDragId === id}
       onpointerenter={(e) => {
         // A tap isn't a hover; it would only flash
@@ -1051,12 +1082,17 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       in:growIn
       animate:flip={{ duration: flipDurationMs }}
     >
+      <span class="fill-layer" style:background={color.hex} aria-hidden="true"
+      ></span>
       {#if preferences.value.layout === 'grid'}
         <!-- The handle, the color (as in the list), and ⋮ on one line at the top, so the yarn and range below get the card's full width -->
         <div class="flex items-center gap-1 px-2 pt-2">
-          {@render handle(index)}
+          {@render handle(index, filled)}
           <span
-            class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+            class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] {filled
+              ? 'ring-2 ring-current/40'
+              : ''}"
+            data-fill-origin
             class:feedback-pop={pop.index === index}
             class:history-flash={historyChange.gaugeId === gauge.id &&
               historyChange.indices.includes(index)}
@@ -1065,7 +1101,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
               color.hex ?? '#fff',
             )}"><span class="sr-only">Color</span> {index + 1}</span
           >
-          <span class="ml-auto">{@render more(index, color, 'surface')}</span>
+          <span class="ml-auto">{@render more(index, color)}</span>
         </div>
         <div class="@container flex flex-1 flex-col gap-1 p-2 text-left">
           {@render yarn(index, color, false)}
@@ -1092,7 +1128,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
               : 'grid-cols-[2rem_minmax(0,1fr)_auto]'}"
         >
           <span class="col-start-1 row-start-1 flex justify-center">
-            {@render handle(index)}
+            {@render handle(index, filled)}
           </span>
           <span class="col-start-2 row-start-1 flex min-w-0">
             {@render yarn(index, color, true)}
@@ -1125,7 +1161,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
                 ? '@lg:col-start-4'
                 : ''}"
           >
-            {@render more(index, color, 'surface')}
+            {@render more(index, color)}
           </span>
         </div>
       {/if}

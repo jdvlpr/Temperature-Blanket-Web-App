@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if checked}
   <CircleCheckIcon
 
-    class="text-primary-700-300 shrink-0 size-5"
+    class="shrink-0 size-5"
     aria-hidden="true"
   />
 {:else}

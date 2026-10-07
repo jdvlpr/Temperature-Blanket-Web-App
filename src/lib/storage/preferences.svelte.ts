@@ -41,6 +41,8 @@ type LocalStatePreferencesType = {
   effects?: EffectsPreferences;
   /** The yarn chosen first where none is, as `{brandId}-{yarnId}`; missing or `''` for none */
   defaultYarn?: string;
+  /** View › Fill with color: colorway cards and rows, and palette colors, take their yarn's color; missing until first changed (off) */
+  fillColor?: boolean;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(

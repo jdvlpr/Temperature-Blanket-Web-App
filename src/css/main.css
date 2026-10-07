@@ -158,10 +158,15 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 /* The usual button hover. preset-tonal-surface's background is the page's own
    (surface 50/950), so as a hover it barely showed, and btn's brightness filter
    washed it out further. A step off the background instead, without the
-   filter. Unlayered so it wins over the utility. */
+   filter. Unlayered so it wins over the utility. On a color (hover-on-color,
+   e.g. a card filled with its yarn's color) the tint is enough too: the filter
+   would also change the color itself, like a swatch inside the button. */
 @media (hover: hover) {
   .hover\:preset-tonal-surface:hover:not(:disabled) {
     background-color: var(--color-surface-200-800);
+    filter: none;
+  }
+  .hover-on-color:hover:not(:disabled) {
     filter: none;
   }
 }
@@ -258,6 +263,39 @@ and fade back while another gauge color is highlighted */
 
 /* What an undo or redo just changed glows for a moment: a ring in the swatch's own text color (which
 contrasts with it), or an outline around the preview. Reduced motion shows the same ring, without the fade. */
+/* View › Fill with color (fill-with-color.ts): a layer in the yarn's color
+under a card's or row's content, which has `relative isolate overflow-hidden`.
+In layer components, so utilities still win. Text eases to its color on the
+fill, and a swatch that fades into it fades; the layer itself animates from
+script, only when the option changes. */
+@layer components {
+  .fill-layer {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    clip-path: circle(0px);
+  }
+  [data-filled] > .fill-layer {
+    clip-path: none;
+  }
+  [data-fillable],
+  [data-fillable] :where(*) {
+    transition-property: color, opacity;
+    transition-duration: 450ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-fillable],
+    [data-fillable] :where(*) {
+      transition-duration: 0s;
+    }
+  }
+  [data-motion='reduce'] :is([data-fillable], [data-fillable] *) {
+    transition-duration: 0s;
+  }
+}
+
 @keyframes history-flash {
   0%,
   35% {

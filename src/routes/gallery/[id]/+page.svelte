@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
+  import GaugeColorsView from '$lib/components/GaugeColorsView.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
@@ -31,7 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { GaugeRange, GaugeRangeCategory } from '$lib/types/gauge-types';
   import type { Color } from '$lib/types/yarn-types';
-  import { getTextColor } from '$lib/utils/color-utils';
   import {
     gaugeParamsHaveYarnDetails,
     parseGaugeURLHash,
@@ -359,12 +359,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           (
                             range: GaugeRange | GaugeRangeCategory,
                             index: number,
-                          ) => {
-                            return {
-                              range,
-                              ...colors?.[index],
-                            };
-                          },
+                          ) => ({
+                            color: colors?.[index] ?? { hex: '' },
+                            label: index + 1,
+                            range,
+                          }),
                         )}
                         {@const unitLabel = allGaugesAttributes.find(
                           (item) => item.id === id,
@@ -416,107 +415,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             <p class="mt-4 px-2 text-sm">
                               Purchases via links with a shopping cart icon <ShoppingCartIcon
                                 class="relative -top-px inline size-4"
-                              /> support the developer of this web app at no extra
-                              cost to you.
+                              /> (in each color's ⋮ menu) support the developer of
+                              this web app at no extra cost to you.
                             </p>
                           {/if}
                           <div class="mx-auto mt-4 w-fit">
-                            <ViewMenu bind:value={preferences.value.layout} />
+                            <ViewMenu
+                              bind:value={preferences.value.layout}
+                              fillOption
+                            />
                           </div>
-                          <div
-                            class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences
-                              .value.layout === 'grid'
-                              ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
-                              : 'flex flex-col'}"
-                          >
-                            {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
-                              <div
-                                class="flex flex-wrap items-center justify-around gap-2 p-2 {preferences
-                                  .value.layout === 'grid'
-                                  ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-                                  : ''}"
-                                style="background-color:{hex};color:{getTextColor(
-                                  hex ?? '#000000',
-                                )}"
-                              >
-                                <p class="text-xs">
-                                  {i + 1}
-                                </p>
-                                <div
-                                  class="flex items-center justify-start gap-2"
-                                >
-                                  {#if gaugeType === 'category'}
-                                    <p id="range-{i}-value">
-                                      {(range as GaugeRangeCategory).label}
-                                    </p>
-                                  {:else}
-                                    <div
-                                      class="flex flex-col items-start text-left"
-                                      id="range-{i}-from"
-                                    >
-                                      <p class="text-xs">From</p>
-                                      <p class="-mt-1 text-xs opacity-50">
-                                        {rangeOptions?.includeFromValue
-                                          ? 'Including'
-                                          : 'Excluding'}
-                                      </p>
-                                      <div class="flex items-start">
-                                        <p class="text-lg">
-                                          {(range as GaugeRange).from}
-                                        </p>
-                                        <p class="text-xs">{unitLabel}</p>
-                                      </div>
-                                    </div>
-                                    <div
-                                      class="flex flex-col items-start text-left"
-                                      id="range-{i}-to"
-                                    >
-                                      <p class="text-xs">To</p>
-                                      <p class="-mt-1 text-xs opacity-50">
-                                        {rangeOptions?.includeToValue
-                                          ? 'Including'
-                                          : 'Excluding'}
-                                      </p>
-                                      <div class="flex items-start">
-                                        <p class="text-lg">
-                                          {(range as GaugeRange).to}
-                                        </p>
-                                        <p class="text-xs">{unitLabel}</p>
-                                      </div>
-                                    </div>
-                                  {/if}
-                                </div>
-                                {#if affiliate_variant_href}
-                                  <a
-                                    class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-start"
-                                    href={affiliate_variant_href}
-                                    target="_blank"
-                                    rel="noreferrer nofollow"
-                                  >
-                                    <ShoppingCartIcon />
-                                    <span class="underline">Buy</span></a
-                                  >
-                                {/if}
-                                {#if brandName && yarnName}
-                                  <div
-                                    class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
-                                  >
-                                    <span class="text-xs"
-                                      >{brandName}
-                                      -
-                                      {yarnName}</span
-                                    >
-                                    <span
-                                      class="flex flex-wrap items-start justify-start text-lg leading-tight"
-                                    >
-                                      {name}
-                                    </span>
-                                  </div>
-                                {:else}
-                                  {hex}
-                                {/if}
-                              </div>
-                            {/each}
+                          <div class="mt-4 mb-2 xl:mb-4">
+                            <GaugeColorsView
+                              items={item}
+                              {unitLabel}
+                              unitType={gaugeType}
+                              {rangeOptions}
+                            />
                           </div>
                         </div>
                       {/each}
@@ -525,54 +440,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if extraColors.length}
                     <div class="flex flex-col">
                       <p class="text-lg font-semibold">Additional Colors</p>
-                      <div
-                        class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences
-                          .value.layout === 'grid'
-                          ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
-                          : 'flex flex-col'}"
-                      >
-                        {#each extraColors as { role, label, color: { hex, name, yarnName, brandName, affiliate_variant_href } } (role)}
-                          <div
-                            class="flex flex-wrap items-center justify-around gap-2 p-2 {preferences
-                              .value.layout === 'grid'
-                              ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-                              : ''}"
-                            style="background-color:{hex};color:{getTextColor(
-                              hex ?? '#000000',
-                            )}"
-                          >
-                            <p class="text-sm">{label}</p>
-                            {#if affiliate_variant_href}
-                              <a
-                                class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-start"
-                                href={affiliate_variant_href}
-                                target="_blank"
-                                rel="noreferrer nofollow"
-                              >
-                                <ShoppingCartIcon />
-                                <span class="underline">Buy</span></a
-                              >
-                            {/if}
-                            {#if brandName && yarnName}
-                              <div
-                                class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
-                              >
-                                <span class="text-xs"
-                                  >{brandName}
-                                  -
-                                  {yarnName}</span
-                                >
-                                <span
-                                  class="flex flex-wrap items-start justify-start text-lg leading-tight"
-                                >
-                                  {name}
-                                </span>
-                              </div>
-                            {:else}
-                              {hex}
-                            {/if}
-                          </div>
-                        {/each}
+                      <div class="mt-4 mb-2 xl:mb-4">
+                        <GaugeColorsView
+                          items={extraColors.map(({ label, color }) => ({
+                            color,
+                            label,
+                          }))}
+                        />
                       </div>
                     </div>
                   {/if}

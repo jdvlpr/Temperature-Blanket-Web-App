@@ -213,7 +213,9 @@ Settings and user preferences are stored in the browser's Local Storage.
 
 **`preferences.defaultYarn`** (unreleased, after 6.3.2): the yarn chosen first where none is, as `{brandId}-{yarnId}`, set in the Preferences dialog or with "Set as Default Yarn". Missing or `''` for none (before, it was kept only until the page was reloaded).
 
-**Synced to the account** while signed in ([`$lib/sync/preferences`](src/lib/sync/preferences.ts)): `defaultYarn`, `theme.id`, `theme.mode`, `theme.roundness` and `theme.headingStyle`; the newest change to each wins. The rest stay on the device: text size, spacing, effects, layout, units and seasons (every project link carries its own units and seasons).
+**`preferences.fillColor`** (unreleased, after 6.3.2): View › Fill with color, offered for yarn colorway cards and rows (the finder, Choose Colorways, Change Color) and a palette's colors. `true` fills each card or row with its yarn's color; missing (off) until first changed.
+
+**Synced to the account** while signed in ([`$lib/sync/preferences`](src/lib/sync/preferences.ts)): `defaultYarn`, `theme.id`, `theme.mode`, `theme.roundness` and `theme.headingStyle`; the newest change to each wins. The rest stay on the device: text size, spacing, effects, layout, fillColor, units and seasons (every project link carries its own units and seasons).
 
 > **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale`/`headingStyle` fields automatically receive defaults on next page load. No data is lost.
 

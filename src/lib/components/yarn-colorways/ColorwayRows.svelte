@@ -19,6 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   copy options. The match sits at the row's end, or under the name where the
   list is narrow.
 
+  With View › Fill with color, the whole row takes the colorway's color, as
+  the cards do (see ColorwayCards).
+
   With `selection`, each row (but its ⋮ menu) is one toggle button, led by a
   circle that's checked when it's selected.
 -->
@@ -28,10 +31,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorwayMoreMenu from './ColorwayMoreMenu.svelte';
   import {
     colorwayKey,
+    iconColorOn,
     matchPercent,
     swatchClass,
     type ColorwaySelection,
   } from './colorway-utils';
+  import { fillFromSwatch, fillWithColor, mutedText } from './fill-with-color';
 
   interface Props {
     colorways: (Color & { delta?: number })[];
@@ -39,7 +44,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { colorways, selection }: Props = $props();
+
+  let filled = $derived(fillWithColor.on);
 </script>
+
+{#snippet fillLayer(colorway: Color)}
+  <span class="fill-layer" style="background:{colorway.hex}" aria-hidden="true"
+  ></span>
+{/snippet}
 
 <!-- Spans, since in a selectable row they're inside its button -->
 {#snippet matchPill(match: number, extra: string)}
@@ -52,14 +64,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet row(colorway: Color & { delta?: number })}
   {@const match = matchPercent(colorway)}
-  <span class={swatchClass} style="background:{colorway.hex}"></span>
+  <span
+    class="{swatchClass} {filled ? 'opacity-0' : ''}"
+    style="background:{colorway.hex}"
+    data-fill-origin
+  ></span>
   <span class="flex min-w-0 flex-1 flex-col gap-0.5">
     <span class="leading-tight font-semibold text-pretty">{colorway.name}</span>
-    <span class="text-surface-700-300 text-xs text-pretty">
+    <span class="{mutedText(filled)} text-xs text-pretty">
       {colorway.brandName} · {colorway.yarnName}
     </span>
     {#if colorway.unavailable}
-      <span class="text-surface-700-300 text-xs leading-tight">
+      <span class="{mutedText(filled)} text-xs leading-tight">
         No longer available
       </span>
     {/if}
@@ -78,20 +94,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}
       {@const selected = selection.isSelected(colorway)}
+      <!-- Selected on a color: an outline in the text's color, which
+      stands out on any yarn -->
       <li
-        class="flex items-center gap-1 pr-2 {selected
-          ? 'bg-primary-500/15'
+        class="relative isolate flex items-center gap-1 overflow-hidden pr-2 {selected
+          ? filled
+            ? 'outline-2 -outline-offset-4 outline-current'
+            : 'bg-primary-500/15'
           : ''}"
+        style:color={filled ? iconColorOn(colorway.hex) : undefined}
+        data-fillable
+        data-filled={filled || undefined}
+        use:fillFromSwatch={filled}
       >
+        {@render fillLayer(colorway)}
         <button
           type="button"
-          class="hover:bg-surface-200-800/50 flex min-w-0 flex-1 cursor-pointer items-center gap-3 p-2 text-left"
+          class="{filled
+            ? 'hover-on-color'
+            : 'hover:bg-surface-200-800/50'} flex min-w-0 flex-1 cursor-pointer items-center gap-3 p-2 text-left"
           aria-pressed={selected}
           onclick={() => selection.ontoggle(colorway)}
         >
           {#if selected}
             <CircleCheckIcon
-              class="text-primary-700-300 shrink-0"
+              class="shrink-0 {filled ? '' : 'text-primary-700-300'}"
               aria-hidden="true"
             />
           {:else}
@@ -99,12 +126,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
           {@render row(colorway)}
         </button>
-        <ColorwayMoreMenu {colorway} on="surface" />
+        <ColorwayMoreMenu {colorway} on={filled ? 'color' : 'surface'} />
       </li>
     {:else}
-      <li class="flex items-center gap-3 p-2">
+      <li
+        class="relative isolate flex items-center gap-3 overflow-hidden p-2"
+        style:color={filled ? iconColorOn(colorway.hex) : undefined}
+        data-fillable
+        data-filled={filled || undefined}
+        use:fillFromSwatch={filled}
+      >
+        {@render fillLayer(colorway)}
         {@render row(colorway)}
-        <ColorwayMoreMenu {colorway} on="surface" />
+        <ColorwayMoreMenu {colorway} on={filled ? 'color' : 'surface'} />
       </li>
     {/if}
   {/each}

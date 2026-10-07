@@ -16,8 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   Yarn colorways as cards, like the palette's color cards: a round swatch on
   the card's top line with a "more" menu (⋮) at its end, then the name, yarn
-  and match below it on the card, so text reads the same on every color. The
-  ⋮ menu holds the link to buy or view it and the copy options.
+  and match below it on the card. The ⋮ menu holds the link to buy or view
+  it and the copy options.
+
+  With View › Fill with color, the whole card takes the colorway's color,
+  grown out of the swatch (which fades into it), with black or white text,
+  whichever stands out on it. The match keeps its own surface.
 
   With `selection`, each card (but its ⋮ menu) is one toggle button, led by a
   circle that's checked when it's selected, beside the swatch.
@@ -28,10 +32,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorwayMoreMenu from './ColorwayMoreMenu.svelte';
   import {
     colorwayKey,
+    iconColorOn,
     matchPercent,
     swatchClass,
     type ColorwaySelection,
   } from './colorway-utils';
+  import { fillFromSwatch, fillWithColor, mutedText } from './fill-with-color';
 
   interface Props {
     colorways: (Color & { delta?: number })[];
@@ -39,11 +45,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { colorways, selection }: Props = $props();
+
+  let filled = $derived(fillWithColor.on);
 </script>
 
 <!-- Spans, since in a selectable card they're inside its button -->
 {#snippet swatch(colorway: Color)}
-  <span class={swatchClass} style="background:{colorway.hex}"></span>
+  <span
+    class="{swatchClass} {filled ? 'opacity-0' : ''}"
+    style="background:{colorway.hex}"
+    data-fill-origin
+  ></span>
+{/snippet}
+
+{#snippet fillLayer(colorway: Color)}
+  <span class="fill-layer" style="background:{colorway.hex}" aria-hidden="true"
+  ></span>
 {/snippet}
 
 {#snippet details(colorway: Color & { delta?: number })}
@@ -52,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span class="leading-tight font-semibold text-pretty">
       {colorway.name}
     </span>
-    <span class="text-surface-700-300 text-xs text-pretty">
+    <span class="{mutedText(filled)} text-xs text-pretty">
       {colorway.brandName} · {colorway.yarnName}
     </span>
   </span>
@@ -64,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </span>
   {/if}
   {#if colorway.unavailable}
-    <span class="text-surface-700-300 mt-auto text-xs leading-tight">
+    <span class="{mutedText(filled)} mt-auto text-xs leading-tight">
       No longer available
     </span>
   {/if}
@@ -76,14 +93,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}
       {@const selected = selection.isSelected(colorway)}
+      <!-- Selected on a color: the ring stands off the card, so it shows
+      even on a yarn close to the ring's own color -->
       <li
-        class="card bg-surface-50-950 relative flex min-w-0 flex-col overflow-hidden border {selected
+        class="card bg-surface-50-950 relative isolate flex min-w-0 flex-col overflow-hidden border {selected
           ? 'border-primary-500 ring-primary-500 ring-2'
-          : 'border-surface-200-800'}"
+          : 'border-surface-200-800'} {selected && filled
+          ? 'ring-offset-surface-50-950 ring-offset-2'
+          : ''}"
+        style:color={filled ? iconColorOn(colorway.hex) : undefined}
+        data-fillable
+        data-filled={filled || undefined}
+        use:fillFromSwatch={filled}
       >
+        {@render fillLayer(colorway)}
         <button
           type="button"
-          class="hover:bg-surface-200-800/50 flex flex-1 cursor-pointer flex-col text-left"
+          class="flex flex-1 cursor-pointer flex-col text-left {filled
+            ? 'hover-on-color'
+            : 'hover:bg-surface-200-800/50'}"
           aria-pressed={selected}
           onclick={() => selection.ontoggle(colorway)}
         >
@@ -92,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="flex size-8 shrink-0 items-center justify-center">
               {#if selected}
                 <CircleCheckIcon
-                  class="text-primary-700-300"
+                  class={filled ? '' : 'text-primary-700-300'}
                   aria-hidden="true"
                 />
               {:else}
@@ -108,17 +136,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <!-- Over the swatch's line, a box the same height and as far down,
         so the button centers on that line whatever its own size -->
         <div class="absolute top-2 right-2 flex h-12 items-center">
-          <ColorwayMoreMenu {colorway} on="surface" />
+          <ColorwayMoreMenu {colorway} on={filled ? 'color' : 'surface'} />
         </div>
       </li>
     {:else}
       <li
-        class="card bg-surface-50-950 border-surface-200-800 flex min-w-0 flex-col overflow-hidden border"
+        class="card bg-surface-50-950 border-surface-200-800 relative isolate flex min-w-0 flex-col overflow-hidden border"
+        style:color={filled ? iconColorOn(colorway.hex) : undefined}
+        data-fillable
+        data-filled={filled || undefined}
+        use:fillFromSwatch={filled}
       >
+        {@render fillLayer(colorway)}
         <div class="flex h-14 items-center gap-1 px-2 pt-2">
           {@render swatch(colorway)}
           <span class="ml-auto flex items-center"
-            ><ColorwayMoreMenu {colorway} on="surface" /></span
+            ><ColorwayMoreMenu
+              {colorway}
+              on={filled ? 'color' : 'surface'}
+            /></span
           >
         </div>
         <div class="flex flex-1 flex-col gap-2 p-2">

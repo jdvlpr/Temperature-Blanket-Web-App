@@ -425,7 +425,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onreverse={(reversed) =>
                     (yarnColorwayFinderState.reversed = reversed)}
                 />
-                <ViewMenu bind:value={layout} />
+                <ViewMenu bind:value={layout} fillOption />
               </div>
             {/if}
 
