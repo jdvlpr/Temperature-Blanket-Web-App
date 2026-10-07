@@ -531,34 +531,51 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <!-- The number being edited, in its own field like the search fields: the
-number (its unit is only in its label, to leave the number room) and ✕ to cancel -->
+number (its unit is only in its label, to leave the number room) and ✕ to
+cancel, then Save -->
 {#snippet rangeInput(index: number, edge: 'from' | 'to')}
   {#if editing}
-    <span class="input-group w-fit grid-cols-[minmax(0,1fr)_auto]">
-      <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
+    <span class="flex flex-wrap items-center gap-1.5">
+      <span class="input-group w-fit grid-cols-[minmax(0,1fr)_auto]">
+        <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
       from zooming in. Room for the up and down buttons a computer shows. -->
-      <input
-        type="number"
-        step="any"
-        class="ig-input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
-        aria-label="Color {index + 1} {edge}{unitLabel ? `, ${unitLabel}` : ''}"
-        bind:value={editing[edge]}
-        {@attach (el) => {
-          el.focus();
-          el.select();
-          keepAboveKeyboard(el);
-        }}
-      />
-      <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
+        <input
+          type="number"
+          step="any"
+          class="ig-input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
+          aria-label="Color {index + 1} {edge}{unitLabel
+            ? `, ${unitLabel}`
+            : ''}"
+          bind:value={editing[edge]}
+          {@attach (el) => {
+            el.focus();
+            el.select();
+            keepAboveKeyboard(el);
+          }}
+        />
+        <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
+        <button
+          type="button"
+          class="ig-btn"
+          title="Cancel"
+          aria-label="Cancel editing range for color {index + 1}"
+          onmousedown={(e) => e.preventDefault()}
+          onclick={() => cancelRange({ refocus: true })}
+        >
+          <XIcon size={18} aria-hidden="true" />
+        </button>
+      </span>
+      <!-- Filled, like Save elsewhere: right after the number, or under it in a narrow card -->
       <button
         type="button"
-        class="ig-btn"
-        title="Cancel"
-        aria-label="Cancel editing range for color {index + 1}"
+        class="btn preset-filled-primary-500 h-9 px-3 @max-[13rem]:w-full"
+        title="Save Range"
+        aria-label="Save range for color {index + 1}"
         onmousedown={(e) => e.preventDefault()}
-        onclick={() => cancelRange({ refocus: true })}
+        onclick={() => saveRange({ refocus: true })}
       >
-        <XIcon size={18} aria-hidden="true" />
+        <CheckIcon size={18} aria-hidden="true" />
+        Save
       </button>
     </span>
   {/if}
@@ -573,7 +590,7 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
       {@const isEditing = editing?.index === index}
       <!-- From and To are each a button, just around the number. In the
       list, each sits in a slot as wide as the widest, so they line up.
-      Tapping one turns just it into a field, with Save after the range.
+      Tapping one turns just it into a field, with Save right after it.
       Only Save (or Enter, from the keyboard) keeps it; ✕, Escape, or
       pressing or tabbing anywhere else (the other number too) puts it back. -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -634,20 +651,6 @@ number (its unit is only in its label, to leave the number room) and ✕ to canc
           {@render rangeInput(index, 'to')}
         {:else}
           {@render rangeValue(index, r, 'to', column)}
-        {/if}
-        {#if isEditing}
-          <!-- Filled, like Save elsewhere; under the range in a narrow card -->
-          <button
-            type="button"
-            class="btn preset-filled-primary-500 ml-1.5 h-9 px-3 @max-[13rem]:ml-0 @max-[13rem]:w-full"
-            title="Save Range"
-            aria-label="Save range for color {index + 1}"
-            onmousedown={(e) => e.preventDefault()}
-            onclick={() => saveRange({ refocus: true })}
-          >
-            <CheckIcon size={18} aria-hidden="true" />
-            Save
-          </button>
         {/if}
       </span>
     {/if}
