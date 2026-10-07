@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
+  import PaletteStripEditor from '$lib/components/PaletteStripEditor.svelte';
   import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
   import { yarnUses } from '$lib/storage/yarn-uses.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -432,10 +432,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
           >
             {#if palette.points.length}
-              <ColorPaletteEditable
+              <PaletteStripEditor
                 staggerIn
-                canUserEditColor={false}
-                showSchemeName={false}
+                lockable
                 roundedBottom={false}
                 colors={paletteColors}
                 {highlightIndex}
@@ -444,9 +443,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     index === null
                       ? null
                       : (palette.points[index]?.id ?? null))}
-                onchanged={(
-                  colors: Parameters<typeof palette.syncFromColors>[0],
-                ) => palette.syncFromColors(colors)}
+                onchange={(colors) =>
+                  palette.syncFromColors(
+                    colors as Parameters<typeof palette.syncFromColors>[0],
+                  )}
               />
             {:else}
               <div

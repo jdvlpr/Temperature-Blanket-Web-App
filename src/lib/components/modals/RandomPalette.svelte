@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
+  import PaletteStripEditor from '$lib/components/PaletteStripEditor.svelte';
   import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
   import { yarnUses } from '$lib/storage/yarn-uses.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -243,16 +243,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <Spinner />
         </div>
       {:else}
-        {#key randomPalette}
-          <ColorPaletteEditable
-            canUserEditColor={false}
-            bind:colors={randomPalette}
-            onchanged={(eventColors: Color[] | undefined) => {
-              if (eventColors) randomPalette = eventColors;
-              numberOfColors = randomPalette.length;
-            }}
-          />
-        {/key}
+        <PaletteStripEditor
+          bind:colors={randomPalette}
+          lockable
+          onchange={(colors) => (numberOfColors = colors.length)}
+        />
       {/if}
     </div>
 

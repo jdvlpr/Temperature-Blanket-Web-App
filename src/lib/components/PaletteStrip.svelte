@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, type Snippet } from 'svelte';
   import { createAttachmentKey } from 'svelte/attachments';
   import { scale } from 'svelte/transition';
+  import { LockKeyholeIcon } from '@lucide/svelte';
 
   interface Props {
     colors: Color[];
@@ -160,6 +161,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     swatches[next]?.focus();
   }
 
+  /** Moves the focus to a color, as when a control for it goes away */
+  export function focusColor(index: number) {
+    tabStop = Math.max(0, Math.min(index, colors.length - 1));
+    swatches[tabStop]?.focus();
+  }
+
   /** What a color's span or button has either way */
   function swatchAttributes(color: Color, index: number) {
     const hex = color.hex ?? WHITE;
@@ -168,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         swatches[index] = node;
       },
       class: [
-        'block h-full min-w-0 flex-1 focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
+        'grid h-full min-w-0 flex-1 place-items-center focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-current',
         onselect && 'cursor-pointer',
         flashIndices.includes(index) && 'history-flash',
       ],
@@ -179,7 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }`,
       'aria-label': insideControl
         ? undefined
-        : `Color ${index + 1}: ${describe(color)}`,
+        : `Color ${index + 1}: ${describe(color)}${color.locked ? ', locked' : ''}`,
       tabindex: insideControl ? undefined : index === tabStop ? 0 : -1,
       onpointerenter: (event: PointerEvent) => {
         if (event.pointerType === 'touch') {
@@ -202,6 +209,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   }
 </script>
+
+{#snippet lock(color: Color)}
+  {#if color.locked}
+    <LockKeyholeIcon size={20} class="opacity-60" aria-hidden="true" />
+  {/if}
+{/snippet}
 
 <!-- Spans throughout, so the strip can sit inside a link or button -->
 <span class="flex w-full flex-col gap-y-1 text-left">
@@ -235,14 +248,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               active = null;
               onselect(index);
             }}
-            in:swatchIn|global={{ index }}
-          ></button>
+            in:swatchIn|global={{ index }}>{@render lock(color)}</button
+          >
         {:else}
           <span
             {...swatchAttributes(color, index)}
             role={insideControl ? undefined : 'img'}
-            in:swatchIn|global={{ index }}
-          ></span>
+            in:swatchIn|global={{ index }}>{@render lock(color)}</span
+          >
         {/if}
       {/each}
     </span>

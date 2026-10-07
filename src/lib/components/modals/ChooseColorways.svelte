@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
+  import PaletteStripEditor from '$lib/components/PaletteStripEditor.svelte';
   import ColorSearchField from '$lib/components/ColorSearchField.svelte';
   import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
@@ -151,13 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       {#if selectedColors.length}
         <div class="">
-          {#key selectedColors.length}
-            <ColorPaletteEditable
-              canUserEditColor={false}
-              showSchemeName={false}
-              bind:colors={selectedColors}
-            />
-          {/key}
+          <PaletteStripEditor bind:colors={selectedColors} />
           <div class="mt-2 flex items-center justify-between gap-2">
             <p class="text-xs">{paletteTitleText}</p>
             <div class="flex items-center gap-1">

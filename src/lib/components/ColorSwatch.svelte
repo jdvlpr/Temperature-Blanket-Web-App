@@ -29,6 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     filled?: boolean;
     pop?: boolean;
     flash?: boolean;
+    /** Smaller, as in a pop-up's footer */
+    small?: boolean;
   }
 
   let {
@@ -37,12 +39,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     filled = false,
     pop = false,
     flash = false,
+    small = false,
   }: Props = $props();
 </script>
 
 <span
   class={[
-    'grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
+    'grid shrink-0 place-items-center rounded-full font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
+    small ? 'size-9 text-xs' : 'size-12 text-sm',
     filled && 'ring-2 ring-current/40',
     pop && 'feedback-pop',
     flash && 'history-flash',
