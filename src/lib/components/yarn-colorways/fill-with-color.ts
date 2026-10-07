@@ -47,7 +47,7 @@ const getObserver = () =>
     }
   }));
 
-/** The swatch's middle and radius within the item, ignoring transforms
+/** The swatch, and its middle and radius within the item, ignoring transforms
  * (a swatch's pop, an item's move or grow), or undefined without one */
 const swatchCircle = (item: HTMLElement) => {
   const swatch =
@@ -65,7 +65,7 @@ const swatchCircle = (item: HTMLElement) => {
   }
   // The item is the `relative` box the layer fills, so offsets end there
   if (el !== item) return;
-  return { x, y, r: swatch.offsetWidth / 2 };
+  return { swatch, x, y, r: swatch.offsetWidth / 2 };
 };
 
 /** On a card or row (`relative`, with a `.fill-layer` first): plays the
@@ -113,6 +113,14 @@ export const fillFromSwatch: Action<HTMLElement, boolean> = (item, filled) => {
       { clipPath: next ? [small, large] : [large, small] },
       { duration: DURATION, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
     );
+    // Shrinking, the swatch (and its outline) shows only once the fill has
+    // become it. Visibility, since its opacity may be transitioning, and a
+    // transition wins over an animation.
+    if (!next && circle.swatch.dataset.fillOrigin !== 'fallback')
+      circle.swatch.animate(
+        { visibility: ['hidden', 'hidden'] },
+        { duration: DURATION },
+      );
   }
 };
 
