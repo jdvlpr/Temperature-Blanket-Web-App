@@ -55,8 +55,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu } from '@skeletonlabs/skeleton-svelte';
   import {
+    DRAGGED_ELEMENT_ID,
     dragHandle,
     dragHandleZone,
+    SHADOW_ITEM_MARKER_PROPERTY_NAME,
     SOURCES,
     TRIGGERS,
   } from 'svelte-dnd-action';
@@ -384,6 +386,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else if (trigger === TRIGGERS.DRAG_STOPPED) {
       keyboardDragId = null;
     }
+    // The card under the pointer is a copy made when the drag started; give
+    // it the number, range and days of the slot it would drop into, which
+    // the hidden placeholder there already shows
+    if (source !== SOURCES.KEYBOARD && dragging)
+      tick().then(() => {
+        const at = sortableColors.findIndex(
+          (color) => SHADOW_ITEM_MARKER_PROPERTY_NAME in color,
+        );
+        const shadow = at < 0 ? null : listElement?.children[at];
+        const lifted = document.getElementById(DRAGGED_ELEMENT_ID);
+        if (shadow && lifted) lifted.innerHTML = shadow.innerHTML;
+      });
   }
 
   // On drag end, update the gauge colors
