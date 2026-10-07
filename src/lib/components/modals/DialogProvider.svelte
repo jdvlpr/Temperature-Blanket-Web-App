@@ -28,6 +28,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // The Project menu: a panel that slides in from the right
   const side = $derived(dialog.options.placement === 'side');
 
+  // The page's scrollbar is hidden while a dialog is open (the page is padded
+  // in its place), and comes back as soon as closing starts, narrowing the
+  // screen under the dialog as it fades out. Measured as a dialog opens,
+  // before the scrollbar goes, so that while closing it keeps the width it
+  // had and doesn't shift sideways.
+  let scrollbarWidth = $state(0);
+  $effect.pre(() => {
+    if (dialog.opened)
+      scrollbarWidth = Math.max(
+        0,
+        window.innerWidth - document.documentElement.clientWidth,
+      );
+  });
+  /** Under the scrollbar's place while closing, for the backdrop and the dialog */
+  const closingRight = $derived(
+    !dialog.opened && scrollbarWidth ? `right: -${scrollbarWidth}px;` : '',
+  );
+
   // Below the sm breakpoint a dialog is a bottom sheet
   const phone = new MediaQuery('(max-width: 639.98px)');
 
@@ -404,7 +422,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     in from the right (the site menu comes from the left) -->
     <Dialog.Backdrop
       class="bg-surface-950/35 fixed inset-0 z-60 dark:bg-black/55"
-      style="{backdropLook(
+      style="{closingRight}{backdropLook(
         grabbable ? 1 - dragProgress : 1,
       )}; transition: {dragging || reduceMotion
         ? 'none'
@@ -421,9 +439,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         'fixed inset-0 z-60 flex items-center justify-center',
         side ? 'items-stretch justify-end' : 'max-sm:items-end',
       ]}
-      style={visibleArea
-        ? `top: ${visibleArea.top}px; bottom: auto; height: ${visibleArea.height}px`
-        : undefined}
+      style={`${closingRight}${
+        visibleArea
+          ? `top: ${visibleArea.top}px; bottom: auto; height: ${visibleArea.height}px`
+          : ''
+      }`}
     >
       <Dialog.Content
         class={[
