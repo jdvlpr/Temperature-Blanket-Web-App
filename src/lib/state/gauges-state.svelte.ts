@@ -45,6 +45,11 @@ import {
 
 export const showDaysInRange: { value: boolean } = $state({ value: true });
 
+// The gauge whose Manual steps (every, from) show under the Ranges menu
+export const manualRangesEditor: { gaugeId: string | null } = $state({
+  gaugeId: null,
+});
+
 type AnyGauge =
   TemperatureGauge | RainGauge | SnowGauge | DayTimeGauge | MoonPhaseGauge;
 

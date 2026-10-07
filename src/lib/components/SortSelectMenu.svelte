@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronDownIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
+  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
 
   interface Props {
     /** Each sort, with a few words under it on what it does, if any */
@@ -128,11 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? 'The other way round'
                 : undefined,
             )}
-            <CheckIcon
-              size={18}
-              class="shrink-0 {isReversed ? '' : 'invisible'}"
-              aria-hidden="true"
-            />
+            <MenuCheckbox checked={isReversed} />
           </Menu.OptionItem>
         {/if}
       </Menu.Content>

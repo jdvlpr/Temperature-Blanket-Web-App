@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { page } from '$app/state';
   import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
+  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
   import { menuItemClass } from '$lib/components/menu-styles';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
@@ -23,7 +24,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
   import { dialog } from '$lib/state/page-state.svelte';
   import { previewHighlight } from '$lib/state/preview-state.svelte';
-  import { gauges, showDaysInRange } from '$lib/state/gauges-state.svelte';
+  import {
+    gauges,
+    manualRangesEditor,
+    showDaysInRange,
+  } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { GaugeRange } from '$lib/types/gauge-types';
@@ -34,6 +39,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setRangeValue,
   } from '$lib/utils/range-utils.svelte';
   import { sameColorList } from '$lib/utils/color-utils';
+  import { displayNumber } from '$lib/utils/number-utils';
+  import {
+    confirmGaugeChange,
+    gaugeChangeState,
+  } from '$lib/utils/history-utils.svelte';
+  import {
+    describeIncrement,
+    withGeneratedRanges,
+  } from '$lib/utils/gauge-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     growIn,
@@ -138,10 +152,97 @@ If not, see <https://www.gnu.org/licenses/>. -->
     to: number | null;
   } | null = $state(null);
 
+  // Manual steps (every, from), opened from the Ranges menu. As with a
+  // range, the list follows what's typed, and only Save keeps it: one undo
+  // step. Cancel, Escape, or tapping or tabbing anywhere else puts it back.
+  let showManual = $derived(
+    manualRangesEditor.gaugeId === gauge.id && !isCategory,
+  );
+  let manualDraft: { increment: number | null; start: number | null } = $state({
+    increment: null,
+    start: null,
+  });
+  let manualValid = $derived(
+    Number.isFinite(manualDraft.increment) &&
+      (manualDraft.increment ?? 0) > 0 &&
+      Number.isFinite(manualDraft.start),
+  );
+
+  // Opening it starts from the manual steps, or else from the first range,
+  // so the list doesn't jump
+  $effect.pre(() => {
+    if (!showManual) return;
+    untrack(() => {
+      const options = gauge.rangeOptions;
+      const first = (gauge.ranges as GaugeRange[] | undefined)?.[0];
+      manualDraft =
+        options?.mode === 'manual' && !options.isCustomRanges
+          ? { ...options.manual }
+          : {
+              increment: first
+                ? displayNumber(Math.abs(first.to - first.from))
+                : (options?.manual.increment ?? null),
+              start: first?.from ?? options?.manual.start ?? null,
+            };
+      editing = null;
+    });
+  });
+
+  // Closed when this gauge or the list goes away, so it never reopens itself
+  $effect(() => {
+    const id = gauge.id;
+    return () => {
+      if (manualRangesEditor.gaugeId === id) manualRangesEditor.gaugeId = null;
+    };
+  });
+
+  function cancelManualOnEscape(e: KeyboardEvent) {
+    if (e.key !== 'Escape') return;
+    // Only the strip, not a dialog around it
+    e.preventDefault();
+    e.stopPropagation();
+    closeManual({ save: false });
+  }
+
+  function closeManual({ save }: { save: boolean }) {
+    if (!showManual) return;
+    if (save) {
+      if (!manualValid) return;
+      const result = withGeneratedRanges(gauge, {
+        mode: 'manual',
+        manual: {
+          increment: manualDraft.increment as number,
+          start: manualDraft.start as number,
+        },
+      });
+      const before = gaugeChangeState(gauge);
+      gauge.rangeOptions = result.rangeOptions;
+      gauge.ranges = result.ranges;
+      confirmGaugeChange(gauge.id, before, gaugeChangeState(gauge));
+    }
+    manualRangesEditor.gaugeId = null;
+    tick().then(() =>
+      document
+        .querySelector<HTMLElement>('[data-ranges-menu-trigger]')
+        ?.focus(),
+    );
+  }
+
   // The ranges with the draft applied, and which neighbors it moved
   let draft = $derived.by(() => {
     let ranges: GaugeRange[] = gauge.ranges ?? [];
     const moved: number[] = [];
+    if (showManual && manualValid)
+      return {
+        ranges: withGeneratedRanges(gauge, {
+          mode: 'manual',
+          manual: {
+            increment: manualDraft.increment as number,
+            start: manualDraft.start as number,
+          },
+        }).ranges,
+        moved,
+      };
     if (!editing || isCategory) return { ranges, moved };
     const original = ranges[editing.index];
     for (const edge of ['from', 'to'] as const) {
@@ -215,6 +316,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (refocus) focusRange(index, edge);
   }
 
+  // A tap or click outside an editor puts it back, but not a scroll: a
+  // touch that scrolls ends in pointercancel, and a drag (the scrollbar, a
+  // mouse) moves too far to count as a press
+  function cancelOnOutsidePress(cancel: () => void) {
+    return (el: HTMLElement) => {
+      let press: { id: number; x: number; y: number } | null = null;
+      const onPointerDown = (e: PointerEvent) => {
+        press = el.contains(e.target as Node)
+          ? null
+          : { id: e.pointerId, x: e.clientX, y: e.clientY };
+      };
+      const onPointerUp = (e: PointerEvent) => {
+        if (
+          press?.id === e.pointerId &&
+          Math.hypot(e.clientX - press.x, e.clientY - press.y) < 10
+        )
+          cancel();
+        press = null;
+      };
+      const onPointerCancel = () => (press = null);
+      document.addEventListener('pointerdown', onPointerDown, true);
+      document.addEventListener('pointerup', onPointerUp, true);
+      document.addEventListener('pointercancel', onPointerCancel, true);
+      return () => {
+        document.removeEventListener('pointerdown', onPointerDown, true);
+        document.removeEventListener('pointerup', onPointerUp, true);
+        document.removeEventListener('pointercancel', onPointerCancel, true);
+      };
+    };
+  }
+
   function cancelRange({ refocus }: { refocus: boolean }) {
     if (!editing) return;
     const { index, edge } = editing;
@@ -280,13 +412,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let periods = $derived(pluralize(weather.grouping, 2));
 
   // The gauge's range options aren't reactive state, but they only change
-  // along with its ranges (a save here, Configure Ranges, undo), so they're
+  // along with its ranges (a save here, the Ranges menu, undo), so they're
   // read again whenever the ranges change
   let rules = $derived.by(() => {
     void gauge.ranges;
     const options = gauge.rangeOptions;
     return options ? { ...options } : null;
   });
+
+  // How the ranges were made, said above the list
+  let generatedAs = $derived.by(() => {
+    if (!rules || isCategory) return '';
+    if (rules.isCustomRanges) return 'Custom ranges';
+    if (rules.mode === 'manual')
+      return `Manual steps: every ${rules.manual.increment} ${unitLabel} from ${rules.manual.start} ${unitLabel}`;
+    if (rules.auto.optimization === 'ranges')
+      return gauge.autoRangeOptions
+        ? `Even steps of ${describeIncrement(rules, gauge.autoRangeOptions)} ${unitLabel}`
+        : 'Even steps';
+    const target = gauge.targets?.find(
+      (t: { id: string }) => t.id === rules?.auto.optimization,
+    );
+    return `Even days by ${target?.label.toLowerCase() ?? 'temperature'}`;
+  });
+
+  // With both ends included or neither, rounded or manual steps can't make
+  // ranges that meet exactly
+  let endsDontMeet = $derived(
+    !!rules &&
+      !rules.isCustomRanges &&
+      rules.includeFromValue === rules.includeToValue &&
+      (rules.mode !== 'auto' || rules.auto.roundIncrement),
+  );
 
   // In the list, every row's From and To are as wide as the widest of them,
   // so the ranges line up and their buttons are no wider than the numbers.
@@ -642,42 +799,7 @@ cancel, then Save -->
           }
         }}
         {@attach isEditing
-          ? (el) => {
-              // A tap or click anywhere else puts it back, but not a scroll:
-              // a touch that scrolls ends in pointercancel, and a drag (the
-              // scrollbar, a mouse) moves too far to count as a press
-              let press: { id: number; x: number; y: number } | null = null;
-              const onPointerDown = (e: PointerEvent) => {
-                press = el.contains(e.target as Node)
-                  ? null
-                  : { id: e.pointerId, x: e.clientX, y: e.clientY };
-              };
-              const onPointerUp = (e: PointerEvent) => {
-                if (
-                  press?.id === e.pointerId &&
-                  Math.hypot(e.clientX - press.x, e.clientY - press.y) < 10
-                )
-                  cancelRange({ refocus: false });
-                press = null;
-              };
-              const onPointerCancel = () => (press = null);
-              document.addEventListener('pointerdown', onPointerDown, true);
-              document.addEventListener('pointerup', onPointerUp, true);
-              document.addEventListener('pointercancel', onPointerCancel, true);
-              return () => {
-                document.removeEventListener(
-                  'pointerdown',
-                  onPointerDown,
-                  true,
-                );
-                document.removeEventListener('pointerup', onPointerUp, true);
-                document.removeEventListener(
-                  'pointercancel',
-                  onPointerCancel,
-                  true,
-                );
-              };
-            }
+          ? cancelOnOutsidePress(() => cancelRange({ refocus: false }))
           : null}
       >
         {#if isEditing && editing?.edge === 'from'}
@@ -789,11 +911,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           <span class="text-surface-700-300 text-xs">How many fall in each</span
           >
         </span>
-        <CheckIcon
-          size={18}
-          class="shrink-0 {showDaysInRange.value ? '' : 'invisible'}"
-          aria-hidden="true"
-        />
+        <MenuCheckbox checked={showDaysInRange.value} />
       </Menu.OptionItem>
     </ViewMenu>
   {:else}
@@ -802,14 +920,95 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 </div>
 
 {#if showRanges && !isCategory && rules}
-  <!-- Says when hand-set numbers have replaced Automatic or Manual ones -->
+  {#if showManual}
+    <!-- Manual steps: the list below follows what's typed until Save. Like
+    a range: Enter saves; ✕, Escape, or tapping or tabbing anywhere else
+    puts it back; scrolling doesn't. -->
+    <form
+      class="mt-3 flex flex-wrap items-end justify-center gap-2 px-2"
+      aria-label="Manual steps"
+      onsubmit={(e) => {
+        e.preventDefault();
+        closeManual({ save: true });
+      }}
+      onfocusout={(e) => {
+        const to = e.relatedTarget as Node | null;
+        if (to && !e.currentTarget.contains(to)) closeManual({ save: false });
+      }}
+      {@attach cancelOnOutsidePress(() => closeManual({ save: false }))}
+    >
+      <label class="label w-fit">
+        <span class="label-text text-xs">Every ({unitLabel})</span>
+        <!-- 16px text keeps iOS from zooming in -->
+        <input
+          type="number"
+          step="any"
+          min="0"
+          class="input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums"
+          bind:value={manualDraft.increment}
+          onkeydown={cancelManualOnEscape}
+          {@attach (el) => {
+            // After the Ranges menu closes and focuses its button
+            const timer = setTimeout(() => {
+              el.focus();
+              el.select();
+              keepAboveKeyboard(el);
+            });
+            return () => clearTimeout(timer);
+          }}
+        />
+      </label>
+      <label class="label w-fit">
+        <span class="label-text text-xs">From ({unitLabel})</span>
+        <input
+          type="number"
+          step="any"
+          class="input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums"
+          aria-describedby="manual-start-hint"
+          bind:value={manualDraft.start}
+          onkeydown={cancelManualOnEscape}
+        />
+      </label>
+      <!-- Pressing either keeps the focus in a number, so the keyboard stays up -->
+      <button
+        type="button"
+        class="btn preset-tonal h-9 px-3"
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => closeManual({ save: false })}
+      >
+        <XIcon size={18} aria-hidden="true" />
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn preset-filled-primary-500 h-9 px-3"
+        disabled={!manualValid}
+        onmousedown={(e) => e.preventDefault()}
+      >
+        <CheckIcon size={18} aria-hidden="true" />
+        Save
+      </button>
+      <p
+        id="manual-start-hint"
+        class="text-surface-700-300 w-full text-center text-xs"
+      >
+        {manualValid
+          ? `From is usually the ${rules.direction === 'high-to-low' ? 'highest' : 'lowest'} value in your weather.`
+          : 'Every needs a number above 0, and From a number.'}
+      </p>
+    </form>
+  {/if}
+  <!-- How the ranges were made, and how to change one -->
   <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
-    {rules.isCustomRanges ? 'Custom ranges' : 'Ranges'}: From is {rules.includeFromValue
-      ? 'included'
-      : 'excluded'}, To is {rules.includeToValue ? 'included' : 'excluded'}. Tap
-    a range to change it{rules.linked
+    {generatedAs}. From is {rules.includeFromValue ? 'included' : 'excluded'},
+    To is {rules.includeToValue ? 'included' : 'excluded'}. Tap a range to
+    change it{rules.linked
       ? '; the next or previous one follows'
-      : ''}.{showDays ? ` Tap a count to see those ${periods}.` : ''}
+      : ''}.{showDays
+      ? ` Tap a count to see those ${periods}.`
+      : ''}{endsDontMeet
+      ? ' With both ends included or neither, these steps leave gaps or overlaps: try Round numbers off or another choice in the Ranges menu.'
+      : ''}
   </p>
 {/if}
 <p class="sr-only" aria-live="polite">{announcement}</p>

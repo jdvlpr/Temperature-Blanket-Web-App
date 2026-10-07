@@ -234,6 +234,71 @@ export function withRangeOptions(
   return { rangeOptions, ranges: result.ranges };
 }
 
+/**
+ * The step between Automatic even ranges, as shown: "4 or 5" when rounded
+ * ranges alternate, otherwise one number.
+ */
+export function describeIncrement(
+  rangeOptions: GaugeRangeOptions,
+  autoRangeOptions: GaugeRangeOptions,
+): string {
+  const { includeFromValue: from, includeToValue: to } = rangeOptions;
+  const increment = getIncrement(
+    { ...rangeOptions, mode: 'auto' },
+    autoRangeOptions,
+  );
+  const adjusted =
+    !from && !to
+      ? (increment ?? 0) - 0.01
+      : from && to
+        ? (increment ?? 0) + 0.01
+        : (increment ?? 0);
+  const step = Math.abs(adjusted);
+  if (!rangeOptions.auto.roundIncrement) return String(displayNumber(step));
+  if (Math.floor(step) !== Math.ceil(step))
+    return `${Math.floor(step)} or ${Math.ceil(step)}`;
+  return String(Math.round(step));
+}
+
+/** How a gauge's ranges are generated, as chosen in the Ranges menu */
+export type RangeGeneration = {
+  mode?: GaugeRangeOptions['mode'];
+  optimization?: GaugeRangeOptions['auto']['optimization'];
+  roundIncrement?: boolean;
+  manual?: Partial<GaugeRangeOptions['manual']>;
+};
+
+/**
+ * A gauge's range options and ranges generated a new way (Automatic with a
+ * balance focus, or Manual steps). Custom ranges are replaced. Plain copies,
+ * so nothing live is changed.
+ */
+export function withGeneratedRanges(
+  gauge: Parameters<typeof withRangeOptions>[0],
+  generation: RangeGeneration,
+): { rangeOptions: GaugeRangeOptions; ranges: GaugeRange[] } {
+  const copy = <T>(value: T) => structuredClone($state.snapshot(value)) as T;
+  const rangeOptions = copy(gauge.rangeOptions);
+  if (generation.mode) rangeOptions.mode = generation.mode;
+  if (generation.optimization)
+    rangeOptions.auto.optimization = generation.optimization;
+  if (generation.roundIncrement !== undefined)
+    rangeOptions.auto.roundIncrement = generation.roundIncrement;
+  if (generation.manual)
+    rangeOptions.manual = { ...rangeOptions.manual, ...generation.manual };
+  rangeOptions.isCustomRanges = false;
+
+  const result = regenerateRanges({
+    id: gauge.id,
+    rangeOptions,
+    autoRangeOptions: copy(gauge.autoRangeOptions),
+    ranges: copy(gauge.ranges),
+    colors: copy(gauge.colors),
+  });
+  rangeOptions.mode = result.mode;
+  return { rangeOptions, ranges: result.ranges };
+}
+
 export const createGaugeColors = ({
   schemeId,
   numberOfColors,

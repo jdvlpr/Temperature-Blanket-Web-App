@@ -25,6 +25,9 @@ import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import { showHistoryChange } from '$lib/utils/feedback.svelte';
 import { exists } from '$lib/utils/other-utils';
+import { escapeHtml } from '$lib/utils/string-utils';
+import type { GaugeRange, GaugeRangeOptions } from '$lib/types/gauge-types';
+import type { Color } from '$lib/types/yarn-types';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
@@ -109,11 +112,11 @@ export const loadFromHistory = async ({
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
         preferences.value.units = 'imperial';
-        message = 'Units';
+        message = 'Units set to Imperial';
       }
       if (newParams.u.value === 'm') {
         preferences.value.units = 'metric';
-        message = 'Units';
+        message = 'Units set to Metric';
       }
     }
   }
@@ -148,19 +151,26 @@ export const loadFromHistory = async ({
         );
 
         const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
+        const name = gauge.label.replace(/ Gauge$/, '');
+        if (!exists(oldParams[gauge.id])) message = `${gauge.label} added`;
+        else message = name;
         if (_gauge && settings) {
-          const before = _gauge.colors.map((color) => color?.hex);
+          const before = gaugeChangeState(_gauge as GaugeChangeState);
           _gauge.updateSettings({ settings });
-          const after = _gauge.colors.map((color) => color?.hex);
+          const after = gaugeChangeState(_gauge as GaugeChangeState);
           changedGaugeId = gauge.id;
-          changedIndex = changedColorIndex(before, after);
+          changedIndex = changedColorIndex(
+            before.colors.map((color) => color?.hex),
+            after.colors.map((color) => color?.hex),
+          );
+          const change = describeGaugeChange(before, after);
+          if (change && exists(oldParams[gauge.id]))
+            message = `${name}: ${change}`;
         }
-
-        message = 'Colors';
       }
     } else if (exists(oldParams[gauge.id])) {
       gauges.remove(gauge.id);
-      message = 'Colors';
+      message = `${gauge.label} removed`;
     }
   }
 
@@ -190,11 +200,148 @@ export const loadFromHistory = async ({
 
   if (message) {
     toast.trigger({
-      message: `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`,
+      message: `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${escapeHtml(message)}</span></span>`,
       background: 'preset-filled-success-100-900',
     });
   }
 };
+export type GaugeChangeState = {
+  colors: Color[];
+  ranges?: GaugeRange[];
+  rangeOptions?: GaugeRangeOptions;
+};
+
+/** How a gauge's ranges are generated, in a few words */
+function generationOf(options: GaugeRangeOptions): string {
+  if (options.isCustomRanges) return 'custom ranges';
+  if (options.mode === 'manual')
+    return `manual steps, every ${options.manual.increment} from ${options.manual.start}`;
+  const by = { tmax: 'high', tavg: 'average', tmin: 'low' } as const;
+  const optimization = options.auto.optimization;
+  if (optimization === 'ranges')
+    return options.auto.roundIncrement ? 'even steps, rounded' : 'even steps';
+  return `even days by ${by[optimization]} temperature`;
+}
+
+const includesLabel = (o: GaugeRangeOptions) =>
+  o.includeFromValue && o.includeToValue
+    ? 'both From and To'
+    : o.includeFromValue
+      ? 'From, not To'
+      : o.includeToValue
+        ? 'To, not From'
+        : 'neither From nor To';
+
+/**
+ * What an undo or redo changed in one gauge, as it is afterwards (e.g.
+ * "color 3 changed to Ruby Red", "range 2 is 10 to 20"), or '' when nothing
+ * specific can be said. Colors first, then how ranges are made, then ranges.
+ */
+export function describeGaugeChange(
+  before: GaugeChangeState,
+  after: GaugeChangeState,
+): string {
+  const hexes = (state: GaugeChangeState) => state.colors.map((c) => c?.hex);
+  const was = hexes(before);
+  const now = hexes(after);
+  const colorName = (c: Color | undefined) => c?.name || c?.hex || 'a color';
+
+  if (was.join() !== now.join()) {
+    const index = changedColorIndex(was, now);
+    if (now.length === was.length + 1)
+      return index === null
+        ? `${now.length} colors`
+        : `color ${index + 1} added (${colorName(after.colors[index])})`;
+    if (now.length === was.length - 1) {
+      const removed = was.findIndex((hex, i) => hex !== now[i]);
+      const shifted = now.every(
+        (hex, i) => hex === was[i < removed ? i : i + 1],
+      );
+      return shifted
+        ? `color ${removed + 1} removed (${colorName(before.colors[removed])})`
+        : `${now.length} colors`;
+    }
+    if (now.length !== was.length || index === null) return 'colors changed';
+    const sameColors = [...was].sort().join() === [...now].sort().join();
+    return sameColors
+      ? `color moved to ${index + 1}`
+      : `color ${index + 1} changed to ${colorName(after.colors[index])}`;
+  }
+
+  const oldRanges = before.ranges ?? [];
+  const newRanges = after.ranges ?? [];
+  const changed = newRanges.flatMap((r, i) =>
+    r.from !== oldRanges[i]?.from || r.to !== oldRanges[i]?.to ? [i] : [],
+  );
+  const oneRange =
+    changed.length === 1
+      ? `range ${changed[0] + 1} is ${newRanges[changed[0]].from} to ${newRanges[changed[0]].to}`
+      : '';
+
+  const a = before.rangeOptions;
+  const b = after.rangeOptions;
+  if (a && b) {
+    if (generationOf(a) !== generationOf(b)) {
+      // Editing one range makes them custom: say which range
+      const onlyCustom =
+        generationOf({ ...a, isCustomRanges: false }) ===
+        generationOf({ ...b, isCustomRanges: false });
+      return onlyCustom && oneRange
+        ? oneRange
+        : `ranges set to ${generationOf(b)}`;
+    }
+    if (a.direction !== b.direction)
+      return `direction ${b.direction === 'high-to-low' ? 'high to low' : 'low to high'}`;
+    if (includesLabel(a) !== includesLabel(b))
+      return `each range includes ${includesLabel(b)}`;
+    if (a.linked !== b.linked)
+      return b.linked ? 'linked ranges on' : 'linked ranges off';
+  }
+
+  if (oneRange) return oneRange;
+  if (changed.length) return 'ranges changed';
+  return '';
+}
+
+/** A gauge's colors, ranges and range options as they are now, to compare */
+export function gaugeChangeState(gauge: GaugeChangeState): GaugeChangeState {
+  return $state.snapshot({
+    colors: gauge.colors,
+    ranges: gauge.ranges,
+    rangeOptions: gauge.rangeOptions,
+  }) as GaugeChangeState;
+}
+
+/**
+ * Says what a change to a gauge's range settings did, e.g. "Temperature:
+ * Direction low to high", with Undo
+ */
+export function confirmGaugeChange(
+  gaugeId: string,
+  before: GaugeChangeState,
+  after: GaugeChangeState,
+) {
+  const change = describeGaugeChange(before, after);
+  if (!change) return;
+  const label = allGaugesAttributes.find((g) => g.id === gaugeId)?.label;
+  const name = label?.replace(/ Gauge$/, '');
+  const text = `${change[0].toUpperCase()}${change.slice(1)}`;
+  toast.trigger({
+    category: 'success',
+    message: escapeHtml(name ? `${name}: ${text}` : text),
+    action: {
+      label: 'Undo',
+      response: () => {
+        // The change goes into history a moment after it's made; make sure
+        // it's there, so Undo takes back this change and not the one before
+        updateHistory();
+        if (!project.history.isFirst && !project.history.isUpdating)
+          void loadFromHistory({ action: 'Undo' });
+      },
+    },
+  });
+}
+
 /**
  * The one color an undo or redo changed, added, or moved, by its index afterwards — or null when there's
  * no single color to point to (only ranges changed, a color was removed, or the whole palette changed)

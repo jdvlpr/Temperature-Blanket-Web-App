@@ -115,8 +115,12 @@ vi.mock('$lib/utils/seasons-utils.svelte', () => ({
   seasonsFromUrlHash: vi.fn(),
 }));
 
-const { changedColorIndex, loadFromHistory, updateHistory } =
-  await import('./history-utils.svelte');
+const {
+  changedColorIndex,
+  describeGaugeChange,
+  loadFromHistory,
+  updateHistory,
+} = await import('./history-utils.svelte');
 
 describe('loadFromHistory - preview switching', () => {
   beforeEach(() => {
@@ -238,5 +242,114 @@ describe('changedColorIndex', () => {
     expect(changedColorIndex(['a', 'b'], ['a', 'b'])).toBeNull();
     expect(changedColorIndex(['a', 'b', 'c'], ['a', 'c'])).toBeNull();
     expect(changedColorIndex(['a', 'b', 'c'], ['x', 'y', 'z'])).toBeNull();
+  });
+});
+
+describe('describeGaugeChange', () => {
+  const options = (change: Record<string, unknown> = {}) =>
+    ({
+      auto: {
+        optimization: 'ranges',
+        start: { high: 30, low: 0 },
+        increment: 10,
+        roundIncrement: true,
+      },
+      manual: { start: 30, increment: 10 },
+      direction: 'high-to-low',
+      includeFromValue: true,
+      includeToValue: false,
+      linked: true,
+      mode: 'auto',
+      isCustomRanges: false,
+      ...change,
+    }) as any;
+  const red = { hex: '#ff0000', name: 'Ruby Red' } as any;
+  const green = { hex: '#00ff00', name: 'Moss' } as any;
+  const blue = { hex: '#0000ff' } as any;
+  const ranges = [
+    { from: 30, to: 20 },
+    { from: 20, to: 10 },
+  ];
+  const state = (change: Record<string, unknown> = {}) => ({
+    colors: [red, green],
+    ranges,
+    rangeOptions: options(),
+    ...change,
+  });
+
+  it('names a changed color', () => {
+    expect(describeGaugeChange(state(), state({ colors: [red, blue] }))).toBe(
+      'color 2 changed to #0000ff',
+    );
+  });
+
+  it('names an added and a removed color', () => {
+    expect(
+      describeGaugeChange(state(), state({ colors: [red, green, blue] })),
+    ).toBe('color 3 added (#0000ff)');
+    expect(describeGaugeChange(state(), state({ colors: [green] }))).toBe(
+      'color 1 removed (Ruby Red)',
+    );
+  });
+
+  it('says where a color moved', () => {
+    expect(
+      describeGaugeChange(
+        state({ colors: [red, green, blue] }),
+        state({ colors: [blue, red, green] }),
+      ),
+    ).toBe('color moved to 1');
+  });
+
+  it('says how ranges are generated, then direction, ends and linking', () => {
+    expect(
+      describeGaugeChange(
+        state(),
+        state({ rangeOptions: options({ mode: 'manual' }) }),
+      ),
+    ).toBe('ranges set to manual steps, every 10 from 30');
+    expect(
+      describeGaugeChange(
+        state(),
+        state({ rangeOptions: options({ direction: 'low-to-high' }) }),
+      ),
+    ).toBe('direction low to high');
+    expect(
+      describeGaugeChange(
+        state(),
+        state({ rangeOptions: options({ includeToValue: true }) }),
+      ),
+    ).toBe('each range includes both From and To');
+    expect(
+      describeGaugeChange(
+        state(),
+        state({ rangeOptions: options({ linked: false }) }),
+      ),
+    ).toBe('linked ranges off');
+  });
+
+  it('names one changed range', () => {
+    expect(
+      describeGaugeChange(
+        state(),
+        state({ ranges: [{ from: 30, to: 25 }, ranges[1]] }),
+      ),
+    ).toBe('range 1 is 30 to 25');
+  });
+
+  it('names the range edited by hand, not just that ranges are custom', () => {
+    expect(
+      describeGaugeChange(
+        state(),
+        state({
+          ranges: [{ from: 30, to: 25 }, ranges[1]],
+          rangeOptions: options({ isCustomRanges: true }),
+        }),
+      ),
+    ).toBe('range 1 is 30 to 25');
+  });
+
+  it('says nothing when nothing it knows changed', () => {
+    expect(describeGaugeChange(state(), state())).toBe('');
   });
 });

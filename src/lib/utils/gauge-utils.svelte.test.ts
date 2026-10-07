@@ -16,7 +16,7 @@
 import type { GaugeRangeOptions } from '$lib/types/gauge-types';
 import type { Color } from '$lib/types/yarn-types';
 import { describe, expect, it } from 'vitest';
-import { withRangeOptions } from './gauge-utils.svelte';
+import { withGeneratedRanges, withRangeOptions } from './gauge-utils.svelte';
 
 function options(change: Partial<GaugeRangeOptions> = {}): GaugeRangeOptions {
   return {
@@ -89,5 +89,43 @@ describe('withRangeOptions', () => {
     expect(before.rangeOptions.linked).toBe(true);
     expect(ranges).toEqual(before.ranges);
     expect(ranges).not.toBe(before.ranges);
+  });
+});
+
+describe('withGeneratedRanges', () => {
+  it('replaces custom ranges with manual steps', () => {
+    const before = gauge({ isCustomRanges: true });
+    const { rangeOptions, ranges } = withGeneratedRanges(before, {
+      mode: 'manual',
+      manual: { start: 50, increment: 5 },
+    });
+    expect(rangeOptions.mode).toBe('manual');
+    expect(rangeOptions.isCustomRanges).toBe(false);
+    expect(ranges).toEqual([
+      { from: 50, to: 45 },
+      { from: 45, to: 40 },
+      { from: 40, to: 35 },
+    ]);
+    expect(before.rangeOptions.isCustomRanges).toBe(true);
+  });
+
+  it('keeps the other manual value when only one changes', () => {
+    const { rangeOptions } = withGeneratedRanges(gauge({ mode: 'manual' }), {
+      manual: { increment: 2 },
+    });
+    expect(rangeOptions.manual).toEqual({ start: 30, increment: 2 });
+  });
+
+  it('generates even steps automatically', () => {
+    const { rangeOptions, ranges } = withGeneratedRanges(
+      gauge({ mode: 'manual' }),
+      { mode: 'auto', optimization: 'ranges' },
+    );
+    expect(rangeOptions.mode).toBe('auto');
+    expect(ranges).toEqual([
+      { from: 30, to: 20 },
+      { from: 20, to: 10 },
+      { from: 10, to: 0 },
+    ]);
   });
 });
