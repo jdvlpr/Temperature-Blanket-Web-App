@@ -397,6 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dialog.escapeAction();
   }}
   initialFocusEl={undefined}
+  finalFocusEl={() => dialog.finalFocus?.() ?? null}
 >
   <Portal>
     <!-- Dimmed behind, as with the site menu's drawer; the side panel slides

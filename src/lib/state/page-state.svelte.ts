@@ -87,6 +87,9 @@ class DialogClass {
   /** Set by a view shown inside a dialog, for Escape to leave just that view
    * rather than close the dialog. Cleared whenever another dialog opens. */
   escapeAction = $state<(() => void) | null>(null);
+  /** Where the focus goes when the dialog closes, instead of back to what
+   * opened it, as to a color the dialog just added. Null for the default. */
+  finalFocus: (() => HTMLElement | null) | null = null;
 
   /** Which way the last change of view went, for its slide */
   direction = $state<'forward' | 'back' | 'none'>('none');
@@ -129,6 +132,7 @@ class DialogClass {
     }
     this.backAction = null;
     this.escapeAction = null;
+    this.finalFocus = null;
     this.direction = fromReturnable ? 'forward' : 'none';
 
     // Every dialog starts from the defaults, so nothing carries over from

@@ -577,13 +577,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauge.updateColors({ colors });
     sortableColors = getSortableColors();
     gauge.schemeId = 'Custom';
+    // The focus goes to the new color's yarn, not back to the ⋮ button
+    dialog.finalFocus = () =>
+      listElement
+        ?.querySelectorAll<HTMLElement>(':scope > .color')
+        [at]?.querySelector<HTMLElement>('.yarn-button') ?? null;
     dialog.close();
     pop.trigger(at);
     announcement = `Added color ${at + 1}`;
-    // To the new color once the dialog has closed and given the focus back
-    setTimeout(() =>
-      requestAnimationFrame(() => focusGaugeColor(gauge.id, at)),
-    );
+    // Scrolled to and glowing, like a color picked in the strip, once the
+    // dialog has let go of the focus
+    setTimeout(() => focusGaugeColor(gauge.id, at));
   }
 
   function removeColor(index: number) {

@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   size, with a black or white icon, whichever stands out on that color, and
   a tint of that on hover. Either way it stays tinted while its menu is open, so a tap on a
   phone (which has no hover) shows it too.
-  With `oninsert`, it offers Add Color Before / After, and with `onremove`,
+  With `oninsert`, it offers Add color before / after, and with `onremove`,
   it ends with Remove, for a color in a palette.
 -->
 <script lang="ts">
@@ -162,11 +162,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <Menu.Separator />
           <Menu.Item value="insert-before" class={menuItemClass}>
             <Before size={16} aria-hidden="true" />
-            <span>Add Color Before</span>
+            <span>Add color before</span>
           </Menu.Item>
           <Menu.Item value="insert-after" class={menuItemClass}>
             <After size={16} aria-hidden="true" />
-            <span>Add Color After</span>
+            <span>Add color after</span>
           </Menu.Item>
         {/if}
         {#if onremove}
