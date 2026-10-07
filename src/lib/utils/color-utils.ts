@@ -41,18 +41,56 @@ import {
 } from '$lib/features/image-palette/order';
 import chroma from 'chroma-js';
 
+/** The least WCAG 2 contrast ratio for normal text (AA) */
+const WCAG_AA_TEXT = 4.5;
+
 /**
- * Returns the appropriate text color based on the given color.
+ * APCA lightness contrast (Lc) of text on a background, as a magnitude: the
+ * perceptual contrast method drafted for WCAG 3 (APCA 0.0.98G-4g base, from
+ * https://github.com/Myndex/apca-w3). Unlike the WCAG 2 ratio, it knows that
+ * white reads well on mid reds and blues.
+ */
+const apcaContrast = (text: chroma.Color, background: chroma.Color) => {
+  const luminance = (color: chroma.Color) => {
+    const [r, g, b] = color.rgb().map((c) => Math.pow(c / 255, 2.4));
+    const y = 0.2126729 * r + 0.7151522 * g + 0.072175 * b;
+    // Soft clamp near black
+    return y > 0.022 ? y : y + Math.pow(0.022 - y, 1.414);
+  };
+  const t = luminance(text);
+  const bg = luminance(background);
+  // Dark text on a light background, or light text on a dark one
+  const contrast =
+    bg > t
+      ? (Math.pow(bg, 0.56) - Math.pow(t, 0.57)) * 1.14
+      : (Math.pow(bg, 0.65) - Math.pow(t, 0.62)) * 1.14;
+  if (Math.abs(contrast) < 0.1) return 0;
+  return (Math.abs(contrast) - 0.027) * 100;
+};
+
+/**
+ * Black or white, for text (or an icon) on a color: the one APCA finds easier
+ * to read, as long as it also passes WCAG 2 AA (4.5:1); otherwise the one with
+ * more WCAG 2 contrast, which always does (at least 4.58:1). So it's never
+ * below AA, and white where APCA prefers it and AA allows it.
  *
- * @param {string} color - The color to determine the text color for.
- * @return {string} The text color, either "black" or "white".
+ * @param {string} color - The color the text sits on.
+ * @return {string} The text color, either "black" or "white"; black for an invalid color.
  */
 export const getTextColor = (color: string): 'black' | 'white' => {
-  return chroma.valid(color)
-    ? chroma(color).luminance() >= 0.5
+  if (!chroma.valid(color)) return 'black';
+  const background = chroma(color);
+  const black = chroma('black');
+  const white = chroma('white');
+  const perceived =
+    apcaContrast(black, background) >= apcaContrast(white, background)
       ? 'black'
-      : 'white'
-    : 'black';
+      : 'white';
+  if (chroma.contrast(background, perceived) >= WCAG_AA_TEXT) return perceived;
+  return chroma.contrast(background, black) >=
+    chroma.contrast(background, white)
+    ? 'black'
+    : 'white';
 };
 
 /**

@@ -1,6 +1,6 @@
 import type { Color } from '$lib/types/yarn-types';
 import { copyToClipboard } from '$lib/utils/clipboard-utils';
-import { getSortedPalette } from '$lib/utils/color-utils';
+import { getSortedPalette, getTextColor } from '$lib/utils/color-utils';
 import { ClipboardCheckIcon } from '@lucide/svelte';
 import chroma from 'chroma-js';
 
@@ -33,17 +33,11 @@ export const copyColorwayText = (text: string) =>
 export const swatchClass =
   'size-12 shrink-0 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]';
 
-/**
- * Black or white, whichever stands out more on a color, for an icon drawn
- * right on a swatch. Unlike getTextColor's luminance cutoff, this keeps every
- * mid-tone at the 3:1 contrast icons need (e.g. black, not white, on pinks).
- */
-export const iconColorOn = (hex: string | undefined): 'black' | 'white' => {
-  if (!hex || !chroma.valid(hex)) return 'black';
-  return chroma.contrast(hex, 'black') >= chroma.contrast(hex, 'white')
-    ? 'black'
-    : 'white';
-};
+/** Black or white, for an icon or text right on a swatch or a card filled
+ * with its color: the app's one rule for that (getTextColor), or black
+ * without a valid color */
+export const iconColorOn = (hex: string | undefined): 'black' | 'white' =>
+  hex ? getTextColor(hex) : 'black';
 
 /** The site a link goes to, for naming it ("hobbii.com"), or undefined
  * when the link isn't a web address */

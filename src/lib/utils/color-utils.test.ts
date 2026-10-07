@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import chroma from 'chroma-js';
 import {
   colorsToCode,
   colorsToPaletteCode,
@@ -113,6 +114,38 @@ describe('color-utils', () => {
       expect(getTextColor('#000000')).toBe('white');
       expect(getTextColor('black')).toBe('white');
       expect(getTextColor('#0000ff')).toBe('white');
+    });
+
+    it('prefers white where APCA reads it better and it passes AA', () => {
+      expect(getTextColor('#5e4fa2')).toBe('white');
+      expect(getTextColor('#2f6fb0')).toBe('white');
+    });
+
+    it('never goes below AA, even where APCA prefers white', () => {
+      // White reads better here, but is only 4.35:1
+      expect(getTextColor('#d8434e')).toBe('black');
+      // A luminance cutoff would pick white here, at 1.99:1
+      expect(getTextColor('#75c8a5')).toBe('black');
+    });
+
+    it('always passes WCAG AA (4.5:1)', () => {
+      const steps = [0, 51, 102, 153, 204, 255];
+      const colors = [
+        ...chroma.scale('Spectral').colors(10),
+        ...steps.flatMap((r) =>
+          steps.flatMap((g) => steps.map((b) => chroma(r, g, b).hex())),
+        ),
+      ];
+      for (const color of colors) {
+        expect(
+          chroma.contrast(color, getTextColor(color)),
+          color,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    it('falls back to black without a valid color', () => {
+      expect(getTextColor('not a color')).toBe('black');
     });
   });
 
