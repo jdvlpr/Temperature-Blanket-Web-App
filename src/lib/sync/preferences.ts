@@ -18,7 +18,7 @@
 // changing the colors on one device and the units on another keeps both.
 //
 // Only preferences that follow the person sync. Ones that suit a device (text
-// size, spacing, sound, vibration, motion, list or grid) stay on it, as do units
+// size, spacing, motion, list or grid) stay on it, as do units
 // and seasons: every project link carries its own, and opening one sets them.
 
 /** The synced preferences, by their path in the `preferences` object */

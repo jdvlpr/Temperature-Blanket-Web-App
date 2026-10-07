@@ -24,10 +24,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor, sameColorList } from '$lib/utils/color-utils';
   import {
-    dragConsiderFeedback,
-    dragFinalizeFeedback,
     growIn,
     liftDraggedElement,
+    markDragged,
     motionDuration,
     Pop,
   } from '$lib/utils/feedback.svelte';
@@ -182,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    dragConsiderFeedback(newItems, e.detail.info);
+    markDragged();
     if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STARTED) {
       keyboardDragId = Number(id);
     }
@@ -207,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
     keyboardDragId = null;
-    dragFinalizeFeedback();
+    markDragged();
 
     colors = $state.snapshot(sortableColors).map((color) => {
       const { id, ...rest } = color;

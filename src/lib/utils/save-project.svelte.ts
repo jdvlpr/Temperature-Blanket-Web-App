@@ -24,9 +24,8 @@ import {
   saveOpenProject,
 } from '$lib/storage/autosave.svelte';
 import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
-import { feedback } from '$lib/utils/feedback.svelte';
 
-/** Saves the open project; returns whether it saved. Only for explicit saves (it plays the success sound/vibration). */
+/** Saves the open project; returns whether it saved. */
 export async function saveProject(): Promise<boolean> {
   if (!weather.data.length) {
     toast.trigger({
@@ -43,9 +42,7 @@ export async function saveProject(): Promise<boolean> {
       return false;
     }
     await saveNow();
-    const saved = autosave.state === 'saved';
-    if (saved) feedback('success');
-    return saved;
+    return autosave.state === 'saved';
   }
 
   const firstSave = !autosave.stored;
@@ -58,7 +55,6 @@ export async function saveProject(): Promise<boolean> {
     return false;
   }
 
-  feedback('success');
   toast.trigger({
     message: !autosave.on
       ? 'Saved'

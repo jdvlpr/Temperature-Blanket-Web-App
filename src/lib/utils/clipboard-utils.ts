@@ -1,9 +1,8 @@
 import { toast, type ToastSettings } from '$lib/state/page-state.svelte';
-import { feedback } from '$lib/utils/feedback.svelte';
 
 /**
- * Copies text (or clipboard items, like an image) and confirms it with a toast, which screen readers announce,
- * plus a light tap or click if the user has those on. Returns whether the copy worked.
+ * Copies text (or clipboard items, like an image) and confirms it with a toast, which screen readers announce.
+ * Returns whether the copy worked.
  */
 export async function copyToClipboard(
   data: string | ClipboardItem[],
@@ -17,7 +16,6 @@ export async function copyToClipboard(
     toast.trigger({ message: errorMessage, category: 'error' });
     return false;
   }
-  feedback('copy');
   toast.trigger({
     ...(typeof success === 'string' ? { message: success } : success),
     category: 'success',

@@ -36,11 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { sameColorList } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import {
-    dragConsiderFeedback,
-    dragFinalizeFeedback,
     growIn,
     historyChange,
     liftDraggedElement,
+    markDragged,
     motionDuration,
     Pop,
   } from '$lib/utils/feedback.svelte';
@@ -242,10 +241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       info: { source: string; trigger: string; id: string };
     }>;
     sortableColors = event.detail.items as (Color & { id: number })[];
-    dragConsiderFeedback(
-      event.detail.items as (Color & { id: number })[],
-      event.detail.info,
-    );
+    markDragged();
     const { source, trigger, id } = event.detail.info;
     // A keyboard drop sends "drag stopped" after finalize
     dragging = trigger !== TRIGGERS.DRAG_STOPPED;
@@ -266,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // A color moved with the keyboard keeps the focus, to move it again
     const movedId = keyboardDragId;
     keyboardDragId = null;
-    dragFinalizeFeedback();
+    markDragged();
     // After the drag library refocuses the row and the list settles, which
     // would otherwise leave the focus nowhere
     if (movedId !== null)

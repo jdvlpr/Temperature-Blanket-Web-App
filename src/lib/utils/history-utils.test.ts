@@ -70,7 +70,6 @@ const {
 }));
 
 vi.mock('$lib/utils/feedback.svelte', () => ({
-  feedback: vi.fn(),
   showHistoryChange: vi.fn(),
 }));
 vi.mock('$app/environment', () => ({ browser: true }));

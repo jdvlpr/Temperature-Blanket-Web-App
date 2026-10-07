@@ -1,10 +1,10 @@
-<!-- Preferences: how the site looks, sounds, and moves, and the default yarn.
+<!-- Preferences: how the site looks and moves, and the default yarn.
 Every change applies right away and is kept in this browser; signed in, the
 colors, mode, buttons, headings, and default yarn also follow the account (see
 $lib/sync/preferences). Built from the site's usual settings pieces (as in the
 palette image export): selects with the current choice's icon beside it,
 headed sections (as the account page), each holding a card, for appearance
-(with the light/dark segmented control), yarn, and sound & motion, rows of
+(with the light/dark segmented control), yarn, and motion, rows of
 thumbnails for colors and headings
 (as the pattern picker), the usual yarn picker, and a card of switches. -->
 
@@ -24,15 +24,10 @@ thumbnails for colors and headings
   } from '$lib/constants/page-constants';
   import { defaultYarn } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import {
-    canVibrate,
-    getEffects,
-    motion,
-    setEffect,
-  } from '$lib/utils/feedback.svelte';
+  import { getEffects, motion, setEffect } from '$lib/utils/feedback.svelte';
   import { RotateCcwIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
-  import { onMount, type Snippet } from 'svelte';
+  import type { Snippet } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
 
   type Theme = typeof preferences.value.theme;
@@ -49,12 +44,6 @@ thumbnails for colors and headings
   };
 
   let effects = $derived(getEffects());
-
-  // Only offer vibration where it does something (in practice, Android phones)
-  let showVibration = $state(false);
-  onMount(() => {
-    showVibration = canVibrate();
-  });
 
   // Keeps the chosen thumbnail in view in its scrolling row, e.g. when it's
   // picked from the select. Only the row scrolls, sideways: this runs again
@@ -343,34 +332,13 @@ site does -->
     </div>
   </section>
 
-  <section
-    class="flex flex-col gap-2"
-    aria-labelledby="preferences-sound-motion"
-  >
-    <h3 id="preferences-sound-motion" class="px-2 text-sm font-bold opacity-70">
-      Sound & Motion
+  <section class="flex flex-col gap-2" aria-labelledby="preferences-motion">
+    <h3 id="preferences-motion" class="px-2 text-sm font-bold opacity-70">
+      Motion
     </h3>
     <div
       class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
     >
-      <ToggleSwitch
-        bare
-        label="Sounds"
-        details="Soft clicks as you move colors, copy, and save"
-        checked={effects.sound}
-        onchange={(e) =>
-          setEffect('sound', (e.currentTarget as HTMLInputElement).checked)}
-      />
-      {#if showVibration}
-        <ToggleSwitch
-          bare
-          label="Vibration"
-          details="A light tap for some actions"
-          checked={effects.haptics}
-          onchange={(e) =>
-            setEffect('haptics', (e.currentTarget as HTMLInputElement).checked)}
-        />
-      {/if}
       <ToggleSwitch
         bare
         label="Reduce Motion"

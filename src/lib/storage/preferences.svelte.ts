@@ -11,19 +11,13 @@ type SeasonConfig = {
   endDate: string; // MM-DD format
 };
 
-/** Sound, vibration, and motion feedback settings */
+/** Motion feedback settings */
 export type EffectsPreferences = {
-  /** Play small sounds on actions like moving colors or saving */
-  sound: boolean;
-  /** Vibrate on supporting devices (in practice, Android phones) */
-  haptics: boolean;
   /** `'system'` follows the device's Reduce Motion setting; `'reduce'` always reduces motion */
   motion: 'system' | 'reduce';
 };
 
 export const DEFAULT_EFFECTS: EffectsPreferences = {
-  sound: true,
-  haptics: true,
   motion: 'system',
 };
 
@@ -43,7 +37,7 @@ type LocalStatePreferencesType = {
   units: Unit | null;
   /** The palette image export's last settings; missing until first changed */
   paletteImage?: PaletteImageSettings;
-  /** Sound, vibration, and motion settings; missing until first changed */
+  /** Motion settings; missing until first changed */
   effects?: EffectsPreferences;
   /** The yarn chosen first where none is, as `{brandId}-{yarnId}`; missing or `''` for none */
   defaultYarn?: string;

@@ -17,7 +17,6 @@ import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
-  BellRingIcon,
   CloudCogIcon,
   FolderHeartIcon,
   PaletteIcon,
@@ -72,8 +71,8 @@ export const entries: ChangelogItemGroup[] = [
                 title: 'Yarn Palette Tools',
               },
               {
-                IconComponent: BellRingIcon,
-                text: `Preferences have been redesigned with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn on small sounds, vibrations and motion touches (or turn them off) under Sound & Motion.`,
+                IconComponent: CogIcon,
+                text: `Preferences have been redesigned with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn off motion touches with Reduce Motion.`,
                 title: 'Preferences',
               },
               {
