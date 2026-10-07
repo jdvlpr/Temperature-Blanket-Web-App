@@ -126,8 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   // A range being edited in place: its From and To as typed (null while
-  // empty). Nothing is saved until Enter or leaving it, so one edit is one
-  // undo step; until then, the numbers and days follow the draft.
+  // empty). Nothing is saved until ✓, Enter or leaving it, so one edit is one
+  // undo step. Until then, only the two numbers show it; the neighbor
+  // and the days change when it's saved.
   let editing: {
     index: number;
     edge: 'from' | 'to';
@@ -135,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     to: number | null;
   } | null = $state(null);
 
-  // The ranges with the draft applied, and which neighbors it moved
+  // The ranges with the draft applied, and which neighbors it moves, for saving
   let draft = $derived.by(() => {
     let ranges: GaugeRange[] = gauge.ranges ?? [];
     const moved: number[] = [];
@@ -218,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let days = $derived.by(() => {
     if (!showDays) return [];
     return gauge.colors.map((_: Color, index: number) => {
-      const range = draft.ranges[index];
+      const range = gauge.ranges?.[index];
       return gauge.targets.map(
         (target: { id: Parameters<typeof getDaysInRange>[0]['id'] }) =>
           range
@@ -430,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 {#snippet range(index: number, column: boolean)}
-  {@const r = isCategory ? gauge.ranges?.[index] : draft.ranges[index]}
+  {@const r = gauge.ranges?.[index]}
   {#if r}
     {#if isCategory}
       <span class="truncate px-2 text-sm">{r.label}</span>
