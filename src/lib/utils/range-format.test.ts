@@ -34,10 +34,10 @@ describe('rangeRuleSentence', () => {
   it('says which ends are in each range', () => {
     expect(
       rangeRuleSentence({ includeFromValue: true, includeToValue: false }),
-    ).toBe('Each range includes its From number, not its To.');
+    ).toBe('Each range includes its From number, not its To number.');
     expect(
       rangeRuleSentence({ includeFromValue: false, includeToValue: true }),
-    ).toBe('Each range includes its To number, not its From.');
+    ).toBe('Each range includes its To number, not its From number.');
     expect(
       rangeRuleSentence({ includeFromValue: true, includeToValue: true }),
     ).toBe('Each range includes both its From and To numbers.');

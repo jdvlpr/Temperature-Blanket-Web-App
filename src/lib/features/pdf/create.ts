@@ -164,9 +164,9 @@ export async function createPdf({
       gauge.label,
       !isCategory && gauge.rangeOptions
         ? [
-            `${gauge.colors.length} colors, in order. ${rangeRuleSentence(gauge.rangeOptions)}`,
+            `${gauge.colors.length} colors. ${rangeRuleSentence(gauge.rangeOptions)}`,
           ]
-        : [`${gauge.colors.length} colors, in order.`],
+        : [`${gauge.colors.length} colors.`],
     );
     drawStrip(pdf, flow, gauge.colors ?? []);
     flow.y += 4;
