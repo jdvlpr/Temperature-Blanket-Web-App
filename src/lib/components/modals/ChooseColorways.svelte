@@ -151,41 +151,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       {#if selectedColors.length}
         <div class="">
-          <PaletteStripEditor bind:colors={selectedColors} />
-          <div class="mt-2 flex items-center justify-between gap-2">
-            <p class="text-xs">{paletteTitleText}</p>
-            <div class="flex items-center gap-1">
-              <SortMenu
-                colors={selectedColors}
-                placement="top"
-                triggerClass="btn btn-sm hover:bg-surface-200-800"
-                disabled={selectedColors.length < 2}
-                onsort={(sort) => {
-                  const colors = $state.snapshot(selectedColors);
-                  selectedColors =
-                    sort === 'reverse'
-                      ? reverseColors(colors)
-                      : sort === 'shuffle'
-                        ? shuffleColors(colors)
-                        : getSortedPalette({
-                            palette: colors,
-                            sortColors: sort,
-                          });
-                }}
-              />
-              <button
-                type="button"
-                class="btn btn-sm hover:bg-surface-200-800"
-                title="Remove all colorways"
-                bind:this={clearButton}
-                onclick={clear}
-              >
-                <Trash2Icon aria-hidden="true" />
-                <!-- Just the icon on small screens, as in From an Image -->
-                <span class="max-sm:sr-only">Clear</span>
-              </button>
-            </div>
-          </div>
+          <!-- Sort and Clear, or the bar for a color pressed in the strip -->
+          <PaletteStripEditor
+            bind:colors={selectedColors}
+            buttonClass="btn btn-sm hover:bg-surface-200-800"
+          >
+            {#snippet toolbar()}
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-xs">{paletteTitleText}</p>
+                <div class="flex items-center gap-1">
+                  <SortMenu
+                    colors={selectedColors}
+                    placement="top"
+                    triggerClass="btn btn-sm hover:bg-surface-200-800"
+                    disabled={selectedColors.length < 2}
+                    onsort={(sort) => {
+                      const colors = $state.snapshot(selectedColors);
+                      selectedColors =
+                        sort === 'reverse'
+                          ? reverseColors(colors)
+                          : sort === 'shuffle'
+                            ? shuffleColors(colors)
+                            : getSortedPalette({
+                                palette: colors,
+                                sortColors: sort,
+                              });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-sm hover:bg-surface-200-800"
+                    title="Remove all colorways"
+                    bind:this={clearButton}
+                    onclick={clear}
+                  >
+                    <Trash2Icon aria-hidden="true" />
+                    <!-- Just the icon on small screens, as in From an Image -->
+                    <span class="max-sm:sr-only">Clear</span>
+                  </button>
+                </div>
+              </div>
+            {/snippet}
+          </PaletteStripEditor>
         </div>
       {/if}
 

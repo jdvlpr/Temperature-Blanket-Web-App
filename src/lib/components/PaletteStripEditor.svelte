@@ -24,14 +24,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PaletteStrip from '$lib/components/PaletteStrip.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { sameColorList } from '$lib/utils/color-utils';
-  import { tick } from 'svelte';
+  import { tick, type Snippet } from 'svelte';
   import {
     ArrowLeftIcon,
     ArrowRightIcon,
     LockKeyholeIcon,
     LockOpenIcon,
     Trash2Icon,
-    XIcon,
+    CheckIcon,
   } from '@lucide/svelte';
 
   interface Props {
@@ -46,6 +46,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Called with a color's index when it's pointed at or focused from the keyboard, and null after */
     onhover?: (index: number | null) => void;
     staggerIn?: boolean;
+    /** The pop-up's own tools under the strip (Sort, Clear…); the color's bar takes their place while it's open */
+    toolbar?: Snippet;
+    /** The pop-up's toolbar button class, so the bar's buttons match them */
+    buttonClass?: string;
   }
 
   let {
@@ -56,6 +60,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     highlightIndex = null,
     onhover,
     staggerIn = false,
+    toolbar,
+    buttonClass = 'btn hover:preset-tonal-surface',
   }: Props = $props();
 
   let strip: ReturnType<typeof PaletteStrip> | undefined = $state();
@@ -126,13 +132,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // Buttons that can't do anything right now say so, but keep the focus
-  const barButtonClass =
-    'btn hover:preset-tonal-surface gap-1 px-3 aria-disabled:opacity-40 aria-disabled:hover:bg-transparent';
+  let barButtonClass = $derived([
+    buttonClass,
+    'aria-disabled:opacity-40 aria-disabled:hover:bg-transparent',
+  ]);
   // Hidden on a phone, but still the button's name for screen readers
   const phoneHidden = 'sr-only sm:not-sr-only';
 </script>
 
-<div class="flex w-full flex-col">
+<div class="flex w-full flex-col gap-2">
   <PaletteStrip
     bind:this={strip}
     {colors}
@@ -148,7 +156,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
       bind:this={bar}
-      class="flex flex-wrap items-center gap-x-2 gap-y-1 px-2 pt-2 text-left"
+      class={[
+        // Tinted, like the pop-ups' other notices, so it reads as its own
+        // panel for this one color
+        'card preset-tonal-surface flex flex-wrap items-center gap-x-2 gap-y-1 p-2 text-left',
+        // A strip with a square bottom sits flush in a card, whose tools are inset
+        roundedBottom ? 'w-full' : 'mx-2 w-[calc(100%-1rem)]',
+      ]}
       role="group"
       aria-label="Color {selected + 1}"
       onkeydown={(event) => {
@@ -170,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       </span>
       <!-- Each button's name is its text; the bar is named for its color.
-      On a phone, the arrows and Close show only their icons. -->
+      On a phone, the arrows show only their icons; Done always says so. -->
       <span
         class="flex w-full flex-wrap items-center justify-end gap-1 sm:w-auto"
       >
@@ -225,14 +239,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           type="button"
           class={barButtonClass}
-          title="Close"
+          title="Done with this color: its changes are kept"
           onclick={close}
         >
-          <XIcon aria-hidden="true" />
-          <span class={phoneHidden}>Close</span>
+          <CheckIcon aria-hidden="true" />
+          <span>Done</span>
         </button>
       </span>
     </div>
+  {:else if toolbar}
+    {@render toolbar()}
   {/if}
   <p class="sr-only" aria-live="polite">{announcement}</p>
 </div>
