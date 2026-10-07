@@ -997,21 +997,21 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     >
       <span
         class="{mutedText(filled)} text-xs whitespace-nowrap {fill
-          ? '@max-[15rem]:flex-1'
+          ? '@max-[15rem]:min-w-0 @max-[15rem]:flex-1 @max-[15rem]:truncate'
           : ''}"
       >
         {target.icon}
         {target.gaugeLabel}
       </span>
       <span
-        class="text-sm leading-tight font-semibold whitespace-nowrap {unsaved.includes(
-          index,
-        )
-          ? changedText
-          : ''}">{count}</span
+        class="text-sm leading-tight font-semibold whitespace-nowrap {fill
+          ? '@max-[15rem]:shrink-0'
+          : ''} {unsaved.includes(index) ? changedText : ''}">{count}</span
       >
-      <span class="{mutedText(filled)} text-xs whitespace-nowrap"
-        >{percent}</span
+      <span
+        class="{mutedText(filled)} text-xs whitespace-nowrap {fill
+          ? '@max-[15rem]:shrink-0'
+          : ''}">{percent}</span
       >
     </button>
   {/each}
@@ -1230,7 +1230,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           {/if}
           {#if showDays}
             <div
-              class="grid gap-1 @[15rem]:auto-cols-fr @[15rem]:grid-flow-col"
+              class="grid grid-cols-[minmax(0,1fr)] gap-1 @[15rem]:auto-cols-fr @[15rem]:grid-flow-col @[15rem]:grid-cols-none"
             >
               {@render daysCells(index, true)}
             </div>
