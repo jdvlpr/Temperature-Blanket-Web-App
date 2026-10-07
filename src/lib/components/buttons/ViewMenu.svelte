@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="flex min-w-0 flex-1 flex-col">
               <span>Fill with color</span>
               <span class="text-surface-700-300 text-xs"
-                >Each takes its yarn's color</span
+                >Items with colored backgrounds</span
               >
             </span>
             <MenuCheckbox checked={fillWithColor.on} />
