@@ -57,23 +57,30 @@ export const svgToPNG = async ({
   canvas.height = height;
   canvas.style.display = 'none';
   document.getElementsByTagName('body')[0].appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Could not get canvas 2d context.');
+  try {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Could not get canvas 2d context.');
 
-  const outerHTML = new XMLSerializer().serializeToString(svgNode);
+    const outerHTML = new XMLSerializer().serializeToString(svgNode);
 
-  // Read the SVG string using the fromString method
-  // of Canvg
-  const { Canvg } = await import('canvg');
-  let v = Canvg.fromString(ctx, outerHTML);
+    // Drawn once and waited for: start() would keep redrawing every frame,
+    // forever, on a canvas no one uses any more
+    const { Canvg } = await import('canvg');
+    const v = Canvg.fromString(ctx, outerHTML, {
+      ignoreAnimation: true,
+      ignoreMouse: true,
+    });
+    await v.render();
 
-  // Start drawing the SVG on the canvas
-  v.start();
-
-  // Convert the Canvas to an image
-  let img = canvas.toDataURL('img/png');
-  if (download) img = img.replace('image/png', 'image/octet-stream');
-  return img;
+    // Convert the Canvas to an image
+    const img = canvas.toDataURL('image/png');
+    return download ? img.replace('image/png', 'image/octet-stream') : img;
+  } finally {
+    // Let the canvas go; Safari only frees its memory once it's sized down
+    canvas.remove();
+    canvas.width = 0;
+    canvas.height = 0;
+  }
 };
 
 export const downloadPreviewPNG = async (

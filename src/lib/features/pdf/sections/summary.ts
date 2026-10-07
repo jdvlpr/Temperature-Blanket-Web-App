@@ -23,7 +23,6 @@ import { preferences } from '$lib/storage/preferences.svelte';
 import type { TISO8601DateString } from '$lib/types/weather-types';
 import { stringToDate } from '$lib/utils/date-utils';
 import { getAverage } from '$lib/utils/number-utils';
-import { svgToPNG } from '$lib/utils/preview-utils.svelte';
 import { formatRangeEnd } from '$lib/utils/range-format';
 import { pluralize } from '$lib/utils/string-utils';
 import { INK, SIZE, paragraph, wrap, type Pdf } from '../draw';
@@ -55,24 +54,66 @@ function temperatures(): string | null {
   return `Temperatures: ${parts.join(', ')}`;
 }
 
-/** The open preview as a picture, or null if there isn't one to take */
+/** The picture's longest side, in pixels: sharp in print (about 250 dpi
+ * across a page), and small enough for a phone's memory */
+const PREVIEW_MAX_SIDE = 1800;
+
+/**
+ * The open preview as a JPEG, or null if there isn't one to take. A JPEG goes
+ * into the PDF as it is, where a PNG is decoded pixel by pixel first; with a
+ * big preview that took more memory than iOS Safari allows a tab, and the
+ * page reloaded instead of saving the PDF. Drawn once (no animation loop),
+ * and the canvas let go of straight after.
+ */
 async function previewImage() {
   const active = previews.active;
   if (!active?.svg || !active.width || !active.height) return null;
+  const scale = Math.min(
+    1,
+    PREVIEW_MAX_SIDE / Math.max(active.width, active.height),
+  );
+  const width = Math.round(active.width * scale);
+  const height = Math.round(active.height * scale);
+  // Drawn at the preview's own size, as the gallery's picture is (so it
+  // fills its canvas), then copied down to the size the PDF needs
+  const full = document.createElement('canvas');
+  const small = document.createElement('canvas');
   try {
-    const data = await svgToPNG({
-      svgNode: active.svg,
-      width: active.width,
-      height: active.height,
-      download: false,
-      canvasId: 'pdf-preview-canvas',
-    });
-    return { data, width: active.width, height: active.height };
+    full.width = active.width;
+    full.height = active.height;
+    const fullCtx = full.getContext('2d');
+    if (!fullCtx) return null;
+    const { Canvg } = await import('canvg');
+    const drawing = Canvg.fromString(
+      fullCtx,
+      new XMLSerializer().serializeToString(active.svg),
+      { ignoreAnimation: true, ignoreMouse: true },
+    );
+    await drawing.render();
+
+    small.width = width;
+    small.height = height;
+    const ctx = small.getContext('2d');
+    if (!ctx) return null;
+    // JPEG has no transparency: the paper's white behind the preview
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(full, 0, 0, width, height);
+    return {
+      data: small.toDataURL('image/jpeg', 0.9),
+      width,
+      height,
+    };
   } catch (error) {
     console.warn("Can't add the preview to the PDF", error);
     return null;
   } finally {
-    document.getElementById('pdf-preview-canvas')?.remove();
+    // Safari keeps a canvas's memory until it's sized down
+    for (const canvas of [full, small]) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
   }
 }
 
@@ -134,7 +175,7 @@ export async function drawSummary(
     flow.ensure(size.height);
     pdf.doc.addImage(
       image.data,
-      'PNG',
+      'JPEG',
       left + (width - size.width) / 2,
       flow.y,
       size.width,
