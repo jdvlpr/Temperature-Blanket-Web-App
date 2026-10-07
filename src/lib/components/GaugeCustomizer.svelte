@@ -719,6 +719,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
+<!-- The color's number, on its drag handle: its place in the palette, which
+dragging changes. Fill with color grows from here, and when filled (with no
+swatch) it pops when the color changes and glows on undo or redo. -->
 {#snippet handle(index: number, onColor = false)}
   <!-- Not a <button>: svelte-dnd-action ignores Space and Enter from buttons,
   so keyboard dragging only starts from an element like this -->
@@ -727,20 +730,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tabindex="0"
     title="Move Color"
     aria-label="Drag handle to reorder color {index + 1}"
-    class="handle flex size-8 shrink-0 cursor-grab items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-current {onColor
-      ? 'hover-on-color'
-      : 'hover:preset-tonal-surface'}"
+    class={[
+      'handle flex h-8 w-12 shrink-0 cursor-grab items-center justify-center gap-0.5 rounded-full text-sm font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-current',
+      onColor ? 'hover-on-color' : 'hover:preset-tonal-surface',
+      onColor && pop.index === index && 'feedback-pop',
+      onColor &&
+        historyChange.gaugeId === gauge.id &&
+        historyChange.indices.includes(index) &&
+        'history-flash',
+    ]}
+    style:--pop-scale="1.12"
     data-sheet-no-drag
+    data-fill-origin
     use:dragHandle
   >
-    <GripVerticalIcon size={18} aria-hidden="true" />
+    <GripVerticalIcon size={16} aria-hidden="true" />
+    <span aria-hidden="true">{index + 1}</span>
   </div>
 {/snippet}
 
+<!-- The color itself; its number is on the drag handle -->
 {#snippet colorSwatch(index: number, color: Color)}
   <ColorSwatch
     hex={color.hex}
-    number={index + 1}
+    origin={false}
     {filled}
     pop={pop.index === index}
     flash={historyChange.gaugeId === gauge.id &&
@@ -1196,17 +1209,20 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         <div class="flex items-center gap-1 px-2 pt-2">
           {@render handle(index, filled)}
           <!-- Opens Change Color, as the swatch does in a row. For a pointer
-          only: the yarn button below does the same from the keyboard. -->
-          <button
-            type="button"
-            class="rounded-full {hoverTint} p-0.5"
-            tabindex="-1"
-            aria-hidden="true"
-            title="Choose a Color"
-            onclick={() => openChangeColor(index, gauge.colors[index])}
-          >
-            {@render colorSwatch(index, color)}
-          </button>
+          only: the yarn button below does the same from the keyboard.
+          Filled, the card is the color, so there's no swatch. -->
+          {#if !filled}
+            <button
+              type="button"
+              class="rounded-full {hoverTint} p-0.5"
+              tabindex="-1"
+              aria-hidden="true"
+              title="Choose a Color"
+              onclick={() => openChangeColor(index, gauge.colors[index])}
+            >
+              {@render colorSwatch(index, color)}
+            </button>
+          {/if}
           <span class="ml-auto">{@render more(index, color)}</span>
         </div>
         <div class="@container flex flex-1 flex-col gap-1 p-2 text-left">
@@ -1228,21 +1244,23 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         a second line under the yarn. Every row has the same columns, so they line up. -->
         <div
           class="grid items-center gap-x-2 gap-y-1 p-2 text-left {showDays
-            ? 'grid-cols-[2rem_minmax(0,1fr)_auto] @2xl:grid-cols-[2rem_minmax(0,1fr)_auto_auto_auto]'
+            ? 'grid-cols-[3rem_minmax(0,1fr)_auto] @2xl:grid-cols-[3rem_minmax(0,1fr)_auto_auto_auto]'
             : showRanges
-              ? 'grid-cols-[2rem_minmax(0,1fr)_auto] @lg:grid-cols-[2rem_minmax(0,1fr)_auto_auto]'
-              : 'grid-cols-[2rem_minmax(0,1fr)_auto]'}"
+              ? 'grid-cols-[3rem_minmax(0,1fr)_auto] @lg:grid-cols-[3rem_minmax(0,1fr)_auto_auto]'
+              : 'grid-cols-[3rem_minmax(0,1fr)_auto]'}"
         >
           <span class="col-start-1 row-start-1 flex justify-center">
             {@render handle(index, filled)}
           </span>
           <span class="col-start-2 row-start-1 flex min-w-0">
-            {@render yarn(index, color, true)}
+            {@render yarn(index, color, !filled)}
           </span>
           {#if showRanges}
             <!-- Under the yarn's name on a phone; its own columns where there's room -->
             <span
-              class="col-span-3 col-start-1 row-start-2 flex flex-wrap items-center gap-1 pl-1 @sm:pl-[6.25rem] {showDays
+              class="col-span-3 col-start-1 row-start-2 flex flex-wrap items-center gap-1 pl-1 {filled
+                ? '@sm:pl-[3.5rem]'
+                : '@sm:pl-[7.25rem]'} {showDays
                 ? '@2xl:contents'
                 : '@lg:contents'}"
             >

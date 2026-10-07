@@ -32,6 +32,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     flash?: boolean;
     /** Smaller, as in a pop-up's footer */
     small?: boolean;
+    /** Whether Fill with color grows from it; false where something else
+     * (a palette's numbered drag handle) does */
+    origin?: boolean;
   }
 
   let {
@@ -41,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pop = false,
     flash = false,
     small = false,
+    origin = true,
   }: Props = $props();
 </script>
 
@@ -55,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   style:--pop-scale="1.12"
   style:background={hex}
   style:color={iconColorOn(hex ?? '#fff')}
-  data-fill-origin
+  data-fill-origin={origin || undefined}
 >
   {#if number !== undefined}<span class="sr-only">Color</span> {number}{/if}
 </span>
