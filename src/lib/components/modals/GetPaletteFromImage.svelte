@@ -29,6 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImagePaletteCanvas from '$lib/features/image-palette/ImagePaletteCanvas.svelte';
   import { ImagePaletteState } from '$lib/features/image-palette/image-palette-state.svelte';
   import {
+    colorwayKey,
+    type MatchedColor,
+  } from '$lib/features/image-palette/match';
+  import {
     PALETTE_STYLES,
     type PaletteStyle,
   } from '$lib/features/image-palette/select';
@@ -128,6 +132,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? `Closest ${colorways}`
         : 'Closest colorways from any yarn';
   });
+  // The color being edited, in the bar under the palette. Picked there or by
+  // pressing its dot on the photo: both are the same selection.
+  const COLOR_BAR_ID = 'image-palette-color-bar';
+  let selectedIndex = $derived(
+    palette.points.findIndex((point) => point.id === palette.selectedId),
+  );
+  /** Another yarn for it, while it's pointed at */
+  let previewYarn = $state<MatchedColor | null>(null);
+  /** What the yarn choices last did, for screen readers */
+  let yarnAnnouncement = $state('');
+  let closeYarns = $derived(
+    palette.selected && palette.mode === 'yarn' && !palette.selected.locked
+      ? palette.alternatives(palette.selected)
+      : [],
+  );
+
+  $effect(() => {
+    // A different color was selected: stop previewing another yarn
+    void palette.selectedId;
+    previewYarn = null;
+  });
+
+  const percent = (color: MatchedColor) =>
+    `${Math.floor(100 - (color.delta ?? 0))}% match`;
+
   let highlightIndex = $derived(
     palette.points.findIndex((point) => point.id === palette.hoveredId),
   );
@@ -396,7 +425,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
 
           <div class="min-h-0 flex-1 max-lg:px-6">
-            <ImagePaletteCanvas {palette} />
+            <ImagePaletteCanvas
+              {palette}
+              colorBarId={COLOR_BAR_ID}
+              preview={previewYarn?.hex}
+            />
           </div>
 
           {#if palette.credit && palette.hasImage}
@@ -594,8 +627,68 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
 
+            {#snippet yarnChoices(index: number)}
+              {@const point = palette.points[index]}
+              {#if point?.yarn && palette.mode === 'yarn'}
+                {@const yarn = previewYarn ?? point.yarn}
+                <div
+                  class="border-surface-300-700 mt-1 flex flex-col gap-1.5 border-t pt-2"
+                >
+                  <p class="text-surface-700-300 text-xs">
+                    {percent(yarn)}{#if closeYarns.length > 1}
+                      · Other close yarns{/if}
+                  </p>
+                  {#if closeYarns.length > 1}
+                    <div class="flex flex-wrap gap-2 p-0.5">
+                      {#each closeYarns as option (colorwayKey(option))}
+                        {@const current =
+                          colorwayKey(option) === colorwayKey(point.yarn)}
+                        <button
+                          type="button"
+                          class={[
+                            'size-8 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.25)] transition-transform hover:scale-110',
+                            current &&
+                              'outline-primary-500 outline-2 outline-offset-2',
+                          ]}
+                          style="background:{option.hex}"
+                          title="{option.brandName} - {option.yarnName}: {option.name}"
+                          aria-label="Use {option.brandName} {option.yarnName} {option.name}, {percent(
+                            option,
+                          )}"
+                          aria-pressed={current}
+                          onpointerenter={() => (previewYarn = option)}
+                          onpointerleave={() => (previewYarn = null)}
+                          onfocus={() => (previewYarn = option)}
+                          onblur={() => (previewYarn = null)}
+                          onclick={() => {
+                            palette.setYarn(point.id, option);
+                            previewYarn = null;
+                            yarnAnnouncement = `Changed to ${option.brandName} ${option.yarnName} ${option.name}`;
+                          }}
+                        ></button>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            {/snippet}
+
+            <p class="sr-only" aria-live="polite">{yarnAnnouncement}</p>
+
             {#if palette.points.length}
               <PaletteStripEditor
+                bind:selectedIndex={
+                  () => (selectedIndex === -1 ? null : selectedIndex),
+                  (index) =>
+                    (palette.selectedId =
+                      index === null
+                        ? null
+                        : (palette.points[index]?.id ?? null))
+                }
+                keepOpen
+                barId={COLOR_BAR_ID}
+                details={yarnChoices}
+                preview={previewYarn}
                 staggerIn
                 lockable
                 roundedBottom={false}

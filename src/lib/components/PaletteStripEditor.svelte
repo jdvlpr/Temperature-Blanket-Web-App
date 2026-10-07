@@ -17,7 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A palette's strip, for the pop-ups that make one (Choose Colorways, Random
   Palette, From an Image). Pressing a color outlines it and opens one bar
   under the strip, for that color: move it left or right, lock it
-  (`lockable`), or remove it. Sort, in each pop-up, does the rest.
+  (`lockable`), or remove it. Sort, in each pop-up, does the rest. A pop-up
+  can add its own row to the bar (`details`), and pick the color itself
+  (`bind:selectedIndex`), as From an Image does when a photo's dot is pressed.
 -->
 <script lang="ts">
   import ColorSwatch from '$lib/components/ColorSwatch.svelte';
@@ -49,6 +51,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     staggerIn?: boolean;
     /** The pop-up's own tools under the strip (Sort, Clear…); the color's bar takes their place while it's open */
     toolbar?: Snippet;
+    /** The color the bar is for, or null when it's closed */
+    selectedIndex?: number | null;
+    /** The pop-up's own row at the bottom of the bar, for that color */
+    details?: Snippet<[index: number]>;
+    /** A color to show in the bar instead, as while one of `details`' choices is pointed at */
+    preview?: Color | null;
+    /** Keep the bar open when the colors change from elsewhere, for a pop-up that closes it itself */
+    keepOpen?: boolean;
+    /** An id for the bar, for whatever else opens it */
+    barId?: string;
   }
 
   let {
@@ -60,24 +72,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onhover,
     staggerIn = false,
     toolbar,
+    selectedIndex: selected = $bindable(null),
+    details,
+    preview = null,
+    keepOpen = false,
+    barId,
   }: Props = $props();
 
   let strip: ReturnType<typeof PaletteStrip> | undefined = $state();
   let bar: HTMLElement | undefined = $state();
-  /** The color the bar is for */
-  let selected: number | null = $state(null);
   /** What the bar last did, for screen readers */
   let announcement = $state('');
   /** The colors as this last changed them */
   let own: Color[] = [];
 
   let color = $derived(selected === null ? null : colors[selected]);
+  let shown = $derived(preview ?? color);
 
   // A new palette from elsewhere (Randomize, a new photo, or Random
   // Palette's re-roll after a removal) closes the bar; the focus, if it was
   // in the bar, goes back to the strip
   $effect.pre(() => {
-    if (selected === null || sameColorList(colors, own)) return;
+    if (keepOpen || selected === null || sameColorList(colors, own)) return;
     const index = selected;
     const hadFocus = !!bar?.contains(document.activeElement);
     selected = null;
@@ -108,8 +124,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (to < 0 || to >= colors.length) return;
     const next = [...colors];
     [next[selected], next[to]] = [next[to], next[selected]];
-    selected = to;
+    // The colors first, so a pop-up that keeps the selection by its own ids
+    // finds the moved color in its new place
     update(next);
+    selected = to;
     announcement = `Moved to ${to + 1} of ${next.length}`;
   }
 
@@ -123,9 +141,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function remove() {
     if (selected === null || colors.length < 2) return;
     const next = colors.filter((_, i) => i !== selected);
-    // The bar stays, for the color that took its place, so several can go in a row
-    selected = Math.min(selected, next.length - 1);
+    // The bar stays, for the color that took its place, so several can go in
+    // a row (set after the colors, as in `move`)
+    const index = Math.min(selected, next.length - 1);
     update(next);
+    selected = index;
     announcement = `Removed. ${next.length} colors left`;
   }
 
@@ -155,6 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
       bind:this={bar}
+      id={barId}
       class={[
         // Tinted, like the pop-ups' other notices, so it reads as its own
         // panel for this one color
@@ -171,17 +192,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         close();
       }}
     >
-      <ColorSwatch hex={color.hex} number={selected + 1} small />
-      <span class="flex min-w-0 flex-1 flex-col">
-        <span class="truncate text-sm leading-tight font-semibold">
-          {color.name || color.hex}
-        </span>
-        {#if color.brandName && color.yarnName}
-          <span class="text-surface-700-300 truncate text-xs">
-            {color.brandName} · {color.yarnName}
+      {#if shown}
+        <ColorSwatch hex={shown.hex} number={selected + 1} small />
+        <span class="flex min-w-0 flex-1 flex-col">
+          <span class="truncate text-sm leading-tight font-semibold">
+            {shown.name || shown.hex}
           </span>
-        {/if}
-      </span>
+          {#if shown.brandName && shown.yarnName}
+            <span class="text-surface-700-300 truncate text-xs">
+              {shown.brandName} · {shown.yarnName}
+            </span>
+          {/if}
+        </span>
+      {/if}
       <!-- Each button's name is its text; the bar is named for its color.
       On a phone, the arrows show only their icons; Done always says so. -->
       <span
@@ -245,6 +268,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <span>Done</span>
         </button>
       </span>
+      {#if details}
+        <div class="w-full">{@render details(selected)}</div>
+      {/if}
     </div>
   {:else if toolbar}
     {@render toolbar()}
