@@ -15,6 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
+  import ColorSwatch from '$lib/components/ColorSwatch.svelte';
+  import {
+    paletteCardClass,
+    paletteGridClass,
+    paletteListClass,
+    paletteRowClass,
+  } from '$lib/components/palette-item-styles';
   import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
   import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
   import { menuItemClass } from '$lib/components/menu-styles';
@@ -633,6 +640,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {/snippet}
 
+{#snippet colorSwatch(index: number, color: Color)}
+  <ColorSwatch
+    hex={color.hex}
+    number={index + 1}
+    {filled}
+    pop={pop.index === index}
+    flash={historyChange.gaugeId === gauge.id &&
+      historyChange.indices.includes(index)}
+  />
+{/snippet}
+
 <!-- The yarn: its name and "Brand · Yarn", or its hex code; opens Change Color -->
 {#snippet yarn(index: number, color: Color, swatch: boolean)}
   <button
@@ -642,18 +660,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick={() => openChangeColor(index, gauge.colors[index])}
   >
     {#if swatch}
-      <span
-        class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] {filled
-          ? 'ring-2 ring-current/40'
-          : ''}"
-        data-fill-origin
-        class:feedback-pop={pop.index === index}
-        class:history-flash={historyChange.gaugeId === gauge.id &&
-          historyChange.indices.includes(index)}
-        style:--pop-scale="1.12"
-        style="background:{color.hex};color:{iconColorOn(color.hex ?? '#fff')}"
-        ><span class="sr-only">Color</span> {index + 1}</span
-      >
+      {@render colorSwatch(index, color)}
     {/if}
     <span class="flex min-w-0 flex-col">
       <span
@@ -1041,9 +1048,8 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 
 <div
   class="mt-3 mb-2 lg:mb-4 {preferences.value.layout === 'grid'
-    ? 'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4'
-    : // The end rows round their own corners, so nothing is clipped
-      'rounded-container border-surface-200-800 bg-surface-50-950 flex flex-col border'}"
+    ? paletteGridClass
+    : paletteListClass}"
   bind:this={listElement}
   use:dragHandleZone={{
     items: sortableColors,
@@ -1061,8 +1067,8 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       data-color-id={id}
       class="color relative isolate overflow-hidden {preferences.value
         .layout === 'grid'
-        ? 'card border-surface-200-800 bg-surface-50-950 flex min-w-0 flex-col border'
-        : 'bg-surface-50-950 border-surface-200-800 first:rounded-t-container last:rounded-b-container @container border-b last:border-b-0'}"
+        ? paletteCardClass
+        : paletteRowClass}"
       style:color={filled ? iconColorOn(color.hex ?? '#fff') : undefined}
       data-fillable
       data-filled={filled || undefined}
@@ -1088,19 +1094,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         <!-- The handle, the color (as in the list), and ⋮ on one line at the top, so the yarn and range below get the card's full width -->
         <div class="flex items-center gap-1 px-2 pt-2">
           {@render handle(index, filled)}
-          <span
-            class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] {filled
-              ? 'ring-2 ring-current/40'
-              : ''}"
-            data-fill-origin
-            class:feedback-pop={pop.index === index}
-            class:history-flash={historyChange.gaugeId === gauge.id &&
-              historyChange.indices.includes(index)}
-            style:--pop-scale="1.12"
-            style="background:{color.hex};color:{iconColorOn(
-              color.hex ?? '#fff',
-            )}"><span class="sr-only">Color</span> {index + 1}</span
-          >
+          {@render colorSwatch(index, color)}
           <span class="ml-auto">{@render more(index, color)}</span>
         </div>
         <div class="@container flex flex-1 flex-col gap-1 p-2 text-left">

@@ -22,6 +22,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   with color, each card or row takes its color, grown out of its swatch.
 -->
 <script lang="ts">
+  import ColorSwatch from '$lib/components/ColorSwatch.svelte';
+  import {
+    paletteCardClass,
+    paletteGridClass,
+    paletteListClass,
+    paletteRowClass,
+  } from '$lib/components/palette-item-styles';
   import ColorwayMoreMenu from '$lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
   import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
   import {
@@ -64,17 +71,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#snippet swatch({ color, label }: Item)}
-  <span
-    class="grid size-12 shrink-0 place-items-center rounded-full text-sm font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)] {filled
-      ? 'ring-2 ring-current/40'
-      : ''}"
-    style="background:{color.hex};color:{iconColorOn(color.hex ?? '#fff')}"
-    data-fill-origin
-  >
-    {#if typeof label === 'number'}
-      <span class="sr-only">Color</span> {label}
-    {/if}
-  </span>
+  <ColorSwatch
+    hex={color.hex}
+    number={typeof label === 'number' ? label : undefined}
+    {filled}
+  />
 {/snippet}
 
 <!-- The yarn: its role if it has one, its name and "Brand · Yarn", or its hex code -->
@@ -124,16 +125,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 {/snippet}
 
-<div
-  class="text-left {grid
-    ? 'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4'
-    : 'rounded-container border-surface-200-800 bg-surface-50-950 flex flex-col border'}"
->
+<div class="text-left {grid ? paletteGridClass : paletteListClass}">
   {#each items as item, index (index)}
     <div
       class="relative isolate overflow-hidden {grid
-        ? 'card border-surface-200-800 bg-surface-50-950 flex min-w-0 flex-col border'
-        : 'bg-surface-50-950 border-surface-200-800 first:rounded-t-container last:rounded-b-container @container border-b last:border-b-0'}"
+        ? paletteCardClass
+        : paletteRowClass}"
       style:color={filled ? iconColorOn(item.color.hex ?? '#fff') : undefined}
       data-fillable
       data-filled={filled || undefined}
