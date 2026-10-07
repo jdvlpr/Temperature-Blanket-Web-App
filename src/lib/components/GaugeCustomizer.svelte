@@ -202,6 +202,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   // View › Fill with color: each color's card or row takes its color
   let filled = $derived(fillWithColor.on);
+  // Filled, there's no swatch (the color is the card's). It goes a moment
+  // after filling starts, once the fill has measured it to grow out of.
+  let swatchShown = $state(untrack(() => !fillWithColor.on));
+  $effect.pre(() => {
+    if (!filled) swatchShown = true;
+    else
+      tick().then(() => {
+        if (filled) swatchShown = false;
+      });
+  });
   // A hover tint that shows on the page's surface, or on a color
   let hoverTint = $derived(
     filled ? 'hover-on-color' : 'hover:preset-tonal-surface',
@@ -720,8 +730,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <!-- The color's number, on its drag handle: its place in the palette, which
-dragging changes. Fill with color grows from here, and when filled (with no
-swatch) it pops when the color changes and glows on undo or redo. -->
+dragging changes. Filled (with no swatch), it pops when the color changes
+and glows on undo or redo. -->
 {#snippet handle(index: number, onColor = false)}
   <!-- Not a <button>: svelte-dnd-action ignores Space and Enter from buttons,
   so keyboard dragging only starts from an element like this -->
@@ -741,7 +751,7 @@ swatch) it pops when the color changes and glows on undo or redo. -->
     ]}
     style:--pop-scale="1.12"
     data-sheet-no-drag
-    data-fill-origin
+    data-fill-origin="fallback"
     use:dragHandle
   >
     <GripVerticalIcon size={16} aria-hidden="true" />
@@ -753,7 +763,6 @@ swatch) it pops when the color changes and glows on undo or redo. -->
 {#snippet colorSwatch(index: number, color: Color)}
   <ColorSwatch
     hex={color.hex}
-    origin={false}
     {filled}
     pop={pop.index === index}
     flash={historyChange.gaugeId === gauge.id &&
@@ -1213,7 +1222,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           <!-- Opens Change Color, as the swatch does in a row. For a pointer
           only: the yarn button below does the same from the keyboard.
           Filled, the card is the color, so there's no swatch. -->
-          {#if !filled}
+          {#if swatchShown}
             <button
               type="button"
               class="rounded-full {hoverTint} p-0.5"
@@ -1259,7 +1268,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           <span
             class="col-start-2 row-start-1 flex min-h-14 min-w-0 items-center"
           >
-            {@render yarn(index, color, !filled)}
+            {@render yarn(index, color, swatchShown)}
           </span>
           {#if showRanges}
             <!-- Under the yarn's name on a phone; its own columns where there's room -->
