@@ -16,6 +16,7 @@
 import { queryGallery } from '#lib/utils/gallery-utils.js';
 import type { GalleryOwner } from '#lib/server/gallery/store.js';
 import type { PageServerLoad } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const load: PageServerLoad = async (event) => {
   const [{ project }, owner] = await Promise.all([
@@ -29,7 +30,7 @@ export const load: PageServerLoad = async (event) => {
 async function getOwner(
   event: Parameters<PageServerLoad>[0],
 ): Promise<GalleryOwner | null> {
-  const env = event.platform?.env;
+  const env = getPlatform()?.env;
   const id = Number(event.params.id);
   if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB || !Number.isSafeInteger(id))
     return null;

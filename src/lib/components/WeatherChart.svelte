@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import {

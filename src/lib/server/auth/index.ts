@@ -29,6 +29,7 @@ import { cleanName } from '#lib/utils/string-utils.js';
 import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
 import { readAuthSettings } from './settings';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 type Auth = ReturnType<typeof createAuth>;
 
@@ -40,7 +41,7 @@ function runInBackground(promise: Promise<unknown>) {
   const logged = promise.catch((e) =>
     console.error('Account background task failed', e),
   );
-  requestPlatform.getStore()?.ctx.waitUntil(logged);
+  requestPlatform.getStore()?.ctx?.waitUntil(logged);
 }
 
 function createAuth(
@@ -119,7 +120,7 @@ const isPost = (event: RequestEvent, path: string) =>
 export async function handleAuthRequest(
   event: RequestEvent,
 ): Promise<Response> {
-  const { platform } = event;
+  const platform = getPlatform();
   const auth = authFor(platform);
   if (auth instanceof Response) return auth;
   const db = platform!.env!.DB!;
@@ -210,7 +211,7 @@ export async function requireAccount(
 ): Promise<
   { auth: Auth; user: { id: string; email: string; name: string } } | Response
 > {
-  const auth = authFor(event.platform);
+  const auth = authFor(getPlatform());
   if (auth instanceof Response) return auth;
   const session = await auth.api.getSession({
     headers: event.request.headers,

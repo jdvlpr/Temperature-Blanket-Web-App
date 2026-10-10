@@ -29,7 +29,7 @@ vi.mock('idb-keyval', () => ({
   }),
 }));
 
-vi.mock('$app/environment', () => ({
+vi.mock('$app/env', () => ({
   browser: true,
   dev: true,
   version: '1.0.0',

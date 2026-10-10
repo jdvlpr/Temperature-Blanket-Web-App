@@ -23,12 +23,12 @@ export async function GET({ url, request }) {
   if (!dev) {
     const { headers } = request;
     if (!headers.has('X-RapidAPI-Proxy-Secret'))
-      return error(401, { message: 'Not authorized' });
+      return error(401, 'Not authorized');
     if (
       headers.get('X-RapidAPI-Proxy-Secret') !==
       SECRET_RAPID_API_PROXY_HEADER_KEY
     )
-      return error(401, { message: 'Not authorized' });
+      return error(401, 'Not authorized');
   }
 
   const results = ALL_YARN_WEIGHTS.map((weight) => {

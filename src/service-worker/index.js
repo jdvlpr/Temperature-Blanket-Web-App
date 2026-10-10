@@ -13,16 +13,18 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-/// <reference types="@sveltejs/kit" />
-import { build, files, version } from '$service-worker';
+import { version } from '$app/env';
+import { assets, immutable } from '$app/manifest';
+import { self } from '$app/service-worker';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 
+// Manifest paths are relative to the base path; the fetch handler compares pathnames
 const ASSETS = [
-  ...build, // the app itself
-  ...files, // everything in `static`
-];
+  ...immutable, // the app itself
+  ...assets, // everything in `static`
+].map(({ path }) => new URL(path, self.registration.scope).pathname);
 
 self.addEventListener('install', (event) => {
   // Create a new cache and add all files to it
@@ -84,5 +86,6 @@ self.addEventListener('fetch', (event) => {
     }
   }
 
-  event.respondWith(respond());
+  // Nothing cached and offline: a network error, as before the typed service worker
+  event.respondWith(respond().then((response) => response ?? Response.error()));
 });

@@ -18,10 +18,12 @@
 import { readAuthSettings } from '#lib/server/auth/settings.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
-export const GET: RequestHandler = async ({ platform }) => {
+export const GET: RequestHandler = async () => {
+  const platform = getPlatform();
   const result = readAuthSettings(platform?.env);
   if (result.status !== 'ready')
     return json({ message: 'Not found' }, { status: 404 });

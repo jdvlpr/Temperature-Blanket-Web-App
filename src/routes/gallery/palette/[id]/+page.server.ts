@@ -24,6 +24,7 @@ import {
 } from '#lib/utils/gallery-utils.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
@@ -70,7 +71,7 @@ async function getOwner(
   event: Parameters<PageServerLoad>[0],
   id: number,
 ): Promise<GalleryOwner | null> {
-  const env = event.platform?.env;
+  const env = getPlatform()?.env;
   if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB) return null;
   try {
     const { ownerForPost } = await import('#lib/server/gallery/store.js');

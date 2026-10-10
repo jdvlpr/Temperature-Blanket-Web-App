@@ -35,6 +35,7 @@ import {
   type GallerySettings,
 } from './store';
 import { galleryApi, type GalleryApi } from './wordpress';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 const MAX_TITLE_LENGTH = 200;
 /** The plugin's limit too (TEMPBLANKET_PALETTE_MAX_TITLE_LENGTH) */
@@ -81,7 +82,7 @@ export async function requireGallery(
   const account = await requireAccount(event);
   if (account instanceof Response) return account;
 
-  const env = event.platform?.env;
+  const env = getPlatform()?.env;
 
   if (!env?.DB || (publishing && env.GALLERY_PUBLISH_ENABLED !== 'true'))
     return galleryError(

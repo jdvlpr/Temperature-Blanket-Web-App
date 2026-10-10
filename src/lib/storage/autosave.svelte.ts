@@ -130,8 +130,9 @@ async function refresh() {
     clearTimeout(timer);
     autosave.state = 'conflict';
     project.status.saved = false;
-  } else // Nothing waiting: leaving the page loses nothing
-  if (autosave.state === 'saved') project.status.saved = true;
+  }
+  // Nothing waiting: leaving the page loses nothing
+  else if (autosave.state === 'saved') project.status.saved = true;
 }
 
 async function rememberStored() {

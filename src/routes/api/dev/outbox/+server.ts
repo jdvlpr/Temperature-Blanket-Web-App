@@ -21,10 +21,12 @@ import { readDevOutbox } from '#lib/server/email/dev-outbox.js';
 import { requireDevRoutes, requireStorage } from '#lib/server/platform.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
-export const GET: RequestHandler = async ({ platform, url }) => {
+export const GET: RequestHandler = async ({ url }) => {
+  const platform = getPlatform();
   requireDevRoutes(platform);
   const { projects } = requireStorage(platform);
   const to = url.searchParams.get('to');
@@ -32,7 +34,8 @@ export const GET: RequestHandler = async ({ platform, url }) => {
   return json(await readDevOutbox(projects, to));
 };
 
-export const POST: RequestHandler = async ({ platform, request }) => {
+export const POST: RequestHandler = async ({ request }) => {
+  const platform = getPlatform();
   requireDevRoutes(platform);
   const body = (await request.json()) as {
     to?: string;

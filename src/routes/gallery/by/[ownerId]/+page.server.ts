@@ -24,6 +24,7 @@ import {
 } from '#lib/utils/gallery-utils.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
@@ -41,7 +42,7 @@ export type OwnerPalette = Pick<
 >;
 
 export const load: PageServerLoad = async (event) => {
-  const env = event.platform?.env;
+  const env = getPlatform()?.env;
   const { ownerPage, PUBLIC_ID_PATTERN } =
     await import('#lib/server/gallery/store.js');
   if (

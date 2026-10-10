@@ -152,15 +152,15 @@
               highlight === name && '!bg-primary-50 dark:!bg-primary-950',
             ]}
             onclick={() => {
+              const url = new URL(page.url.href);
               if (highlight !== name) {
                 highlight = name;
-                page.url.searchParams.set('highlight', name);
-                history.replaceState(history.state, '', page.url);
+                url.searchParams.set('highlight', name);
               } else {
                 highlight = null;
-                page.url.searchParams.delete('highlight');
-                history.replaceState(history.state, '', page.url);
+                url.searchParams.delete('highlight');
               }
+              history.replaceState(history.state, '', url);
             }}
           >
             <td class="">{name}</td>

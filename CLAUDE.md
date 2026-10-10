@@ -8,7 +8,7 @@ This file is committed per branch on purpose: branches differ (e.g. `main` has n
 
 [temperature-blanket.com](https://temperature-blanket.com): visualize a location's historical climate data, build a color "gauge" mapping temperature/weather to yarn colors, and preview a crochet/knitting temperature blanket pattern. Projects can be saved locally, shared as a URL, exported to PDF/CSV/PNG/Google Sheets, or published to the public gallery (backed by a headless WordPress site). With accounts on, projects, palettes and preferences also sync to the server.
 
-Svelte 5 (runes) + SvelteKit 2, Skeleton UI 5 (plus its v4 `input-group` utilities, kept in `src/css/input-group.css`), Tailwind 4, TypeScript, deployed on Cloudflare Pages via `@sveltejs/adapter-cloudflare`. Package manager is **pnpm**.
+Svelte 5 (runes) + SvelteKit 3 (config lives in `sveltekit({...})` in `vite.config.ts`; there is no `svelte.config.js`; imports use `#lib/...` with file extensions), Skeleton UI 5 (plus its v4 `input-group` utilities, kept in `src/css/input-group.css`), Tailwind 4, TypeScript, deployed on Cloudflare Pages via `@sveltejs/adapter-cloudflare`. Package manager is **pnpm**.
 
 ## Setup
 
@@ -45,7 +45,7 @@ Single unit test file: `pnpm vitest run src/lib/utils/color-utils.test.ts`. Sing
 - **`src/routes/api/`** — server routes. `location/*` and `weather/v1/meteostat/*` proxy GeoNames/Meteostat to hide keys; `project/+server.ts` proxies anonymous gallery submissions to WordPress; `yarn-colorways/{v1,v3}/*` is a public, versioned yarn colorway API (documented at `/api/yarn-colorways`).
 - **`src/lib/data/yarns/`** — static yarn/colorway data.
 - Routes map roughly 1:1 to top-level nav (`weather`, `yarn`, `yarn-colorway-finder`, `gallery/[id]`, `globe`, `blog/*` dated folders, `my-projects`, `account`, docs pages). `src/routes/.dev-tools/` is dev-only (redirected away in production by `hooks.server.ts`).
-- `svelte.config.js`'s Cloudflare adapter `routes.exclude` controls which paths are static vs. hit a Function — keep API routes out of it; the free plan caps it at ~100 entries, so prefer `/*` wildcards.
+- The Cloudflare adapter's `routes.exclude` (in `vite.config.ts`) controls which paths are static vs. hit a Function — keep API routes out of it; the free plan caps it at ~100 entries, so prefer `/*` wildcards.
 
 ### Accounts and sync
 
@@ -53,6 +53,7 @@ Accounts are behind flags and dormant in production until launch:
 
 - `PUBLIC_ACCOUNTS_ENABLED=true` at **build time** includes the account UI (see `app.d.ts`, `vite.config.ts`).
 - Server-side, `ACCOUNTS_ENABLED`, `SYNC_ENABLED`, `GALLERY_PUBLISH_ENABLED`, `ACCOUNTS_SIGNUP_LIMIT` and `BETTER_AUTH_SECRET` are Cloudflare bindings/vars. `wrangler.jsonc` is **local-only** (no `pages_build_output_dir`); production values live in the Pages dashboard.
+- `src/lib/server/cloudflare.ts`: `getPlatform()` returns the bindings (`env`), `ctx.waitUntil` and `caches` from `cloudflare:workers` — adapter-cloudflare 8 no longer sets `event.platform`, so server code calls this instead (undefined while building/prerendering).
 - `src/lib/server/platform.ts`: `requireStorage()` returns 503 when the `DB` (D1) / `PROJECTS` (R2) bindings are missing; `/api/dev/*` routes exist only when `ENABLE_DEV_ROUTES=true` and otherwise 404.
 
 Pieces:

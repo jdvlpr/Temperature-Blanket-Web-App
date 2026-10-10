@@ -18,10 +18,12 @@
 import { requireDevRoutes, requireStorage } from '#lib/server/platform.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
-export const GET: RequestHandler = async ({ platform }) => {
+export const GET: RequestHandler = async () => {
+  const platform = getPlatform();
   requireDevRoutes(platform);
   const { db, projects } = requireStorage(platform);
 

@@ -3,7 +3,7 @@ import * as stringUtils from './string-utils';
 
 // Flexible mock for browser environment
 let isBrowser = true;
-vi.mock('$app/environment', () => ({
+vi.mock('$app/env', () => ({
   get browser() {
     return isBrowser;
   },

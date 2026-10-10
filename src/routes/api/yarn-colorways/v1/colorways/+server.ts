@@ -32,12 +32,12 @@ export const GET: RequestHandler = async ({ url, request }) => {
   if (!dev) {
     const { headers } = request;
     if (!headers.has('X-RapidAPI-Proxy-Secret'))
-      return error(401, { message: 'Not authorized' });
+      return error(401, 'Not authorized');
     if (
       headers.get('X-RapidAPI-Proxy-Secret') !==
       SECRET_RAPID_API_PROXY_HEADER_KEY
     )
-      return error(401, { message: 'Not authorized' });
+      return error(401, 'Not authorized');
   }
 
   const { searchParams } = url;
@@ -90,10 +90,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
 
   if (searchParams.has('weight')) {
     let weight = searchParams.get('weight');
-    if (!weight)
-      return error(400, {
-        message: "Parameter 'weight' is empty",
-      });
+    if (!weight) return error(400, "Parameter 'weight' is empty");
 
     const yarnWeightIds: string[] = ALL_YARN_WEIGHTS.map((n) => n.id);
     const yarnWeightNames = ALL_YARN_WEIGHTS.map((n) => n.name.toLowerCase());
@@ -110,9 +107,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
         return colorway.yarnWeightId === yarnWeightId;
       });
     } else {
-      return error(400, {
-        message: "Parameter 'weight' is not a valid yarn weight",
-      });
+      return error(400, "Parameter 'weight' is not a valid yarn weight");
     }
   }
 
@@ -120,9 +115,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
     const color = searchParams.get('color');
     if (!color) return error(400);
     if (!chroma.valid(color))
-      return error(400, {
-        message: "Parameter 'color' is not a valid color",
-      });
+      return error(400, "Parameter 'color' is not a valid color");
     const hex = chroma(color).hex();
     colorways = colorways.filter((colorway) => colorway.hex === hex);
   }
@@ -140,9 +133,10 @@ export const GET: RequestHandler = async ({ url, request }) => {
     const sortBy = searchParams.get('sortBy');
     const sortByOptions = ['default', 'lightness', 'name'];
     if (sortBy === null || !sortByOptions.includes(sortBy))
-      return error(400, {
-        message: "Parameter 'sortBy' must be 'default', 'lightness', or 'name'",
-      });
+      return error(
+        400,
+        "Parameter 'sortBy' must be 'default', 'lightness', or 'name'",
+      );
     if (sortBy === 'lightness')
       colorways = sortColorsLightToDark({
         colors: colorways,
@@ -154,33 +148,23 @@ export const GET: RequestHandler = async ({ url, request }) => {
     const direction = searchParams.get('direction');
     const directionOptions = ['ASC', 'DESC'];
     if (direction === null || !directionOptions.includes(direction))
-      return error(400, {
-        message: "Parameter 'direction' must be 'ASC' or 'DESC'",
-      });
+      return error(400, "Parameter 'direction' must be 'ASC' or 'DESC'");
     if (direction === 'DESC') colorways.reverse();
   }
 
   let offset = 0;
   if (searchParams.has('offset')) {
     offset = Number(searchParams.get('offset'));
-    if (isNaN(offset))
-      return error(400, {
-        message: "Parameter 'offset' must be a number",
-      });
+    if (isNaN(offset)) return error(400, "Parameter 'offset' must be a number");
   }
   colorways = colorways.slice(offset);
 
   let limit = 50; // default number of results is 50, maximum 500
   if (searchParams.has('limit')) {
     limit = Number(searchParams.get('limit'));
-    if (isNaN(limit))
-      return error(400, {
-        message: "Parameter 'limit' must be a number",
-      });
+    if (isNaN(limit)) return error(400, "Parameter 'limit' must be a number");
     if (limit > 500)
-      return error(400, {
-        message: "Parameter 'limit' must be less than 501",
-      });
+      return error(400, "Parameter 'limit' must be less than 501");
   }
 
   if (colorways.length > limit) colorways.length = limit;

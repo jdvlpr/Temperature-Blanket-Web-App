@@ -19,6 +19,7 @@
 // include it on the owner's public gallery) or change settings (PATCH).
 
 import type { RequestHandler } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
@@ -37,7 +38,7 @@ export const GET: RequestHandler = async (event) => {
   ]);
   // Whether publishing is on too, so the page only offers what will work, and
   // the display name as it is now (this browser's copy may be out of date)
-  const publishing = event.platform?.env?.GALLERY_PUBLISH_ENABLED === 'true';
+  const publishing = getPlatform()?.env?.GALLERY_PUBLISH_ENABLED === 'true';
   return Response.json(
     { posts, settings, publishing, name: gallery.name ?? '' },
     { headers: NO_STORE },

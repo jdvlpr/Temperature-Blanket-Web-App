@@ -72,7 +72,7 @@ const {
 vi.mock('#lib/utils/feedback.svelte.js', () => ({
   showHistoryChange: vi.fn(),
 }));
-vi.mock('$app/environment', () => ({ browser: true }));
+vi.mock('$app/env', () => ({ browser: true }));
 vi.mock('#lib/storage/autosave.svelte.js', () => ({ projectChanged: vi.fn() }));
 
 vi.mock('#lib/state/gauges-state.svelte.js', () => ({

@@ -531,7 +531,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * still return to that project, not to the same globe with the link intact.
    */
   function clearDeepLink() {
-    const url = new URL(page.url);
+    const url = new URL(page.url.href);
     const params = ['lat', 'lng', 'z'];
     if (!params.some((name) => url.searchParams.has(name))) return;
     for (const name of params) url.searchParams.delete(name);
@@ -675,7 +675,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // that runs on every return visit, so reading these inside the creation
       // arm would make /globe?lat=..&lng=.. work only on a hard page load and
       // silently do nothing when arriving via client-side navigation.
-      const params = page.url.searchParams;
+      const params = new URL(page.url.href).searchParams;
       const deepLink = parseDeepLink(params);
 
       // If globe already exists, reuse it — just move its DOM back in

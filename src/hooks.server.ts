@@ -177,6 +177,9 @@ export const handle: Handle = sequence(
   themeCookies,
 );
 
-export const handleError: HandleServerError = ({ error }) => {
+// SvelteKit 3 also passes expected errors here (error(404, ...) and the like);
+// only log the unexpected ones, as before
+export const handleError: HandleServerError = ({ kind, error }) => {
+  if (kind !== 'unknown') return;
   console.error(error instanceof Error ? error.stack : String(error));
 };

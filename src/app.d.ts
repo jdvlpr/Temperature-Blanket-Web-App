@@ -1,6 +1,8 @@
-/// <reference types="@sveltejs/adapter-cloudflare" />
-
-import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
+import type {
+  CacheStorage,
+  D1Database,
+  R2Bucket,
+} from '@cloudflare/workers-types';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -29,6 +31,8 @@ declare global {
         SYNC_ENABLED?: string;
         GALLERY_PUBLISH_ENABLED?: string;
       };
+      ctx?: { waitUntil(promise: Promise<unknown>): void };
+      caches?: CacheStorage;
     }
   }
 

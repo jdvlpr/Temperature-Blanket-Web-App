@@ -19,6 +19,7 @@ import { requireAccount } from '#lib/server/auth/index.js';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { cleanUpUserSync } from './store';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export type SyncContext = {
   db: D1Database;
@@ -42,11 +43,11 @@ export async function requireSync(
   const account = await requireAccount(event);
   if (account instanceof Response) return account;
 
-  const env = event.platform?.env;
+  const env = getPlatform()?.env;
   if (env?.SYNC_ENABLED !== 'true' || !env.DB || !env.PROJECTS)
     return syncError(503, 'SYNC_PAUSED', 'Sync is paused');
 
-  const ctx = event.platform?.ctx;
+  const ctx = getPlatform()?.ctx;
   return {
     db: env.DB,
     bucket: env.PROJECTS,

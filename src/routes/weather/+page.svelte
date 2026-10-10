@@ -90,10 +90,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     hourFormat: '12' | '24';
   }) {
     if (!id || !units || !hourFormat) return; // prevents from running durring mount, I think ?
-    page.url.searchParams.set('id', String(id));
-    page.url.searchParams.set('h', hourFormat === '12' ? '0' : '1');
-    page.url.searchParams.set('u', units === 'metric' ? 'm' : 'i');
-    shareableURL = page.url.href;
+    const url = new URL(page.url.href);
+    url.searchParams.set('id', String(id));
+    url.searchParams.set('h', hourFormat === '12' ? '0' : '1');
+    url.searchParams.set('u', units === 'metric' ? 'm' : 'i');
+    shareableURL = url.href;
   }
 
   async function updateShowChart() {
@@ -410,18 +411,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             item.saved = true;
                           return item;
                         });
-                        page.url.searchParams.set(
-                          'id',
-                          String(weatherState.activeLocationID),
-                        );
-                        page.url.searchParams.set(
-                          'h',
-                          weatherState.hour === '12' ? '0' : '1',
-                        );
-                        page.url.searchParams.set(
-                          'u',
-                          preferences.value.units === 'metric' ? 'm' : 'i',
-                        );
+                        getShareableURL({
+                          id: weatherState.activeLocationID,
+                          units: preferences.value.units,
+                          hourFormat: weatherState.hour,
+                        });
                       }}
                     >
                       <PlusIcon />

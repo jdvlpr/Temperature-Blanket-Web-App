@@ -38,10 +38,12 @@ import { cachedJSON } from '#lib/features/cache/edge-cache.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import * as SunCalc from 'suncalc';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h — short enough to avoid stale past/future-day nulling near date boundaries
 
-export const POST: RequestHandler = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request }) => {
+  const platform = getPlatform();
   const body = await request.json();
 
   const location = body?.location;
@@ -101,17 +103,19 @@ async function fetchAndProcessDailyWeather(
 
   if (response.status === 503) {
     // Service Temporarily Unavailable
-    throw error(400, {
-      message: `
+    throw error(
+      400,
+      `
                 <p class="font-bold text-xl my-4">Service Temporarily Unavailable</p>
                 <p class="mt-4">Please try again.</p>
             `,
-    });
+    );
   }
   if (!response.ok) {
     // Request Failed with HTTP code ${response.status}
-    throw error(400, {
-      message: `<p class="font-bold text-xl my-4">Something Went Wrong</p>
+    throw error(
+      400,
+      `<p class="font-bold text-xl my-4">Something Went Wrong</p>
         <p>A search request for weather data from <span class="font-bold">${
           location.label
         }</span> (${stringToDate(location.from).toLocaleDateString(undefined, {
@@ -121,7 +125,7 @@ async function fetchAndProcessDailyWeather(
         })}) was sent to <a href="https://meteostat.net/" target="_blank" rel="noopener noreferrer" class="link">Meteostat.net</a>, but the response returned an error.</p>
         <p class="my-4">Try again with a different location or dates, or change the Weather Source setting.</p>
         <p class="italic text-sm">Error status code: ${response.status}</p>`,
-    });
+    );
   }
 
   const data = await response.json();
@@ -130,11 +134,11 @@ async function fetchAndProcessDailyWeather(
     '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>';
   if (!data.data) {
     // No data property returned from meteostat
-    throw error(400, { message: errorMessage });
+    throw error(400, errorMessage);
   }
   if (data.data.every((day: { tavg: number | null }) => day.tavg === null)) {
     // Empty data array
-    throw error(400, { message: errorMessage });
+    throw error(400, errorMessage);
   }
 
   location.stations = data.meta.stations;

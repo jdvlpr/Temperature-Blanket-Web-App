@@ -31,12 +31,12 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
   if (!dev) {
     const { headers } = request;
     if (!headers.has('X-RapidAPI-Proxy-Secret'))
-      return error(401, { message: 'Not authorized' });
+      return error(401, 'Not authorized');
     if (
       headers.get('X-RapidAPI-Proxy-Secret') !==
       SECRET_RAPID_API_PROXY_HEADER_KEY
     )
-      return error(401, { message: 'Not authorized' });
+      return error(401, 'Not authorized');
   }
 
   const { searchParams } = url;
@@ -44,19 +44,14 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
   color = decodeURIComponent(color);
 
   if (!color || !chroma.valid(color))
-    return error(400, {
-      message: "Parameter 'color' is not a valid color",
-    });
+    return error(400, "Parameter 'color' is not a valid color");
 
   await ensureYarnData();
   let colorways = getAllColorways();
 
   if (searchParams.has('brand')) {
     let brand = searchParams.get('brand');
-    if (!brand)
-      return error(400, {
-        message: "Parameter 'brand' is empty",
-      });
+    if (!brand) return error(400, "Parameter 'brand' is empty");
 
     brand = decodeURIComponent(brand).toLowerCase();
     if (brand?.includes(',')) {
@@ -79,10 +74,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
 
   if (searchParams.has('yarn')) {
     let yarn = searchParams.get('yarn');
-    if (!yarn)
-      return error(400, {
-        message: "Parameter 'yarn' is empty",
-      });
+    if (!yarn) return error(400, "Parameter 'yarn' is empty");
     yarn = decodeURIComponent(yarn).toLowerCase();
     if (yarn?.includes(',')) {
       const yarns = yarn.split(',');
@@ -103,10 +95,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
 
   if (searchParams.has('weight')) {
     let weight = searchParams.get('weight');
-    if (!weight)
-      return error(400, {
-        message: "Parameter 'weight' is empty",
-      });
+    if (!weight) return error(400, "Parameter 'weight' is empty");
 
     const yarnWeightIds: string[] = ALL_YARN_WEIGHTS.map((n) => n.id);
     const yarnWeightNames = ALL_YARN_WEIGHTS.map((n) => n.name.toLowerCase());
@@ -123,9 +112,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
         return colorway.yarnWeightId === yarnWeightId;
       });
     } else {
-      return error(400, {
-        message: "Parameter 'weight' is not a valid yarn weight",
-      });
+      return error(400, "Parameter 'weight' is not a valid yarn weight");
     }
   }
 
@@ -147,9 +134,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
   if (searchParams.has('threshold')) {
     threshold = Number(searchParams.get('threshold'));
     if (isNaN(threshold))
-      return error(400, {
-        message: "Parameter 'threshold' must be a number",
-      });
+      return error(400, "Parameter 'threshold' must be a number");
   }
 
   let filtered = matches.filter(
@@ -161,10 +146,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
   let offset = 0; // maximum 500
   if (searchParams.has('offset')) {
     offset = Number(searchParams.get('offset'));
-    if (isNaN(offset))
-      return error(400, {
-        message: "Parameter 'offset' must be a number",
-      });
+    if (isNaN(offset)) return error(400, "Parameter 'offset' must be a number");
   }
 
   filtered = filtered.slice(offset);
@@ -172,14 +154,9 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
   let limit = 50; // default number of results is 50, maximum is 500
   if (searchParams.has('limit')) {
     limit = Number(searchParams.get('limit'));
-    if (isNaN(limit))
-      return error(400, {
-        message: "Parameter 'limit' must be a number",
-      });
+    if (isNaN(limit)) return error(400, "Parameter 'limit' must be a number");
     if (limit > 500)
-      return error(400, {
-        message: "Parameter 'limit' must be less than 501",
-      });
+      return error(400, "Parameter 'limit' must be less than 501");
   }
   if (filtered.length > limit) filtered.length = limit;
 

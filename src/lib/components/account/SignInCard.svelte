@@ -144,9 +144,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rememberAccountSummary(user);
       toast.trigger({ category: 'success', message: 'You’re signed in' });
       if (onsignedin) onsignedin(user);
-      // A path on this site, already checked by safeRedirect
-      // eslint-disable-next-line svelte/no-navigation-without-resolve
-      else await goto(redirectTo);
+      // A path on this site, already checked by safeRedirect. goto rejects a
+      // path no route matches; load it as a page then, rather than showing a
+      // sign-in error after signing in
+      else
+        // eslint-disable-next-line svelte/no-navigation-without-resolve
+        await goto(redirectTo).catch(() => (window.location.href = redirectTo));
     } catch (e) {
       errorMessage = accountErrorMessage(e);
       // Clear a wrong code so the next try starts fresh

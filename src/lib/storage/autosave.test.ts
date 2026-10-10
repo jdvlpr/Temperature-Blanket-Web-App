@@ -16,7 +16,7 @@ const state = vi.hoisted(() => ({
   save: vi.fn(async () => null),
 }));
 
-vi.mock('$app/navigation', () => ({ replaceState: vi.fn() }));
+vi.mock('$app/navigation', () => ({ goto: vi.fn(async () => {}) }));
 vi.mock('#lib/state/project-state.svelte.js', () => ({
   project: state.project,
 }));

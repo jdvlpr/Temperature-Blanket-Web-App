@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { persistedState } from '$lib/storage/preferences.svelte';
+  import { persistedState } from '#lib/storage/preferences.svelte.js';
 
   const initialOptions = {
     content: '',
@@ -31,17 +31,17 @@
 </script>
 
 <script lang="ts">
-  import { browser, dev } from '$app/environment';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import Footer from '$lib/components/Footer.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { getBrands } from '$lib/data/yarns/colorways.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import { getTextColor } from '$lib/utils/color-utils';
+  import { browser, dev } from '$app/env';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { getTextColor } from '#lib/utils/color-utils.js';
   import chroma from 'chroma-js';
 
   let showClearButton = $state(false);

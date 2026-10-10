@@ -79,7 +79,7 @@ vi.mock('#lib/storage/preferences.svelte.js', () => ({
   },
 }));
 
-vi.mock('$app/environment', () => ({
+vi.mock('$app/env', () => ({
   browser: true,
   dev: true,
 }));

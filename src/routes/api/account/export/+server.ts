@@ -19,6 +19,7 @@
 import type { D1Database } from '@cloudflare/workers-types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
 
@@ -32,9 +33,9 @@ export const GET: RequestHandler = async (event) => {
     await Promise.all([
       account.auth.api.listUserAccounts({ headers }),
       account.auth.api.listSessions({ headers }),
-      galleryPages(event.platform?.env?.DB, account.user.id, event.url.origin),
-      savedPalettes(event.platform?.env?.DB, account.user.id),
-      savedPreferences(event.platform?.env?.DB, account.user.id),
+      galleryPages(getPlatform()?.env?.DB, account.user.id, event.url.origin),
+      savedPalettes(getPlatform()?.env?.DB, account.user.id),
+      savedPreferences(getPlatform()?.env?.DB, account.user.id),
     ]);
 
   const data = {
