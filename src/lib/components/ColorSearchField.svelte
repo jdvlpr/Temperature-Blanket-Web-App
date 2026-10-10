@@ -98,7 +98,7 @@ so the text box keeps its room -->
       <PipetteIcon
         size={16}
         aria-hidden="true"
-        class="pointer-events-none absolute top-1/2 left-1/2 -translate-1/2"
+        class="pointer-events-none absolute top-3.5 left-1/2 -translate-1/2"
         style="color:{iconColorOn(hex || '#000000')}"
       />
     </span>
