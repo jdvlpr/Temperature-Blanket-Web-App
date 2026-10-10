@@ -186,7 +186,7 @@ site does -->
   {#if style}
     <span
       class="flex h-8 w-12 items-center justify-center text-3xl leading-none"
-      style="font-family:var(--heading-font-family);font-variation-settings:'opsz' {style.opsz}, 'wght' {style.wght}, 'SOFT' {style.SOFT}, 'WONK' {style.WONK}"
+      style="font-family:var(--typo-heading--font-family);font-variation-settings:'opsz' {style.opsz}, 'wght' {style.wght}, 'SOFT' {style.SOFT}, 'WONK' {style.WONK}"
       >Aa</span
     >
   {/if}

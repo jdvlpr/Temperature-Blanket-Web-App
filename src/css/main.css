@@ -15,6 +15,9 @@
 /* Custom Theme */
 @import '../../classic-theme';
 
+/* Skeleton v4 Input Group, kept through the v5 upgrade */
+@import './input-group.css';
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* To avoid a breaking style issue in Windows-based browsers, it’s recommended you include this temporary fix into your global stylesheet. Please note this change will be automatically and permanently applied for you in Skeleton v5+.
@@ -51,7 +54,7 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   }
 
   ::selection {
-    color: var(--base-font-color-dark);
+    color: var(--typo-base--color-dark);
   }
 }
 
@@ -78,11 +81,11 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 
 /* Override default theme font families */
 [data-theme] {
-  --base-font-family: 'Be Vietnam Pro', sans-serif;
-  --heading-font-family: 'Fraunces Variable', serif;
-  --heading-font-weight: inherit;
-  --heading-font-style: inherit;
-  --heading-letter-spacing: inherit;
+  --typo-base--font-family: 'Be Vietnam Pro', sans-serif;
+  --typo-heading--font-family: 'Fraunces Variable', serif;
+  --typo-heading--font-weight: inherit;
+  --typo-heading--font-style: inherit;
+  --typo-heading--letter-spacing: inherit;
 }
 
 /* Heading Style — font-variation-settings for the Fraunces variable font.
@@ -410,17 +413,17 @@ th div {
 
   & > div.selected {
     @apply bg-primary-100/50 dark:bg-primary-900/50;
-    color: var(--base-font-color);
+    color: var(--typo-base--color-light);
     @variant dark {
-      color: var(--base-font-color-dark);
+      color: var(--typo-base--color-dark);
     }
   }
 
   & > div:hover:not(.group) {
     @apply bg-primary-100/50 dark:bg-primary-900/50;
-    color: var(--base-font-color);
+    color: var(--typo-base--color-light);
     @variant dark {
-      color: var(--base-font-color-dark);
+      color: var(--typo-base--color-dark);
     }
   }
 }
