@@ -6,7 +6,7 @@ import {
   stringToBrandAndYarnDetails,
 } from './yarn-utils';
 
-vi.mock('$lib/constants/seasons-constants', () => {
+vi.mock('#lib/constants/seasons-constants.js', () => {
   return {
     SEASON_PRESETS: {
       northernMeteorological: { seasons: [] },
@@ -18,7 +18,7 @@ vi.mock('$lib/constants/seasons-constants', () => {
   };
 });
 
-vi.mock('$lib/data/yarns/colorways.svelte', () => ({
+vi.mock('#lib/data/yarns/colorways.svelte.js', () => ({
   ensureYarnData: async () => {},
   getBrands: () => [
     {

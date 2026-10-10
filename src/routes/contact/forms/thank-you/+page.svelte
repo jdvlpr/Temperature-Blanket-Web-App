@@ -14,19 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
   import { ArrowLeftIcon, CircleCheckBigIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
   <title>Your form was received</title>
+
   <meta name="description" content="Thanks for your feedback" />
 
   <meta property="og:title" content="Your form was received" />
+
   <meta property="og:description" content="Thanks for your feedback" />
+
   <meta property="og:url" content="{PUBLIC_BASE_URL}/contact/forms/thank-you" />
+
   <meta property="og:type" content="website" />
 </svelte:head>
 

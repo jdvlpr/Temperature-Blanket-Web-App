@@ -14,16 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import type { WeatherParam } from '$lib/types/gauge-types';
-  import { getColorInfo } from '$lib/utils/color-utils';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
+  import { getColorInfo } from '#lib/utils/color-utils.js';
   import {
     getSquareSectionTargetIds,
     showPreviewImageWeatherDetails,
-  } from '$lib/utils/preview-utils.svelte';
-  import { runPreview } from '$lib/utils/function-utils.svelte';
+  } from '#lib/utils/preview-utils.svelte.js';
+  import { runPreview } from '#lib/utils/function-utils.svelte.js';
   import { squaresPreview, type SquaresSection } from './state.svelte';
 
   let width = $state(squaresPreview.width);

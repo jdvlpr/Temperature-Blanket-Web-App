@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { WeatherDay } from '$lib/types/weather-types';
+import type { WeatherDay } from '#lib/types/weather-types.js';
 import { describe, expect, it } from 'vitest';
 import {
   getEvenlyDistributedRangeValuesWithEqualDayCount,

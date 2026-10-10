@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser } from '$app/environment';
-import { SKELETON_THEMES } from '$lib/constants/page-constants';
-import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
-import { trackPreferenceChanges } from '$lib/storage/preferences-sync.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { PageLayout } from '$lib/types/page-types';
+import { browser } from '$app/env';
+import { SKELETON_THEMES } from '#lib/constants/page-constants.js';
+import { DEFAULT_SEASONS } from '#lib/constants/seasons-constants.js';
+import { trackPreferenceChanges } from '#lib/storage/preferences-sync.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { PageLayout } from '#lib/types/page-types.js';
 import { MigrationManager } from './migration-manager';
 
 // Debounce timer for persisting theme prefs to cookies. The theme effect can

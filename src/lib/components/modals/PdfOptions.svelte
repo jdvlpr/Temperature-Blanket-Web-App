@@ -18,24 +18,24 @@ downloadPDF; its title is in the dialog's header. Layout, Fill with color and
 Days in ranges start as the View menu has them; the rest is remembered. -->
 
 <script lang="ts">
-  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
+  import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
   import {
     DEFAULT_PDF_SETTINGS,
     defaultPageSize,
     type PdfSettings,
-  } from '$lib/features/pdf/options';
+  } from '#lib/features/pdf/options.js';
   import {
     allGaugesAttributes,
     gauges,
     showDaysInRange,
-  } from '$lib/state/gauges-state.svelte';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { weather } from '$lib/state/weather-state.svelte';
+  } from '#lib/state/gauges-state.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import {
     ChevronDownIcon,
@@ -119,7 +119,7 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
     remember();
     dialog.close();
     try {
-      const { createPdf } = await import('$lib/features/pdf/create');
+      const { createPdf } = await import('#lib/features/pdf/create.js');
       await createPdf({
         settings: $state.snapshot(settings),
         gaugeIds: $state.snapshot(gaugeIds),

@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as beCool } from './be-cool/yarn';
 import { yarn as forNature } from './for-nature/yarn';
 

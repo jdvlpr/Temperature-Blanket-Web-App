@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { projectChanged } from '$lib/storage/autosave.svelte';
-  import { UNIT_LABELS } from '$lib/constants/weather-constants';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import { projectChanged } from '#lib/storage/autosave.svelte.js';
+  import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import {
     celsiusToFahrenheit,
     fahrenheitToCelsius,
     hoursToMinutes,
     inchesToMillimeters,
     millimetersToInches,
-  } from '$lib/utils/unit-utils.svelte';
+  } from '#lib/utils/unit-utils.svelte.js';
   import {
     dateToISO8601String,
     getIsFutureDate,
     getIsRecentDate,
-  } from '$lib/utils/date-utils';
-  import { displayNumber } from '$lib/utils/number-utils';
-  import { getTextColor } from '$lib/utils/color-utils';
+  } from '#lib/utils/date-utils.js';
+  import { displayNumber } from '#lib/utils/number-utils.js';
+  import { getTextColor } from '#lib/utils/color-utils.js';
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { onMount } from 'svelte';
   import RecentWeatherDataTooltip from './RecentWeatherDataTooltip.svelte';

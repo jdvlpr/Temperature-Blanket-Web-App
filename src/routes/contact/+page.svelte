@@ -20,9 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_FACEBOOK_LINK,
     PUBLIC_GITHUB_LINK,
     PUBLIC_SITE_TITLE,
-  } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
   import {
     CloudAlertIcon,
     CodeIcon,

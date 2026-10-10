@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
   import { CheckIcon, LoaderCircleIcon, XIcon } from '@lucide/svelte';
   import { exportToGoogleSheet, prepareGoogleExport } from './client';
   import type { ExportOptions } from './types';

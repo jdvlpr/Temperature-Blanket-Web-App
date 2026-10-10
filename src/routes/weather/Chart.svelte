@@ -14,15 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { Chart, registerChartJS } from '$lib/features/charts/chartjs-setup';
+  import {
+    Chart,
+    registerChartJS,
+  } from '#lib/features/charts/chartjs-setup.js';
   import {
     buildXAxis,
     buildYAxis,
     buildY2Axis,
-  } from '$lib/features/charts/axis-theme';
+  } from '#lib/features/charts/axis-theme.js';
   import { onMount } from 'svelte';
   import { weatherState } from './+page.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { ChartDataset } from 'chart.js';
   import type { WeatherHourlyItem, WeatherDailyItem } from './open-meteo-types';
 

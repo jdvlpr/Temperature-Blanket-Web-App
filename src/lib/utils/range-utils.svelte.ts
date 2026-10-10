@@ -13,17 +13,17 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { NON_NEGATIVE_PARAMS } from '$lib/constants/weather-constants';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
+import { NON_NEGATIVE_PARAMS } from '#lib/constants/weather-constants.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
 import type {
   GaugeAttributes,
   GaugeRange,
   GaugeRangeCategory,
   GaugeRangeOptions,
-} from '$lib/types/gauge-types';
-import type { WeatherDay } from '$lib/types/weather-types';
-import { displayNumber } from '$lib/utils/number-utils';
+} from '#lib/types/gauge-types.js';
+import type { WeatherDay } from '#lib/types/weather-types.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
 
 export const getStart = (
   rangeOptions: GaugeRangeOptions | undefined,

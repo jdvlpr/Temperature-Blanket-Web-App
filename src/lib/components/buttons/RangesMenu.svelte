@@ -24,25 +24,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuContentClass,
     menuItemClass,
     menuTriggerClass,
-  } from '$lib/components/menu-styles';
+  } from '#lib/components/menu-styles.js';
   import { resolve } from '$app/paths';
-  import MenuSubmenu from '$lib/components/buttons/MenuSubmenu.svelte';
-  import { provideMenuDrill } from '$lib/components/menu-drill.svelte';
+  import MenuSubmenu from '#lib/components/buttons/MenuSubmenu.svelte';
+  import { provideMenuDrill } from '#lib/components/menu-drill.svelte.js';
   import {
     confirmGaugeChange,
     gaugeChangeState,
     type GaugeChangeState,
-  } from '$lib/utils/history-utils.svelte';
-  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
-  import { gauges, manualRangesEditor } from '$lib/state/gauges-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import type { GaugeRangeOptions } from '$lib/types/gauge-types';
+  } from '#lib/utils/history-utils.svelte.js';
+  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
+  import {
+    gauges,
+    manualRangesEditor,
+  } from '#lib/state/gauges-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import type { GaugeRangeOptions } from '#lib/types/gauge-types.js';
   import {
     describeIncrement,
     withGeneratedRanges,
     withRangeOptions,
     type RangeGeneration,
-  } from '$lib/utils/gauge-utils.svelte';
+  } from '#lib/utils/gauge-utils.svelte.js';
   import {
     ArrowDown10Icon,
     ArrowDownNarrowWideIcon,
@@ -430,7 +433,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#snippet element(attributes)}
                 <a
                   {...attributes as HTMLAnchorAttributes}
-                  href="{resolve('/documentation')}#range-calculation-methods"
+                  href="{resolve('documentation')}#range-calculation-methods"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

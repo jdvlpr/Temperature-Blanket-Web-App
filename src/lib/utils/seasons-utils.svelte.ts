@@ -16,11 +16,11 @@
 import {
   DEFAULT_SEASONS,
   SEASON_PRESETS,
-} from '$lib/constants/seasons-constants';
-import { MONTHS } from '$lib/constants/weather-constants';
-import { previews } from '$lib/state/preview-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { LocationType } from '$lib/types/location-types';
+} from '#lib/constants/seasons-constants.js';
+import { MONTHS } from '#lib/constants/weather-constants.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { LocationType } from '#lib/types/location-types.js';
 
 /**
  * Parse a MM-DD string into month and day numbers

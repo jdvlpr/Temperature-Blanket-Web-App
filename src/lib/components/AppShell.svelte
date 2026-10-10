@@ -14,16 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import AccountButton from '$lib/components/account/AccountButton.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { alignIconInk } from '$lib/state/attachments/align-icon-ink';
+  import AppNavigation from '#lib/components/AppNavigation.svelte';
+  import AccountButton from '#lib/components/account/AccountButton.svelte';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import {
     drawerState,
     showNavigationSideBar,
-  } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { motion } from '$lib/utils/feedback.svelte';
+  } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { motion } from '#lib/utils/feedback.svelte.js';
   import {
     MenuIcon,
     PanelLeftClose,

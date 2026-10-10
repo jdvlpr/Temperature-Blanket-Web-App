@@ -21,8 +21,8 @@ import {
   getColorwaysWithAffiliateLinks,
   isYarnDataLoaded,
 } from './colorways.svelte';
-import { getColorName } from '$lib/utils/color-utils';
-import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
+import { getColorName } from '#lib/utils/color-utils.js';
+import { getColorPropertiesFromYarnStringAndHex } from '#lib/utils/yarn-utils.js';
 
 // Regression coverage for the B1 lazy-load split: `getBrands`/`getColorwaysWithAffiliateLinks`/
 // `getAllColorways` must start empty (nothing has warmed the module-level cache yet) and only
@@ -32,7 +32,7 @@ import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
 //
 // These tests share one module instance and run in declaration order (the "before load" checks
 // must run first) rather than resetting modules between tests, since resetting this module also
-// tears down the `$env`/`$lib` virtual module graph it depends on and hangs under Vitest.
+// tears down the `$env`/`#lib` virtual module graph it depends on and hangs under Vitest.
 
 describe('colorways.svelte', () => {
   it('getters are empty before ensureYarnData() resolves', () => {

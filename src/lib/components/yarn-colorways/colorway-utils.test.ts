@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Color } from '$lib/types/yarn-types';
+import type { Color } from '#lib/types/yarn-types.js';
 import {
   closeMatches,
   colorwaySortOptions,

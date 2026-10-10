@@ -17,13 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     calendarPreview,
     type CalendarSection,
-  } from '$lib/components/previews/calendar/state.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { getColorInfo } from '$lib/utils/color-utils';
-  import { runPreview } from '$lib/utils/function-utils.svelte';
-  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
+  } from '#lib/components/previews/calendar/state.svelte.js';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { getColorInfo } from '#lib/utils/color-utils.js';
+  import { runPreview } from '#lib/utils/function-utils.svelte.js';
+  import { showPreviewImageWeatherDetails } from '#lib/utils/preview-utils.svelte.js';
 
   let width = $state(calendarPreview.width);
 

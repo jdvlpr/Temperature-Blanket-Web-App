@@ -23,7 +23,7 @@ import type { RequestHandler } from './$types';
 export const prerender = false;
 
 export const GET: RequestHandler = async (event) => {
-  const { requireAccount } = await import('$lib/server/auth');
+  const { requireAccount } = await import('#lib/server/auth/index.js');
   const account = await requireAccount(event);
   if (account instanceof Response) return account;
 
@@ -126,7 +126,8 @@ async function galleryPages(
   origin: string,
 ) {
   if (!db) return null;
-  const { listPosts, getSettings } = await import('$lib/server/gallery/store');
+  const { listPosts, getSettings } =
+    await import('#lib/server/gallery/store.js');
   try {
     const [posts, settings] = await Promise.all([
       listPosts(db, userId),

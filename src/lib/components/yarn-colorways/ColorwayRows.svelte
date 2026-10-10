@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   circle that's checked when it's selected.
 -->
 <script lang="ts">
-  import type { Color } from '$lib/types/yarn-types';
+  import type { Color } from '#lib/types/yarn-types.js';
   import { CircleCheckIcon, CircleIcon } from '@lucide/svelte';
   import ColorwayMoreMenu from './ColorwayMoreMenu.svelte';
   import {

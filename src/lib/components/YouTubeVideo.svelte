@@ -25,9 +25,7 @@ visiting a page sends nothing to YouTube (see the Privacy Policy). -->
     start = 0,
     title = 'YouTube video',
   }: { id: string; start?: number; title?: string } = $props();
-
   let playing = $state(false);
-
   const src = $derived(
     `https://www.youtube-nocookie.com/embed/${id}?autoplay=1${start ? `&start=${start}` : ''}`,
   );
@@ -52,14 +50,13 @@ visiting a page sends nothing to YouTube (see the Privacy Policy). -->
       <button
         type="button"
         class="btn preset-filled-primary-500"
-        onclick={() => (playing = true)}
+        onclick={() => (playing = true)}><PlayIcon />Play video</button
       >
-        <PlayIcon />
-        Play video
-      </button>
+
       <p class="max-w-sm text-sm opacity-80">
         The video plays from YouTube, which receives your IP address. See the
-        <a href={resolve('/privacy')} class="link">Privacy Policy</a>.
+        <a href={resolve('privacy')} class="link">Privacy Policy</a>
+        .
       </p>
     </div>
   {/if}

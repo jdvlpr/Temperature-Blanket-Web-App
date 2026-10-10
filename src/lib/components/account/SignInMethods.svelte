@@ -26,8 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     unlinkAccount,
     type LinkedAccount,
     type SignInProvider,
-  } from '$lib/accounts/client';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  } from '#lib/accounts/client.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { CheckIcon, LoaderCircleIcon, MailIcon } from '@lucide/svelte';
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';

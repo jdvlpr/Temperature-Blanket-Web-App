@@ -1,5 +1,5 @@
 import type { R2Bucket } from '@cloudflare/workers-types';
-import { createTestD1 } from '$lib/server/test-d1';
+import { createTestD1 } from '#lib/server/test-d1.js';
 import { describe, expect, it } from 'vitest';
 import {
   cleanUpUserSync,
@@ -19,8 +19,8 @@ import {
   saveProject,
   type SaveInput,
 } from './store';
-import { TRASH_DAYS } from '$lib/storage/trash';
-import type { PaletteInput } from '$lib/sync/protocol';
+import { TRASH_DAYS } from '#lib/storage/trash.js';
+import type { PaletteInput } from '#lib/sync/protocol.js';
 
 /** An in-memory R2 bucket covering put/get/delete/list. */
 function createTestBucket() {

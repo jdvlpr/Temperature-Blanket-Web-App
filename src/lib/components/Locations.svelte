@@ -14,15 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { version } from '$app/environment';
-  import Location from '$lib/components/Location.svelte';
-  import { MAXIMUM_LOCATIONS } from '$lib/constants/location-constants';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { stringToDate } from '$lib/utils/date-utils';
-  import type { TISO8601DateString } from '$lib/types/weather-types';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { version } from '$app/env';
+  import Location from '#lib/components/Location.svelte';
+  import { MAXIMUM_LOCATIONS } from '#lib/constants/location-constants.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { stringToDate } from '#lib/utils/date-utils.js';
+  import type { TISO8601DateString } from '#lib/types/weather-types.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,

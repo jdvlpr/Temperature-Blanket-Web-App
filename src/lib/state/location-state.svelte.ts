@@ -13,23 +13,23 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser } from '$app/environment';
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
-import { MAXIMUM_DAYS_PER_LOCATION } from '$lib/constants/location-constants';
+import { browser } from '$app/env';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
+import { MAXIMUM_DAYS_PER_LOCATION } from '#lib/constants/location-constants.js';
 import type {
   LocationsStateType,
   LocationStateType,
   LocationType,
-} from '$lib/types/location-types';
+} from '#lib/types/location-types.js';
 import type {
   TISO8601DateString,
   WeatherSource,
-} from '$lib/types/weather-types';
+} from '#lib/types/weather-types.js';
 import {
   dateToISO8601String,
   getDaysBetween,
   stringToDate,
-} from '$lib/utils/date-utils';
+} from '#lib/utils/date-utils.js';
 
 export class LocationClass implements LocationType {
   uuid: string = $state('');
@@ -89,10 +89,8 @@ export class LocationState extends LocationClass implements LocationStateType {
   errorMessage = $derived.by(() => {
     if (this.from && this.#today && this.from >= this.#today)
       return 'The starting date must be at least one day in the past.';
-
     if (this.days > MAXIMUM_DAYS_PER_LOCATION)
       return `Please select a maximum of ${MAXIMUM_DAYS_PER_LOCATION} days. You've selected ${this.days} days.`;
-
     if (this.days < 1)
       return `It looks like the selected end date comes before the selected start date. Please select an end date which comes after the start date.`;
 

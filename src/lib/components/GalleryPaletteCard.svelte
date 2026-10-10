@@ -20,9 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import type { GalleryPalette } from '$lib/utils/color-utils';
-  import { pluralize } from '$lib/utils/string-utils';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import type { GalleryPalette } from '#lib/utils/color-utils.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { ExternalLinkIcon } from '@lucide/svelte';
 
   interface Props {
@@ -33,9 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { palette, toYarnPage = false, onclick }: Props = $props();
-
   let count = $derived(palette.colors.length);
-
   const controlClass = 'flex w-full cursor-pointer flex-col gap-y-1 text-left';
 </script>
 
@@ -50,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#if toYarnPage}
     <a
-      href={resolve('/yarn')}
+      href={resolve('yarn')}
       {onclick}
       class={controlClass}
       title="Open in Yarn Palette Creator">{@render content()}</a

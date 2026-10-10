@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 
 // When in dev mode, use free geonames .org instead of paid geonames.net credits. It's mandatory for local dev environment to use the .org domain because of permissions
 // Check GeoNames api usage here: https://www.geonames .org/account

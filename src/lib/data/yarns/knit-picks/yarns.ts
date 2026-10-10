@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as animation } from './animation/yarn';
 import { yarn as bravaSport } from './brava-sport/yarn';
 import { yarn as bravaTweed } from './brava-tweed/yarn';

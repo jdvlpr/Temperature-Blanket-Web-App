@@ -16,15 +16,15 @@
 // The first page: the project at a glance. Its name, places and dates, the
 // weather in short, and the preview.
 
-import { locations } from '$lib/state/location-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { TISO8601DateString } from '$lib/types/weather-types';
-import { stringToDate } from '$lib/utils/date-utils';
-import { getAverage } from '$lib/utils/number-utils';
-import { formatRangeEnd } from '$lib/utils/range-format';
-import { pluralize } from '$lib/utils/string-utils';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { TISO8601DateString } from '#lib/types/weather-types.js';
+import { stringToDate } from '#lib/utils/date-utils.js';
+import { getAverage } from '#lib/utils/number-utils.js';
+import { formatRangeEnd } from '#lib/utils/range-format.js';
+import { pluralize } from '#lib/utils/string-utils.js';
 import { INK, SIZE, paragraph, wrap, type Pdf } from '../draw';
 import { Flow, fitImage } from '../layout';
 

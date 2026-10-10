@@ -1,5 +1,5 @@
-import type { SavedPalette } from '$lib/storage/palettes.svelte';
-import type { StoredProject } from '$lib/storage/projects.svelte';
+import type { SavedPalette } from '#lib/storage/palettes.svelte.js';
+import type { StoredProject } from '#lib/storage/projects.svelte.js';
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {

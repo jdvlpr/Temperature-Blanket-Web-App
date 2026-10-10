@@ -14,15 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { previewHighlight, previews } from '$lib/state/preview-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
-  import { exists } from '$lib/utils/other-utils';
-  import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
+  import PreviewSelect from '#lib/components/previews/PreviewSelect.svelte';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import {
+    previewHighlight,
+    previews,
+  } from '#lib/state/preview-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { downloadPreviewPNG } from '#lib/utils/preview-utils.svelte.js';
+  import { exists } from '#lib/utils/other-utils.js';
+  import { getProjectParametersFromURLHash } from '#lib/utils/project-utils.svelte.js';
   import { ImageIcon } from '@lucide/svelte';
-  import { historyChange } from '$lib/utils/feedback.svelte';
+  import { historyChange } from '#lib/utils/feedback.svelte.js';
   import { onMount } from 'svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 

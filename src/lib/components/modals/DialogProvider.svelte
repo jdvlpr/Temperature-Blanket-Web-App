@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
-  import { motion } from '$lib/utils/feedback.svelte';
+  import { motion } from '#lib/utils/feedback.svelte.js';
   import { tick, untrack } from 'svelte';
   import { cubicOut, linear } from 'svelte/easing';
   import { MediaQuery } from 'svelte/reactivity';

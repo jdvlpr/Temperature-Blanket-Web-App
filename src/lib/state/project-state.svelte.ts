@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser, version } from '$app/environment';
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import { timestampFromLegacyProjectId } from '$lib/utils/project-id-utils';
-import { seasonsToUrlHash } from '$lib/utils/seasons-utils.svelte';
+import { browser, version } from '$app/env';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import { timestampFromLegacyProjectId } from '#lib/utils/project-id-utils.js';
+import { seasonsToUrlHash } from '#lib/utils/seasons-utils.svelte.js';
 
 export class HistoryStateClass {
   stack: string[] = $state([]);

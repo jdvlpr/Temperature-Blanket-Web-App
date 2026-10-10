@@ -14,20 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
-  import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
-  import GalleryPaletteCard from '$lib/components/GalleryPaletteCard.svelte';
-  import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
+  import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
+  import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
+  import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import {
     fetchPopularProjects,
     fetchPaletteGallery,
     popularToGalleryNodes,
     recordPageView,
-  } from '$lib/utils/gallery-utils';
-  import { getPalettesFromProjects } from '$lib/utils/color-utils';
+  } from '#lib/utils/gallery-utils.js';
+  import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import {
     ChevronRightIcon,
     ClockIcon,

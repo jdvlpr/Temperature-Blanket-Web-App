@@ -10,8 +10,8 @@
 // changes, `<html>` has `data-fill-changing`, so that only the item's own text
 // color eases (see main.css); its content follows by inheriting it.
 
-import { preferences } from '$lib/storage/preferences.svelte';
-import { motion } from '$lib/utils/feedback.svelte';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import { motion } from '#lib/utils/feedback.svelte.js';
 import { tick } from 'svelte';
 import type { Action } from 'svelte/action';
 

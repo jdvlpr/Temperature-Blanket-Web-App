@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import { project } from '$lib/state/project-state.svelte';
-  import { signal } from '$lib/state/location-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { signal } from '#lib/state/location-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { weatherState } from './+page.svelte';
   import type {
     OpenMeteoForecastData,

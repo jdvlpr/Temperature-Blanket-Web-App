@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { displayNumber } from '$lib/utils/number-utils';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { displayNumber } from '#lib/utils/number-utils.js';
 
   interface Props {
     value: number;

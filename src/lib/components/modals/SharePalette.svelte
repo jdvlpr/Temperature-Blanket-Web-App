@@ -18,14 +18,14 @@ signed in. It goes live at once and is linked to the account. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import { getGalleryPages, sharePalette } from '$lib/accounts/gallery';
-  import { account } from '$lib/accounts/summary.svelte';
-  import ShowOwnerToggle from '$lib/components/account/ShowOwnerToggle.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import { getGalleryPages, sharePalette } from '#lib/accounts/gallery.js';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import { onMount } from 'svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import { getYarnPageURL } from '$lib/utils/color-utils';
-  import { cleanName } from '$lib/utils/string-utils';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { getYarnPageURL } from '#lib/utils/color-utils.js';
+  import { cleanName } from '#lib/utils/string-utils.js';
   import { CheckIcon, LoaderCircleIcon, Share2Icon } from '@lucide/svelte';
 
   // The gallery's limit (MAX_PALETTE_TITLE_LENGTH on the server)
@@ -80,6 +80,7 @@ signed in. It goes live at once and is linked to the account. -->
 
 <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
   <PaletteStrip {colors} />
+
   {#if shared}
     <div class="flex flex-col items-center gap-2 text-center" role="status">
       <CheckIcon class="text-success-700-300 size-8" />
@@ -95,7 +96,7 @@ signed in. It goes live at once and is linked to the account. -->
         >
       {/if}
       <a
-        href="{resolve('/gallery')}?view=yarn-palettes"
+        href="{resolve('gallery')}?view=yarn-palettes"
         target="_blank"
         class="link">View the Yarn Palette Gallery</a
       >

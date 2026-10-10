@@ -14,11 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import YouTubeVideo from '$lib/components/YouTubeVideo.svelte';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
+  import YouTubeVideo from '#lib/components/YouTubeVideo.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
@@ -28,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // These may also be included inline.
   const animBackdrop =
     'transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100';
+
   const animModal =
     'transition transition-discrete opacity-0 translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0';
 </script>
@@ -40,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <meta property="og:title" content="How to Plan a Temperature Blanket" />
+
   <meta
     property="og:description"
     content="Using temperature-blanket.com to help you plan your crochet or knitting project."
@@ -66,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openTableOfContents = false;
     }
   }}
-/>
+></svelte:document>
 
 {#snippet tableOfContents()}
   <nav data-testid="toc" class="toc max-w-[60vw] space-y-4 p-4">
@@ -147,8 +149,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ><path
                 fill="currentColor"
                 d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-              /></svg
-            >
+              ></path>
+            </svg>
 
             <span class="">Content</span>
           </div>
@@ -312,13 +314,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         largest screen available to you.
                       </p>
                       <div class="my-4"></div>
-                      <p>
-                        🤔
-                        <span class="italic">Is there an app?</span>
-                      </p>
+                      <p>🤔 <span class="italic">Is there an app?</span></p>
+
                       <p>
                         The website is the app. It's not in the Apple or Google
                         app store, but you can
+
                         <a
                           href="https://support.google.com/chrome/answer/9658361"
                           target="_blank"
@@ -413,11 +414,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     So you've chosen your location and dates. Hurray! Now press
                     that Search button.
                   </p>
+
                   <p>
                     Beep boop beep...searching...searching....wait for it...
                     Whoa! Numbers and graphs and tables! This is the Weather
                     section.
                   </p>
+
                   <div class="flex flex-wrap gap-4">
                     <div class="flex-1">
                       <img
@@ -482,9 +485,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         - You can download the weather data as a CSV file and
                         open it as a spreadsheet.
                       </p>
+
                       <p>
                         - Want to use custom weather data? Click on a cell in
                         the table to change the value, or
+
                         <a
                           href="/documentation#import-weather-data"
                           class="link">upload your own CSV file</a
@@ -772,6 +777,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <p>
                         - Tap or click on the preview image to see more details.
                       </p>
+
                       <p>
                         -
                         <a href="/documentation#save-project" class="link"

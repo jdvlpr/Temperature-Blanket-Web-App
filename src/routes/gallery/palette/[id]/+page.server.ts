@@ -17,11 +17,11 @@
 // owner's name shows only when they included it on their public gallery, read
 // from D1 now, so a rename shows straight away.
 
-import type { GalleryOwner } from '$lib/server/gallery/store';
+import type { GalleryOwner } from '#lib/server/gallery/store.js';
 import {
   queryGallery,
   type GallerySharedPaletteNode,
-} from '$lib/utils/gallery-utils';
+} from '#lib/utils/gallery-utils.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -73,7 +73,7 @@ async function getOwner(
   const env = event.platform?.env;
   if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB) return null;
   try {
-    const { ownerForPost } = await import('$lib/server/gallery/store');
+    const { ownerForPost } = await import('#lib/server/gallery/store.js');
     return await ownerForPost(env.DB, id);
   } catch (e) {
     console.error('Could not look up gallery palette owner', e);

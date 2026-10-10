@@ -17,7 +17,7 @@
 // as the gauge customizer's colors: filled with the color, or a round swatch
 // beside the text; a muted second line; ranges as "40 → 49" with a small unit
 
-import { getTextColor } from '$lib/utils/color-utils';
+import { getTextColor } from '#lib/utils/color-utils.js';
 import {
   LINE_HEIGHT,
   fitFontSize,

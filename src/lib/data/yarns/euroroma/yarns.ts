@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as ecoamigurumi } from './ecoamigurumi/yarn';
 
 export const brand: Brand = {

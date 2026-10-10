@@ -17,12 +17,14 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock('$app/navigation', () => ({ replaceState: vi.fn() }));
-vi.mock('$lib/state/project-state.svelte', () => ({ project: state.project }));
-vi.mock('$lib/sync/status.svelte', () => ({ sync: state.sync }));
-vi.mock('$lib/accounts/summary.svelte', () => ({
+vi.mock('#lib/state/project-state.svelte.js', () => ({
+  project: state.project,
+}));
+vi.mock('#lib/sync/status.svelte.js', () => ({ sync: state.sync }));
+vi.mock('#lib/accounts/summary.svelte.js', () => ({
   account: { summary: { id: 'u1' } },
 }));
-vi.mock('$lib/storage/projects.svelte', () => ({
+vi.mock('#lib/storage/projects.svelte.js', () => ({
   lastSavedAt: (i: (typeof state.index)[number]) =>
     i.sync?.updatedAt ?? i.updatedAt ?? null,
   ProjectStorage: {

@@ -14,26 +14,26 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { TrashUndos } from '$lib/utils/trash-undo.svelte';
-  import TrashUndo from '$lib/components/TrashUndo.svelte';
-  import { version } from '$app/environment';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
+  import { TrashUndos } from '#lib/utils/trash-undo.svelte.js';
+  import TrashUndo from '#lib/components/TrashUndo.svelte';
+  import { version } from '$app/env';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
   import {
     MAX_SAVED_PALETTE_NAME_LENGTH,
     PaletteStorage,
     savedPalettes,
     type SavedPalette,
-  } from '$lib/storage/palettes.svelte';
-  import type { Color } from '$lib/types/yarn-types';
+  } from '#lib/storage/palettes.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     getColorsFromInput,
     getPaletteFallbackName,
     getYarnPageURL,
-  } from '$lib/utils/color-utils';
-  import { formatDateTime } from '$lib/utils/date-utils';
+  } from '#lib/utils/color-utils.js';
+  import { formatDateTime } from '#lib/utils/date-utils.js';
   import {
     CheckIcon,
     PencilIcon,
@@ -232,10 +232,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   type="button"
                   class="ig-btn hover:preset-tonal-surface"
                   title="Cancel"
-                  onclick={() => (editingId = null)}
+                  onclick={() => (editingId = null)}><XIcon /></button
                 >
-                  <XIcon />
-                </button>
               </div>
             </div>
           {:else}
@@ -270,12 +268,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       })}
                       class="underline"
                       title="Open in Yarn Palette Creator"
-                      ><span class="sr-only">Open </span>{label}<span
-                        class="sr-only"
-                      >
-                        in Yarn Palette Creator</span
-                      ></a
                     >
+                      <span class="sr-only">Open</span>
+                      {label}
+                      <span class="sr-only">in Yarn Palette Creator</span>
+                    </a>
+
                     <!-- eslint-enable svelte/no-navigation-without-resolve -->
                   {/if}
                   <span>Saved {saved}</span>

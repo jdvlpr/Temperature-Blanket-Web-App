@@ -22,7 +22,7 @@ export const prerender = false;
 
 export const POST: RequestHandler = async (event) => {
   const { requireGallery, publishPaletteFromAccount, galleryError } =
-    await import('$lib/server/gallery');
+    await import('#lib/server/gallery/index.js');
   const gallery = await requireGallery(event, { publishing: true });
   if (gallery instanceof Response) return gallery;
 

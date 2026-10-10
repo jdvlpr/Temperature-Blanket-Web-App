@@ -25,14 +25,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuContentClass,
     menuItemClass,
     menuTriggerClass,
-  } from '$lib/components/menu-styles';
+  } from '#lib/components/menu-styles.js';
   import {
     ArrowDownWideNarrowIcon,
     CheckIcon,
     ChevronDownIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
-  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
+  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
 
   interface Props {
     /** Each sort, with a few words under it on what it does, if any */

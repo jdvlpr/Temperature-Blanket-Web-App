@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { FilePlusIcon } from '@lucide/svelte';
   import ExportToGoogleSheetModal from './ExportToGoogleSheetModal.svelte';
 

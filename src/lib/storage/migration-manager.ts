@@ -1,4 +1,4 @@
-import { project } from '$lib/state/project-state.svelte';
+import { project } from '#lib/state/project-state.svelte.js';
 import { ProjectStorage, type StoredProject } from './projects.svelte';
 
 const LEGACY_PROJECTS_KEY = 'projects';

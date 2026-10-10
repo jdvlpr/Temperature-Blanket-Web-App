@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   it ends with Remove, for a color in a palette.
 -->
 <script lang="ts">
-  import type { Color } from '$lib/types/yarn-types';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     CopyIcon,
     EllipsisVerticalIcon,
@@ -33,9 +33,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShoppingCartIcon,
     Trash2Icon,
   } from '@lucide/svelte';
-  import InsertColorIcon from '$lib/components/buttons/InsertColorIcon.svelte';
+  import InsertColorIcon from '#lib/components/buttons/InsertColorIcon.svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { menuContentClass, menuItemClass } from '$lib/components/menu-styles';
+  import {
+    menuContentClass,
+    menuItemClass,
+  } from '#lib/components/menu-styles.js';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
   import {
     colorwayLink,

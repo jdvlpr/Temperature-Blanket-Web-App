@@ -18,9 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
@@ -41,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <meta property="og:title" content="Yarn Colorways JSON API" />
+
   <meta
     property="og:description"
     content="Find yarn colorways by HTML hex color code."
@@ -62,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openTableOfContents = false;
     }
   }}
-/>
+></svelte:document>
 
 {#snippet tableOfContents()}
   <nav data-testid="toc" class="toc max-w-[60vw] space-y-4 p-4">
@@ -140,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item block">
         <a
           href="#terms-and-license"
-          class="toc-anchor opacity-60 hover:opacity-100">Terms &amp; License</a
+          class="toc-anchor opacity-60 hover:opacity-100">Terms & License</a
         >
       </li>
     </ul>
@@ -171,8 +172,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ><path
                 fill="currentColor"
                 d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-              /></svg
-            >
+              ></path>
+            </svg>
 
             <span class="">Content</span>
           </div>
@@ -1327,10 +1328,8 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/weights`}
                 <tbody
                   class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
-                  <tr>
-                    <td>200</td>
-                    <td>Success: All is fine</td>
-                  </tr>
+                  <tr><td>200</td><td>Success: All is fine</td></tr>
+
                   <tr>
                     <td>400</td>
                     <td>Bad Request: Please check the query parameters</td>

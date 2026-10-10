@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { YarnWeight } from '$lib/types/yarn-types';
+import type { YarnWeight } from '#lib/types/yarn-types.js';
 
 export const YARN_COLORWAYS_PER_PAGE = 100;
 

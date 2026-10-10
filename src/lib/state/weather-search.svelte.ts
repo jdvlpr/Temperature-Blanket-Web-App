@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { controller, locations } from '$lib/state/location-state.svelte';
-import { goToProjectSection } from '$lib/state/page-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { LocationType } from '$lib/types/location-types';
-import type { WeatherDay } from '$lib/types/weather-types';
-import { setSeasonsByLocation } from '$lib/utils/seasons-utils.svelte';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { controller, locations } from '#lib/state/location-state.svelte.js';
+import { goToProjectSection } from '#lib/state/page-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { LocationType } from '#lib/types/location-types.js';
+import type { WeatherDay } from '#lib/types/weather-types.js';
+import { setSeasonsByLocation } from '#lib/utils/seasons-utils.svelte.js';
 
 /** The weather already there, to put back if the search is cancelled */
 type Restore = {

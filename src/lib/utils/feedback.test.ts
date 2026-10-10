@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   reducedMotion: { current: false },
 }));
 
-vi.mock('$lib/storage/preferences.svelte', () => ({
+vi.mock('#lib/storage/preferences.svelte.js', () => ({
   DEFAULT_EFFECTS: { motion: 'system' },
   preferences: mocks.preferences,
 }));

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
-import { createTestD1 } from '$lib/server/test-d1';
+import { createTestD1 } from '#lib/server/test-d1.js';
 
 describe('readSignUpLimit', () => {
   it('reads a whole number, no limit when unset, and closes on anything else', () => {

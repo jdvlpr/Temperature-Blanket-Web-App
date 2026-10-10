@@ -16,7 +16,7 @@
 // One project in the account's Trash: its data, to show or restore it, or
 // deleting it forever.
 
-import { SYNC_HEADERS } from '$lib/sync/protocol';
+import { SYNC_HEADERS } from '#lib/sync/protocol.js';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -24,9 +24,9 @@ export const prerender = false;
 const NO_STORE = { 'Cache-Control': 'no-store' };
 
 async function load(event: Parameters<RequestHandler>[0]) {
-  const { requireSync, syncError } = await import('$lib/server/sync');
-  const store = await import('$lib/server/sync/store');
-  const { isProjectId } = await import('$lib/server/sync/request');
+  const { requireSync, syncError } = await import('#lib/server/sync/index.js');
+  const store = await import('#lib/server/sync/store.js');
+  const { isProjectId } = await import('#lib/server/sync/request.js');
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;
   if (!isProjectId(event.params.id))

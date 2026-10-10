@@ -1,7 +1,7 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
   import { flip } from 'svelte/animate';
-  import { toast } from '$lib/state/page-state.svelte';
+  import { toast } from '#lib/state/page-state.svelte.js';
   import {
     CircleAlertIcon,
     CircleCheckIcon,

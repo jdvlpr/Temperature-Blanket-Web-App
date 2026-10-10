@@ -18,8 +18,8 @@ haven't finished syncing. Signing out removes the synced ones from this
 browser; these stay, since the account doesn't have them yet. -->
 
 <script lang="ts">
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { sync, syncNow, unsyncedCount } from '$lib/sync/sync.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { sync, syncNow, unsyncedCount } from '#lib/sync/sync.svelte.js';
   import { LoaderCircleIcon, TriangleAlertIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 

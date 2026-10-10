@@ -15,21 +15,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
-  import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
-  import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
-  import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import AccountSync from '$lib/components/sync/AccountSync.svelte';
+  import { PUBLIC_MICROSOFT_CLARITY_ID } from '$app/env/public';
+  import DialogProvider from '#lib/components/modals/DialogProvider.svelte';
+  import LegacyMigrationError from '#lib/components/modals/LegacyMigrationError.svelte';
+  import ToastProvider from '#lib/components/ToastProvider.svelte';
+  import AccountSync from '#lib/components/sync/AccountSync.svelte';
   import {
     consentToMSClarityCookies,
     dialog,
     drawerState,
     toast,
     handleKeyDown,
-  } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
-  import { privacy } from '$lib/utils/privacy-utils.svelte';
+  } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { initializeLocalStorage } from '#lib/storage/storage-utils.svelte.js';
+  import { privacy } from '#lib/utils/privacy-utils.svelte.js';
   import { onMount, type Snippet } from 'svelte';
   // Fonts are served from this site, so pages load nothing from font services
   import '@fontsource/be-vietnam-pro/300.css';
@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import '@fontsource/be-vietnam-pro/700-italic.css';
   import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
-  import { ICONS } from '$lib/constants/icon-constants';
+  import { ICONS } from '#lib/constants/icon-constants.js';
 
   interface Props {
     children?: Snippet;
@@ -70,15 +70,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     privacy.init();
   });
 
-  beforeNavigate(() => {
+  beforeNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     dialog.close();
   });
 
-  afterNavigate(() => {
+  afterNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     drawerState.closeAll();
   });
 
   onNavigate((navigation) => {
+    if (navigation.shallow && navigation.type === 'goto') return;
     if (!document.startViewTransition) return;
 
     return new Promise((resolve) => {

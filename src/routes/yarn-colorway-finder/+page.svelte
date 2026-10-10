@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import type { ColorwaySort } from '$lib/components/yarn-colorways/colorway-utils';
+  import type { ColorwaySort } from '#lib/components/yarn-colorways/colorway-utils.js';
 
   class YarnColorwayFinderState {
     selectedBrandId = $state('');
@@ -32,18 +32,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import { browser, version } from '$app/environment';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
-  import Footer from '$lib/components/Footer.svelte';
-  import ColorSearchField from '$lib/components/ColorSearchField.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
-  import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
-  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
-  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
+  import { browser, version } from '$app/env';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import ColorSearchField from '#lib/components/ColorSearchField.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import ColorwayCards from '#lib/components/yarn-colorways/ColorwayCards.svelte';
+  import ColorwayRows from '#lib/components/yarn-colorways/ColorwayRows.svelte';
+  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import {
     canReverse,
     closeMatches,
@@ -51,24 +51,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     defaultColorwaySort,
     isColorwaySort,
     sortColorways,
-  } from '$lib/components/yarn-colorways/colorway-utils';
-  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
-  import Share from '$lib/components/Share.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import YarnSources from '$lib/components/YarnSources.svelte';
-  import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
+  } from '#lib/components/yarn-colorways/colorway-utils.js';
+  import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
+  import Share from '#lib/components/Share.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import YarnSources from '#lib/components/YarnSources.svelte';
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import {
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
-  } from '$lib/constants/color-constants';
+  } from '#lib/constants/color-constants.js';
   import {
     ensureYarnData,
     getBrands,
     getColorwaysWithAffiliateLinks,
-  } from '$lib/data/yarns/colorways.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import type { Color, YarnWeight } from '$lib/types/yarn-types';
-  import { pluralize } from '$lib/utils/string-utils';
+  } from '#lib/data/yarns/colorways.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import type { Color, YarnWeight } from '#lib/types/yarn-types.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     ChevronDownIcon,
     CircleQuestionMarkIcon,
@@ -383,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             d="M6 18L18 6M6 6l12 12"
-                          />
+                          ></path>
                         </svg>
                       </button>
                     {/if}
@@ -440,9 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <button
                   class="btn rounded-container bg-primary-200-800 mb-2"
                   onclick={() => (itemsToShow += YARN_COLORWAYS_PER_PAGE)}
-                >
-                  <PlusIcon />
-                  Show More</button
+                  ><PlusIcon />Show More</button
                 >
               </div>
             {/if}

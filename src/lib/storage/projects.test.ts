@@ -49,16 +49,16 @@ const vi_mockWeather = vi.hoisted(() => ({
   setRawData: (() => {}) as (data: unknown[]) => void,
 }));
 
-vi.mock('$lib/state/project-state.svelte', () => ({
+vi.mock('#lib/state/project-state.svelte.js', () => ({
   project: vi_mockProject,
 }));
 
-vi.mock('$lib/state/weather-state.svelte', () => ({
+vi.mock('#lib/state/weather-state.svelte.js', () => ({
   weather: vi_mockWeather,
   getMoonPhase: vi.fn(() => 0),
 }));
 
-vi.mock('$lib/state/location-state.svelte', () => ({
+vi.mock('#lib/state/location-state.svelte.js', () => ({
   locations: {
     projectTitle: 'Test Project',
     all: [],
@@ -66,7 +66,7 @@ vi.mock('$lib/state/location-state.svelte', () => ({
   },
 }));
 
-vi.mock('$lib/utils/date-utils', () => ({
+vi.mock('#lib/utils/date-utils.js', () => ({
   dateToISO8601String: vi.fn((d) => d.toISOString().split('T')[0]),
   stringToDate: vi.fn((s) => new Date(s)),
   formatDateTime: vi.fn(() => '1/1/2026 at 12:00 PM'),

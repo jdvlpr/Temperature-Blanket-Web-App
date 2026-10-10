@@ -12,9 +12,9 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
+import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$app/env/private';
 
-import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$env/static/private';
-import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
+import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -35,6 +35,7 @@ export const POST: RequestHandler = async function ({ fetch, request }) {
       body: JSON.stringify(data), // body data type must match "Content-Type" header
     },
   );
+
   const response = await postRequest.json();
   return json(response);
 };

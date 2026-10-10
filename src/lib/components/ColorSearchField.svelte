@@ -20,10 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   dialog, unless `onphoto` handles it (e.g. inside a dialog already).
 -->
 <script lang="ts">
-  import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { getTextColor } from '$lib/utils/color-utils';
-  import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  import PickColorFromImage from '#lib/components/modals/PickColorFromImage.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { getTextColor } from '#lib/utils/color-utils.js';
+  import { iconColorOn } from '#lib/components/yarn-colorways/colorway-utils.js';
   import { ImageIcon, PipetteIcon, XIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
   import { untrack } from 'svelte';

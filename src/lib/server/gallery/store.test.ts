@@ -1,4 +1,4 @@
-import { createTestD1 } from '$lib/server/test-d1';
+import { createTestD1 } from '#lib/server/test-d1.js';
 import { describe, expect, it } from 'vitest';
 import {
   ensurePublicId,

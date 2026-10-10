@@ -14,17 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import { ICONS } from '$lib/constants/icon-constants';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import { ICONS } from '#lib/constants/icon-constants.js';
 </script>
 
 <svelte:head>
   <title>Received Yarn Suggestion</title>
+
   <meta name="description" content="Thanks for your yarn search request." />
 
   <meta property="og:title" content="Recieved Yarn Suggestion" />
+
   <meta
     property="og:description"
     content="Thanks for your yarn search request."

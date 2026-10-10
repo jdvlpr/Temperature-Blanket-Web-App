@@ -1,6 +1,6 @@
-import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-import type { Brand } from '$lib/types/yarn-types';
-import { pluralize } from '$lib/utils/string-utils';
+import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
+import type { Brand } from '#lib/types/yarn-types.js';
+import { pluralize } from '#lib/utils/string-utils.js';
 
 /**
  * The yarn picker's list: each brand, then its yarns. Picking a brand picks

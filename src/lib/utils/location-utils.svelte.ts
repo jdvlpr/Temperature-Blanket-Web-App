@@ -16,7 +16,7 @@
 import type {
   GeoNamesSearchResult,
   LocationSuggestion,
-} from '$lib/types/location-types';
+} from '#lib/types/location-types.js';
 
 export const formatFeatureName = (fclName: string): string => {
   let _featureName = fclName;

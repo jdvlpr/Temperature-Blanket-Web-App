@@ -14,23 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
-  import type { Color } from '$lib/types/yarn-types';
-  import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
-  import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
-  import SeasonEditor from '$lib/components/SeasonEditor.svelte';
-  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
-  import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { withExtraColorDetails } from '#lib/utils/extra-colors-utils.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import NumberInputButton from '#lib/components/buttons/NumberInputButton.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import ToggleSwitchGroup from '#lib/components/buttons/ToggleSwitchGroup.svelte';
+  import ChangeColor from '#lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '#lib/components/PreviewInfo.svelte';
+  import SeasonEditor from '#lib/components/SeasonEditor.svelte';
+  import SpanYarnColorSelectIcon from '#lib/components/SpanYarnColorSelectIcon.svelte';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { capitalizeFirstLetter } from '#lib/utils/other-utils.js';
+  import { formatDateRange } from '#lib/utils/seasons-utils.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { PencilIcon } from '@lucide/svelte';
   import Preview from './Preview.svelte';
   import { rowsPreview } from './state.svelte';

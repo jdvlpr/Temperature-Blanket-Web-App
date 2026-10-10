@@ -14,34 +14,34 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import WeatherChart from '$lib/components/WeatherChart.svelte';
-  import WeatherItem from '$lib/components/WeatherItem.svelte';
-  import WeatherNavigator from '$lib/components/WeatherNavigator.svelte';
-  import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import ToggleWeatherData from '$lib/components/buttons/ToggleWeatherData.svelte';
-  import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import WeatherChart from '#lib/components/WeatherChart.svelte';
+  import WeatherItem from '#lib/components/WeatherItem.svelte';
+  import WeatherNavigator from '#lib/components/WeatherNavigator.svelte';
+  import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
+  import ToggleWeatherData from '#lib/components/buttons/ToggleWeatherData.svelte';
+  import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
   import {
     DAYS_OF_THE_WEEK,
     METEOSTAT_DELAY_DAYS,
     MONTHS,
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
-  } from '$lib/constants/weather-constants';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { convertTime } from '$lib/utils/unit-utils.svelte';
-  import { displayNumber, getAverage } from '$lib/utils/number-utils';
-  import { isDateWithinLastSevenDays } from '$lib/utils/date-utils';
-  import { pluralize } from '$lib/utils/string-utils';
+  } from '#lib/constants/weather-constants.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { convertTime } from '#lib/utils/unit-utils.svelte.js';
+  import { displayNumber, getAverage } from '#lib/utils/number-utils.js';
+  import { isDateWithinLastSevenDays } from '#lib/utils/date-utils.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { CloudAlert, TriangleAlertIcon } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import UnitMenu from '$lib/components/buttons/UnitMenu.svelte';
+  import UnitMenu from '#lib/components/buttons/UnitMenu.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { getBrands } from '$lib/data/yarns/colorways.svelte';
-  import type { YarnWeight } from '$lib/types/yarn-types';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
+  import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
+  import type { YarnWeight } from '#lib/types/yarn-types.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { CircleQuestionMarkIcon, SpoolIcon } from '@lucide/svelte';
 
   interface Props {

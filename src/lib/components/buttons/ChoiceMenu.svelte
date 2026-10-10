@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License along with Tem
     menuContentClass,
     menuItemClass,
     menuTriggerClass,
-  } from '$lib/components/menu-styles';
+  } from '#lib/components/menu-styles.js';
   import { CheckIcon, ChevronDownIcon } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import type { Component } from 'svelte';

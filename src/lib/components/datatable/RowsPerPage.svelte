@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { weather } from '$lib/state/weather-state.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import type { TableHandler } from '@vincjo/datatables';
 
   interface Props {

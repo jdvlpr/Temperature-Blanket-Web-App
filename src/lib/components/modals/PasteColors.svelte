@@ -14,17 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_COOLORS_LINK } from '$env/static/public';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import { readPastedColors } from '$lib/utils/color-utils';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { PUBLIC_COOLORS_LINK } from '$app/env/public';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { readPastedColors } from '#lib/utils/color-utils.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { onMount } from 'svelte';
 
   let {

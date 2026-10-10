@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
-  import { THEMES } from '$lib/constants/page-constants';
-  import { previews } from '$lib/state/preview-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import { browser } from '$app/env';
+  import { THEMES } from '#lib/constants/page-constants.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { onDestroy, onMount, tick } from 'svelte';
 
   let theme = $state(

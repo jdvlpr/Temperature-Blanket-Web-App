@@ -23,8 +23,8 @@ export const prerender = false;
 const NO_STORE = { 'Cache-Control': 'no-store' };
 
 export const GET: RequestHandler = async (event) => {
-  const { requireSync } = await import('$lib/server/sync');
-  const { listTrash } = await import('$lib/server/sync/store');
+  const { requireSync } = await import('#lib/server/sync/index.js');
+  const { listTrash } = await import('#lib/server/sync/store.js');
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;
 
@@ -34,8 +34,8 @@ export const GET: RequestHandler = async (event) => {
 
 /** Empty Trash: deletes everything in it forever, in one request. */
 export const DELETE: RequestHandler = async (event) => {
-  const { requireSync } = await import('$lib/server/sync');
-  const { purgeTrash } = await import('$lib/server/sync/store');
+  const { requireSync } = await import('#lib/server/sync/index.js');
+  const { purgeTrash } = await import('#lib/server/sync/store.js');
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;
 

@@ -14,14 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import ExportToGoogleSheetModal from '$lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
+  import ExportToGoogleSheetModal from '#lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
   import {
     downloadPDF,
     downloadWeatherCSV,
-  } from '$lib/utils/project-utils.svelte';
-  import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
+  } from '#lib/utils/project-utils.svelte.js';
+  import { downloadPreviewPNG } from '#lib/utils/preview-utils.svelte.js';
   import {
     ChevronDownIcon,
     DownloadIcon,

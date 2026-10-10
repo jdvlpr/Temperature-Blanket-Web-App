@@ -18,27 +18,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   its settings beside it (below it on phones) and its actions at the bottom.
 -->
 <script lang="ts">
-  import CopyIcon from '$lib/components/CopyIcon.svelte';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { Flash } from '$lib/utils/feedback.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { Flash } from '#lib/utils/feedback.svelte.js';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
   import {
     DEFAULT_PALETTE_IMAGE_SETTINGS,
     rangeToText,
     type PaletteImageLabels,
     type PaletteImageRange,
     type PaletteImageSettings,
-  } from '$lib/features/palette-image/layout';
+  } from '#lib/features/palette-image/layout.js';
   import {
     canvasToBlob,
     loadPaletteImageFonts,
     renderPaletteImage,
-  } from '$lib/features/palette-image/render';
-  import { toast } from '$lib/state/page-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
-  import type { Color } from '$lib/types/yarn-types';
+  } from '#lib/features/palette-image/render.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     DownloadIcon,
     LayoutGridIcon,

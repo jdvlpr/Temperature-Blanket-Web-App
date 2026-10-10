@@ -1,29 +1,29 @@
-import { browser } from '$app/environment';
-import { account } from '$lib/accounts/summary.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { LocationType } from '$lib/types/location-types';
+import { browser } from '$app/env';
+import { account } from '#lib/accounts/summary.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { LocationType } from '#lib/types/location-types.js';
 import type {
   WeatherDay,
   WeatherSourceOptions,
   TISO8601DateString,
-} from '$lib/types/weather-types';
+} from '#lib/types/weather-types.js';
 import {
   dateToISO8601String,
   formatDateTime,
   numberOfDays,
   stringToDate,
-} from '$lib/utils/date-utils';
-import { getMoonPhase } from '$lib/state/weather-state.svelte';
-import { projectCreatedAtTime } from '$lib/utils/project-id-utils';
-import { cleanName } from '$lib/utils/string-utils';
+} from '#lib/utils/date-utils.js';
+import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
+import { projectCreatedAtTime } from '#lib/utils/project-id-utils.js';
+import { cleanName } from '#lib/utils/string-utils.js';
 import type {
   AccountSyncState,
   LocalStore,
   ProjectSyncState,
-} from '$lib/sync/engine';
-import { unchangedSince } from '$lib/sync/seen';
+} from '#lib/sync/engine.js';
+import { unchangedSince } from '#lib/sync/seen.js';
 import { del, get, set, update } from 'idb-keyval';
 import { trashCutoff } from './trash';
 
@@ -189,10 +189,11 @@ export class ProjectStorage {
     id,
     localProject,
     toAccount = true,
+
+    /** false: it stays where it is, only in this browser if it is now */
   }: {
     id?: string | null;
     localProject?: StoredProject | null;
-    /** false: it stays where it is, only in this browser if it is now */
     toAccount?: boolean;
   } = {}): Promise<StoredProjectIndexItem | null> {
     if (!browser) return null;

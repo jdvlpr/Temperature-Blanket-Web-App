@@ -18,15 +18,15 @@ and device, after signing in, and again whenever someone asks to add projects
 (`later`). Saved palettes go along unless someone chooses otherwise. -->
 
 <script lang="ts">
-  import { ROW_FOCUS } from '$lib/constants/class-constants';
-  import ProjectDetails from '$lib/components/ProjectDetails.svelte';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { ROW_FOCUS } from '#lib/constants/class-constants.js';
+  import ProjectDetails from '#lib/components/ProjectDetails.svelte';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import {
     ProjectStorage,
     type StoredProjectIndexItem,
-  } from '$lib/storage/projects.svelte';
-  import { sync } from '$lib/sync/status.svelte';
-  import { addToAccount, markImportAsked } from '$lib/sync/sync.svelte';
+  } from '#lib/storage/projects.svelte.js';
+  import { sync } from '#lib/sync/status.svelte.js';
+  import { addToAccount, markImportAsked } from '#lib/sync/sync.svelte.js';
   import {
     ChevronRightIcon,
     ClockIcon,

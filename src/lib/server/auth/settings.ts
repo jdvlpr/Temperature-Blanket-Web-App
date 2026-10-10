@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { emailConfigProblem, type EmailEnv } from '$lib/server/email';
+import { emailConfigProblem, type EmailEnv } from '#lib/server/email/index.js';
 import type { AuthConfig } from './options';
 
 /** Where the app's own settings for accounts come from (platform.env on Cloudflare). */

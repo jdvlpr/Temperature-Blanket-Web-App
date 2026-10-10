@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { GaugeRangeOptions } from '$lib/types/gauge-types';
-import type { Color } from '$lib/types/yarn-types';
-import { displayNumber } from '$lib/utils/number-utils';
+import type { GaugeRangeOptions } from '#lib/types/gauge-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
 import { describe, expect, it } from 'vitest';
 import { isValueInRange } from './range-utils.svelte';
 import {

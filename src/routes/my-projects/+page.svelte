@@ -17,29 +17,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 and the Trash sync to the account, and palettes can be shared to the gallery. -->
 
 <script>
-  import { LIST_ENDS } from '$lib/constants/class-constants';
-  import { browser } from '$app/environment';
+  import { LIST_ENDS } from '#lib/constants/class-constants.js';
+  import { browser } from '$app/env';
   import { resolve } from '$app/paths';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import { account } from '$lib/accounts/summary.svelte';
-  import { getGalleryPages } from '$lib/accounts/gallery';
-  import { sync } from '$lib/sync/status.svelte';
-  import GalleryPages from '$lib/components/account/GalleryPages.svelte';
-  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
-  import LocalProjects from '$lib/components/LocalProjects.svelte';
-  import SavedPalettes from '$lib/components/SavedPalettes.svelte';
-  import SharePalette from '$lib/components/modals/SharePalette.svelte';
-  import Trash from '$lib/components/Trash.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { savedPalettes } from '$lib/storage/palettes.svelte';
-  import { savedProjects } from '$lib/storage/projects.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import { getGalleryPages } from '#lib/accounts/gallery.js';
+  import { sync } from '#lib/sync/status.svelte.js';
+  import GalleryPages from '#lib/components/account/GalleryPages.svelte';
+  import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
+  import LocalProjects from '#lib/components/LocalProjects.svelte';
+  import SavedPalettes from '#lib/components/SavedPalettes.svelte';
+  import SharePalette from '#lib/components/modals/SharePalette.svelte';
+  import Trash from '#lib/components/Trash.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { savedPalettes } from '#lib/storage/palettes.svelte.js';
+  import { savedProjects } from '#lib/storage/projects.svelte.js';
   import {
     accountTrash,
     loadProjectTrash,
     refreshAccountTrash,
-  } from '$lib/storage/account-trash.svelte';
+  } from '#lib/storage/account-trash.svelte.js';
   import { onMount } from 'svelte';
   import { LogInIcon, PlusIcon, Trash2Icon } from '@lucide/svelte';
 
@@ -76,6 +76,7 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
     void savedProjects.version;
     void accountTrash.list;
     void account.summary?.id;
+
     if (browser)
       loadProjectTrash().then((trash) => (trashedProjectCount = trash.length));
   });
@@ -108,8 +109,8 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
     >
       <p class="text-surface-700-300 text-center text-sm">
         {#if synced}
-          Your projects and yarn palettes are saved to your account and
-          show up on every device where you're signed in.
+          Your projects and yarn palettes are saved to your account and show up
+          on every device where you're signed in.
         {:else}
           Your saved projects and yarn palettes are stored in this browser, so
           they won't show up on other devices. If this browser's site data is
@@ -123,13 +124,12 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
           class="bg-surface-100-900 rounded-container flex flex-col items-center gap-3 p-4 text-center"
         >
           <p class="text-sm">
-            Sign in to keep your
-            projects and yarn palettes on all your devices.
+            Sign in to keep your projects and yarn palettes on all your devices.
           </p>
-          <a href={resolve('/account')} class="btn preset-filled-primary-500">
-            <LogInIcon />
-            Sign In
-          </a>
+
+          <a href={resolve('account')} class="btn preset-filled-primary-500"
+            ><LogInIcon />Sign In</a
+          >
         </div>
       {/if}
 
@@ -154,10 +154,9 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
       <section class="flex flex-col gap-2" aria-labelledby="palettes">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 id="palettes" class="h3">My Yarn Palettes</h2>
-          <a href={resolve('/yarn')} class="btn hover:preset-tonal-surface">
-            <PlusIcon />
-            New Palette
-          </a>
+          <a href={resolve('yarn')} class="btn hover:preset-tonal-surface"
+            ><PlusIcon />New Palette</a
+          >
         </div>
         {#if browser}
           {#if synced}

@@ -9,7 +9,7 @@ name with sr-only, give it a title, and name the choice in the control's label
 Whatever still doesn't fit scrolls sideways, keeping the chosen option in view. -->
 
 <script lang="ts">
-  import { motion } from '$lib/utils/feedback.svelte';
+  import { motion } from '#lib/utils/feedback.svelte.js';
   import type { Snippet } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
 

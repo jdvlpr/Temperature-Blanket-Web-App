@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     initialsFor,
     type AccountSummary,
-  } from '$lib/accounts/summary.svelte';
+  } from '#lib/accounts/summary.svelte.js';
 
   let {
     summary,

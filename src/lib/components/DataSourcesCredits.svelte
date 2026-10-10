@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 Documentation's Data Sources & Credits section (the Project menu links there). -->
 
 <script lang="ts">
-  import YarnSources from '$lib/components/YarnSources.svelte';
+  import YarnSources from '#lib/components/YarnSources.svelte';
 </script>
 
 <div class="flex w-full flex-col items-start gap-2">

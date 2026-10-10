@@ -13,31 +13,31 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
 import {
   RainGauge,
   gaugeAttributes as rainGaugeAttributes,
-} from '$lib/state/gauges/rain-gauge-state.svelte';
+} from '#lib/state/gauges/rain-gauge-state.svelte.js';
 import {
   SnowGauge,
   gaugeAttributes as snowGaugeAttributes,
-} from '$lib/state/gauges/snow-gauge-state.svelte';
+} from '#lib/state/gauges/snow-gauge-state.svelte.js';
 import {
   TemperatureGauge,
   gaugeAttributes as tempGaugeAttributes,
-} from '$lib/state/gauges/temperature-gauge-state.svelte';
+} from '#lib/state/gauges/temperature-gauge-state.svelte.js';
 import {
   DayTimeGauge,
   gaugeAttributes as daytGaugeAttributes,
-} from '$lib/state/gauges/daytime-gauge-state.svelte';
+} from '#lib/state/gauges/daytime-gauge-state.svelte.js';
 import type {
   GaugeAttributes,
   GaugeRange,
   GaugeRangeCategory,
   GaugeStateInterface,
-} from '$lib/types/gauge-types';
-import { colorsToYarnDetails } from '$lib/utils/color-utils';
-import { displayNumber } from '$lib/utils/number-utils';
+} from '#lib/types/gauge-types.js';
+import { colorsToYarnDetails } from '#lib/utils/color-utils.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
 import {
   MoonPhaseGauge,
   gaugeAttributes as moonGaugeAttributes,
@@ -250,4 +250,4 @@ export {
   getWPGauge,
   getTargetParentGaugeId,
   getSchemeName,
-} from '$lib/utils/gauge-utils.svelte';
+} from '#lib/utils/gauge-utils.svelte.js';

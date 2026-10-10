@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
   import Globe from './Globe.svelte';
 </script>
 
@@ -26,7 +26,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Explore temperature blanket projects on a 3D map of the earth"
   />
+
   <meta property="og:title" content="Temperature Blanket Globe" />
+
   <meta
     property="og:description"
     content="Explore temperature blanket projects on a 3D map of the earth"

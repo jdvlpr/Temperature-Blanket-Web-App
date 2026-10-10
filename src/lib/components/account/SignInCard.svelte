@@ -27,10 +27,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     signInWithProvider,
     type AccountUser,
     type SignInProvider,
-  } from '$lib/accounts/client';
-  import { rememberAccountSummary } from '$lib/accounts/summary.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { toast } from '$lib/state/page-state.svelte';
+  } from '#lib/accounts/client.js';
+  import { rememberAccountSummary } from '#lib/accounts/summary.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
   import {
     ArrowLeftIcon,
     LoaderCircleIcon,
@@ -213,7 +213,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Email me a code
         </button>
         <p class="text-center text-sm opacity-80">
-          You don't need a password for this web app. Instead, you'll be emailed sign-in codes.
+          You don't need a password for this web app. Instead, you'll be emailed
+          sign-in codes.
         </p>
       </form>
     </div>

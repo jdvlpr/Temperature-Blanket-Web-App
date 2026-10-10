@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import NumberInput from '$lib/components/modals/NumberInput.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import NumberInput from '#lib/components/modals/NumberInput.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { RulerIcon } from '@lucide/svelte';
   import type { Component } from 'svelte';
 

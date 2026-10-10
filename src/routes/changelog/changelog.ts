@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { PUBLIC_GITHUB_LINK } from '$env/static/public';
-import { ICONS } from '$lib/constants/icon-constants';
-import type { ChangelogItemGroup } from '$lib/types/page-types';
+import { PUBLIC_GITHUB_LINK } from '$app/env/public';
+import { ICONS } from '#lib/constants/icon-constants.js';
+import type { ChangelogItemGroup } from '#lib/types/page-types.js';
 import {
   CloudCogIcon,
   FileTextIcon,
@@ -59,6 +59,7 @@ export const entries: ChangelogItemGroup[] = [
                 },
               ]
             : []),
+
           {
             notes: [
               {

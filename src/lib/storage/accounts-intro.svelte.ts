@@ -19,8 +19,8 @@
 
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { account } from '$lib/accounts/summary.svelte';
-import { toast } from '$lib/state/page-state.svelte';
+import { account } from '#lib/accounts/summary.svelte.js';
+import { toast } from '#lib/state/page-state.svelte.js';
 
 const KEY = 'accounts_intro';
 
@@ -90,10 +90,7 @@ class AccountsIntro {
       category: 'info',
       // Stays until dismissed, so there's time to read it and choose
       autohide: false,
-      action: {
-        label: 'Sign In',
-        response: () => goto(resolve('/account')),
-      },
+      action: { label: 'Sign In', response: () => goto(resolve('account')) },
     });
   }
 }

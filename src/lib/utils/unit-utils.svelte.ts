@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { WEATHER_DATA_DECIMALS } from '$lib/constants/weather-constants';
-import { windowLanguage } from '$lib/state/page-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { Unit } from '$lib/types/weather-types';
-import { displayNumber } from '$lib/utils/number-utils';
-import { exists } from '$lib/utils/other-utils';
-import { pluralize } from '$lib/utils/string-utils';
+import { WEATHER_DATA_DECIMALS } from '#lib/constants/weather-constants.js';
+import { windowLanguage } from '#lib/state/page-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { Unit } from '#lib/types/weather-types.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
+import { exists } from '#lib/utils/other-utils.js';
+import { pluralize } from '#lib/utils/string-utils.js';
 /**
  * [description]
  */

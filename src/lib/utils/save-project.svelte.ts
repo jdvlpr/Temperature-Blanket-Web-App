@@ -16,14 +16,14 @@
 // Saving from the top bar (and Ctrl+S): right away, with a toast to say where
 // it went. There's no Save dialog; the Project menu has the rest.
 
-import { openProjectMenu, toast } from '$lib/state/page-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
+import { openProjectMenu, toast } from '#lib/state/page-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
 import {
   autosave,
   saveNow,
   saveOpenProject,
-} from '$lib/storage/autosave.svelte';
-import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
+} from '#lib/storage/autosave.svelte.js';
+import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
 
 /** Saves the open project; returns whether it saved. */
 export async function saveProject(): Promise<boolean> {

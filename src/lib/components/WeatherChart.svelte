@@ -15,14 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
   import { browser } from '$app/environment';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { Chart, registerChartJS } from '$lib/features/charts/chartjs-setup';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import {
+    Chart,
+    registerChartJS,
+  } from '#lib/features/charts/chartjs-setup.js';
   import {
     buildXAxis,
     buildYAxis,
     buildY2Axis,
-  } from '$lib/features/charts/axis-theme';
+  } from '#lib/features/charts/axis-theme.js';
 
   registerChartJS();
 

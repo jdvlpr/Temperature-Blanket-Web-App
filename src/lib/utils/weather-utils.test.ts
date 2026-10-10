@@ -9,7 +9,7 @@ const { mockAllGaugesAttributes } = vi.hoisted(() => ({
   mockAllGaugesAttributes: [] as any[],
 }));
 
-vi.mock('$lib/state/gauges-state.svelte', () => ({
+vi.mock('#lib/state/gauges-state.svelte.js', () => ({
   allGaugesAttributes: mockAllGaugesAttributes,
 }));
 

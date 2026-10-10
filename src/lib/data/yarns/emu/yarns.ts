@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as classicDk } from './classic-dk/yarn';
 
 export const brand: Brand = {

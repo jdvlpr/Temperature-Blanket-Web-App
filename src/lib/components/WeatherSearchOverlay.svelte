@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { weatherSearch } from '$lib/state/weather-search.svelte';
-  import { motionDuration } from '$lib/utils/feedback.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
+  import { motionDuration } from '#lib/utils/feedback.svelte.js';
   import { ArrowLeftIcon, CloudOffIcon, XIcon } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onDestroy, tick } from 'svelte';

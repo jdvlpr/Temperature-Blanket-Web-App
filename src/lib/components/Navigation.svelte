@@ -18,8 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pageSections,
     showNavigationSideBar,
     goToProjectSection,
-  } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import { onMount } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 

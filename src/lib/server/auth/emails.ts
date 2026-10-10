@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { EmailMessage } from '$lib/server/email';
+import type { EmailMessage } from '#lib/server/email/index.js';
 import type { SignInCodePurpose } from './options';
 
 // Stripes like a temperature blanket, in the logo's colors

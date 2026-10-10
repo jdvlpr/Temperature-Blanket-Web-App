@@ -14,15 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
-  import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import NumberInputButton from '#lib/components/buttons/NumberInputButton.svelte';
+  import DataTable from '#lib/components/datatable/DataTable.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import PreviewInfo from '#lib/components/PreviewInfo.svelte';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { capitalizeFirstLetter } from '#lib/utils/other-utils.js';
   import { DownloadIcon } from '@lucide/svelte';
   import { TableHandler } from '@vincjo/datatables';
   import Preview from './Preview.svelte';

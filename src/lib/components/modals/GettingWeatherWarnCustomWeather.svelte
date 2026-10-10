@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { weatherSearch } from '$lib/state/weather-search.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
 
   interface Props {
     /** Runs if the search is cancelled or fails */

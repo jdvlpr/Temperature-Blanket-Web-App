@@ -19,17 +19,17 @@
 // and projects only in this browser are never added to the account without
 // asking (see addOpenProjectToAccount).
 
-import { replaceState } from '$app/navigation';
-import { account } from '$lib/accounts/summary.svelte';
-import { project } from '$lib/state/project-state.svelte';
+import { goto } from '$app/navigation';
+import { account } from '#lib/accounts/summary.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
 import {
   lastSavedAt,
   MAX_SAVED_PROJECT_NAME_LENGTH,
   ProjectStorage,
   type StoredProjectIndexItem,
-} from '$lib/storage/projects.svelte';
-import { sync } from '$lib/sync/status.svelte';
-import { newProjectId } from '$lib/utils/project-id-utils';
+} from '#lib/storage/projects.svelte.js';
+import { sync } from '#lib/sync/status.svelte.js';
+import { newProjectId } from '#lib/utils/project-id-utils.js';
 
 /** Saves this long after the last change */
 export const IDLE_MS = 2000;
@@ -130,9 +130,8 @@ async function refresh() {
     clearTimeout(timer);
     autosave.state = 'conflict';
     project.status.saved = false;
-  }
-  // Nothing waiting: leaving the page loses nothing
-  else if (autosave.state === 'saved') project.status.saved = true;
+  } else // Nothing waiting: leaving the page loses nothing
+  if (autosave.state === 'saved') project.status.saved = true;
 }
 
 async function rememberStored() {
@@ -213,7 +212,7 @@ export async function saveNow() {
     try {
       // As Save does: the address bar holds the saved project
       // eslint-disable-next-line svelte/no-navigation-without-resolve
-      replaceState(new URL(href), '');
+      goto(new URL(href), { shallow: true, replace: true, state: '' });
       // Where it is: one only in this browser stays there
       await ProjectStorage.save({ toAccount: false });
       await rememberStored();
@@ -274,7 +273,7 @@ export async function addOpenProjectToAccount() {
   if (!id || !userId) return;
   // Waiting changes go in first, so what's added is what's here
   await saveNow();
-  const { addToAccount } = await import('$lib/sync/sync.svelte');
+  const { addToAccount } = await import('#lib/sync/sync.svelte.js');
   await addToAccount(userId, [id]);
   await rememberStored();
   await refresh();
@@ -295,7 +294,7 @@ export async function saveOpenProject() {
   }
 
   // eslint-disable-next-line svelte/no-navigation-without-resolve
-  replaceState(new URL(project.url.href), '');
+  goto(new URL(project.url.href), { shallow: true, replace: true, state: '' });
   try {
     const item = await ProjectStorage.save();
     project.status.saved = true;
@@ -324,7 +323,7 @@ export async function saveCopy() {
   project.id = newProjectId();
   project.createdAt = new Date().toISOString();
   // eslint-disable-next-line svelte/no-navigation-without-resolve
-  replaceState(new URL(project.url.href), '');
+  goto(new URL(project.url.href), { shallow: true, replace: true, state: '' });
   let item = await ProjectStorage.save();
   // The copy says so, unnamed too (from its title), so the two don't look the
   // same on My Projects

@@ -19,12 +19,13 @@ Project menu. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { account } from '$lib/accounts/summary.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
   import {
     addOpenProjectToAccount,
     autosave,
-  } from '$lib/storage/autosave.svelte';
+  } from '#lib/storage/autosave.svelte.js';
+
   import {
     CloudCheckIcon,
     CloudUploadIcon,
@@ -98,10 +99,9 @@ Project menu. -->
         Add to Account
       </button>
     {:else}
-      <a href={resolve('/account')} class="btn preset-tonal-primary self-start">
-        <LogInIcon />
-        Sign In
-      </a>
+      <a href={resolve('account')} class="btn preset-tonal-primary self-start"
+        ><LogInIcon />Sign In</a
+      >
     {/if}
   {/if}
 </div>

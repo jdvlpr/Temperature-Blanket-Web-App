@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_KOFI_LINK } from '$env/static/public';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { PUBLIC_KOFI_LINK } from '$app/env/public';
+  import { dialog } from '#lib/state/page-state.svelte.js';
 </script>
 
 <div class="flex flex-col gap-4 p-4">

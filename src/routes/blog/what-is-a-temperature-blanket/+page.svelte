@@ -14,11 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
-  import { getColorsFromInput, getTextColor } from '$lib/utils/color-utils';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
+  import { getColorsFromInput, getTextColor } from '#lib/utils/color-utils.js';
   import { ArrowLeftIcon } from '@lucide/svelte';
 
   const colorsCode = `palette:ca2c29a4435b46203cea9d5deec06697b2dc5ea1de3271c51838971a2d46yarn:hobbii-amigo`;
@@ -46,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <meta property="og:title" content="What is a Temperature Blanket?" />
+
   <meta
     property="og:description"
     content="Find out more about beautiful and creative yarn projects based on weather data."

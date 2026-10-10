@@ -14,19 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  import { alignIconInk } from '$lib/state/attachments/align-icon-ink';
+  import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   let openedNavigationItems = $state(['tools', 'explore']);
 </script>
 
 <script>
-  import { version } from '$app/environment';
+  import { version } from '$app/env';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { PUBLIC_GITHUB_LINK } from '$env/static/public';
-  import PreferencesDialog from '$lib/components/modals/PreferencesDialog.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
+  import { PUBLIC_GITHUB_LINK } from '$app/env/public';
+  import PreferencesDialog from '#lib/components/modals/PreferencesDialog.svelte';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,
@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <a
-    href={resolve('/my-projects')}
+    href={resolve('my-projects')}
     class={[
       'btn hover:preset-tonal-surface w-fit',
       page.url.pathname === '/my-projects' && 'preset-tonal-secondary',

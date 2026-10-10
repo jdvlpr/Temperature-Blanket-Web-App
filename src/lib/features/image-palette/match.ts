@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { Color } from '$lib/types/yarn-types';
+import type { Color } from '#lib/types/yarn-types.js';
 import chroma from 'chroma-js';
 import { hexToOklab } from './color-space';
 

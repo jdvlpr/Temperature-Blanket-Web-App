@@ -14,17 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import type { StoredProject } from '$lib/storage/projects.svelte';
-  import CopyIcon from '$lib/components/CopyIcon.svelte';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { Flash } from '$lib/utils/feedback.svelte';
-  import { convertTime } from '$lib/utils/unit-utils.svelte';
-  import { exists } from '$lib/utils/other-utils';
-  import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+  import { allGaugesAttributes } from '#lib/state/gauges-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import type { StoredProject } from '#lib/storage/projects.svelte.js';
+  import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { Flash } from '#lib/utils/feedback.svelte.js';
+  import { convertTime } from '#lib/utils/unit-utils.svelte.js';
+  import { exists } from '#lib/utils/other-utils.js';
+  import { getProjectParametersFromURLHash } from '#lib/utils/project-utils.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { DownloadIcon, TriangleAlertIcon } from '@lucide/svelte';
 
   let { uid, error } = $props();

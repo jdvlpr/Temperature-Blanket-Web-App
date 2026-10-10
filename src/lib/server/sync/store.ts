@@ -19,19 +19,19 @@
 // copy for TRASH_DAYS (the Trash). Saved palettes are small, so they live in D1
 // (migrations/0006_trash_and_palettes.sql) and share the revision counter.
 
-import { trashCutoff } from '$lib/storage/trash';
+import { trashCutoff } from '#lib/storage/trash.js';
 import type {
   ChangesResponse,
   PaletteInput,
   PaletteRecord,
   ProjectMeta,
   TrashedProjectMeta,
-} from '$lib/sync/protocol';
+} from '#lib/sync/protocol.js';
 import {
   mergePreferences,
   type PreferencesRecord,
   type PreferencesUpload,
-} from '$lib/sync/preferences';
+} from '#lib/sync/preferences.js';
 import type {
   D1Database,
   R2Bucket,

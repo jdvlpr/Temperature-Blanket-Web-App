@@ -14,16 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
-  import Footer from '$lib/components/Footer.svelte';
-  import Gauge from '$lib/components/Gauge.svelte';
-  import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
-  import YarnSources from '$lib/components/YarnSources.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { stringToColors, yarnDetailsToColors } from '$lib/utils/color-utils';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import Gauge from '#lib/components/Gauge.svelte';
+  import GaugeCustomizer from '#lib/components/GaugeCustomizer.svelte';
+  import YarnSources from '#lib/components/YarnSources.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import {
+    stringToColors,
+    yarnDetailsToColors,
+  } from '#lib/utils/color-utils.js';
   import { onMount } from 'svelte';
   import { yarnPageState } from './state.svelte';
 

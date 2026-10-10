@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { page } from '$app/state';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
 </script>
 
 <AppShell pageName="Error">

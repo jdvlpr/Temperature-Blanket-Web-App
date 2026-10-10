@@ -15,7 +15,7 @@
 
 // What goes in a project's PDF, and how it looks
 
-import type { WeatherParam } from '$lib/types/gauge-types';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
 
 export const PDF_PAGE_SIZES = ['a4', 'letter'] as const;
 export type PdfPageSize = (typeof PDF_PAGE_SIZES)[number];

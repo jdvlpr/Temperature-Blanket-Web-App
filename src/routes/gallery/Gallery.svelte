@@ -14,20 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
-  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
-  import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
-  import { previews } from '$lib/state/preview-state.svelte';
+  import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
   import {
     fetchPopularProjects,
     fetchProjects,
-  } from '$lib/utils/gallery-utils';
-  import { getColorsFromInput } from '$lib/utils/color-utils';
-  import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
+  } from '#lib/utils/gallery-utils.js';
+  import { getColorsFromInput } from '#lib/utils/color-utils.js';
+  import { getTitleFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import {
     ChevronRightIcon,
     ClockIcon,
@@ -110,11 +110,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!galleryState.filteredBrandId && !galleryState.filteredYarnId)
         return true;
       const yarnURLs = JSON.parse(project?.yarnUrls) as string[];
+
       if (!galleryState.palettesContainOnlyFilteredYarn)
         return yarnURLs?.some((yarnURL) => {
-          let colors = getColorsFromInput({
-            string: yarnURL,
-          });
+          let colors = getColorsFromInput({ string: yarnURL });
+
           return (
             colors &&
             colors.some((color) => {
@@ -123,15 +123,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   color?.brandId === galleryState.filteredBrandId &&
                   color?.yarnId === galleryState.filteredYarnId
                 );
+
               return color?.brandId === galleryState.filteredBrandId;
             })
           );
         });
       else
         return yarnURLs?.every((yarnURL) => {
-          let colors = getColorsFromInput({
-            string: yarnURL,
-          });
+          let colors = getColorsFromInput({ string: yarnURL });
+
           return (
             colors &&
             colors.every((color) => {
@@ -140,6 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   color?.brandId === galleryState.filteredBrandId &&
                   color?.yarnId === galleryState.filteredYarnId
                 );
+
               return color?.brandId === galleryState.filteredBrandId;
             })
           );
@@ -455,7 +456,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M12 4.5v15m7.5-7.5h-15"
-            />
+            ></path>
           </svg>
           <span>Load More</span>
         </button>

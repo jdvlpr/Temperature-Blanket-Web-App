@@ -13,30 +13,30 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import PdfOptions from '$lib/components/modals/PdfOptions.svelte';
+import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+import PdfOptions from '#lib/components/modals/PdfOptions.svelte';
 import {
   allGaugesAttributes,
   gauges,
   getWPGauge,
-} from '$lib/state/gauges-state.svelte';
-import { dialog } from '$lib/state/page-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import { colorsToCode, colorsToYarnDetails } from '$lib/utils/color-utils';
-import { buildGalleryRequestBody } from '$lib/utils/gallery-upload-utils';
-import { convertTime } from '$lib/utils/unit-utils.svelte';
+} from '#lib/state/gauges-state.svelte.js';
+import { dialog } from '#lib/state/page-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import { colorsToCode, colorsToYarnDetails } from '#lib/utils/color-utils.js';
+import { buildGalleryRequestBody } from '#lib/utils/gallery-upload-utils.js';
+import { convertTime } from '#lib/utils/unit-utils.svelte.js';
 import {
   dateToISO8601String,
   getLocalISODateString,
   stringToDate,
-} from '$lib/utils/date-utils';
-import { decodeHtmlEntities, escapeHtml } from '$lib/utils/string-utils';
-import type { GaugeAttributes } from '$lib/types/gauge-types';
-import type { Color } from '$lib/types/yarn-types';
+} from '#lib/utils/date-utils.js';
+import { decodeHtmlEntities, escapeHtml } from '#lib/utils/string-utils.js';
+import type { GaugeAttributes } from '#lib/types/gauge-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
 
 export const getProjectParametersFromURLHash = (
   hash: string,
@@ -223,7 +223,7 @@ export const sendToProjectGallery = async (
     // WordPress's answer, from either route
     let response: Awaited<ReturnType<Response['json']>> | undefined;
     if (fromAccount) {
-      const { publishFromAccount } = await import('$lib/accounts/gallery');
+      const { publishFromAccount } = await import('#lib/accounts/gallery.js');
       const result = await publishFromAccount(body, { showOwner });
       if (result.status === 'answered') response = result.response;
     }

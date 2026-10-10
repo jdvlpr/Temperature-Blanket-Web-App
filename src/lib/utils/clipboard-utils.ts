@@ -1,4 +1,4 @@
-import { toast, type ToastSettings } from '$lib/state/page-state.svelte';
+import { toast, type ToastSettings } from '#lib/state/page-state.svelte.js';
 
 /**
  * Copies text (or clipboard items, like an image) and confirms it with a toast, which screen readers announce.

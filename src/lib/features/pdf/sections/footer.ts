@@ -16,10 +16,10 @@
 // Each page's footer, added once every page is drawn, so it can say how
 // many there are: "Page 2 of 5" and where the data came from, as links
 
-import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-import { locations } from '$lib/state/location-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { WeatherSource } from '$lib/types/weather-types';
+import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { WeatherSource } from '#lib/types/weather-types.js';
 import { INK, SIZE, measure, style, type Pdf } from '../draw';
 import { FOOTER_OFFSET, type Box } from '../layout';
 

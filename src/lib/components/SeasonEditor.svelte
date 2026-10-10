@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MONTHS } from '$lib/constants/weather-constants';
-  import { SEASON_PRESETS } from '$lib/constants/seasons-constants';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
+  import CloseButton from '#lib/components/modals/CloseButton.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { MONTHS } from '#lib/constants/weather-constants.js';
+  import { SEASON_PRESETS } from '#lib/constants/seasons-constants.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { formatDateRange } from '#lib/utils/seasons-utils.svelte.js';
   import { CheckIcon } from '@lucide/svelte';
 
   let { onClose } = $props();

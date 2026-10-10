@@ -13,9 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser } from '$app/environment';
-import { consentToMSClarityCookies, toast } from '$lib/state/page-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
+import { browser } from '$app/env';
+import {
+  consentToMSClarityCookies,
+  toast,
+} from '#lib/state/page-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
 
 export const privacy = {
   get_cookie: function (name: string) {
@@ -109,9 +112,11 @@ export const privacy = {
           },
           callback: (response) => {
             if (response.status !== 'closed') return;
+
             const dontShowAgainElement = document.getElementById(
               'cookies-dont-show-again',
             ) as HTMLInputElement | null;
+
             if (dontShowAgainElement?.checked)
               preferences.value.disableToastAnalytics = true;
             else preferences.value.disableToastAnalytics = false;
@@ -119,7 +124,6 @@ export const privacy = {
             const consentToggleElement = document.getElementById(
               'clarity-consent-toggle',
             ) as HTMLInputElement | null;
-
             let consentEvent;
             if (consentToggleElement?.checked)
               consentEvent = new CustomEvent('consentToMSClarity');

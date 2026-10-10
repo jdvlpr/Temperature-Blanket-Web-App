@@ -9,11 +9,11 @@ thumbnails for colors and headings
 (as the pattern picker), the usual yarn picker, and a card of switches. -->
 
 <script lang="ts">
-  import { account } from '$lib/accounts/summary.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
   import {
     HEADING_STYLE,
     ROUNDNESS,
@@ -21,10 +21,10 @@ thumbnails for colors and headings
     SPACING,
     TEXT_SCALE,
     THEMES,
-  } from '$lib/constants/page-constants';
-  import { defaultYarn } from '$lib/state/page-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { getEffects, motion, setEffect } from '$lib/utils/feedback.svelte';
+  } from '#lib/constants/page-constants.js';
+  import { defaultYarn } from '#lib/state/page-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { getEffects, motion, setEffect } from '#lib/utils/feedback.svelte.js';
   import { RotateCcwIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import type { Snippet } from 'svelte';

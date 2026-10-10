@@ -1,6 +1,6 @@
-import { SECRET_GEONAMES_USERNAME } from '$env/static/private';
-import { API_SERVICES } from '$lib/constants/api-constants';
-import { cachedJSON } from '$lib/features/cache/edge-cache';
+import { SECRET_GEONAMES_USERNAME } from '$app/env/private';
+import { API_SERVICES } from '#lib/constants/api-constants.js';
+import { cachedJSON } from '#lib/features/cache/edge-cache.js';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 
 const CACHE_TTL_SECONDS = 60 * 60 * 4; // 4h

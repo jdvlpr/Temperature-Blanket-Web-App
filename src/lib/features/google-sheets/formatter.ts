@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { MONTHS, MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import { getTextColor } from '$lib/utils/color-utils';
+import { MONTHS, MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import { getTextColor } from '#lib/utils/color-utils.js';
 import type { ExportOptions, SpreadsheetData } from './types';
 
 const MONTH_NAMES = MONTHS.map((m) => m.name);
@@ -336,7 +336,7 @@ function createCheckboxRequests(
 }
 
 // Import shared utility for consistent range checks
-import { isValueInRange } from '$lib/utils/range-utils.svelte';
+import { isValueInRange } from '#lib/utils/range-utils.svelte.js';
 
 // Helper to get all column letters in 'Weather Data' that correspond to valid data
 function getWeatherDataColumnLetters(

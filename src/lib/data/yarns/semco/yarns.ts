@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as stallion } from './stallion-8-ply/yarn';
 
 export const brand: Brand = {

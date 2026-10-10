@@ -14,13 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { pluralize } from '$lib/utils/string-utils';
-  import { stringToDate } from '$lib/utils/date-utils';
+  import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
+  import {
+    ensureYarnData,
+    getBrands,
+  } from '#lib/data/yarns/colorways.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
+  import { stringToDate } from '#lib/utils/date-utils.js';
   import { ShoppingCartIcon } from '@lucide/svelte';
 
   interface Props {

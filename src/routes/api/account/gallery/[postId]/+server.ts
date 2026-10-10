@@ -28,9 +28,10 @@ function postIdFrom(param: string) {
 }
 
 export const PATCH: RequestHandler = async (event) => {
-  const { requireGallery, galleryError } = await import('$lib/server/gallery');
+  const { requireGallery, galleryError } =
+    await import('#lib/server/gallery/index.js');
   const { setPostShowOwner, getSettings } =
-    await import('$lib/server/gallery/store');
+    await import('#lib/server/gallery/store.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 
@@ -57,8 +58,9 @@ export const PATCH: RequestHandler = async (event) => {
 };
 
 export const DELETE: RequestHandler = async (event) => {
-  const { requireGallery, galleryError } = await import('$lib/server/gallery');
-  const { ownsPost, forgetPost } = await import('$lib/server/gallery/store');
+  const { requireGallery, galleryError } =
+    await import('#lib/server/gallery/index.js');
+  const { ownsPost, forgetPost } = await import('#lib/server/gallery/store.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 

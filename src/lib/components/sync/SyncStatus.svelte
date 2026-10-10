@@ -18,7 +18,7 @@ Shows nothing while syncing works, which is the usual case. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import { sync } from '$lib/sync/status.svelte';
+  import { sync } from '#lib/sync/status.svelte.js';
   import { CloudAlertIcon, CloudOffIcon } from '@lucide/svelte';
 
   let { class: className = '' }: { class?: string } = $props();
@@ -28,7 +28,7 @@ Shows nothing while syncing works, which is the usual case. -->
   );
 
   async function syncNow() {
-    const { syncNow } = await import('$lib/sync/sync.svelte');
+    const { syncNow } = await import('#lib/sync/sync.svelte.js');
     await syncNow();
   }
 </script>

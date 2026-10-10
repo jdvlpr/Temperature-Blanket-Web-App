@@ -2,9 +2,9 @@
 place of an always-there toggle. The default is otherwise set in Preferences. -->
 
 <script lang="ts">
-  import { defaultYarn } from '$lib/state/page-state.svelte';
-  import { yarnKey, yarnUses } from '$lib/storage/yarn-uses.svelte';
-  import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
+  import { defaultYarn } from '#lib/state/page-state.svelte.js';
+  import { yarnKey, yarnUses } from '#lib/storage/yarn-uses.svelte.js';
+  import { stringToBrandAndYarnDetails } from '#lib/utils/yarn-utils.js';
   import { CheckIcon, XIcon } from '@lucide/svelte';
 
   let {

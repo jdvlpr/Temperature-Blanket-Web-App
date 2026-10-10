@@ -13,34 +13,34 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { API_SERVICES } from '$lib/constants/api-constants';
-import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { locations, signal } from '$lib/state/location-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { WeatherParam } from '$lib/types/gauge-types';
-import type { LocationType } from '$lib/types/location-types';
+import { API_SERVICES } from '#lib/constants/api-constants.js';
+import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+import { locations, signal } from '#lib/state/location-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
+import type { LocationType } from '#lib/types/location-types.js';
 import type {
   MoonPhasesId,
   WeatherDay,
   WeatherSourceOptions,
-} from '$lib/types/weather-types';
-import { getColorInfo, type ColorInfo } from '$lib/utils/color-utils';
+} from '#lib/types/weather-types.js';
+import { getColorInfo, type ColorInfo } from '#lib/utils/color-utils.js';
 import {
   createWeeksProperty,
   dateToISO8601String,
   getLocalISODateString,
   numberOfDays,
   stringToDate,
-} from '$lib/utils/date-utils';
-import { displayNumber, getAverage } from '$lib/utils/number-utils';
-import { pluralize } from '$lib/utils/string-utils';
+} from '#lib/utils/date-utils.js';
+import { displayNumber, getAverage } from '#lib/utils/number-utils.js';
+import { pluralize } from '#lib/utils/string-utils.js';
 import {
   celsiusToFahrenheit,
   convertTime,
   hoursToMinutes,
   millimetersToInches,
-} from '$lib/utils/unit-utils.svelte';
-import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+} from '#lib/utils/unit-utils.svelte.js';
+import { getWeatherTargets } from '#lib/utils/weather-utils.svelte.js';
 import * as SunCalc from 'suncalc';
 
 class WeatherClass {

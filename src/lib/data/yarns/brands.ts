@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { brand as _4Seasons } from './4-seasons/yarns'; // Add underscore to keep alpha-numeric placement at top of import list and avoid linting error
 import { brand as auntLydias } from './aunt-lydias/yarns';
 import { brand as alize } from './alize/yarns';

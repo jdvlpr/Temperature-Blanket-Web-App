@@ -14,23 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import PaletteStripEditor from '$lib/components/PaletteStripEditor.svelte';
-  import ColorSearchField from '$lib/components/ColorSearchField.svelte';
-  import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import SortMenu from '$lib/components/SortMenu.svelte';
-  import { menuTriggerClass } from '$lib/components/menu-styles';
-  import type { Color } from '$lib/types/yarn-types';
+  import PaletteStripEditor from '#lib/components/PaletteStripEditor.svelte';
+  import ColorSearchField from '#lib/components/ColorSearchField.svelte';
+  import PickColorFromImage from '#lib/components/modals/PickColorFromImage.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import YarnGridSelect from '#lib/components/modals/YarnGridSelect.svelte';
+  import SortMenu from '#lib/components/SortMenu.svelte';
+  import { menuTriggerClass } from '#lib/components/menu-styles.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     getSortedPalette,
     reverseColors,
     shuffleColors,
-  } from '$lib/utils/color-utils';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
-  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
+  } from '#lib/utils/color-utils.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
+  import { yarnUses } from '#lib/storage/yarn-uses.svelte.js';
   import { Trash2Icon, Undo2Icon } from '@lucide/svelte';
   import { tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';

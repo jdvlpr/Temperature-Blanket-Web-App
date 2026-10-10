@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import Alert from '$lib/components/modals/Alert.svelte';
-import { dialog } from '$lib/state/page-state.svelte';
+import Alert from '#lib/components/modals/Alert.svelte';
+import { dialog } from '#lib/state/page-state.svelte.js';
 import { online } from 'svelte/reactivity/window';
 
 /**

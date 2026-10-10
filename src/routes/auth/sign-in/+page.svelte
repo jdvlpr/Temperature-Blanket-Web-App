@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import SignInCard from '$lib/components/account/SignInCard.svelte';
-  import { safeRedirect } from '$lib/accounts/redirect';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import SignInCard from '#lib/components/account/SignInCard.svelte';
+  import { safeRedirect } from '#lib/accounts/redirect.js';
   import { onMount } from 'svelte';
 
   // Read after mount: the page is prerendered, so there's no query string at build time

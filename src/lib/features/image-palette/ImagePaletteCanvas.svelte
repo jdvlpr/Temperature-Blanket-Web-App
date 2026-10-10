@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { getTextColor } from '$lib/utils/color-utils';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { getTextColor } from '#lib/utils/color-utils.js';
   import { LockKeyholeIcon } from '@lucide/svelte';
   import { Portal } from '@skeletonlabs/skeleton-svelte';
   import { tick } from 'svelte';

@@ -15,8 +15,8 @@
 
 // One synced project: download, save, delete (see $lib/sync/protocol).
 
-import { dev } from '$app/environment';
-import { SYNC_HEADERS, type ProjectMeta } from '$lib/sync/protocol';
+import { dev } from '$app/env';
+import { SYNC_HEADERS, type ProjectMeta } from '#lib/sync/protocol.js';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -31,9 +31,9 @@ const conflict = (current: ProjectMeta | null) =>
 
 async function load(event: Parameters<RequestHandler>[0]) {
   const { requireSync, syncError, cleanUpAfterWrite } =
-    await import('$lib/server/sync');
-  const store = await import('$lib/server/sync/store');
-  const request = await import('$lib/server/sync/request');
+    await import('#lib/server/sync/index.js');
+  const store = await import('#lib/server/sync/store.js');
+  const request = await import('#lib/server/sync/request.js');
 
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;
@@ -111,6 +111,7 @@ export const DELETE: RequestHandler = async (event) => {
   const { sync, store, request, syncError, cleanUpAfterWrite } = loaded;
 
   const baseRev = request.parseRev(event.url.searchParams.get('baseRev'));
+
   if (baseRev === null)
     return syncError(400, 'INVALID_REQUEST', 'baseRev is required');
 
@@ -120,6 +121,7 @@ export const DELETE: RequestHandler = async (event) => {
     event.params.id,
     baseRev,
   );
+
   if (result.status === 'not-found')
     return syncError(404, 'NOT_FOUND', 'No such project');
   if (result.status === 'conflict') return conflict(result.current);

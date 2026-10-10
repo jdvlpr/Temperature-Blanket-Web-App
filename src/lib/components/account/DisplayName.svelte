@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { accountErrorMessage, updateName } from '$lib/accounts/client';
+  import { accountErrorMessage, updateName } from '#lib/accounts/client.js';
   import { CheckIcon, LoaderCircleIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
 

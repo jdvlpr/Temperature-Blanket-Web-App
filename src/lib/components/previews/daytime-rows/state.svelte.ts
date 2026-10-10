@@ -1,12 +1,12 @@
-import { HOURS_PER_DAY } from '$lib/constants/weather-constants';
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { BasePreviewSettings } from '$lib/types/preview-types';
-import type { WeatherParam } from '$lib/types/gauge-types';
-import { dateToISO8601String } from '$lib/utils/date-utils';
-import { displayNumber } from '$lib/utils/number-utils';
-import { setTargets } from '$lib/utils/preview-utils.svelte';
+import { HOURS_PER_DAY } from '#lib/constants/weather-constants.js';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { BasePreviewSettings } from '#lib/types/preview-types.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
+import { dateToISO8601String } from '#lib/utils/date-utils.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
+import { setTargets } from '#lib/utils/preview-utils.svelte.js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 

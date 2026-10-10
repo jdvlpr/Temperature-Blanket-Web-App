@@ -14,11 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CopyIcon from '$lib/components/CopyIcon.svelte';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { Flash } from '$lib/utils/feedback.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import type { Color } from '$lib/types/yarn-types';
+  import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { Flash } from '#lib/utils/feedback.svelte.js';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import type { Color } from '#lib/types/yarn-types.js';
 
   let {
     colors = [],

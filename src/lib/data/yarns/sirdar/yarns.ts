@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as heyfieldBonusDK } from './heyfield-bonus-dk/yarn';
 import { yarn as stories } from './stories/yarn';
 

@@ -1,3 +1,5 @@
+import { redirect } from '@sveltejs/kit';
+
 // Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
@@ -13,10 +15,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { dev } from '$app/environment';
-import { THEMES, SKELETON_THEMES } from '$lib/constants/page-constants';
-import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import { dev } from '$app/env';
+import { THEMES, SKELETON_THEMES } from '#lib/constants/page-constants.js';
+import {
+  sequence,
+  type Handle,
+  type HandleServerError,
+} from '@sveltejs/kit/hooks';
 
 // Legacy urls from previous versions of the app
 const legacyRedirects: Handle = async ({ event, resolve }) => {
@@ -87,7 +92,7 @@ const devRedirects: Handle = async ({ event, resolve }) => {
 // Account API. Imported only for these paths, so other requests never load it.
 const accountsApi: Handle = async ({ event, resolve }) => {
   if (!event.url.pathname.startsWith('/api/auth/')) return resolve(event);
-  const { handleAuthRequest } = await import('$lib/server/auth');
+  const { handleAuthRequest } = await import('#lib/server/auth/index.js');
   return handleAuthRequest(event);
 };
 

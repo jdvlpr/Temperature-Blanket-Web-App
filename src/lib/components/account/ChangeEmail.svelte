@@ -19,8 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     confirmEmailChange,
     requestEmailChange,
     sendCurrentEmailCode,
-  } from '$lib/accounts/client';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  } from '#lib/accounts/client.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { LoaderCircleIcon, MailIcon } from '@lucide/svelte';
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';

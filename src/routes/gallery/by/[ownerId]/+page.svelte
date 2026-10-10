@@ -19,17 +19,20 @@ linked from "By <name>" on their gallery pages. -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { getTitleFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import {
     galleryTitleText,
     sharedPaletteFrom,
-  } from '$lib/utils/shared-palette-utils';
-  import { decodeHtmlEntities, stripHTMLTags } from '$lib/utils/string-utils';
+  } from '#lib/utils/shared-palette-utils.js';
+  import {
+    decodeHtmlEntities,
+    stripHTMLTags,
+  } from '#lib/utils/string-utils.js';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -54,8 +57,11 @@ linked from "By <name>" on their gallery pages. -->
 
 <svelte:head>
   <title>Project Gallery: {heading}</title>
+
   <meta name="description" content="Temperature blanket {heading}" />
+
   <meta property="og:title" content="Project Gallery: {heading}" />
+
   <meta
     property="og:url"
     content="{PUBLIC_BASE_URL}/gallery/by/{page.params.ownerId}"
@@ -72,7 +78,7 @@ linked from "By <name>" on their gallery pages. -->
       class="m-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-start gap-2 pb-8"
     >
       <a
-        href={resolve('/gallery')}
+        href={resolve('gallery')}
         class="btn hover:bg-surface-100-900 mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
       >
         <ArrowLeftIcon />

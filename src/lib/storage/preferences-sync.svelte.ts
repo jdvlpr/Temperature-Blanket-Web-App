@@ -29,7 +29,7 @@ import {
   type PreferencesRecord,
   type PreferencesUpload,
   type SyncedPreferenceKey,
-} from '$lib/sync/preferences';
+} from '#lib/sync/preferences.js';
 import { untrack } from 'svelte';
 import { preferences } from './preferences.svelte';
 

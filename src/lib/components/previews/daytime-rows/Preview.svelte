@@ -14,14 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { HOURS_PER_DAY } from '$lib/constants/weather-constants';
-  import type { WeatherParam } from '$lib/types/gauge-types';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { displayNumber } from '$lib/utils/number-utils';
-  import { getColorInfo } from '$lib/utils/color-utils';
-  import { runPreview } from '$lib/utils/function-utils.svelte';
-  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { HOURS_PER_DAY } from '#lib/constants/weather-constants.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { displayNumber } from '#lib/utils/number-utils.js';
+  import { getColorInfo } from '#lib/utils/color-utils.js';
+  import { runPreview } from '#lib/utils/function-utils.svelte.js';
+  import { showPreviewImageWeatherDetails } from '#lib/utils/preview-utils.svelte.js';
   import { daytimeRowsPreview, type DaytimeRowsSection } from './state.svelte';
 
   let width = $state(daytimeRowsPreview.width);

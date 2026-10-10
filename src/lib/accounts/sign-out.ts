@@ -19,13 +19,13 @@
 
 import { accountErrorMessage, signOut, signOutEverywhere } from './client';
 import { forgetAccountSummary } from './summary.svelte';
-import { dialog } from '$lib/state/page-state.svelte';
+import { dialog } from '#lib/state/page-state.svelte.js';
 
 /** Ends the session, then removes the account's synced projects from here. */
 async function finishSignOut(userId: string, everywhere: boolean) {
   if (everywhere) await signOutEverywhere();
   else await signOut();
-  const { leaveAccount } = await import('$lib/sync/sync.svelte');
+  const { leaveAccount } = await import('#lib/sync/sync.svelte.js');
   await leaveAccount(userId, false);
   forgetAccountSummary();
 }
@@ -48,7 +48,7 @@ export async function startSignOut({
   onError: (message: string) => void;
 }) {
   try {
-    const { unsyncedCount } = await import('$lib/sync/sync.svelte');
+    const { unsyncedCount } = await import('#lib/sync/sync.svelte.js');
     if (!(await unsyncedCount(userId))) {
       await finishSignOut(userId, everywhere);
       onSignedOut?.();
@@ -56,7 +56,7 @@ export async function startSignOut({
     }
 
     const { default: SignOutDialog } =
-      await import('$lib/components/sync/SignOutDialog.svelte');
+      await import('#lib/components/sync/SignOutDialog.svelte');
     dialog.trigger({
       type: 'component',
       component: {

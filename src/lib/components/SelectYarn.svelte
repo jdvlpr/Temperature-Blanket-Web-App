@@ -18,10 +18,13 @@ phone it opens a full-screen search, so the list has the whole screen above
 the keyboard; elsewhere the list drops down from the field. -->
 
 <script lang="ts">
-  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
-  import { defaultYarn } from '$lib/state/page-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
-  import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
+  import {
+    ensureYarnData,
+    getBrands,
+  } from '#lib/data/yarns/colorways.svelte.js';
+  import { defaultYarn } from '#lib/state/page-state.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
+  import { stringToBrandAndYarnDetails } from '#lib/utils/yarn-utils.js';
   import {
     brandValue,
     buildYarnOptions,
@@ -31,7 +34,7 @@ the keyboard; elsewhere the list drops down from the field. -->
     searchTerms,
     yarnValue,
     type YarnOption,
-  } from '$lib/utils/yarn-search';
+  } from '#lib/utils/yarn-search.js';
   import { yarnBall } from '@lucide/lab';
   import {
     ArrowLeftIcon,

@@ -22,10 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   the colors aren't tab stops, and screen readers hear the control's name instead.
 -->
 <script lang="ts">
-  import type { Color } from '$lib/types/yarn-types';
-  import { getTextColor } from '$lib/utils/color-utils';
-  import { growIn, motionDuration } from '$lib/utils/feedback.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { getTextColor } from '#lib/utils/color-utils.js';
+  import { growIn, motionDuration } from '#lib/utils/feedback.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     arrow,
     autoUpdate,

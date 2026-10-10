@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CopyIcon from '$lib/components/CopyIcon.svelte';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { Flash } from '$lib/utils/feedback.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { Flash } from '#lib/utils/feedback.svelte.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { ClipboardCheckIcon, Share2Icon, XIcon } from '@lucide/svelte';
   import { Popover } from '@skeletonlabs/skeleton-svelte';
 

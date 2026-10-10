@@ -19,9 +19,9 @@ TRASH_DAYS anyway. Signed in, it's the account's Trash: what was deleted on any
 device, restored everywhere (see $lib/storage/account-trash). -->
 
 <script lang="ts">
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
   import {
     accountTrash,
     deleteTrashEntryForever,
@@ -31,16 +31,19 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     restoreTrashEntry,
     trashedProject,
     type ProjectTrashEntry,
-  } from '$lib/storage/account-trash.svelte';
-  import { PaletteStorage, savedPalettes } from '$lib/storage/palettes.svelte';
-  import { savedProjects } from '$lib/storage/projects.svelte';
-  import { TRASH_DAYS } from '$lib/storage/trash';
-  import type { Color } from '$lib/types/yarn-types';
+  } from '#lib/storage/account-trash.svelte.js';
+  import {
+    PaletteStorage,
+    savedPalettes,
+  } from '#lib/storage/palettes.svelte.js';
+  import { savedProjects } from '#lib/storage/projects.svelte.js';
+  import { TRASH_DAYS } from '#lib/storage/trash.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     getColorsFromInput,
     getPaletteFallbackName,
-  } from '$lib/utils/color-utils';
-  import { formatDateTime } from '$lib/utils/date-utils';
+  } from '#lib/utils/color-utils.js';
+  import { formatDateTime } from '#lib/utils/date-utils.js';
   import {
     ArchiveRestoreIcon,
     NotebookPenIcon,

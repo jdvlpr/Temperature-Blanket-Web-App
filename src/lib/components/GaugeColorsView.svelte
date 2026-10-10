@@ -22,29 +22,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   with color, each card or row takes its color, grown out of its swatch.
 -->
 <script lang="ts">
-  import ColorSwatch from '$lib/components/ColorSwatch.svelte';
+  import ColorSwatch from '#lib/components/ColorSwatch.svelte';
   import {
     paletteCardClass,
     paletteGridClass,
     paletteListClass,
     paletteRowClass,
-  } from '$lib/components/palette-item-styles';
-  import RangeValue from '$lib/components/RangeValue.svelte';
-  import ColorwayMoreMenu from '$lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
-  import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  } from '#lib/components/palette-item-styles.js';
+  import RangeValue from '#lib/components/RangeValue.svelte';
+  import ColorwayMoreMenu from '#lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
+  import { iconColorOn } from '#lib/components/yarn-colorways/colorway-utils.js';
   import {
     fillFromSwatch,
     fillWithColor,
     mutedText,
-  } from '$lib/components/yarn-colorways/fill-with-color';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  } from '#lib/components/yarn-colorways/fill-with-color.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import type {
     GaugeRange,
     GaugeRangeCategory,
     GaugeRangeOptions,
-  } from '$lib/types/gauge-types';
-  import type { Color } from '$lib/types/yarn-types';
-  import { rangeRuleSentence } from '$lib/utils/range-format';
+  } from '#lib/types/gauge-types.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { rangeRuleSentence } from '#lib/utils/range-format.js';
 
   interface Item {
     color: Color;

@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { SCHEMES } from '$lib/constants/color-constants';
-import { NON_NEGATIVE_PARAMS } from '$lib/constants/weather-constants';
-import { toast } from '$lib/state/page-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { Color } from '$lib/types/yarn-types';
+import { SCHEMES } from '#lib/constants/color-constants.js';
+import { NON_NEGATIVE_PARAMS } from '#lib/constants/weather-constants.js';
+import { toast } from '#lib/state/page-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { Color } from '#lib/types/yarn-types.js';
 import type {
   GaugeAttributes,
   GaugeRange,
@@ -27,16 +27,16 @@ import type {
   GaugeSettingsType,
   GaugeStateInterface,
   WeatherParam,
-} from '$lib/types/gauge-types';
-import { displayNumber } from '$lib/utils/number-utils';
+} from '#lib/types/gauge-types.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
 import {
   getDaysInRange,
   getDaysPercent,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
   getIncrement,
   getStart,
-} from '$lib/utils/range-utils.svelte';
-import { pluralize } from '$lib/utils/string-utils';
+} from '#lib/utils/range-utils.svelte.js';
+import { pluralize } from '#lib/utils/string-utils.js';
 import chroma from 'chroma-js';
 
 export function getRanges({

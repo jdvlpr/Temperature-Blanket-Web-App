@@ -14,21 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
-  import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
-  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import type { SecondaryTarget } from '$lib/types/preview-types';
-  import type { WeatherParam } from '$lib/types/gauge-types';
-  import { DAYS_OF_THE_WEEK } from '$lib/constants/weather-constants';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { withExtraColorDetails } from '#lib/utils/extra-colors-utils.js';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import ChangeColor from '#lib/components/modals/ChangeColor.svelte';
+  import SquareDesigner from '#lib/components/modals/SquareDesigner.svelte';
+  import PreviewInfo from '#lib/components/PreviewInfo.svelte';
+  import { calendarPreview } from '#lib/components/previews/calendar/state.svelte.js';
+  import SpanYarnColorSelectIcon from '#lib/components/SpanYarnColorSelectIcon.svelte';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import type { SecondaryTarget } from '#lib/types/preview-types.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
+  import { DAYS_OF_THE_WEEK } from '#lib/constants/weather-constants.js';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { SquareSquareIcon } from '@lucide/svelte';
   import Preview from './Preview.svelte';
 

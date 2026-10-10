@@ -13,15 +13,18 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import WeatherDetails from '$lib/components/WeatherDetails.svelte';
-import { dialog } from '$lib/state/page-state.svelte';
-import { gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { WeatherDay } from '$lib/types/weather-types';
-import type { WeatherParam } from '$lib/types/gauge-types';
-import type { SecondaryTarget } from '$lib/types/preview-types';
-import { exists } from '$lib/utils/other-utils';
+import WeatherDetails from '#lib/components/WeatherDetails.svelte';
+import { dialog } from '#lib/state/page-state.svelte.js';
+import {
+  gauges,
+  getTargetParentGaugeId,
+} from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { WeatherDay } from '#lib/types/weather-types.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
+import type { SecondaryTarget } from '#lib/types/preview-types.js';
+import { exists } from '#lib/utils/other-utils.js';
 
 export const showPreviewImageWeatherDetails = (
   targets: WeatherParam[],

@@ -1,13 +1,13 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { BasePreviewSettings } from '$lib/types/preview-types';
-import type { Color } from '$lib/types/yarn-types';
-import type { WeatherParam } from '$lib/types/gauge-types';
-import { setTargets } from '$lib/utils/preview-utils.svelte';
-import { upToDate } from '$lib/utils/other-utils';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { BasePreviewSettings } from '#lib/types/preview-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
+import { setTargets } from '#lib/utils/preview-utils.svelte.js';
+import { upToDate } from '#lib/utils/other-utils.js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 

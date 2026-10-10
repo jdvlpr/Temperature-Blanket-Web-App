@@ -21,20 +21,20 @@ means keeping it. Save is beside it until the project saves by itself; then
 the Project button shows the save state. -->
 
 <script lang="ts">
-  import SaveButton from '$lib/components/buttons/SaveButton.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
+  import SaveButton from '#lib/components/buttons/SaveButton.svelte';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
   import {
     autosave,
     renameOpenProject,
     storedItem,
-  } from '$lib/storage/autosave.svelte';
+  } from '#lib/storage/autosave.svelte.js';
   import {
     MAX_SAVED_PROJECT_NAME_LENGTH,
     savedProjects,
-  } from '$lib/storage/projects.svelte';
-  import { saveProject } from '$lib/utils/save-project.svelte';
+  } from '#lib/storage/projects.svelte.js';
+  import { saveProject } from '#lib/utils/save-project.svelte.js';
   import { tick } from 'svelte';
 
   let savedName = $state('');

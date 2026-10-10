@@ -13,47 +13,47 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { version } from '$app/environment';
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { version } from '$app/env';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
 import {
   DAYS_OF_THE_WEEK,
   UNIT_LABELS,
-} from '$lib/constants/weather-constants';
-import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
-import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { toast } from '$lib/state/page-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { MoonPhaseGauge } from '$lib/state/gauges/moon-phase-gauge-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
+} from '#lib/constants/weather-constants.js';
+import { NO_DATA_SRTM3 } from '#lib/constants/location-constants.js';
+import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+import { allGaugesAttributes, gauges } from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { toast } from '#lib/state/page-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { MoonPhaseGauge } from '#lib/state/gauges/moon-phase-gauge-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
 import {
   celsiusToFahrenheit,
   millimetersToInches,
-} from '$lib/utils/unit-utils.svelte';
-import { dateToISO8601String, yearFrom } from '$lib/utils/date-utils';
-import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
-import { exists, upToDate } from '$lib/utils/other-utils';
+} from '#lib/utils/unit-utils.svelte.js';
+import { dateToISO8601String, yearFrom } from '#lib/utils/date-utils.js';
+import { displayGeoNamesErrorMessage } from '#lib/utils/error-utils.svelte.js';
+import { exists, upToDate } from '#lib/utils/other-utils.js';
 import {
   formatFeatureName,
   formatLocationLabel,
-} from '$lib/utils/location-utils.svelte';
-import { getColorsFromInput } from '$lib/utils/color-utils';
+} from '#lib/utils/location-utils.svelte.js';
+import { getColorsFromInput } from '#lib/utils/color-utils.js';
 import {
   EXTRA_COLORS_HASH_KEY,
   extraColorDetailsFromUrlHash,
   extraColorsHaveYarnDetails,
-} from '$lib/utils/extra-colors-utils';
-import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
-import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
+} from '#lib/utils/extra-colors-utils.js';
+import { getProjectParametersFromURLHash } from '#lib/utils/project-utils.svelte.js';
+import { seasonsFromUrlHash } from '#lib/utils/seasons-utils.svelte.js';
 import type {
   GaugeAttributes,
   GaugeRange,
   GaugeSettingsType,
-} from '$lib/types/gauge-types';
-import type { TISO8601DateString } from '$lib/types/weather-types';
+} from '#lib/types/gauge-types.js';
+import type { TISO8601DateString } from '#lib/types/weather-types.js';
 
 // Gauge hash values can carry a second `!`-delimited section with yarn
 // details (brandId-yarnId); only those need the yarn dataset loaded.
@@ -579,7 +579,6 @@ export const parseGaugeURLHash = (
     gauge.rangeOptions.mode === 'manual' &&
     gauge.rangeOptions.isCustomRanges === false &&
     customRangeIncrementSeparatorPosition !== -1;
-
   const isTempGaugeWithAutoRanges =
     gauge.id === 'temp' &&
     gauge.rangeOptions.mode === 'auto' &&

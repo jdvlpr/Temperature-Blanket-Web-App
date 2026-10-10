@@ -18,12 +18,12 @@ browser that belong to no account. Only while signed in and syncing; the dialog 
 when it's clicked, so guests never download them. -->
 
 <script lang="ts">
-  import { account } from '$lib/accounts/summary.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { PaletteStorage } from '$lib/storage/palettes.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
-  import { sync } from '$lib/sync/status.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { PaletteStorage } from '#lib/storage/palettes.svelte.js';
+  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
+  import { sync } from '#lib/sync/status.svelte.js';
   import { CloudUploadIcon } from '@lucide/svelte';
 
   let {

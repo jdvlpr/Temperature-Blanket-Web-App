@@ -15,39 +15,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { page } from '$app/state';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import YarnSources from '$lib/components/YarnSources.svelte';
-  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
-  import GaugeColorsView from '$lib/components/GaugeColorsView.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import type { GaugeRange, GaugeRangeCategory } from '$lib/types/gauge-types';
-  import type { Color } from '$lib/types/yarn-types';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import YarnSources from '#lib/components/YarnSources.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import GaugeColorsView from '#lib/components/GaugeColorsView.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { allGaugesAttributes } from '#lib/state/gauges-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import type { GaugeRange, GaugeRangeCategory } from '#lib/types/gauge-types.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     gaugeParamsHaveYarnDetails,
     parseGaugeURLHash,
-  } from '$lib/utils/load-project-utils.svelte';
+  } from '#lib/utils/load-project-utils.svelte.js';
+
   import {
     EXTRA_COLORS_HASH_KEY,
     extraColorsFromUrlHash,
     extraColorsHaveYarnDetails,
-  } from '$lib/utils/extra-colors-utils';
-  import { exists } from '$lib/utils/other-utils';
+  } from '#lib/utils/extra-colors-utils.js';
+  import { exists } from '#lib/utils/other-utils.js';
   import {
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
-  } from '$lib/utils/project-utils.svelte';
-  import { recordPageView } from '$lib/utils/gallery-utils';
-  import { decodeHtmlEntities, stripHTMLTags } from '$lib/utils/string-utils';
+  } from '#lib/utils/project-utils.svelte.js';
+  import { recordPageView } from '#lib/utils/gallery-utils.js';
+  import {
+    decodeHtmlEntities,
+    stripHTMLTags,
+  } from '#lib/utils/string-utils.js';
   import {
     ArrowLeftIcon,
     GlobeIcon,
@@ -226,9 +230,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:head>
   <title>Project Gallery: {projectTitleNoHTML}</title>
+
   <meta name="description" content="Project Gallery: {projectTitleNoHTML}" />
 
   <meta property="og:title" content="Project Gallery: {projectTitleNoHTML}" />
+
   <meta
     property="og:description"
     content="Temperature Blanket Project: {projectTitleNoHTML}"
@@ -401,7 +407,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   stroke-linecap="round"
                                   stroke-linejoin="round"
                                   d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                                />
+                                ></path>
                               </svg>
                             </a>
                           </div>

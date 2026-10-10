@@ -17,16 +17,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 layout, when accounts are on. The sync code loads only after someone signs in. -->
 
 <script lang="ts">
-  import { getSession } from '$lib/accounts/client';
+  import { getSession } from '#lib/accounts/client.js';
   import {
     account,
     forgetAccountSummary,
     rememberAccountSummary,
-  } from '$lib/accounts/summary.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
+  } from '#lib/accounts/summary.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 
-  let syncModule: typeof import('$lib/sync/sync.svelte') | undefined;
+  let syncModule: typeof import('#lib/sync/sync.svelte.js') | undefined;
   let checkedSummary = false;
 
   // Summaries saved before sync have no account ID: ask the server once
@@ -51,7 +51,7 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
       return;
     }
     void (async () => {
-      syncModule ??= await import('$lib/sync/sync.svelte');
+      syncModule ??= await import('#lib/sync/sync.svelte.js');
       syncModule.startSync();
 
       // First sign-in on this device: offer to add its projects to the account

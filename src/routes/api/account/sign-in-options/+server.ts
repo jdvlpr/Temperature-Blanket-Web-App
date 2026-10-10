@@ -15,7 +15,7 @@
 
 // Which sign-in providers are configured, for the sign-in and account pages.
 
-import { readAuthSettings } from '$lib/server/auth/settings';
+import { readAuthSettings } from '#lib/server/auth/settings.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

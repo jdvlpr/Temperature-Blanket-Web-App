@@ -18,7 +18,7 @@ each is included on the account's public gallery (with its display name), and re
 Hidden until the account has a page or publishing from accounts is on. -->
 
 <script lang="ts">
-  import { ROW_FOCUS } from '$lib/constants/class-constants';
+  import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import {
     GALLERY_PAGES_CHANGED,
@@ -26,8 +26,8 @@ Hidden until the account has a page or publishing from accounts is on. -->
     removeGalleryPage,
     setGalleryPageShowOwner,
     type GalleryPage,
-  } from '$lib/accounts/gallery';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  } from '#lib/accounts/gallery.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import {
     ExternalLinkIcon,
     ImageIcon,
@@ -41,11 +41,9 @@ Hidden until the account has a page or publishing from accounts is on. -->
   let {
     name,
     cardClass,
-  }: {
+
     /** The account's display name */
-    name: string;
-    cardClass: string;
-  } = $props();
+  }: { name: string; cardClass: string } = $props();
 
   let loaded = $state(false);
   let publishing = $state(false);
@@ -132,9 +130,9 @@ Hidden until the account has a page or publishing from accounts is on. -->
           Those on your public gallery say “By {currentName}”. The others don’t
           show your name.
         {:else}
-          Add a display name on your <a href={resolve('/account')} class="link"
-            >Account page</a
-          > to show it on those you include on your public gallery.
+          Add a display name on your
+          <a href={resolve('account')} class="link">Account page</a>
+          to show it on those you include on your public gallery.
         {/if}
       </p>
       {#if anyIncluded && hasName && publicId}
@@ -166,9 +164,10 @@ Hidden until the account has a page or publishing from accounts is on. -->
                     href={pageHref(page)}
                     target="_blank"
                     class="link line-clamp-2 break-words"
-                    >{page.title}
-                    <ExternalLinkIcon class="inline size-4" /></a
                   >
+                    {page.title}
+                    <ExternalLinkIcon class="inline size-4" />
+                  </a>
                   <span class="text-sm opacity-70"
                     >{isPalette(page) ? 'Palette, shared' : 'Published'}
                     {publishedOn(page.publishedAt)}</span
@@ -217,9 +216,14 @@ Hidden until the account has a page or publishing from accounts is on. -->
                       class="btn preset-filled-error-500 max-sm:w-full"
                       onclick={() => remove(page.postId)}
                       disabled={busy}
-                      >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if} Remove
-                      page</button
                     >
+                      {#if busy}
+                        <LoaderCircleIcon class="animate-spin" />
+                      {/if}
+
+                      Remove page
+                    </button>
+
                     <button
                       type="button"
                       class="btn preset-tonal-surface max-sm:w-full"

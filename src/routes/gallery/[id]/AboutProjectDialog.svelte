@@ -23,8 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import type { PageData } from './$types';
 
   interface Props {

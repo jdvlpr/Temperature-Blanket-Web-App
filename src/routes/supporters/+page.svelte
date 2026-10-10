@@ -14,11 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Supporters from '$lib/components/Supporters.svelte';
-  import DonateButton from '$lib/components/buttons/DonateButton.svelte';
+  import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Supporters from '#lib/components/Supporters.svelte';
+  import DonateButton from '#lib/components/buttons/DonateButton.svelte';
 </script>
 
 <svelte:head>

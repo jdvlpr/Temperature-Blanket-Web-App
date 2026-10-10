@@ -15,19 +15,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { sendToProjectGallery } from '$lib/utils/project-utils.svelte';
-  import { svgToPNG } from '$lib/utils/preview-utils.svelte';
-  import { account } from '$lib/accounts/summary.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { sendToProjectGallery } from '#lib/utils/project-utils.svelte.js';
+  import { svgToPNG } from '#lib/utils/preview-utils.svelte.js';
+  import { account } from '#lib/accounts/summary.svelte.js';
   import { ExternalLinkIcon } from '@lucide/svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { onMount } from 'svelte';
   import StickyPart from './StickyPart.svelte';
-  import ShowOwnerToggle from '$lib/components/account/ShowOwnerToggle.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
+  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 
   // In the Project menu's narrow panel: one column, not three
   const inPanel = $derived(dialog.options.placement === 'side');
@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     projectName = (await ProjectStorage.getById(project.id))?.name ?? '';
     if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
-    const { getGalleryPages } = await import('$lib/accounts/gallery');
+    const { getGalleryPages } = await import('#lib/accounts/gallery.js');
     const gallery = await getGalleryPages();
     if (!gallery?.publishing) return;
     showOwner = gallery.settings.showOwnerDefault;
@@ -62,7 +62,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     submitting = true;
     if (fromAccount) {
       // Published from the account, it's kept there too, next to its gallery page
-      const { saveOpenProject } = await import('$lib/storage/autosave.svelte');
+      const { saveOpenProject } =
+        await import('#lib/storage/autosave.svelte.js');
       await saveOpenProject();
     }
     message = {
@@ -130,16 +131,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : ''}location and dates, gauge and yarn information, URL, preview
             image, and the current date to be displayed as a gallery page in the
             public
-            <a href="/gallery" target="_blank" class="link">Project Gallery</a
-            >
+            <a href="/gallery" target="_blank" class="link">Project Gallery</a>
           </p>
           {#if fromAccount}
             <p>
               • It will be linked to your account, so you can remove it later
-              from <a
-                href={resolve('/my-projects')}
-                target="_blank"
-                class="link">My Projects</a
+              from
+              <a href={resolve('my-projects')} target="_blank" class="link"
+                >My Projects</a
               >.
             </p>
           {/if}

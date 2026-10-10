@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-  import type { WeatherParam } from '$lib/types/gauge-types';
+  import RecentWeatherDataTooltip from '#lib/components/RecentWeatherDataTooltip.svelte';
+  import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
 
   interface Props {
     id: WeatherParam['id'];

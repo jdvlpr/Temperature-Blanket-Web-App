@@ -1,4 +1,4 @@
-import { defaultYarn } from '$lib/state/page-state.svelte';
+import { defaultYarn } from '#lib/state/page-state.svelte.js';
 
 /**
  * How often each yarn's colors are saved, to suggest making one the default

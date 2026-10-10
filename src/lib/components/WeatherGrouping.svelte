@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License along with Tem
   Whether weather is grouped by day or by week.
 -->
 <script lang="ts">
-  import ChoiceMenu from '$lib/components/buttons/ChoiceMenu.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import { CalendarDaysIcon } from '@lucide/svelte';
 
   const options = [

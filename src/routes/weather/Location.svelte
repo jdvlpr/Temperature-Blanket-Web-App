@@ -26,13 +26,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
-  import { project } from '$lib/state/project-state.svelte';
-  import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
+  import { NO_DATA_SRTM3 } from '#lib/constants/location-constants.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { displayGeoNamesErrorMessage } from '#lib/utils/error-utils.svelte.js';
   import {
     getSuggestions,
     renderResult,
-  } from '$lib/utils/location-utils.svelte';
+  } from '#lib/utils/location-utils.svelte.js';
   import { MapPinIcon, SearchIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import type { WeatherLocation } from './open-meteo-types';
-  import type { LocationSuggestion } from '$lib/types/location-types';
+  import type { LocationSuggestion } from '#lib/types/location-types.js';
 
   let searching = $state(false); // Autocomplete searching status
 

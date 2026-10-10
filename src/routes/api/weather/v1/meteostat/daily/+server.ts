@@ -12,29 +12,29 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
+import { dev } from '$app/env';
 
-import { dev } from '$app/environment';
 import {
   SECRET_METEOSTAT_API_KEY,
   SECRET_METEOSTAT_DEV_API_KEY,
-} from '$env/static/private';
-import { API_SERVICES } from '$lib/constants/api-constants';
-import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
-import type { WeatherDay } from '$lib/types/weather-types';
-import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
+} from '$app/env/private';
+import { API_SERVICES } from '#lib/constants/api-constants.js';
+import { NO_DATA_SRTM3 } from '#lib/constants/location-constants.js';
+import type { WeatherDay } from '#lib/types/weather-types.js';
+import { dateToISO8601String, stringToDate } from '#lib/utils/date-utils.js';
 import {
   displayNumber,
   getAvgOfThree,
   getMaxOfThree,
   getMinOfThree,
-} from '$lib/utils/number-utils';
+} from '#lib/utils/number-utils.js';
 import {
   celsiusToFahrenheit,
   hoursToMinutes,
   millimetersToInches,
-} from '$lib/utils/unit-utils.svelte.js';
-import { getMoonPhase } from '$lib/state/weather-state.svelte';
-import { cachedJSON } from '$lib/features/cache/edge-cache';
+} from '#lib/utils/unit-utils.svelte.js';
+import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
+import { cachedJSON } from '#lib/features/cache/edge-cache.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import * as SunCalc from 'suncalc';

@@ -14,15 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import DataSourcesCredits from '$lib/components/DataSourcesCredits.svelte';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  import DataSourcesCredits from '#lib/components/DataSourcesCredits.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
   import {
     MAXIMUM_DAYS_PER_LOCATION,
     MAXIMUM_LOCATIONS,
-  } from '$lib/constants/location-constants';
-  import { OPEN_METEO_MODELS } from '$lib/constants/weather-constants';
+  } from '#lib/constants/location-constants.js';
+  import { OPEN_METEO_MODELS } from '#lib/constants/weather-constants.js';
   import {
     CircleCheckIcon,
     CircleMinusIcon,
@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openTableOfContents = false;
     }
   }}
-/>
+></svelte:document>
 
 <svelte:head>
   <title>Documentation for temperature-blanket.com</title>
@@ -311,9 +311,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a
           href="#assigning-seasons"
           class="toc-anchor flex items-center gap-2 opacity-60 hover:opacity-100"
-          >Assigning Seasons <span class="badge bg-tertiary-100-900">Beta</span
-          ></a
         >
+          Assigning Seasons
+          <span class="badge bg-tertiary-100-900">Beta</span>
+        </a>
       </li>
       <li class="toc-list-item block">
         <a href="#gallery" class="toc-anchor opacity-60 hover:opacity-100"
@@ -385,8 +386,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ><path
                 fill="currentColor"
                 d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-              /></svg
-            >
+              ></path>
+            </svg>
 
             <span class="">Content</span>
           </div>
@@ -685,8 +686,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     ></tr
                   ><tr
                     class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">1</td><td>Go to Location section</td></tr
                   >
+                    <td class="kbd">1</td>
+                    <td>Go to Location section</td>
+                  </tr>
+
                   <tr
                     class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">2</td><td>Go to Weather section</td></tr
@@ -1133,12 +1137,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 - Open the CSV file with a spreadsheet program (for example
                 Microsoft Excel, Apple Numbers, or Google Sheets).
               </li>
+
               <li>
                 - Edit the weather data you want to change, then export the
                 document as a CSV file
               </li>
+
               <li>
-                - <a class="link" href="#import-weather-data"
+                -
+                <a class="link" href="#import-weather-data"
                   >Import the new CSV file into your project</a
                 >
               </li>
@@ -1435,24 +1442,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </thead>
                 <tbody
                   class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
-                  ><tr
-                    ><td class="p-2">From, not To (default)</td><td class="p-2"
-                      >13 ✅<br />12.5 ✅<br />12 ❌</td
-                    ></tr
-                  ><tr
-                    ><td class="p-2">To, not From</td><td class="p-2"
-                      >13 ❌<br />12.5 ✅<br />12 ✅</td
-                    ></tr
-                  ><tr
-                    ><td class="p-2">Both From and To</td><td class="p-2"
-                      >13 ✅<br />12.5 ✅<br />12 ✅</td
-                    ></tr
-                  ><tr
-                    ><td class="p-2">Neither</td><td class="p-2"
-                      >13 ❌<br />12.5 ✅<br />12 ❌</td
-                    ></tr
-                  ></tbody
                 >
+                  <tr>
+                    <td class="p-2">From, not To (default)</td>
+                    <td class="p-2">13 ✅<br />12.5 ✅<br />12 ❌</td>
+                  </tr>
+
+                  <tr>
+                    <td class="p-2">To, not From</td>
+                    <td class="p-2">13 ❌<br />12.5 ✅<br />12 ✅</td>
+                  </tr>
+
+                  <tr>
+                    <td class="p-2">Both From and To</td>
+                    <td class="p-2">13 ✅<br />12.5 ✅<br />12 ✅</td>
+                  </tr>
+
+                  <tr>
+                    <td class="p-2">Neither</td>
+                    <td class="p-2">13 ❌<br />12.5 ✅<br />12 ❌</td>
+                  </tr>
+                </tbody>
               </table>
             </figure>
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
@@ -1695,14 +1705,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 - An image of the colorway is found (usually from the brand or
                 manufacture’s website).
               </li>
+
               <li>
                 - A unobstructed area of the image showing as much
                 color-variance as possible within that yarn colorway is chosen.
               </li>
+
               <li>
                 - From the selected part of the image, the average color is
                 generated as an HTML color code.
               </li>
+
               <li>
                 - The HTML color code, colorway name, and link to the colorway’s
                 webpage is saved in a database which this web app uses to

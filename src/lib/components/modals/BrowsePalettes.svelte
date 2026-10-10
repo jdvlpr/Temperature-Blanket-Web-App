@@ -14,13 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import GalleryPalettes from '$lib/components/GalleryPalettes.svelte';
-  import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
-  import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
-  import SavedPalettes from '$lib/components/SavedPalettes.svelte';
-  import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
+  import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
+  import GalleryPalettes from '#lib/components/GalleryPalettes.svelte';
+  import GalleryPalettesPopular from '#lib/components/GalleryPalettesPopular.svelte';
+  import PaletteSchemes from '#lib/components/PaletteSchemes.svelte';
+  import SavedPalettes from '#lib/components/SavedPalettes.svelte';
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import {
     BlendIcon,
     BookmarkIcon,

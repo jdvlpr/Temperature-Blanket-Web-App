@@ -15,7 +15,7 @@
 
 // Dev only: checks that the D1 and R2 bindings work, for the wrangler e2e run.
 
-import { requireDevRoutes, requireStorage } from '$lib/server/platform';
+import { requireDevRoutes, requireStorage } from '#lib/server/platform.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

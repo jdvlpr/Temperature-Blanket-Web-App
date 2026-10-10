@@ -14,24 +14,24 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import WeatherItem from '$lib/components/WeatherItem.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { UNIT_LABELS } from '$lib/constants/weather-constants';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { previews } from '$lib/state/preview-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import type { WeatherParam } from '$lib/types/gauge-types';
-  import type { LocationStateType } from '$lib/types/location-types';
-  import type { WeatherDay } from '$lib/types/weather-types';
+  import WeatherItem from '#lib/components/WeatherItem.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
+  import type { LocationStateType } from '#lib/types/location-types.js';
+  import type { WeatherDay } from '#lib/types/weather-types.js';
   import {
     getColorInfo,
     getTextColor,
     type ColorInfo,
-  } from '$lib/utils/color-utils';
-  import { getIsRecentDate } from '$lib/utils/date-utils';
-  import { capitalizeFirstLetter, exists } from '$lib/utils/other-utils';
-  import { convertTime } from '$lib/utils/unit-utils.svelte';
+  } from '#lib/utils/color-utils.js';
+  import { getIsRecentDate } from '#lib/utils/date-utils.js';
+  import { capitalizeFirstLetter, exists } from '#lib/utils/other-utils.js';
+  import { convertTime } from '#lib/utils/unit-utils.svelte.js';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
 
   let {

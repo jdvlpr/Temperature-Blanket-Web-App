@@ -14,29 +14,29 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
-  import { MONTHS } from '$lib/constants/weather-constants';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  import { browser } from '$app/env';
+  import { MONTHS } from '#lib/constants/weather-constants.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import type {
     LocationStateType,
     LocationSuggestion,
-  } from '$lib/types/location-types';
-  import type { TISO8601DateString } from '$lib/types/weather-types';
+  } from '#lib/types/location-types.js';
+  import type { TISO8601DateString } from '#lib/types/weather-types.js';
   import {
     dateToISO8601String,
     stringToDate,
     yearFrom,
-  } from '$lib/utils/date-utils';
-  import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
+  } from '#lib/utils/date-utils.js';
+  import { displayGeoNamesErrorMessage } from '#lib/utils/error-utils.svelte.js';
   import {
     getSuggestions,
     renderResult,
-  } from '$lib/utils/location-utils.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  } from '#lib/utils/location-utils.svelte.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     EllipsisVerticalIcon,
     MapIcon,
@@ -77,6 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Weather or not the clear input text button should appear
   let showReset = $derived.by(() => {
     showResetKey;
+
     return (
       (!searching && (inputLocation?.value?.length ?? 0) > 1) ||
       (!searching && location?.label)
@@ -249,7 +250,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const _from: TISO8601DateString =
       from ??
       (`${year}-${_padFromMonth}-${_padFromDate}` as TISO8601DateString);
-
     let _to: TISO8601DateString | undefined = to;
 
     if (location.duration === 'y') {
@@ -259,6 +259,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         '0',
       );
       const _padToDate = String(yearFromSetDate.getUTCDate()).padStart(2, '0');
+
       _to =
         to ??
         (`${yearFromSetDate.getUTCFullYear()}-${_padToMonth}-${_padToDate}` as TISO8601DateString);
@@ -408,8 +409,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   d="M12 19a7 7 0 1 0 0-14a7 7 0 0 0 0 14Zm0 3c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10Z"
                   clip-rule="evenodd"
                   opacity=".2"
-                />
-                <path d="M2 12C2 6.477 6.477 2 12 2v3a7 7 0 0 0-7 7H2Z" />
+                ></path>
+                <path d="M2 12C2 6.477 6.477 2 12 2v3a7 7 0 0 0-7 7H2Z"></path>
               </g>
             </svg>
           </div>

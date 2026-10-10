@@ -1,5 +1,5 @@
-import { SECRET_GEONAMES_USERNAME } from '$env/static/private';
-import { API_SERVICES } from '$lib/constants/api-constants';
+import { SECRET_GEONAMES_USERNAME } from '$app/env/private';
+import { API_SERVICES } from '#lib/constants/api-constants.js';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params, fetch }) => {

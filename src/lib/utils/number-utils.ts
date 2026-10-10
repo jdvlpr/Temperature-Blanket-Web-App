@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { WEATHER_DATA_DECIMALS } from '$lib/constants/weather-constants';
+import { WEATHER_DATA_DECIMALS } from '#lib/constants/weather-constants.js';
 
 export const getRandomNumber = (min: number, max: number): number => {
   // min and max included

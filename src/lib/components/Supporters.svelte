@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_KOFI_LINK } from '$env/static/public';
-  import { SUPPORTERS } from '$lib/constants/supporter-constants';
+  import { PUBLIC_KOFI_LINK } from '$app/env/public';
+  import { SUPPORTERS } from '#lib/constants/supporter-constants.js';
   import { AwardIcon } from '@lucide/svelte';
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
 </script>
@@ -54,9 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                 since {monthAndYear}
               </p>
-              <a {href} target="_blank" class="anchor break-all">
-                {linkText}
-              </a>
+
+              <a {href} target="_blank" class="anchor break-all">{linkText}</a>
             </div>
           </div>
         {/each}

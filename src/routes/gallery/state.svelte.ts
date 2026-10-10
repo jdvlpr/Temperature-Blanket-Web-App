@@ -1,11 +1,11 @@
-import type { GalleryPalette } from '$lib/utils/color-utils';
+import type { GalleryPalette } from '#lib/utils/color-utils.js';
 import type {
   GalleryOrder,
   GalleryPageInfo,
   GalleryProjectNode,
   PaletteGalleryNode,
   PopularProject,
-} from '$lib/utils/gallery-utils';
+} from '#lib/utils/gallery-utils.js';
 
 class GalleryState {
   search = $state('');

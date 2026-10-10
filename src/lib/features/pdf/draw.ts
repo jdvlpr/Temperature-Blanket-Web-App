@@ -17,9 +17,9 @@
 // swatches, text in black or white on a color (getTextColor), and ranges
 // like "105°F → 92°F".
 
-import { fitFontSize } from '$lib/features/palette-image/layout';
-import { getTextColor } from '$lib/utils/color-utils';
-import { formatRangeNumber } from '$lib/utils/range-format';
+import { fitFontSize } from '#lib/features/palette-image/layout.js';
+import { getTextColor } from '#lib/utils/color-utils.js';
+import { formatRangeNumber } from '#lib/utils/range-format.js';
 import type { jsPDF } from 'jspdf';
 import { APP_FONT } from './fonts';
 import { lineHeight, ptToMm } from './layout';

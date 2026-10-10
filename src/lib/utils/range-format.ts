@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { NON_NEGATIVE_PARAMS } from '$lib/constants/weather-constants';
-import type { GaugeRangeOptions } from '$lib/types/gauge-types';
+import { NON_NEGATIVE_PARAMS } from '#lib/constants/weather-constants.js';
+import type { GaugeRangeOptions } from '#lib/types/gauge-types.js';
 
 // How a range reads everywhere it's shown (palette editor, gallery, palette
 // image, PDF, Google Sheets): "105°F → 92°F", From first, in the gauge's

@@ -1,4 +1,4 @@
-import { SYNC_HEADERS } from '$lib/sync/protocol';
+import { SYNC_HEADERS } from '#lib/sync/protocol.js';
 import { describe, expect, it } from 'vitest';
 import { isProjectId, parseSaveHeaders } from './request';
 import { MAX_PROJECT_BYTES } from './store';

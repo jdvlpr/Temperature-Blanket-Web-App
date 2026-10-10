@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
   import { NotebookPenIcon, SwatchBookIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import Gallery from './Gallery.svelte';

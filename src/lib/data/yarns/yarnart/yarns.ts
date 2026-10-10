@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as elite } from './elite/yarn';
 import { yarn as jeans } from './jeans/yarn';
 

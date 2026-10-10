@@ -1,24 +1,24 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import type { BasePreviewSettings } from '$lib/types/preview-types';
-import type { Color } from '$lib/types/yarn-types';
-import type { WeatherParam } from '$lib/types/gauge-types';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import type { BasePreviewSettings } from '#lib/types/preview-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
 import {
   getDaysInLongestMonth,
   getFactors,
   getPossibleDimensions,
   setTargets,
   weatherMonthsData,
-} from '$lib/utils/preview-utils.svelte';
-import { getMiddleValueOfArray } from '$lib/utils/number-utils';
-import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+} from '#lib/utils/preview-utils.svelte.js';
+import { getMiddleValueOfArray } from '#lib/utils/number-utils.js';
+import { getWeatherTargets } from '#lib/utils/weather-utils.svelte.js';
 import {
   resolveExtraColors,
   type ExtraColorDetails,
   type PreviewExtraColor,
-} from '$lib/utils/extra-colors-utils';
+} from '#lib/utils/extra-colors-utils.js';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';

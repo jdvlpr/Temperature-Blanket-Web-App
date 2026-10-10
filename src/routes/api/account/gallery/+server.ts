@@ -25,8 +25,9 @@ export const prerender = false;
 const NO_STORE = { 'Cache-Control': 'no-store' };
 
 export const GET: RequestHandler = async (event) => {
-  const { requireGallery } = await import('$lib/server/gallery');
-  const { listPosts, getSettings } = await import('$lib/server/gallery/store');
+  const { requireGallery } = await import('#lib/server/gallery/index.js');
+  const { listPosts, getSettings } =
+    await import('#lib/server/gallery/store.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 
@@ -45,7 +46,7 @@ export const GET: RequestHandler = async (event) => {
 
 export const POST: RequestHandler = async (event) => {
   const { requireGallery, publishFromAccount } =
-    await import('$lib/server/gallery');
+    await import('#lib/server/gallery/index.js');
   const gallery = await requireGallery(event, { publishing: true });
   if (gallery instanceof Response) return gallery;
 
@@ -57,8 +58,9 @@ export const POST: RequestHandler = async (event) => {
 };
 
 export const PATCH: RequestHandler = async (event) => {
-  const { requireGallery, galleryError } = await import('$lib/server/gallery');
-  const { updateSettings } = await import('$lib/server/gallery/store');
+  const { requireGallery, galleryError } =
+    await import('#lib/server/gallery/index.js');
+  const { updateSettings } = await import('#lib/server/gallery/store.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 

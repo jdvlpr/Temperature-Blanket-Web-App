@@ -22,8 +22,8 @@
 // browser's copy is kept while its deletion hasn't reached the account, or when
 // the account's list couldn't be fetched (offline, sync paused).
 
-import { SYNC_API, type TrashedProjectMeta } from '$lib/sync/protocol';
-import type { ProjectSyncState } from '$lib/sync/engine';
+import { SYNC_API, type TrashedProjectMeta } from '#lib/sync/protocol.js';
+import type { ProjectSyncState } from '#lib/sync/engine.js';
 import {
   ProjectStorage,
   type StoredProject,
@@ -174,8 +174,8 @@ export function trashedProject(
           { credentials: 'same-origin' },
         );
         if (!response.ok || !response.body) return null;
-        const { gunzip } = await import('$lib/sync/http');
-        const { rehomeHref } = await import('$lib/sync/engine');
+        const { gunzip } = await import('#lib/sync/http.js');
+        const { rehomeHref } = await import('#lib/sync/engine.js');
         const project = JSON.parse(
           await gunzip(response.body),
         ) as StoredProject;

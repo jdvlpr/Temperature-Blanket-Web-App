@@ -14,16 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import {
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_BASE_URL,
     PUBLIC_GITHUB_LINK,
-  } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import ChangelogItem from '$lib/components/ChangelogItem.svelte';
-  import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
+  } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import ChangelogItem from '#lib/components/ChangelogItem.svelte';
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import { onMount } from 'svelte';
   import { entries } from './changelog';
 
@@ -72,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div class="flex flex-col items-start gap-2" bind:this={container}>
         <h2 class="h2 text-gradient mt-2 max-lg:hidden">What's New?</h2>
-        <p class="text-left text-sm text-surface-700-300">
+        <p class="text-surface-700-300 text-left text-sm">
           Selected highlights of changes to {PUBLIC_BASE_DOMAIN_NAME}. To see
           the full changelog,
           <a

@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as washWorsted } from './wash-worsted/yarn';
 
 export const brand: Brand = {

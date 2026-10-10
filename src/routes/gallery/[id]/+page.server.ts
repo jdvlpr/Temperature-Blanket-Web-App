@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { queryGallery } from '$lib/utils/gallery-utils';
-import type { GalleryOwner } from '$lib/server/gallery/store';
+import { queryGallery } from '#lib/utils/gallery-utils.js';
+import type { GalleryOwner } from '#lib/server/gallery/store.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -34,7 +34,7 @@ async function getOwner(
   if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB || !Number.isSafeInteger(id))
     return null;
   try {
-    const { ownerForPost } = await import('$lib/server/gallery/store');
+    const { ownerForPost } = await import('#lib/server/gallery/store.js');
     return await ownerForPost(env.DB, id);
   } catch (e) {
     // Before migration 0004, or D1 unavailable: the page renders without a name

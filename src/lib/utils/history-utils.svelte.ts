@@ -13,28 +13,28 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { projectChanged } from '$lib/storage/autosave.svelte';
-import { browser } from '$app/environment';
-import { ICONS } from '$lib/constants/icon-constants';
-import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { toast } from '$lib/state/page-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import { showHistoryChange } from '$lib/utils/feedback.svelte';
-import { exists } from '$lib/utils/other-utils';
-import { escapeHtml } from '$lib/utils/string-utils';
-import type { GaugeRange, GaugeRangeOptions } from '$lib/types/gauge-types';
-import type { Color } from '$lib/types/yarn-types';
-import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
-import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
-import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
+import { projectChanged } from '#lib/storage/autosave.svelte.js';
+import { browser } from '$app/env';
+import { ICONS } from '#lib/constants/icon-constants.js';
+import { allGaugesAttributes, gauges } from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { toast } from '#lib/state/page-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import { showHistoryChange } from '#lib/utils/feedback.svelte.js';
+import { exists } from '#lib/utils/other-utils.js';
+import { escapeHtml } from '#lib/utils/string-utils.js';
+import type { GaugeRange, GaugeRangeOptions } from '#lib/types/gauge-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import { getProjectParametersFromURLHash } from '#lib/utils/project-utils.svelte.js';
+import { parseGaugeURLHash } from '#lib/utils/load-project-utils.svelte.js';
+import { seasonsFromUrlHash } from '#lib/utils/seasons-utils.svelte.js';
 import {
   EXTRA_COLORS_HASH_KEY,
   extraColorDetailsFromUrlHash,
-} from '$lib/utils/extra-colors-utils';
+} from '#lib/utils/extra-colors-utils.js';
 
 export const loadFromHistory = async ({
   action,

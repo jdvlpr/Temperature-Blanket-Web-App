@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { Unit, WeatherSource } from '$lib/types/weather-types';
+import type { Unit, WeatherSource } from '#lib/types/weather-types.js';
 
 /** Shape of the `/weather` route's standalone Open-Meteo forecast integration
- * (distinct from the main app's Meteostat-backed `$lib/state/weather-state.svelte.ts`). */
+ * (distinct from the main app's Meteostat-backed `#lib/state/weather-state.svelte.ts`). */
 
 export interface OpenMeteoCurrentWeather {
   time: string;

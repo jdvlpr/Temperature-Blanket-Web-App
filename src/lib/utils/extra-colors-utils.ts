@@ -32,8 +32,8 @@
 // Projects saved before this param existed simply have no `x` param, so their
 // extra colors are hex-only (read from the preview's own param) as before.
 
-import type { Color } from '$lib/types/yarn-types';
-import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
+import type { Color } from '#lib/types/yarn-types.js';
+import { getColorPropertiesFromYarnStringAndHex } from '#lib/utils/yarn-utils.js';
 import chroma from 'chroma-js';
 
 export const EXTRA_COLORS_HASH_KEY = 'x';

@@ -16,8 +16,8 @@
 import {
   getBrands,
   getColorwaysWithAffiliateLinks,
-} from '$lib/data/yarns/colorways.svelte';
-import type { Color, Yarn } from '$lib/types/yarn-types';
+} from '#lib/data/yarns/colorways.svelte.js';
+import type { Color, Yarn } from '#lib/types/yarn-types.js';
 
 /**
  * [getColorPropertiesFromYarnStringAndHex description]

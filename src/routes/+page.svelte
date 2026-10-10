@@ -14,49 +14,49 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { beforeNavigate } from '$app/navigation';
-  import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Gauges from '$lib/components/Gauges.svelte';
-  import Locations from '$lib/components/Locations.svelte';
-  import Navigation from '$lib/components/Navigation.svelte';
-  import Previews from '$lib/components/Previews.svelte';
-  import WeatherSearchOverlay from '$lib/components/WeatherSearchOverlay.svelte';
-  import WeatherSection from '$lib/components/WeatherSection.svelte';
-  import DonateButton from '$lib/components/buttons/DonateButton.svelte';
-  import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
-  import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
-  import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
-  import ProjectMenuButton from '$lib/components/buttons/ProjectMenuButton.svelte';
-  import SaveButton from '$lib/components/buttons/SaveButton.svelte';
-  import ProjectTitle from '$lib/components/ProjectTitle.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
+  import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Gauges from '#lib/components/Gauges.svelte';
+  import Locations from '#lib/components/Locations.svelte';
+  import Navigation from '#lib/components/Navigation.svelte';
+  import Previews from '#lib/components/Previews.svelte';
+  import WeatherSearchOverlay from '#lib/components/WeatherSearchOverlay.svelte';
+  import WeatherSection from '#lib/components/WeatherSection.svelte';
+  import DonateButton from '#lib/components/buttons/DonateButton.svelte';
+  import SectionNavigationButtons from '#lib/components/buttons/SectionNavigationButtons.svelte';
+  import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
+  import LegacyNotification from '#lib/components/modals/LegacyNotification.svelte';
+  import ProjectMenuButton from '#lib/components/buttons/ProjectMenuButton.svelte';
+  import SaveButton from '#lib/components/buttons/SaveButton.svelte';
+  import ProjectTitle from '#lib/components/ProjectTitle.svelte';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
   import {
     dialog,
     isDesktop,
     pageSections,
     toast,
-  } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import {
     autosave,
     changedElsewhereMessage,
     saveCopy,
     saveNow,
-  } from '$lib/storage/autosave.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
-  import { takeJustTrashed } from '$lib/storage/trash';
+  } from '#lib/storage/autosave.svelte.js';
+  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import { takeJustTrashed } from '#lib/storage/trash.js';
   import {
     loadFromHistory,
     updateHistory,
-  } from '$lib/utils/history-utils.svelte';
-  import { loadProjectFromURL } from '$lib/utils/load-project-utils.svelte';
-  import { upToDate } from '$lib/utils/other-utils';
-  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
+  } from '#lib/utils/history-utils.svelte.js';
+  import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
+  import { upToDate } from '#lib/utils/other-utils.js';
+  import { setUnitsFromNavigator } from '#lib/utils/unit-utils.svelte.js';
   import { RedoIcon, UndoIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
 
@@ -85,10 +85,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // Leaving for another page of the site: a change waiting to save saves now
-  beforeNavigate(() => void saveNow());
+  beforeNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
 
-  // Another tab or device changed the open project: say so once, since
-  // changes here stop saving rather than overwrite it
+    return void saveNow();
+  });
   $effect(() => {
     if (autosave.state !== 'conflict') return;
     untrack(() =>

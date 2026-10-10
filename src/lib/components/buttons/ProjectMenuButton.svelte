@@ -20,8 +20,8 @@ since saved is the usual state; a slow, dimmed spinner while a change waits
 to save, with a little pop when it lands; red only for a problem, which the menu explains. -->
 
 <script lang="ts">
-  import { openProjectMenu } from '$lib/state/page-state.svelte';
-  import { autosave } from '$lib/storage/autosave.svelte';
+  import { openProjectMenu } from '#lib/state/page-state.svelte.js';
+  import { autosave } from '#lib/storage/autosave.svelte.js';
   import {
     CloudAlertIcon,
     CloudCheckIcon,

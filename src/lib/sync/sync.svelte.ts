@@ -23,16 +23,16 @@
 
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { account } from '$lib/accounts/summary.svelte';
-import { toast } from '$lib/state/page-state.svelte';
-import { PaletteStorage, savedPalettes } from '$lib/storage/palettes.svelte';
+import { account } from '#lib/accounts/summary.svelte.js';
+import { toast } from '#lib/state/page-state.svelte.js';
+import { PaletteStorage, savedPalettes } from '#lib/storage/palettes.svelte.js';
 import {
   applyAccountPreferences,
   leaveAccountPreferences,
   onPreferencesChange,
   pendingPreferences,
-} from '$lib/storage/preferences-sync.svelte';
-import { ProjectStorage } from '$lib/storage/projects.svelte';
+} from '#lib/storage/preferences-sync.svelte.js';
+import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 import {
   syncAccount,
   SyncHttpError,
@@ -160,7 +160,7 @@ async function toastNewProblem(userId: string) {
       message,
       category: 'error',
       autohide: false,
-      action: { label: action, response: () => goto(resolve('/account')) },
+      action: { label: action, response: () => goto(resolve('account')) },
     });
   }
   shownProblem = problem;

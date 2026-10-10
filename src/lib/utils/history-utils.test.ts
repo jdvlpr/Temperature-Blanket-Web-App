@@ -69,49 +69,49 @@ const {
   },
 }));
 
-vi.mock('$lib/utils/feedback.svelte', () => ({
+vi.mock('#lib/utils/feedback.svelte.js', () => ({
   showHistoryChange: vi.fn(),
 }));
 vi.mock('$app/environment', () => ({ browser: true }));
-vi.mock('$lib/storage/autosave.svelte', () => ({ projectChanged: vi.fn() }));
+vi.mock('#lib/storage/autosave.svelte.js', () => ({ projectChanged: vi.fn() }));
 
-vi.mock('$lib/state/gauges-state.svelte', () => ({
+vi.mock('#lib/state/gauges-state.svelte.js', () => ({
   allGaugesAttributes: mockGauges.allGaugesAttributes,
   gauges: mockGauges.gauges,
 }));
 
-vi.mock('$lib/state/location-state.svelte', () => ({
+vi.mock('#lib/state/location-state.svelte.js', () => ({
   locations: mockLocations,
 }));
 
-vi.mock('$lib/state/preview-state.svelte', () => ({
+vi.mock('#lib/state/preview-state.svelte.js', () => ({
   previews: mockPreviews,
 }));
 
-vi.mock('$lib/state/project-state.svelte', () => ({
+vi.mock('#lib/state/project-state.svelte.js', () => ({
   project: mockProject,
 }));
 
-vi.mock('$lib/state/page-state.svelte', () => ({
+vi.mock('#lib/state/page-state.svelte.js', () => ({
   toast: mockToast,
 }));
 
-vi.mock('$lib/state/weather-state.svelte', () => ({
+vi.mock('#lib/state/weather-state.svelte.js', () => ({
   weather: mockWeather,
 }));
 
-vi.mock('$lib/storage/preferences.svelte', () => ({
+vi.mock('#lib/storage/preferences.svelte.js', () => ({
   preferences: mockPreferences,
 }));
 
 // Only `parseGaugeURLHash` is used by history-utils, and the real module
 // transitively pulls in the full yarn colorway dataset via ensureYarnData -
 // stub it out rather than loading that for a test that keeps gauges empty.
-vi.mock('$lib/utils/load-project-utils.svelte', () => ({
+vi.mock('#lib/utils/load-project-utils.svelte.js', () => ({
   parseGaugeURLHash: vi.fn(),
 }));
 
-vi.mock('$lib/utils/seasons-utils.svelte', () => ({
+vi.mock('#lib/utils/seasons-utils.svelte.js', () => ({
   seasonsFromUrlHash: vi.fn(),
 }));
 

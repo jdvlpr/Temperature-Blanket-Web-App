@@ -1,15 +1,15 @@
-import { weather } from '$lib/state/weather-state.svelte';
+import { weather } from '#lib/state/weather-state.svelte.js';
 import type {
   GaugeAttributes,
   GaugeRange,
   GaugeRangeOptions,
   GaugeSettingsType,
   WeatherParam,
-} from '$lib/types/gauge-types';
-import type { Color } from '$lib/types/yarn-types';
-import { displayNumber } from '$lib/utils/number-utils';
-import { getIncrement, getStart } from '$lib/utils/range-utils.svelte';
-import { getRanges } from '$lib/utils/gauge-utils.svelte';
+} from '#lib/types/gauge-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
+import { getIncrement, getStart } from '#lib/utils/range-utils.svelte.js';
+import { getRanges } from '#lib/utils/gauge-utils.svelte.js';
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {

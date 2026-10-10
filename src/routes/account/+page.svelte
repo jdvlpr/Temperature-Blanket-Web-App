@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { LIST_ENDS, ROW_FOCUS } from '$lib/constants/class-constants';
+  import { LIST_ENDS, ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import {
     accountErrorMessage,
@@ -22,22 +22,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSession,
     hasSignedInHint,
     type AccountUser,
-  } from '$lib/accounts/client';
+  } from '#lib/accounts/client.js';
   import {
     account,
     forgetAccountSummary,
     rememberAccountSummary,
-  } from '$lib/accounts/summary.svelte';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import AccountAvatar from '$lib/components/account/AccountAvatar.svelte';
-  import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
-  import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
-  import DisplayName from '$lib/components/account/DisplayName.svelte';
-  import GalleryProfileLink from '$lib/components/account/GalleryProfileLink.svelte';
-  import SignInCard from '$lib/components/account/SignInCard.svelte';
-  import SignInMethods from '$lib/components/account/SignInMethods.svelte';
-  import { getGalleryPages } from '$lib/accounts/gallery';
+  } from '#lib/accounts/summary.svelte.js';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import AccountAvatar from '#lib/components/account/AccountAvatar.svelte';
+  import ChangeEmail from '#lib/components/account/ChangeEmail.svelte';
+  import DeleteAccount from '#lib/components/account/DeleteAccount.svelte';
+  import DisplayName from '#lib/components/account/DisplayName.svelte';
+  import GalleryProfileLink from '#lib/components/account/GalleryProfileLink.svelte';
+  import SignInCard from '#lib/components/account/SignInCard.svelte';
+  import SignInMethods from '#lib/components/account/SignInMethods.svelte';
+  import { getGalleryPages } from '#lib/accounts/gallery.js';
   import {
     ChevronRightIcon,
     DownloadIcon,
@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (status !== 'signed-in') return;
+
     getGalleryPages().then(
       (gallery) => (galleryPageCount = gallery?.posts.length ?? 0),
     );
@@ -105,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!user) return;
     busy = true;
     errorMessage = '';
-    const { startSignOut } = await import('$lib/accounts/sign-out');
+    const { startSignOut } = await import('#lib/accounts/sign-out.js');
     await startSignOut({
       userId: user.id,
       everywhere,
@@ -132,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const data = await response.json();
       try {
         const { downloadAccountProjects } =
-          await import('$lib/sync/sync.svelte');
+          await import('#lib/sync/sync.svelte.js');
         data.projects = await downloadAccountProjects();
       } catch {
         data.projects =
@@ -298,7 +299,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {galleryPageCount}
               ondeleted={async () => {
                 // The account's copies are gone; keep this browser's
-                const { leaveAccount } = await import('$lib/sync/sync.svelte');
+                const { leaveAccount } =
+                  await import('#lib/sync/sync.svelte.js');
                 if (user) await leaveAccount(user.id, true);
                 forgetAccountSummary();
                 user = null;
@@ -325,12 +327,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="mx-auto max-w-md px-2 py-4 text-center text-sm opacity-80">
             <span class="badge preset-tonal-secondary mr-1">Beta</span>
             Accounts were
-            <a href={resolve('/blog/2026-09-28-accounts-beta')} class="link"
+
+            <a href={resolve('blog/2026-09-28-accounts-beta')} class="link"
               >recently announced</a
             >
+
             and are currently in beta; if something doesn't work as expected,
             please
-            <a href={resolve('/contact')} class="link">get in touch</a>.
+            <a href={resolve('contact')} class="link">get in touch</a>
+            .
           </p>
         </div>
         <SignInCard onsignedin={showSignedIn} />

@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
 
   const title = 'Accounts (Beta): Your Projects on Every Device';
@@ -250,8 +250,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a href="/documentation#range-calculation-methods" class="link"
                 >documentation</a
               >
-              has always said. Before, it took the color of the last one. This
-              only happens if you've typed in ranges that overlap, or chose
+              has always said. Before, it took the color of the last one. This only
+              happens if you've typed in ranges that overlap, or chose
               <span class="italic">Both From and To</span> under
               <span class="italic">Each range includes</span> in the Ranges menu.
               If so, some days in your preview may change color, so it's worth a look

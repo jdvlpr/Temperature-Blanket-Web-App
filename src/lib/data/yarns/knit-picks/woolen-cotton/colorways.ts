@@ -1,4 +1,4 @@
-import type { Colorway } from '$lib/types/yarn-types';
+import type { Colorway } from '#lib/types/yarn-types.js';
 
 const colorways: Colorway[] = [
   {

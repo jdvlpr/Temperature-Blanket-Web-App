@@ -20,10 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
 
   import { ExternalLinkIcon } from '@lucide/svelte';
   import { tick } from 'svelte';

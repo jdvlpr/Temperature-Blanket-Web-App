@@ -1,23 +1,23 @@
-import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
-import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
-import { gauges } from '$lib/state/gauges-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { BasePreviewSettings } from '$lib/types/preview-types';
-import type { Color } from '$lib/types/yarn-types';
-import type { WeatherParam } from '$lib/types/gauge-types';
-import { displayNumber } from '$lib/utils/number-utils';
-import { getColorInfo } from '$lib/utils/color-utils';
-import { setTargets } from '$lib/utils/preview-utils.svelte';
-import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
+import { weatherDataUpdatedKey } from '#lib/components/WeatherTableWrapper.svelte';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
+import { DEFAULT_SEASONS } from '#lib/constants/seasons-constants.js';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { BasePreviewSettings } from '#lib/types/preview-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
+import { displayNumber } from '#lib/utils/number-utils.js';
+import { getColorInfo } from '#lib/utils/color-utils.js';
+import { setTargets } from '#lib/utils/preview-utils.svelte.js';
+import { getSeasonForDate } from '#lib/utils/seasons-utils.svelte.js';
 import {
   resolveExtraColors,
   type ExtraColorDetails,
   type PreviewExtraColor,
-} from '$lib/utils/extra-colors-utils';
+} from '#lib/utils/extra-colors-utils.js';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';

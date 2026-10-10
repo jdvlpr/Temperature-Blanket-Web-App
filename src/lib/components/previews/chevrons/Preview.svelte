@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { getColorInfo } from '$lib/utils/color-utils';
-  import { runPreview } from '$lib/utils/function-utils.svelte';
-  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { getColorInfo } from '#lib/utils/color-utils.js';
+  import { runPreview } from '#lib/utils/function-utils.svelte.js';
+  import { showPreviewImageWeatherDetails } from '#lib/utils/preview-utils.svelte.js';
   import { chevronsPreview, type ChevronsSection } from './state.svelte';
 
   let width = $state(chevronsPreview.width);

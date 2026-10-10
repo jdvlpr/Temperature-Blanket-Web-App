@@ -23,7 +23,7 @@ import {
 } from './color-utils';
 
 // Mocking $lib modules
-vi.mock('$lib/state/gauges-state.svelte', () => ({
+vi.mock('#lib/state/gauges-state.svelte.js', () => ({
   allGaugesAttributes: [
     {
       id: 'tmax_gauge',
@@ -66,13 +66,13 @@ vi.mock('$lib/state/gauges-state.svelte', () => ({
   }),
 }));
 
-vi.mock('$lib/state/project-state.svelte', () => ({
+vi.mock('#lib/state/project-state.svelte.js', () => ({
   project: {
     url: { href: 'http://localhost/?project=123' },
   },
 }));
 
-vi.mock('$lib/utils/number-utils', async (importOriginal) => {
+vi.mock('#lib/utils/number-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -82,7 +82,7 @@ vi.mock('$lib/utils/number-utils', async (importOriginal) => {
   };
 });
 
-vi.mock('$lib/utils/yarn-utils', async (importOriginal) => {
+vi.mock('#lib/utils/yarn-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -166,7 +166,7 @@ describe('color-utils', () => {
     });
 
     it("gives a value in overlapping ranges the first range's color", async () => {
-      const { gauges } = await import('$lib/state/gauges-state.svelte');
+      const { gauges } = await import('#lib/state/gauges-state.svelte.js');
       vi.mocked(gauges.getSnapshot).mockReturnValueOnce({
         unit: { type: 'number' },
         ranges: [

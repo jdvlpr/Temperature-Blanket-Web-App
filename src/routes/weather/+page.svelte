@@ -27,23 +27,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { page } from '$app/state';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Footer from '$lib/components/Footer.svelte';
-  import Share from '$lib/components/Share.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import UnitMenu from '$lib/components/buttons/UnitMenu.svelte';
-  import { dialog, showNavigationSideBar } from '$lib/state/page-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { delay } from '$lib/utils/function-utils.svelte';
-  import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
-  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
-  import type { Unit } from '$lib/types/weather-types';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import Share from '#lib/components/Share.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import UnitMenu from '#lib/components/buttons/UnitMenu.svelte';
+  import {
+    dialog,
+    showNavigationSideBar,
+  } from '#lib/state/page-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { delay } from '#lib/utils/function-utils.svelte.js';
+  import { getWeatherCodeDetails } from '#lib/utils/weather-forecast-utils.js';
+  import { setUnitsFromNavigator } from '#lib/utils/unit-utils.svelte.js';
+  import type { Unit } from '#lib/types/weather-types.js';
   import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
   import { onDestroy, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
@@ -219,12 +222,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       hourlyData.map((item) => item.isNow).indexOf(true) + 24,
     ),
   );
-
   let currentTime = $derived(
-    getCurrentTime({
-      weatherData: weatherData,
-      hourFormat: weatherState.hour,
-    }),
+    getCurrentTime({ weatherData, hourFormat: weatherState.hour }),
   );
 
   // Update the weather chart when the sidebar is closed or opened
@@ -497,7 +496,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
+                    ></path>
                   </svg>
                   Hourly Forcast
                 </p>
@@ -567,7 +566,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
-                    />
+                    ></path>
                   </svg>
                   Daily Forecast
                 </p>

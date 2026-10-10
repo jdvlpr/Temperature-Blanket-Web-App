@@ -20,12 +20,15 @@ Projects). The name shows on My Projects instead of the location title, and
 syncs like any other change. -->
 
 <script lang="ts">
-  import ProjectNameField from '$lib/components/ProjectNameField.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { renameOpenProject, storedItem } from '$lib/storage/autosave.svelte';
-  import { savedProjects } from '$lib/storage/projects.svelte';
+  import ProjectNameField from '#lib/components/ProjectNameField.svelte';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import {
+    renameOpenProject,
+    storedItem,
+  } from '#lib/storage/autosave.svelte.js';
+  import { savedProjects } from '#lib/storage/projects.svelte.js';
   import { PencilIcon } from '@lucide/svelte';
 
   let id = $state<string | null>(null);

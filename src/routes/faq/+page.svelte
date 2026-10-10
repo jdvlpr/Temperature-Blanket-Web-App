@@ -14,26 +14,28 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import YouTubeVideo from '$lib/components/YouTubeVideo.svelte';
-  import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import YouTubeVideo from '#lib/components/YouTubeVideo.svelte';
+  import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { ChevronDownIcon, CircleQuestionMarkIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
   let value = $state(['club']);
-
   let isExpandedRevealInstructions = $state(false);
 </script>
 
 <svelte:head>
   <title>FAQ</title>
+
   <meta name="description" content="Frequently Asked Questions" />
 
   <meta property="og:title" content="Frequently Asked Questions" />
+
   <meta property="og:description" content="Frequently Asked Questions" />
+
   <meta property="og:url" content="{PUBLIC_BASE_URL}/faq" />
   <meta property="og:type" content="website" />
 </svelte:head>
@@ -419,17 +421,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             you want to use (e.g. both fields would be set to March
                             10, 1942, for only one day of weather data).
                           </li>
+
                           <li>
                             Press <span class="italic">Add Location</span>.
                           </li>
+
                           <li>
                             Enter and select the same location, then repeat
                             steps 2-3 for each year you want to include in your
-                            project, changing the <span class="italic"
-                              >From</span
-                            >
-                            and <span class="italic">To</span> dates to the same date
-                            in the following year.
+                            project, changing the
+                            <span class="italic">From</span>
+                            and
+                            <span class="italic">To</span>
+                            dates to the same date in the following year.
                           </li>
                           <li>
                             Once you've added a new location for each year, you

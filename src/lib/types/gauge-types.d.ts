@@ -1,4 +1,4 @@
-import type { Color } from '$lib/types/yarn-types';
+import type { Color } from '#lib/types/yarn-types.js';
 
 // Gauge Types
 export interface GaugeRange {

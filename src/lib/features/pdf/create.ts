@@ -18,17 +18,20 @@
 // of the weather, each day with its colors. Drawn with jsPDF, all as text
 // and shapes, so it can be searched and copied from.
 
-import { PUBLIC_BASE_DOMAIN_NAME } from '$env/static/public';
-import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { previews } from '$lib/state/preview-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { GaugeStateInterface } from '$lib/types/gauge-types';
-import type { Color } from '$lib/types/yarn-types';
-import { getDaysInRange, getDaysPercent } from '$lib/utils/range-utils.svelte';
-import { rangeRuleSentence } from '$lib/utils/range-format';
-import { pluralize } from '$lib/utils/string-utils';
+import { PUBLIC_BASE_DOMAIN_NAME } from '$app/env/public';
+import { allGaugesAttributes, gauges } from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { previews } from '#lib/state/preview-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { GaugeStateInterface } from '#lib/types/gauge-types.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import {
+  getDaysInRange,
+  getDaysPercent,
+} from '#lib/utils/range-utils.svelte.js';
+import { rangeRuleSentence } from '#lib/utils/range-format.js';
+import { pluralize } from '#lib/utils/string-utils.js';
 import { INK, SIZE, paragraph, wrap, type Pdf } from './draw';
 import { addAppFont } from './fonts';
 import { Flow, lineHeight, pageBox } from './layout';
@@ -136,12 +139,13 @@ export async function createPdf({
   gaugeIds,
   name,
   download = true,
+
+  /** The saved project's name, if it has one */
+  /** Save it as a file (off for tests) */
 }: {
   settings: PdfSettings;
   gaugeIds: string[];
-  /** The saved project's name, if it has one */
   name: string;
-  /** Save it as a file (off for tests) */
   download?: boolean;
 }) {
   const { jsPDF } = await import('jspdf');

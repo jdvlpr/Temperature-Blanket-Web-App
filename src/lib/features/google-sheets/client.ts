@@ -12,11 +12,11 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
-
 import {
   PUBLIC_GOOGLE_API_KEY,
   PUBLIC_GOOGLE_CLIENT_ID,
-} from '$env/static/public';
+} from '$app/env/public';
+
 import { buildSpreadsheetData } from './formatter';
 import type { ExportOptions } from './types';
 

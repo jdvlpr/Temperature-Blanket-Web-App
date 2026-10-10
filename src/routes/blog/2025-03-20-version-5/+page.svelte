@@ -14,19 +14,22 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
   <title>Version 5: Refreshed & Rebuilt</title>
+
   <meta name="description" content="Version 5: Refreshed & Rebuilt" />
 
   <meta property="og:title" content="Version 5: Refreshed & Rebuilt" />
+
   <meta property="og:description" content="Version 5: Refreshed & Rebuilt" />
+
   <meta
     property="og:url"
     content="{PUBLIC_BASE_URL}/blog/2025-03-20-version-5"

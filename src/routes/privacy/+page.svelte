@@ -14,19 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import {
     consentToMSClarityCookies,
     toast,
-  } from '$lib/state/page-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  } from '#lib/state/page-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { RefreshCcwIcon } from '@lucide/svelte';
 
   let kofiUrl = new URL(PUBLIC_KOFI_LINK || 'https://ko-fi.com');
-
   let kofiLinkTitle = kofiUrl.hostname + kofiUrl.pathname;
 </script>
 
@@ -71,7 +70,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class="flex flex-col gap-2">
         <p class="text-xl font-bold">Cookies and data privacy</p>
-
         <p>
           Learn how this site uses cookies and manage your preferences below.
         </p>
@@ -286,10 +284,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="text-xl font-bold">Supporter details</p>
           <p>
             You can make a donation to the developer of temperature-blanket.com
-            at <a href={PUBLIC_KOFI_LINK} target="_blank" class="link"
+            at
+
+            <a href={PUBLIC_KOFI_LINK} target="_blank" class="link"
               >{kofiLinkTitle}</a
-            >. Any personal details you provide there are used for communication
+            >
+
+            . Any personal details you provide there are used for communication
             between the developer and you. To learn more, visit
+
             <a
               href="https://more.ko-fi.com/privacy"
               target="_blank"

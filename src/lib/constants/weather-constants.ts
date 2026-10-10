@@ -16,7 +16,7 @@
 import type {
   MoonPhasesName,
   WeatherSourceOptions,
-} from '$lib/types/weather-types';
+} from '#lib/types/weather-types.js';
 
 export const OPEN_METEO_DELAY_DAYS = 6;
 

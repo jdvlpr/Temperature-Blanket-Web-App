@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
+  import CloseButton from '#lib/components/modals/CloseButton.svelte';
   import { CheckIcon } from '@lucide/svelte';
 
   interface Props {

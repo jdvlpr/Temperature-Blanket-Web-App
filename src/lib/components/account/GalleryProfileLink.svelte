@@ -19,7 +19,7 @@ chosen for each one, when adding it and in My Projects). Hidden otherwise. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { getGalleryPages } from '$lib/accounts/gallery';
+  import { getGalleryPages } from '#lib/accounts/gallery.js';
   import { ExternalLinkIcon, UserRoundIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -54,8 +54,8 @@ chosen for each one, when adding it and in My Projects). Hidden otherwise. -->
     </a>
   {:else}
     <p class="text-warning-700-300 px-4 py-3 text-sm">
-      Add a display name above to show it on your public gallery page and on
-      the projects and palettes you included there.
+      Add a display name above to show it on your public gallery page and on the
+      projects and palettes you included there.
     </p>
   {/if}
 {/if}

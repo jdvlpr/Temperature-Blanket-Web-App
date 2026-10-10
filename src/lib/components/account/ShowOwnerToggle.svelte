@@ -19,7 +19,7 @@ owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import { ExternalLinkIcon } from '@lucide/svelte';
 
   let {
@@ -27,10 +27,11 @@ owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
     checked = $bindable(false),
     name,
     disabled = false,
+
+    /** The account's display name, as it is now */
   }: {
     kind: 'project' | 'palette';
     checked?: boolean;
-    /** The account's display name, as it is now */
     name: string;
     disabled?: boolean;
   } = $props();
@@ -53,9 +54,12 @@ owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
   {#if checked && !shownName}
     <p class="text-warning-700-300 px-4 pb-3 text-sm">
       Add a display name on your
-      <a href={resolve('/account')} target="_blank" class="link"
-        >Account page <ExternalLinkIcon class="inline size-3" /></a
-      >
+
+      <a href={resolve('account')} target="_blank" class="link">
+        Account page
+        <ExternalLinkIcon class="inline size-3" />
+      </a>
+
       to show it.
     </p>
   {/if}

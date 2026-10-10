@@ -18,8 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GalleryOrder,
     PaletteGalleryNode,
     GalleryPageInfo,
-  } from '$lib/utils/gallery-utils';
-  import type { GalleryPalette } from '$lib/utils/color-utils';
+  } from '#lib/utils/gallery-utils.js';
+  import type { GalleryPalette } from '#lib/utils/color-utils.js';
 
   class GalleryPalettesState {
     search = $state('');
@@ -48,22 +48,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import GalleryPaletteCard from '$lib/components/GalleryPaletteCard.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { ICONS } from '$lib/constants/icon-constants';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { isDesktop } from '$lib/state/page-state.svelte';
-  import { getPalettesFromProjects } from '$lib/utils/color-utils';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { ICONS } from '#lib/constants/icon-constants.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { isDesktop } from '#lib/state/page-state.svelte.js';
+  import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import {
     fetchPaletteGallery,
     recordPageView,
-  } from '$lib/utils/gallery-utils';
-  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
-  import { GALLERY_ORDERS } from '$lib/utils/gallery-utils';
+  } from '#lib/utils/gallery-utils.js';
+  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
+  import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 

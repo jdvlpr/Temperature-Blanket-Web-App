@@ -105,7 +105,7 @@ const days = Array.from({ length: 70 }, (_, i) => {
   };
 });
 
-vi.mock('$lib/state/gauges-state.svelte', () => {
+vi.mock('#lib/state/gauges-state.svelte.js', () => {
   const temp = {
     id: 'temp',
     label: 'Temperature Gauge',
@@ -143,7 +143,7 @@ vi.mock('$lib/state/gauges-state.svelte', () => {
   };
 });
 
-vi.mock('$lib/state/location-state.svelte', () => ({
+vi.mock('#lib/state/location-state.svelte.js', () => ({
   locations: {
     all: [
       {
@@ -165,7 +165,7 @@ vi.mock('$lib/state/location-state.svelte', () => ({
   },
 }));
 
-vi.mock('$lib/state/weather-state.svelte', () => ({
+vi.mock('#lib/state/weather-state.svelte.js', () => ({
   weather: {
     data: days,
     grouping: 'day',
@@ -179,7 +179,7 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
   },
 }));
 
-vi.mock('$lib/state/preview-state.svelte', () => ({
+vi.mock('#lib/state/preview-state.svelte.js', () => ({
   previews: {
     active: null,
     extraColors: [
@@ -189,21 +189,21 @@ vi.mock('$lib/state/preview-state.svelte', () => ({
   },
 }));
 
-vi.mock('$lib/storage/preferences.svelte', () => ({
+vi.mock('#lib/storage/preferences.svelte.js', () => ({
   preferences: { value: { units: 'imperial' } },
 }));
 
-vi.mock('$lib/utils/preview-utils.svelte', () => ({ svgToPNG: vi.fn() }));
+vi.mock('#lib/utils/preview-utils.svelte.js', () => ({ svgToPNG: vi.fn() }));
 
-vi.mock('$lib/utils/range-utils.svelte', () => ({
+vi.mock('#lib/utils/range-utils.svelte.js', () => ({
   getDaysInRange: ({ range }: { range: { from?: number } }) =>
     Array.from({ length: Math.abs(Math.round((range.from ?? 3) / 7)) }),
   getDaysPercent: (n: number) => Math.round((n / 70) * 1000) / 10,
 }));
 
-vi.mock('$lib/utils/color-utils', async (importOriginal) => {
+vi.mock('#lib/utils/color-utils.js', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('$lib/utils/color-utils')>();
+    await importOriginal<typeof import('#lib/utils/color-utils.js')>();
   return {
     ...actual,
     getColorInfo: ({ value }: { value: number | null }) => {

@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as worsted8 } from './worsted-8/yarn';
 import { yarn as worsted8Heathers } from './worsted-8-heathers/yarn';
 import { yarn as worsted8Wildflowers } from './worsted-8-wildflowers/yarn';

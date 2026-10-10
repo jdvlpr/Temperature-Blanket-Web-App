@@ -1,9 +1,9 @@
-import { browser } from '$app/environment';
-import { account } from '$lib/accounts/summary.svelte';
-import type { PaletteRecord } from '$lib/sync/protocol';
+import { browser } from '$app/env';
+import { account } from '#lib/accounts/summary.svelte.js';
+import type { PaletteRecord } from '#lib/sync/protocol.js';
 import { get, update } from 'idb-keyval';
 import { trashCutoff } from './trash';
-import { cleanName } from '$lib/utils/string-utils';
+import { cleanName } from '#lib/utils/string-utils.js';
 
 /** Present once the palette belongs to an account (see $lib/sync) */
 export type PaletteSyncState = {

@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 
 <script lang="ts">
-  import { pluralize } from '$lib/utils/string-utils';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import { ChevronDownIcon, SearchIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import GlobeRegionDetails from './GlobeRegionDetails.svelte';

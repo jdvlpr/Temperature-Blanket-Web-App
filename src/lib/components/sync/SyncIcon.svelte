@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 words are for hover and screen readers. -->
 
 <script lang="ts">
-  import type { SyncLabel } from '$lib/sync/status.svelte';
+  import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import {
     CloudAlertIcon,
     CloudCheckIcon,

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PaletteRecord } from '$lib/sync/protocol';
+import type { PaletteRecord } from '#lib/sync/protocol.js';
 import {
   MAX_SAVED_PALETTE_NAME_LENGTH,
   PaletteStorage,

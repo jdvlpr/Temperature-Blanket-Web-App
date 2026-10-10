@@ -9,7 +9,7 @@ import {
   withExtraColorDetails,
 } from './extra-colors-utils';
 
-vi.mock('$lib/utils/yarn-utils', () => ({
+vi.mock('#lib/utils/yarn-utils.js', () => ({
   getColorPropertiesFromYarnStringAndHex: ({
     yarnString,
     hex,

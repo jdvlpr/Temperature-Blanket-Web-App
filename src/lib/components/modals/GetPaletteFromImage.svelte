@@ -14,33 +14,33 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import PaletteStripEditor from '$lib/components/PaletteStripEditor.svelte';
-  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
-  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
-  import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import SortMenu from '$lib/components/SortMenu.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
-  import ImagePaletteCanvas from '$lib/features/image-palette/ImagePaletteCanvas.svelte';
-  import { ImagePaletteState } from '$lib/features/image-palette/image-palette-state.svelte';
+  import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
+  import PaletteStripEditor from '#lib/components/PaletteStripEditor.svelte';
+  import DefaultYarnSuggestion from '#lib/components/DefaultYarnSuggestion.svelte';
+  import { yarnUses } from '#lib/storage/yarn-uses.svelte.js';
+  import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import SortMenu from '#lib/components/SortMenu.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '#lib/constants/color-constants.js';
+  import ImagePaletteCanvas from '#lib/features/image-palette/ImagePaletteCanvas.svelte';
+  import { ImagePaletteState } from '#lib/features/image-palette/image-palette-state.svelte.js';
   import {
     colorwayKey,
     type MatchedColor,
-  } from '$lib/features/image-palette/match';
+  } from '#lib/features/image-palette/match.js';
   import {
     PALETTE_STYLES,
     type PaletteStyle,
-  } from '$lib/features/image-palette/select';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { getBrands } from '$lib/data/yarns/colorways.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import type { GaugeSettingsType } from '$lib/types/gauge-types';
-  import type { Color } from '$lib/types/yarn-types';
+  } from '#lib/features/image-palette/select.js';
+  import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
+  import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import type { GaugeSettingsType } from '#lib/types/gauge-types.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     CheckIcon,
     ChevronDownIcon,

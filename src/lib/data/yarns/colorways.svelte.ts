@@ -12,17 +12,17 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
-
 import {
   PUBLIC_AFFILIATE_BASE_URL,
   PUBLIC_AFFILIATE_YARNS,
-} from '$env/static/public';
+} from '$app/env/public';
+
 import type {
   AffiliateYarn,
   AffiliateYarnCompressed,
   Brand,
   Color,
-} from '$lib/types/yarn-types';
+} from '#lib/types/yarn-types.js';
 import chroma from 'chroma-js';
 
 // The yarn brand dataset (~1.2MB) is heavy, so it's kept out of every
@@ -44,7 +44,7 @@ export function ensureYarnData(): Promise<void> {
 }
 
 async function loadYarnData(): Promise<void> {
-  const { brands: loadedBrands } = await import('$lib/data/yarns/brands');
+  const { brands: loadedBrands } = await import('#lib/data/yarns/brands.js');
   const affiliateYarnsMap = getAffiliateYarns();
   brands = loadedBrands;
   colorwaysWithAffiliateLinks = buildColorwaysWithAffiliateLinks(

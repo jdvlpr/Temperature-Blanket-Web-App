@@ -12,10 +12,10 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
+import { dev } from '$app/env';
 
-import { dev } from '$app/environment';
-import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
-import { brands } from '$lib/data/yarns/brands.js';
+import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$app/env/private';
+import { brands } from '#lib/data/yarns/brands.js';
 import { error, json } from '@sveltejs/kit';
 
 export async function GET({ url, request }) {
@@ -56,9 +56,11 @@ export async function GET({ url, request }) {
       const colorways = yarn.colorways.reduce((a, b) => {
         return a + b.colors.length;
       }, 0);
+
       const isUnavailable = yarn.colorways.every(
         (c) => !!c.source?.unavailable,
       );
+
       return {
         brandId: brand.id,
         brandName: brand.name,
@@ -74,10 +76,5 @@ export async function GET({ url, request }) {
     });
   });
 
-  return json({
-    meta: {
-      total: data.length,
-    },
-    data: data,
-  });
+  return json({ meta: { total: data.length }, data });
 }

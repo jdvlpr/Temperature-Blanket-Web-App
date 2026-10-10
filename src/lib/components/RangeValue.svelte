@@ -18,9 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   included is said once for the gauge (see `rangeRuleSentence`).
 -->
 <script lang="ts">
-  import RangeArrow from '$lib/components/RangeArrow.svelte';
-  import RangeUnit from '$lib/components/RangeUnit.svelte';
-  import { formatRangeNumber } from '$lib/utils/range-format';
+  import RangeArrow from '#lib/components/RangeArrow.svelte';
+  import RangeUnit from '#lib/components/RangeUnit.svelte';
+  import { formatRangeNumber } from '#lib/utils/range-format.js';
 
   interface Props {
     from: number;

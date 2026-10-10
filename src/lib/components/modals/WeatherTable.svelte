@@ -14,13 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import { convertTime } from '$lib/utils/unit-utils.svelte';
-  import { dateToISO8601String } from '$lib/utils/date-utils';
+  import DataTable from '#lib/components/datatable/DataTable.svelte';
+  import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+  import { allGaugesAttributes } from '#lib/state/gauges-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { convertTime } from '#lib/utils/unit-utils.svelte.js';
+  import { dateToISO8601String } from '#lib/utils/date-utils.js';
   import { TableHandler, ThSort } from '@vincjo/datatables';
 
   let { weatherData } = $props();

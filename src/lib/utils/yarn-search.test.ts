@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import {
   buildYarnOptions,
   filterYarnOptions,

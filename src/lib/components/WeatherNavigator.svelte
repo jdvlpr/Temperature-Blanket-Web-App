@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
-  import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  import WeatherTableWrapper from '#lib/components/WeatherTableWrapper.svelte';
+  import ImportWeatherData from '#lib/components/modals/ImportWeatherData.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import { FileUpIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
   import DownloadExportButton from './buttons/DownloadExportButton.svelte';

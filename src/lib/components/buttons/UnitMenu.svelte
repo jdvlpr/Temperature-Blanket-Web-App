@@ -16,10 +16,10 @@ You should have received a copy of the GNU General Public License along with Tem
   Which units weather is shown in, metric or imperial.
 -->
 <script lang="ts">
-  import ChoiceMenu from '$lib/components/buttons/ChoiceMenu.svelte';
-  import { UNIT_LABELS } from '$lib/constants/weather-constants';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import type { Unit } from '$lib/types/weather-types';
+  import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
+  import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import type { Unit } from '#lib/types/weather-types.js';
   import { RulerIcon } from '@lucide/svelte';
 
   const options = (['metric', 'imperial'] as const).map((unit) => {

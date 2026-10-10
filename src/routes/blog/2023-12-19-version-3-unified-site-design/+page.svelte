@@ -14,19 +14,22 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
   <title>Version 3: Unified Site Design</title>
+
   <meta name="description" content="Version 3: Unified Site Design" />
 
   <meta property="og:title" content="Version 3: Unified Site Design" />
+
   <meta property="og:description" content="Version 3: Unified Site Design" />
+
   <meta
     property="og:url"
     content="{PUBLIC_BASE_URL}/blog/2023-12-19-version-3-unified-site-design"

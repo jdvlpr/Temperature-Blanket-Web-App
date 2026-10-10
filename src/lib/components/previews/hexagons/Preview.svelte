@@ -13,13 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import type { WeatherParam } from '$lib/types/gauge-types';
-  import type { Color } from '$lib/types/yarn-types';
-  import { getColorInfo } from '$lib/utils/color-utils';
-  import { runPreview } from '$lib/utils/function-utils.svelte';
-  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { getColorInfo } from '#lib/utils/color-utils.js';
+  import { runPreview } from '#lib/utils/function-utils.svelte.js';
+  import { showPreviewImageWeatherDetails } from '#lib/utils/preview-utils.svelte.js';
   import { hexagonsPreview, type HexagonsSection } from './state.svelte';
 
   let width = $state(hexagonsPreview.width);

@@ -13,14 +13,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
-  import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
+  import {
+    allGaugesAttributes,
+    gauges,
+  } from '#lib/state/gauges-state.svelte.js';
   import {
     dialog,
     pageSections,
     showNavigationSideBar,
-  } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { CirclePlusIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount, tick, untrack } from 'svelte';
   import Gauge from './Gauge.svelte';

@@ -10,7 +10,7 @@ import {
   stringToDate,
 } from './date-utils';
 
-vi.mock('$lib/state/weather-state.svelte', () => ({
+vi.mock('#lib/state/weather-state.svelte.js', () => ({
   weather: {
     isUserEdited: false,
     source: { name: 'Meteostat' },

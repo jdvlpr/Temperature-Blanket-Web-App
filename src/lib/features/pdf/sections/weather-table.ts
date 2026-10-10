@@ -16,15 +16,18 @@
 // Every day's (or week's) weather, a row each: its date and place, then a
 // column for each chosen value with that value's numbered color beside it
 
-import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
-import { locations } from '$lib/state/location-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import type { WeatherParam } from '$lib/types/gauge-types';
-import type { WeatherDay } from '$lib/types/weather-types';
-import { getColorInfo } from '$lib/utils/color-utils';
-import { convertTime } from '$lib/utils/unit-utils.svelte';
+import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
+import {
+  gauges,
+  getTargetParentGaugeId,
+} from '#lib/state/gauges-state.svelte.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import type { WeatherParam } from '#lib/types/gauge-types.js';
+import type { WeatherDay } from '#lib/types/weather-types.js';
+import { getColorInfo } from '#lib/utils/color-utils.js';
+import { convertTime } from '#lib/utils/unit-utils.svelte.js';
 import {
   INK,
   SIZE,

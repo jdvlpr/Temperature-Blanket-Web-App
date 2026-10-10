@@ -20,14 +20,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   with its yarn's color everywhere it's offered.
 -->
 <script lang="ts">
-  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
+  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
   import {
     menuContentClass,
     menuItemClass,
     menuTriggerClass,
-  } from '$lib/components/menu-styles';
-  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
-  import type { PageLayout } from '$lib/types/page-types';
+  } from '#lib/components/menu-styles.js';
+  import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
+  import type { PageLayout } from '#lib/types/page-types.js';
   import {
     CheckIcon,
     ChevronDownIcon,
@@ -97,13 +97,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onCheckedChange={(checked) => (fillWithColor.on = checked)}
             class={menuItemClass}
           >
-            <span class="flex items-center justify-start gap-2 text-left min-w-0 flex-1">
-              <PaintBucketIcon  class="shrink-0" />
+            <span
+              class="flex min-w-0 flex-1 items-center justify-start gap-2 text-left"
+            >
+              <PaintBucketIcon class="shrink-0" />
               <div class="flex min-w-0 flex-col text-left">
-                  <span>Fill backgrounds</span>
-                  <span class="text-surface-700-300 text-xs"
-                    >Colored background</span
-                  >
+                <span>Fill backgrounds</span>
+                <span class="text-surface-700-300 text-xs"
+                  >Colored background</span
+                >
               </div>
             </span>
             <MenuCheckbox checked={fillWithColor.on} />

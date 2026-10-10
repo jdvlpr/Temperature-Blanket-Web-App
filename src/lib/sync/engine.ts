@@ -24,8 +24,8 @@
 // - Palettes ride the same changes feed; the newest change to one wins.
 // - So do preferences; the newest change to each one wins.
 
-import type { SavedPalette } from '$lib/storage/palettes.svelte';
-import type { StoredProject } from '$lib/storage/projects.svelte';
+import type { SavedPalette } from '#lib/storage/palettes.svelte.js';
+import type { StoredProject } from '#lib/storage/projects.svelte.js';
 import type {
   ChangesResponse,
   PaletteRecord,

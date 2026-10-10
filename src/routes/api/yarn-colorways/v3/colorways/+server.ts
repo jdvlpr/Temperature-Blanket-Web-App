@@ -12,18 +12,18 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
+import { dev } from '$app/env';
 
-import { dev } from '$app/environment';
-import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
-import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$app/env/private';
+import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
 import {
   ensureYarnData,
   getAllColorways,
-} from '$lib/data/yarns/colorways.svelte';
+} from '#lib/data/yarns/colorways.svelte.js';
 import {
   sortColorsByName,
   sortColorsLightToDark,
-} from '$lib/utils/color-utils.js';
+} from '#lib/utils/color-utils.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
@@ -51,6 +51,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
     brand = decodeURIComponent(brand).toLowerCase();
     if (brand?.includes(',')) {
       let brands = brand.split(',');
+
       colorways = colorways.filter(
         (colorway) =>
           (colorway.brandId !== undefined &&
@@ -72,6 +73,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
     yarn = decodeURIComponent(yarn).toLowerCase();
     if (yarn?.includes(',')) {
       const yarns = yarn.split(',');
+
       colorways = colorways.filter(
         (colorway) =>
           (colorway.yarnId !== undefined && yarns.includes(colorway.yarnId)) ||

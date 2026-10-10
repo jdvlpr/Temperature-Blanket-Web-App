@@ -15,12 +15,12 @@
 
 // Publishing to the gallery from an account (/api/account/gallery). Guests keep
 // submitting anonymously through /api/project.
+import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$app/env/private';
 
-import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$env/static/private';
-import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-import { requireAccount } from '$lib/server/auth';
-import { PROJECT_ID_PATTERN } from '$lib/server/sync/store';
-import { cleanName } from '$lib/utils/string-utils';
+import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
+import { requireAccount } from '#lib/server/auth/index.js';
+import { PROJECT_ID_PATTERN } from '#lib/server/sync/store.js';
+import { cleanName } from '#lib/utils/string-utils.js';
 import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import {
@@ -82,12 +82,14 @@ export async function requireGallery(
   if (account instanceof Response) return account;
 
   const env = event.platform?.env;
+
   if (!env?.DB || (publishing && env.GALLERY_PUBLISH_ENABLED !== 'true'))
     return galleryError(
       503,
       'GALLERY_PAUSED',
       'Publishing from accounts is paused',
     );
+
   return {
     db: env.DB,
     userId: account.user.id,
@@ -204,12 +206,14 @@ export async function publishPaletteFromAccount(
   const input = (body ?? {}) as Record<string, unknown>;
   const title = cleanName(input.title, MAX_PALETTE_TITLE_LENGTH);
   const yarnUrl = paletteLink(input.yarnUrl, origin);
+
   if (!title || !yarnUrl)
     return galleryError(
       400,
       'INVALID_REQUEST',
       'A palette needs a name and a Yarn Palette Creator link',
     );
+
   const paletteId =
     typeof input.paletteId === 'string' &&
     SAVED_PALETTE_ID.test(input.paletteId)
@@ -230,6 +234,7 @@ export async function publishPaletteFromAccount(
     { title, yarn_url: yarnUrl },
     gallery.userId,
   );
+
   if (Number(response.code) === 200 && typeof response.id === 'number') {
     await recordPublished(gallery, {
       postId: response.id,

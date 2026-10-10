@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     pageSections,
     goToProjectSection,
-  } from '$lib/state/page-state.svelte';
+  } from '#lib/state/page-state.svelte.js';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 
   /**

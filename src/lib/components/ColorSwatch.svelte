@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   glows when undo or redo changes it.
 -->
 <script lang="ts">
-  import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  import { iconColorOn } from '#lib/components/yarn-colorways/colorway-utils.js';
 
   interface Props {
     hex: string | undefined;

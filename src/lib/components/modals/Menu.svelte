@@ -21,35 +21,35 @@ of help links. Save itself is in the top bar. A side panel on large screens
 button to it. -->
 
 <script lang="ts">
-  import { PANEL_LIST, PANEL_ROW } from '$lib/constants/class-constants';
-  import { browser } from '$app/environment';
+  import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
+  import { browser } from '$app/env';
   import { resolve } from '$app/paths';
-  import { account } from '$lib/accounts/summary.svelte';
-  import RenameProject from '$lib/components/RenameProject.svelte';
-  import SaveStatus from '$lib/components/SaveStatus.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { dialog, isDesktop, toast } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import RenameProject from '#lib/components/RenameProject.svelte';
+  import SaveStatus from '#lib/components/SaveStatus.svelte';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { dialog, isDesktop, toast } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import {
     autosave,
     changedElsewhereMessage,
     saveCopy,
     storedItem,
     trashOpenProject,
-  } from '$lib/storage/autosave.svelte';
+  } from '#lib/storage/autosave.svelte.js';
   import {
     ProjectStorage,
     savedProjects,
     type StoredProjectIndexItem,
-  } from '$lib/storage/projects.svelte';
-  import { rememberJustTrashed, TRASH_DAYS } from '$lib/storage/trash';
-  import { sync } from '$lib/sync/status.svelte';
-  import CopyIcon from '$lib/components/CopyIcon.svelte';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { Flash } from '$lib/utils/feedback.svelte';
-  import { getColorsFromInput } from '$lib/utils/color-utils';
-  import { saveProject } from '$lib/utils/save-project.svelte';
+  } from '#lib/storage/projects.svelte.js';
+  import { rememberJustTrashed, TRASH_DAYS } from '#lib/storage/trash.js';
+  import { sync } from '#lib/sync/status.svelte.js';
+  import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { Flash } from '#lib/utils/feedback.svelte.js';
+  import { getColorsFromInput } from '#lib/utils/color-utils.js';
+  import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
     ChevronRightIcon,
@@ -73,7 +73,7 @@ button to it. -->
   import ExportOptions from './ExportOptions.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { pluralize } from '#lib/utils/string-utils.js';
 
   const ROW = PANEL_ROW;
   const LINK = 'hover:underline opacity-80 hover:opacity-100';
@@ -252,7 +252,7 @@ button to it. -->
           Sign in to open your saved projects and yarn palettes from any device.
         </p>
         <a
-          href={resolve('/account')}
+          href={resolve('account')}
           class="btn preset-tonal-primary self-start"
           data-testid="menu-sign-in"
         >
@@ -474,7 +474,7 @@ button to it. -->
           </li>
         {/each}
         <li>
-          <a href={resolve('/my-projects')} class={ROW}>
+          <a href={resolve('my-projects')} class={ROW}>
             <FolderOpenIcon class="shrink-0 opacity-70" />
             <span class="flex-1"
               >{recentTotal > recent.length
@@ -504,17 +504,23 @@ button to it. -->
       onclick={() => open(KeyboardShortcuts, 'Keyboard Shortcuts')}
       >Keyboard Shortcuts</button
     >
-    <a href={resolve('/faq')} target="_blank" class={LINK}
+
+    <a href={resolve('faq')} target="_blank" class={LINK}
       >FAQ <ExternalLinkIcon class={LINK_ICON} /></a
     >
-    <a href={resolve('/documentation')} target="_blank" class={LINK}
-      >Documentation <ExternalLinkIcon class={LINK_ICON} /></a
-    >
-    <a href={resolve('/contact')} target="_blank" class={LINK}
+
+    <a href={resolve('documentation')} target="_blank" class={LINK}>
+      Documentation
+      <ExternalLinkIcon class={LINK_ICON} />
+    </a>
+
+    <a href={resolve('contact')} target="_blank" class={LINK}
       >Contact <ExternalLinkIcon class={LINK_ICON} /></a
     >
-    <a href="{resolve('/documentation')}#credits" target="_blank" class={LINK}
-      >Data Sources & Credits <ExternalLinkIcon class={LINK_ICON} /></a
-    >
+
+    <a href="{resolve('documentation')}#credits" target="_blank" class={LINK}>
+      Data Sources & Credits
+      <ExternalLinkIcon class={LINK_ICON} />
+    </a>
   </nav>
 </div>

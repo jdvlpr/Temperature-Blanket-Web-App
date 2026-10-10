@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Spinner from '$lib/components/Spinner.svelte';
-  import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { CSVtoArray } from '$lib/utils/weather-utils.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { CSVtoArray } from '#lib/utils/weather-utils.svelte.js';
   import {
     celsiusToFahrenheit,
     convertTime,
@@ -25,10 +25,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     hoursToMinutes,
     inchesToMillimeters,
     millimetersToInches,
-  } from '$lib/utils/unit-utils.svelte';
-  import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
-  import type { TISO8601DateString } from '$lib/types/weather-types';
-  import { displayNumber } from '$lib/utils/number-utils';
+  } from '#lib/utils/unit-utils.svelte.js';
+  import { dateToISO8601String, stringToDate } from '#lib/utils/date-utils.js';
+  import type { TISO8601DateString } from '#lib/types/weather-types.js';
+  import { displayNumber } from '#lib/utils/number-utils.js';
   import { FileIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 

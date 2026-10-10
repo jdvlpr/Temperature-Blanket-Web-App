@@ -20,14 +20,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   colors are in, either way round: `current`, or else worked out from them.
 -->
 <script lang="ts">
-  import type { Color } from '$lib/types/yarn-types';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     getSortedPalette,
     PALETTE_SORTS,
     reverseColors,
     reversedSort,
     type PaletteSort,
-  } from '$lib/utils/color-utils';
+  } from '#lib/utils/color-utils.js';
   import {
     ArrowDownWideNarrowIcon,
     ArrowLeftRightIcon,
@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuContentClass,
     menuItemClass,
     menuTriggerClass,
-  } from '$lib/components/menu-styles';
+  } from '#lib/components/menu-styles.js';
 
   interface Props {
     /** The palette, to tell whether sorting by name makes sense */

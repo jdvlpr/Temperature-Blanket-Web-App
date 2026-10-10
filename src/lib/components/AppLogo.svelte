@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { PUBLIC_SITE_TITLE } from '$env/static/public';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { PUBLIC_SITE_TITLE } from '$app/env/public';
+  import { dialog } from '#lib/state/page-state.svelte.js';
 </script>
 
 <button

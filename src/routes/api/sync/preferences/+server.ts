@@ -17,15 +17,15 @@
 // taken in only if it's newer than the account's; they come back to devices in
 // the changes feed.
 
-import { parsePreferencesUpload } from '$lib/sync/preferences';
+import { parsePreferencesUpload } from '#lib/sync/preferences.js';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
 
 export const PUT: RequestHandler = async (event) => {
   const { requireSync, syncError, cleanUpAfterWrite } =
-    await import('$lib/server/sync');
-  const { savePreferences } = await import('$lib/server/sync/store');
+    await import('#lib/server/sync/index.js');
+  const { savePreferences } = await import('#lib/server/sync/store.js');
 
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;

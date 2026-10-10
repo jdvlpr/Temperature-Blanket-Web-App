@@ -22,11 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   (`bind:selectedIndex`), as From an Image does when a photo's dot is pressed.
 -->
 <script lang="ts">
-  import ColorSwatch from '$lib/components/ColorSwatch.svelte';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import { menuTriggerClass } from '$lib/components/menu-styles';
-  import type { Color } from '$lib/types/yarn-types';
-  import { sameColorList } from '$lib/utils/color-utils';
+  import ColorSwatch from '#lib/components/ColorSwatch.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import { menuTriggerClass } from '#lib/components/menu-styles.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { sameColorList } from '#lib/utils/color-utils.js';
   import { tick, type Snippet } from 'svelte';
   import {
     ArrowLeftIcon,

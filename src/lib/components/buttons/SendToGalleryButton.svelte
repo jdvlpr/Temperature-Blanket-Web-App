@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { locations } from '$lib/state/location-state.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
   import { ExternalLinkIcon, SendIcon } from '@lucide/svelte';
   import AddToGallery from '../modals/AddToGallery.svelte';
 

@@ -16,21 +16,21 @@
 import {
   extraColorsToUrlHash,
   type PreviewExtraColor,
-} from '$lib/utils/extra-colors-utils';
-import type { TwelvePointStarPreviewClass } from '$lib/components/previews/12-point-star/state.svelte';
-import type { CalendarPreviewClass } from '$lib/components/previews/calendar/state.svelte';
-import type { ChevronsPreviewClass } from '$lib/components/previews/chevrons/state.svelte';
-import type { ContinuousSquarePreviewClass } from '$lib/components/previews/continuous-square/state.svelte';
-import type { CornerToCornerPreviewClass } from '$lib/components/previews/corner-to-corner/state.svelte';
-import type { DaytimeRowsPreviewClass } from '$lib/components/previews/daytime-rows/state.svelte';
-import type { HexagonRoundsPreviewClass } from '$lib/components/previews/hexagon-rounds/state.svelte';
-import type { HexagonsPreviewClass } from '$lib/components/previews/hexagons/state.svelte';
-import type { MonthRowsPreviewClass } from '$lib/components/previews/month-rows/state.svelte';
-import type { MonthSquaresPreviewClass } from '$lib/components/previews/month-squares/state.svelte';
-import type { RowsPreviewClass } from '$lib/components/previews/rows/state.svelte';
-import type { SplitMonthSquaresPreviewClass } from '$lib/components/previews/split-month-squares/state.svelte';
-import type { SquareRoundsPreviewClass } from '$lib/components/previews/square-rounds/state.svelte';
-import type { SquaresPreviewClass } from '$lib/components/previews/squares/state.svelte';
+} from '#lib/utils/extra-colors-utils.js';
+import type { TwelvePointStarPreviewClass } from '#lib/components/previews/12-point-star/state.svelte.js';
+import type { CalendarPreviewClass } from '#lib/components/previews/calendar/state.svelte.js';
+import type { ChevronsPreviewClass } from '#lib/components/previews/chevrons/state.svelte.js';
+import type { ContinuousSquarePreviewClass } from '#lib/components/previews/continuous-square/state.svelte.js';
+import type { CornerToCornerPreviewClass } from '#lib/components/previews/corner-to-corner/state.svelte.js';
+import type { DaytimeRowsPreviewClass } from '#lib/components/previews/daytime-rows/state.svelte.js';
+import type { HexagonRoundsPreviewClass } from '#lib/components/previews/hexagon-rounds/state.svelte.js';
+import type { HexagonsPreviewClass } from '#lib/components/previews/hexagons/state.svelte.js';
+import type { MonthRowsPreviewClass } from '#lib/components/previews/month-rows/state.svelte.js';
+import type { MonthSquaresPreviewClass } from '#lib/components/previews/month-squares/state.svelte.js';
+import type { RowsPreviewClass } from '#lib/components/previews/rows/state.svelte.js';
+import type { SplitMonthSquaresPreviewClass } from '#lib/components/previews/split-month-squares/state.svelte.js';
+import type { SquareRoundsPreviewClass } from '#lib/components/previews/square-rounds/state.svelte.js';
+import type { SquaresPreviewClass } from '#lib/components/previews/squares/state.svelte.js';
 
 // The union of every preview's real (heavy) instance type. These are
 // type-only imports, so they're erased at build time and don't pull the
@@ -72,7 +72,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: '12-point-star',
     importFn: async () =>
-      (await import('$lib/components/previews/12-point-star/state.svelte'))
+      (await import('#lib/components/previews/12-point-star/state.svelte.js'))
         .twelvePointStarPreview,
   },
   {
@@ -84,7 +84,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'calendar',
     importFn: async () =>
-      (await import('$lib/components/previews/calendar/state.svelte'))
+      (await import('#lib/components/previews/calendar/state.svelte.js'))
         .calendarPreview,
   },
   {
@@ -96,7 +96,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'chevrons',
     importFn: async () =>
-      (await import('$lib/components/previews/chevrons/state.svelte'))
+      (await import('#lib/components/previews/chevrons/state.svelte.js'))
         .chevronsPreview,
   },
   {
@@ -108,8 +108,9 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'continuous-square',
     importFn: async () =>
-      (await import('$lib/components/previews/continuous-square/state.svelte'))
-        .continuousSquarePreview,
+      (
+        await import('#lib/components/previews/continuous-square/state.svelte.js')
+      ).continuousSquarePreview,
   },
   {
     id: 'crnr',
@@ -120,8 +121,9 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'corner-to-corner',
     importFn: async () =>
-      (await import('$lib/components/previews/corner-to-corner/state.svelte'))
-        .cornerToCornerPreview,
+      (
+        await import('#lib/components/previews/corner-to-corner/state.svelte.js')
+      ).cornerToCornerPreview,
   },
   {
     id: 'rsun',
@@ -132,7 +134,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'daylight-rows',
     importFn: async () =>
-      (await import('$lib/components/previews/daytime-rows/state.svelte'))
+      (await import('#lib/components/previews/daytime-rows/state.svelte.js'))
         .daytimeRowsPreview,
   },
   {
@@ -144,7 +146,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'hexagons',
     importFn: async () =>
-      (await import('$lib/components/previews/hexagons/state.svelte'))
+      (await import('#lib/components/previews/hexagons/state.svelte.js'))
         .hexagonsPreview,
   },
   {
@@ -156,7 +158,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'hexagon-rounds',
     importFn: async () =>
-      (await import('$lib/components/previews/hexagon-rounds/state.svelte'))
+      (await import('#lib/components/previews/hexagon-rounds/state.svelte.js'))
         .hexagonRoundsPreview,
   },
   {
@@ -168,7 +170,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'month-rows',
     importFn: async () =>
-      (await import('$lib/components/previews/month-rows/state.svelte'))
+      (await import('#lib/components/previews/month-rows/state.svelte.js'))
         .monthRowsPreview,
   },
   {
@@ -180,7 +182,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'month-squares',
     importFn: async () =>
-      (await import('$lib/components/previews/month-squares/state.svelte'))
+      (await import('#lib/components/previews/month-squares/state.svelte.js'))
         .monthSquaresPreview,
   },
   {
@@ -192,7 +194,8 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'rows',
     importFn: async () =>
-      (await import('$lib/components/previews/rows/state.svelte')).rowsPreview,
+      (await import('#lib/components/previews/rows/state.svelte.js'))
+        .rowsPreview,
   },
   {
     id: 'smsq',
@@ -204,7 +207,7 @@ const manifest: PreviewManifestEntry[] = [
     wpTagSlug: 'split-month-squares',
     importFn: async () =>
       (
-        await import('$lib/components/previews/split-month-squares/state.svelte')
+        await import('#lib/components/previews/split-month-squares/state.svelte.js')
       ).splitMonthSquaresPreview,
   },
   {
@@ -216,7 +219,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'square-rounds',
     importFn: async () =>
-      (await import('$lib/components/previews/square-rounds/state.svelte'))
+      (await import('#lib/components/previews/square-rounds/state.svelte.js'))
         .squareRoundsPreview,
   },
   {
@@ -228,7 +231,7 @@ const manifest: PreviewManifestEntry[] = [
     },
     wpTagSlug: 'squares',
     importFn: async () =>
-      (await import('$lib/components/previews/squares/state.svelte'))
+      (await import('#lib/components/previews/squares/state.svelte.js'))
         .squaresPreview,
   },
 ];

@@ -14,11 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import { SCHEMES } from '$lib/constants/color-constants';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import type { Color } from '$lib/types/yarn-types';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
+  import { SCHEMES } from '#lib/constants/color-constants.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import { PaletteIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 

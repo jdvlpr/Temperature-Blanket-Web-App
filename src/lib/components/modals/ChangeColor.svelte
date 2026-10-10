@@ -14,13 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ColorSearchField from '$lib/components/ColorSearchField.svelte';
-  import PickColorFromImage from '$lib/components/modals/PickColorFromImage.svelte';
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import type { Color } from '$lib/types/yarn-types';
+  import ColorSearchField from '#lib/components/ColorSearchField.svelte';
+  import PickColorFromImage from '#lib/components/modals/PickColorFromImage.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import YarnGridSelect from '#lib/components/modals/YarnGridSelect.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
   import { tick } from 'svelte';
 

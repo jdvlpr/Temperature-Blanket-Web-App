@@ -5,7 +5,7 @@ import {
   DEFAULT_EFFECTS,
   preferences,
   type EffectsPreferences,
-} from '$lib/storage/preferences.svelte';
+} from '#lib/storage/preferences.svelte.js';
 import { prefersReducedMotion } from 'svelte/motion';
 import { scale } from 'svelte/transition';
 

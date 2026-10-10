@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  import RowsPerPage from '#lib/components/datatable/RowsPerPage.svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import {
     CalendarIcon,
     CircleArrowLeftIcon,

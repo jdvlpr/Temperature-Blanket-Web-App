@@ -13,21 +13,21 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
-import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-import { defaultYarn } from '$lib/state/page-state.svelte';
-import type { Color } from '$lib/types/yarn-types';
+import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '#lib/constants/color-constants.js';
+import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+import { defaultYarn } from '#lib/state/page-state.svelte.js';
+import type { Color } from '#lib/types/yarn-types.js';
 import {
   getSortedPalette,
   reversedSort,
   reverseColors,
   shuffleColors,
   type PaletteSort,
-} from '$lib/utils/color-utils';
+} from '#lib/utils/color-utils.js';
 import {
   getColorways,
   stringToBrandAndYarnDetails,
-} from '$lib/utils/yarn-utils';
+} from '#lib/utils/yarn-utils.js';
 import chroma from 'chroma-js';
 import { hexToOklab, oklabToHex, type Oklab } from './color-space';
 import {

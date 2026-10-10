@@ -16,7 +16,7 @@
 // Accounts are loaded only for /api/auth/* requests (see hooks.server.ts), so the
 // rest of the site never pays for them.
 
-import { getEmailSender } from '$lib/server/email';
+import { getEmailSender } from '#lib/server/email/index.js';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
 import { AsyncLocalStorage } from 'node:async_hooks';
@@ -24,8 +24,8 @@ import { cleanUpExpired } from './cleanup';
 import { allowCodeRequest } from './code-request-limit';
 import { emailChangedNotice, signInCodeEmail } from './emails';
 import { withSignedInHint } from './hint-cookie';
-import { deleteUserProjectData } from '$lib/server/sync/store';
-import { cleanName } from '$lib/utils/string-utils';
+import { deleteUserProjectData } from '#lib/server/sync/store.js';
+import { cleanName } from '#lib/utils/string-utils.js';
 import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
 import { readAuthSettings } from './settings';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
@@ -63,7 +63,7 @@ function createAuth(
         const env = requestPlatform.getStore()?.env;
         if (env?.DB) {
           const { releaseGalleryPosts, defaultGalleryApi } =
-            await import('$lib/server/gallery');
+            await import('#lib/server/gallery/index.js');
           await releaseGalleryPosts(env.DB, defaultGalleryApi(), userId);
         }
         if (env?.PROJECTS) await deleteUserProjectData(env.PROJECTS, userId);

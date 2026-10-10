@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import type { TISO8601DateString } from '$lib/types/weather-types';
-  import { stringToDate } from '$lib/utils/date-utils';
+  import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
+  import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import type { TISO8601DateString } from '#lib/types/weather-types.js';
+  import { stringToDate } from '#lib/utils/date-utils.js';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 

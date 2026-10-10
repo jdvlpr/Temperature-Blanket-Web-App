@@ -14,17 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import type { WeatherParam } from '$lib/types/gauge-types';
-  import type { SecondaryTarget } from '$lib/types/preview-types';
-  import { getTextColor } from '$lib/utils/color-utils';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import type { WeatherParam } from '#lib/types/gauge-types.js';
+  import type { SecondaryTarget } from '#lib/types/preview-types.js';
+  import { getTextColor } from '#lib/utils/color-utils.js';
   import {
     getSquareSectionTargetIds,
     setSecondaryTargets,
-  } from '$lib/utils/preview-utils.svelte';
+  } from '#lib/utils/preview-utils.svelte.js';
   import { RefreshCwIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
 

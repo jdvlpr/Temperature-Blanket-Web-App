@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as highlandHeathersDk } from './highland-heathers-dk/yarn';
 import { yarn as lifeDk } from './life-dk/yarn';
 import { yarn as naturalsBambooCotton } from './naturals-bamboo-cotton/yarn';

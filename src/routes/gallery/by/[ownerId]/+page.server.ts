@@ -21,7 +21,7 @@ import {
   queryGallery,
   type GalleryProjectNode,
   type GallerySharedPaletteNode,
-} from '$lib/utils/gallery-utils';
+} from '#lib/utils/gallery-utils.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -43,7 +43,7 @@ export type OwnerPalette = Pick<
 export const load: PageServerLoad = async (event) => {
   const env = event.platform?.env;
   const { ownerPage, PUBLIC_ID_PATTERN } =
-    await import('$lib/server/gallery/store');
+    await import('#lib/server/gallery/store.js');
   if (
     env?.ACCOUNTS_ENABLED !== 'true' ||
     !env.DB ||

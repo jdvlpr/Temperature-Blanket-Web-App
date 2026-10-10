@@ -20,15 +20,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Best match comes first. `limit` keeps just the last one chosen.
 -->
 <script lang="ts">
-  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
-  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
-  import ColorwayCards from '$lib/components/yarn-colorways/ColorwayCards.svelte';
-  import ColorwayRows from '$lib/components/yarn-colorways/ColorwayRows.svelte';
+  import DefaultYarnSuggestion from '#lib/components/DefaultYarnSuggestion.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
+  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import ColorwayCards from '#lib/components/yarn-colorways/ColorwayCards.svelte';
+  import ColorwayRows from '#lib/components/yarn-colorways/ColorwayRows.svelte';
   import {
     canReverse,
     colorwaySortOptions,
@@ -36,12 +36,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorways,
     withDeltas,
     type ColorwaySort,
-  } from '$lib/components/yarn-colorways/colorway-utils';
-  import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants/color-constants';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import { pluralize } from '$lib/utils/string-utils';
-  import { getColorways } from '$lib/utils/yarn-utils';
+  } from '#lib/components/yarn-colorways/colorway-utils.js';
+  import { YARN_COLORWAYS_PER_PAGE } from '#lib/constants/color-constants.js';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
+  import { getColorways } from '#lib/utils/yarn-utils.js';
   import { PlusIcon, SearchIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 

@@ -20,10 +20,10 @@ import type { RequestHandler } from './$types';
 export const prerender = false;
 
 export const GET: RequestHandler = async (event) => {
-  const { requireSync, syncError } = await import('$lib/server/sync');
+  const { requireSync, syncError } = await import('#lib/server/sync/index.js');
   const { listChanges, MAX_CHANGES_PAGE } =
-    await import('$lib/server/sync/store');
-  const { parseRev } = await import('$lib/server/sync/request');
+    await import('#lib/server/sync/store.js');
+  const { parseRev } = await import('#lib/server/sync/request.js');
 
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;

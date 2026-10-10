@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as merinoBaby } from './merino-baby/yarn';
 import { yarn as merinoClassic } from './merino-classic/yarn';
 import { yarn as planet } from './planet/yarn';

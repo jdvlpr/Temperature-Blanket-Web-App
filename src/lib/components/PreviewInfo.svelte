@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { previews } from '$lib/state/preview-state.svelte';
+  import { previews } from '#lib/state/preview-state.svelte.js';
   import { ChevronDownIcon, ChevronUpIcon, InfoIcon } from '@lucide/svelte';
   import { slide } from 'svelte/transition';
 
@@ -23,7 +23,7 @@
   </button>
 
   {#if previews.showInformation}
-    <div class="flex flex-col gap-2 max-w-screen-md" transition:slide>
+    <div class="flex max-w-screen-md flex-col gap-2" transition:slide>
       {#if description}
         <div class="">
           <p class="text-2xl font-bold">About</p>
@@ -39,7 +39,7 @@
         </div>
       {/if}
 
-      <p class="text-xs mt-2">
+      <p class="mt-2 text-xs">
         Touch or click the preview below to see weather details.
       </p>
     </div>

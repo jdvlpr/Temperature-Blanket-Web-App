@@ -16,8 +16,8 @@
 import {
   METEOSTAT_DELAY_DAYS,
   OPEN_METEO_DELAY_DAYS,
-} from '$lib/constants/weather-constants';
-import { weather } from '$lib/state/weather-state.svelte';
+} from '#lib/constants/weather-constants.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
 import type {
   TDayString,
   TISO8601DateString,
@@ -26,7 +26,7 @@ import type {
   TMonthString,
   TYearString,
   WeatherDay,
-} from '$lib/types/weather-types';
+} from '#lib/types/weather-types.js';
 
 /**
  * Checks if a given date is recent based on the weather source.

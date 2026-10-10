@@ -18,17 +18,17 @@ account's details, sync and sign out; otherwise it's a way to sign in. Nothing
 when accounts are off. -->
 
 <script lang="ts">
-  import { ROW_FOCUS } from '$lib/constants/class-constants';
+  import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { account, loadAccountSummary } from '$lib/accounts/summary.svelte';
-  import AccountAvatar from '$lib/components/account/AccountAvatar.svelte';
-  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
-  import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { toast } from '$lib/state/page-state.svelte';
-  import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
-  import { sync } from '$lib/sync/status.svelte';
+  import { account, loadAccountSummary } from '#lib/accounts/summary.svelte.js';
+  import AccountAvatar from '#lib/components/account/AccountAvatar.svelte';
+  import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
+  import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
+  import { sync } from '#lib/sync/status.svelte.js';
   import {
     CircleUserRoundIcon,
     LogOutIcon,
@@ -66,7 +66,7 @@ when accounts are off. -->
     busy = true;
     errorMessage = '';
     // Loaded on demand, so guests never download it
-    const { startSignOut } = await import('$lib/accounts/sign-out');
+    const { startSignOut } = await import('#lib/accounts/sign-out.js');
     await startSignOut({
       userId,
       onSignedOut: () => {
@@ -86,10 +86,11 @@ when accounts are off. -->
       {open}
       onOpenChange={(e) => {
         open = e.open;
+
         if (!open) errorMessage = '';
-        // Catch up with changes from other devices while this tab stayed open
-        else if (sync.active)
-          import('$lib/sync/sync.svelte').then((m) => m.refreshSync());
+        else // Catch up with changes from other devices while this tab stayed open
+        if (sync.active)
+          import('#lib/sync/sync.svelte.js').then((m) => m.refreshSync());
       }}
     >
       <Popover.Trigger
@@ -139,7 +140,7 @@ when accounts are off. -->
                   >
                     {#if !onAccountPage}
                       <a
-                        href={resolve('/account')}
+                        href={resolve('account')}
                         class={ROW}
                         onclick={() => (open = false)}
                       >
@@ -181,7 +182,7 @@ when accounts are off. -->
     <!-- A "New" dot, until it's used, to introduce accounts -->
     {@const isNew = mounted && accountsIntro.showDot}
     <a
-      href={resolve('/account')}
+      href={resolve('account')}
       class={[BUTTON, 'relative', onAccountPage && 'preset-tonal-secondary']}
       aria-label={isNew ? 'Sign in. Accounts (Beta)' : 'Sign in'}
       title={isNew ? 'Sign in. Accounts (Beta)' : 'Sign in'}

@@ -16,8 +16,8 @@
 // Palettes shared to the gallery on their own (gallery plugin 1.5.0+): a name
 // and one Yarn Palette Creator link.
 
-import { getColorsFromInput } from '$lib/utils/color-utils';
-import { decodeHtmlEntities } from '$lib/utils/string-utils';
+import { getColorsFromInput } from '#lib/utils/color-utils.js';
+import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
 
 /**
  * A shared palette's colors, and its Yarn Palette Creator link on this site

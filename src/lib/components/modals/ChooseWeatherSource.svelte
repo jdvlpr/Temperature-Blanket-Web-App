@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { OPEN_METEO_MODELS } from '$lib/constants/weather-constants';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  import { OPEN_METEO_MODELS } from '#lib/constants/weather-constants.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import {
     ClockIcon,
     ExternalLinkIcon,
@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
   import StickyPart from './StickyPart.svelte';
-  import { weatherSearch } from '$lib/state/weather-search.svelte';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
 
   let warnSearchAgain = $derived.by(() => {
     if (!weather.data.length) return false;

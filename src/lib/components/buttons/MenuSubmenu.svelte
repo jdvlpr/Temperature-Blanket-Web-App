@@ -22,8 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   `drill.showsMenu` is false).
 -->
 <script lang="ts">
-  import { menuContentClass, menuItemClass } from '$lib/components/menu-styles';
-  import { getMenuDrill } from '$lib/components/menu-drill.svelte';
+  import {
+    menuContentClass,
+    menuItemClass,
+  } from '#lib/components/menu-styles.js';
+  import { getMenuDrill } from '#lib/components/menu-drill.svelte.js';
   import { ChevronLeftIcon, ChevronRightIcon } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import { tick, type Snippet } from 'svelte';

@@ -17,8 +17,8 @@
 // browser compressed it; its metadata travels in headers, so the Worker never
 // has to decompress or parse the project.
 
-import { SYNC_HEADERS, type PaletteInput } from '$lib/sync/protocol';
-import { cleanName } from '$lib/utils/string-utils';
+import { SYNC_HEADERS, type PaletteInput } from '#lib/sync/protocol.js';
+import { cleanName } from '#lib/utils/string-utils.js';
 import {
   MAX_PALETTE_CODE_LENGTH,
   MAX_PALETTE_NAME_LENGTH,

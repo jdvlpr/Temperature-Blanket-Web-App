@@ -13,28 +13,28 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
 import {
   allGaugesAttributes,
   gauges,
   getTargetParentGaugeId,
-} from '$lib/state/gauges-state.svelte';
-import type { Color } from '$lib/types/yarn-types';
-import type { GaugeRange, WeatherParam } from '$lib/types/gauge-types';
-import { capitalizeFirstLetter } from '$lib/utils/other-utils';
-import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
+} from '#lib/state/gauges-state.svelte.js';
+import type { Color } from '#lib/types/yarn-types.js';
+import type { GaugeRange, WeatherParam } from '#lib/types/gauge-types.js';
+import { capitalizeFirstLetter } from '#lib/utils/other-utils.js';
+import { getColorPropertiesFromYarnStringAndHex } from '#lib/utils/yarn-utils.js';
 import {
   getProjectParametersFromURLHash,
   getTitleTextFromLocationsMeta,
-} from '$lib/utils/project-utils.svelte';
-import { isValueInRange } from '$lib/utils/range-utils.svelte';
-import { decodeHtmlEntities, pluralize } from '$lib/utils/string-utils';
-import { getBrands } from '$lib/data/yarns/colorways.svelte';
-import { hexToOklab } from '$lib/features/image-palette/color-space';
+} from '#lib/utils/project-utils.svelte.js';
+import { isValueInRange } from '#lib/utils/range-utils.svelte.js';
+import { decodeHtmlEntities, pluralize } from '#lib/utils/string-utils.js';
+import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
+import { hexToOklab } from '#lib/features/image-palette/color-space.js';
 import {
   orderAsGradient,
   orderAsRainbow,
-} from '$lib/features/image-palette/order';
+} from '#lib/features/image-palette/order.js';
 import chroma from 'chroma-js';
 
 /** The least WCAG 2 contrast ratio for normal text (AA) */

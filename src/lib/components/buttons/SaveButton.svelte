@@ -18,9 +18,9 @@ project saves by itself: then the Project button's icon shows the save state
 (see ProjectMenuButton). Beside the project's name on wider screens. -->
 
 <script lang="ts">
-  import { project } from '$lib/state/project-state.svelte';
-  import { autosave } from '$lib/storage/autosave.svelte';
-  import { saveProject } from '$lib/utils/save-project.svelte';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { autosave } from '#lib/storage/autosave.svelte.js';
+  import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkCheckIcon,
     BookmarkIcon,

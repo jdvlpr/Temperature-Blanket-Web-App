@@ -20,17 +20,17 @@
 import {
   MAX_PALETTES_PER_UPLOAD,
   type PaletteUploadResult,
-} from '$lib/sync/protocol';
+} from '#lib/sync/protocol.js';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
 
 export const PUT: RequestHandler = async (event) => {
   const { requireSync, syncError, cleanUpAfterWrite } =
-    await import('$lib/server/sync');
-  const store = await import('$lib/server/sync/store');
+    await import('#lib/server/sync/index.js');
+  const store = await import('#lib/server/sync/store.js');
   const { isProjectId, parsePaletteInput } =
-    await import('$lib/server/sync/request');
+    await import('#lib/server/sync/request.js');
 
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;

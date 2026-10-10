@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ChoiceMenu from '$lib/components/buttons/ChoiceMenu.svelte';
-  import UnitMenu from '$lib/components/buttons/UnitMenu.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
+  import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
+  import UnitMenu from '#lib/components/buttons/UnitMenu.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { getWeatherCodeDetails } from '#lib/utils/weather-forecast-utils.js';
   import { ClockIcon, Trash2Icon } from '@lucide/svelte';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';

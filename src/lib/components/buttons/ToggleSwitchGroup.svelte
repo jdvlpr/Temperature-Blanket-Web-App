@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   let { groupLabel, targets, value = $bindable() } = $props();
 </script>
 

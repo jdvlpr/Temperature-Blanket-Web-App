@@ -14,28 +14,28 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, version } from '$app/environment';
+  import { browser, version } from '$app/env';
   import { page } from '$app/state';
   import {
     PUBLIC_BASE_URL,
     PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK,
-  } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import Expand from '$lib/components/Expand.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import Expand from '#lib/components/Expand.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import {
     dateToISO8601String,
     dateToISO8601StringVersion2,
     stringToDate,
     stringToDateVersion2,
-  } from '$lib/utils/date-utils';
+  } from '#lib/utils/date-utils.js';
   import {
     ArrowLeftIcon,
     ChevronDownIcon,
@@ -122,9 +122,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:head>
   <title>Weather Data Feedback Form</title>
+
   <meta name="description" content="Weather Data Feedback Form" />
 
   <meta property="og:title" content="Weather Data Feedback Form " />
+
   <meta
     property="og:description"
     content="Report issues and feedback and weather data"
@@ -269,8 +271,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         href="/documentation#weather-sources"
                         target="_blank"
                         class="link">documentation</a
-                      >.
+                      >
 
+                      .
                       <br />
                       <br />
                       Using the new models (ERA5 Land and ERA5) is in beta status—you

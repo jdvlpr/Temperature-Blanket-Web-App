@@ -14,13 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { locations } from '$lib/state/location-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { weatherSearch } from '$lib/state/weather-search.svelte';
-  import { PopoverInstance } from '$lib/state/attachments/floating-state.svelte';
+  import GettingWeatherWarnCustomWeather from '#lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
+  import { PopoverInstance } from '#lib/state/attachments/floating-state.svelte.js';
   import { ChevronRightIcon } from '@lucide/svelte';
   import { scale } from 'svelte/transition';
 

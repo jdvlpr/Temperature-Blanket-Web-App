@@ -15,7 +15,7 @@
 
 // The /api/sync routes. Imported only by those routes, so other requests never load it.
 
-import { requireAccount } from '$lib/server/auth';
+import { requireAccount } from '#lib/server/auth/index.js';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { cleanUpUserSync } from './store';

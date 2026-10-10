@@ -18,7 +18,7 @@ vi.mock('idb-keyval', () => ({
 }));
 
 // Mock $lib/state
-vi.mock('$lib/state/weather-state.svelte', () => ({
+vi.mock('#lib/state/weather-state.svelte.js', () => ({
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
@@ -38,7 +38,7 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
   getMoonPhase: vi.fn(() => 0),
 }));
 
-vi.mock('$lib/state/project-state.svelte', () => ({
+vi.mock('#lib/state/project-state.svelte.js', () => ({
   project: {
     onLoaded: {
       href: 'http://localhost/?project=123',
@@ -51,7 +51,7 @@ vi.mock('$lib/state/project-state.svelte', () => ({
   },
 }));
 
-vi.mock('$lib/state/location-state.svelte', () => ({
+vi.mock('#lib/state/location-state.svelte.js', () => ({
   locations: {
     projectTitle: 'Test Project',
     all: [],
@@ -60,7 +60,7 @@ vi.mock('$lib/state/location-state.svelte', () => ({
 }));
 
 // Mock preferences
-vi.mock('$lib/storage/preferences.svelte', () => ({
+vi.mock('#lib/storage/preferences.svelte.js', () => ({
   preferences: {
     value: {
       theme: {
@@ -157,7 +157,7 @@ describe('storage-utils integration', () => {
 
     await ProjectStorage.load();
 
-    const { weather } = await import('$lib/state/weather-state.svelte');
+    const { weather } = await import('#lib/state/weather-state.svelte.js');
     expect(weather.rawData).toHaveLength(1);
     expect(weather.wasLoadedFromStorage).toBe(true);
   });

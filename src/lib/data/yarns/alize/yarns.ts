@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as cottonGold } from './cotton-gold/yarn';
 import { yarn as softyPlus } from './softy-plus/yarn';
 import { yarn as superlandaMidi } from './superlana-midi/yarn';

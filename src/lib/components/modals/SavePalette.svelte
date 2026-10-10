@@ -14,20 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { account } from '$lib/accounts/summary.svelte';
-  import { sync } from '$lib/sync/status.svelte';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
-  import { accountsIntro } from '$lib/storage/accounts-intro.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import { sync } from '#lib/sync/status.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
   import {
     MAX_SAVED_PALETTE_NAME_LENGTH,
     PaletteStorage,
-  } from '$lib/storage/palettes.svelte';
-  import type { Color } from '$lib/types/yarn-types';
+  } from '#lib/storage/palettes.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     colorsToPaletteCode,
     getPaletteFallbackName,
-  } from '$lib/utils/color-utils';
+  } from '#lib/utils/color-utils.js';
 
   let { colors }: { colors: Color[] } = $props();
 

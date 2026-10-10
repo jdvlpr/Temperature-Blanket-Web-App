@@ -1,17 +1,17 @@
 import * as SunCalc from 'suncalc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getDayTime, getMoonPhase, weather } from './weather-state.svelte';
-import type { LocationType } from '$lib/types/location-types';
+import type { LocationType } from '#lib/types/location-types.js';
 
 // Mocking $lib modules
-vi.mock('$lib/constants/api-constants', async (importOriginal) => ({
+vi.mock('#lib/constants/api-constants.js', async (importOriginal) => ({
   ...(await importOriginal<any>()),
   API_SERVICES: {
     openMeteo: { baseURL: 'https://archive-api.open-meteo.com/v1/archive' },
   },
 }));
 
-vi.mock('$lib/constants/weather-constants', async (importOriginal) => ({
+vi.mock('#lib/constants/weather-constants.js', async (importOriginal) => ({
   ...(await importOriginal<any>()),
   MOON_PHASE_NAMES: [
     'New Moon',
@@ -58,28 +58,28 @@ const {
   },
 }));
 
-vi.mock('$lib/storage/preferences.svelte', () => ({
+vi.mock('#lib/storage/preferences.svelte.js', () => ({
   preferences: mockPreferences,
 }));
 
-vi.mock('$lib/state/location-state.svelte', () => ({
+vi.mock('#lib/state/location-state.svelte.js', () => ({
   locations: mockLocations,
   signal: { value: null },
 }));
 
-vi.mock('$lib/state/gauges-state.svelte', () => ({
+vi.mock('#lib/state/gauges-state.svelte.js', () => ({
   allGaugesAttributes: mockAllGaugesAttributes,
   showDaysInRange: mockShowDaysInRange,
 }));
 
-vi.mock('$lib/state/project-state.svelte', () => ({
+vi.mock('#lib/state/project-state.svelte.js', () => ({
   project: {
     url: { href: 'http://localhost/?project=123' },
   },
 }));
 
 // Mock utils that are used within weather-state
-vi.mock('$lib/utils/unit-utils.svelte', async (importOriginal) => {
+vi.mock('#lib/utils/unit-utils.svelte.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -91,7 +91,7 @@ vi.mock('$lib/utils/unit-utils.svelte', async (importOriginal) => {
   };
 });
 
-vi.mock('$lib/utils/number-utils', async (importOriginal) => {
+vi.mock('#lib/utils/number-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -102,7 +102,7 @@ vi.mock('$lib/utils/number-utils', async (importOriginal) => {
   };
 });
 
-vi.mock('$lib/utils/date-utils', async (importOriginal) => {
+vi.mock('#lib/utils/date-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -118,7 +118,7 @@ vi.mock('$lib/utils/date-utils', async (importOriginal) => {
   };
 });
 
-vi.mock('$lib/utils/color-utils', async (importOriginal) => {
+vi.mock('#lib/utils/color-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -130,7 +130,7 @@ vi.mock('$lib/utils/color-utils', async (importOriginal) => {
   };
 });
 
-vi.mock('$lib/utils/weather-utils.svelte', () => ({
+vi.mock('#lib/utils/weather-utils.svelte.js', () => ({
   getWeatherTargets: vi.fn(() => []),
 }));
 

@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     METEOSTAT_DELAY_DAYS,
     OPEN_METEO_DELAY_DAYS,
-  } from '$lib/constants/weather-constants';
-  import { PopoverInstance } from '$lib/state/attachments/floating-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
+  } from '#lib/constants/weather-constants.js';
+  import { PopoverInstance } from '#lib/state/attachments/floating-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import { TriangleAlertIcon } from '@lucide/svelte';
 
   let popover = new PopoverInstance();

@@ -1,6 +1,6 @@
-import type { Color } from '$lib/types/yarn-types';
-import { copyToClipboard } from '$lib/utils/clipboard-utils';
-import { getSortedPalette, getTextColor } from '$lib/utils/color-utils';
+import type { Color } from '#lib/types/yarn-types.js';
+import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+import { getSortedPalette, getTextColor } from '#lib/utils/color-utils.js';
 import { ClipboardCheckIcon } from '@lucide/svelte';
 import chroma from 'chroma-js';
 

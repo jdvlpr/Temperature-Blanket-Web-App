@@ -16,7 +16,7 @@
 // Where everything goes in a palette image, without drawing anything, so it
 // can be tested. Sizes are in the image's own pixels.
 
-import { formatRangeLabel } from '$lib/utils/range-format';
+import { formatRangeLabel } from '#lib/utils/range-format.js';
 
 /** As the View menu's list and grid */
 export const PALETTE_IMAGE_LAYOUTS = ['list', 'grid'] as const;
@@ -327,4 +327,7 @@ export function getSwatchPlacement(
 }
 
 // Ranges read the same here as everywhere else
-export { formatRangeLabel, formatRangeNumber } from '$lib/utils/range-format';
+export {
+  formatRangeLabel,
+  formatRangeNumber,
+} from '#lib/utils/range-format.js';

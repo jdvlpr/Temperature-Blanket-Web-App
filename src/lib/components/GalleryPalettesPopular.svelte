@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import type { PopularProject } from '$lib/utils/gallery-utils';
+  import type { PopularProject } from '#lib/utils/gallery-utils.js';
 
   class GalleryPalettesPopularState {
     projects: PopularProject[] = $state([]);
@@ -25,15 +25,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import GalleryPaletteCard from '$lib/components/GalleryPaletteCard.svelte';
-  import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
+  import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
+  import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import {
     fetchPopularProjects,
     popularToGalleryNodes,
     recordPageView,
-  } from '$lib/utils/gallery-utils';
-  import type { GalleryPalette } from '$lib/utils/color-utils';
-  import { getPalettesFromProjects } from '$lib/utils/color-utils';
+  } from '#lib/utils/gallery-utils.js';
+  import type { GalleryPalette } from '#lib/utils/color-utils.js';
+  import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import { onMount } from 'svelte';
   import { ClockIcon } from '@lucide/svelte';
 

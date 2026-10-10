@@ -21,8 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     needsFreshSession,
     sendSignInCode,
     signInWithCode,
-  } from '$lib/accounts/client';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  } from '#lib/accounts/client.js';
+  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { LoaderCircleIcon, Trash2Icon } from '@lucide/svelte';
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';
@@ -51,7 +51,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       if (galleryPageCount) {
         // The server removes or keeps them as the account is deleted
-        const { updateGallerySettings } = await import('$lib/accounts/gallery');
+        const { updateGallerySettings } =
+          await import('#lib/accounts/gallery.js');
         const removeOnDelete = galleryPages === 'remove';
         await updateGallerySettings({ removeOnDelete }).catch((e) => {
           // Keeping them needs nothing saved, unless removal was chosen before

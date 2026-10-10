@@ -16,13 +16,13 @@
 import { MediaQuery } from 'svelte/reactivity';
 import type { Component } from 'svelte';
 import { page } from '$app/state';
-import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
-import Menu from '$lib/components/modals/Menu.svelte';
-import { project } from '$lib/state/project-state.svelte';
-import { weather } from '$lib/state/weather-state.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
-import { delay } from '$lib/utils/function-utils.svelte';
-import { loadFromHistory } from '$lib/utils/history-utils.svelte';
+import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
+import Menu from '#lib/components/modals/Menu.svelte';
+import { project } from '#lib/state/project-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { preferences } from '#lib/storage/preferences.svelte.js';
+import { delay } from '#lib/utils/function-utils.svelte.js';
+import { loadFromHistory } from '#lib/utils/history-utils.svelte.js';
 import { tick } from 'svelte';
 
 type DialogOptions = {
@@ -625,8 +625,8 @@ export const handleKeyDown = (ev: KeyboardEvent) => {
           loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
-        void import('$lib/utils/save-project.svelte').then(({ saveProject }) =>
-          saveProject(),
+        void import('#lib/utils/save-project.svelte.js').then(
+          ({ saveProject }) => saveProject(),
         );
       }
       // Check for section navigation shortcuts

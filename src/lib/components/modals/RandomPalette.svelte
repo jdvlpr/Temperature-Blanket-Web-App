@@ -14,25 +14,25 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import PaletteStripEditor from '$lib/components/PaletteStripEditor.svelte';
-  import DefaultYarnSuggestion from '$lib/components/DefaultYarnSuggestion.svelte';
-  import { yarnUses } from '$lib/storage/yarn-uses.svelte';
-  import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import SortSelectMenu from '$lib/components/SortSelectMenu.svelte';
+  import PaletteStripEditor from '#lib/components/PaletteStripEditor.svelte';
+  import DefaultYarnSuggestion from '#lib/components/DefaultYarnSuggestion.svelte';
+  import { yarnUses } from '#lib/storage/yarn-uses.svelte.js';
+  import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
+  import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
   import {
     getSortedPalette,
     PALETTE_SORTS,
     reverseColors,
-  } from '$lib/utils/color-utils';
-  import { pickRandomFromArray } from '$lib/utils/number-utils';
-  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
+  } from '#lib/utils/color-utils.js';
+  import { pickRandomFromArray } from '#lib/utils/number-utils.js';
+  import { getColorways, getFilteredYarns } from '#lib/utils/yarn-utils.js';
   import { ShuffleIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';

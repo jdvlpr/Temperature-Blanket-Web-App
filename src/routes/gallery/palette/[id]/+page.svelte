@@ -20,18 +20,18 @@ included it on their public gallery. -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { recordPageView } from '$lib/utils/gallery-utils';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { recordPageView } from '#lib/utils/gallery-utils.js';
   import {
     galleryTitleText,
     sharedPaletteFrom,
-  } from '$lib/utils/shared-palette-utils';
+  } from '#lib/utils/shared-palette-utils.js';
   import { ArrowLeftIcon, LinkIcon, PaletteIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -87,7 +87,7 @@ included it on their public gallery. -->
       class="m-auto flex w-full max-w-(--breakpoint-md) flex-col justify-start gap-2 pb-8"
     >
       <a
-        href="{resolve('/gallery')}?view=yarn-palettes"
+        href="{resolve('gallery')}?view=yarn-palettes"
         class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
       >
         <ArrowLeftIcon />

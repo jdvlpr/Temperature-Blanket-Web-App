@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_KOFI_LINK } from '$env/static/public';
-  import DonateOptionsModal from '$lib/components/modals/DonateOptionsModal.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { PUBLIC_KOFI_LINK } from '$app/env/public';
+  import DonateOptionsModal from '#lib/components/modals/DonateOptionsModal.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { HeartIcon } from '@lucide/svelte';
 
   function openDonationOptions() {

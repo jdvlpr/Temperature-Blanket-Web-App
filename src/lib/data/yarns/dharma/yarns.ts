@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types/yarn-types';
+import type { Brand } from '#lib/types/yarn-types.js';
 import { yarn as acidDyes } from './acid-dyes/yarn';
 import { yarn as fiberReactiveProcionDyes } from './fiber-reactive-procion-dyes/yarn';
 

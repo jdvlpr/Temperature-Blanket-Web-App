@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
-  import { replaceState } from '$app/navigation';
+  import { browser } from '$app/env';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import {
     LoaderCircleIcon,
@@ -30,13 +30,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { globeState } from './globe-state.svelte';
   import GlobePlacesPanel from './GlobePlacesPanel.svelte';
   import GlobeSheet from './GlobeSheet.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     IMAGERY,
     applyAnisotropy,
     applyImagery,
     whenFirstTileLoads,
   } from './globe-imagery';
+
   import {
     MIN_ALTITUDE,
     PX_PER_DEG,
@@ -58,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type GlobeSearchResult,
     type SheetSnap,
   } from './globe-utils';
-  import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
+  import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
 
   /** How many places the panel lists at once. The cap is what keeps the DOM
    * small while the camera moves; the panel reports what it leaves out. */
@@ -125,6 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const { top: insetTop, bottom: insetBottom } = globeState.viewInsets;
       isOnScreen = (region) => {
         const { x, y } = globe.getScreenCoords(region.lat, region.lng, 0);
+
         return (
           x >= 0 && x <= width && y >= insetTop && y <= height - insetBottom
         );
@@ -533,7 +535,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const params = ['lat', 'lng', 'z'];
     if (!params.some((name) => url.searchParams.has(name))) return;
     for (const name of params) url.searchParams.delete(name);
-    replaceState(url, page.state);
+    goto(url, { shallow: true, replace: true, state: page.state });
   }
 
   function handleToggleRotate() {
@@ -703,8 +705,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .backgroundImageUrl('/images/night-sky.png')
           .atmosphereAltitude(0.2)
           .atmosphereColor('lightskyblue')
-          .globeCurvatureResolution(8)
-          // Flat discs lying on the surface, one per kept region — see
+          .globeCurvatureResolution(8) // Flat discs lying on the surface, one per kept region — see
           // globe-discs.ts for why this isn't three-globe's points layer
           // (its cylinders always stick up). Seeded by updatePointSet below.
           .customLayerData([])
@@ -732,19 +733,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .onCustomLayerHover((d: object | null) => {
             globeState.hoveringPoint = !!d;
             globeState.highlighted = (d as GlobeRegion | null) ?? null;
-          })
-          // A single-datum layer driven by panel hover. Empty by default.
+          }) // A single-datum layer driven by panel hover. Empty by default.
           .ringsData([])
           .ringLat('lat')
-          .ringLng('lng')
-          // On the surface, like the discs: any real height floats the ring
+          .ringLng('lng') // On the surface, like the discs: any real height floats the ring
           // visibly above the map once the camera is close in.
           .ringAltitude(0.00005)
-          .ringColor(() => (t: number) => `rgba(255,255,255,${1 - t})`)
-          // In degrees, like the disc radius, so the pulse is sized to the dot
+          .ringColor(() => (t: number) => `rgba(255,255,255,${1 - t})`) // In degrees, like the disc radius, so the pulse is sized to the dot
           // at any zoom rather than covering the whole view when close in.
-          .ringMaxRadius((d: object) => 3 * pointRadiusAccessor()(d))
-          // Degrees per second: scaled with the radius so one pulse always
+          .ringMaxRadius((d: object) => 3 * pointRadiusAccessor()(d)) // Degrees per second: scaled with the radius so one pulse always
           // takes the same time to expand, at any zoom.
           .ringPropagationSpeed(
             (d: object) => (3 * pointRadiusAccessor()(d)) / 0.7,
@@ -949,7 +946,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {:else}
   <div
-    class="flex w-full gap-2 max-lg:landscape:flex-row max-lg:portrait:flex-col lg:flex-row lg:items-start"
+    class="flex w-full gap-2 lg:flex-row lg:items-start max-lg:portrait:flex-col max-lg:landscape:flex-row"
     style:--globe-header-h="{headerHeight}px"
   >
     <!--
@@ -962,7 +959,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-      class="lg:rounded-container relative w-full flex-1 overflow-hidden bg-black max-lg:landscape:h-[calc(100dvh-var(--globe-header-h,4rem)-0.5rem)] max-lg:portrait:fixed max-lg:portrait:inset-0 lg:h-[75dvh] lg:shadow-md"
+      class="lg:rounded-container relative w-full flex-1 overflow-hidden bg-black lg:h-[75dvh] lg:shadow-md max-lg:portrait:fixed max-lg:portrait:inset-0 max-lg:landscape:h-[calc(100dvh-var(--globe-header-h,4rem)-0.5rem)]"
       onmouseenter={handleMouseEnter}
       onmouseleave={handleMouseLeave}
       onpointerdown={handlePointerDown}

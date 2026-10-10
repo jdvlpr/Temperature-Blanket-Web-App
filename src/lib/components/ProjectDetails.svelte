@@ -14,15 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import ProjectNameField from '$lib/components/ProjectNameField.svelte';
-  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
-  import { getColorsFromInput } from '$lib/utils/color-utils';
-  import { extraColorsFromProjectHref } from '$lib/utils/extra-colors-utils';
-  import { pluralize } from '$lib/utils/string-utils';
-  import type { Color } from '$lib/types/yarn-types';
-  import SyncIcon from '$lib/components/sync/SyncIcon.svelte';
-  import type { SyncLabel } from '$lib/sync/status.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import ProjectNameField from '#lib/components/ProjectNameField.svelte';
+  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '#lib/constants/color-constants.js';
+  import { getColorsFromInput } from '#lib/utils/color-utils.js';
+  import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import SyncIcon from '#lib/components/sync/SyncIcon.svelte';
+  import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import { PencilIcon, Trash2Icon } from '@lucide/svelte';
 
   interface Props {

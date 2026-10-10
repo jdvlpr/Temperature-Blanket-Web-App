@@ -29,57 +29,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import ColorSwatch from '$lib/components/ColorSwatch.svelte';
-  import RangeArrow from '$lib/components/RangeArrow.svelte';
-  import RangeUnit from '$lib/components/RangeUnit.svelte';
+  import ColorSwatch from '#lib/components/ColorSwatch.svelte';
+  import RangeArrow from '#lib/components/RangeArrow.svelte';
+  import RangeUnit from '#lib/components/RangeUnit.svelte';
   import {
     paletteCardClass,
     paletteGridClass,
     paletteListClass,
     paletteRowClass,
-  } from '$lib/components/palette-item-styles';
-  import ViewMenu from '$lib/components/buttons/ViewMenu.svelte';
-  import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
-  import { menuItemClass } from '$lib/components/menu-styles';
-  import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
-  import ColorwayMoreMenu from '$lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
-  import { iconColorOn } from '$lib/components/yarn-colorways/colorway-utils';
+  } from '#lib/components/palette-item-styles.js';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
+  import { menuItemClass } from '#lib/components/menu-styles.js';
+  import ChangeColor from '#lib/components/modals/ChangeColor.svelte';
+  import WeatherTable from '#lib/components/modals/WeatherTable.svelte';
+  import ColorwayMoreMenu from '#lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
+  import { iconColorOn } from '#lib/components/yarn-colorways/colorway-utils.js';
   import {
     fillFromSwatch,
     fillWithColor,
     mutedText,
-  } from '$lib/components/yarn-colorways/fill-with-color';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { previewHighlight } from '$lib/state/preview-state.svelte';
+  } from '#lib/components/yarn-colorways/fill-with-color.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { previewHighlight } from '#lib/state/preview-state.svelte.js';
   import {
     gauges,
     manualRangesEditor,
     showDaysInRange,
-  } from '$lib/state/gauges-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
-  import type { GaugeRange } from '$lib/types/gauge-types';
-  import type { Color } from '$lib/types/yarn-types';
+  } from '#lib/state/gauges-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import type { GaugeRange } from '#lib/types/gauge-types.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
     getDaysInRange,
     getDaysPercent,
     setRangeValue,
-  } from '$lib/utils/range-utils.svelte';
-  import { sameColorList } from '$lib/utils/color-utils';
-  import { displayNumber } from '$lib/utils/number-utils';
+  } from '#lib/utils/range-utils.svelte.js';
+  import { sameColorList } from '#lib/utils/color-utils.js';
+  import { displayNumber } from '#lib/utils/number-utils.js';
   import {
     confirmGaugeChange,
     gaugeChangeState,
-  } from '$lib/utils/history-utils.svelte';
+  } from '#lib/utils/history-utils.svelte.js';
   import {
     describeIncrement,
     insertRange,
     removeRange,
     withGeneratedRanges,
-  } from '$lib/utils/gauge-utils.svelte';
-  import { rangeRuleSentence } from '$lib/utils/range-format';
-  import { pluralize } from '$lib/utils/string-utils';
+  } from '#lib/utils/gauge-utils.svelte.js';
+  import { rangeRuleSentence } from '#lib/utils/range-format.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     growIn,
     historyChange,
@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     motionDuration,
     Pop,
     showHistoryChange,
-  } from '$lib/utils/feedback.svelte';
+  } from '#lib/utils/feedback.svelte.js';
   import {
     CheckIcon,
     GripVerticalIcon,

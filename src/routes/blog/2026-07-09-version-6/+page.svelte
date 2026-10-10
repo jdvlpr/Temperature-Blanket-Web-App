@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
+  import { PUBLIC_BASE_URL } from '$app/env/public';
+  import AppLogo from '#lib/components/AppLogo.svelte';
+  import AppShell from '#lib/components/AppShell.svelte';
+  import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 </script>
 
@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <p class="font-bold text-2xl">What's in this update?</p>
+            <p class="text-2xl font-bold">What's in this update?</p>
             <p class="font-bold">Improved Daylight Accuracy</p>
             <p>
               Version 6 improves the accuracy of daylight times for weather data
@@ -105,16 +105,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
               for Daytime Rows previews are also more accurate.
             </p>
 
-            <div class="max-w-sm flex flex-col gap-1">
-              <p class="opacity-70 font-bold">
+            <div class="flex max-w-sm flex-col gap-1">
+              <p class="font-bold opacity-70">
                 Margin of Error for Sunrise/Sunset Times
               </p>
               <table
-                class="table w-full border border-surface-200-800 overflow-auto"
+                class="border-surface-200-800 table w-full overflow-auto border"
               >
                 <thead>
                   <tr
-                    class=" bg-surface-50-950 divide-x divide-surface-200-800"
+                    class=" bg-surface-50-950 divide-surface-200-800 divide-x"
                   >
                     <th class="text-left">Version 5</th>
                     <th class="text-left">Version 6</th>
@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </thead>
                 <tbody>
                   <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
+                    class="bg-surface-100-900 divide-surface-200-800 divide-x"
                   >
                     <td>~75 seconds</td>
                     <td>~15 seconds</td>
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <img
                 src="/images/blog-images/2026-07-09-version-6/appearance-menu.png"
                 alt="Appearance customization options include: colors, button styles, font styles, and spacing."
-                class="max-w-90vw w-xs border rounded-container"
+                class="max-w-90vw rounded-container w-xs border"
               />
               <p class="text-xs opacity-50">
                 These settings can be found by pressing the Appearance button in
@@ -163,7 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <p class="font-bold text-2xl">
+            <p class="text-2xl font-bold">
               Changes That May Affect Some Saved Projects
             </p>
             <p class="font-bold">Which Projects are Affected?</p>
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               > (all projects saved locally with weather data are not affected):
             </p>
 
-            <ul class="list-disc ml-8">
+            <ul class="ml-8 list-disc">
               <li>
                 Saved projects that used a <a
                   href="/documentation#add-a-gauge"
@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               A quick way to determine if a project is affected is to check if
               you see the following when opening the project:
             </p>
-            <div class="p-4 rounded-container border w-fit">
+            <div class="rounded-container w-fit border p-4">
               <p
                 class="flex w-fit flex-wrap items-center justify-center gap-1 text-left text-sm"
               >
@@ -237,13 +237,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <div class="overflow-x-auto">
                 <table
-                  class="table w-sm max-w-[90vw] border border-surface-200-800 overflow-auto"
+                  class="border-surface-200-800 table w-sm max-w-[90vw] overflow-auto border"
                 >
                   <thead>
                     <tr
-                      class=" bg-surface-50-950 divide-x divide-surface-200-800"
+                      class=" bg-surface-50-950 divide-surface-200-800 divide-x"
                     >
-                      <th class="text-left min-w-25">Date</th>
+                      <th class="min-w-25 text-left">Date</th>
                       <th class="text-left">Version 5 Daytime</th>
                       <th class="text-left">Version 6 Daytime</th>
                       <th class="text-left">Difference</th>
@@ -251,7 +251,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </thead>
                   <tbody>
                     <tr
-                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                      class="bg-surface-100-900 divide-surface-200-800 divide-x"
                     >
                       <td>2025-01-01</td>
                       <td>5:37</td>
@@ -259,7 +259,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <td>3 minutes</td>
                     </tr>
                     <tr
-                      class="bg-surface-50-950 divide-x divide-surface-200-800"
+                      class="bg-surface-50-950 divide-surface-200-800 divide-x"
                     >
                       <td>2025-01-02</td>
                       <td>5:39</td>
@@ -267,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <td>4 minutes</td>
                     </tr>
                     <tr
-                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                      class="bg-surface-100-900 divide-surface-200-800 divide-x"
                     >
                       <td>2025-01-03</td>
                       <td>5:42</td>
@@ -304,13 +304,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <div class="overflow-x-auto">
                 <table
-                  class="table w-sm max-w-[90vw] border border-surface-200-800 overflow-auto"
+                  class="border-surface-200-800 table w-sm max-w-[90vw] overflow-auto border"
                 >
                   <thead>
                     <tr
-                      class=" bg-surface-50-950 divide-x divide-surface-200-800"
+                      class=" bg-surface-50-950 divide-surface-200-800 divide-x"
                     >
-                      <th class="text-left min-w-25">Date</th>
+                      <th class="min-w-25 text-left">Date</th>
                       <th class="text-left"
                         >Version 5 Daytime stitches (left side)</th
                       >
@@ -322,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </thead>
                   <tbody>
                     <tr
-                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                      class="bg-surface-100-900 divide-surface-200-800 divide-x"
                     >
                       <td>2025-01-01</td>
                       <td>70</td>
@@ -330,7 +330,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <td>1 stitch</td>
                     </tr>
                     <tr
-                      class="bg-surface-50-950 divide-x divide-surface-200-800"
+                      class="bg-surface-50-950 divide-surface-200-800 divide-x"
                     >
                       <td>2025-01-02</td>
                       <td>71</td>
@@ -338,7 +338,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <td>none</td>
                     </tr>
                     <tr
-                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                      class="bg-surface-100-900 divide-surface-200-800 divide-x"
                     >
                       <td>2025-01-03</td>
                       <td>71</td>
@@ -352,14 +352,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Example data from Anchorage, Alaska
               </p>
             </div>
+
             <p>
               If there is a difference in the stitch count, it is usually just a
               one-or-two-stitch difference.
             </p>
-
             <p class="font-bold">
               What Should I Do if my Project was Affected?
             </p>
+
             <div class="flex flex-col gap-1">
               <p class="font-semibold opacity-50">
                 For projects using a Daytime Gauge

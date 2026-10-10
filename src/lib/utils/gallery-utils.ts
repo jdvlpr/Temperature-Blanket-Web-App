@@ -12,9 +12,9 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
+import { browser, dev } from '$app/env';
 
-import { browser, dev } from '$app/environment';
-import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
+import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
 
 export type GalleryPageInfo = {
   hasNextPage: boolean;
@@ -267,11 +267,12 @@ export const fetchPopularProjects = async ({
   limit = 40,
   timeUnit = 'month',
   palettes = false,
+
+  /** Include palettes shared on their own; a gallery plugin before 1.6.0 leaves them out */
 }: {
   months?: number;
   limit?: number;
   timeUnit?: string;
-  /** Include palettes shared on their own; a gallery plugin before 1.6.0 leaves them out */
   palettes?: boolean;
 }): Promise<PopularProject[]> => {
   if (months == 0.25) {

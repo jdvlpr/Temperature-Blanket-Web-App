@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import type { Point } from '$lib/features/image-palette/pixels';
+  import type { Point } from '#lib/features/image-palette/pixels.js';
 
   // The last photo and spot, so reopening during a visit picks up there
   let last = $state.raw<{
@@ -25,21 +25,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import Spinner from '#lib/components/Spinner.svelte';
   import {
     checkImageFile,
     decodeImage,
     imageToPixels,
     makeThumbnail,
-  } from '$lib/features/image-palette/decode';
+  } from '#lib/features/image-palette/decode.js';
   import {
     placeMagnifier,
     sampleHex,
-  } from '$lib/features/image-palette/pixels';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { getGenericColorName, getTextColor } from '$lib/utils/color-utils';
+  } from '#lib/features/image-palette/pixels.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { getGenericColorName, getTextColor } from '#lib/utils/color-utils.js';
   import { ChevronRightIcon, ImagePlusIcon } from '@lucide/svelte';
   import { Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';

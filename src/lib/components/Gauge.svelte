@@ -14,35 +14,35 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { copyToClipboard } from '$lib/utils/clipboard-utils';
-  import { version } from '$app/environment';
-  import { focusGaugeColor } from '$lib/components/GaugeCustomizer.svelte';
-  import PaletteStrip from '$lib/components/PaletteStrip.svelte';
-  import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
-  import ExportPaletteImage from '$lib/components/modals/ExportPaletteImage.svelte';
-  import type { PaletteImageRange } from '$lib/features/palette-image/layout';
-  import ChooseColorways from '$lib/components/modals/ChooseColorways.svelte';
-  import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
-  import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
-  import PasteColors from '$lib/components/modals/PasteColors.svelte';
-  import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
-  import SavePalette from '$lib/components/modals/SavePalette.svelte';
-  import SortMenu from '$lib/components/SortMenu.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { version } from '$app/env';
+  import { focusGaugeColor } from '#lib/components/GaugeCustomizer.svelte';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
+  import BrowsePalettes from '#lib/components/modals/BrowsePalettes.svelte';
+  import ExportPaletteImage from '#lib/components/modals/ExportPaletteImage.svelte';
+  import type { PaletteImageRange } from '#lib/features/palette-image/layout.js';
+  import ChooseColorways from '#lib/components/modals/ChooseColorways.svelte';
+  import GetPaletteFromImage from '#lib/components/modals/GetPaletteFromImage.svelte';
+  import ImportExportPalette from '#lib/components/modals/ImportExportPalette.svelte';
+  import PasteColors from '#lib/components/modals/PasteColors.svelte';
+  import RandomPalette from '#lib/components/modals/RandomPalette.svelte';
+  import SavePalette from '#lib/components/modals/SavePalette.svelte';
+  import SortMenu from '#lib/components/SortMenu.svelte';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import {
     getPaletteFallbackName,
     getSortedPalette,
     getYarnPageURL,
     reverseColors,
     shuffleColors,
-  } from '$lib/utils/color-utils';
-  import { drawerState, dialog } from '$lib/state/page-state.svelte';
-  import { previewHighlight } from '$lib/state/preview-state.svelte';
-  import { historyChange } from '$lib/utils/feedback.svelte';
-  import type { Color } from '$lib/types/yarn-types';
-  import type { GaugeSettingsType } from '$lib/types/gauge-types';
-  import { createGaugeColors } from '$lib/state/gauges-state.svelte';
+  } from '#lib/utils/color-utils.js';
+  import { drawerState, dialog } from '#lib/state/page-state.svelte.js';
+  import { previewHighlight } from '#lib/state/preview-state.svelte.js';
+  import { historyChange } from '#lib/utils/feedback.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import type { GaugeSettingsType } from '#lib/types/gauge-types.js';
+  import { createGaugeColors } from '#lib/state/gauges-state.svelte.js';
   import {
     BookmarkPlusIcon,
     ChevronDownIcon,
@@ -75,10 +75,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
   $effect(() => {
     if (!inProject) return;
+
     previewHighlight.hex =
       highlightIndex === null
         ? null
         : (gauge.colors[highlightIndex]?.hex ?? null);
+
     return () => (previewHighlight.hex = null);
   });
 
@@ -415,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <ShareIcon />
         <span class="flex items-center gap-1"
-          >Save & Export <ChevronDownIcon size={18}  /></span
+          >Save & Export <ChevronDownIcon size={18} /></span
         >
       </Menu.Trigger>
       <Portal>

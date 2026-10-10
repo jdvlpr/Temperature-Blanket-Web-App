@@ -16,9 +16,9 @@
 // Dev only: the fake email outbox. GET ?to=<address> lists messages sent to that
 // address (newest first); POST {to, subject, text} sends one through the configured sender.
 
-import { getEmailSender } from '$lib/server/email';
-import { readDevOutbox } from '$lib/server/email/dev-outbox';
-import { requireDevRoutes, requireStorage } from '$lib/server/platform';
+import { getEmailSender } from '#lib/server/email/index.js';
+import { readDevOutbox } from '#lib/server/email/dev-outbox.js';
+import { requireDevRoutes, requireStorage } from '#lib/server/platform.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

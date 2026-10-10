@@ -14,18 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { TrashUndos } from '$lib/utils/trash-undo.svelte';
-  import TrashUndo from '$lib/components/TrashUndo.svelte';
-  import { browser } from '$app/environment';
+  import { TrashUndos } from '#lib/utils/trash-undo.svelte.js';
+  import TrashUndo from '#lib/components/TrashUndo.svelte';
+  import { browser } from '$app/env';
   import { resolve } from '$app/paths';
-  import ProjectDetails from '$lib/components/ProjectDetails.svelte';
-  import { toast } from '$lib/state/page-state.svelte';
-  import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
-  import { ProjectStorage, savedProjects } from '$lib/storage/projects.svelte';
-  import { account } from '$lib/accounts/summary.svelte';
-  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
-  import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
-  import { sync, syncLabelFor } from '$lib/sync/status.svelte';
+  import ProjectDetails from '#lib/components/ProjectDetails.svelte';
+  import { toast } from '#lib/state/page-state.svelte.js';
+  import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
+  import {
+    ProjectStorage,
+    savedProjects,
+  } from '#lib/storage/projects.svelte.js';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
+  import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
+  import { sync, syncLabelFor } from '#lib/sync/status.svelte.js';
   import { FolderOpenIcon } from '@lucide/svelte';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
@@ -154,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#if limit}
         <a
-          href={resolve('/my-projects')}
+          href={resolve('my-projects')}
           class="btn hover:preset-tonal-surface mt-2"
         >
           <FolderOpenIcon />
