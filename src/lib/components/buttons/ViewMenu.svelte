@@ -21,18 +21,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import MenuCheckbox from '$lib/components/buttons/MenuCheckbox.svelte';
-  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
   import {
     menuContentClass,
     menuItemClass,
     menuTriggerClass,
   } from '$lib/components/menu-styles';
+  import { fillWithColor } from '$lib/components/yarn-colorways/fill-with-color';
   import type { PageLayout } from '$lib/types/page-types';
   import {
     CheckIcon,
     ChevronDownIcon,
     LayoutGridIcon,
     LayoutListIcon,
+    PaintBucketIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import type { Snippet } from 'svelte';
@@ -75,10 +76,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onCheckedChange={() => (value = view.value)}
             class={menuItemClass}
           >
-            <view.icon size={18} class="shrink-0" aria-hidden="true" />
+            <view.icon class="shrink-0" aria-hidden="true" />
             <span class="min-w-0 flex-1">{view.label}</span>
             <CheckIcon
-              size={18}
               class="shrink-0 {view.value === current.value ? '' : 'invisible'}"
               aria-hidden="true"
             />
@@ -97,11 +97,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onCheckedChange={(checked) => (fillWithColor.on = checked)}
             class={menuItemClass}
           >
-            <span class="flex min-w-0 flex-1 flex-col">
-              <span>Fill backgrounds</span>
-              <span class="text-surface-700-300 text-xs"
-                >Colored background</span
-              >
+            <span class="flex items-center justify-start gap-2 text-left min-w-0 flex-1">
+              <PaintBucketIcon  class="shrink-0" />
+              <div class="flex min-w-0 flex-col text-left">
+                  <span>Fill backgrounds</span>
+                  <span class="text-surface-700-300 text-xs"
+                    >Colored background</span
+                  >
+              </div>
             </span>
             <MenuCheckbox checked={fillWithColor.on} />
           </Menu.OptionItem>

@@ -18,7 +18,7 @@
       <ChevronUpIcon />
     {:else}
       Information
-      <ChevronDownIcon />
+      <ChevronDownIcon size={18} />
     {/if}
   </button>
 

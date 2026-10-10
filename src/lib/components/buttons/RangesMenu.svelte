@@ -44,8 +44,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type RangeGeneration,
   } from '$lib/utils/gauge-utils.svelte';
   import {
+  ArrowDown10Icon,
     ArrowDownNarrowWideIcon,
     ArrowDownWideNarrowIcon,
+    ArrowUp01Icon,
     BracketsIcon,
     CheckIcon,
     ChevronDownIcon,
@@ -190,12 +192,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       value: 'high-to-low',
       label: 'High to low',
-      icon: ArrowDownWideNarrowIcon,
+      icon: ArrowDown10Icon,
     },
     {
       value: 'low-to-high',
       label: 'Low to high',
-      icon: ArrowDownNarrowWideIcon,
+      icon: ArrowUp01Icon,
     },
   ] as const;
 
@@ -254,14 +256,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-hidden="true">{item.icon}</span
       >
     {:else}
-      <item.icon size={18} class="shrink-0" aria-hidden="true" />
+      <item.icon  class="shrink-0" aria-hidden="true" />
     {/if}
     <span class="flex min-w-0 flex-1 flex-col">
       <span>{item.label}</span>
       <span class="text-surface-700-300 text-xs">{item.note}</span>
     </span>
     <CheckIcon
-      size={18}
+
       class="shrink-0 {checked ? '' : 'invisible'}"
       aria-hidden="true"
     />
@@ -312,7 +314,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class={menuItemClass}
               >
                 <DecimalsArrowLeftIcon
-                  size={18}
+
                   class="shrink-0"
                   aria-hidden="true"
                 />
@@ -341,13 +343,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class={menuItemClass}
                 >
                   <direction.icon
-                    size={18}
+
                     class="shrink-0"
                     aria-hidden="true"
                   />
                   <span class="min-w-0 flex-1">{direction.label}</span>
                   <CheckIcon
-                    size={18}
+
                     class="shrink-0 {checked ? '' : 'invisible'}"
                     aria-hidden="true"
                   />
@@ -365,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               onCheckedChange={(checked) => change({ linked: checked })}
               class={menuItemClass}
             >
-              <Link2Icon size={18} class="shrink-0" aria-hidden="true" />
+              <Link2Icon  class="shrink-0" aria-hidden="true" />
               <span class="flex min-w-0 flex-1 flex-col">
                 <span>Linked ranges</span>
                 <span class="text-surface-700-300 text-xs"
@@ -409,7 +411,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/if}
                 </span>
                 <CheckIcon
-                  size={18}
+
                   class="shrink-0 {checked ? '' : 'invisible'}"
                   aria-hidden="true"
                 />

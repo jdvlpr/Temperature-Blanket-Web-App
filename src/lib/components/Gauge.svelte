@@ -415,7 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <ShareIcon />
         <span class="flex items-center gap-1"
-          >Save & Export <ChevronDownIcon size={18} /></span
+          >Save & Export <ChevronDownIcon size={18}  /></span
         >
       </Menu.Trigger>
       <Portal>

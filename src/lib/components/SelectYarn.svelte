@@ -341,7 +341,7 @@ the keyboard; elsewhere the list drops down from the field. -->
           class={['min-w-0 flex-1 truncate', !selectedLabel && 'opacity-60']}
           >{selectedLabel || placeholder}</span
         >
-        <ChevronDownIcon class="shrink-0" aria-hidden="true" />
+        <ChevronDownIcon class="shrink-0" aria-hidden="true" size={18} />
       </button>
       {#if selectedValue}
         <button
@@ -510,7 +510,7 @@ the keyboard; elsewhere the list drops down from the field. -->
           class={['ig-btn hover:preset-tonal-surface', buttonReset]}
           aria-label="Show All Yarns"
         >
-          <ChevronDownIcon />
+          <ChevronDownIcon size={18} />
         </Combobox.Trigger>
         {#if selectedValue || inputValue}
           <!-- In the tab order, as it was; Skeleton leaves it out -->
