@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type RangeGeneration,
   } from '$lib/utils/gauge-utils.svelte';
   import {
-  ArrowDown10Icon,
+    ArrowDown10Icon,
     ArrowDownNarrowWideIcon,
     ArrowDownWideNarrowIcon,
     ArrowUp01Icon,
@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value: 'ranges',
         label: 'Even steps',
         icon: RulerIcon,
-        note: `${step} ${unitLabel} each (auto-calculated from your weather)`,
+        note: `${step} ${unitLabel} each (calculated from your weather)`,
         generation: { mode: 'auto', optimization: 'ranges' },
       },
     ];
@@ -143,6 +143,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let generatedLabel = $derived(
     generations.find((g) => g.value === generatedAs)?.label.replace('…', '') ??
       'Custom ranges',
+  );
+
+  // The button says how the ranges were made, as View says its layout; the
+  // sentence under the toolbar (GaugeCustomizer) gives the detail
+  let triggerMode = $derived(
+    options?.isCustomRanges
+      ? 'Custom'
+      : options?.mode === 'manual'
+        ? 'Manual'
+        : 'Auto',
   );
 
   // Rounding only matters for Automatic ranges whose step isn't whole
@@ -256,14 +266,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-hidden="true">{item.icon}</span
       >
     {:else}
-      <item.icon  class="shrink-0" aria-hidden="true" />
+      <item.icon class="shrink-0" aria-hidden="true" />
     {/if}
     <span class="flex min-w-0 flex-1 flex-col">
       <span>{item.label}</span>
       <span class="text-surface-700-300 text-xs">{item.note}</span>
     </span>
     <CheckIcon
-
       class="shrink-0 {checked ? '' : 'invisible'}"
       aria-hidden="true"
     />
@@ -276,9 +285,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!open) drill.open = null;
   }}
 >
-  <Menu.Trigger class={menuTriggerClass} data-ranges-menu-trigger>
+  <Menu.Trigger
+    class={menuTriggerClass}
+    data-ranges-menu-trigger
+    aria-describedby="ranges-description"
+  >
     <Settings2Icon size={18} aria-hidden="true" />
-    <span>Ranges</span>
+    <span>Ranges{options ? `: ${triggerMode}` : ''}</span>
     <ChevronDownIcon size={18} aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
@@ -286,7 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Menu.Content class={menuContentClass}>
         {#if options}
           <MenuSubmenu
-            label="Generate ranges"
+            label="Auto ranges"
             icon={WandSparklesIcon}
             current={options.mode === 'manual' && !options.isCustomRanges
               ? 'Manual steps'
@@ -313,11 +326,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   generate({ roundIncrement: checked })}
                 class={menuItemClass}
               >
-                <DecimalsArrowLeftIcon
-
-                  class="shrink-0"
-                  aria-hidden="true"
-                />
+                <DecimalsArrowLeftIcon class="shrink-0" aria-hidden="true" />
                 <span class="min-w-0 flex-1">Round numbers</span>
                 <MenuCheckbox checked={options.auto.roundIncrement} />
               </Menu.OptionItem>
@@ -342,14 +351,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onCheckedChange={() => change({ direction: direction.value })}
                   class={menuItemClass}
                 >
-                  <direction.icon
-
-                    class="shrink-0"
-                    aria-hidden="true"
-                  />
+                  <direction.icon class="shrink-0" aria-hidden="true" />
                   <span class="min-w-0 flex-1">{direction.label}</span>
                   <CheckIcon
-
                     class="shrink-0 {checked ? '' : 'invisible'}"
                     aria-hidden="true"
                   />
@@ -367,16 +371,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
               onCheckedChange={(checked) => change({ linked: checked })}
               class={menuItemClass}
             >
-              <Link2Icon  class="shrink-0" aria-hidden="true" />
+              <Link2Icon class="shrink-0" aria-hidden="true" />
               <span class="flex min-w-0 flex-1 flex-col">
                 <span>Linked ranges</span>
                 <span class="text-surface-700-300 text-xs"
-                  >Changing a range value automatically updates the next or previous one</span
+                  >Changing a range value automatically updates the next or
+                  previous one</span
                 >
               </span>
               <MenuCheckbox checked={options.linked} />
             </Menu.OptionItem>
-        <Menu.Separator />
+            <Menu.Separator />
           {/if}
           <MenuSubmenu
             label="Each range includes"
@@ -411,7 +416,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/if}
                 </span>
                 <CheckIcon
-
                   class="shrink-0 {checked ? '' : 'invisible'}"
                   aria-hidden="true"
                 />
@@ -432,7 +436,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/snippet}
             </Menu.Item>
           </MenuSubmenu>
-
         {/if}
       </Menu.Content>
     </Menu.Positioner>
