@@ -248,10 +248,9 @@ the keyboard; elsewhere the list drops down from the field. -->
   }
 
   // Skeleton styles the combobox's parts on its own; these fit them into the
-  // app's input group and list look instead
-  const inputReset = 'rounded-none ring-0 focus:ring-0';
+  // field group and the app's list look instead
   const buttonReset =
-    'static h-auto w-auto translate-none transform-none rounded-none bg-transparent text-inherit';
+    'static h-auto w-auto translate-none transform-none bg-transparent text-inherit';
   const listClass =
     'flex flex-col bg-surface-50 dark:bg-surface-950 overscroll-contain overflow-y-auto';
   const itemClass =
@@ -328,12 +327,14 @@ the keyboard; elsewhere the list drops down from the field. -->
 <div class="label flex w-full flex-col justify-start md:col-span-2">
   {#if phone.current}
     <span class="label-text" id="{uid}-label">Yarn Name</span>
-    <div class="input-group w-full grid-cols-[auto_1fr_auto]">
-      <span class="ig-cell"><Icon iconNode={yarnBall} /></span>
+    <div class="field-group w-full grid-cols-[auto_1fr_auto]">
+      <span class="label label-text preset-tonal"
+        ><Icon iconNode={yarnBall} /></span
+      >
       <button
         bind:this={fieldButton}
         type="button"
-        class="ig-input flex min-w-0 items-center gap-2 text-left"
+        class="input flex min-w-0 items-center gap-2 text-left"
         aria-haspopup="dialog"
         aria-labelledby="{uid}-label {uid}-value"
         disabled={disabled || !ready}
@@ -350,7 +351,7 @@ the keyboard; elsewhere the list drops down from the field. -->
         <button
           type="button"
           aria-label="Clear"
-          class="ig-btn hover:preset-tonal-surface"
+          class="btn hover:preset-tonal-surface"
           {disabled}
           onclick={() => pick(undefined)}
         >
@@ -424,11 +425,13 @@ the keyboard; elsewhere the list drops down from the field. -->
                   >
                 </div>
                 <Combobox.Control
-                  class="input-group mx-2 mb-2 grid-cols-[auto_1fr_auto]"
+                  class="field-group mx-2 mb-2 grid-cols-[auto_1fr_auto]"
                 >
-                  <span class="ig-cell"><SearchIcon /></span>
+                  <span class="label label-text preset-tonal"
+                    ><SearchIcon /></span
+                  >
                   <Combobox.Input
-                    class={['ig-input', inputReset]}
+                    class="input"
                     placeholder="Search {placeholder}"
                     enterkeyhint="search"
                   >
@@ -440,7 +443,7 @@ the keyboard; elsewhere the list drops down from the field. -->
                     <button
                       type="button"
                       aria-label="Clear Search"
-                      class="ig-btn hover:preset-tonal-surface"
+                      class="btn hover:preset-tonal-surface"
                       onclick={() => {
                         query = '';
                         searchInput?.focus();
@@ -501,16 +504,18 @@ the keyboard; elsewhere the list drops down from the field. -->
     >
       <Combobox.Label class="label-text">Yarn Name</Combobox.Label>
       <Combobox.Control
-        class="input-group w-full grid-cols-[auto_1fr_auto_auto]"
+        class="field-group w-full grid-cols-[auto_1fr_auto_auto]"
       >
-        <span class="ig-cell"><Icon iconNode={yarnBall} /></span>
+        <span class="label label-text preset-tonal"
+          ><Icon iconNode={yarnBall} /></span
+        >
         <Combobox.Input
-          class={['ig-input truncate', inputReset]}
+          class="input truncate"
           {placeholder}
           onfocus={(event) => event.currentTarget.select()}
         />
         <Combobox.Trigger
-          class={['ig-btn hover:preset-tonal-surface', buttonReset]}
+          class={['btn hover:preset-tonal-surface', buttonReset]}
           aria-label="Show All Yarns"
         >
           <ChevronDownIcon size={18} />
@@ -518,7 +523,7 @@ the keyboard; elsewhere the list drops down from the field. -->
         {#if selectedValue || inputValue}
           <!-- In the tab order, as it was; Skeleton leaves it out -->
           <Combobox.ClearTrigger
-            class={['ig-btn hover:preset-tonal-surface', buttonReset]}
+            class={['btn hover:preset-tonal-surface', buttonReset]}
             aria-label="Clear"
             tabindex={0}
           >

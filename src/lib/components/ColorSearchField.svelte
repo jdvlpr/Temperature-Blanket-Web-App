@@ -79,8 +79,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 so the text box keeps its room -->
 <div class="label @container w-full">
   <label class="label-text" for="{id}-text">{label}</label>
-  <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
-    <span class="ig-cell relative p-1.5">
+  <div class="field-group w-full grid-cols-[auto_1fr_auto_auto]">
+    <span class="label label-text preset-tonal relative p-1.5">
       <input
         type="color"
         class="input size-8 cursor-pointer rounded-full! p-0"
@@ -102,7 +102,7 @@ so the text box keeps its room -->
     <input
       id="{id}-text"
       type="text"
-      class="ig-input min-w-0"
+      class="input min-w-0"
       autocomplete="off"
       placeholder="e.g., pink, #c3f4d2"
       style="background:{hex || 'none'} !important;color:{getTextColor(hex)}"
@@ -113,7 +113,7 @@ so the text box keeps its room -->
       <button
         type="button"
         aria-label="Clear Color"
-        class="ig-btn"
+        class="btn"
         onclick={() => {
           hex = '';
           text = '';
@@ -125,7 +125,7 @@ so the text box keeps its room -->
       type="button"
       aria-label="Pick color from a photo"
       title="Pick color from a photo"
-      class="ig-btn gap-1"
+      class="btn gap-1"
       data-photo-button
       onclick={photo}
       ><ImageIcon aria-hidden="true" />

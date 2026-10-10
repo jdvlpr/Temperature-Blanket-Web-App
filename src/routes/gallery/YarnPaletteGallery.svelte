@@ -243,11 +243,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class="label col-span-12 w-full md:col-span-3">
           <span class="label-text"> Search </span>
-          <div class="input-group grid-cols-[auto_1fr_auto]">
-            <span class="ig-cell"><EarthIcon /></span>
+          <div class="field-group grid-cols-[auto_1fr_auto]">
+            <span class="label label-text preset-tonal"><EarthIcon /></span>
             <input
               type="text"
-              class="ig-input truncate"
+              class="input truncate"
               autocomplete="off"
               placeholder="e.g., Kansas, 2003"
               bind:value={yarnPaletteGalleryState.search}
@@ -256,7 +256,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if showSearchReset}
               <button
-                class="ig-btn hover:preset-tonal-surface"
+                class="btn hover:preset-tonal-surface"
                 title="Reset Search"
                 onclick={() => {
                   yarnPaletteGalleryState.search = '';

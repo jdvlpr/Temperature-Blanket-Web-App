@@ -203,10 +203,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
               <PaletteStrip {colors} />
-              <div class="input-group grid-cols-[1fr_auto_auto]">
+              <div class="field-group grid-cols-[1fr_auto_auto]">
                 <input
                   type="text"
-                  class="ig-input"
+                  class="input"
                   aria-label="Palette name"
                   autocomplete="off"
                   maxlength={MAX_SAVED_PALETTE_NAME_LENGTH}
@@ -222,7 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 <button
                   type="button"
-                  class="ig-btn hover:preset-tonal-surface"
+                  class="btn hover:preset-tonal-surface"
                   title="Save Name"
                   onclick={saveRename}
                 >
@@ -230,7 +230,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </button>
                 <button
                   type="button"
-                  class="ig-btn hover:preset-tonal-surface"
+                  class="btn hover:preset-tonal-surface"
                   title="Cancel"
                   onclick={() => (editingId = null)}><XIcon /></button
                 >

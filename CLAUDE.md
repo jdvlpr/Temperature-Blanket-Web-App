@@ -8,7 +8,7 @@ This file is committed per branch on purpose: branches differ (e.g. `main` has n
 
 [temperature-blanket.com](https://temperature-blanket.com): visualize a location's historical climate data, build a color "gauge" mapping temperature/weather to yarn colors, and preview a crochet/knitting temperature blanket pattern. Projects can be saved locally, shared as a URL, exported to PDF/CSV/PNG/Google Sheets, or published to the public gallery (backed by a headless WordPress site). With accounts on, projects, palettes and preferences also sync to the server.
 
-Svelte 5 (runes) + SvelteKit 3 (config lives in `sveltekit({...})` in `vite.config.ts`; there is no `svelte.config.js`; imports use `#lib/...` with file extensions), Skeleton UI 5 (plus its v4 `input-group` utilities, kept in `src/css/input-group.css`), Tailwind 4, TypeScript, deployed on Cloudflare Pages via `@sveltejs/adapter-cloudflare`. Package manager is **pnpm**.
+Svelte 5 (runes) + SvelteKit 3 (config lives in `sveltekit({...})` in `vite.config.ts`; there is no `svelte.config.js`; imports use `#lib/...` with file extensions), Skeleton UI 5, Tailwind 4, TypeScript, deployed on Cloudflare Pages via `@sveltejs/adapter-cloudflare`. Package manager is **pnpm**.
 
 ## Setup
 

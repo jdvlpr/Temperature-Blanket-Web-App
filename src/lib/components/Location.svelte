@@ -377,16 +377,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       </p>
       <div
-        class={['input-group grid-cols-[auto_1fr_auto]']}
+        class={['field-group grid-cols-[auto_1fr_auto]']}
         bind:this={locationGroup}
       >
-        <div class="ig-cell">
+        <div class="label label-text preset-tonal">
           <SearchIcon />
         </div>
         <input
           type="text"
           id="location-{location.uuid}"
-          class="ig-input truncate"
+          class="input truncate"
           autocomplete="off"
           placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
           title="Enter a city, region, or landmark"
@@ -397,7 +397,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={project.status.loading || weather.isUserEdited}
         />
         {#if searching}
-          <div class="ig-cell flex items-center justify-center">
+          <div
+            class="label label-text preset-tonal flex items-center justify-center"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="size-6 animate-spin"
@@ -416,7 +418,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {:else if showReset}
           <button
-            class="ig-btn hover:preset-tonal-surface"
+            class="btn hover:preset-tonal-surface"
             title="Reset Location Search"
             disabled={weather.isUserEdited || project.status.loading}
             onclick={() => {
@@ -437,7 +439,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
         {:else if project.geolocationAvailable}
           <button
-            class="ig-btn hover:preset-tonal-surface"
+            class="btn hover:preset-tonal-surface"
             title="Use My Location"
             disabled={weather.isUserEdited || project.status.loading}
             onclick={async () => {

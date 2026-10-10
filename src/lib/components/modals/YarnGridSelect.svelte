@@ -222,21 +222,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <label class="label-text" for="yarn-select-search-input"
       >Colorway Name</label
     >
-    <div class="input-group w-full grid-cols-[auto_1fr_auto]">
-      <span class="ig-cell"><SearchIcon /></span>
+    <div class="field-group w-full grid-cols-[auto_1fr_auto]">
+      <span class="label label-text preset-tonal"><SearchIcon /></span>
       <input
         id="yarn-select-search-input"
         autocomplete="off"
         placeholder="e.g., Wisteria, Cream"
         type="text"
-        class="ig-input truncate"
+        class="input truncate"
         bind:value={search}
       />
       {#if search}
         <button
           type="button"
           aria-label="Clear Search"
-          class="ig-btn hover:preset-tonal-surface"
+          class="btn hover:preset-tonal-surface"
           onclick={() => (search = '')}><XIcon /></button
         >
       {/if}

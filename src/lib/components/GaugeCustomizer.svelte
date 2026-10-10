@@ -857,14 +857,14 @@ cancel, then Save -->
     <span class="flex flex-wrap items-center gap-1.5">
       <!-- On the surface, even in a card filled with its color -->
       <span
-        class="input-group bg-surface-50-950 text-surface-950-50 w-fit grid-cols-[minmax(0,1fr)_auto]"
+        class="field-group bg-surface-50-950 text-surface-950-50 w-fit grid-cols-[minmax(0,1fr)_auto]"
       >
         <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
       from zooming in. Room for the up and down buttons a computer shows. -->
         <input
           type="number"
           step="any"
-          class="ig-input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
+          class="input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
           aria-label="Color {index + 1} {edge}{unitLabel
             ? `, ${unitLabel}`
             : ''}"
@@ -878,7 +878,7 @@ cancel, then Save -->
         <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
         <button
           type="button"
-          class="ig-btn"
+          class="btn"
           title="Cancel"
           aria-label="Cancel editing range for color {index + 1}"
           onmousedown={(e) => e.preventDefault()}

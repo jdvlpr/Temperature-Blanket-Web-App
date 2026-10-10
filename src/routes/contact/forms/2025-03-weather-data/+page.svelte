@@ -508,17 +508,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div>
           <label for="projectLink" class="label">
             <span class="label-text">Link to your project</span>
-            <div class="input-group grid-cols-[1fr_auto]">
+            <div class="field-group grid-cols-[1fr_auto]">
               <input
                 id="projectLink"
-                class="ig-input"
+                class="input"
                 bind:value={projectLink}
                 type="text"
                 name="projectLink"
                 placeholder="Your Project URL"
               />
               <button
-                class="ig-btn preset-filled"
+                class="btn preset-filled"
                 title="Clear"
                 onclick={(e) => {
                   e.preventDefault();

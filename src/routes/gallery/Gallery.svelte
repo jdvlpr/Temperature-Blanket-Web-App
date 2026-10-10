@@ -300,11 +300,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class="label col-span-12 md:col-span-5">
           <span class="label-text">Search Projects</span>
-          <div class="input-group grid-cols-[auto_1fr_auto]">
-            <span class="ig-cell"><EarthIcon /></span>
+          <div class="field-group grid-cols-[auto_1fr_auto]">
+            <span class="label label-text preset-tonal"><EarthIcon /></span>
             <input
               type="text"
-              class="ig-input w-full truncate"
+              class="input w-full truncate"
               autocomplete="off"
               placeholder="e.g., Kansas, 2003"
               bind:value={galleryState.search}
@@ -313,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if showSearchReset}
               <button
-                class="ig-btn hover:bg-surface-100-900"
+                class="btn hover:bg-surface-100-900"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';

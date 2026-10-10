@@ -354,20 +354,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="col-span-12 flex w-full flex-col justify-start gap-1">
                 <div class="label">
                   <span class="label-text"> Colorway Name </span>
-                  <div class="input-group w-full grid-cols-[auto_1fr_auto]">
-                    <span class="ig-cell"><SearchIcon /></span>
+                  <div class="field-group w-full grid-cols-[auto_1fr_auto]">
+                    <span class="label label-text preset-tonal"
+                      ><SearchIcon /></span
+                    >
                     <input
                       id="yarn-select-search-input"
                       autocomplete="off"
                       placeholder="e.g., Wisteria, Cream"
                       type="text"
-                      class="ig-input truncate"
+                      class="input truncate"
                       bind:value={yarnColorwayFinderState.search}
                     />
                     {#if yarnColorwayFinderState.search}
                       <button
                         aria-label="Clear Search"
-                        class="ig-btn hover:preset-tonal-surface"
+                        class="btn hover:preset-tonal-surface"
                         onclick={() => {
                           yarnColorwayFinderState.search = '';
                         }}

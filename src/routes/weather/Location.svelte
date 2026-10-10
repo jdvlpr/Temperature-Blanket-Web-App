@@ -268,16 +268,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </span>
     <div
-      class="input-group grid-cols-[auto_1fr_auto]"
+      class="field-group grid-cols-[auto_1fr_auto]"
       bind:this={locationGroup}
     >
-      <div class="ig-cell">
+      <div class="label label-text preset-tonal">
         <SearchIcon />
       </div>
       <input
         type="text"
         id="location-weather"
-        class="ig-input truncate"
+        class="input truncate"
         autocomplete="off"
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
@@ -306,7 +306,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {:else if showReset}
         <button
-          class="ig-btn hover:preset-tonal-surface"
+          class="btn hover:preset-tonal-surface"
           title="Reset Location Search"
           onclick={async () => {
             if (weatherLocationState.inputLocation)
@@ -325,7 +325,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
       {:else if navigatorAvailable}
         <button
-          class="ig-btn hover:preset-tonal-surface"
+          class="btn hover:preset-tonal-surface"
           title="Use My Location"
           onclick={async () => {
             if (weatherLocationState.inputLocation)

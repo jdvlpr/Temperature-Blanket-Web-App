@@ -188,13 +188,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class="col-span-12 flex w-full flex-col justify-start md:col-span-3">
         <span class="label-text text-left"> Search </span>
-        <div class="input-group grid-cols-[auto_1fr_auto]">
-          <span class="ig-cell">
+        <div class="field-group grid-cols-[auto_1fr_auto]">
+          <span class="label label-text preset-tonal">
             <EarthIcon />
           </span>
           <input
             type="text"
-            class="ig-input w-full truncate"
+            class="input w-full truncate"
             autocomplete="off"
             placeholder="e.g., Kansas, 2003"
             bind:value={galleryPalettesState.search}
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#if showSearchReset}
             <button
-              class="ig-btn hover:preset-tonal-surface"
+              class="btn hover:preset-tonal-surface"
               title="Reset Search"
               onclick={() => {
                 galleryPalettesState.search = '';
