@@ -45,4 +45,36 @@ describe('rangeRuleSentence', () => {
       rangeRuleSentence({ includeFromValue: false, includeToValue: false }),
     ).toBe('Each range includes neither its From nor its To number.');
   });
+
+  it('says a rain or snow range ending at 0 includes 0', () => {
+    const highToLow = {
+      includeFromValue: true,
+      includeToValue: false,
+      direction: 'high-to-low' as const,
+    };
+    expect(rangeRuleSentence(highToLow, 'prcp')).toBe(
+      'Each range includes its From number, not its To number. A range with a To of 0 includes 0.',
+    );
+    expect(
+      rangeRuleSentence(
+        { ...highToLow, direction: 'low-to-high' as const },
+        'snow',
+      ),
+    ).toBe('Each range includes its From number, not its To number.');
+    expect(
+      rangeRuleSentence(
+        {
+          includeFromValue: false,
+          includeToValue: true,
+          direction: 'low-to-high',
+        },
+        'snow',
+      ),
+    ).toBe(
+      'Each range includes its To number, not its From number. A range with a From of 0 includes 0.',
+    );
+    expect(rangeRuleSentence(highToLow, 'temp')).toBe(
+      'Each range includes its From number, not its To number.',
+    );
+  });
 });

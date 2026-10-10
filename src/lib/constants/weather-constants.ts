@@ -26,6 +26,9 @@ export const WEATHER_DATA_DECIMALS = 2;
 
 export const HOURS_PER_DAY = 24;
 
+/** Weather values that are never negative, so their ranges stop at 0 */
+export const NON_NEGATIVE_PARAMS: string[] = ['prcp', 'snow'];
+
 export const MONTHS = [
   {
     value: 1,

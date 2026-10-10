@@ -60,9 +60,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     unitType?: string;
     /** Whether ranges include their From and To, said once above them */
     rangeOptions?: GaugeRangeOptions;
+    /** Which gauge, for what its ranges can include */
+    gaugeId?: string;
   }
 
-  let { items, unitLabel = '', unitType, rangeOptions }: Props = $props();
+  let {
+    items,
+    unitLabel = '',
+    unitType,
+    rangeOptions,
+    gaugeId,
+  }: Props = $props();
 
   let grid = $derived(preferences.value.layout === 'grid');
   let filled = $derived(fillWithColor.on);
@@ -107,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if hasRanges && rangeOptions}
   <p class="text-surface-700-300 mb-2 px-2 text-center text-xs">
-    {rangeRuleSentence(rangeOptions)}
+    {rangeRuleSentence(rangeOptions, gaugeId)}
   </p>
 {/if}
 <div class="text-left {grid ? paletteGridClass : paletteListClass}">

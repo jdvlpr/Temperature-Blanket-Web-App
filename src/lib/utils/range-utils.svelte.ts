@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { NON_NEGATIVE_PARAMS } from '$lib/constants/weather-constants';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type {
@@ -23,9 +24,6 @@ import type {
 } from '$lib/types/gauge-types';
 import type { WeatherDay } from '$lib/types/weather-types';
 import { displayNumber } from '$lib/utils/number-utils';
-
-/** Weather values that are never negative, so their ranges stop at 0 */
-export const NON_NEGATIVE_PARAMS: string[] = ['prcp', 'snow'];
 
 export const getStart = (
   rangeOptions: GaugeRangeOptions | undefined,
@@ -147,8 +145,7 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
     }
 
     // If the to value isn't past the from value (many days share one value), move it
-    // one past the from value. Stop if ±1 can no longer change the value (±Infinity, or
-    // magnitudes past the safe-integer range), which would otherwise loop forever.
+    // one past the from value
     if (gaugeDirection === 'high-to-low' && currentTo >= currentFrom)
       currentTo = currentFrom - 1;
     else if (gaugeDirection !== 'high-to-low' && currentTo <= currentFrom)

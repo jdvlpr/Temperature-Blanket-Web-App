@@ -151,10 +151,10 @@ describe('getEvenlyDistributedRangeValuesWithEqualDayCount', () => {
                 expect(range.to).toBeLessThan(range.from);
               else expect(range.to).toBeGreaterThan(range.from);
             }
-            // Every day, dry ones included, gets a range
+            // Every day, dry ones included, is in exactly one range
             for (const value of amounts)
               expect(
-                ranges.some((range) =>
+                ranges.filter((range) =>
                   isValueInRange({
                     value,
                     range,
@@ -163,8 +163,8 @@ describe('getEvenlyDistributedRangeValuesWithEqualDayCount', () => {
                     includeToValue: includeTo,
                     param: 'prcp',
                   }),
-                ),
-              ).toBe(true);
+                ).length,
+              ).toBe(1);
           });
   });
 });

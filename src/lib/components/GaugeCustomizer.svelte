@@ -1168,7 +1168,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 <!-- Which ends of each range are in it, said once, just above the ranges -->
 {#if showRanges && !isCategory && rules}
   <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
-    {rangeRuleSentence(rules)}
+    {rangeRuleSentence(rules, gauge.id)}
   </p>
 {/if}
 

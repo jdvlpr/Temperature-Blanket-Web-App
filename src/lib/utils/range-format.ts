@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { NON_NEGATIVE_PARAMS } from '$lib/constants/weather-constants';
+import type { GaugeRangeOptions } from '$lib/types/gauge-types';
+
 // How a range reads everywhere it's shown (palette editor, gallery, palette
 // image, PDF, Google Sheets): "105°F → 92°F", From first, in the gauge's
 // direction. Whether a range includes its From and To is said once per gauge,
@@ -35,18 +38,34 @@ export function formatRangeLabel(from: number, to: number, unit = ''): string {
 }
 
 /** Which ends of each range count as in it, said once for a gauge, e.g.
- * "Each range includes its From number, not its To." */
-export function rangeRuleSentence({
-  includeFromValue,
-  includeToValue,
-}: {
-  includeFromValue: boolean | undefined;
-  includeToValue: boolean | undefined;
-}): string {
+ * "Each range includes its From number, not its To." Rain and snow can't go
+ * below 0, so a range ending at 0 includes 0 either way, and that's said too. */
+export function rangeRuleSentence(
+  {
+    includeFromValue,
+    includeToValue,
+    direction,
+  }: {
+    includeFromValue: boolean | undefined;
+    includeToValue: boolean | undefined;
+    direction?: GaugeRangeOptions['direction'];
+  },
+  gaugeId?: string,
+): string {
+  let sentence: string;
   if (includeFromValue && includeToValue)
-    return 'Each range includes both its From and To numbers.';
-  if (includeFromValue)
-    return 'Each range includes its From number, not its To number.';
-  if (includeToValue) return 'Each range includes its To number, not its From number.';
-  return 'Each range includes neither its From nor its To number.';
+    sentence = 'Each range includes both its From and To numbers.';
+  else if (includeFromValue)
+    sentence = 'Each range includes its From number, not its To number.';
+  else if (includeToValue)
+    sentence = 'Each range includes its To number, not its From number.';
+  else sentence = 'Each range includes neither its From nor its To number.';
+
+  if (gaugeId && NON_NEGATIVE_PARAMS.includes(gaugeId)) {
+    if (direction === 'high-to-low' && !includeToValue)
+      sentence += ' A range with a To of 0 includes 0.';
+    else if (direction !== 'high-to-low' && !includeFromValue)
+      sentence += ' A range with a From of 0 includes 0.';
+  }
+  return sentence;
 }

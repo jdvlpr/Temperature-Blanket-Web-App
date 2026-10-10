@@ -417,6 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               {unitLabel}
                               unitType={gaugeType}
                               {rangeOptions}
+                              gaugeId={id}
                             />
                           </div>
                         </div>

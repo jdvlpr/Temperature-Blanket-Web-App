@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants/color-constants';
+import { NON_NEGATIVE_PARAMS } from '$lib/constants/weather-constants';
 import { toast } from '$lib/state/page-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
@@ -34,7 +35,6 @@ import {
   getEvenlyDistributedRangeValuesWithEqualDayCount,
   getIncrement,
   getStart,
-  NON_NEGATIVE_PARAMS,
 } from '$lib/utils/range-utils.svelte';
 import { pluralize } from '$lib/utils/string-utils';
 import chroma from 'chroma-js';
@@ -146,8 +146,12 @@ export function getRanges({
         to = Math.max(0, to);
       }
 
+      // Whole numbers, unless steps under 1 would round neighbors together.
+      // That happens with little rain or snow, now it can't start below 0
       const decimals =
-        rangeOptions.auto.roundIncrement && rangeOptions.mode !== 'manual'
+        rangeOptions.auto.roundIncrement &&
+        rangeOptions.mode !== 'manual' &&
+        !(NON_NEGATIVE_PARAMS.includes(gaugeId) && Math.abs(_increment) < 1)
           ? 0
           : 2;
 

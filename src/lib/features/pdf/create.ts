@@ -164,7 +164,7 @@ export async function createPdf({
       gauge.label,
       !isCategory && gauge.rangeOptions
         ? [
-            `${gauge.colors.length} colors. ${rangeRuleSentence(gauge.rangeOptions)}`,
+            `${gauge.colors.length} colors. ${rangeRuleSentence(gauge.rangeOptions, gauge.id)}`,
           ]
         : [`${gauge.colors.length} colors.`],
     );

@@ -15,7 +15,9 @@
 
 import type { GaugeRangeOptions } from '$lib/types/gauge-types';
 import type { Color } from '$lib/types/yarn-types';
+import { displayNumber } from '$lib/utils/number-utils';
 import { describe, expect, it } from 'vitest';
+import { isValueInRange } from './range-utils.svelte';
 import {
   getRanges,
   insertRange,
@@ -270,4 +272,57 @@ describe('getRanges, equal size', () => {
   it('leaves temperatures below 0 alone', () => {
     expect(equalSize('temp', -0.67).at(-1)?.to).toBe(-0.02);
   });
+});
+
+describe('getRanges, equal size with little rain', () => {
+  // The rain gauge's defaults: whole numbers, high to low, From in, To out,
+  // with the top above the most rain and the bottom at 0
+  for (const units of ['mm', 'in'] as const)
+    for (const most of [0.3, 0.8, 1, 1.2, 2, 2.6, 5, 12])
+      for (const count of [4, 6])
+        it(`${count} colors, up to ${most} ${units}`, () => {
+          const top = Number.isInteger(most) ? most + 1 : Math.ceil(most);
+          const increment = displayNumber(top / count, 2);
+          const days = [0, 0, 0, most, most / 2, most / 3, most / 7].map((n) =>
+            displayNumber(n, units === 'mm' ? 1 : 2),
+          );
+          const ranges = getRanges({
+            rangeOptions: options({
+              auto: {
+                optimization: 'ranges',
+                start: { high: top, low: 0 },
+                increment,
+                roundIncrement: true,
+              },
+            }),
+            ranges: [],
+            start: top,
+            increment: -increment,
+            colors: Array.from({ length: count }, () => ({
+              hex: '#000000',
+            })) as Color[],
+            includeFromAndTo: false,
+            dontIncludeFromAndTo: false,
+            gaugeId: 'prcp',
+          }).ranges;
+
+          for (const range of ranges) {
+            expect(range.to).toBeGreaterThanOrEqual(0);
+            expect(range.to).toBeLessThan(range.from);
+          }
+          expect(ranges.at(-1)?.to).toBe(0);
+          for (const value of days)
+            expect(
+              ranges.filter((range) =>
+                isValueInRange({
+                  value,
+                  range,
+                  direction: 'high-to-low',
+                  includeFromValue: true,
+                  includeToValue: false,
+                  param: 'prcp',
+                }),
+              ).length,
+            ).toBe(1);
+        });
 });
