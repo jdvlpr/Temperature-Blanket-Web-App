@@ -18,6 +18,7 @@ phone it opens a full-screen search, so the list has the whole screen above
 the keyboard; elsewhere the list drops down from the field. -->
 
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import {
     ensureYarnData,
     getBrands,
@@ -327,10 +328,8 @@ the keyboard; elsewhere the list drops down from the field. -->
 <div class="label flex w-full flex-col justify-start md:col-span-2">
   {#if phone.current}
     <span class="label-text" id="{uid}-label">Yarn Name</span>
-    <div class="field-group w-full grid-cols-[auto_1fr_auto]">
-      <span class="label label-text preset-tonal"
-        ><Icon iconNode={yarnBall} /></span
-      >
+    <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto]']}>
+      <span class="label label-text"><Icon iconNode={yarnBall} /></span>
       <button
         bind:this={fieldButton}
         type="button"
@@ -425,11 +424,9 @@ the keyboard; elsewhere the list drops down from the field. -->
                   >
                 </div>
                 <Combobox.Control
-                  class="field-group mx-2 mb-2 grid-cols-[auto_1fr_auto]"
+                  class={[FIELD_GROUP, 'mx-2 mb-2 grid-cols-[auto_1fr_auto]']}
                 >
-                  <span class="label label-text preset-tonal"
-                    ><SearchIcon /></span
-                  >
+                  <span class="label label-text"><SearchIcon /></span>
                   <Combobox.Input
                     class="input"
                     placeholder="Search {placeholder}"
@@ -504,11 +501,9 @@ the keyboard; elsewhere the list drops down from the field. -->
     >
       <Combobox.Label class="label-text">Yarn Name</Combobox.Label>
       <Combobox.Control
-        class="field-group w-full grid-cols-[auto_1fr_auto_auto]"
+        class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto_auto]']}
       >
-        <span class="label label-text preset-tonal"
-          ><Icon iconNode={yarnBall} /></span
-        >
+        <span class="label label-text"><Icon iconNode={yarnBall} /></span>
         <Combobox.Input
           class="input truncate"
           {placeholder}

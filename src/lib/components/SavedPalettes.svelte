@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import { TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
@@ -203,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
               <PaletteStrip {colors} />
-              <div class="field-group grid-cols-[1fr_auto_auto]">
+              <div class={[FIELD_GROUP, 'grid-cols-[1fr_auto_auto]']}>
                 <input
                   type="text"
                   class="input"

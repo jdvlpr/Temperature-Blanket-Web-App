@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   // Validates location id
 
   class WeatherLocationState {
@@ -268,10 +269,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </span>
     <div
-      class="field-group grid-cols-[auto_1fr_auto]"
+      class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}
       bind:this={locationGroup}
     >
-      <div class="label label-text preset-tonal">
+      <div class="label label-text">
         <SearchIcon />
       </div>
       <input

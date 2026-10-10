@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
@@ -300,8 +301,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class="label col-span-12 md:col-span-5">
           <span class="label-text">Search Projects</span>
-          <div class="field-group grid-cols-[auto_1fr_auto]">
-            <span class="label label-text preset-tonal"><EarthIcon /></span>
+          <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
+            <span class="label label-text"><EarthIcon /></span>
             <input
               type="text"
               class="input w-full truncate"

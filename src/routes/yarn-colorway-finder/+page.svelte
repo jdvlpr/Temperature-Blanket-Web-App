@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import type { ColorwaySort } from '#lib/components/yarn-colorways/colorway-utils.js';
 
   class YarnColorwayFinderState {
@@ -354,10 +355,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="col-span-12 flex w-full flex-col justify-start gap-1">
                 <div class="label">
                   <span class="label-text"> Colorway Name </span>
-                  <div class="field-group w-full grid-cols-[auto_1fr_auto]">
-                    <span class="label label-text preset-tonal"
-                      ><SearchIcon /></span
-                    >
+                  <div
+                    class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto]']}
+                  >
+                    <span class="label label-text"><SearchIcon /></span>
                     <input
                       id="yarn-select-search-input"
                       autocomplete="off"

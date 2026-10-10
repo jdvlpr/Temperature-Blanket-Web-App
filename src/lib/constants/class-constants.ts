@@ -32,3 +32,12 @@ export const LIST_ENDS =
 // too, which shouldn't be open in two tabs).
 export const PANEL_LIST = `bg-surface-100 dark:bg-surface-900 rounded-container card-border divide-surface-200-800 flex flex-col divide-y overflow-hidden ${LIST_ENDS}`;
 export const PANEL_ROW = `hover:bg-surface-200-800 flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;
+
+// A Skeleton field group drawn as one field: a single border around the icon,
+// input and buttons (its children drop their own), in the theme's roundness.
+// Drawn as an outline, which paints over the children's backgrounds (an inset
+// ring would sit under them).
+// The border thickens in the primary color while anything inside has focus,
+// since the input inside no longer shows its own focus ring.
+export const FIELD_GROUP =
+  'field-group gap-0 overflow-hidden rounded-base bg-surface-50-950 outline-1 -outline-offset-1 outline-surface-300-700 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary-500 *:rounded-none! *:[box-shadow:none]!';

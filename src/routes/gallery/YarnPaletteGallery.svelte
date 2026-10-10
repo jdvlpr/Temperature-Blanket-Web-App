@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
   import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
@@ -243,8 +244,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class="label col-span-12 w-full md:col-span-3">
           <span class="label-text"> Search </span>
-          <div class="field-group grid-cols-[auto_1fr_auto]">
-            <span class="label label-text preset-tonal"><EarthIcon /></span>
+          <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
+            <span class="label label-text"><EarthIcon /></span>
             <input
               type="text"
               class="input truncate"

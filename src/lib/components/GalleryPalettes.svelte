@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import type {
     GalleryOrder,
     PaletteGalleryNode,
@@ -188,8 +189,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class="col-span-12 flex w-full flex-col justify-start md:col-span-3">
         <span class="label-text text-left"> Search </span>
-        <div class="field-group grid-cols-[auto_1fr_auto]">
-          <span class="label label-text preset-tonal">
+        <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
+          <span class="label label-text">
             <EarthIcon />
           </span>
           <input

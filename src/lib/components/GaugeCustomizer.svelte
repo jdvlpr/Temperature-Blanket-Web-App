@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   /** A color the palette's strip asked to go to: its gauge's list shows it */
   const colorRequest: { gaugeId: string | null; index: number } = $state({
     gaugeId: null,
@@ -857,7 +858,10 @@ cancel, then Save -->
     <span class="flex flex-wrap items-center gap-1.5">
       <!-- On the surface, even in a card filled with its color -->
       <span
-        class="field-group bg-surface-50-950 text-surface-950-50 w-fit grid-cols-[minmax(0,1fr)_auto]"
+        class={[
+          FIELD_GROUP,
+          'bg-surface-50-950 text-surface-950-50 w-fit grid-cols-[minmax(0,1fr)_auto]',
+        ]}
       >
         <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
       from zooming in. Room for the up and down buttons a computer shows. -->

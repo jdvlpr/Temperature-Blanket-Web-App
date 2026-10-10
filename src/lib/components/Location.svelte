@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { MONTHS } from '#lib/constants/weather-constants.js';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
@@ -377,10 +378,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       </p>
       <div
-        class={['field-group grid-cols-[auto_1fr_auto]']}
+        class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}
         bind:this={locationGroup}
       >
-        <div class="label label-text preset-tonal">
+        <div class="label label-text">
           <SearchIcon />
         </div>
         <input
@@ -397,9 +398,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={project.status.loading || weather.isUserEdited}
         />
         {#if searching}
-          <div
-            class="label label-text preset-tonal flex items-center justify-center"
-          >
+          <div class="label label-text flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="size-6 animate-spin"

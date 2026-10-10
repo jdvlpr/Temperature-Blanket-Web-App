@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import { browser, version } from '$app/env';
   import { page } from '$app/state';
   import {
@@ -508,7 +509,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div>
           <label for="projectLink" class="label">
             <span class="label-text">Link to your project</span>
-            <div class="field-group grid-cols-[1fr_auto]">
+            <div class={[FIELD_GROUP, 'grid-cols-[1fr_auto]']}>
               <input
                 id="projectLink"
                 class="input"

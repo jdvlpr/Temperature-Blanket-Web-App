@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   dialog, unless `onphoto` handles it (e.g. inside a dialog already).
 -->
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import PickColorFromImage from '#lib/components/modals/PickColorFromImage.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { getTextColor } from '#lib/utils/color-utils.js';
@@ -79,8 +80,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 so the text box keeps its room -->
 <div class="label @container w-full">
   <label class="label-text" for="{id}-text">{label}</label>
-  <div class="field-group w-full grid-cols-[auto_1fr_auto_auto]">
-    <span class="label label-text preset-tonal relative p-1.5">
+  <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto_auto]']}>
+    <span class="label label-text relative p-1.5">
       <input
         type="color"
         class="input size-8 cursor-pointer rounded-full! p-0"

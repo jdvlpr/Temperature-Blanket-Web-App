@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Best match comes first. `limit` keeps just the last one chosen.
 -->
 <script lang="ts">
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import DefaultYarnSuggestion from '#lib/components/DefaultYarnSuggestion.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
@@ -222,8 +223,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <label class="label-text" for="yarn-select-search-input"
       >Colorway Name</label
     >
-    <div class="field-group w-full grid-cols-[auto_1fr_auto]">
-      <span class="label label-text preset-tonal"><SearchIcon /></span>
+    <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto]']}>
+      <span class="label label-text"><SearchIcon /></span>
       <input
         id="yarn-select-search-input"
         autocomplete="off"
