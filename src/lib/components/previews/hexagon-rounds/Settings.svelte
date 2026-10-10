@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
           or
           <span class="inline font-bold">Hexagon Settings</span>
-          <ArrowRightIcon class="relative -top-[2px] inline size-4" />
+          <ArrowRightIcon class="icon-sm relative -top-[2px] inline" />
           <span class="inline font-bold"
             >{capitalizeFirstLetter(weather.grouping)}s Per Hexagon</span
           >

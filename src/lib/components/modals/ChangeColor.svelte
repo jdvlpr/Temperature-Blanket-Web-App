@@ -140,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if affiliate_variant_href}
         <ShoppingCartIcon aria-hidden="true" />
       {:else}
-        <ExternalLinkIcon aria-hidden="true" />
+        <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
       {/if}
       <span class="flex flex-col items-start text-left">
         {#if name}

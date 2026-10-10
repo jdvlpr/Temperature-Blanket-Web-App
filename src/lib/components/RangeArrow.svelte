@@ -30,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <ArrowRightIcon
-  size={14}
-  class="shrink-0 opacity-60 {className}"
+  class="size-3.5 shrink-0 opacity-60 {className}"
   aria-hidden="true"
 />{#if !silent}<span class="sr-only">to</span>{/if}

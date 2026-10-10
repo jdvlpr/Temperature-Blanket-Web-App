@@ -20,7 +20,7 @@
   <div class="flex w-full flex-col gap-4">
     {#if location.fclName}
       <div>
-        <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Location
+        <MapPinnedIcon class="icon-sm relative -top-[1px] mr-1 inline" /> Location
         Type:
         <p class="badge bg-surface-100-900 text-base">
           {@html location.fclName}
@@ -29,13 +29,13 @@
     {/if}
     {#if location.population}
       <div>
-        <PersonStandingIcon class="relative -top-[1px] mr-1 inline size-5" /> Population:
+        <PersonStandingIcon class="icon-sm relative -top-[1px] mr-1 inline" /> Population:
         <p class="badge bg-surface-100-900 text-base">{location.population}</p>
       </div>
     {/if}
     <div class="items-s flex flex-col gap-2">
       <div class="">
-        <GlobeIcon class="relative -top-[1px] mr-1 inline size-5" /> Latitude, Longitude:
+        <GlobeIcon class="icon-sm relative -top-[1px] mr-1 inline" /> Latitude, Longitude:
         <p class=" badge bg-surface-100-900 text-base select-all">
           {location.lat}, {location.lng}
         </p>

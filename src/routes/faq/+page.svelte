@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -234,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -272,7 +272,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -302,7 +302,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -342,7 +342,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -381,7 +381,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>

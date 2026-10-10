@@ -63,7 +63,7 @@ and device, after signing in, and again whenever someone asks to add projects
   // The first and last rows round their own outer corners, so the first row's
   // fill fits inside the list's border
   const ROW = `flex w-full items-start gap-3 px-4 py-3 text-left transition-colors first:rounded-t-container last:rounded-b-container disabled:opacity-50 ${ROW_FOCUS}`;
-  const ICON = 'mt-0.5 size-5 shrink-0';
+  const ICON = 'mt-0.5 shrink-0';
   const DETAIL = 'block text-sm opacity-75';
 
   const plural = (n: number) => (n === 1 ? 'project' : 'projects');
@@ -106,7 +106,7 @@ and device, after signing in, and again whenever someone asks to add projects
   aria-labelledby="sync-import-title"
 >
   <div class="flex items-start gap-3">
-    <CloudUploadIcon class="text-primary-500 mt-1 size-6 shrink-0" />
+    <CloudUploadIcon class="text-primary-500 mt-1 shrink-0" />
     <div class="flex flex-col gap-1">
       <h2 id="sync-import-title" class="h4">
         {later
@@ -203,7 +203,7 @@ and device, after signing in, and again whenever someone asks to add projects
             <span class="block font-bold">Choose…</span>
             <span class={DETAIL}>Pick what to add.</span>
           </span>
-          <ChevronRightIcon class="mt-0.5 size-5 shrink-0 opacity-50" />
+          <ChevronRightIcon class="icon-sm mt-0.5 shrink-0 opacity-50" />
         </button>
       {/if}
 

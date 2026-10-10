@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Menu.Trigger class={menuTriggerClass}>
     <current.icon size={18} aria-hidden="true" />
     <span>View: {current.label}</span>
-    <ChevronDownIcon size={18} aria-hidden="true" />
+    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>

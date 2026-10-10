@@ -77,7 +77,7 @@ button to it. -->
 
   const ROW = PANEL_ROW;
   const LINK = 'hover:underline opacity-80 hover:opacity-100';
-  const LINK_ICON = 'inline size-3 opacity-60';
+  const LINK_ICON = 'icon-sm inline opacity-60';
 
   const hasWeather = $derived(weather.data.length > 0);
   const hasProject = $derived(hasWeather && locations.allValid);
@@ -211,9 +211,9 @@ button to it. -->
         data-testid="autosave-status"
       >
         {#if autosave.account}
-          <CloudAlertIcon class="text-error-700-300 size-4" />
+          <CloudAlertIcon class="icon-sm text-error-700-300" />
         {:else}
-          <MonitorXIcon class="text-error-700-300 size-4" />
+          <MonitorXIcon class="icon-sm text-error-700-300" />
         {/if}
         Not saved
       </p>
@@ -222,7 +222,7 @@ button to it. -->
     {:else if autosave.stored}
       <!-- Another account's project, here signed out -->
       <p class="flex items-start gap-1 text-sm">
-        <MonitorIcon class="mt-0.5 size-4 shrink-0 opacity-70" />
+        <MonitorIcon class="icon-sm mt-0.5 shrink-0 opacity-70" />
         <span>
           Saved in this browser{#if !project.status.saved}, with unsaved changes{/if}.
         </span>
@@ -268,7 +268,7 @@ button to it. -->
         role="alert"
       >
         <p class="flex items-start gap-2">
-          <TriangleAlertIcon class="size-4 shrink-0" />
+          <TriangleAlertIcon class="icon-sm shrink-0" />
           {changedElsewhereMessage()}
         </p>
         <div class="flex flex-wrap gap-2">
@@ -332,7 +332,7 @@ button to it. -->
                 >PDF, CSV, PNG or Google Sheets</span
               >
             </span>
-            <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
+            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
           </button>
         </li>
         <li>
@@ -351,7 +351,7 @@ button to it. -->
                   >This project is in the Project Gallery</span
                 >
               </span>
-              <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+              <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
             </a>
             <!-- eslint-enable svelte/no-navigation-without-resolve -->
           {:else}
@@ -367,7 +367,7 @@ button to it. -->
                   >Share it on a public gallery page</span
                 >
               </span>
-              <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
+              <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
             </button>
           {/if}
         </li>
@@ -398,7 +398,7 @@ button to it. -->
                 >In a new tab, leaving this one open</span
               >
             </span>
-            <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+            <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
           </a>
         </li>
       </ul>
@@ -468,7 +468,7 @@ button to it. -->
                   </span>
                 {/if}
               </span>
-              <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+              <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
             </a>
             <!-- eslint-enable svelte/no-navigation-without-resolve -->
           </li>

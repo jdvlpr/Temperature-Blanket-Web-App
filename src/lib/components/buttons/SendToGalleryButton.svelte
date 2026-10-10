@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <SendIcon />
     View Gallery Page
-    <ExternalLinkIcon class="size-4 opacity-60" />
+    <ExternalLinkIcon class="icon-sm opacity-60" />
   </a>
   <!-- eslint-enable svelte/no-navigation-without-resolve -->
 {:else}

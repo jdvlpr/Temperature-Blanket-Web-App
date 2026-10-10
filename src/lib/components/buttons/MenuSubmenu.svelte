@@ -74,13 +74,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-hidden="true">{RowIcon}</span
     >
   {:else if RowIcon}
-    <RowIcon size={18} class="shrink-0" aria-hidden="true" />
+    <RowIcon class="shrink-0" aria-hidden="true" />
   {/if}
   <span class="flex min-w-0 flex-1 flex-col">
     <span>{label}</span>
     <span class="text-surface-700-300 text-xs">{current}</span>
   </span>
-  <ChevronRightIcon size={18} class="shrink-0" aria-hidden="true" />
+  <ChevronRightIcon class="icon-sm shrink-0" aria-hidden="true" />
 {/snippet}
 
 {#if drill?.inPlace}
@@ -94,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {...attributes}
               {@attach onChoose(() => go(null, label, menu))}
             >
-              <ChevronLeftIcon size={18} class="shrink-0" aria-hidden="true" />
+              <ChevronLeftIcon class="icon-sm shrink-0" aria-hidden="true" />
               <span class="flex-1">Back</span>
             </div>
           {/snippet}

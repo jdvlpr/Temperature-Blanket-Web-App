@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else if saved}
       <span
         class="text-success-700-300 flex shrink-0 items-center gap-1 text-sm"
-        role="status"><CheckIcon size="16" /> Saved</span
+        role="status"><CheckIcon /> Saved</span
       >
     {/if}
   </div>

@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <div class="relative">
       <SearchIcon
-        class="text-surface-500 pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2"
+        class="icon-sm text-surface-500 pointer-events-none absolute top-1/2 left-2 -translate-y-1/2"
       />
       <input
         type="search"
@@ -216,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
               </span>
               <ChevronDownIcon
-                class="text-surface-500 size-4 shrink-0 transition-transform {expanded
+                class="icon-sm text-surface-500 shrink-0 transition-transform {expanded
                   ? 'rotate-180'
                   : ''}"
               />

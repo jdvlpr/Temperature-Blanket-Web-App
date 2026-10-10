@@ -295,9 +295,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     data-ranges-menu-trigger
     aria-describedby="ranges-description"
   >
-    <Settings2Icon size={18} aria-hidden="true" />
+    <Settings2Icon aria-hidden="true" />
     <span>Ranges{options ? `: ${triggerMode}` : ''}</span>
-    <ChevronDownIcon size={18} aria-hidden="true" />
+    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
@@ -437,7 +437,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ExternalLinkIcon size={16} aria-hidden="true" />
+                  <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
                   <span class="text-sm">How this changes the days</span>
                   <span class="sr-only">(opens in a new tab)</span>
                 </a>

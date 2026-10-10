@@ -107,7 +107,7 @@ current choice's icon beside it -->
     <span class="label-text">{label}</span>
     <div class="relative flex items-center">
       <span
-        class="pointer-events-none absolute left-2 flex size-6 items-center justify-center"
+        class="pointer-events-none absolute left-3 flex items-center justify-center"
         aria-hidden="true"
       >
         {@render icon(current)}
@@ -194,12 +194,12 @@ site does -->
 
 {#snippet textSizeIcon(id: string)}
   {@const Icon = TEXT_SCALE.find((option) => option.id === id)?.IconComponent}
-  {#if Icon}<Icon class="size-5" />{/if}
+  {#if Icon}<Icon />{/if}
 {/snippet}
 
 {#snippet spacingIcon(id: string)}
   {@const Icon = SPACING.find((option) => option.id === id)?.IconComponent}
-  {#if Icon}<Icon class="size-5" />{/if}
+  {#if Icon}<Icon />{/if}
 {/snippet}
 
 {#snippet buttonsIcon(id: string)}

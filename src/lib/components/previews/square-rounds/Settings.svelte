@@ -94,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Adjust the <span class="inline font-bold">Layout Settings</span>
           or
           <span class="inline font-bold">Square Settings</span>
-          <ArrowRightIcon class="relative -top-[2px] inline size-4" />
+          <ArrowRightIcon class="icon-sm relative -top-[2px] inline" />
           <span class="inline font-bold"
             >{capitalizeFirstLetter(weather.grouping)}s Per Square</span
           >

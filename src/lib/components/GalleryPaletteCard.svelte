@@ -75,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? 'Open Palette Page'
       : 'Open Project Preview Page'}
   >
-    <ExternalLinkIcon class="inline size-4" aria-hidden="true" />
+    <ExternalLinkIcon class="icon-sm inline" aria-hidden="true" />
     <span class="whitespace-pre-wrap">{palette.page.title}</span>
   </a>
 </div>

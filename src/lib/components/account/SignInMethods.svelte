@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="text-sm opacity-70">A 6-digit code sent to your email</p>
     </div>
     <span class="flex shrink-0 items-center gap-1 text-sm opacity-80"
-      ><CheckIcon size="16" /> Always on</span
+      ><CheckIcon /> Always on</span
     >
   </div>
   {#if loading}

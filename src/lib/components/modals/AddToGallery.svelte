@@ -105,7 +105,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           href={project.gallery.href}
           target="_blank"
           class="link btn hover:preset-tonal-surface w-fit whitespace-pre-wrap"
-          rel="noreferrer"><ExternalLinkIcon />{project.gallery.title}</a
+          rel="noreferrer"
+          ><ExternalLinkIcon class="icon-sm" />{project.gallery.title}</a
         >
       </p>
     </div>

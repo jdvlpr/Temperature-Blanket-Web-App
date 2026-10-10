@@ -62,7 +62,7 @@ that follow the card's (its radius less its padding) -->
             {/if}
             {#if instructions}
               <span class="pt-2 text-sm">
-                <ChevronsRightIcon class="relative -top-[1px] inline size-4" />
+                <ChevronsRightIcon class="icon-sm relative -top-[1px] inline" />
                 <span>{@html instructions}</span>
               </span>
             {/if}

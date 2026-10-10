@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="my-2 flex w-fit flex-col items-center justify-center gap-2">
     <input
       type="number"
-      class="input text-2xl"
+      class="input field-2xl"
       id="number-input"
       min={noMinMax ? '' : min}
       max={noMinMax ? '' : max || getMaxValue(_value)}

@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Menu.Trigger class="btn hover:preset-tonal-surface w-fit">
     <DownloadIcon />
     <span class="flex items-center gap-1"
-      >{buttonText} <ChevronDownIcon size={18} /></span
+      >{buttonText} <ChevronDownIcon class="icon-sm" /></span
     ></Menu.Trigger
   >
   <Portal>

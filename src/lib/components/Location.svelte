@@ -531,7 +531,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             });
           }}
         >
-          <MapIcon class="inline size-4" />
+          <MapIcon class="icon-sm inline" />
           Details
         </button>
       {/if}
@@ -672,7 +672,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p
             class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
           >
-            <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
+            <TriangleAlertIcon class="icon-sm relative -top-[1px] inline" />
 
             {#if !datesMustBeHistorical}
               For best results, don't include future dates.
@@ -695,7 +695,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p
           class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
         >
-          <TriangleAlertIcon class="relative -top-px inline size-4" />
+          <TriangleAlertIcon class="icon-sm relative -top-px inline" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}

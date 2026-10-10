@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <label for="other-comments" class="label">Other Comments </label>
               <textarea
                 id="other-comments"
-                class="textarea rounded-container"
+                class="textarea"
                 name="otherComments"
                 placeholder="Other Comments"></textarea>
             </div>

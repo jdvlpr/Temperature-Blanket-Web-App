@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-col items-center gap-4 px-2 text-center"
     >
       <a href="/contact" class="link"
-        ><ArrowLeftIcon class="relative -top-[2px] mr-1 inline size-4" /> Back to
+        ><ArrowLeftIcon class="icon-sm relative -top-[2px] mr-1 inline" /> Back to
         contact</a
       >
       <h2 class="h2 text-gradient flex flex-wrap items-center gap-2">
@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="">
         <span class="text-success-700-300"
           ><CircleCheckBigIcon
-            class="relative -top-[2px] mr-1 inline size-4"
+            class="icon-sm relative -top-[2px] mr-1 inline"
           /></span
         > Your feedback has been received, thank you!
       </p>

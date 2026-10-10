@@ -15,10 +15,10 @@
     <InfoIcon />
     {#if previews.showInformation}
       Information
-      <ChevronUpIcon />
+      <ChevronUpIcon class="icon-sm" />
     {:else}
       Information
-      <ChevronDownIcon size={18} />
+      <ChevronDownIcon class="icon-sm" />
     {/if}
   </button>
 

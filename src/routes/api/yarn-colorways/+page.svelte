@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
+  import { TableOfContentsIcon } from '@lucide/svelte';
   let selectedVersion = $state({ value: 'v3' });
 </script>
 
@@ -165,15 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label="Content Menu"
         >
           <div class="flex flex-wrap items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              viewBox="0 0 24 24"
-              ><path
-                fill="currentColor"
-                d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-              ></path>
-            </svg>
+            <TableOfContentsIcon />
 
             <span class="">Content</span>
           </div>

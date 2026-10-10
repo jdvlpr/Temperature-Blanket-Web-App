@@ -40,18 +40,18 @@ Shows nothing while syncing works, which is the usual case. -->
     data-testid="sync-status"
   >
     {#if sync.state === 'offline'}
-      <CloudOffIcon class="size-4 shrink-0 opacity-70" />
+      <CloudOffIcon class="icon-sm shrink-0 opacity-70" />
       <span>Offline. Changes sync when you’re back online.</span>
     {:else if sync.state === 'paused'}
-      <CloudOffIcon class="size-4 shrink-0 opacity-70" />
+      <CloudOffIcon class="icon-sm shrink-0 opacity-70" />
       <span>Sync paused. Your projects are safe in this browser.</span>
     {:else if sync.state === 'signed-out'}
-      <CloudAlertIcon class="text-warning-700-300 size-4 shrink-0" />
+      <CloudAlertIcon class="icon-sm text-warning-700-300 shrink-0" />
       <span>Your session ended.</span>
       <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
       <a class="anchor" href={signInHref}>Sign in to sync</a>
     {:else if sync.state === 'error'}
-      <CloudAlertIcon class="text-error-700-300 size-4 shrink-0" />
+      <CloudAlertIcon class="icon-sm text-error-700-300 shrink-0" />
       <span>Couldn’t sync.</span>
       <button type="button" class="anchor" onclick={syncNow}>Try again</button>
     {/if}

@@ -360,7 +360,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <PaletteIcon />
         <span class="flex items-center gap-1"
-          >Get Colors <ChevronDownIcon size={18} /></span
+          >Get Colors <ChevronDownIcon class="icon-sm" /></span
         >
       </Menu.Trigger>
       <Portal>
@@ -417,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <ShareIcon />
         <span class="flex items-center gap-1"
-          >Save & Export <ChevronDownIcon size={18} /></span
+          >Save & Export <ChevronDownIcon class="icon-sm" /></span
         >
       </Menu.Trigger>
       <Portal>

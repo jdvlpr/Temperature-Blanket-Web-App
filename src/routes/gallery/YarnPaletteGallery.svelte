@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
+  import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
   import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="label">
         <span class="label-text">Popular in the last</span>
         <div class="relative flex w-fit items-center">
-          <ClockIcon class="pointer-events-none absolute left-2" />
+          <ClockIcon class={FIELD_ICON} />
           <select
             bind:value={yarnPaletteGalleryState.timePeriod}
             class="select mx-auto w-fit min-w-[90px] truncate pl-10"

@@ -127,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             {season.label}
-            <PencilIcon size={16} />
+            <PencilIcon />
             <span class="text-sm font-normal">
               ({formatDateRange(season.startDate, season.endDate)})
             </span>

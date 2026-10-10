@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Menu.Trigger class={triggerClass} title="Sort Colors" {disabled}>
     <ArrowDownWideNarrowIcon />
     <span class="flex items-center gap-1"
-      >Sort <ChevronDownIcon size={18} /></span
+      >Sort <ChevronDownIcon class="icon-sm" /></span
     >
   </Menu.Trigger>
   <Portal>

@@ -49,6 +49,6 @@ words are for hover and screen readers. -->
   title={label.text}
   data-testid="sync-label"
 >
-  <Icon class="size-4 shrink-0" aria-hidden="true" />
+  <Icon class="icon-sm shrink-0" aria-hidden="true" />
   <span class="sr-only">{label.text}</span>
 </span>

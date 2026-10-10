@@ -373,7 +373,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >Pick up where you left off</span
             >
           </span>
-          <ChevronRightIcon class="shrink-0" />
+          <ChevronRightIcon class="icon-sm shrink-0" />
         </button>
       {/if}
     </div>

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
+  import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     EarthIcon,
     Grid3x3,
     XIcon,
+    PlusIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryState } from './state.svelte';
@@ -199,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="label">
         <span class="label-text">Popular in the last</span>
         <div class="relative flex w-fit items-center">
-          <ClockIcon class="pointer-events-none absolute left-2" />
+          <ClockIcon class={FIELD_ICON} />
           <select
             bind:value={galleryState.timePeriod}
             class="select mx-auto w-fit min-w-[100px] truncate pl-10"
@@ -314,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if showSearchReset}
               <button
-                class="btn hover:bg-surface-100-900"
+                class="btn hover:preset-tonal-surface"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';
@@ -330,7 +331,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <label class="label col-span-12 w-full md:col-span-7">
           <span class="label-text"> Pattern Type </span>
           <div class="relative flex items-center">
-            <Grid3x3 class="pointer-events-none absolute left-2" />
+            <Grid3x3 class={FIELD_ICON} />
             <select
               disabled={loading}
               class="select truncate pl-10"
@@ -445,20 +446,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             loading = false;
           }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-6 w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            ></path>
-          </svg>
+          <PlusIcon />
           <span>Load More</span>
         </button>
       {/if}

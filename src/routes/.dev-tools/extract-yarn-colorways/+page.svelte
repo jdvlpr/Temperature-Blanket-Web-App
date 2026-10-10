@@ -172,7 +172,7 @@
           <label class="text-sm"
             >Paste HTML Here
             <textarea
-              class="textarea w-full grow border-none shadow-inner rounded-container"
+              class="textarea w-full grow border-none shadow-inner"
               bind:value={options.value.content}
               rows="5"></textarea>
           </label>
@@ -367,7 +367,7 @@
                     <p class="text-sm">{index + 1}</p>
                     {#if options.value.mergeWithExistingColors && options.value.selectedYarn.brandId && options.value.selectedYarn.yarnId}
                       {#if !existingColorways.some((ec) => ec.name.toLowerCase() === name.toLowerCase())}
-                        <span class="badge bg-primary-500 uppercase text-[10px]"
+                        <span class="badge bg-primary-500 text-[10px] uppercase"
                           >new</span
                         >
                       {/if}

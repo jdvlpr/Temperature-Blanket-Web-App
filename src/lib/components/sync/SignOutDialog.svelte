@@ -75,7 +75,7 @@ browser; these stay, since the account doesn't have them yet. -->
       role="status"
     >
       <p class="flex items-start gap-2 text-sm">
-        <TriangleAlertIcon class="text-warning-700-300 size-5 shrink-0" />
+        <TriangleAlertIcon class="text-warning-700-300 shrink-0" />
         <span>
           {projects(unsynced)}
           {unsynced === 1 ? 'hasn’t' : 'haven’t'} finished syncing to your account,
@@ -92,7 +92,7 @@ browser; these stay, since the account doesn't have them yet. -->
         onclick={syncFirst}
       >
         {#if sync.state === 'syncing'}
-          <LoaderCircleIcon class="size-4 animate-spin" /> Syncing…
+          <LoaderCircleIcon class="icon-sm animate-spin" /> Syncing…
         {:else}
           Sync now
         {/if}

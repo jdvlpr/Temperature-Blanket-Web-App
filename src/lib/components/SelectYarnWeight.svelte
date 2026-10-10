@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { FIELD_ICON } from '#lib/constants/class-constants.js';
   import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
   import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
   import type { YarnWeight } from '#lib/types/yarn-types.js';
@@ -73,11 +74,11 @@
       target="_blank"
       title="See the yarn weights chart"
     >
-      <CircleQuestionMarkIcon class="size-4" /></a
+      <CircleQuestionMarkIcon class="icon-sm" /></a
     ></span
   >
   <div class="relative flex items-center">
-    <SpoolIcon class="absolute left-2" />
+    <SpoolIcon class={FIELD_ICON} />
     <select
       class="select truncate pl-10"
       bind:value={selectedYarnWeightId}

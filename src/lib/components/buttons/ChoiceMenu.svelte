@@ -49,9 +49,9 @@ You should have received a copy of the GNU General Public License along with Tem
 
 <Menu positioning={{ placement: 'bottom-start' }}>
   <Menu.Trigger class={menuTriggerClass}>
-    <Icon size={18} aria-hidden="true" />
+    <Icon aria-hidden="true" />
     <span>{label}: {current?.short ?? current?.label ?? ''}</span>
-    <ChevronDownIcon size={18} aria-hidden="true" />
+    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
@@ -73,7 +73,6 @@ You should have received a copy of the GNU General Public License along with Tem
               {/if}
             </span>
             <CheckIcon
-              size={18}
               class="shrink-0 {option.value === current?.value
                 ? ''
                 : 'invisible'}"

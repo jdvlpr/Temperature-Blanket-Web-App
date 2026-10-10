@@ -754,7 +754,7 @@ and glows on undo or redo. -->
     data-fill-origin="fallback"
     use:dragHandle
   >
-    <GripVerticalIcon size={16} aria-hidden="true" />
+    <GripVerticalIcon aria-hidden="true" />
     <span aria-hidden="true" class="tracking-tighter">{index + 1}</span>
   </div>
 {/snippet}
@@ -797,8 +797,7 @@ and glows on undo or redo. -->
         {#if color.brandName && color.yarnName}
           {color.brandName} · {color.yarnName}
         {:else}
-          <SearchIcon size={12} class="inline" aria-hidden="true" /> Find matching
-          yarn
+          <SearchIcon class="inline size-3" aria-hidden="true" /> Find matching yarn
         {/if}
       </span>
     </span>
@@ -868,7 +867,7 @@ cancel, then Save -->
         <input
           type="number"
           step="any"
-          class="input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
+          class="input w-[calc(7ch+1.25rem)] px-2 tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
           aria-label="Color {index + 1} {edge}{unitLabel
             ? `, ${unitLabel}`
             : ''}"
@@ -882,25 +881,25 @@ cancel, then Save -->
         <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
         <button
           type="button"
-          class="btn"
+          class="btn hover:preset-tonal-surface"
           title="Cancel"
           aria-label="Cancel editing range for color {index + 1}"
           onmousedown={(e) => e.preventDefault()}
           onclick={() => cancelRange({ refocus: true })}
         >
-          <XIcon size={18} aria-hidden="true" />
+          <XIcon aria-hidden="true" />
         </button>
       </span>
       <!-- Filled, like Save elsewhere: right after the number, or under it in a narrow card -->
       <button
         type="button"
-        class="btn preset-filled-primary-500 h-9 px-3 @max-[13rem]:w-full"
+        class="btn preset-filled-primary-500 px-3 @max-[13rem]:w-full"
         title="Save Range"
         aria-label="Save range for color {index + 1}"
         onmousedown={(e) => e.preventDefault()}
         onclick={() => saveRange({ refocus: true })}
       >
-        <CheckIcon size={18} aria-hidden="true" />
+        <CheckIcon aria-hidden="true" />
         Save
       </button>
     </span>
@@ -1084,7 +1083,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
           type="number"
           step="any"
           min="0"
-          class="input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums"
+          class="input w-[calc(7ch+1.25rem)] px-2 tabular-nums"
           bind:value={manualDraft.increment}
           onkeydown={cancelManualOnEscape}
           {@attach (el) => {
@@ -1103,7 +1102,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         <input
           type="number"
           step="any"
-          class="input w-[calc(7ch+1.25rem)] px-2 text-base tabular-nums"
+          class="input w-[calc(7ch+1.25rem)] px-2 tabular-nums"
           aria-describedby="manual-start-hint"
           bind:value={manualDraft.start}
           onkeydown={cancelManualOnEscape}
@@ -1112,20 +1111,20 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       <!-- Pressing either keeps the focus in a number, so the keyboard stays up -->
       <button
         type="button"
-        class="btn preset-tonal h-9 px-3"
+        class="btn preset-tonal px-3"
         onmousedown={(e) => e.preventDefault()}
         onclick={() => closeManual({ save: false })}
       >
-        <XIcon size={18} aria-hidden="true" />
+        <XIcon aria-hidden="true" />
         Cancel
       </button>
       <button
         type="submit"
-        class="btn preset-filled-primary-500 h-9 px-3"
+        class="btn preset-filled-primary-500 px-3"
         disabled={!manualValid}
         onmousedown={(e) => e.preventDefault()}
       >
-        <CheckIcon size={18} aria-hidden="true" />
+        <CheckIcon aria-hidden="true" />
         Save
       </button>
       <p
@@ -1154,11 +1153,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       <p
         class="text-warning-800-200 mt-2 flex items-start justify-center gap-1.5 px-2 text-center text-xs"
       >
-        <TriangleAlertIcon
-          size={14}
-          class="mt-px shrink-0"
-          aria-hidden="true"
-        />
+        <TriangleAlertIcon class="mt-px size-3.5 shrink-0" aria-hidden="true" />
         <span
           >With both ends included or neither, these steps leave gaps or
           overlaps: try Round numbers off or another choice in the Ranges menu.</span

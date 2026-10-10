@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <CodeIcon />
               GitHub Issues
-              <ExternalLinkIcon class="relative -top-[1px] size-5" />
+              <ExternalLinkIcon class="icon-sm relative -top-[1px]" />
             </a>
 
             <p class="font-bold">
@@ -109,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <CodeIcon />
               GitHub Discussions
-              <ExternalLinkIcon class="relative -top-[1px] size-5" />
+              <ExternalLinkIcon class="icon-sm relative -top-[1px]" />
             </a>
           {/if}
 
@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <UsersIcon />
               Facebook
-              <ExternalLinkIcon class="relative -top-[1px] size-5" />
+              <ExternalLinkIcon class="icon-sm relative -top-[1px]" />
             </a>
           {/if}
         </div>

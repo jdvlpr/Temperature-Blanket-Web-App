@@ -144,7 +144,7 @@ Hidden until the account has a page or publishing from accounts is on. -->
         >
           <UserRoundIcon class="shrink-0 opacity-70" />
           <span class="flex-1">Your public gallery page</span>
-          <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+          <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
         </a>
       {/if}
 
@@ -166,7 +166,7 @@ Hidden until the account has a page or publishing from accounts is on. -->
                     class="link line-clamp-2 break-words"
                   >
                     {page.title}
-                    <ExternalLinkIcon class="inline size-4" />
+                    <ExternalLinkIcon class="icon-sm inline" />
                   </a>
                   <span class="text-sm opacity-70"
                     >{isPalette(page) ? 'Palette, shared' : 'Published'}

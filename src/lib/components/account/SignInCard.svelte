@@ -268,8 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="button"
           class="btn btn-sm hover:preset-tonal-surface"
           onclick={changeEmail}
-          disabled={busy}
-          ><ArrowLeftIcon size="16" /> Use a different email</button
+          disabled={busy}><ArrowLeftIcon /> Use a different email</button
         >
         <button
           type="button"

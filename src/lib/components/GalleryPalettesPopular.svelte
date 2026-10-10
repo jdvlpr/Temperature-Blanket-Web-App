@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
+  import { FIELD_ICON } from '#lib/constants/class-constants.js';
   import type { PopularProject } from '#lib/utils/gallery-utils.js';
 
   class GalleryPalettesPopularState {
@@ -65,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <label class="label">
     <span class="label-text">Popular in the last</span>
     <div class="relative flex w-fit items-center">
-      <ClockIcon class="pointer-events-none absolute left-2" />
+      <ClockIcon class={FIELD_ICON} />
       <select
         class="select mx-auto w-fit min-w-[100px] truncate pl-10"
         id="select-time-period"

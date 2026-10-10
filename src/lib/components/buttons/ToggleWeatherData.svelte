@@ -27,10 +27,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   aria-pressed={view}
 >
   {#if view}
-    <EyeIcon class="size-5" aria-hidden="true" />
+    <EyeIcon aria-hidden="true" />
     <p class="text-sm">{@render children?.()}</p>
   {:else}
-    <EyeOffIcon class="size-5" aria-hidden="true" />
+    <EyeOffIcon aria-hidden="true" />
     <p class="text-sm"><s>{@render children?.()}</s></p>
   {/if}
 </button>

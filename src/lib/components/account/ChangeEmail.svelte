@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onclick={start}
         disabled={busy}
       >
-        {#if busy}<LoaderCircleIcon class="animate-spin" size="16" />{/if}
+        {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
         Change
       </button>
     {/if}

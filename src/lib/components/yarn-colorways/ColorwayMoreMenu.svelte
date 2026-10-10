@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-label="More for {colorway.name || colorway.hex}"
     title="More"
   >
-    <EllipsisVerticalIcon size={16} aria-hidden="true" />
+    <EllipsisVerticalIcon aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
@@ -131,9 +131,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 rel="noopener noreferrer"
               >
                 {#if link.isAffiliate}
-                  <ShoppingCartIcon size={16} aria-hidden="true" />
+                  <ShoppingCartIcon aria-hidden="true" />
                 {:else}
-                  <ExternalLinkIcon size={16} aria-hidden="true" />
+                  <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
                 {/if}
                 {#if link.isAffiliate}
                   <span class="flex flex-col">
@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
         {#each copies as copy (copy.value)}
           <Menu.Item value={copy.value} class={menuItemClass}>
-            <CopyIcon size={16} aria-hidden="true" />
+            <CopyIcon aria-hidden="true" />
             <span>{copy.label}</span>
             <span
               class="text-surface-700-300 ml-auto truncate pl-4 text-xs {copy.value ===
@@ -170,7 +170,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <InsertColorIcon
               where="before"
               layout={insertLayout}
-              size={16}
               aria-hidden="true"
             />
             <span>Add color before</span>
@@ -179,7 +178,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <InsertColorIcon
               where="after"
               layout={insertLayout}
-              size={16}
               aria-hidden="true"
             />
             <span>Add color after</span>
@@ -188,7 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if onremove}
           {#if !oninsert}<Menu.Separator />{/if}
           <Menu.Item value="remove" class={menuItemClass}>
-            <Trash2Icon size={16} aria-hidden="true" />
+            <Trash2Icon aria-hidden="true" />
             <span>{removeLabel}</span>
           </Menu.Item>
         {/if}

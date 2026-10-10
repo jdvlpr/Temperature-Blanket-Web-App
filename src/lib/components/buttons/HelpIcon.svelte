@@ -27,6 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="relative inline-flex items-end justify-start gap-1 underline"
   class:top-[5px]={!text}
 >
-  <CircleQuestionMarkIcon class="relative bottom-[2px] size-5" />
+  <CircleQuestionMarkIcon class="relative bottom-[2px]" />
   {@render text?.()}
 </a>

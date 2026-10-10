@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Grid3X3Icon,
     InfoIcon,
     ShoppingCartIcon,
+    TableOfContentsIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
@@ -379,15 +380,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label="Content Menu"
         >
           <div class="flex flex-wrap items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              viewBox="0 0 24 24"
-              ><path
-                fill="currentColor"
-                d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-              ></path>
-            </svg>
+            <TableOfContentsIcon />
 
             <span class="">Content</span>
           </div>
@@ -457,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <p class="font-bold">Use the Project Planner</p>
                 <p>
                   <CircleCheckIcon
-                    class="inline"
+                    class="icon-sm inline"
                     style="color:var(--color-success-500)"
                   />
                   Before you start working on your project, to help choose your yarn
@@ -465,7 +458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
                 <p>
                   <CircleCheckIcon
-                    class="inline"
+                    class="icon-sm inline"
                     style="color:var(--color-success-500)"
                   />
                   As you pick dates for your project, to view aggregated historical
@@ -474,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
                 <p>
                   <CircleCheckIcon
-                    class="inline"
+                    class="icon-sm inline"
                     style="color:var(--color-success-500)"
                   />
                   Before you buy your yarn, to estimate how many skeins of each colorway
@@ -482,7 +475,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
                 <p>
                   <CircleCheckIcon
-                    class="inline"
+                    class="icon-sm inline"
                     style="color:var(--color-success-500)"
                   />
                   While you’re working on your project, to get historical weather
@@ -493,13 +486,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <p class="font-bold">Don’t use the Project Planner</p>
                 <p>
                   <CircleMinusIcon
-                    class="inline"
+                    class="icon-sm inline"
                     style="color:var(--color-error-500)"
                   /> If your project contains dates beyond the current date
                 </p>
                 <p>
                   <CircleMinusIcon
-                    class="inline"
+                    class="icon-sm inline"
                     style="color:var(--color-error-500)"
                   /> To view future weather forecasts. (For that use the
                   <a href="/weather" class="link">Weather Forecast</a> tool.)
@@ -534,13 +527,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ul>
               <li>
                 <CircleCheckIcon
-                  class="inline"
+                  class="icon-sm inline"
                   style="color:var(--color-success-500)"
                 /> There’s no need to set up an account in order to save your project
               </li>
               <li>
                 <CircleCheckIcon
-                  class="inline"
+                  class="icon-sm inline"
                   style="color:var(--color-success-500)"
                 /> You must save the project’s URL somewhere if you want to share
                 the project or open it in a different browser.
@@ -884,7 +877,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div class="ml-4 flex flex-col gap-1">
                       <p class="">
                         <ClockIcon
-                          class="relative -top-[2px] mr-1 inline size-4"
+                          class="icon-sm relative -top-[2px] mr-1 inline"
                         />
                         {timespan}
                       </p>
@@ -896,7 +889,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                       <p class="">
                         <InfoIcon
-                          class="relative -top-[2px] mr-1 inline size-4"
+                          class="icon-sm relative -top-[2px] mr-1 inline"
                         />
                         {@html details}
                       </p>
@@ -1678,7 +1671,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Real yarn colors will look different than what’s on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies. Purchases via links with a shopping cart
-              icon <ShoppingCartIcon class="relative -top-px inline size-4" /> support
+              icon <ShoppingCartIcon class="icon-sm relative -top-px inline" /> support
               the developer of this web app at no extra cost to you. Colors may be
               inaccurate, and may not represent yarn as it appears in physical reality.
               Requests for yarn to be included in these results can be made by anyone

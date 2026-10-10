@@ -179,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   January 28, 2026
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -253,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   April 20, 2025
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -298,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   April 2, 2025
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -343,7 +343,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   April 1, 2025
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -376,7 +376,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   March 28, 2025
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   March 27, 2025
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -431,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   March 26, 2025
                   <Accordion.ItemIndicator class="group">
                     <ChevronDownIcon
-                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                      class="icon-sm transition group-data-[state=open]:rotate-180"
                     />
                   </Accordion.ItemIndicator>
                 </Accordion.ItemTrigger>
@@ -526,7 +526,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   projectLink = '';
                 }}
               >
-                <XIcon size={16} />
+                <XIcon />
               </button>
             </div>
           </label>
@@ -602,7 +602,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   target="_blank"
                   >Click here to open the archived version at
                   archive-v4.temperature-blanket.com
-                  <ExternalLinkIcon class="relative -top-[2px] inline size-4" />
+                  <ExternalLinkIcon
+                    class="icon-sm relative -top-[2px] inline"
+                  />
                 </a>
               </li>
               {#if !projectLinkURLPart}
@@ -624,7 +626,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
               <textarea
                 id="archiveResult"
-                class="textarea rounded-container"
+                class="textarea"
                 name="archiveResult"
                 rows="5"
                 placeholder="e.g. When I used the archived version, the weather data was back to normal; it was not shifted."
@@ -651,7 +653,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
             <textarea
               id="description"
-              class="textarea rounded-container"
+              class="textarea"
               name="description"
               rows="5"
               placeholder="e.g. I open my project from it's saved URL. After I get the weather data and look at the table, the weather data changed from what it used to be."
@@ -663,7 +665,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <span class="label-text">Any other comments</span>
           <textarea
             id="comments"
-            class="textarea rounded-container"
+            class="textarea"
             name="comments"
             rows="5"
             placeholder="e.g. this feature works really well, but this features does not work well. I also have some ideas about how to improve this feature."

@@ -231,7 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Popover.Trigger
           class="btn hover:preset-tonal-surface text-warning-800-200 text-left text-sm whitespace-pre-wrap"
         >
-          <TriangleAlertIcon size="18" />
+          <TriangleAlertIcon />
           <p>
             Weather within the past {weather.source.name === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS

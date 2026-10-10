@@ -27,11 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if checked}
-  <CircleCheckIcon
-
-    class="text-primary-700-300 shrink-0 size-6"
-    aria-hidden="true"
-  />
+  <CircleCheckIcon class="text-primary-700-300 shrink-0" aria-hidden="true" />
 {:else}
-  <CircleIcon class="shrink-0 size-6" aria-hidden="true" />
+  <CircleIcon class="shrink-0" aria-hidden="true" />
 {/if}

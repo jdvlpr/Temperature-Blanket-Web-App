@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { FIELD_ICON } from '#lib/constants/class-constants.js';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '#lib/constants/color-constants.js';
@@ -60,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <label class="label">
     <span class="label-text flex items-center gap-1"> Color Scheme </span>
     <div class="relative flex items-center">
-      <PaletteIcon class="absolute left-2" />
+      <PaletteIcon class={FIELD_ICON} />
       <select
         class="select truncate pl-10"
         id="select-sort-by"

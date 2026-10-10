@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           {#if selected}
             <span class="flex items-center gap-1 text-xs">
-              <CheckIcon class="size-4" />
+              <CheckIcon class="icon-sm" />
             </span>
           {/if}
         </button>

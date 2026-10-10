@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <input
         type="text"
-        class="input w-fit grow text-xl"
+        class="input field-xl w-fit grow"
         {id}
         {title}
         bind:value

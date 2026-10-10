@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet lock(color: Color)}
   {#if color.locked}
-    <LockKeyholeIcon size={20} class="opacity-60" aria-hidden="true" />
+    <LockKeyholeIcon class="opacity-60" aria-hidden="true" />
   {/if}
 {/snippet}
 

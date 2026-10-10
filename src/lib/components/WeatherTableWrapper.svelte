@@ -103,5 +103,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="link mb-4 inline-block px-2 text-sm"
   target="_blank"
 >
-  <ExternalLinkIcon class="relative -top-[2px] inline size-4" /> Weather Data Feedback
+  <ExternalLinkIcon class="icon-sm relative -top-[2px] inline" /> Weather Data Feedback
 </a>

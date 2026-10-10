@@ -75,6 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CircleQuestionMarkIcon,
     PlusIcon,
     SearchIcon,
+    XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
@@ -374,20 +375,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         onclick={() => {
                           yarnColorwayFinderState.search = '';
                         }}
-                        ><svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="h-6 w-6"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          ></path>
-                        </svg>
+                        ><XIcon />
                       </button>
                     {/if}
                   </div>
@@ -474,7 +462,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>
@@ -511,7 +499,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 <Accordion.ItemIndicator class="group">
                   <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    class="icon-sm transition group-data-[state=open]:rotate-180"
                   />
                 </Accordion.ItemIndicator>
               </Accordion.ItemTrigger>

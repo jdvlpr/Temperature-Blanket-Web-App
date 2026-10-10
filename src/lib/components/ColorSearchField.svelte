@@ -96,9 +96,8 @@ so the text box keeps its room -->
       />
       <!-- Shows the circle picks a color; clicks go through to it -->
       <PipetteIcon
-        size={16}
         aria-hidden="true"
-        class="pointer-events-none absolute top-3.5 left-1/2 -translate-1/2"
+        class="icon-sm pointer-events-none absolute top-1/2 left-1/2 mt-0! -translate-1/2"
         style="color:{iconColorOn(hex || '#000000')}"
       />
     </span>

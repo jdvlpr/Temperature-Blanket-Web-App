@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   its settings beside it (below it on phones) and its actions at the bottom.
 -->
 <script lang="ts">
+  import { FIELD_ICON } from '#lib/constants/class-constants.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
@@ -296,7 +297,7 @@ choice's icon beside it, and what it's for below -->
       <span class="label-text">{label}</span>
       <div class="relative flex items-center">
         {#if chosen}
-          <chosen.icon class="pointer-events-none absolute left-2" />
+          <chosen.icon class={FIELD_ICON} />
         {/if}
         <select
           class="select truncate pl-10"

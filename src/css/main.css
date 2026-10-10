@@ -17,19 +17,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* To avoid a breaking style issue in Windows-based browsers, it’s recommended you include this temporary fix into your global stylesheet. Please note this change will be automatically and permanently applied for you in Skeleton v5+.
-https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
-*/
-
-.select,
-.input,
-.textarea {
-  background-color: var(--color-surface-50-950);
-  color: var(--color-surface-950-50);
-}
-
 /* Define variables for weather parameters */
 :root {
+  /* Icon sizes: every icon is one size (in rem, so they follow the text
+  scale), and a step smaller for chevrons and icons inline with text
+  (icon-sm). Larger only on purpose, with a size-* class. */
+  --icon-size: 1.25rem;
+  --icon-size-sm: 1rem;
+
   --tmin: #38bdf8;
   --tavg: #a3a3a3;
   --tmax: #f87171;
@@ -51,6 +46,37 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 
   ::selection {
     color: var(--typo-base--color-dark);
+  }
+
+  /* Skeleton 5 dropped the pointer from buttons and checkboxes */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  select:not(:disabled),
+  input:is([type='checkbox'], [type='radio']):not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Lucide icons default to the app's icon size. In the base layer, so a
+  size-* or icon-sm class on an icon still wins. */
+  .lucide {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    flex-shrink: 0;
+  }
+}
+
+/* Native select arrow: a Lucide chevron at the small icon size, in a color
+for light or dark mode (the forms plugin's is one grey for both, and an
+image can't use currentColor) */
+@layer components {
+  select:not([multiple]):not([size]) {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
+    background-size: var(--icon-size-sm) var(--icon-size-sm);
+    background-position: right calc(var(--spacing) * 3) center;
+    padding-right: calc(var(--icon-size-sm) + var(--spacing) * 5);
+  }
+  .dark select:not([multiple]):not([size]) {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4d4d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
   }
 }
 
@@ -440,17 +466,46 @@ th div {
   text-align: left;
 }
 
+/* Skeleton 5 sizes an icon in a button to the button's text (16px). Ours
+are the app's icon size instead, with a negative margin so the larger icon
+sits in the padding: a button with an icon is as tall as one without, and
+as the fields beside it. More specific than Skeleton's rule, which Tailwind
+emits after this one; it leaves size-* icons alone, and icon-sm works since
+this reads --icon-size from the icon itself. */
+@utility btn {
+  & > svg:not([class*='size-']) {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    margin-block: calc((var(--btn-size) - var(--icon-size)) / 2);
+  }
+}
+
+/* A small button's icons are the small size */
+@utility btn-sm {
+  & > svg {
+    --icon-size: var(--icon-size-sm);
+  }
+}
+
 /* Icon buttons are circles, like the account button, with room around the
 icon for their hover background (Skeleton's are squarer and tighter) */
 @utility btn-icon {
   border-radius: 9999px;
-  width: --spacing(6);
-  height: --spacing(6);
-  padding: --spacing(2);
+  width: calc(var(--icon-size) + --spacing(5));
+  height: calc(var(--icon-size) + --spacing(5));
+  padding: 0;
+
+  & > svg:not([class*='size-']) {
+    width: var(--icon-size);
+    height: var(--icon-size);
+  }
 }
 
-.btn-icon > * {
-  flex-shrink: 0 !important;
+/* The small icon size: chevrons on dropdowns and rows, icons inline with text */
+@utility icon-sm {
+  --icon-size: var(--icon-size-sm);
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
 }
 
 /* Corners for a button that can hold two lines of text: as round as the
@@ -466,8 +521,4 @@ white for contrast, shows on any color where a surface tint looks muddy */
   &:hover {
     background-color: color-mix(in oklab, currentColor 18%, transparent);
   }
-}
-
-.lucide {
-  flex-shrink: 0;
 }

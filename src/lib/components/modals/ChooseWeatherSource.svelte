@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <span class="inline-flex gap-1 underline">
             open-meteo.com <ExternalLinkIcon
-              class="relative top-0.5 inline size-4"
+              class="icon-sm relative top-0.5 inline"
             />
           </span>
         </a>
@@ -146,7 +146,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <span class="inline-flex gap-1 underline">
             meteostat.net <ExternalLinkIcon
-              class="relative top-0.5 inline size-4"
+              class="icon-sm relative top-0.5 inline"
             />
           </span>
         </a>
@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
           <div class="ml-4 flex flex-col gap-1 text-sm">
             <p class="">
-              <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
+              <ClockIcon class="icon-sm relative -top-[2px] mr-1 inline" />
               {timespan}
             </p>
             <p class="">
@@ -234,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {resolution}
             </p>
             <p class="">
-              <InfoIcon class="relative -top-[2px] mr-1 inline size-4" />
+              <InfoIcon class="icon-sm relative -top-[2px] mr-1 inline" />
               {@html details}
             </p>
           </div>

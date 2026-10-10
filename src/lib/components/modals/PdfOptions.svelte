@@ -18,6 +18,7 @@ downloadPDF; its title is in the dialog's header. Layout, Fill with color and
 Days in ranges start as the View menu has them; the rest is remembered. -->
 
 <script lang="ts">
+  import { FIELD_ICON } from '#lib/constants/class-constants.js';
   import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
   import {
     DEFAULT_PDF_SETTINGS,
@@ -188,7 +189,7 @@ choice's icon beside it, and what it's for below -->
       <span class="label-text">{label}</span>
       <div class="relative flex items-center">
         {#if chosen}
-          <chosen.icon class="pointer-events-none absolute left-2" />
+          <chosen.icon class={FIELD_ICON} />
         {/if}
         <select
           class="select truncate pl-10"
@@ -230,7 +231,7 @@ choice's icon beside it, and what it's for below -->
 {#snippet indicator()}
   <Accordion.ItemIndicator>
     <ChevronDownIcon
-      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+      class="icon-sm transition group-data-[state=open]:rotate-180"
     />
   </Accordion.ItemIndicator>
 {/snippet}

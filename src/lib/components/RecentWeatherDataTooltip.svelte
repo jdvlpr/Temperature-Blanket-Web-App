@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   aria-label="Weather data delay information"
   aria-describedby="weather-delay-tooltip"
 >
-  <TriangleAlertIcon class="relative -top-[2px] inline size-4" />
+  <TriangleAlertIcon class="icon-sm relative -top-[2px] inline" />
 </button>
 
 {#if popover.isOpen()}

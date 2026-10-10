@@ -181,9 +181,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <li>
                 Cycle through Light <ArrowRightIcon
-                  class="relative -top-[1px] inline size-4"
+                  class="icon-sm relative -top-[1px] inline"
                 /> Dark
-                <ArrowRightIcon class="relative -top-[1px] inline size-4" /> System
+                <ArrowRightIcon class="icon-sm relative -top-[1px] inline" /> System
                 themes by using the keyboard shortcut
                 <span class="kbd">t</span> on any page
               </li>
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <h2 class="font-bold">
               Svelte 4 <ArrowRightIcon
-                class="relative -top-[1px] inline size-4"
+                class="icon-sm relative -top-[1px] inline"
               /> 5
             </h2>
             <p>
@@ -227,7 +227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <h2 class="font-bold">
               Skeleton 2 <ArrowRightIcon
-                class="relative -top-[1px] inline size-4"
+                class="icon-sm relative -top-[1px] inline"
               /> 3
             </h2>
             <p>

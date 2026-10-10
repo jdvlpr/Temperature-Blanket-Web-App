@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Real yarn colors will look different than what's on the screen. Any
     trademarked yarn or colorway details are owned by their respective
     companies. Purchases via links with a shopping cart icon <ShoppingCartIcon
-      class="relative -top-px inline size-4"
+      class="icon-sm relative -top-px inline"
     /> support the developer of this web app at no extra cost to you. Requests for
     yarn to be included in these results can be made by anyone using
     <a href="/yarn-search-request" class="link">this request form.</a>

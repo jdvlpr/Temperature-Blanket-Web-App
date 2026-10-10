@@ -79,7 +79,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Menu.Trigger class={menuTriggerClass} {disabled}>
     <!-- Flipped upside down when reversed; screen readers hear "reversed" -->
     <ArrowDownWideNarrowIcon
-      size={18}
       aria-hidden="true"
       class="transition-transform motion-reduce:transition-none {isReversed
         ? '-scale-y-100'
@@ -90,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >, reversed</span
         >{/if}</span
     >
-    <ChevronDownIcon size={18} aria-hidden="true" />
+    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
@@ -105,7 +104,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             {@render item(option.label, option.details)}
             <CheckIcon
-              size={18}
               class="shrink-0 {option.value === current ? '' : 'invisible'}"
               aria-hidden="true"
             />

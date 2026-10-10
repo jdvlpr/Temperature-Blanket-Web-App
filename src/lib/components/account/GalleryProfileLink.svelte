@@ -50,7 +50,7 @@ chosen for each one, when adding it and in My Projects). Hidden otherwise. -->
     >
       <UserRoundIcon class="shrink-0 opacity-70" />
       <span class="flex-1">Your public gallery page</span>
-      <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+      <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
     </a>
   {:else}
     <p class="text-warning-700-300 px-4 py-3 text-sm">

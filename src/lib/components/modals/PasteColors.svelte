@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <textarea
       bind:value={text}
       id="paste-colors"
-      class="textarea rounded-container min-h-28"
+      class="textarea min-h-28"
       placeholder="e.g. red, FFA500, #ADD8E6"
       aria-describedby="paste-colors-hint"
       onkeydown={(e) => {

@@ -59,7 +59,7 @@ screen of their own. -->
             <span>PDF</span>
             <span class="text-xs opacity-70">Gauges & Weather Data</span>
           </span>
-          <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
+          <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
         </button>
       </li>
       <li>
@@ -108,7 +108,7 @@ screen of their own. -->
               >Gauges & Weather Data, in a new sheet in your Google Drive</span
             >
           </span>
-          <ChevronRightIcon class="size-4 shrink-0 opacity-50" />
+          <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
         </button>
       </li>
     </ul>

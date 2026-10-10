@@ -48,6 +48,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@html iconMore}
   {/if}
   {#if !iconMore && !iconLess}
-    <ChevronDownIcon class={['transition', isExpanded && 'rotate-180']} />
+    <ChevronDownIcon
+      class={['icon-sm transition', isExpanded && 'rotate-180']}
+    />
   {/if}
 </button>

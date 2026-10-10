@@ -180,7 +180,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
         >
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span class="badge bg-surface-200-800 gap-1 text-sm">
-              <KindIcon size={16} />
+              <KindIcon />
               {entry.kind === 'project' ? 'Project' : 'Yarn Palette'}
             </span>
             <span class="font-bold">{entry.label}</span>

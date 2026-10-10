@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {name}
               </h4>
               <p class="text-surface-500 mb-1 text-xs">
-                <AwardIcon class="inline size-4 text-yellow-500" />
+                <AwardIcon class="icon-sm inline text-yellow-500" />
                 <a
                   href="{PUBLIC_KOFI_LINK}/tiers"
                   class="anchor"
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h4 class="h4">{name}</h4>
             <p class="text-surface-500 text-xs">
-              <AwardIcon class="inline size-4 text-slate-500" />
+              <AwardIcon class="icon-sm inline text-slate-500" />
               <a href="{PUBLIC_KOFI_LINK}/tiers" class="anchor" target="_blank"
                 >Silver Supporter</a
               >
@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h4 class="h4">{name}</h4>
             <p class="text-surface-500 text-xs">
-              <AwardIcon class="inline size-4 text-yellow-700" />
+              <AwardIcon class="icon-sm inline text-yellow-700" />
               <a href="{PUBLIC_KOFI_LINK}/tiers" class="anchor" target="_blank"
                 >Bronze Supporter</a
               >

@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Portal,
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
+  import { menuItemClass } from '#lib/components/menu-styles.js';
   import { yarnBall } from '@lucide/lab';
   import { onMount, tick, untrack } from 'svelte';
 
@@ -99,8 +100,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // As in the main palette's toolbar
   const toolbarButtonClass = 'hover:preset-tonal-surface btn justify-start';
-  const menuItemClass =
-    'data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit';
 
   // Choose a photo first, then work with it
   let step = $state<'start' | 'editor'>('start');
@@ -344,7 +343,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >Pick up where you left off</span
             >
           </span>
-          <ChevronRightIcon class="shrink-0" />
+          <ChevronRightIcon class="icon-sm shrink-0" />
         </button>
       {/if}
     </div>
@@ -429,11 +428,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <p>{palette.warningMessage}</p>
               <button
-                class="btn-icon btn-icon-sm hover:bg-surface-200-800"
+                class="btn-icon hover:bg-surface-200-800 size-7"
                 aria-label="Dismiss"
                 onclick={() => (palette.warningMessage = null)}
               >
-                <XIcon />
+                <XIcon class="icon-sm" />
               </button>
             </div>
           {/if}
@@ -514,7 +513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     <Icon iconNode={yarnBall} />
                     <span class="flex items-center gap-1"
-                      >Yarn <ChevronDownIcon size={18} /></span
+                      >Yarn <ChevronDownIcon class="icon-sm" /></span
                     >
                   </Popover.Trigger>
                   {#if yarnOpen}
@@ -586,7 +585,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <!-- Shortened on small screens, to fit the toolbar -->
                     <span class="flex items-center gap-1"
                       >Auto<span class="max-sm:hidden">&nbsp;Palette</span>
-                      <ChevronDownIcon size={18} /></span
+                      <ChevronDownIcon class="icon-sm" /></span
                     >
                   </Menu.Trigger>
                   <Portal>

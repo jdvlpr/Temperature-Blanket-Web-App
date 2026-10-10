@@ -167,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet indicator()}
     <Accordion.ItemIndicator class="">
       <ChevronDownIcon
-        class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+        class="icon-sm transition group-data-[state=open]:rotate-180"
       />
     </Accordion.ItemIndicator>
   {/snippet}
@@ -394,7 +394,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   <CodeIcon />
                   GitHub
-                  <ExternalLinkIcon class="relative -top-[1px] size-5" />
+                  <ExternalLinkIcon class="icon-sm relative -top-[1px]" />
                 </a>
               {/if}
             </div>

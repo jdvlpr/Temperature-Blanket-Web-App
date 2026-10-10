@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
-      <CircleCheckBigIcon class="text-success-900-100 size-4" />
+      <CircleCheckBigIcon class="icon-sm text-success-900-100" />
       {#if weather.wasLoadedFromStorage && !!weather.data.length}
         Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
         data
@@ -86,8 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               target="_blank"
               rel="noreferrer"
               >open a new project <ExternalLinkIcon
-                size="12"
-                class="relative -top-[2px] inline"
+                class="relative -top-[2px] inline size-3"
               /></a
             >.
           </span>
@@ -120,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
       <p class="rounded-container bg-warning-500/20 my-2 p-2 text-sm">
-        <TriangleAlertIcon class="inline size-4" />
+        <TriangleAlertIcon class="icon-sm inline" />
         For the best results, include multiple days in your project; otherwise, some
         features may not work as expected.
       </p>

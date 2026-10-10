@@ -64,13 +64,13 @@ Project menu. -->
 <div class="flex flex-col gap-2 text-sm">
   <p class="flex items-center gap-2 font-bold" data-testid="autosave-status">
     {#if saving}
-      <LoaderCircleIcon class="size-4 shrink-0 animate-spin opacity-70" />
+      <LoaderCircleIcon class="icon-sm shrink-0 animate-spin opacity-70" />
       Saving…
     {:else if autosave.account}
-      <CloudCheckIcon class="size-4 shrink-0" />
+      <CloudCheckIcon class="icon-sm shrink-0" />
       Saved to your account
     {:else}
-      <MonitorCheckIcon class="size-4 shrink-0" />
+      <MonitorCheckIcon class="icon-sm shrink-0" />
       Saved in this browser
     {/if}
   </p>

@@ -244,7 +244,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <span class="block font-bold">Sign out</span>
                   <span class="block text-sm opacity-70">On this device</span>
                 </span>
-                <ChevronRightIcon class="shrink-0 opacity-50" />
+                <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
               </button>
               <button
                 type="button"
@@ -260,7 +260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >Ends your sessions on every device and browser</span
                   >
                 </span>
-                <ChevronRightIcon class="shrink-0 opacity-50" />
+                <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
               </button>
               <button
                 type="button"
@@ -277,7 +277,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     file</span
                   >
                 </span>
-                <ChevronRightIcon class="shrink-0 opacity-50" />
+                <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
               </button>
               {#if errorMessage}
                 <p class="text-error-700-300 px-4 py-3" role="alert">
