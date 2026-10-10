@@ -113,7 +113,7 @@ current choice's icon beside it -->
         {@render icon(current)}
       </span>
       <select
-        class="select truncate pl-14"
+        class="select truncate pl-11"
         value={current}
         onchange={(e) => choose(key, e.currentTarget.value)}
       >

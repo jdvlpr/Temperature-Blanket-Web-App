@@ -69,6 +69,15 @@
 for light or dark mode (the forms plugin's is one grey for both, and an
 image can't use currentColor) */
 @layer components {
+  /* Fields as tall as a button (Skeleton's own formula). Skeleton sizes them
+  by padding and line height, but browsers won't make a text input's line
+  shorter than the font's natural one, so text fields came out taller than
+  selects and buttons beside them. A height utility still wins. */
+  .input:not([type='file']),
+  .select:not([multiple]):not([size]) {
+    height: calc(var(--field-size) * 2 - --spacing(0.5));
+  }
+
   select:not([multiple]):not([size]) {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
     background-size: var(--icon-size-sm) var(--icon-size-sm);

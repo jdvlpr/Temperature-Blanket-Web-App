@@ -818,7 +818,7 @@ and glows on undo or redo. -->
   >
     <button
       type="button"
-      class="range-{edge} btn rounded-tile {hoverTint} h-9 min-w-9 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {movedValue(
+      class="range-{edge} btn rounded-tile {hoverTint} min-w-8 gap-0 px-2 font-semibold whitespace-nowrap tabular-nums {movedValue(
         index,
         edge,
       )
