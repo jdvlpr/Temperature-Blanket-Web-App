@@ -244,12 +244,12 @@ test.describe('Palette toolbar', () => {
     await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
 
     const dialog = page.getByRole('dialog');
-    const categories = dialog.getByRole('group', { name: 'Category' });
-    await expect(categories.getByRole('button')).toHaveCount(4);
-    await categories.getByRole('button', { name: 'Saved' }).click();
+    const categories = dialog.getByRole('radiogroup', { name: 'Category' });
+    await expect(categories.getByRole('radio')).toHaveCount(4);
+    await categories.getByText('Saved', { exact: true }).dispatchEvent('click');
     await expect(
-      categories.getByRole('button', { name: 'Saved' }),
-    ).toHaveAttribute('aria-pressed', 'true');
+      categories.getByRole('radio', { name: 'Saved' }),
+    ).toBeChecked();
     await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
   });
 });
