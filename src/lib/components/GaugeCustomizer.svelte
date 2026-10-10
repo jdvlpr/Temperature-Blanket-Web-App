@@ -503,17 +503,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // How the ranges were made, in detail: the Ranges button names the mode
   let generatedAs = $derived.by(() => {
     if (!rules || isCategory) return '';
-    if (rules.isCustomRanges) return 'Edited individually';
+    if (rules.isCustomRanges)
+      return "You've edited range numbers individually. Choose Auto ranges or Manual steps to start over";
     if (rules.mode === 'manual')
       return `Every ${rules.manual.increment} ${unitLabel} from ${rules.manual.start} ${unitLabel}`;
     if (rules.auto.optimization === 'ranges')
       return gauge.autoRangeOptions
-        ? `${describeIncrement(rules, gauge.autoRangeOptions)} ${unitLabel} steps`
-        : 'Equal steps';
+        ? `Each range covers ${describeIncrement(rules, gauge.autoRangeOptions)} ${unitLabel}`
+        : 'Each range covers the same amount';
     const target = gauge.targets?.find(
       (t: { id: string }) => t.id === rules?.auto.optimization,
     );
-    return `Similar number of ${target?.label.toLowerCase() ?? 'temperature'} days in each range`;
+    return `About the same number of ${target?.label.toLowerCase() ?? 'temperature'} days in each range`;
   });
 
   // With both ends included or neither, rounded or manual steps can't make
@@ -1134,25 +1135,32 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     </form>
   {/if}
   <!-- What the Ranges button's mode means, and how to change a range; the
-  button points here with aria-describedby -->
-  <p
-    id="ranges-description"
-    class="text-surface-700-300 mt-3 px-2 text-center text-xs"
-  >
-    {generatedAs}.{rules.linked
-      ? ' Editing a range number also automatically updates the next or previous one.'
-      : ''}
-  </p>
-  {#if endsDontMeet}
+  button points here with aria-describedby. Hidden while Manual steps are
+  being set: it would describe the saved ranges, not the ones being typed. -->
+  {#if !showManual}
     <p
-      class="text-warning-800-200 mt-2 flex items-start justify-center gap-1.5 px-2 text-center text-xs"
+      id="ranges-description"
+      class="text-surface-700-300 mt-3 px-2 text-center text-xs"
     >
-      <TriangleAlertIcon size={14} class="mt-px shrink-0" aria-hidden="true" />
-      <span
-        >With both ends included or neither, these steps leave gaps or overlaps:
-        try Round numbers off or another choice in the Ranges menu.</span
-      >
+      {generatedAs}.{rules.linked
+        ? ' Editing a range number also automatically updates the next or previous one.'
+        : ''}
     </p>
+    {#if endsDontMeet}
+      <p
+        class="text-warning-800-200 mt-2 flex items-start justify-center gap-1.5 px-2 text-center text-xs"
+      >
+        <TriangleAlertIcon
+          size={14}
+          class="mt-px shrink-0"
+          aria-hidden="true"
+        />
+        <span
+          >With both ends included or neither, these steps leave gaps or
+          overlaps: try Round numbers off or another choice in the Ranges menu.</span
+        >
+      </p>
+    {/if}
   {/if}
 {/if}
 <p class="sr-only" aria-live="polite">{announcement}</p>

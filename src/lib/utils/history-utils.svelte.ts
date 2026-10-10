@@ -213,14 +213,14 @@ export type GaugeChangeState = {
 
 /** How a gauge's ranges are generated, in a few words */
 function generationOf(options: GaugeRangeOptions): string {
-  if (options.isCustomRanges) return 'custom ranges';
+  if (options.isCustomRanges) return 'edited ranges';
   if (options.mode === 'manual')
     return `manual steps, every ${options.manual.increment} from ${options.manual.start}`;
   const by = { tmax: 'high', tavg: 'average', tmin: 'low' } as const;
   const optimization = options.auto.optimization;
   if (optimization === 'ranges')
-    return options.auto.roundIncrement ? 'even steps, rounded' : 'even steps';
-  return `even days by ${by[optimization]} temperature`;
+    return options.auto.roundIncrement ? 'equal size, rounded' : 'equal size';
+  return `equal days by ${by[optimization]} temperature`;
 }
 
 const includesLabel = (o: GaugeRangeOptions) =>

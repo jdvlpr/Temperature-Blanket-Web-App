@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauges.activeGauge?.unit.label[preferences.value.units ?? 'metric'] ?? '',
   );
 
-  // Ways to generate ranges: even steps, (temperature only) a similar number
+  // Ways to generate ranges: equal size, (temperature only) a similar number
   // of days for each target, or manual steps
   let generations = $derived.by(() => {
     const gauge = gauges.activeGauge;
@@ -96,9 +96,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }[] = [
       {
         value: 'ranges',
-        label: 'Even steps',
+        label: 'Equal size',
         icon: RulerIcon,
-        note: `${step} ${unitLabel} each (calculated from your weather)`,
+        note: `Each range covers ${step} ${unitLabel}, calculated from your weather`,
         generation: { mode: 'auto', optimization: 'ranges' },
       },
     ];
@@ -112,9 +112,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           continue;
         list.push({
           value: target.id,
-          label: `Even days · ${target.label}`,
+          label: `Equal days · ${target.label}`,
           icon: target.icon,
-          note: `Approximately equal number of ${target.label.toLowerCase()} days in each range`,
+          note: `About the same number of ${target.label.toLowerCase()} days in each range`,
           generation: { mode: 'auto', optimization: target.id },
         });
       }
@@ -126,7 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       note:
         options.mode === 'manual' && !options.isCustomRanges
           ? `Every ${options.manual.increment} ${unitLabel} from ${options.manual.start} ${unitLabel} · tap to change`
-          : 'Set your own step and starting value',
+          : options.isCustomRanges
+            ? 'Choose the step size and starting value. Saving replaces your edited ranges.'
+            : 'Choose the step size and starting value',
       generation: { mode: 'manual' },
     });
     return list;
@@ -142,14 +144,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let generatedLabel = $derived(
     generations.find((g) => g.value === generatedAs)?.label.replace('…', '') ??
-      'Custom ranges',
+      'Edited',
   );
 
   // The button says how the ranges were made, as View says its layout; the
   // sentence under the toolbar (GaugeCustomizer) gives the detail
   let triggerMode = $derived(
     options?.isCustomRanges
-      ? 'Custom'
+      ? 'Edited'
       : options?.mode === 'manual'
         ? 'Manual'
         : 'Auto',
@@ -250,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<!-- One way to generate ranges, in the Generate ranges submenu -->
+<!-- One way to generate ranges: in the Auto ranges submenu, or Manual steps beside it -->
 {#snippet choice(item: (typeof generations)[number])}
   {@const checked = generatedAs === item.value}
   <Menu.OptionItem
@@ -301,17 +303,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <MenuSubmenu
             label="Auto ranges"
             icon={WandSparklesIcon}
-            current={options.mode === 'manual' && !options.isCustomRanges
-              ? 'Manual steps'
-              : generatedLabel}
+            current={generatedAs && generatedAs !== 'manual'
+              ? generatedLabel
+              : 'Not in use'}
           >
             {#if options.isCustomRanges}
               <p class="text-surface-700-300 max-w-64 px-2 py-1 text-xs">
-                Choosing one replaces your custom ranges. Undo puts them back.
+                Choosing one replaces your edited ranges. Undo puts them back.
               </p>
             {/if}
             <!-- Automatic choices, then (set apart, as in other menus)
-            rounding them, then setting the steps by hand -->
+            rounding them -->
             {#each generations.filter((g) => g.value !== 'manual') as item (item.value)}
               {@render choice(item)}
             {/each}
@@ -331,11 +333,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <MenuCheckbox checked={options.auto.roundIncrement} />
               </Menu.OptionItem>
             {/if}
+          </MenuSubmenu>
+          <!-- Not an automatic choice, so it sits beside the Auto ranges
+          submenu, not in it -->
+          {#if drill.showsMenu}
             {#each generations.filter((g) => g.value === 'manual') as item (item.value)}
-              <Menu.Separator />
               {@render choice(item)}
             {/each}
-          </MenuSubmenu>
+          {/if}
           {#if drill.showsMenu}
             <Menu.Separator />
             <Menu.ItemGroup>

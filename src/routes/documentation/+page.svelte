@@ -233,7 +233,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item ml-4 block">
         <a
           href="#increment-modes"
-          class="toc-anchor opacity-60 hover:opacity-100">Increment Modes</a
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Auto and Manual Ranges</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
@@ -1471,39 +1472,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="increment-modes"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="scroll-mt-[58px] text-xl font-bold">Increment Modes</h3>
+            <h3 class="scroll-mt-[58px] text-xl font-bold">
+              Auto and Manual Ranges
+            </h3>
 
             <p>
-              A range increment is the difference between the highest and lowest
-              values in a range.
+              The Ranges button shows how your ranges were made. A range’s
+              increment is the difference between the highest and lowest values
+              in it.
             </p>
             <ul class="ml-4 flex flex-col gap-2">
               <li>
-                <span class="font-bold">Automatic</span>
-                – Each range’s increment is automatically chosen based on your weather
-                data. The maximum and minimum weather data values for the gauge are
-                used to calculate increments which fit the number of colors.
+                <span class="font-bold">Auto ranges</span>
+                – The app chooses the ranges from your weather data, and updates them
+                when the data changes.
                 <ul>
                   <li>
-                    Round Increment – This option is available if an
-                    auto-calculated increment has decimals. Choose this option
-                    to avoid decimals in ranges’ From and To values.
+                    <span class="font-bold">Equal size</span> – Each range covers
+                    the same amount, chosen from the maximum and minimum weather data
+                    values for the gauge so that the ranges fit the number of colors.
+                  </li>
+                  <li>
+                    <span class="font-bold">Equal days</span> (Temperature gauges,
+                    by High, Average, or Low) – Each range holds about the same number
+                    of days.
+                  </li>
+                  <li>
+                    <span class="font-bold">Round numbers</span> – Available when
+                    an Equal size increment has decimals. Choose this option to avoid
+                    decimals in ranges’ From and To values.
                   </li>
                 </ul>
               </li>
               <li>
-                <span class="font-bold">Manual</span> – Set an increment value and
-                a start value. Based on the Direction and the number of colors in
-                your gauge, each range will be set using your increment value.
+                <span class="font-bold">Manual steps</span> – Set an increment value
+                and a start value. Based on the Direction and the number of colors
+                in your gauge, each range will be set using your increment value.
+              </li>
+              <li>
+                <span class="font-bold">Edited</span> – You changed the numbers of
+                individual ranges. Choosing Auto ranges or Manual steps replaces your
+                edited ranges (Undo puts them back).
               </li>
             </ul>
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                When using Automatic Increments on height-type gauges (Rain
-                Gauge, Snow Gauge), depending on the weather data, some ranges
-                might have negative values. If this is the case, you can
-                manually adjust those ranges to positive values (in real life
-                you can’t have a negative amount of rain or snow).
+                When using Auto ranges on height-type gauges (Rain Gauge, Snow
+                Gauge), depending on the weather data, some ranges might have
+                negative values. If this is the case, you can manually adjust
+                those ranges to positive values (in real life you can’t have a
+                negative amount of rain or snow).
               </p>
             </div>
           </section>
