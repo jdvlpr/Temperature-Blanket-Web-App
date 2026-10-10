@@ -24,6 +24,9 @@ import type {
 import type { WeatherDay } from '$lib/types/weather-types';
 import { displayNumber } from '$lib/utils/number-utils';
 
+/** Weather values that are never negative, so their ranges stop at 0 */
+export const NON_NEGATIVE_PARAMS: string[] = ['prcp', 'snow'];
+
 export const getStart = (
   rangeOptions: GaugeRangeOptions | undefined,
 ): number | undefined => {
@@ -113,23 +116,18 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
   // Create a list to store the from and to values for each range.
   const rangeValues: GaugeRange[] = [];
   let startValue: number;
-  const maxValue = Math.max(
-    ..._weatherData
-      .map((day) => day.tmax[_units])
-      .filter((n): n is number => n !== null),
+  const values = _weatherData.map((day) => day[prop][_units]!);
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
+  // Rain and snow can't go below 0. A range ending at 0 still includes 0 (see isValueInRange)
+  const floor = NON_NEGATIVE_PARAMS.includes(prop) ? 0 : -Infinity;
+  const lowest = Math.max(
+    floor,
+    roundIncrement ? Math.floor(minValue - 0.01) : minValue - 0.01,
   );
-  const minValue = Math.min(
-    ..._weatherData
-      .map((day) => day.tmin[_units])
-      .filter((n): n is number => n !== null),
-  );
-  if (roundIncrement && gaugeDirection === 'high-to-low')
-    startValue = Math.ceil(maxValue + 0.01);
-  else if (roundIncrement && gaugeDirection === 'low-to-high')
-    startValue = Math.floor(minValue - 0.01);
-  else if (!roundIncrement && gaugeDirection === 'high-to-low')
-    startValue = maxValue + 0.01;
-  else startValue = minValue - 0.01;
+  const highest = roundIncrement ? Math.ceil(maxValue + 0.01) : maxValue + 0.01;
+  if (gaugeDirection === 'high-to-low') startValue = highest;
+  else startValue = lowest;
 
   let currentFrom = startValue;
   let currentTo = currentFrom;
@@ -138,15 +136,7 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
     const weatherIndex = (i + 1) * (daysPerRange - 1);
     if (i === numRanges - 1) {
       // It's the last range, so use the highest or lowest value possible in order to include every day
-      let endValue: number;
-      if (roundIncrement && gaugeDirection === 'high-to-low')
-        endValue = Math.floor(minValue - 0.01);
-      else if (roundIncrement && gaugeDirection === 'low-to-high')
-        endValue = Math.ceil(maxValue + 0.01);
-      else if (!roundIncrement && gaugeDirection === 'high-to-low')
-        endValue = minValue - 0.01;
-      else endValue = maxValue + 0.01;
-      currentTo = endValue;
+      currentTo = gaugeDirection === 'high-to-low' ? lowest : highest;
     } else if (weatherIndex >= _weatherData.length) {
       // there are more ranges than days of weather, so just add one.
       currentTo += gaugeDirection === 'high-to-low' ? -1 : 1;
@@ -156,14 +146,27 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
         : _weatherData[weatherIndex][prop][_units]!;
     }
 
-    // If the from and to values are the same, add or subtract one until they are not
-    // equal. Stop if ±1 can no longer change the value (±Infinity, or magnitudes past
-    // the safe-integer range), which would otherwise loop forever.
-    while (currentTo === currentFrom) {
-      const next =
-        gaugeDirection === 'high-to-low' ? currentTo - 1 : currentTo + 1;
-      if (next === currentTo) break;
-      currentTo = next;
+    // If the to value isn't past the from value (many days share one value), move it
+    // one past the from value. Stop if ±1 can no longer change the value (±Infinity, or
+    // magnitudes past the safe-integer range), which would otherwise loop forever.
+    if (gaugeDirection === 'high-to-low' && currentTo >= currentFrom)
+      currentTo = currentFrom - 1;
+    else if (gaugeDirection !== 'high-to-low' && currentTo <= currentFrom)
+      currentTo = currentFrom + 1;
+
+    // Going down toward the floor, every range before the last needs room above
+    // it, so share what's left between the remaining ranges
+    if (
+      gaugeDirection === 'high-to-low' &&
+      i < numRanges - 1 &&
+      currentTo <= floor
+    ) {
+      const target = currentFrom - (currentFrom - floor) / (numRanges - i);
+      // Whole numbers if there's room for one, otherwise hundredths
+      currentTo =
+        roundIncrement && Math.ceil(target) < currentFrom
+          ? Math.ceil(target)
+          : displayNumber(target, 2);
     }
 
     rangeValues.push({
@@ -237,6 +240,7 @@ export const getDaysInRange = ({
       direction,
       includeFromValue,
       includeToValue,
+      param: id,
     });
   });
   return days;
@@ -248,14 +252,23 @@ export const isValueInRange = ({
   direction,
   includeFromValue,
   includeToValue,
+  param,
 }: {
   value: number | null;
   range: GaugeRange;
   direction: GaugeRangeOptions['direction'] | undefined;
   includeFromValue: boolean | undefined;
   includeToValue: boolean | undefined;
+  param?: string;
 }): boolean => {
   if (value === null) return false;
+  // Rain and snow can't go below 0, so a range whose low end is 0 always
+  // includes 0, or dry days would be in no range at all.
+  if (value === 0 && param && NON_NEGATIVE_PARAMS.includes(param)) {
+    if (direction === 'high-to-low' && range.to === 0) includeToValue = true;
+    if (direction !== 'high-to-low' && range.from === 0)
+      includeFromValue = true;
+  }
   if (direction === 'high-to-low') {
     if (includeFromValue && includeToValue)
       return value >= range.to && value <= range.from;

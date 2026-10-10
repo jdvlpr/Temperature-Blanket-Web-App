@@ -35,6 +35,13 @@ function day(tmin: number, tmax: number): WeatherDay {
   } as WeatherDay;
 }
 
+function rainDay(prcp: number): WeatherDay {
+  return {
+    ...day(-15 + prcp, -5 + prcp),
+    prcp: { metric: prcp, imperial: prcp },
+  };
+}
+
 describe('getEvenlyDistributedRangeValuesWithEqualDayCount', () => {
   // Regression: with no weather data `Math.max(...[])`/`Math.min(...[])` are ∓Infinity,
   // so `currentFrom`/`currentTo` both became -Infinity and the loop that nudges them
@@ -105,6 +112,60 @@ describe('getEvenlyDistributedRangeValuesWithEqualDayCount', () => {
     });
 
     expect(ranges).toHaveLength(8);
+  });
+
+  // Regression: the ends came from tmax/tmin whatever the prop, and days sharing
+  // one value (lots of dry days) pushed the ranges below 0, so rain gauges could
+  // end with a negative number
+  describe('rain with little variation', () => {
+    // 365 days: mostly dry, some light rain, cold enough for negative temperatures
+    const amounts = Array.from({ length: 365 }, (_, i) =>
+      i % 9 === 0 ? (i % 4) + 0.5 : i % 23 === 0 ? 0.2 : 0,
+    );
+    const weatherData = amounts.map((n) => rainDay(n));
+
+    for (const gaugeDirection of ['high-to-low', 'low-to-high'] as const)
+      for (const roundIncrement of [true, false])
+        for (const [includeFrom, includeTo] of [
+          [true, false],
+          [false, true],
+          [true, true],
+          [false, false],
+        ])
+          it(`${gaugeDirection}, ${roundIncrement ? 'rounded' : 'exact'}, From ${includeFrom ? 'in' : 'out'}, To ${includeTo ? 'in' : 'out'}`, () => {
+            const ranges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+              weatherData,
+              numRanges: 6,
+              prop: 'prcp',
+              gaugeDirection,
+              roundIncrement,
+              includeFrom,
+              includeTo,
+            });
+
+            expect(ranges).toHaveLength(6);
+            for (const range of ranges) {
+              expect(range.from).toBeGreaterThanOrEqual(0);
+              expect(range.to).toBeGreaterThanOrEqual(0);
+              if (gaugeDirection === 'high-to-low')
+                expect(range.to).toBeLessThan(range.from);
+              else expect(range.to).toBeGreaterThan(range.from);
+            }
+            // Every day, dry ones included, gets a range
+            for (const value of amounts)
+              expect(
+                ranges.some((range) =>
+                  isValueInRange({
+                    value,
+                    range,
+                    direction: gaugeDirection,
+                    includeFromValue: includeFrom,
+                    includeToValue: includeTo,
+                    param: 'prcp',
+                  }),
+                ),
+              ).toBe(true);
+          });
   });
 });
 
@@ -221,4 +282,29 @@ describe('isValueInRange', () => {
       });
     }
   }
+
+  describe('at 0 for rain and snow', () => {
+    for (const direction of ['high-to-low', 'low-to-high'] as const) {
+      const range =
+        direction === 'high-to-low' ? { from: 5, to: 0 } : { from: 0, to: 5 };
+      const check = (param: string) =>
+        isValueInRange({
+          value: 0,
+          range,
+          direction,
+          includeFromValue: false,
+          includeToValue: false,
+          param,
+        });
+
+      it(`${direction}: an end at 0 includes dry days, since nothing is below 0`, () => {
+        expect(check('prcp')).toBe(true);
+        expect(check('snow')).toBe(true);
+      });
+
+      it(`${direction}: other weather keeps the end excluded`, () => {
+        expect(check('tmax')).toBe(false);
+      });
+    }
+  });
 });

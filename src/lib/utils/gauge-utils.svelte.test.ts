@@ -17,6 +17,7 @@ import type { GaugeRangeOptions } from '$lib/types/gauge-types';
 import type { Color } from '$lib/types/yarn-types';
 import { describe, expect, it } from 'vitest';
 import {
+  getRanges,
   insertRange,
   removeRange,
   withGeneratedRanges,
@@ -232,5 +233,41 @@ describe('removeRange', () => {
   it("doesn't change the ranges it's given", () => {
     removeRange(ranges, 0);
     expect(ranges[1]).toEqual({ from: 20, to: 10 });
+  });
+});
+
+describe('getRanges, equal size', () => {
+  const six = Array.from({ length: 6 }, () => ({ hex: '#000000' })) as Color[];
+  const equalSize = (gaugeId: 'prcp' | 'temp', increment: number) =>
+    getRanges({
+      rangeOptions: options({
+        auto: {
+          optimization: 'ranges',
+          start: { high: 4, low: 0 },
+          increment: Math.abs(increment),
+          roundIncrement: false,
+        },
+      }),
+      ranges: [],
+      start: 4,
+      increment,
+      colors: six,
+      includeFromAndTo: false,
+      dontIncludeFromAndTo: false,
+      gaugeId,
+    }).ranges;
+
+  // Regression: 4 ÷ 6 rounds to 0.67, so six steps down from 4 overshot to -0.02
+  it("doesn't end rain below 0", () => {
+    expect(equalSize('prcp', -0.67).at(-1)?.to).toBe(0);
+  });
+
+  // ...and rounding down stopped just short of 0, leaving out dry days
+  it('ends rain at 0 when the increment stops just short of it', () => {
+    expect(equalSize('prcp', -0.66).at(-1)?.to).toBe(0);
+  });
+
+  it('leaves temperatures below 0 alone', () => {
+    expect(equalSize('temp', -0.67).at(-1)?.to).toBe(-0.02);
   });
 });

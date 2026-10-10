@@ -128,11 +128,16 @@ export class RainGauge implements GaugeAttributes {
       : Math.ceil(Math.max(...this.#maxes));
   });
 
-  // Set the min value to below the lowest integer based on the weather data
+  // Set the min value to below the lowest integer based on the weather data,
+  // but never below 0, since there's no negative rain or snow. A range ending
+  // at 0 still includes 0 (see isValueInRange)
   #min = $derived.by(() => {
-    return Number.isInteger(Math.min(...this.#mins))
-      ? Math.min(...this.#mins) - 1
-      : Math.floor(Math.min(...this.#mins));
+    return Math.max(
+      0,
+      Number.isInteger(Math.min(...this.#mins))
+        ? Math.min(...this.#mins) - 1
+        : Math.floor(Math.min(...this.#mins)),
+    );
   });
 
   colors: Color[] = $state(

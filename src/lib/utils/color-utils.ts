@@ -445,6 +445,7 @@ export const getColorInfo = ({
           direction: rangeOptions.direction,
           includeFromValue: rangeOptions.includeFromValue,
           includeToValue: rangeOptions.includeToValue,
+          param,
         })
       ) {
         // The first range a value is in gives its color, should ranges overlap

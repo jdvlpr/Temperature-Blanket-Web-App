@@ -532,6 +532,7 @@ function countDaysInRange(
         direction,
         includeFromValue: includeFrom,
         includeToValue: includeTo,
+        param: targetId,
       })
     ) {
       count++;

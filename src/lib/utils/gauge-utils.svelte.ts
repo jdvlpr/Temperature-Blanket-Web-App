@@ -34,6 +34,7 @@ import {
   getEvenlyDistributedRangeValuesWithEqualDayCount,
   getIncrement,
   getStart,
+  NON_NEGATIVE_PARAMS,
 } from '$lib/utils/range-utils.svelte';
 import { pluralize } from '$lib/utils/string-utils';
 import chroma from 'chroma-js';
@@ -123,13 +124,27 @@ export function getRanges({
     newRanges = colors.map((n, i) => {
       const isLastRange = i === colors.length - 1;
 
-      const from = _start;
+      let from = _start;
       let to = _start + _increment;
 
       if (!isLastRange && rangeOptions.mode !== 'manual')
         to += includeFromAndTo ? 0.01 : dontIncludeFromAndTo ? -0.01 : 0;
 
       _start += _increment;
+
+      if (NON_NEGATIVE_PARAMS.includes(gaugeId)) {
+        // No negative rain or snow. The rounded increment can also stop just
+        // short of 0, which would leave out dry days
+        if (
+          isLastRange &&
+          rangeOptions.mode !== 'manual' &&
+          rangeOptions.direction === 'high-to-low' &&
+          to < Math.abs(_increment)
+        )
+          to = 0;
+        from = Math.max(0, from);
+        to = Math.max(0, to);
+      }
 
       const decimals =
         rangeOptions.auto.roundIncrement && rangeOptions.mode !== 'manual'
