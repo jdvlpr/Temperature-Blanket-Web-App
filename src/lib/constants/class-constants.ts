@@ -38,6 +38,8 @@ export const PANEL_ROW = `hover:bg-surface-200-800 flex min-h-12 w-full items-ce
 // Drawn as an outline, which paints over the children's backgrounds (an inset
 // ring would sit under them).
 // The border thickens in the primary color while anything inside has focus,
-// since the input inside no longer shows its own focus ring.
+// since the input inside no longer shows its own focus ring. While its field is
+// disabled the whole group fades, not just the field (whose own fade is undone
+// so it isn't faded twice).
 export const FIELD_GROUP =
-  'field-group gap-0 overflow-hidden rounded-base bg-surface-50-950 outline-1 -outline-offset-1 outline-surface-300-700 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary-500 *:rounded-none! *:[box-shadow:none]!';
+  'field-group gap-0 overflow-hidden rounded-base bg-surface-50-950 outline-1 -outline-offset-1 outline-surface-300-700 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary-500 *:rounded-none! *:[box-shadow:none]! has-[>.input:disabled]:cursor-not-allowed has-[>.input:disabled]:opacity-50 has-[>.input:disabled]:*:opacity-100!';

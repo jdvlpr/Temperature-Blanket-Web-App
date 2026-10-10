@@ -81,10 +81,12 @@ so the text box keeps its room -->
 <div class="label @container w-full">
   <label class="label-text" for="{id}-text">{label}</label>
   <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto_auto]']}>
-    <span class="label label-text relative p-1.5">
+    <!-- The circle takes the field's height less an even gap, so it sits in the
+    field's rounded end at any text size -->
+    <span class="label label-text relative p-[3px]!">
       <input
         type="color"
-        class="input size-8 cursor-pointer rounded-full! p-0"
+        class="input aspect-square h-full! w-auto! cursor-pointer rounded-full! p-0"
         aria-label="Choose a color"
         value={hex || '#000000'}
         onchange={(e) => {
@@ -114,7 +116,7 @@ so the text box keeps its room -->
       <button
         type="button"
         aria-label="Clear Color"
-        class="btn"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
           hex = '';
           text = '';
@@ -126,7 +128,7 @@ so the text box keeps its room -->
       type="button"
       aria-label="Pick color from a photo"
       title="Pick color from a photo"
-      class="btn gap-1"
+      class="btn hover:preset-tonal-surface gap-1"
       data-photo-button
       onclick={photo}
       ><ImageIcon aria-hidden="true" />
