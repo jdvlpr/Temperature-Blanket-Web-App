@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Footer from '$lib/components/Footer.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import UnitChanger from '$lib/components/UnitChanger.svelte';
+  import UnitMenu from '$lib/components/buttons/UnitMenu.svelte';
   import { dialog, showNavigationSideBar } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -68,6 +68,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
+
+  function openMenu() {
+    dialog.trigger({
+      type: 'component',
+      component: { ref: Menu },
+      options: { title: 'Locations & Settings' },
+    });
+  }
 
   function getShareableURL({
     id,
@@ -351,7 +359,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div class="hidden lg:flex">
       {#if mounted}
-        <UnitChanger />
+        <UnitMenu />
       {/if}
     </div>
 
@@ -359,43 +367,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Share href={shareableURL} />
 
       <button
-        aria-label="Open Settings"
+        aria-label="Open Locations and Settings"
         class="btn-icon hover:preset-tonal-surface"
-        title="Open Settings"
-        onclick={() =>
-          dialog.trigger({
-            type: 'component',
-            component: {
-              ref: Menu,
-              props: {
-                page: 'settings',
-              },
-            },
-            options: { title: 'Settings' },
-          })}
+        title="Open Locations and Settings"
+        onclick={openMenu}
       >
         <SettingsIcon />
       </button>
-      {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
-        <button
-          aria-label="Open Locations"
-          class="btn-icon hover:preset-tonal-surface"
-          title="Open Locations"
-          onclick={() =>
-            dialog.trigger({
-              type: 'component',
-              component: {
-                ref: Menu,
-                props: {
-                  page: 'locations',
-                },
-              },
-              options: { title: 'Locations' },
-            })}
-        >
-          <ListIcon />
-        </button>
-      {/if}
     </div>
   {/snippet}
 
@@ -454,17 +432,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <button
                       in:fade
                       class="btn hover:preset-tonal-surface"
-                      onclick={() =>
-                        dialog.trigger({
-                          type: 'component',
-                          component: {
-                            ref: Menu,
-                            props: {
-                              page: 'locations',
-                            },
-                          },
-                          options: { title: 'Locations' },
-                        })}
+                      onclick={openMenu}
                       ><ListIcon />
                       Locations</button
                     >

@@ -291,7 +291,7 @@ site does -->
           icon: spacingIcon,
         })}
         {@render choiceSelect({
-          label: 'Buttons',
+          label: 'Border Radius',
           key: 'roundness',
           options: ROUNDNESS,
           fallback: 'pill',

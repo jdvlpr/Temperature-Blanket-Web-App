@@ -14,30 +14,36 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import SegmentsScroller from '$lib/components/SegmentsScroller.svelte';
-  import UnitChanger from '$lib/components/UnitChanger.svelte';
+  import ChoiceMenu from '$lib/components/buttons/ChoiceMenu.svelte';
+  import UnitMenu from '$lib/components/buttons/UnitMenu.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
-  import { Trash2Icon } from '@lucide/svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import { ClockIcon, Trash2Icon } from '@lucide/svelte';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { weatherLocationState } from './Location.svelte';
 
-  interface Props {
-    page?: 'settings' | 'locations';
-  }
-
-  let { page = 'settings' }: Props = $props();
-
   let savedWeatherLocations = $derived(
     weatherState.weatherLocations.filter((item) => item.saved),
   );
+
+  // Each option shows the time now, so the difference is visible
+  const hourOptions = (['12', '24'] as const).map((hour) => ({
+    value: hour,
+    label: `${hour}hr`,
+    details: new Date().toLocaleTimeString(navigator.language, {
+      timeStyle: 'short',
+      hour12: hour === '12',
+    }),
+  }));
 </script>
 
-<div class="px-4 pt-2 pb-4 text-left">
-  {#if page === 'locations'}
-    <div>
+<div class="flex w-full flex-col gap-6 px-4 pt-2 pb-4 text-left sm:w-xl">
+  {#if savedWeatherLocations.length}
+    <section class="flex flex-col gap-2" aria-labelledby="weather-locations">
+      <h3 id="weather-locations" class="px-2 text-sm font-bold opacity-70">
+        Locations
+      </h3>
       <div class="flex flex-col gap-2">
         {#each savedWeatherLocations as { id, data, label }}
           <div
@@ -116,12 +122,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   weatherState.activeLocationID =
                     weatherState.weatherLocations.find((item) => item.saved)
                       ?.id || null;
-
-                if (
-                  !weatherState.weatherLocations.filter((item) => item?.saved)
-                    ?.length
-                )
-                  dialog.close();
               }}
             >
               <Trash2Icon />
@@ -129,51 +129,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/each}
       </div>
-    </div>
+    </section>
   {/if}
-  {#if page === 'settings'}
-    <div class="w-full">
-      <div
-        class="bg-surface-50 dark:bg-surface-950 flex w-fit max-w-full flex-col justify-center gap-2 rounded p-2"
-      >
-        <div><UnitChanger /></div>
-        <div
-          class="rounded-container flex flex-wrap items-center justify-center gap-4 p-2"
-        >
-          <div
-            class="flex max-w-full min-w-0 flex-wrap items-center justify-center gap-2"
-          >
-            <SegmentsScroller>
-              <SegmentedControl
-                value={weatherState.hour}
-                onValueChange={(e) => {
-                  weatherState.hour = e.value as '12' | '24';
-                }}
-              >
-                <SegmentedControl.Control
-                  class="bg-surface-100 dark:bg-surface-900 min-w-max"
-                >
-                  <SegmentedControl.Indicator />
-                  <SegmentedControl.Item value="12">
-                    <SegmentedControl.ItemText>12hr</SegmentedControl.ItemText>
-                    <SegmentedControl.ItemHiddenInput />
-                  </SegmentedControl.Item>
-                  <SegmentedControl.Item value="24">
-                    <SegmentedControl.ItemText>24hr</SegmentedControl.ItemText>
-                    <SegmentedControl.ItemHiddenInput />
-                  </SegmentedControl.Item>
-                </SegmentedControl.Control>
-              </SegmentedControl>
-            </SegmentsScroller>
-            <p class="text-sm">
-              {new Date().toLocaleTimeString(navigator.language, {
-                timeStyle: 'short',
-                hour12: weatherState.hour === '12' ? true : false,
-              })}
-            </p>
-          </div>
-        </div>
-      </div>
+  <section class="flex flex-col gap-2" aria-labelledby="weather-settings">
+    <h3 id="weather-settings" class="px-2 text-sm font-bold opacity-70">
+      Settings
+    </h3>
+    <div
+      class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-wrap items-center gap-2 border border-gray-300 p-4 dark:border-gray-700"
+    >
+      <UnitMenu />
+      <ChoiceMenu
+        options={hourOptions}
+        value={weatherState.hour}
+        onchange={(hour) => (weatherState.hour = hour)}
+        label="Time"
+        icon={ClockIcon}
+      />
     </div>
-  {/if}
+  </section>
 </div>

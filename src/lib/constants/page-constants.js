@@ -212,7 +212,7 @@ export const ROUNDNESS = [
   },
   {
     id: 'pill',
-    name: 'Pill',
+    name: 'Full',
     description: 'Fully rounded buttons, gently rounded containers.',
     radiusBase: '9999rem',
     radiusContainer: '1.5rem',

@@ -738,7 +738,7 @@ and glows on undo or redo. -->
     title="Move Color"
     aria-label="Drag handle to reorder color {index + 1}"
     class={[
-      'handle flex h-8 w-12 shrink-0 cursor-grab items-center justify-center gap-0.5 rounded-full text-sm font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-current',
+      'btn-icon handle flex size-8 shrink-0 cursor-grab items-center justify-center rounded-full text-sm font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-current',
       onColor ? 'hover-on-color' : 'hover:preset-tonal-surface',
       onColor && pop.index === index && 'feedback-pop',
       onColor &&
@@ -752,7 +752,7 @@ and glows on undo or redo. -->
     use:dragHandle
   >
     <GripVerticalIcon size={16} aria-hidden="true" />
-    <span aria-hidden="true">{index + 1}</span>
+    <span aria-hidden="true" class="tracking-tighter">{index + 1}</span>
   </div>
 {/snippet}
 

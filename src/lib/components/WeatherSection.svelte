@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { CloudAlert, TriangleAlertIcon } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import UnitChanger from './UnitChanger.svelte';
+  import UnitMenu from '$lib/components/buttons/UnitMenu.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 
@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
       <WeatherSourceButton />
 
-      <UnitChanger />
+      <UnitMenu />
 
       <WeatherGrouping />
     </div>

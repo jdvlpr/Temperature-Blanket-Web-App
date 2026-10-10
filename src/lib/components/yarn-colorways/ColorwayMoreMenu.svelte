@@ -27,16 +27,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import type { Color } from '$lib/types/yarn-types';
   import {
-    BetweenHorizontalEndIcon,
-    BetweenHorizontalStartIcon,
-    BetweenVerticalEndIcon,
-    BetweenVerticalStartIcon,
     CopyIcon,
     EllipsisVerticalIcon,
     ExternalLinkIcon,
     ShoppingCartIcon,
     Trash2Icon,
   } from '@lucide/svelte';
+  import InsertColorIcon from '$lib/components/buttons/InsertColorIcon.svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import { menuContentClass, menuItemClass } from '$lib/components/menu-styles';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
@@ -67,6 +64,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onremove,
     removeLabel = 'Remove',
   }: Props = $props();
+
+  // Grid places colors side by side (rows of tiles), list stacks them
+  let insertLayout = $derived<'grid' | 'list'>(
+    insertAxis === 'row' ? 'grid' : 'list',
+  );
 
   let link = $derived.by(() => {
     const link = colorwayLink(colorway);
@@ -160,21 +162,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Menu.Item>
         {/each}
         {#if oninsert}
-          {@const Before =
-            insertAxis === 'row'
-              ? BetweenVerticalStartIcon
-              : BetweenHorizontalStartIcon}
-          {@const After =
-            insertAxis === 'row'
-              ? BetweenVerticalEndIcon
-              : BetweenHorizontalEndIcon}
           <Menu.Separator />
           <Menu.Item value="insert-before" class={menuItemClass}>
-            <Before size={16} aria-hidden="true" />
+            <InsertColorIcon
+              where="before"
+              layout={insertLayout}
+              size={16}
+              aria-hidden="true"
+            />
             <span>Add color before</span>
           </Menu.Item>
           <Menu.Item value="insert-after" class={menuItemClass}>
-            <After size={16} aria-hidden="true" />
+            <InsertColorIcon
+              where="after"
+              layout={insertLayout}
+              size={16}
+              aria-hidden="true"
+            />
             <span>Add color after</span>
           </Menu.Item>
         {/if}
