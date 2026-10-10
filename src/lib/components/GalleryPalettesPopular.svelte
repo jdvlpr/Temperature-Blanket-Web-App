@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="relative flex w-fit items-center">
       <ClockIcon class={FIELD_ICON} />
       <select
-        class="select mx-auto w-fit min-w-[100px] truncate pl-10"
+        class="select mx-auto w-fit min-w-[100px] truncate pl-14"
         id="select-time-period"
         bind:value={galleryPalettesPopularState.months}
         onchange={async () => {

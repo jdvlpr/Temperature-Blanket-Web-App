@@ -30,7 +30,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations } from '#lib/state/location-state.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
-  import type { GaugeRange, GaugeRangeCategory } from '#lib/types/gauge-types.js';
+  import type {
+    GaugeRange,
+    GaugeRangeCategory,
+  } from '#lib/types/gauge-types.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import {
     gaugeParamsHaveYarnDetails,

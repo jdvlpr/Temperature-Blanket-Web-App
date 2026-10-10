@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="relative flex items-center">
       <PaletteIcon class={FIELD_ICON} />
       <select
-        class="select truncate pl-10"
+        class="select truncate pl-14"
         id="select-sort-by"
         bind:value={currentScheme}
       >

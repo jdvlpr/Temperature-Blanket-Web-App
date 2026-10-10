@@ -80,7 +80,7 @@
   <div class="relative flex items-center">
     <SpoolIcon class={FIELD_ICON} />
     <select
-      class="select truncate pl-10"
+      class="select truncate pl-14"
       bind:value={selectedYarnWeightId}
       {onchange}
     >

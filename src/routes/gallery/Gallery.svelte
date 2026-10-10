@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ClockIcon class={FIELD_ICON} />
           <select
             bind:value={galleryState.timePeriod}
-            class="select mx-auto w-fit min-w-[100px] truncate pl-10"
+            class="select mx-auto w-fit min-w-[100px] truncate pl-14"
             onchange={() => {
               galleryState.popularProjects = [];
               fetchPopularProjectsWrapper();
@@ -334,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Grid3x3 class={FIELD_ICON} />
             <select
               disabled={loading}
-              class="select truncate pl-10"
+              class="select truncate pl-14"
               id="select-gallery-pattern-type"
               bind:value={galleryState.filteredPatternType}
               onchange={debouncedSearch}

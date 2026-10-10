@@ -45,6 +45,6 @@ export const FIELD_GROUP =
   'field-group gap-0 overflow-hidden rounded-base bg-surface-50-950 outline-1 -outline-offset-1 outline-surface-300-700 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary-500 *:rounded-none! *:[box-shadow:none]! has-[>.input:disabled]:cursor-not-allowed has-[>.input:disabled]:opacity-50 has-[>.input:disabled]:*:opacity-100!';
 
 // An icon at the start of a select (or any field), as far in as a field
-// group's icon cell puts its icon. The field needs pl-10 to clear it. Inside a
-// `relative flex items-center` wrapper.
+// group's icon cell puts its icon. The select needs pl-14, so its text starts
+// where a field group's does. Inside a `relative flex items-center` wrapper.
 export const FIELD_ICON = 'pointer-events-none absolute left-3';

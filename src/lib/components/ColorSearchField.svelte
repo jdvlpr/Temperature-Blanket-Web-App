@@ -81,24 +81,30 @@ so the text box keeps its room -->
 <div class="label @container w-full">
   <label class="label-text" for="{id}-text">{label}</label>
   <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto_auto]']}>
-    <!-- The circle takes the field's height less an even gap, so it sits in the
-    field's rounded end at any text size -->
-    <span class="label label-text relative p-[3px]!">
+    <!-- A square as tall as the field, with a circle in it less an even gap, so
+    it sits in the field's rounded end at any text size. The cell is the square
+    and the circle is drawn: Safari won't size a color input by aspect-ratio
+    (it squeezed it to half width). The real input lies over it, unseen. -->
+    <span class="relative aspect-square h-full">
+      <span
+        class="ring-surface-300-700 absolute inset-[3px] rounded-full ring-1 ring-inset"
+        style="background:{hex || '#000000'}"
+      ></span>
+      <!-- Shows the circle picks a color -->
+      <PipetteIcon
+        aria-hidden="true"
+        class="icon-sm pointer-events-none absolute top-1/2 left-1/2 -translate-1/2"
+        style="color:{iconColorOn(hex || '#000000')}"
+      />
       <input
         type="color"
-        class="input aspect-square h-full! w-auto! cursor-pointer rounded-full! p-0"
+        class="absolute inset-0 size-full cursor-pointer rounded-full opacity-0"
         aria-label="Choose a color"
         value={hex || '#000000'}
         onchange={(e) => {
           text = e.currentTarget.value;
           setColor(text);
         }}
-      />
-      <!-- Shows the circle picks a color; clicks go through to it -->
-      <PipetteIcon
-        aria-hidden="true"
-        class="icon-sm pointer-events-none absolute top-1/2 left-1/2 mt-0! -translate-1/2"
-        style="color:{iconColorOn(hex || '#000000')}"
       />
     </span>
     <input
@@ -131,7 +137,7 @@ so the text box keeps its room -->
       data-photo-button
       onclick={photo}
       ><ImageIcon aria-hidden="true" />
-      <span class="hidden @sm:inline">Photo</span>
+      <span class="hidden @xs:inline">Photo</span>
     </button>
   </div>
 </div>

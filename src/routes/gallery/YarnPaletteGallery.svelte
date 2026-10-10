@@ -165,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ClockIcon class={FIELD_ICON} />
           <select
             bind:value={yarnPaletteGalleryState.timePeriod}
-            class="select mx-auto w-fit min-w-[90px] truncate pl-10"
+            class="select mx-auto w-fit min-w-[90px] truncate pl-14"
             onchange={() => {
               yarnPaletteGalleryState.popularPalettes = [];
               fetchPopularPalettes();

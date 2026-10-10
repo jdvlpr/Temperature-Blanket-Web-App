@@ -300,7 +300,7 @@ choice's icon beside it, and what it's for below -->
           <chosen.icon class={FIELD_ICON} />
         {/if}
         <select
-          class="select truncate pl-10"
+          class="select truncate pl-14"
           value={current}
           onchange={(e) => onchoose(e.currentTarget.value)}
         >

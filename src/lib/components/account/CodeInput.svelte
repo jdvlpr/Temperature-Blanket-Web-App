@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span class="label-text">{label}</span>
   <input
     type="text"
-    class="input h-14 text-center font-mono text-3xl tracking-[0.4em] indent-[0.4em]"
+    class="input h-14 text-center indent-[0.4em] font-mono text-3xl tracking-[0.4em]"
     inputmode="numeric"
     autocomplete="one-time-code"
     autocapitalize="off"
