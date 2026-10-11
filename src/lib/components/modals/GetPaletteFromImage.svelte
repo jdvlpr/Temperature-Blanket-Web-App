@@ -432,7 +432,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <p>{palette.warningMessage}</p>
               <button
-                class="btn-icon hover:bg-surface-200-800 size-7"
+                class="btn-icon hover:bg-surface-200-800 size-8"
                 aria-label="Dismiss"
                 onclick={() => (palette.warningMessage = null)}
               >

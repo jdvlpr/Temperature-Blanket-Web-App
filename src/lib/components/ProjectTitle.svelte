@@ -101,7 +101,7 @@ wide as the title, focused or not -->
   <input
     type="text"
     size={1}
-    class="rounded-base hover:border-surface-300-700 focus:border-surface-300-700 focus:bg-surface-50-950 col-start-1 row-start-1 h-9 w-full min-w-0 truncate border border-transparent bg-transparent px-2 outline-none placeholder:text-current"
+    class="rounded-base hover:border-surface-300-700 focus:border-surface-300-700 focus:bg-surface-50-950 col-start-1 row-start-1 h-10 w-full min-w-0 truncate border border-transparent bg-transparent px-2 outline-none placeholder:text-current"
     class:placeholder:opacity-70={!autosave.stored}
     aria-label="Project name"
     title={autosave.stored ? 'Rename Project' : 'Save and name this project'}

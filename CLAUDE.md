@@ -67,7 +67,7 @@ Server unit tests that need a database use `src/lib/server/test-d1.ts`, an in-me
 
 ## Icons and fields
 
-- Icons are sized by CSS tokens in `src/css/main.css`: `--icon-size` (1.25rem) for every icon, `--icon-size-sm` (1rem) via the `icon-sm` class for dropdown/row chevrons, external-link and other icons inline with text. Never use Lucide's `size` prop (CSS overrides it); use `icon-sm`, or a `size-*` class only for deliberately large icons (empty states, spinners). Icons in `btn-sm` are small automatically; `btn-icon` is a 40px circle.
+- Icons are sized by CSS tokens in `src/css/main.css`: `--icon-size` (1.25rem) for every icon, `--icon-size-sm` (1rem) via the `icon-sm` class for dropdown/row chevrons, external-link and other icons inline with text. Never use Lucide's `size` prop (CSS overrides it); use `icon-sm`, or a `size-*` class only for deliberately large icons (empty states, spinners). Icons in `btn-sm` are small automatically; Buttons, icon buttons and fields share one height, twice their text size plus `--spacing(1.5)` (40px at normal settings; `src/css/main.css`); `btn-icon` is that size as a circle, with an invisible tap area of at least 44px (its `::after`).
 - Joined fields use `FIELD_GROUP`; an icon at the start of a select uses `FIELD_ICON` with `pl-11` on the select (`src/lib/constants/class-constants.ts`). Don't add `text-*` to `.input` (it changes its height); use Skeleton's `field-*` sizes.
 
 ## Testing conventions

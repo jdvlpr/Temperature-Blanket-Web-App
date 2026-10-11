@@ -28,8 +28,8 @@ export const copyColorwayText = (text: string) =>
     icon: ClipboardCheckIcon,
   });
 
-/** A colorway's round swatch, as big as the ⋮ button beside it (48px:
- * Skeleton's btn-icon pads its 32px outside the size) */
+/** A colorway's round swatch (48px), a little bigger than the ⋮ button
+ * beside it */
 export const swatchClass =
   'size-12 shrink-0 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]';
 

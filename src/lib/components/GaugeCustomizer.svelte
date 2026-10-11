@@ -741,7 +741,7 @@ and glows on undo or redo. -->
     title="Move Color"
     aria-label="Drag handle to reorder color {index + 1}"
     class={[
-      'btn-icon handle flex size-8 shrink-0 cursor-grab items-center justify-center rounded-full text-sm font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-current',
+      'btn-icon handle flex shrink-0 cursor-grab items-center justify-center rounded-full text-sm font-semibold tabular-nums focus-visible:outline-2 focus-visible:outline-current',
       onColor ? 'hover-on-color' : 'hover:preset-tonal-surface',
       onColor && pop.index === index && 'feedback-pop',
       onColor &&

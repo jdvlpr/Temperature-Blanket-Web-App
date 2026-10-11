@@ -109,8 +109,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <Menu.Trigger
     class={on === 'color'
-      ? 'btn-icon hover-on-color size-8 shrink-0 focus-visible:outline-2 focus-visible:outline-current active:bg-[color-mix(in_oklab,currentColor_18%,transparent)] data-[state=open]:bg-[color-mix(in_oklab,currentColor_18%,transparent)]'
-      : 'btn-icon hover:preset-tonal-surface active:bg-surface-200-800 data-[state=open]:bg-surface-200-800 size-8 shrink-0'}
+      ? 'btn-icon hover-on-color shrink-0 focus-visible:outline-2 focus-visible:outline-current active:bg-[color-mix(in_oklab,currentColor_18%,transparent)] data-[state=open]:bg-[color-mix(in_oklab,currentColor_18%,transparent)]'
+      : 'btn-icon hover:preset-tonal-surface active:bg-surface-200-800 data-[state=open]:bg-surface-200-800 shrink-0'}
     style={on === 'color' ? `color:${iconColorOn(colorway.hex)}` : undefined}
     aria-label="More for {colorway.name || colorway.hex}"
     title="More"

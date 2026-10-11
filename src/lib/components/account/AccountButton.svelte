@@ -37,8 +37,7 @@ when accounts are off. -->
   import { Popover } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
-  const BUTTON =
-    'hover:preset-tonal-surface inline-flex size-10 shrink-0 items-center justify-center rounded-full';
+  const BUTTON = 'btn-icon hover:preset-tonal-surface shrink-0';
   const ROW = `hover:preset-tonal-surface flex w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50 ${ROW_FOCUS}`;
 
   let open = $state(false);
