@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
-  import ProjectNameField from '#lib/components/ProjectNameField.svelte';
+  import NameField from '#lib/components/NameField.svelte';
   import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '#lib/constants/color-constants.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     with, so arriving by client-side navigation skips the saved weather -->
     {#if editing}
       <div class="mb-1">
-        <ProjectNameField
+        <NameField
           bind:value={editingName}
           placeholder={title}
           onsave={saveName}
@@ -118,6 +118,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           rel="noopener noreferrer"
           class="line-clamp-4 min-w-0 underline">{label}</a
         >
+        <!-- Right by the title so it's clear what it edits -->
+        {#if onrename}
+          <button
+            type="button"
+            class="hover:bg-surface-200-800 rounded-base -my-0.5 -ml-1 inline-flex size-7 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
+            title="Rename Project"
+            aria-label="Rename {label}"
+            onclick={() => {
+              editingName = name;
+              editing = true;
+            }}
+          >
+            <PencilIcon class="icon-sm" />
+          </button>
+        {/if}
       </div>
     {/if}
     {#if syncLabel?.tone === 'error'}
@@ -139,20 +154,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <PaletteStrip {colors} height="24px" label={description} />
     {/if}
   </div>
-  {#if onrename && !editing}
-    <button
-      type="button"
-      class="btn-icon hover:preset-tonal-surface"
-      title="Rename Project"
-      aria-label="Rename {label}"
-      onclick={() => {
-        editingName = name;
-        editing = true;
-      }}
-    >
-      <PencilIcon />
-    </button>
-  {/if}
   <!-- Not while renaming, which gets the room -->
   {#if canRemove && !editing}
     <button

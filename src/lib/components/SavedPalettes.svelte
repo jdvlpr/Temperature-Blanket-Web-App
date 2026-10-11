@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import { TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
+  import NameField from '#lib/components/NameField.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
@@ -35,13 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import {
-    CheckIcon,
-    PencilIcon,
-    Share2Icon,
-    Trash2Icon,
-    XIcon,
-  } from '@lucide/svelte';
+  import { PencilIcon, Share2Icon, Trash2Icon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
@@ -204,38 +198,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
               <PaletteStrip {colors} />
-              <div class={[FIELD_GROUP, 'grid-cols-[1fr_auto_auto]']}>
-                <input
-                  type="text"
-                  class="input"
-                  aria-label="Palette name"
-                  autocomplete="off"
-                  maxlength={MAX_SAVED_PALETTE_NAME_LENGTH}
-                  placeholder={getPaletteFallbackName(colors)}
-                  bind:value={editingName}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter') saveRename();
-                    if (e.key === 'Escape') {
-                      e.stopPropagation();
-                      editingId = null;
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  class="btn hover:preset-tonal-surface"
-                  title="Save Name"
-                  onclick={saveRename}
-                >
-                  <CheckIcon />
-                </button>
-                <button
-                  type="button"
-                  class="btn hover:preset-tonal-surface"
-                  title="Cancel"
-                  onclick={() => (editingId = null)}><XIcon /></button
-                >
-              </div>
+              <NameField
+                bind:value={editingName}
+                label="Palette name"
+                maxlength={MAX_SAVED_PALETTE_NAME_LENGTH}
+                placeholder={getPaletteFallbackName(colors)}
+                onsave={saveRename}
+                oncancel={() => (editingId = null)}
+              />
             </div>
           {:else}
             <!-- The name in the label is the real link or button, for keyboards and
@@ -253,30 +223,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span
                   class="flex flex-wrap items-center justify-start gap-x-4 text-xs"
                 >
-                  {#if updateGauge}
+                  <!-- The name with its Rename button right by it, so it's
+                  clear what it edits -->
+                  <span class="inline-flex items-center gap-0.5">
+                    {#if updateGauge}
+                      <button
+                        type="button"
+                        class="cursor-pointer text-left underline"
+                        ><span class="sr-only">Use </span>{label}</button
+                      >
+                    {:else}
+                      <!-- eslint-disable svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
+                      <a
+                        href={getYarnPageURL({
+                          colors,
+                          origin: window.location.origin,
+                          version,
+                        })}
+                        class="underline"
+                        title="Open in Yarn Palette Creator"
+                      >
+                        <span class="sr-only">Open</span>
+                        {label}
+                        <span class="sr-only">in Yarn Palette Creator</span>
+                      </a>
+
+                      <!-- eslint-enable svelte/no-navigation-without-resolve -->
+                    {/if}
+                    <!-- Its click stays here, not choosing the palette -->
                     <button
                       type="button"
-                      class="cursor-pointer text-left underline"
-                      ><span class="sr-only">Use </span>{label}</button
+                      class="hover:bg-surface-200-800 rounded-base -my-1 inline-flex size-6 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
+                      title="Rename Palette"
+                      aria-label="Rename {label}"
+                      onclick={(event) => {
+                        event.stopPropagation();
+                        startRename(palette);
+                      }}
                     >
-                  {:else}
-                    <!-- eslint-disable svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
-                    <a
-                      href={getYarnPageURL({
-                        colors,
-                        origin: window.location.origin,
-                        version,
-                      })}
-                      class="underline"
-                      title="Open in Yarn Palette Creator"
-                    >
-                      <span class="sr-only">Open</span>
-                      {label}
-                      <span class="sr-only">in Yarn Palette Creator</span>
-                    </a>
-
-                    <!-- eslint-enable svelte/no-navigation-without-resolve -->
-                  {/if}
+                      <PencilIcon class="icon-sm" />
+                    </button>
+                  </span>
                   <span>Saved {saved}</span>
                 </span>
               {/snippet}
@@ -284,15 +271,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
             <!-- Centered on the 70px color bar, not the label under it -->
             <div class="flex h-[70px] shrink-0 items-center gap-1">
-              <button
-                type="button"
-                class="btn-icon hover:preset-tonal-surface"
-                title="Rename Palette"
-                aria-label="Rename {label}"
-                onclick={() => startRename(palette)}
-              >
-                <PencilIcon />
-              </button>
               {#if onshare}
                 <button
                   type="button"

@@ -20,7 +20,7 @@ Projects). The name shows on My Projects instead of the location title, and
 syncs like any other change. -->
 
 <script lang="ts">
-  import ProjectNameField from '#lib/components/ProjectNameField.svelte';
+  import NameField from '#lib/components/NameField.svelte';
   import { toast } from '#lib/state/page-state.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
@@ -67,7 +67,7 @@ syncs like any other change. -->
 </script>
 
 {#if editing && id}
-  <ProjectNameField
+  <NameField
     bind:value={name}
     placeholder={title}
     onsave={save}

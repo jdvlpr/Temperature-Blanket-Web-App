@@ -13,7 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Renaming a project (on My Projects, and in the Project menu): the whole
+<!-- Renaming a project (on My Projects, and in the Project menu) or a saved
+palette, so both feel the same: the whole
 name shows as it's edited, wrapping onto more lines as needed, with Cancel and
 Save below. It's still one line of text: Enter saves, and line breaks become
 spaces. -->
@@ -26,11 +27,16 @@ spaces. -->
   let {
     value = $bindable(''),
     placeholder = '',
+    label = 'Project name',
+    maxlength = MAX_SAVED_PROJECT_NAME_LENGTH,
     onsave,
     oncancel,
   }: {
     value?: string;
     placeholder?: string;
+    /** The field's accessible name */
+    label?: string;
+    maxlength?: number;
     onsave: () => void;
     oncancel: () => void;
   } = $props();
@@ -50,11 +56,11 @@ spaces. -->
   <textarea
     class="textarea min-h-11 resize-none overflow-hidden rounded-[min(var(--radius-base),0.75rem)] text-lg leading-snug"
     rows="1"
-    aria-label="Project name"
+    aria-label={label}
     autocomplete="off"
     autofocus
     enterkeyhint="done"
-    maxlength={MAX_SAVED_PROJECT_NAME_LENGTH}
+    {maxlength}
     {placeholder}
     bind:value
     oninput={() => (value = value.replace(/\s*[\r\n]+\s*/g, ' '))}

@@ -54,7 +54,7 @@ test.describe('Saved palettes', () => {
     // Rename
     await list.getByRole('button', { name: 'Rename Test Sunset' }).click();
     await list.getByLabel('Palette name').fill('Test Dusk');
-    await list.getByRole('button', { name: 'Save Name' }).click();
+    await list.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();
 
     // Delete, then undo
