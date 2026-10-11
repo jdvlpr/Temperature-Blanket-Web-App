@@ -354,6 +354,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     />
 
+    <SortMenu
+      colors={gauge.colors}
+      triggerClass={toolbarButtonClass}
+      onsort={(sort) => {
+        const colors = $state.snapshot(gauge.colors);
+        updateGauge({
+          _colors:
+            sort === 'reverse'
+              ? reverseColors(colors)
+              : sort === 'shuffle'
+                ? shuffleColors(colors)
+                : getSortedPalette({
+                    palette: colors,
+                    sortColors: sort,
+                  }),
+        });
+      }}
+    />
+
     <Menu
       positioning={menuPositioning('bottom-start')}
       onSelect={(details) => openColorSource(details.value)}
@@ -388,25 +407,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Menu.Positioner>
       </Portal>
     </Menu>
-
-    <SortMenu
-      colors={gauge.colors}
-      triggerClass={toolbarButtonClass}
-      onsort={(sort) => {
-        const colors = $state.snapshot(gauge.colors);
-        updateGauge({
-          _colors:
-            sort === 'reverse'
-              ? reverseColors(colors)
-              : sort === 'shuffle'
-                ? shuffleColors(colors)
-                : getSortedPalette({
-                    palette: colors,
-                    sortColors: sort,
-                  }),
-        });
-      }}
-    />
 
     <Menu
       positioning={menuPositioning('bottom-start')}
