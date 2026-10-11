@@ -20,6 +20,7 @@ You should have received a copy of the GNU General Public License along with Tem
 <script lang="ts" generics="T extends string">
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
     menuTriggerClass,
   } from '#lib/components/menu-styles.js';
@@ -47,7 +48,7 @@ You should have received a copy of the GNU General Public License along with Tem
   let current = $derived(options.find((option) => option.value === value));
 </script>
 
-<Menu positioning={{ placement: 'bottom-start' }}>
+<Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={menuTriggerClass}>
     <Icon aria-hidden="true" />
     <span>{label}: {current?.short ?? current?.label ?? ''}</span>

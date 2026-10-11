@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
   } from '#lib/components/menu-styles.js';
   import { getMenuDrill } from '#lib/components/menu-drill.svelte.js';
@@ -52,17 +53,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     open: string | null,
     highlight: string,
     menu: () => { setHighlightedValue: (value: string) => void },
+    row: HTMLElement,
   ) {
     if (!drill) return;
+    const content = row.closest<HTMLElement>(
+      '[data-scope="menu"][data-part="content"]',
+    );
+    if (content) drill.hold(content);
     drill.open = open;
-    tick().then(() => menu().setHighlightedValue(highlight));
+    // The items start at the top, not where the list before was scrolled to
+    tick().then(() => {
+      if (content) content.scrollTop = 0;
+      menu().setHighlightedValue(highlight);
+    });
   }
 
   // Choosing an item, by pointer or keyboard, sends it this event
-  function onChoose(handler: () => void) {
+  function onChoose(handler: (el: HTMLElement) => void) {
     return (el: HTMLElement) => {
-      el.addEventListener('menu:select', handler);
-      return () => el.removeEventListener('menu:select', handler);
+      const listener = () => handler(el);
+      el.addEventListener('menu:select', listener);
+      return () => el.removeEventListener('menu:select', listener);
     };
   }
 </script>
@@ -92,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet element(attributes)}
             <div
               {...attributes}
-              {@attach onChoose(() => go(null, label, menu))}
+              {@attach onChoose((el) => go(null, label, menu, el))}
             >
               <ChevronLeftIcon class="icon-sm shrink-0" aria-hidden="true" />
               <span class="flex-1">Back</span>
@@ -108,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet element(attributes)}
             <div
               {...attributes}
-              {@attach onChoose(() => go(label, 'back', menu))}
+              {@attach onChoose((el) => go(label, 'back', menu, el))}
             >
               {@render row()}
             </div>
@@ -119,12 +130,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Menu.Context>
 {:else}
   <Menu
-    positioning={{
-      placement: 'right-start',
+    positioning={menuPositioning('right-start', {
       flip: ['left-start', 'bottom-start'],
       overlap: true,
       gutter: 4,
-    }}
+    })}
   >
     <!-- Filled like a highlighted item while its submenu is open, so it's clear
   which row the submenu belongs to -->

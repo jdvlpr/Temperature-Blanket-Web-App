@@ -22,12 +22,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
     menuTriggerClass,
   } from '#lib/components/menu-styles.js';
   import { resolve } from '$app/paths';
   import MenuSubmenu from '#lib/components/buttons/MenuSubmenu.svelte';
-  import { provideMenuDrill } from '#lib/components/menu-drill.svelte.js';
+  import {
+    drillPositionerClass,
+    provideMenuDrill,
+  } from '#lib/components/menu-drill.svelte.js';
   import {
     confirmGaugeChange,
     gaugeChangeState,
@@ -48,8 +52,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/gauge-utils.svelte.js';
   import {
     ArrowDown10Icon,
-    ArrowDownNarrowWideIcon,
-    ArrowDownWideNarrowIcon,
     ArrowUp01Icon,
     BracketsIcon,
     CheckIcon,
@@ -285,9 +287,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <Menu
-  positioning={{ placement: 'bottom-start' }}
+  positioning={menuPositioning('bottom-start')}
   onOpenChange={({ open }) => {
-    if (!open) drill.open = null;
+    if (!open) drill.reset();
   }}
 >
   <Menu.Trigger
@@ -300,8 +302,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
-    <Menu.Positioner>
-      <Menu.Content class={menuContentClass}>
+    <Menu.Positioner class={drillPositionerClass}>
+      <Menu.Content class="{menuContentClass} pointer-events-auto">
         {#if options}
           <MenuSubmenu
             label="Auto ranges"

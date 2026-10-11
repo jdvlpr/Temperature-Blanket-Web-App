@@ -57,6 +57,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShuffleIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
+  import {
+    menuContentClass,
+    menuPositioning,
+  } from '#lib/components/menu-styles.js';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let {
@@ -351,7 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
 
     <Menu
-      positioning={{ placement: 'bottom-start' }}
+      positioning={menuPositioning('bottom-start')}
       onSelect={(details) => openColorSource(details.value)}
     >
       <Menu.Trigger
@@ -365,9 +369,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
-          <Menu.Content
-            class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
-          >
+          <Menu.Content class={menuContentClass}>
             {#each colorSources as source (source.value)}
               <Menu.Item
                 value={source.value}
@@ -407,7 +409,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
 
     <Menu
-      positioning={{ placement: 'bottom-start' }}
+      positioning={menuPositioning('bottom-start')}
       onSelect={(details) => openPaletteOutput(details.value)}
     >
       <!-- Not just "Save": the Project Planner's top bar has a Save for the project -->
@@ -422,9 +424,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
-          <Menu.Content
-            class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
-          >
+          <Menu.Content class={menuContentClass}>
             {#each availablePaletteOutputs as output, index (output.value)}
               <!-- Saving keeps it here; the rest take it elsewhere -->
               {#if index === 1}

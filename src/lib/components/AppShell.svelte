@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   $effect(() => {
-    sidebarWidth;
+    void sidebarWidth;
     debounce(() => {
       if (weatherChart?.current && weather.data.length) weatherChart.update();
     }, 101);
@@ -79,6 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
       stickyHeader && 'lg:py-2',
     ]}
+    data-sticky-bar
     id="top-navbar"
   >
     <div

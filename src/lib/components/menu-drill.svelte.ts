@@ -25,6 +25,8 @@ const KEY = Symbol('menu-drill');
  */
 export class MenuDrill {
   open: string | null = $state(null);
+  /** The menu's positioner while its height is held */
+  #held: HTMLElement | null = null;
   #narrow = new MediaQuery('(max-width: 639px)');
 
   /** Whether submenus open in the menu's place */
@@ -36,7 +38,37 @@ export class MenuDrill {
   get showsMenu() {
     return !this.inPlace || this.open === null;
   }
+
+  /**
+   * As a submenu first opens in the menu's place, holds the menu's positioner
+   * (with `drillPositionerClass`) at the menu's height until it closes: a
+   * shorter submenu would otherwise shrink it, and its positioning could flip
+   * it to the button's other side. The menu itself still fits its items,
+   * against the button, and the space it leaves is invisible and lets taps
+   * through. Set on the element, not by a `style` prop, which would replace
+   * the styles the positioning sets on it (its z-index and room).
+   */
+  hold(content: HTMLElement) {
+    const positioner = content.parentElement;
+    if (this.#held || !positioner) return;
+    const height = content.offsetHeight;
+    positioner.style.minHeight = `min(${height}px, var(--available-height, ${height}px))`;
+    this.#held = positioner;
+  }
+
+  /** When the menu closes */
+  reset() {
+    this.open = null;
+    this.#held?.style.removeProperty('min-height');
+    this.#held = null;
+  }
 }
+
+/** For the positioner of a menu with submenus: its content sits against the
+ * button (at the bottom, when the menu opens above it) and only it takes taps;
+ * the content needs `pointer-events-auto` */
+export const drillPositionerClass =
+  'pointer-events-none flex flex-col has-[>[data-placement^=top]]:justify-end';
 
 /** For a menu with submenus (MenuSubmenu), in its component */
 export const provideMenuDrill = () => setContext(KEY, new MenuDrill());

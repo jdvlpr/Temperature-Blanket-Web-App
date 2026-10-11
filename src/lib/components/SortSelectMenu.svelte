@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts" generics="T extends string">
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
     menuTriggerClass,
   } from '#lib/components/menu-styles.js';
@@ -75,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 {/snippet}
 
-<Menu positioning={{ placement: 'bottom-start' }}>
+<Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={menuTriggerClass} {disabled}>
     <!-- Flipped upside down when reversed; screen readers hear "reversed" -->
     <ArrowDownWideNarrowIcon

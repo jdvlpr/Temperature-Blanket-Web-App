@@ -514,6 +514,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
                     bind:this={topBar}
+                    data-sticky-bar
                     class={[
                       'bg-surface-50 dark:bg-surface-950 sticky top-0 z-20 mb-0',
                       grabbable &&

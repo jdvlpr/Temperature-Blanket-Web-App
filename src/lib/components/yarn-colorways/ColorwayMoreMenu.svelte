@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
   } from '#lib/components/menu-styles.js';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
@@ -97,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Menu
-  positioning={{ placement: 'bottom-end' }}
+  positioning={menuPositioning('bottom-end')}
   onSelect={(details) => {
     const copy = copies.find((c) => c.value === details.value);
     if (copy) copyColorwayText(copy.text);

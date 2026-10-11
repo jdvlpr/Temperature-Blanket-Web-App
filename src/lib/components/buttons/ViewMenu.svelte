@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
     menuTriggerClass,
   } from '#lib/components/menu-styles.js';
@@ -59,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<Menu positioning={{ placement: 'bottom-start' }}>
+<Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={menuTriggerClass}>
     <current.icon size={18} aria-hidden="true" />
     <span>View: {current.label}</span>

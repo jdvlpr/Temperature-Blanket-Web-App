@@ -60,7 +60,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Portal,
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
-  import { menuItemClass } from '#lib/components/menu-styles.js';
+  import {
+    menuContentClass,
+    menuPositioning,
+    menuItemClass,
+  } from '#lib/components/menu-styles.js';
   import { yarnBall } from '@lucide/lab';
   import { onMount, tick, untrack } from 'svelte';
 
@@ -571,7 +575,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </Popover>
 
                 <Menu
-                  positioning={{ placement: 'top' }}
+                  positioning={menuPositioning('top')}
                   onSelect={(details) =>
                     palette.setStyle(details.value as PaletteStyle)}
                 >
@@ -590,9 +594,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </Menu.Trigger>
                   <Portal>
                     <Menu.Positioner>
-                      <Menu.Content
-                        class="bg-surface-100-900 z-9999 max-w-[calc(100vw-2rem)]"
-                      >
+                      <Menu.Content class={menuContentClass}>
                         {#each PALETTE_STYLES as style (style)}
                           <Menu.Item value={style} class={menuItemClass}>
                             <div class="flex min-w-0 flex-1 flex-col text-left">

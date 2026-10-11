@@ -30,6 +30,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ImageIcon,
     TableIcon,
   } from '@lucide/svelte';
+  import {
+    menuContentClass,
+    menuPositioning,
+  } from '#lib/components/menu-styles.js';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let {
@@ -66,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Menu
-  positioning={{ placement: 'top' }}
+  positioning={menuPositioning('top')}
   class="m-0 p-0"
   onSelect={(details) => actions[details.value]?.()}
 >
@@ -78,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
   <Portal>
     <Menu.Positioner>
-      <Menu.Content class="bg-surface-100-900 z-9999">
+      <Menu.Content class={menuContentClass}>
         {#if menuList.includes('pdf')}
           <Menu.Item value="pdf" class={ITEM} title="Download PDF File">
             <FileTextIcon />

@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import {
     menuContentClass,
+    menuPositioning,
     menuItemClass,
     menuTriggerClass,
   } from '#lib/components/menu-styles.js';
@@ -109,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <Menu
-  positioning={{ placement }}
+  positioning={menuPositioning(placement)}
   onOpenChange={(details) => (open = details.open)}
   onSelect={(details) => {
     lastChosen = details.value;
