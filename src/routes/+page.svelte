@@ -275,21 +275,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h2 class="h1 text-gradient mb-0">Weather Data + Art</h2>
             <p>
               Get historical weather data, choose yarn colors, and visualize
-              your crochet or knitting project.
-            </p>
-
-            <div
-              class="space-around flex flex-col items-center justify-center gap-x-4 gap-y-2 text-sm"
-              data-sveltekit-preload-data="hover"
-            >
-              <a
+              your crochet or knitting project. <a
                 href="/blog/what-is-a-temperature-blanket"
                 class="link whitespace-pre-wrap"
                 rel="noreferrer"
               >
                 What's a Temperature Blanket?</a
               >
-            </div>
+            </p>
           </div>
         </div>
 
