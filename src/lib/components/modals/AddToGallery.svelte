@@ -72,6 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let weatherAbort: AbortController | undefined;
   // Puts back the units and seasons the project's loading changed
   let restorePreferences: (() => void) | undefined;
+  // Closed, maybe while the project was still loading
+  let destroyed = false;
 
   async function getWeather() {
     if (weather.rawData.length) return (preparing = null);
@@ -99,8 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   async function loadProject() {
     if (!href) return true;
     try {
-      restorePreferences = await loadInPlace(href);
-      return true;
+      restorePreferences = await loadInPlace(href, () => destroyed);
+      if (destroyed) restorePreferences?.();
+      return !destroyed;
     } catch {
       failed = 'project';
       preparing = 'error';
@@ -110,6 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const onpagehide = () => restorePreferences?.();
   onDestroy(() => {
+    destroyed = true;
     weatherAbort?.abort();
     restorePreferences?.();
     window.removeEventListener('pagehide', onpagehide);

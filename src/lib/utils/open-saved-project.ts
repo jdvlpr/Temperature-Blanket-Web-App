@@ -98,12 +98,25 @@ function resetProjectState(id: string | null) {
   project.status.error = { code: null, message: '' };
 }
 
+// The loadInPlace() under way: the next waits for it, so a dialog closed
+// while its project loads can't have that project land over the next one's
+let loading: Promise<unknown> = Promise.resolve();
+
 /**
  * Loads a saved project behind a dialog, in place of the one loaded before.
  * It needs the units and seasons preferences set to the project's while it
- * shows; the returned function puts back the ones from before.
+ * shows; the returned function puts back the ones from before. If the dialog
+ * closed meanwhile (`closed`), it puts them back itself and returns nothing.
  */
-export async function loadInPlace(href: string) {
+export function loadInPlace(href: string, closed: () => boolean) {
+  const load = loading.then(() =>
+    closed() ? undefined : loadNow(href, closed),
+  );
+  loading = load.catch(() => {});
+  return load;
+}
+
+async function loadNow(href: string, closed: () => boolean) {
   const id = new URL(href).searchParams.get('project');
   // Only for this tab: a project open in another one keeps its units (and
   // doesn't record the change in its history)
@@ -132,7 +145,8 @@ export async function loadInPlace(href: string) {
     project.status.loading = false;
     loadedHere = { id, ...preferencesSnapshot() };
   }
-  return restore;
+  if (!closed()) return restore;
+  restore();
 }
 
 /**
