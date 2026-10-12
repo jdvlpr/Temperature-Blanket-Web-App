@@ -213,6 +213,12 @@ export class LocationsState implements LocationsStateType {
     }
   }
 
+  /** Back to a new project's one empty location, before another project loads */
+  reset(): void {
+    this.all = [];
+    this.add();
+  }
+
   remove(uuid: string) {
     this.all = this.all.filter((location) => location.uuid !== uuid);
     this.all.map((location, i) => {

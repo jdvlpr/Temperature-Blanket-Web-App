@@ -43,6 +43,22 @@ import {
 import { getWeatherTargets } from '#lib/utils/weather-utils.svelte.js';
 import * as SunCalc from 'suncalc';
 
+const defaultWeatherSource = (): WeatherSourceOptions => ({
+  name: 'Open-Meteo',
+  /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
+  useSecondary: false,
+  settings: {
+    openMeteo: {
+      model: 'auto',
+    },
+    meteoStat: {
+      model: true,
+    },
+  },
+  wasLoadedFromStorage: false,
+  wasLoadedFromURLHash: false,
+});
+
 class WeatherClass {
   // ***************
   //    Weather Data
@@ -263,21 +279,7 @@ class WeatherClass {
   //    User Settings
   // ***************
 
-  source: WeatherSourceOptions = $state({
-    name: 'Open-Meteo',
-    /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
-    useSecondary: false,
-    settings: {
-      openMeteo: {
-        model: 'auto',
-      },
-      meteoStat: {
-        model: true,
-      },
-    },
-    wasLoadedFromStorage: false,
-    wasLoadedFromURLHash: false,
-  });
+  source: WeatherSourceOptions = $state(defaultWeatherSource());
 
   grouping: 'day' | 'week' = $state('day');
 
@@ -331,6 +333,16 @@ class WeatherClass {
   setRawData(value: WeatherDay[]) {
     this.currentIndex = 0;
     this.rawData = value;
+  }
+
+  /** Back to a new project's weather, before another project loads */
+  reset() {
+    this.setRawData([]);
+    this.source = defaultWeatherSource();
+    this.grouping = 'day';
+    this.monthGroupingStartDay = 1;
+    this.isUserEdited = false;
+    this.wasLoadedFromStorage = false;
   }
 
   /**

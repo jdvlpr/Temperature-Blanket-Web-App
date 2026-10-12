@@ -302,7 +302,9 @@ test.describe('Gallery pages from accounts', () => {
   }) => {
     await signIn(page, request, uniqueEmail('gallery-in-place'));
 
-    // Two saved projects with their weather kept (edited, so it's always loaded)
+    // Two saved projects with their weather kept (edited, so it's always
+    // loaded). The first has more in it than the second, to tell if any of
+    // it is left behind when the second loads over it.
     await page.goto('/my-projects');
     const day = (date: string, t: number) => ({
       location: 0,
@@ -314,12 +316,13 @@ test.describe('Gallery pages from accounts', () => {
       snow: { metric: 0, imperial: 0 },
       dayt: { metric: 43_200, imperial: 43_200 },
     });
-    const saved = (id: string, name: string) => {
+    const saved = (id: string, name: string, days: number, extra: string) => {
+      const to = `2025-01-0${days}`;
       const href = new URL(
-        `/?project=${id}#l=3652462'2025010120250103&temp=ff0000(0'15)0000ff(15'30)!mlh2t&u=m`,
+        `/?project=${id}#l=3652462'20250101${to.replaceAll('-', '')}&temp=ff0000(0'15)0000ff(15'30)!mlh2t${extra}&u=m`,
         page.url(),
       ).href;
-      const title = 'Quito from 2025-01-01 to 2025-01-03';
+      const title = `Quito from 2025-01-01 to ${to}`;
       return {
         project: {
           name,
@@ -335,17 +338,15 @@ test.describe('Gallery pages from accounts', () => {
               lng: '-78.52495',
               elevation: 2800,
               from: '2025-01-01',
-              to: '2025-01-03',
+              to,
               duration: 'c',
               source: 'Meteostat',
             },
           ],
           title,
-          weatherData: [
-            day('2025-01-01', 12),
-            day('2025-01-02', 14),
-            day('2025-01-03', 16),
-          ],
+          weatherData: Array.from({ length: days }, (_, i) =>
+            day(`2025-01-0${i + 1}`, 12 + 2 * i),
+          ),
           weatherSource: { name: 'Meteostat', useSecondary: false },
         },
         item: {
@@ -357,8 +358,11 @@ test.describe('Gallery pages from accounts', () => {
     };
     const first = String(Date.now());
     const second = String(Date.now() + 1);
-    const a = saved(first, 'First test');
-    const b = saved(second, 'Second test');
+    // A rain gauge, week grouping, and rows with season targets
+    const firstExtra =
+      "&prcp=ff0000(0'5)0000ff(5'10)!mlh2t&rows=tmax'tmin'tavg'tmax(123)&w=1";
+    const a = saved(first, 'First test', 2, firstExtra);
+    const b = saved(second, 'Second test', 3, '&rows=tavg(300)');
     await idbSet(page, {
       [`p_${first}`]: a.project,
       [`p_${second}`]: b.project,
@@ -423,25 +427,51 @@ test.describe('Gallery pages from accounts', () => {
     await expect(dialog).toHaveCount(0);
     expect(sent).toHaveLength(0);
 
-    // Another one: My Projects loads again first, and opens it straight away
+    // Another one opens over the page too: it doesn't load again
+    // (gone if the page loads again)
+    await page.evaluate(() => Object.assign(window, { __notReloaded: true }));
+    const send = async () => {
+      await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
+      await expect(page).toHaveURL(/\/my-projects$/);
+      await dialog
+        .getByRole('button', { name: /Yes, Send to Gallery/ })
+        .click();
+      await expect(dialog).toContainText(
+        'The project gallery webpage has been created.',
+      );
+      await page.keyboard.press('Escape');
+      await expect(dialog).toHaveCount(0);
+    };
     await addToGallery('Second test');
-    await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
-    await expect(page).toHaveURL(/\/my-projects$/);
-    await dialog.getByRole('button', { name: /Yes, Send to Gallery/ }).click();
-    await expect(dialog).toContainText(
-      'The project gallery webpage has been created.',
-    );
+    await send();
     expect(sent).toHaveLength(1);
     const projectUrl = new URL(String(sent[0].project_url));
     expect(projectUrl.searchParams.get('project')).toBe(second);
+    // Only its own: nothing of the first one's is left
     expect(projectUrl.hash).toContain("l=3652462'2025010120250103");
+    expect(projectUrl.hash).toContain('&rows=tavg(300)');
+    expect(projectUrl.hash).not.toContain('prcp=');
+    expect(projectUrl.hash).not.toContain('&w=');
+    expect(projectUrl.hash).not.toContain('&n=');
     expect(sent[0].project_name).toBe('Second test');
     expect(sent[0].total_days).toBe(3);
 
     // Its row says so, without leaving the page
-    await page.keyboard.press('Escape');
     await expect(menuFor('Second test')).toHaveText(/: In the gallery\s*$/);
     await expect(menuFor('First test')).toHaveText(/Link only\s*$/);
+
+    // And back to the first, all of it
+    await addToGallery('First test');
+    await send();
+    expect(sent).toHaveLength(2);
+    const firstUrl = new URL(String(sent[1].project_url));
+    expect(firstUrl.searchParams.get('project')).toBe(first);
+    expect(firstUrl.hash).toContain("l=3652462'2025010120250102");
+    expect(firstUrl.hash).toContain("prcp=ff0000(0'5)0000ff(5'10)");
+    expect(firstUrl.hash).toContain("&rows=tmax'tmin'tavg'tmax(123)");
+    expect(firstUrl.hash).toContain('&w=1');
+    expect(sent[1].total_days).toBe(2);
+    expect(await page.evaluate(() => '__notReloaded' in window)).toBe(true);
   });
 
   test('an owner gets a page listing the gallery pages they include', async ({

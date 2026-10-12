@@ -13,21 +13,18 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { account, loadAccountSummary } from '#lib/accounts/summary.svelte.js';
+import { gauges } from '#lib/state/gauges-state.svelte.js';
 import { locations } from '#lib/state/location-state.svelte.js';
 import { dialog } from '#lib/state/page-state.svelte.js';
 import { previews } from '#lib/state/preview-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
 import { projectNameFromHash } from '#lib/utils/project-name-link.js';
-import {
-  GALLERY_PARAM,
-  galleryRequestLink,
-  parseGalleryRequest,
-  type GalleryRequest,
-} from '#lib/utils/gallery-request.js';
+import { timestampFromLegacyProjectId } from '#lib/utils/project-id-utils.js';
+import type { GalleryRequest } from '#lib/utils/gallery-request.js';
 
 /**
  * Loads a project into the app's state: the one in the address bar on the
@@ -57,9 +54,8 @@ export async function loadSavedProject(
   if (locations.allValid) project.status.wasLoaded = true;
 }
 
-// The one saved project loaded on this page by loadInPlace(), with the units
-// and seasons it set. The state can't be emptied again, so a different
-// project needs a fresh page.
+// The saved project last loaded on this page by loadInPlace(), with the
+// units and seasons it set
 let loadedHere: {
   id: string | null;
   units: typeof preferences.value.units;
@@ -68,10 +64,6 @@ let loadedHere: {
 
 /** Whether a project was loaded on this page behind a dialog */
 export const loadedInPlace = () => loadedHere !== null;
-
-/** Whether this saved project can be loaded here: no other one was */
-export const canLoadInPlace = (id: string) =>
-  loadedHere === null || loadedHere.id === id;
 
 // (a plain copy: the seasons are a reactive proxy)
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value));
@@ -90,10 +82,26 @@ const setPreferences = ({
     preferences.value.seasons = seasons;
 };
 
+/** Empties the app's state of the last project, as a fresh page has it */
+function resetProjectState(id: string | null) {
+  weather.reset();
+  locations.reset();
+  gauges.reset();
+  previews.reset();
+  project.createdAt = new Date(
+    (id && timestampFromLegacyProjectId(id)) ?? Date.now(),
+  ).toISOString();
+  project.linkName = '';
+  project.gallery = { href: '', title: '' };
+  project.status.loading = true;
+  project.status.wasLoaded = false;
+  project.status.error = { code: null, message: '' };
+}
+
 /**
- * Loads a saved project behind a dialog, once per page. It needs the units
- * and seasons preferences set to the project's while it shows; the returned
- * function puts back the ones from before.
+ * Loads a saved project behind a dialog, in place of the one loaded before.
+ * It needs the units and seasons preferences set to the project's while it
+ * shows; the returned function puts back the ones from before.
  */
 export async function loadInPlace(href: string) {
   const id = new URL(href).searchParams.get('project');
@@ -107,13 +115,16 @@ export async function loadInPlace(href: string) {
   };
   if (loadedHere?.id === id) setPreferences(loadedHere);
   else {
-    // Taken even if loading fails partway: the state isn't empty any more
+    // Set first: from here on the state is no longer a fresh page's
     loadedHere = { id, ...before };
     try {
+      resetProjectState(id);
       await loadSavedProject(href, { quiet: true });
       // As the project page does for a link naming no preview (Previews.svelte)
       if (!previews.activeId) await previews.load('rows');
     } catch (error) {
+      // Half loaded: the next try starts over
+      loadedHere = { id: null, ...before };
       restore();
       throw error;
     }
@@ -124,25 +135,11 @@ export async function loadInPlace(href: string) {
   return restore;
 }
 
-// My Projects' address for a project it opens Send to Gallery for, when the
-// page has another project loaded already: ?gallery= plus its ID
-export const GALLERY_FOR_PARAM = 'for';
-
 /**
  * Opens Send to Gallery for a saved project over the current page (My
- * Projects), which loads the project behind it. If another project was loaded
- * here already, My Projects loads again first, opening it straight away.
+ * Projects), which loads the project behind it.
  */
 export async function openGalleryDialog(href: string, request: GalleryRequest) {
-  const id = new URL(href).searchParams.get('project') ?? '';
-  if (!canLoadInPlace(id)) {
-    const url = new URL(window.location.href);
-    url.search = '';
-    url.hash = '';
-    url.searchParams.set(GALLERY_FOR_PARAM, id);
-    window.location.assign(galleryRequestLink(url.href, request));
-    return;
-  }
   const { default: AddToGallery } =
     await import('#lib/components/modals/AddToGallery.svelte');
   dialog.trigger({
@@ -155,24 +152,4 @@ export async function openGalleryDialog(href: string, request: GalleryRequest) {
           : 'Send to Project Gallery',
     },
   });
-}
-
-/**
- * On My Projects: the Send to Gallery its address asks for (see
- * openGalleryDialog), taken out of the address so it opens once.
- */
-export async function openGalleryDialogFromURL() {
-  const url = new URL(window.location.href);
-  const request = parseGalleryRequest(url.searchParams.get(GALLERY_PARAM));
-  const id = url.searchParams.get(GALLERY_FOR_PARAM);
-  if (!url.searchParams.has(GALLERY_PARAM) && !id) return;
-  url.searchParams.delete(GALLERY_PARAM);
-  url.searchParams.delete(GALLERY_FOR_PARAM);
-  history.replaceState(history.state, '', url);
-  if (!request || !id) return;
-  // Sent from the account: the dialog needs to know it's signed in, and on a
-  // fresh page the header may not have read that yet
-  if (__ACCOUNTS_ENABLED__ && !account.summary) loadAccountSummary();
-  const item = (await ProjectStorage.getIndex()).find((i) => i.id === id);
-  if (item) await openGalleryDialog(item.meta.href, request);
 }

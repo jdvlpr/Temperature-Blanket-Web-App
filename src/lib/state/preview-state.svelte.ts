@@ -272,11 +272,31 @@ class PreviewsState {
 
     const entry = this.all[index];
     const instance = 'importFn' in entry ? await entry.importFn() : entry;
+    // Its settings before any project's, for reset()
+    if (!this.#defaults.has(id))
+      this.#defaults.set(id, $state.snapshot(instance.settings));
 
     this.all[index] = instance;
     this.activeId = id;
 
     return instance;
+  }
+
+  #defaults = new Map<string, unknown>();
+
+  /**
+   * Back to no preview, each with its settings from before any project's,
+   * before another project loads (a link only sets the settings it names)
+   */
+  reset() {
+    this.activeId = undefined;
+    for (const preview of this.all) {
+      const defaults = this.#defaults.get(preview.id);
+      if ('importFn' in preview || !defaults) continue;
+      preview.settings = structuredClone(defaults) as typeof preview.settings;
+      preview.svg = null;
+      if ('extraColorDetails' in preview) preview.extraColorDetails = {};
+    }
   }
 }
 

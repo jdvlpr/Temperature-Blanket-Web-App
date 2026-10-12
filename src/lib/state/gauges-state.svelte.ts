@@ -192,6 +192,14 @@ class GaugesState {
     this.activeGaugeId = newGauge.id;
   }
 
+  /** Back to a new project's (none), before another project loads */
+  reset(): void {
+    this.allCreated = [];
+    this.allAvailable = [];
+    this.activeGaugeId = '';
+    this.allowScrollToActiveGaugeButton = true;
+  }
+
   remove(id: string): void {
     if (id === 'temp') return; // don't allow deleting the temperature gauge
     this.allCreated = this.allCreated?.filter((gauge) => gauge.id !== id);
