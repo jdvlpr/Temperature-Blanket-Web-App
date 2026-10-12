@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { isPrimary = false } = $props();
 
-  // Already sent: a link to its gallery page instead, as in the Project menu
+  // Already published: a link to its gallery page instead, as in the Project menu
   const hasGalleryPage = $derived(
     Boolean(
       project.gallery.href &&
@@ -60,11 +60,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: AddToGallery,
         },
-        options: { title: 'Send to Project Gallery' },
+        options: { title: 'Publish to Gallery' },
       })}
-    title="Show Send to Gallery Modal"
+    title="Publish a snapshot of this project to the gallery"
   >
     <SendIcon />
-    Send to Project Gallery
+    Publish to Gallery
   </button>
 {/if}

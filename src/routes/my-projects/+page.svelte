@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Everything someone has saved, in one place. Signed in, projects, palettes
-and the Trash sync to the account, and each project and palette says who can
-see it: only people with its link, or everyone in the gallery. -->
+and the Trash sync to the account, and each project and palette can be
+published to the gallery as a snapshot, with the account's name or without. -->
 
 <script lang="ts">
   import { LIST_ENDS } from '#lib/constants/class-constants.js';
@@ -78,7 +78,7 @@ see it: only people with its link, or everyone in the gallery. -->
     palette: { id: string },
     colors: Color[],
     label: string,
-    options: { showOwner?: boolean; replace?: GalleryPage } = {},
+    options: { replace?: GalleryPage } = {},
   ) {
     dialog.trigger({
       type: 'component',
@@ -88,12 +88,12 @@ see it: only people with its link, or everyone in the gallery. -->
           paletteId: palette.id,
           colors,
           name: label,
-          showOwner: options.replace?.showOwner ?? options.showOwner,
+          showOwner: options.replace?.showOwner,
           replacePostId: options.replace?.postId,
         },
       },
       options: {
-        title: options.replace ? 'Update Gallery Page' : 'Share to the Gallery',
+        title: options.replace ? 'Update Snapshot' : 'Publish to Gallery',
       },
     });
   }
@@ -159,14 +159,14 @@ see it: only people with its link, or everyone in the gallery. -->
         {/if}
       </p>
 
-      <!-- Signed in: what "with my name" shows, and where those pages are listed -->
+      <!-- Signed in: what Show My Name shows, and where those pages are listed -->
       {#if browser && signedIn && galleryPages.shown}
         <p
           class="text-surface-700-300 -mt-6 text-center text-sm"
           data-testid="gallery-name-status"
         >
           {#if ownerName}
-            Those in the gallery with your name say “By {ownerName}”.
+            Published ones that show your name say “By {ownerName}”.
             {#if anyWithName && galleryPages.publicId}
               <a
                 href={resolve('/gallery/by/[ownerId]', {
@@ -182,8 +182,10 @@ see it: only people with its link, or everyone in the gallery. -->
               >
             {/if}
           {:else}
-            To show your name on those in the gallery, add a display name on
-            your <a href={resolve('account')} class="link">Account page</a>.
+            To show your name on published ones, add a display name on your <a
+              href={resolve('account')}
+              class="link">Account page</a
+            >.
           {/if}
         </p>
       {/if}
@@ -243,8 +245,7 @@ see it: only people with its link, or everyone in the gallery. -->
                   changedSince={Boolean(
                     page && palette.updatedAt > page.publishedAt,
                   )}
-                  onadd={(showOwner) =>
-                    sharePalette(palette, colors, label, { showOwner })}
+                  onadd={() => sharePalette(palette, colors, label)}
                   onupdate={(old) =>
                     sharePalette(palette, colors, label, { replace: old })}
                 />

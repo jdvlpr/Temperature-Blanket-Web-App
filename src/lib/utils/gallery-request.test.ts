@@ -14,7 +14,7 @@ describe('galleryRequestLink', () => {
 
   it('round-trips each request', () => {
     for (const request of [
-      { action: 'add', showOwner: false },
+      { action: 'add' },
       { action: 'add', showOwner: true },
       { action: 'replace', postId: 4521 },
     ] as const) {
@@ -27,6 +27,14 @@ describe('galleryRequestLink', () => {
 });
 
 describe('parseGalleryRequest', () => {
+  it('leaves the name to the last choice, unless the link asks for it', () => {
+    expect(parseGalleryRequest('add')).toEqual({ action: 'add' });
+    expect(parseGalleryRequest('named')).toEqual({
+      action: 'add',
+      showOwner: true,
+    });
+  });
+
   it('ignores missing and unknown values', () => {
     for (const value of [null, undefined, '', 'yes', '0', '-3', '1.5', '12a'])
       expect(parseGalleryRequest(value)).toBeNull();

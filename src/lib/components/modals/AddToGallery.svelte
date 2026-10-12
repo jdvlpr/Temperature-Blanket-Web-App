@@ -13,12 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Sends the open project to the Project Gallery. It shows the project as
-its gallery card will (preview, name, place and dates, and "By" with the
-account's name), says plainly what's shared, then sends it in place and links
-to the new page. A project already in the gallery shows its page first, with
-Update for the account's own pages. From My Projects, the saved project loads
-behind the dialog first (with its weather, when that isn't kept with it). -->
+<!-- Publishes the open project to the Project Gallery: a snapshot of it as
+it is now. It shows the project as its gallery card will (preview, name,
+place and dates, and "By" with the account's name), then publishes it in place
+and links to the new page. A project already published shows its page first,
+with Update Snapshot for the account's own pages and Publish Again for
+others. From My Projects, the saved project loads behind the dialog first
+(with its weather, when that isn't kept with it). -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -49,6 +50,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     ExternalLinkIcon,
     LinkIcon,
     LoaderCircleIcon,
+    RefreshCwIcon,
     SendIcon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
@@ -77,7 +79,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     weather:
       "Couldn't get the weather data for this project. Please try again.",
     edited:
-      "This project's edited weather data isn't saved with it. Open the project to send it to the gallery.",
+      "This project's edited weather data isn't saved with it. Open the project to publish it.",
   };
   const preparingText = $derived(
     preparing === 'error'
@@ -152,9 +154,11 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
   // The page this one replaces, once it's known to be the account's
   let replacePostId = $state<number | undefined>();
   // The account's newest page of this project, which Update replaces
-  let accountPage = $state<{ postId: number; showOwner?: boolean } | null>(
-    null,
-  );
+  let accountPage = $state<{
+    postId: number;
+    showOwner?: boolean;
+    publishedAt: number;
+  } | null>(null);
 
   // The page it has already: the account's, or one sent since the page opened
   const existingHref = $derived(
@@ -172,8 +176,8 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     null,
   );
 
-  // Already in the gallery (and not asked from My Projects for a new one),
-  // until Update or Send a New Page is chosen
+  // Already published (and not asked from My Projects for a new one), until
+  // Update Snapshot or Publish Again is chosen
   let showExisting = $state(true);
   const view = $derived(
     preparing
@@ -205,7 +209,8 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     const gallery = await getGalleryPages();
     if (!gallery?.publishing) return;
     showOwner = gallery.settings.showOwnerDefault;
-    if (request?.action === 'add') showOwner = request.showOwner;
+    if (request?.action === 'add' && request.showOwner !== undefined)
+      showOwner = request.showOwner;
     if (request?.action === 'replace') {
       const old = gallery.posts.find((post) => post.postId === request.postId);
       if (old) {
@@ -218,23 +223,34 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
         (post) => post.projectId === project.id && post.kind !== 'palette',
       )
       .sort((a, b) => b.publishedAt - a.publishedAt)[0];
-    if (own) accountPage = { postId: own.postId, showOwner: own.showOwner };
+    if (own)
+      accountPage = {
+        postId: own.postId,
+        showOwner: own.showOwner,
+        publishedAt: own.publishedAt,
+      };
     if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
   }
 
-  // Update: a new page of the project as it is now, in place of the old one
+  // Update Snapshot: a new page of the project as it is now, in place of the
+  // old one, showing the name or not as the old one did
   function update() {
     if (!accountPage) return;
     replacePostId = accountPage.postId;
     showOwner = accountPage.showOwner ?? showOwner;
     showExisting = false;
+    void submit();
   }
 
-  function sendNew() {
+  // Publish Again (a page that isn't the account's): another page beside it
+  function publishAgain() {
     replacePostId = undefined;
     showExisting = false;
   }
+
+  const publishedOn = (time: number) =>
+    new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
 
   const days = $derived(weather.rawData.length);
   const missingDays = $derived(weather.missingDaysCount());
@@ -255,8 +271,8 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
   let step = $state<'image' | GallerySendStep | null>(null);
   const STEP_TEXT = {
     image: 'Drawing the preview image…',
-    sending: 'Sending to the gallery… This can take a minute.',
-    'removing-old': 'Removing the old gallery page…',
+    sending: 'Publishing… This can take a minute.',
+    'removing-old': 'Removing the old snapshot…',
   };
   let problem = $state<Exclude<GallerySendResult, { status: 'sent' }> | null>(
     null,
@@ -320,12 +336,12 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     if (problem.status === 'too-large')
       return 'This project is too large for the gallery. Try a shorter date range or fewer locations.';
     if (problem.status === 'paused')
-      return 'Sending to the gallery from your account is paused right now. Try again later.';
+      return 'Publishing to the gallery is paused right now. Try again later.';
     if (problem.status === 'duplicate')
       return 'This project is already in the gallery, just as it is now.';
     return problem.message
-      ? `It couldn't be sent: ${problem.message}`
-      : "It couldn't be sent. Please try again later.";
+      ? `It couldn't be published: ${problem.message}`
+      : "It couldn't be published. Please try again later.";
   });
 </script>
 
@@ -349,22 +365,12 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     <div class="flex flex-col items-center gap-3 py-4 text-center">
       <CheckIcon class="text-success-700-300 size-8" />
       <h2 class="h4" tabindex="-1" bind:this={sentHeading}>
-        Your project is in the gallery
+        {sent.oldRemoved === null ? 'Published' : 'Snapshot updated'}
       </h2>
-      {#if sent.oldRemoved !== null}
+      {#if sent.oldRemoved === false}
         <p class="text-sm">
-          {sent.oldRemoved
-            ? 'It replaces the old gallery page, which was removed.'
-            : 'The old gallery page couldn’t be removed. You can remove it from My Projects, under Other gallery pages.'}
-        </p>
-      {/if}
-      {#if sent.linked}
-        <p class="text-sm">
-          It’s linked to your account, so you can change who sees it or remove
-          it from
-          <a href={resolve('/my-projects')} target="_blank" class="link"
-            >My Projects</a
-          >.
+          The old snapshot couldn’t be removed. You can unpublish it from My
+          Projects, under Other gallery pages.
         </p>
       {/if}
       {#if sent.link}
@@ -400,9 +406,6 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
           </button>
         </div>
       {/if}
-      <a href={resolve('/gallery')} target="_blank" class="link text-sm"
-        >Browse the Project Gallery</a
-      >
     </div>
   {:else}
     <!-- The project as its gallery card will show it -->
@@ -425,74 +428,49 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     </div>
 
     {#if view === 'existing'}
-      <div class="flex flex-col gap-3">
-        <p>This project is already in the gallery.</p>
-        <div class="flex flex-wrap gap-2">
-          <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
-          <a
-            href={existingHref}
-            target="_blank"
-            rel="noreferrer"
-            class="btn preset-filled-primary-500"
+      <p>
+        {accountPage
+          ? `Published ${publishedOn(accountPage.publishedAt)}.`
+          : 'Published.'}
+        The gallery shows the snapshot from then.
+        {#if accountPage}
+          <span class="opacity-70"
+            >Updating it gives the page a new link, and its views start over.</span
           >
-            View Gallery Page
-            <ExternalLinkIcon class="icon-sm" />
-          </a>
-          <!-- eslint-enable svelte/no-navigation-without-resolve -->
-          {#if accountPage}
-            <button
-              type="button"
-              class="btn hover:preset-tonal-surface"
-              onclick={update}
-            >
-              <SendIcon />
-              Update It
-            </button>
-          {/if}
-        </div>
-        <p class="text-sm opacity-70">
-          {#if accountPage}
-            Changed it since? Update It replaces the page with the project as it
-            is now. The new page has a new link, and its views start over.
-          {:else}
-            Changed it since?
-          {/if}
-          <button type="button" class="link" onclick={sendNew}
-            >Send it as a new page</button
-          >
-          instead.
-        </p>
-      </div>
+        {/if}
+      </p>
     {:else}
-      {#if replacePostId}
-        <p class="bg-surface-100-900 rounded-container p-4 text-sm">
-          This adds a new gallery page of the project as it is now, and removes
-          its old one. The new page has a new link, and its views start over.
-        </p>
-      {/if}
-      <ul class="flex list-inside list-disc flex-col gap-1 text-sm">
-        <li>
-          It goes live in the public
+      <p>
+        {#if replacePostId}
+          Publishes a snapshot of this project as it is now, in place of its old
+          page. The new page has a new link, and its views start over.
+        {:else}
+          Publishes a snapshot of this project, as it is now, to the public
           <a href={resolve('/gallery')} target="_blank" class="link"
             >Project Gallery</a
-          > right away.
-        </li>
-        <li>
-          Its page shows the name, locations and dates, yarns and colors, this
-          preview, a link to the project, and the date it was sent.
-        </li>
-        <li>The page can’t be edited after it’s sent.</li>
-        <li>Pages that look like spam or abuse may be removed.</li>
-        <li>Gallery pages are subject to change.</li>
-      </ul>
+          >.
+        {/if}
+      </p>
       {#if fromAccount}
         <ShowOwnerToggle
-          kind="project"
           bind:checked={showOwner}
           name={ownerName}
           disabled={busy}
         />
       {/if}
+      <details class="text-sm">
+        <summary class="link w-fit cursor-pointer"
+          >What’s on a gallery page?</summary
+        >
+        <ul class="mt-2 flex list-inside list-disc flex-col gap-1">
+          <li>
+            The name, locations and dates, yarns and colors, this preview, a
+            link to the project, and the date it was published.
+          </li>
+          <li>A snapshot can’t be edited. Update it to show changes.</li>
+          <li>Pages that look like spam or abuse may be removed.</li>
+        </ul>
+      </details>
       {#if problem}
         <div class="text-error-700-300 flex flex-col gap-1" role="alert">
           <p>{problemText}</p>
@@ -510,7 +488,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
             <!-- eslint-enable svelte/no-navigation-without-resolve -->
           {/if}
           {#if 'oldRemoved' in problem && problem.oldRemoved}
-            <p>Its old gallery page was removed.</p>
+            <p>Its old snapshot was removed.</p>
           {/if}
         </div>
       {/if}
@@ -535,19 +513,50 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
         >{preparing === 'error' ? 'Close' : 'Cancel'}</button
       >
     </div>
+  {:else if view === 'existing'}
+    <div class="flex flex-col items-center gap-2 p-2 py-4 text-center">
+      <div class="flex flex-wrap justify-center gap-2">
+        <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
+        <a
+          href={existingHref}
+          target="_blank"
+          rel="noreferrer"
+          class="btn {accountPage
+            ? 'hover:preset-tonal-surface'
+            : 'preset-filled-primary-500'}"
+        >
+          View Gallery Page
+          <ExternalLinkIcon class="icon-sm" />
+        </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
+        {#if accountPage}
+          <button
+            type="button"
+            class="btn preset-filled-primary-500"
+            onclick={update}
+          >
+            <RefreshCwIcon />
+            Update Snapshot
+          </button>
+        {/if}
+      </div>
+      {#if !accountPage}
+        <button type="button" class="link text-sm" onclick={publishAgain}
+          >Publish again, as a new page</button
+        >
+      {/if}
+    </div>
   {:else if view === 'form' || view === 'checking'}
     <div class="flex flex-col items-center gap-2 p-2 py-4 text-center">
       <p class="text-sm" aria-hidden={busy}>
         {#if busy && step}
           {STEP_TEXT[step]}
-        {:else if fromAccount}
-          You can remove it later from My Projects.
-        {:else}
-          <span class="font-bold">Once it’s sent, it can’t be removed.</span>
+        {:else if view === 'form' && !fromAccount}
+          <span class="font-bold">It can’t be unpublished later.</span>
           {#if __ACCOUNTS_ENABLED__ && !account.summary}
             <a href={resolve('/account')} target="_blank" class="link"
               >Sign in</a
-            > first to be able to remove it later.
+            > first if you might want to.
           {/if}
         {/if}
       </p>
@@ -557,9 +566,10 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
         disabled={!previews.active?.svg || view === 'checking' || busy}
         onclick={submit}
       >
-        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
-          />{/if}
-        {replacePostId ? 'Update Gallery Page' : 'Send to Gallery'}
+        {#if busy}<LoaderCircleIcon
+            class="animate-spin"
+          />{:else if replacePostId}<RefreshCwIcon />{:else}<SendIcon />{/if}
+        {replacePostId ? 'Update Snapshot' : 'Publish'}
       </button>
     </div>
   {/if}

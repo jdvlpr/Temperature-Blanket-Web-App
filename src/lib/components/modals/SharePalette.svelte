@@ -13,8 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Shares a saved palette to the Yarn Palette Gallery, from My Projects while
-signed in. It goes live at once and is linked to the account. -->
+<!-- Publishes a saved palette to the Yarn Palette Gallery, from My Projects
+while signed in: a snapshot of it as it is now, linked to the account. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -31,7 +31,7 @@ signed in. It goes live at once and is linked to the account. -->
   import type { Color } from '#lib/types/yarn-types.js';
   import { getYarnPageURL } from '#lib/utils/color-utils.js';
   import { cleanName } from '#lib/utils/string-utils.js';
-  import { CheckIcon, LoaderCircleIcon, Share2Icon } from '@lucide/svelte';
+  import { CheckIcon, LoaderCircleIcon, SendIcon } from '@lucide/svelte';
 
   // The gallery's limit (MAX_PALETTE_TITLE_LENGTH on the server)
   const MAX_NAME_LENGTH = 80;
@@ -128,29 +128,22 @@ signed in. It goes live at once and is linked to the account. -->
   {#if shared}
     <div class="flex flex-col items-center gap-2 text-center" role="status">
       <CheckIcon class="text-success-700-300 size-8" />
-      <p class="font-bold">Your palette is in the gallery</p>
-      {#if replacePostId}
+      <p class="font-bold">
+        {replacePostId ? 'Snapshot updated' : 'Published'}
+      </p>
+      {#if replacePostId && !oldRemoved}
         <p class="text-sm">
-          {oldRemoved
-            ? 'Its old gallery page was removed.'
-            : 'Its old gallery page couldn’t be removed. You can remove it from My Projects, under Other gallery pages.'}
+          The old snapshot couldn’t be removed. You can unpublish it from My
+          Projects, under Other gallery pages.
         </p>
       {/if}
-      <p class="text-sm">
-        You can change who sees it or remove it from My Projects.
-      </p>
       {#if postId}
         <a
           href={resolve('/gallery/palette/[id]', { id: String(postId) })}
           target="_blank"
-          class="link">View its gallery page</a
+          class="link">View Gallery Page</a
         >
       {/if}
-      <a
-        href="{resolve('gallery')}?view=yarn-palettes"
-        target="_blank"
-        class="link">View the Yarn Palette Gallery</a
-      >
     </div>
   {:else}
     <form class="flex flex-col gap-4" onsubmit={share}>
@@ -166,25 +159,21 @@ signed in. It goes live at once and is linked to the account. -->
           disabled={busy}
         />
       </label>
-      {#if replacePostId}
-        <p class="bg-surface-100-900 rounded-container p-4 text-sm">
-          This adds a new gallery page with this name, and removes the old one.
-          The new page has a new link, and its views start over.
-        </p>
-      {/if}
-      <ul class="flex list-inside list-disc flex-col gap-1 text-sm">
-        <li>
-          It goes live in the public Yarn Palette Gallery right away, with this
-          name and its colors.
-        </li>
-        <li>
-          It’s linked to your account, so you can change who sees it or remove
-          it later from My Projects.
-        </li>
-        <li>Palettes that look like spam or abuse may be removed.</li>
-      </ul>
+      <p>
+        {#if replacePostId}
+          Publishes a snapshot of this palette as it is now, in place of its old
+          page. The new page has a new link, and its views start over.
+        {:else}
+          Publishes a snapshot of this palette, with this name and its colors,
+          to the public
+          <a
+            href="{resolve('gallery')}?view=yarn-palettes"
+            target="_blank"
+            class="link">Yarn Palette Gallery</a
+          >.
+        {/if}
+      </p>
       <ShowOwnerToggle
-        kind="palette"
         bind:checked={showOwner}
         name={ownerName}
         disabled={busy}
@@ -197,9 +186,9 @@ signed in. It goes live at once and is linked to the account. -->
         class="btn preset-filled-primary-500 w-full sm:w-fit"
         disabled={busy || !cleanName(name, MAX_NAME_LENGTH)}
       >
-        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<Share2Icon
+        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
           />{/if}
-        {replacePostId ? 'Update Gallery Page' : 'Share Palette'}
+        {replacePostId ? 'Update Snapshot' : 'Publish'}
       </button>
     </form>
   {/if}

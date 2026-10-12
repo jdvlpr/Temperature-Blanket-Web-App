@@ -184,8 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   changedSince={Boolean(
                     page && (lastSavedAt(project) ?? 0) > page.publishedAt,
                   )}
-                  onadd={(showOwner) =>
-                    openForGallery(project, { action: 'add', showOwner })}
+                  onadd={() => openForGallery(project, { action: 'add' })}
                   onupdate={(old) =>
                     openForGallery(project, {
                       action: 'replace',

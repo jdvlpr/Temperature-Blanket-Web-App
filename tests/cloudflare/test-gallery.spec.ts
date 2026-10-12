@@ -148,7 +148,7 @@ test.describe('Gallery pages from accounts', () => {
     // Each page is included on the public gallery on its own; the display
     // name itself is on the Account page
     const include = pages.getByRole('checkbox', {
-      name: 'With my name: Ottawa from 2025 to 2026',
+      name: 'Show my name: Ottawa from 2025 to 2026',
     });
     await expect(include).not.toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
@@ -187,7 +187,7 @@ test.describe('Gallery pages from accounts', () => {
     ]);
   });
 
-  test('a saved project shows who can see it, and changing it changes its page', async ({
+  test('a saved project shows if it is published, and its menu changes its page', async ({
     page,
     request,
   }) => {
@@ -232,15 +232,19 @@ test.describe('Gallery pages from accounts', () => {
     await page.reload();
     // The project isn't in the account: leave it in this browser
     await page.getByRole('button', { name: /^Not now/ }).click();
-    const sharing = page.getByRole('group', { name: `Sharing: ${title}` });
-    const menu = sharing.getByRole('button', { name: /^Sharing:/ });
-    await expect(menu).toHaveText(/: In the gallery\s*$/);
+    const sharing = page.getByRole('group', { name: `Gallery: ${title}` });
+    const menu = sharing.getByRole('button', { name: /^Gallery:/ });
+    await expect(menu).toHaveText(/Published\s*$/);
+    // Unchanged since it was published: nothing to update
     await expect(
-      sharing.getByRole('link', { name: /view its gallery page/ }),
-    ).toHaveAttribute('href', `/gallery/${postId}`);
-    // Unchanged since it was added: nothing to update
+      sharing.getByRole('button', { name: /Update the snapshot/ }),
+    ).toHaveCount(0);
+    await menu.click();
     await expect(
-      sharing.getByRole('button', { name: /Update the gallery page/ }),
+      page.getByRole('menuitem', { name: /View Gallery Page/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('menuitem', { name: /Update Snapshot/ }),
     ).toHaveCount(0);
     // The older page is listed on its own
     await expect(
@@ -249,12 +253,10 @@ test.describe('Gallery pages from accounts', () => {
         .getByRole('link', { name: /Older/ }),
     ).toBeVisible();
 
-    // With the name
-    await menu.click();
-    await page
-      .getByRole('menuitemradio', { name: /In the gallery with my name/ })
-      .click();
-    await expect(menu).toHaveText(/with my name\s*$/);
+    // With the name (the menu stays open, to show it took)
+    await page.getByRole('menuitemcheckbox', { name: /Show My Name/ }).click();
+    await page.keyboard.press('Escape');
+    await expect(menu).toHaveText(/Published · By Ada Lovelace\s*$/);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'By Ada Lovelace',
     );
@@ -265,15 +267,13 @@ test.describe('Gallery pages from accounts', () => {
       )[0].showOwner,
     ).toBe(1);
 
-    // Only the link: asks first, then takes the page off the gallery
+    // Unpublish: asks first, then takes the page off the gallery
     await menu.click();
-    await page
-      .getByRole('menuitemradio', { name: /Only people with the link/ })
-      .click();
+    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
     // Both its pages, so the older one doesn't take the newer one's place
-    await expect(sharing).toContainText('Remove its 2 gallery pages?');
+    await expect(sharing).toContainText('all 2 of its gallery pages');
     await sharing.getByRole('button', { name: 'Cancel' }).click();
-    await expect(menu).toHaveText(/with my name\s*$/);
+    await expect(menu).toHaveText(/By Ada Lovelace\s*$/);
     // (WordPress, which trashes the post, isn't running here: as if it did)
     const removed: string[] = [];
     await page.route(`**/api/account/gallery/*`, (route) => {
@@ -282,12 +282,8 @@ test.describe('Gallery pages from accounts', () => {
       return route.fulfill({ status: 204 });
     });
     await menu.click();
-    await page
-      .getByRole('menuitemradio', { name: /Only people with the link/ })
-      .click();
-    await sharing
-      .getByRole('button', { name: 'Remove from the gallery' })
-      .click();
+    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
+    await sharing.getByRole('button', { name: 'Unpublish' }).click();
     await expect(sharing).toHaveCount(0);
     expect(removed.sort()).toEqual([String(postId), String(postId + 1)]);
     await expect(
@@ -404,20 +400,17 @@ test.describe('Gallery pages from accounts', () => {
 
     await page.reload();
     await page.getByRole('button', { name: /^Not now/ }).click();
-    const menuFor = (name: string) =>
-      page
-        .getByRole('group', { name: `Sharing: ${name}` })
-        .getByRole('button', { name: /^Sharing:/ });
+    const rowFor = (name: string) =>
+      page.getByRole('group', { name: `Gallery: ${name}` });
     const addToGallery = async (name: string) => {
-      await menuFor(name).click();
-      await page
-        .getByRole('menuitemradio', { name: /^In the gallery Anyone/ })
+      await rowFor(name)
+        .getByRole('button', { name: /^Publish to Gallery/ })
         .click();
     };
-    const dialog = page.getByRole('dialog', {
-      name: 'Send to Project Gallery',
-    });
-    await expect(menuFor('First test')).toHaveText(/Link only\s*$/);
+    const dialog = page.getByRole('dialog', { name: 'Publish to Gallery' });
+    await expect(
+      rowFor('First test').getByRole('button', { name: /^Publish to Gallery/ }),
+    ).toBeVisible();
 
     // The first one opens over My Projects; closing it leaves everything as it was
     await addToGallery('First test');
@@ -434,11 +427,11 @@ test.describe('Gallery pages from accounts', () => {
       await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
       await expect(page).toHaveURL(/\/my-projects$/);
       await dialog
-        .getByRole('button', { name: /Yes, Send to Gallery/ })
+        .getByRole('button', { name: 'Publish', exact: true })
         .click();
-      await expect(dialog).toContainText(
-        'The project gallery webpage has been created.',
-      );
+      await expect(
+        dialog.getByRole('heading', { name: 'Published' }),
+      ).toBeVisible();
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     };
@@ -457,8 +450,12 @@ test.describe('Gallery pages from accounts', () => {
     expect(sent[0].total_days).toBe(3);
 
     // Its row says so, without leaving the page
-    await expect(menuFor('Second test')).toHaveText(/: In the gallery\s*$/);
-    await expect(menuFor('First test')).toHaveText(/Link only\s*$/);
+    await expect(
+      rowFor('Second test').getByRole('button', { name: /^Gallery:/ }),
+    ).toHaveText(/Published\s*$/);
+    await expect(
+      rowFor('First test').getByRole('button', { name: /^Publish to Gallery/ }),
+    ).toBeVisible();
 
     // And back to the first, all of it
     await addToGallery('First test');

@@ -13,9 +13,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- "Include this project/palette on my public gallery", when adding one to the
-gallery from an account. On: its page says "By" and the display name, and the
-owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
+<!-- "Show my name", when publishing to the gallery from an account. On: its
+page says "By" and the display name, and the owner's public gallery page lists
+it. Off: it's published without a name. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -23,15 +23,12 @@ owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
   import { ExternalLinkIcon } from '@lucide/svelte';
 
   let {
-    kind,
     checked = $bindable(false),
     name,
     disabled = false,
-
-    /** The account's display name, as it is now */
   }: {
-    kind: 'project' | 'palette';
     checked?: boolean;
+    /** The account's display name, as it is now */
     name: string;
     disabled?: boolean;
   } = $props();
@@ -42,12 +39,12 @@ owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
 <div class="bg-surface-100-900 rounded-container flex flex-col text-left">
   <ToggleSwitch
     bare
-    label="Include this {kind} on my public gallery"
+    label="Show my name"
     details={checked
       ? shownName
-        ? `Its page will say “By ${shownName}” and your public gallery page will list it. If you change your display name, it changes here too.`
+        ? `Its page will say “By ${shownName}” and your public gallery page will list it.`
         : 'Your public gallery page will list it once you add a display name.'
-      : `It will be in the gallery without your name, and not on your public gallery page.`}
+      : 'It will be published without your name.'}
     bind:checked
     {disabled}
   />
@@ -63,7 +60,4 @@ owner's public gallery page lists it. Off: it's in the gallery anonymously. -->
       to show it.
     </p>
   {/if}
-  <p class="px-4 pb-3 text-sm opacity-70">
-    You can change this later in My Projects.
-  </p>
 </div>

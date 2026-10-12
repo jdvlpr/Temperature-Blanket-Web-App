@@ -150,7 +150,7 @@ async function loadNow(href: string, closed: () => boolean) {
 }
 
 /**
- * Opens Send to Gallery for a saved project over the current page (My
+ * Opens Publish to Gallery for a saved project over the current page (My
  * Projects), which loads the project behind it.
  */
 export async function openGalleryDialog(href: string, request: GalleryRequest) {
@@ -161,9 +161,7 @@ export async function openGalleryDialog(href: string, request: GalleryRequest) {
     component: { ref: AddToGallery, props: { request, href } },
     options: {
       title:
-        request.action === 'replace'
-          ? 'Update Gallery Page'
-          : 'Send to Project Gallery',
+        request.action === 'replace' ? 'Update Snapshot' : 'Publish to Gallery',
     },
   });
 }

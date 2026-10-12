@@ -13,17 +13,20 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Opening a project with its Send to Gallery dialog showing, from its row in
-// My Projects: the project's link plus ?gallery=. "add" and "named" add a page
-// (without or with the account's name); a post ID replaces that page with one
-// of the project as it is now. The planner drops it from the address bar.
+// Opening a project with its Publish to Gallery dialog showing, from its row
+// in My Projects: the project's link plus ?gallery=. "add" publishes it, with
+// the account's name or not as last chosen ("named": with it, from older
+// links); a post ID replaces that page with a snapshot of the project as it is
+// now. The planner drops it from the address bar.
 
 export const GALLERY_PARAM = 'gallery';
 
 export type GalleryRequest =
-  { action: 'add'; showOwner: boolean } | { action: 'replace'; postId: number };
+  // showOwner left out: the account's last choice
+  | { action: 'add'; showOwner?: boolean }
+  | { action: 'replace'; postId: number };
 
-/** The project's link, opening its Send to Gallery dialog. */
+/** The project's link, opening its Publish to Gallery dialog. */
 export function galleryRequestLink(
   href: string,
   request: GalleryRequest,
@@ -44,7 +47,7 @@ export function galleryRequestLink(
 export function parseGalleryRequest(
   value: string | null | undefined,
 ): GalleryRequest | null {
-  if (value === 'add') return { action: 'add', showOwner: false };
+  if (value === 'add') return { action: 'add' };
   if (value === 'named') return { action: 'add', showOwner: true };
   if (value && /^[1-9]\d{0,15}$/.test(value))
     return { action: 'replace', postId: Number(value) };

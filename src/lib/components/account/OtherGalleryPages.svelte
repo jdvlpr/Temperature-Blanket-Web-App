@@ -81,9 +81,9 @@ when there are none. -->
   <section class="flex flex-col gap-2" aria-labelledby="other-gallery-pages">
     <h2 id="other-gallery-pages" class="h3">Other Gallery Pages</h2>
     <p class="text-sm opacity-70">
-      In the gallery from your account, but not next to a project or palette
-      above: older pages of one you sent again, or of one that’s deleted or not
-      saved here.
+      Published from your account, but not next to a project or palette above:
+      older snapshots of one you published again, or of one that’s deleted or
+      not saved here.
     </p>
     <div class={cardClass}>
       <ul class="flex flex-col" aria-label="Other gallery pages">
@@ -106,7 +106,7 @@ when there are none. -->
                   <ExternalLinkIcon class="icon-sm inline" />
                 </a>
                 <span class="text-sm opacity-70"
-                  >{isPalette(page) ? 'Palette' : 'Project'}, added
+                  >{isPalette(page) ? 'Palette' : 'Project'}, published
                   {addedOn(page.publishedAt)}</span
                 >
                 <label
@@ -115,21 +115,21 @@ when there are none. -->
                   <input
                     type="checkbox"
                     class="checkbox"
-                    aria-label="With my name: {page.title}"
+                    aria-label="Show my name: {page.title}"
                     checked={page.showOwner ?? false}
                     onchange={(event) =>
                       setShowOwner(page, event.currentTarget.checked)}
                     disabled={busy}
                   />
-                  With my name
+                  Show my name
                 </label>
               </div>
               {#if confirming !== page.postId}
                 <button
                   type="button"
                   class="btn-icon hover:preset-tonal-error"
-                  aria-label="Remove {page.title} from the gallery"
-                  title="Remove from the gallery"
+                  aria-label="Unpublish {page.title}"
+                  title="Unpublish"
                   onclick={() => (confirming = page.postId)}
                   disabled={busy}><Trash2Icon /></button
                 >
@@ -139,10 +139,9 @@ when there are none. -->
               <div class="flex flex-col gap-2" in:safeSlide>
                 <p class="text-sm">
                   {#if isPalette(page)}
-                    Remove this palette from the gallery?
+                    Unpublish this palette?
                   {:else}
-                    Remove this page from the gallery? It also comes off the
-                    globe.
+                    Unpublish this page? It also comes off the globe.
                   {/if}
                 </p>
                 <div class="flex flex-wrap gap-2">
@@ -155,7 +154,7 @@ when there are none. -->
                     {#if busy}
                       <LoaderCircleIcon class="animate-spin" />
                     {/if}
-                    Remove page
+                    Unpublish
                   </button>
                   <button
                     type="button"

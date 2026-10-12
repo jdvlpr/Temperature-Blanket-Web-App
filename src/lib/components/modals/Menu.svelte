@@ -59,6 +59,7 @@ button to it. -->
     DownloadIcon,
     ExternalLinkIcon,
     FolderOpenIcon,
+    GlobeIcon,
     LinkIcon,
     LoaderCircleIcon,
     LogInIcon,
@@ -327,7 +328,7 @@ button to it. -->
               <span class="flex flex-1 flex-col">
                 <span>Copy Link</span>
                 <span class="text-xs opacity-70"
-                  >Share it or bookmark it, with all its settings</span
+                  >Anyone with the link gets their own copy</span
                 >
               </span>
             </button>
@@ -351,34 +352,31 @@ button to it. -->
         </li>
         <li>
           {#if hasGalleryPage}
-            <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
-            <a
-              href={project.gallery.href}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
               class={ROW}
+              onclick={() => open(AddToGallery, 'Gallery Page')}
             >
-              <SendIcon class="shrink-0 opacity-70" />
+              <GlobeIcon class="shrink-0 opacity-70" />
               <span class="flex flex-1 flex-col">
-                <span>View Gallery Page</span>
+                <span>Gallery Page</span>
                 <span class="text-xs opacity-70"
-                  >This project is in the Project Gallery</span
+                  >Published. View it, or update its snapshot</span
                 >
               </span>
-              <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
-            </a>
-            <!-- eslint-enable svelte/no-navigation-without-resolve -->
+              <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+            </button>
           {:else}
             <button
               type="button"
               class={ROW}
-              onclick={() => open(AddToGallery, 'Send to Project Gallery')}
+              onclick={() => open(AddToGallery, 'Publish to Gallery')}
             >
               <SendIcon class="shrink-0 opacity-70" />
               <span class="flex flex-1 flex-col">
-                <span>Send to Project Gallery</span>
+                <span>Publish to Gallery</span>
                 <span class="text-xs opacity-70"
-                  >Share it on a public gallery page</span
+                  >A public snapshot, as it is now</span
                 >
               </span>
               <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
