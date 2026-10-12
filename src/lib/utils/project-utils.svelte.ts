@@ -132,6 +132,28 @@ export const downloadWeatherCSV = () => {
   document.body.removeChild(link);
 };
 
+/** What happened when the project was sent to the gallery, for the dialog to show. */
+export type GallerySendResult =
+  | {
+      status: 'sent';
+      /** The new gallery page */
+      link: string;
+      /** Recorded to the signed-in account, so it can be changed or removed later */
+      linked: boolean;
+      /** Replacing a page: whether the old one came off (null when not replacing) */
+      oldRemoved: boolean | null;
+    }
+  /** The same project is in the gallery already: that page */
+  | { status: 'duplicate'; link: string; title: string; oldRemoved: boolean }
+  | { status: 'too-large' }
+  /** Publishing from accounts is paused, and a replaced page can't go anonymously */
+  | { status: 'paused' }
+  /** WordPress's own message, if it gave one (plain text) */
+  | { status: 'error'; message: string; oldRemoved: boolean };
+
+/** Steps of a send after the image, for the dialog to say what it's doing. */
+export type GallerySendStep = 'sending' | 'removing-old';
+
 /**
  * Sends the project to the gallery. `fromAccount` publishes it as the signed-in
  * user when it's saved to their account, falling back to an anonymous submission
@@ -144,6 +166,7 @@ export const sendToProjectGallery = async (
     showOwner = false,
     name = '',
     replacePostId,
+    onStep,
   }: {
     fromAccount?: boolean;
     /** From an account: include it on the owner's public gallery, with their name */
@@ -152,8 +175,9 @@ export const sendToProjectGallery = async (
     name?: string;
     /** From an account: the project's old gallery page, removed once this one is in */
     replacePostId?: number;
+    onStep?: (step: GallerySendStep) => void;
   } = {},
-) => {
+): Promise<GallerySendResult> => {
   const colors: Color[][] = [];
   const palettes: string[] = [];
   const yarnUrls: string[] = [];
@@ -217,12 +241,18 @@ export const sendToProjectGallery = async (
     // location title so gallery search by place still works
     ...(name && { project_name: name }),
   };
-  let message = '';
+  // My Projects' Sharing rows show the new page (and not the old one)
+  const pagesChanged = async () => {
+    if (!fromAccount) return;
+    const { GALLERY_PAGES_CHANGED } = await import('#lib/accounts/gallery.js');
+    window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+  };
+  // WordPress's messages are text, never HTML
+  const text = (value: unknown) =>
+    decodeHtmlEntities(String(value ?? '')).trim();
   try {
     const body = await buildGalleryRequestBody(data);
-    if (!body) {
-      return 'Sorry, this project is too large to add to the gallery. Try a shorter date range or fewer locations.';
-    }
+    if (!body) return { status: 'too-large' };
     // WordPress's answer, from either route
     const publish = async () => {
       if (fromAccount) {
@@ -243,6 +273,7 @@ export const sendToProjectGallery = async (
     };
     const removeOld = async () => {
       if (!replacePostId) return true;
+      onStep?.('removing-old');
       const { removeGalleryPage } = await import('#lib/accounts/gallery.js');
       try {
         await removeGalleryPage(replacePostId);
@@ -252,67 +283,56 @@ export const sendToProjectGallery = async (
       }
     };
 
+    onStep?.('sending');
     let response = await publish();
-    if (!response)
-      return 'Adding to the gallery from your account is paused right now. Try again later.';
+    if (!response) return { status: 'paused' };
     // Replacing with the same settings (only its name changed, say): the old
     // page is the duplicate, so it goes first. Removed pages aren't duplicates.
     let oldRemoved: boolean | null = null;
     if (response.code === 409 && replacePostId) {
       oldRemoved = await removeOld();
-      if (oldRemoved) response = (await publish()) ?? response;
+      if (oldRemoved) {
+        onStep?.('sending');
+        response = (await publish()) ?? response;
+      }
     }
 
     if (response.code === 200) {
-      // success
-      message = `<p class="font-bold text-xl my-2">${escapeHtml(String(response.message ?? ''))}</p><p>The project gallery webpage has been created.</p>`;
-      if (replacePostId) {
-        oldRemoved ??= await removeOld();
-        message += oldRemoved
-          ? '<p>It replaces the old gallery page, which was removed.</p>'
-          : '<p>The old gallery page couldn’t be removed. You can remove it from My Projects, under Other gallery pages.</p>';
-      }
-      // My Projects' Sharing rows show the new page (and not the old one)
-      if (fromAccount) {
-        const { GALLERY_PAGES_CHANGED } =
-          await import('#lib/accounts/gallery.js');
-        window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-      }
-      if (response.linked)
-        message +=
-          '<p class="text-sm opacity-80">It’s linked to your account, so you can change who sees it or remove it from My Projects.</p>';
+      if (replacePostId) oldRemoved ??= await removeOld();
+      await pagesChanged();
       project.gallery.href = response.link;
-      project.gallery.title = decodeHtmlEntities(String(response.title ?? ''));
-      // reloadRecentGalleryProjects();
-    } else if (response.code === 409) {
-      // duplicate project
-      response.data = JSON.parse(response.data);
-      message = response.message;
-      // Another page's title, from WordPress: text, never HTML
-      message += `<a class="link" href="${escapeHtml(String(response.data.permalink ?? ''))}" target="_blank">${escapeHtml(decodeHtmlEntities(String(response.data.title ?? '')))}</a>`;
-    } else if (response.code === 400) {
-      // unexpected or missing request param
-      message = response.message;
-    } else if (response.code === 500) {
-      // pattern type error, image upload error, or attachment error
-      message = response.message;
-    } else {
-      message = 'Error :(';
-      if (response.message) message += ' ' + response.message;
+      project.gallery.title = text(response.title);
+      return {
+        status: 'sent',
+        link: String(response.link ?? ''),
+        linked: Boolean(response.linked),
+        oldRemoved,
+      };
     }
-    if (oldRemoved && response.code !== 200) {
-      message +=
-        '<p>Its old gallery page was removed. You can add the project to the gallery again from My Projects.</p>';
-      const { GALLERY_PAGES_CHANGED } =
-        await import('#lib/accounts/gallery.js');
-      window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+    if (oldRemoved) await pagesChanged();
+    if (response.code === 409) {
+      // The same project's page, already in the gallery
+      const page =
+        typeof response.data === 'string'
+          ? JSON.parse(response.data)
+          : (response.data ?? {});
+      return {
+        status: 'duplicate',
+        link: String(page.permalink ?? ''),
+        title: text(page.title),
+        oldRemoved: Boolean(oldRemoved),
+      };
     }
-  } catch (error) {
-    message =
-      "Sorry, we're experiencing technical difficulties at the moment. Try again later.";
+    // 400: unexpected or missing request param; 500: pattern type, image
+    // upload or attachment error
+    return {
+      status: 'error',
+      message: text(response.message),
+      oldRemoved: Boolean(oldRemoved),
+    };
+  } catch {
+    return { status: 'error', message: '', oldRemoved: false };
   }
-
-  return message;
 };
 
 // In the backend db, each project has a locations meta key

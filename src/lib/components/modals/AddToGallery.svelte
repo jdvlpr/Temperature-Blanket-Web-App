@@ -13,25 +13,46 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<!-- Sends the open project to the Project Gallery. It shows the project as
+its gallery card will (preview, name, place and dates, and "By" with the
+account's name), says plainly what's shared, then sends it in place and links
+to the new page. A project already in the gallery shows its page first, with
+Update for the account's own pages. From My Projects, the saved project loads
+behind the dialog first (with its weather, when that isn't kept with it). -->
+
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
+  import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
-  import { sendToProjectGallery } from '#lib/utils/project-utils.svelte.js';
-  import { svgToPNG } from '#lib/utils/preview-utils.svelte.js';
-  import { account } from '#lib/accounts/summary.svelte.js';
-  import { ExternalLinkIcon } from '@lucide/svelte';
-  import { dialog } from '#lib/state/page-state.svelte.js';
-  import { onDestroy, onMount, untrack } from 'svelte';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
-  import { loadInPlace } from '#lib/utils/open-saved-project.js';
-  import StickyPart from './StickyPart.svelte';
-  import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { Flash } from '#lib/utils/feedback.svelte.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
+  import { loadInPlace } from '#lib/utils/open-saved-project.js';
+  import { svgToPNG } from '#lib/utils/preview-utils.svelte.js';
+  import {
+    sendToProjectGallery,
+    type GallerySendResult,
+    type GallerySendStep,
+  } from '#lib/utils/project-utils.svelte.js';
+  import {
+    CheckIcon,
+    ExternalLinkIcon,
+    LinkIcon,
+    LoaderCircleIcon,
+    SendIcon,
+  } from '@lucide/svelte';
+  import { onDestroy, onMount, tick, untrack } from 'svelte';
+  import StickyPart from './StickyPart.svelte';
 
   let {
     request,
@@ -119,12 +140,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.removeEventListener('pagehide', onpagehide);
   });
 
-  // In the Project menu's narrow panel: one column, not three
-  const inPanel = $derived(dialog.options.placement === 'side');
-
-  let submitting = $state(false),
-    message = $state<{ text: string; icon: 'spinner' | 'none' } | undefined>();
-
   // Signed in with publishing from accounts on: the page is linked to the account
   let fromAccount = $state(false);
   // Until it's known whether it's from the account, it can't be sent: it would
@@ -134,10 +149,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showOwner = $state(false);
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
-  // The name the saved project was given, which the gallery shows as its title
-  let projectName = $state('');
   // The page this one replaces, once it's known to be the account's
   let replacePostId = $state<number | undefined>();
+  // The account's newest page of this project, which Update replaces
+  let accountPage = $state<{ postId: number; showOwner?: boolean } | null>(
+    null,
+  );
+
+  // The page it has already: the account's, or one sent since the page opened
+  const existingHref = $derived(
+    accountPage
+      ? resolve('/gallery/[id]', { id: String(accountPage.postId) })
+      : project.gallery.href &&
+          project.gallery.title &&
+          project.gallery.title === locations.projectTitle
+        ? project.gallery.href
+        : '',
+  );
+
+  // Sent: the new page
+  let sent = $state<Extract<GallerySendResult, { status: 'sent' }> | null>(
+    null,
+  );
+
+  // Already in the gallery (and not asked from My Projects for a new one),
+  // until Update or Send a New Page is chosen
+  let showExisting = $state(true);
+  const view = $derived(
+    preparing
+      ? 'preparing'
+      : sent
+        ? 'sent'
+        : !accountChecked
+          ? 'checking'
+          : existingHref && showExisting && !request
+            ? 'existing'
+            : 'form',
+  );
 
   onMount(async () => {
     window.addEventListener('pagehide', onpagehide);
@@ -150,11 +198,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  // Its name, and whether (and how) it's sent from the account
+  // Whether (and how) it's sent from the account, and its page there if any
   async function checkAccount() {
-    // Not saved here: the name its shared link carried, if any
-    const stored = await ProjectStorage.getById(project.id);
-    projectName = stored ? (stored.name ?? '') : project.linkName;
     if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
     const { getGalleryPages } = await import('#lib/accounts/gallery.js');
     const gallery = await getGalleryPages();
@@ -168,165 +213,313 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showOwner = old.showOwner ?? showOwner;
       }
     }
+    const own = gallery.posts
+      .filter(
+        (post) => post.projectId === project.id && post.kind !== 'palette',
+      )
+      .sort((a, b) => b.publishedAt - a.publishedAt)[0];
+    if (own) accountPage = { postId: own.postId, showOwner: own.showOwner };
     if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
   }
 
+  // Update: a new page of the project as it is now, in place of the old one
+  function update() {
+    if (!accountPage) return;
+    replacePostId = accountPage.postId;
+    showOwner = accountPage.showOwner ?? showOwner;
+    showExisting = false;
+  }
+
+  function sendNew() {
+    replacePostId = undefined;
+    showExisting = false;
+  }
+
+  const days = $derived(weather.rawData.length);
+  const missingDays = $derived(weather.missingDaysCount());
+  const plural = (n: number, word: string) =>
+    `${n.toLocaleString()} ${word}${n === 1 ? '' : 's'}`;
+  // What's sent, under the card: "Rows preview · 365 days · 2 days missing"
+  const details = $derived(
+    [
+      previews.active && `${previews.active.name} preview`,
+      plural(days, 'day'),
+      missingDays && `${plural(missingDays, 'day')} missing`,
+    ]
+      .filter(Boolean)
+      .join(' · '),
+  );
+
+  let busy = $state(false);
+  let step = $state<'image' | GallerySendStep | null>(null);
+  const STEP_TEXT = {
+    image: 'Drawing the preview image…',
+    sending: 'Sending to the gallery… This can take a minute.',
+    'removing-old': 'Removing the old gallery page…',
+  };
+  let problem = $state<Exclude<GallerySendResult, { status: 'sent' }> | null>(
+    null,
+  );
+  // The page's own link, for after it's sent
+  let sentHeading = $state<HTMLElement>();
+  const linkCopied = new Flash();
+
   async function submit() {
     const active = previews.active;
-    if (!active?.svg || !active?.width || !active?.height) return;
-
-    submitting = true;
-    if (fromAccount && !href) {
-      // Published from the account, it's kept there too, next to its gallery page
-      const { saveOpenProject } =
-        await import('#lib/storage/autosave.svelte.js');
-      await saveOpenProject();
+    if (!active?.svg || !active?.width || !active?.height || busy) return;
+    busy = true;
+    problem = null;
+    try {
+      if (fromAccount && !href) {
+        // Published from the account, it's kept there too, next to its gallery page
+        const { saveOpenProject } =
+          await import('#lib/storage/autosave.svelte.js');
+        await saveOpenProject();
+      }
+      // The name it has now, which may have just been changed here
+      const stored = await ProjectStorage.getById(project.id);
+      const name = stored ? (stored.name ?? '') : project.linkName;
+      step = 'image';
+      const img = await svgToPNG({
+        svgNode: active.svg,
+        width: active.width,
+        height: active.height,
+        download: false,
+      });
+      document.getElementById('temporary-canvas')?.remove();
+      const result = await sendToProjectGallery(img, {
+        fromAccount,
+        showOwner: fromAccount && showOwner,
+        name,
+        replacePostId: fromAccount ? replacePostId : undefined,
+        onStep: (next) => (step = next),
+      });
+      if (result.status === 'sent') {
+        sent = result;
+        await tick();
+        sentHeading?.focus();
+      } else {
+        problem = result;
+        // Its old page is gone: sending again adds a new one
+        if ('oldRemoved' in result && result.oldRemoved) {
+          replacePostId = undefined;
+          accountPage = null;
+        }
+      }
+    } catch {
+      problem = { status: 'error', message: '', oldRemoved: false };
+    } finally {
+      busy = false;
+      step = null;
     }
-    message = {
-      text: "<p class='font-bold text-xl my-4 text-center'>Sending Project...</p><p class='italic'>This could take up to a few minutes. Please don't navigate away.</p>",
-      icon: 'spinner',
-    };
-    const imgSrc = await svgToPNG({
-      svgNode: active.svg,
-      width: active.width,
-      height: active.height,
-      download: false,
-    });
-
-    const img = new Image();
-    img.onload = async () => {
-      message = {
-        text: await sendToProjectGallery(imgSrc, {
-          fromAccount,
-          showOwner: fromAccount && showOwner,
-          name: projectName,
-          replacePostId: fromAccount ? replacePostId : undefined,
-        }),
-        icon: 'none',
-      };
-      submitting = false;
-    };
-
-    img.src = imgSrc;
-
-    document.getElementById('temporary-canvas')?.remove();
   }
+
+  const problemText = $derived.by(() => {
+    if (!problem) return '';
+    if (problem.status === 'too-large')
+      return 'This project is too large for the gallery. Try a shorter date range or fewer locations.';
+    if (problem.status === 'paused')
+      return 'Sending to the gallery from your account is paused right now. Try again later.';
+    if (problem.status === 'duplicate')
+      return 'This project is already in the gallery, just as it is now.';
+    return problem.message
+      ? `It couldn't be sent: ${problem.message}`
+      : "It couldn't be sent. Please try again later.";
+  });
 </script>
 
-<div class="w-full p-4 pt-2 text-center">
-  {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-    <div class="card preset-filled-surface-100-900 mt-4 p-4 text-center">
-      <p class="my-2">
-        This project has a gallery page:
-        <a
-          href={project.gallery.href}
-          target="_blank"
-          class="link btn hover:preset-tonal-surface w-fit whitespace-pre-wrap"
-          rel="noreferrer"
-          ><ExternalLinkIcon class="icon-sm" />{project.gallery.title}</a
-        >
-      </p>
+<div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
+  <!-- Always here, so screen readers announce what changes in it -->
+  <p class="sr-only" role="status">
+    {view === 'preparing' ? preparingText : busy && step ? STEP_TEXT[step] : ''}
+  </p>
+
+  {#if view === 'preparing'}
+    <div
+      class="flex w-full flex-col items-center justify-center gap-4 py-8 text-center"
+      aria-hidden="true"
+    >
+      {#if preparing !== 'error'}
+        <Spinner />
+      {/if}
+      <p>{preparingText}</p>
     </div>
-  {/if}
-  <div
-    class="grid max-w-(--breakpoint-sm) grid-cols-1 gap-4 {inPanel
-      ? ''
-      : 'sm:grid-cols-3'}"
-  >
-    <!-- Always here, so screen readers announce what changes in it -->
-    <p class="sr-only" role="status">{preparingText}</p>
-    {#if preparing}
-      <div
-        class="col-span-full flex w-full flex-col items-center justify-center gap-4 py-8"
-        aria-hidden="true"
-      >
-        {#if preparing !== 'error'}
-          <Spinner />
-        {/if}
-        <p>{preparingText}</p>
-      </div>
-    {:else if !message}
-      <div
-        class="col-span-full flex flex-col gap-2 {inPanel
-          ? ''
-          : 'sm:col-span-2'}"
-      >
-        {#if replacePostId}
-          <p class="bg-surface-100-900 rounded-container p-4 text-left">
-            This adds a new gallery page of the project as it is now, and
-            removes its old one. The new page has a new link, and its views
-            start over.
-          </p>
-        {/if}
-        <p class="text-left text-lg font-bold">
-          Do you understand and agree to the following terms and conditions?
+  {:else if view === 'sent' && sent}
+    <div class="flex flex-col items-center gap-3 py-4 text-center">
+      <CheckIcon class="text-success-700-300 size-8" />
+      <h2 class="h4" tabindex="-1" bind:this={sentHeading}>
+        Your project is in the gallery
+      </h2>
+      {#if sent.oldRemoved !== null}
+        <p class="text-sm">
+          {sent.oldRemoved
+            ? 'It replaces the old gallery page, which was removed.'
+            : 'The old gallery page couldn’t be removed. You can remove it from My Projects, under Other gallery pages.'}
         </p>
-        <div class="flex flex-col gap-2 text-left">
-          <p>
-            • I am submitting this project's {projectName
-              ? 'name, '
-              : ''}location and dates, gauge and yarn information, URL, preview
-            image, and the current date to be displayed as a gallery page in the
-            public
-            <a href="/gallery" target="_blank" class="link">Project Gallery</a>
-          </p>
-          {#if fromAccount}
-            <p>
-              • It will be linked to your account, so you can change who sees it
-              or remove it later from
-              <a href={resolve('my-projects')} target="_blank" class="link"
-                >My Projects</a
-              >.
-            </p>
-          {/if}
-          <p>
-            • This project's gallery page cannot be edited once it is submitted.
-          </p>
-          <p>
-            • Submissions which appear to be spam or abuse of this service may
-            be removed.
-          </p>
-          <p>• Gallery pages are subject to change.</p>
+      {/if}
+      {#if sent.linked}
+        <p class="text-sm">
+          It’s linked to your account, so you can change who sees it or remove
+          it from
+          <a href={resolve('/my-projects')} target="_blank" class="link"
+            >My Projects</a
+          >.
+        </p>
+      {/if}
+      {#if sent.link}
+        <div class="flex flex-wrap justify-center gap-2">
+          <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
+          <a
+            href={sent.link}
+            target="_blank"
+            rel="noreferrer"
+            class="btn preset-filled-primary-500"
+          >
+            View Gallery Page
+            <ExternalLinkIcon class="icon-sm" />
+          </a>
+          <!-- eslint-enable svelte/no-navigation-without-resolve -->
+          <button
+            type="button"
+            class="btn hover:preset-tonal-surface"
+            onclick={async () => {
+              if (
+                sent &&
+                (await copyToClipboard(
+                  sent.link,
+                  'Link copied',
+                  'Unable to copy to your clipboard',
+                ))
+              )
+                linkCopied.trigger();
+            }}
+          >
+            <CopyIcon copied={linkCopied.is()} icon={LinkIcon} />
+            Copy Link
+          </button>
         </div>
-        {#if fromAccount}
-          <ShowOwnerToggle
-            kind="project"
-            bind:checked={showOwner}
-            name={ownerName}
-          />
-        {/if}
-      </div>
-      <div
-        class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 {inPanel
-          ? ''
-          : 'sm:col-span-1'}"
+      {/if}
+      <a href={resolve('/gallery')} target="_blank" class="link text-sm"
+        >Browse the Project Gallery</a
       >
-        <span class="line-clamp-4 font-bold"
-          >{projectName || locations.projectTitle}</span
-        >
+    </div>
+  {:else}
+    <!-- The project as its gallery card will show it -->
+    <div
+      class="bg-surface-50 dark:bg-surface-950 rounded-container flex gap-4 p-4"
+      inert={busy}
+    >
+      <div class="pointer-events-none w-24 shrink-0 sm:w-32" aria-hidden="true">
         {#if previews.active}
           <previews.active.previewComponent />
         {/if}
       </div>
-    {:else}
-      <div
-        class="col-span-full flex w-full flex-col items-center justify-center gap-4"
-      >
-        {#if message.icon === 'spinner'}
-          <Spinner />
+      <div class="flex min-w-0 flex-1 flex-col gap-1">
+        <RenameProject saveToName={view === 'form'} />
+        {#if fromAccount && showOwner && ownerName}
+          <p class="text-sm">By {ownerName}</p>
         {/if}
-
-        <div class="my-2 flex flex-col items-center justify-center gap-2">
-          {@html message.text}
-        </div>
+        <p class="mt-auto pt-2 text-xs opacity-70">{details}</p>
       </div>
+    </div>
+
+    {#if view === 'existing'}
+      <div class="flex flex-col gap-3">
+        <p>This project is already in the gallery.</p>
+        <div class="flex flex-wrap gap-2">
+          <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
+          <a
+            href={existingHref}
+            target="_blank"
+            rel="noreferrer"
+            class="btn preset-filled-primary-500"
+          >
+            View Gallery Page
+            <ExternalLinkIcon class="icon-sm" />
+          </a>
+          <!-- eslint-enable svelte/no-navigation-without-resolve -->
+          {#if accountPage}
+            <button
+              type="button"
+              class="btn hover:preset-tonal-surface"
+              onclick={update}
+            >
+              <SendIcon />
+              Update It
+            </button>
+          {/if}
+        </div>
+        <p class="text-sm opacity-70">
+          {#if accountPage}
+            Changed it since? Update It replaces the page with the project as it
+            is now. The new page has a new link, and its views start over.
+          {:else}
+            Changed it since?
+          {/if}
+          <button type="button" class="link" onclick={sendNew}
+            >Send it as a new page</button
+          >
+          instead.
+        </p>
+      </div>
+    {:else}
+      {#if replacePostId}
+        <p class="bg-surface-100-900 rounded-container p-4 text-sm">
+          This adds a new gallery page of the project as it is now, and removes
+          its old one. The new page has a new link, and its views start over.
+        </p>
+      {/if}
+      <ul class="flex list-inside list-disc flex-col gap-1 text-sm">
+        <li>
+          It goes live in the public
+          <a href={resolve('/gallery')} target="_blank" class="link"
+            >Project Gallery</a
+          > right away.
+        </li>
+        <li>
+          Its page shows the name, locations and dates, yarns and colors, this
+          preview, a link to the project, and the date it was sent.
+        </li>
+        <li>The page can’t be edited after it’s sent.</li>
+        <li>Pages that look like spam or abuse may be removed.</li>
+        <li>Gallery pages are subject to change.</li>
+      </ul>
+      {#if fromAccount}
+        <ShowOwnerToggle
+          kind="project"
+          bind:checked={showOwner}
+          name={ownerName}
+          disabled={busy}
+        />
+      {/if}
+      {#if problem}
+        <div class="text-error-700-300 flex flex-col gap-1" role="alert">
+          <p>{problemText}</p>
+          {#if problem.status === 'duplicate' && problem.link}
+            <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
+            <a
+              href={problem.link}
+              target="_blank"
+              rel="noreferrer"
+              class="link w-fit"
+            >
+              {problem.title || 'View its gallery page'}
+              <ExternalLinkIcon class="icon-sm inline" />
+            </a>
+            <!-- eslint-enable svelte/no-navigation-without-resolve -->
+          {/if}
+          {#if 'oldRemoved' in problem && problem.oldRemoved}
+            <p>Its old gallery page was removed.</p>
+          {/if}
+        </div>
+      {/if}
     {/if}
-  </div>
+  {/if}
 </div>
 
 <StickyPart position="bottom">
-  {#if preparing}
+  {#if view === 'preparing'}
     <div class="flex flex-wrap items-center justify-center gap-2 p-2 py-4">
       {#if failed === 'edited' && href}
         <a class="btn preset-filled-primary-500" {href} data-sveltekit-reload
@@ -342,26 +535,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >{preparing === 'error' ? 'Close' : 'Cancel'}</button
       >
     </div>
-  {:else if !submitting && !message}
-    <div
-      class="flex flex-col items-center justify-center gap-2 p-2 py-4 text-center"
-    >
-      <p class="text-sm italic">
-        {#if fromAccount}
+  {:else if view === 'form' || view === 'checking'}
+    <div class="flex flex-col items-center gap-2 p-2 py-4 text-center">
+      <p class="text-sm" aria-hidden={busy}>
+        {#if busy && step}
+          {STEP_TEXT[step]}
+        {:else if fromAccount}
           You can remove it later from My Projects.
         {:else}
-          This action can't be undone.
+          <span class="font-bold">Once it’s sent, it can’t be removed.</span>
+          {#if __ACCOUNTS_ENABLED__ && !account.summary}
+            <a href={resolve('/account')} target="_blank" class="link"
+              >Sign in</a
+            > first to be able to remove it later.
+          {/if}
         {/if}
       </p>
       <button
+        type="button"
         class="btn preset-filled-primary-500"
-        title="Add project to gallery"
-        disabled={!previews.active?.svg || !accountChecked}
+        disabled={!previews.active?.svg || view === 'checking' || busy}
         onclick={submit}
-        >{replacePostId
-          ? 'Yes, Update Gallery Page'
-          : 'Yes, Send to Gallery'}</button
       >
+        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
+          />{/if}
+        {replacePostId ? 'Update Gallery Page' : 'Send to Gallery'}
+      </button>
     </div>
   {/if}
 </StickyPart>

@@ -3,7 +3,13 @@ import * as projectUtils from './project-utils.svelte';
 
 // Mock dependencies
 vi.mock('#lib/state/weather-state.svelte.js', () => ({
-  weather: { data: [], grouping: 'month', rawData: [] },
+  weather: {
+    data: [],
+    grouping: 'month',
+    rawData: [],
+    missingDaysCount: () => 0,
+    getWeatherSourceDetails: () => [],
+  },
 }));
 
 vi.mock('#lib/state/location-state.svelte.js', () => ({
@@ -72,7 +78,68 @@ vi.mock('#lib/utils/weather-utils.svelte.js', async (importOriginal) => {
   };
 });
 
+vi.mock('#lib/utils/gallery-upload-utils.js', () => ({
+  buildGalleryRequestBody: vi.fn(async () => '{}'),
+}));
+
 describe('project-utils', () => {
+  describe('sendToProjectGallery', () => {
+    const answer = (response: unknown) =>
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => ({ json: async () => response })),
+      );
+
+    it('gives the new page, as text', async () => {
+      answer({
+        code: 200,
+        link: 'https://example.test/gallery/1',
+        title: 'Ottawa &amp; Paris',
+      });
+      expect(await projectUtils.sendToProjectGallery('img')).toEqual({
+        status: 'sent',
+        link: 'https://example.test/gallery/1',
+        linked: false,
+        oldRemoved: null,
+      });
+    });
+
+    it('gives the page it duplicates', async () => {
+      answer({
+        code: 409,
+        message: 'Duplicate',
+        data: JSON.stringify({
+          permalink: 'https://example.test/gallery/2',
+          title: '<b>Ottawa</b> &amp; Paris',
+        }),
+      });
+      expect(await projectUtils.sendToProjectGallery('img')).toEqual({
+        status: 'duplicate',
+        link: 'https://example.test/gallery/2',
+        title: '<b>Ottawa</b> & Paris',
+        oldRemoved: false,
+      });
+    });
+
+    it("passes WordPress's message along as text", async () => {
+      answer({ code: 500, message: 'Image upload error' });
+      expect(await projectUtils.sendToProjectGallery('img')).toEqual({
+        status: 'error',
+        message: 'Image upload error',
+        oldRemoved: false,
+      });
+    });
+
+    it('says when it is too large', async () => {
+      const { buildGalleryRequestBody } =
+        await import('#lib/utils/gallery-upload-utils.js');
+      vi.mocked(buildGalleryRequestBody).mockResolvedValueOnce(null);
+      expect(await projectUtils.sendToProjectGallery('img')).toEqual({
+        status: 'too-large',
+      });
+    });
+  });
+
   describe('getProjectParametersFromURLHash', () => {
     it('should parse hash string into object', () => {
       const hash = 'param1=value1&param2=value2';

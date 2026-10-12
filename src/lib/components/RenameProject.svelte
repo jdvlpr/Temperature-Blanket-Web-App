@@ -17,7 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 screens have it in the top bar, see ProjectTitle), falling back to
 the location title, with renaming once it's saved (or was opened from My
 Projects). The name shows on My Projects instead of the location title, and
-syncs like any other change. -->
+syncs like any other change. With `saveToName` (Send to Gallery), a project
+that isn't saved yet can be named too: the pencil saves it first, as the top
+bar's name does. -->
 
 <script lang="ts">
   import NameField from '#lib/components/NameField.svelte';
@@ -26,10 +28,13 @@ syncs like any other change. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import {
     renameOpenProject,
+    saveOpenProject,
     storedItem,
   } from '#lib/storage/autosave.svelte.js';
   import { savedProjects } from '#lib/storage/projects.svelte.js';
   import { PencilIcon } from '@lucide/svelte';
+
+  let { saveToName = false }: { saveToName?: boolean } = $props();
 
   let id = $state<string | null>(null);
   let savedName = $state('');
@@ -40,12 +45,29 @@ syncs like any other change. -->
   $effect(() => {
     void project.url.href;
     void savedProjects.version;
+    // Not saved here yet: the name its shared link carried, if any
+    const linkName = saveToName ? project.linkName : '';
     storedItem().then((item) => {
       id = item?.id ?? null;
-      savedName = item?.meta.name ?? '';
+      savedName = item ? (item.meta.name ?? '') : linkName;
       title = item?.meta.title ?? '';
     });
   });
+
+  async function edit() {
+    // Naming it means keeping it; saving quietly here, so no other dialog
+    // takes this one's place
+    if (!id && !(await saveOpenProject())) {
+      toast.trigger({
+        message: 'Unable to save the project',
+        category: 'error',
+      });
+      return;
+    }
+    id = (await storedItem())?.id ?? null;
+    name = savedName;
+    editing = true;
+  }
 
   async function save() {
     if (!id) return;
@@ -81,16 +103,13 @@ syncs like any other change. -->
     >
       {savedName || locations.projectTitle || 'Untitled Project'}
     </p>
-    {#if id}
+    {#if id || saveToName}
       <button
         type="button"
         class="hover:bg-surface-200-800 rounded-base inline-flex size-7 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
         title={savedName ? 'Rename Project' : 'Name this project'}
         aria-label={savedName ? `Rename ${savedName}` : 'Name this project'}
-        onclick={() => {
-          name = savedName;
-          editing = true;
-        }}
+        onclick={edit}
       >
         <PencilIcon class="size-3.5" />
       </button>
