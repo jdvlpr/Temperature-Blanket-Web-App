@@ -125,7 +125,13 @@ export function persistedState<T>(
 
   let state = $state(storedValue);
 
+  // While held, changes stay in this tab: nothing is written, so other tabs
+  // don't take them. What another tab writes meanwhile waits for release.
+  let held = false;
+  let heldIncoming: string | null | undefined;
+
   function updateStorage(value: T) {
+    if (held) return;
     try {
       const serialized = serializer.stringify(beforeWrite(value));
       if (serialized === synced) return;
@@ -141,6 +147,11 @@ export function persistedState<T>(
   function onStorage(event: StorageEvent) {
     if (event.storageArea !== localStorage) return;
     try {
+      if (held && (event.key === key || event.key === null)) {
+        heldIncoming = event.key === key ? event.newValue : null;
+        synced = heldIncoming;
+        return;
+      }
       if (event.key === key) {
         synced = event.newValue;
         state = beforeRead(
@@ -181,6 +192,29 @@ export function persistedState<T>(
     },
     reset() {
       state = initialValue;
+    },
+    /**
+     * Keeps changes in this tab until `release()`, for a value that's only
+     * changed for a while (and put back before releasing).
+     */
+    hold() {
+      held = true;
+    },
+    /** Saves again: takes what another tab wrote meanwhile, or saves this tab's */
+    release() {
+      if (!held) return;
+      held = false;
+      if (heldIncoming !== undefined) {
+        const incoming = heldIncoming;
+        heldIncoming = undefined;
+        try {
+          state = beforeRead(
+            incoming ? serializer.parse(incoming) : initialValue,
+          );
+        } catch (error) {
+          onParseError(error);
+        }
+      } else updateStorage(state);
     },
   };
 }

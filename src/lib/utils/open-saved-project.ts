@@ -97,19 +97,31 @@ const setPreferences = ({
  */
 export async function loadInPlace(href: string) {
   const id = new URL(href).searchParams.get('project');
+  // Only for this tab: a project open in another one keeps its units (and
+  // doesn't record the change in its history)
+  preferences.hold();
   const before = preferencesSnapshot();
+  const restore = () => {
+    setPreferences(before);
+    preferences.release();
+  };
   if (loadedHere?.id === id) setPreferences(loadedHere);
   else {
     // Taken even if loading fails partway: the state isn't empty any more
     loadedHere = { id, ...before };
-    await loadSavedProject(href, { quiet: true });
-    // As the project page does for a link naming no preview (Previews.svelte)
-    if (!previews.activeId) await previews.load('rows');
+    try {
+      await loadSavedProject(href, { quiet: true });
+      // As the project page does for a link naming no preview (Previews.svelte)
+      if (!previews.activeId) await previews.load('rows');
+    } catch (error) {
+      restore();
+      throw error;
+    }
     // Done, as the project page says once it has loaded: previews draw now
     project.status.loading = false;
     loadedHere = { id, ...preferencesSnapshot() };
   }
-  return () => setPreferences(before);
+  return restore;
 }
 
 // My Projects' address for a project it opens Send to Gallery for, when the
