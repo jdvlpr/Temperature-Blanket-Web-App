@@ -271,6 +271,9 @@ export const sendToProjectGallery = async (
         message += oldRemoved
           ? '<p>It replaces the old gallery page, which was removed.</p>'
           : '<p>The old gallery page couldn’t be removed. You can remove it from My Projects, under Other gallery pages.</p>';
+      }
+      // My Projects' Sharing rows show the new page (and not the old one)
+      if (fromAccount) {
         const { GALLERY_PAGES_CHANGED } =
           await import('#lib/accounts/gallery.js');
         window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));

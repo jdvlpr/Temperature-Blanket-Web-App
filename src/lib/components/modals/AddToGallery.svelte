@@ -58,6 +58,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     edited:
       "This project's edited weather data isn't saved with it. Open the project to send it to the gallery.",
   };
+  const preparingText = $derived(
+    preparing === 'error'
+      ? failed
+        ? FAILED_TEXT[failed]
+        : ''
+      : preparing === 'weather' && weatherSearch.label
+        ? `Getting weather data for ${weatherSearch.label}…`
+        : preparing
+          ? 'Getting the project ready…'
+          : '',
+  );
   let weatherAbort: AbortController | undefined;
   // Puts back the units and seasons the project's loading changed
   let restorePreferences: (() => void) | undefined;
@@ -112,6 +123,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Signed in with publishing from accounts on: the page is linked to the account
   let fromAccount = $state(false);
+  // Until it's known whether it's from the account, it can't be sent: it would
+  // otherwise go without the account (and a replaced page would stay)
+  let accountChecked = $state(false);
   // Include it on the account's public gallery, starting from the last choice
   let showOwner = $state(false);
   let serverName = $state<string | null>(null);
@@ -125,6 +139,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.addEventListener('pagehide', onpagehide);
     if (!(await loadProject())) return;
     void getWeather();
+    try {
+      await checkAccount();
+    } finally {
+      accountChecked = true;
+    }
+  });
+
+  // Its name, and whether (and how) it's sent from the account
+  async function checkAccount() {
     // Not saved here: the name its shared link carried, if any
     const stored = await ProjectStorage.getById(project.id);
     projectName = stored ? (stored.name ?? '') : project.linkName;
@@ -143,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
-  });
+  }
 
   async function submit() {
     const active = previews.active;
@@ -207,24 +230,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? ''
       : 'sm:grid-cols-3'}"
   >
+    <!-- Always here, so screen readers announce what changes in it -->
+    <p class="sr-only" role="status">{preparingText}</p>
     {#if preparing}
       <div
         class="col-span-full flex w-full flex-col items-center justify-center gap-4 py-8"
-        role="status"
-        aria-live="polite"
+        aria-hidden="true"
       >
-        {#if preparing === 'error'}
-          <p>{failed ? FAILED_TEXT[failed] : ''}</p>
-        {:else}
+        {#if preparing !== 'error'}
           <Spinner />
-          <p>
-            {#if preparing === 'weather' && weatherSearch.label}
-              Getting weather data for {weatherSearch.label}…
-            {:else}
-              Getting the project ready…
-            {/if}
-          </p>
         {/if}
+        <p>{preparingText}</p>
       </div>
     {:else if !message}
       <div
@@ -336,7 +352,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"
-        disabled={!previews.active?.svg}
+        disabled={!previews.active?.svg || !accountChecked}
         onclick={submit}
         >{replacePostId
           ? 'Yes, Update Gallery Page'

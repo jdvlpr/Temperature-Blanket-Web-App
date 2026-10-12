@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { account, loadAccountSummary } from '#lib/accounts/summary.svelte.js';
 import { locations } from '#lib/state/location-state.svelte.js';
 import { dialog } from '#lib/state/page-state.svelte.js';
 import { previews } from '#lib/state/preview-state.svelte.js';
@@ -85,10 +86,7 @@ const setPreferences = ({
   seasons,
 }: ReturnType<typeof preferencesSnapshot>) => {
   if (preferences.value.units !== units) preferences.value.units = units;
-  if (
-    JSON.stringify(preferences.value.seasons) !==
-    JSON.stringify(seasons)
-  )
+  if (JSON.stringify(preferences.value.seasons) !== JSON.stringify(seasons))
     preferences.value.seasons = seasons;
 };
 
@@ -160,6 +158,9 @@ export async function openGalleryDialogFromURL() {
   url.searchParams.delete(GALLERY_FOR_PARAM);
   history.replaceState(history.state, '', url);
   if (!request || !id) return;
+  // Sent from the account: the dialog needs to know it's signed in, and on a
+  // fresh page the header may not have read that yet
+  if (__ACCOUNTS_ENABLED__ && !account.summary) loadAccountSummary();
   const item = (await ProjectStorage.getIndex()).find((i) => i.id === id);
   if (item) await openGalleryDialog(item.meta.href, request);
 }

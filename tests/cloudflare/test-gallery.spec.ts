@@ -302,14 +302,8 @@ test.describe('Gallery pages from accounts', () => {
   }) => {
     await signIn(page, request, uniqueEmail('gallery-in-place'));
 
-    // A saved project with its weather kept (edited, so it's always loaded)
+    // Two saved projects with their weather kept (edited, so it's always loaded)
     await page.goto('/my-projects');
-    const id = String(Date.now());
-    const href = new URL(
-      `/?project=${id}#l=3652462'2025010120250103&temp=ff0000(0'15)0000ff(15'30)!mlh2t&u=m`,
-      page.url(),
-    ).href;
-    const title = 'Quito from 2025-01-01 to 2025-01-03';
     const day = (date: string, t: number) => ({
       location: 0,
       date,
@@ -320,58 +314,76 @@ test.describe('Gallery pages from accounts', () => {
       snow: { metric: 0, imperial: 0 },
       dayt: { metric: 43_200, imperial: 43_200 },
     });
-    await idbSet(page, {
-      [`p_${id}`]: {
-        name: 'Gallery test',
-        createdAt: new Date().toISOString(),
-        date: 'today',
-        href,
-        isCustomWeatherData: true,
-        locations: [
-          {
-            id: 3652462,
-            label: 'Quito',
-            lat: '-0.22985',
-            lng: '-78.52495',
-            elevation: 2800,
-            from: '2025-01-01',
-            to: '2025-01-03',
-            duration: 'c',
-            source: 'Meteostat',
-          },
-        ],
-        title,
-        weatherData: [
-          day('2025-01-01', 12),
-          day('2025-01-02', 14),
-          day('2025-01-03', 16),
-        ],
-        weatherSource: { name: 'Meteostat', useSecondary: false },
-      },
-      projects_index: [
-        {
-          id,
-          meta: {
-            date: 'today',
-            href,
-            title,
-            name: 'Gallery test',
-            isCustomWeatherData: true,
-          },
-          updatedAt: Date.now(),
+    const saved = (id: string, name: string) => {
+      const href = new URL(
+        `/?project=${id}#l=3652462'2025010120250103&temp=ff0000(0'15)0000ff(15'30)!mlh2t&u=m`,
+        page.url(),
+      ).href;
+      const title = 'Quito from 2025-01-01 to 2025-01-03';
+      return {
+        project: {
+          name,
+          createdAt: new Date().toISOString(),
+          date: 'today',
+          href,
+          isCustomWeatherData: true,
+          locations: [
+            {
+              id: 3652462,
+              label: 'Quito',
+              lat: '-0.22985',
+              lng: '-78.52495',
+              elevation: 2800,
+              from: '2025-01-01',
+              to: '2025-01-03',
+              duration: 'c',
+              source: 'Meteostat',
+            },
+          ],
+          title,
+          weatherData: [
+            day('2025-01-01', 12),
+            day('2025-01-02', 14),
+            day('2025-01-03', 16),
+          ],
+          weatherSource: { name: 'Meteostat', useSecondary: false },
         },
-      ],
+        item: {
+          id,
+          meta: { date: 'today', href, title, name, isCustomWeatherData: true },
+          updatedAt: Date.now() - 60_000,
+        },
+      };
+    };
+    const first = String(Date.now());
+    const second = String(Date.now() + 1);
+    const a = saved(first, 'First test');
+    const b = saved(second, 'Second test');
+    await idbSet(page, {
+      [`p_${first}`]: a.project,
+      [`p_${second}`]: b.project,
+      projects_index: [a.item, b.item],
     });
 
-    // Publishing is off here: as if it were on, with nothing in the gallery
+    // Publishing is off here: as if it were on, listing what's been sent (on
+    // the context, which also sees the service worker's requests)
     const sent: Record<string, unknown>[] = [];
-    await page.route('**/api/account/gallery**', async (route) => {
+    await page.context().route('**/api/account/gallery**', async (route) => {
       const url = new URL(route.request().url());
       if (url.pathname !== '/api/account/gallery') return route.fallback();
       if (route.request().method() === 'GET')
         return route.fulfill({
           json: {
-            posts: [],
+            posts: sent.map((body, i) => ({
+              postId: 900 + i,
+              projectId: new URL(String(body.project_url)).searchParams.get(
+                'project',
+              ),
+              title: body.title,
+              publishedAt: Date.now(),
+              kind: 'project',
+              showOwner: false,
+            })),
             publishing: true,
             settings: {
               showOwnerDefault: false,
@@ -382,46 +394,54 @@ test.describe('Gallery pages from accounts', () => {
         });
       sent.push(route.request().postDataJSON());
       return route.fulfill({
-        json: { code: 200, message: 'Gallery test', link: '/gallery/1' },
+        json: { code: 200, message: 'Sent', link: '/gallery/900' },
       });
     });
 
     await page.reload();
     await page.getByRole('button', { name: /^Not now/ }).click();
-    const menu = page
-      .getByRole('group', { name: 'Sharing: Gallery test' })
-      .getByRole('button', { name: /^Sharing:/ });
-    await expect(menu).toHaveText(/Link only\s*$/);
-
-    // Cancel leaves everything as it was
-    await menu.click();
-    await page
-      .getByRole('menuitemradio', { name: /^In the gallery Anyone/ })
-      .click();
+    const menuFor = (name: string) =>
+      page
+        .getByRole('group', { name: `Sharing: ${name}` })
+        .getByRole('button', { name: /^Sharing:/ });
+    const addToGallery = async (name: string) => {
+      await menuFor(name).click();
+      await page
+        .getByRole('menuitemradio', { name: /^In the gallery Anyone/ })
+        .click();
+    };
     const dialog = page.getByRole('dialog', {
       name: 'Send to Project Gallery',
     });
+    await expect(menuFor('First test')).toHaveText(/Link only\s*$/);
+
+    // The first one opens over My Projects; closing it leaves everything as it was
+    await addToGallery('First test');
     await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
     await expect(page).toHaveURL(/\/my-projects$/);
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
+    expect(sent).toHaveLength(0);
 
-    // Sending it, still here
-    await menu.click();
-    await page
-      .getByRole('menuitemradio', { name: /^In the gallery Anyone/ })
-      .click();
+    // Another one: My Projects loads again first, and opens it straight away
+    await addToGallery('Second test');
+    await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
+    await expect(page).toHaveURL(/\/my-projects$/);
     await dialog.getByRole('button', { name: /Yes, Send to Gallery/ }).click();
     await expect(dialog).toContainText(
       'The project gallery webpage has been created.',
     );
-    await expect(page).toHaveURL(/\/my-projects$/);
     expect(sent).toHaveLength(1);
     const projectUrl = new URL(String(sent[0].project_url));
-    expect(projectUrl.searchParams.get('project')).toBe(id);
+    expect(projectUrl.searchParams.get('project')).toBe(second);
     expect(projectUrl.hash).toContain("l=3652462'2025010120250103");
-    expect(sent[0].project_name).toBe('Gallery test');
+    expect(sent[0].project_name).toBe('Second test');
     expect(sent[0].total_days).toBe(3);
+
+    // Its row says so, without leaving the page
+    await page.keyboard.press('Escape');
+    await expect(menuFor('Second test')).toHaveText(/: In the gallery\s*$/);
+    await expect(menuFor('First test')).toHaveText(/Link only\s*$/);
   });
 
   test('an owner gets a page listing the gallery pages they include', async ({
