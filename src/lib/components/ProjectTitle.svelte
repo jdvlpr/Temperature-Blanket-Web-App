@@ -31,7 +31,7 @@ the Project button shows the save state. -->
     storedItem,
   } from '#lib/storage/autosave.svelte.js';
   import {
-    MAX_SAVED_PROJECT_NAME_LENGTH,
+    MAX_PROJECT_NAME_LENGTH,
     savedProjects,
   } from '#lib/storage/projects.svelte.js';
   import { saveProject } from '#lib/utils/save-project.svelte.js';
@@ -44,8 +44,10 @@ the Project button shows the save state. -->
   $effect(() => {
     void project.url.href;
     void savedProjects.version;
+    // Not saved here yet: the name its shared link carried, if any
+    const linkName = project.linkName;
     storedItem().then((item) => {
-      savedName = item?.meta.name ?? '';
+      savedName = item ? (item.meta.name ?? '') : linkName;
       if (!focused) name = savedName;
     });
   });
@@ -107,7 +109,7 @@ wide as the title, focused or not -->
     title={autosave.stored ? 'Rename Project' : 'Save and name this project'}
     autocomplete="off"
     spellcheck="false"
-    maxlength={MAX_SAVED_PROJECT_NAME_LENGTH}
+    maxlength={MAX_PROJECT_NAME_LENGTH}
     placeholder={fallback}
     bind:value={name}
     {onfocus}

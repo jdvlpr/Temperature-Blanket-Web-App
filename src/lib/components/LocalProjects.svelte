@@ -22,9 +22,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import {
+    lastSavedAt,
     ProjectStorage,
     savedProjects,
   } from '#lib/storage/projects.svelte.js';
+  import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import GallerySharing from '#lib/components/account/GallerySharing.svelte';
+  import {
+    galleryRequestLink,
+    type GalleryRequest,
+  } from '#lib/utils/gallery-request.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
@@ -96,6 +103,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       projects = [];
     }
     loaded = true;
+    // So My Projects can tell which gallery pages have a project here
+    if (onMyProjectsPage)
+      galleryPages.projectIds = projects.map((project) => project.id);
+  }
+
+  // Signed in on My Projects: who can see each project
+  const showSharing = $derived(
+    onMyProjectsPage && signedIn && galleryPages.shown,
+  );
+
+  // Adding or updating a gallery page happens in the project, which draws the
+  // preview it needs: a full load, like opening the project from here
+  function openForGallery(
+    item: StoredProjectIndexItem,
+    request: GalleryRequest,
+  ) {
+    window.location.assign(galleryRequestLink(item.meta.href, request));
   }
 
   $effect(() => {
@@ -151,7 +175,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onrename={onMyProjectsPage
               ? (name) => rename(project.id, name)
               : undefined}
-          />
+          >
+            {#snippet sharing()}
+              {#if showSharing}
+                {@const page = galleryPages.grouped.byProject.get(project.id)}
+                <GallerySharing
+                  kind="project"
+                  label={labelFor(project)}
+                  {page}
+                  changedSince={Boolean(
+                    page && (lastSavedAt(project) ?? 0) > page.publishedAt,
+                  )}
+                  onadd={(showOwner) =>
+                    openForGallery(project, { action: 'add', showOwner })}
+                  onupdate={(old) =>
+                    openForGallery(project, {
+                      action: 'replace',
+                      postId: old.postId,
+                    })}
+                />
+              {/if}
+            {/snippet}
+          </ProjectDetails>
         {/each}
         {@render undoAt(null)}
       </div>

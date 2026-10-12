@@ -25,7 +25,7 @@ import {
   type BrowserContext,
   type Page,
 } from '@playwright/test';
-import { localD1, randomTestIp, signIn, uniqueEmail } from './helpers';
+import { idbSet, localD1, randomTestIp, signIn, uniqueEmail } from './helpers';
 
 // A sync pass is several requests, slower while the other specs run alongside
 const expect = baseExpect.configure({ timeout: 15_000 });
@@ -57,22 +57,6 @@ async function device(browser: Browser, baseURL: string) {
 }
 
 /** Writes to idb-keyval's store, as ProjectStorage does. */
-async function idbSet(page: Page, entries: Record<string, unknown>) {
-  await page.evaluate(async (entries) => {
-    const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const open = indexedDB.open('keyval-store');
-      open.onupgradeneeded = () => open.result.createObjectStore('keyval');
-      open.onsuccess = () => resolve(open.result);
-      open.onerror = () => reject(open.error);
-    });
-    const tx = db.transaction('keyval', 'readwrite');
-    for (const [key, value] of Object.entries(entries))
-      tx.objectStore('keyval').put(value, key);
-    await new Promise((resolve) => (tx.oncomplete = resolve));
-    db.close();
-  }, entries);
-}
-
 async function savedIndex(page: Page): Promise<IndexItem[]> {
   return page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {

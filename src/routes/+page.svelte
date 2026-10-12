@@ -56,6 +56,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/history-utils.svelte.js';
   import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
   import { upToDate } from '#lib/utils/other-utils.js';
+  import {
+    GALLERY_PARAM,
+    parseGalleryRequest,
+    type GalleryRequest,
+  } from '#lib/utils/gallery-request.js';
+  import AddToGallery from '#lib/components/modals/AddToGallery.svelte';
+  import { projectNameFromHash } from '#lib/utils/project-name-link.js';
+  import { previews } from '#lib/state/preview-state.svelte.js';
   import { setUnitsFromNavigator } from '#lib/utils/unit-utils.svelte.js';
   import { RedoIcon, UndoIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
@@ -78,6 +86,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
 
     if (project.onLoaded.isProject) await ProjectStorage.load();
+
+    // A shared link's name, unless the project is saved here with its own
+    const linkName = projectNameFromHash(window.location.hash);
+    if (linkName && !(await ProjectStorage.getById(project.id)))
+      project.linkName = linkName;
 
     await loadProjectFromURL();
 
@@ -120,6 +133,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (hash && !loading) debounce(() => updateHistory(), 300);
   });
 
+  // Opened from My Projects to add or update its gallery page (?gallery=):
+  // the dialog shows once the project and its preview are ready
+  let galleryRequest = $state<GalleryRequest | null>(null);
+  $effect(() => {
+    const request = galleryRequest;
+    if (!request || project.status.loading || !previews.active?.svg) return;
+    untrack(() => {
+      galleryRequest = null;
+      dialog.trigger({
+        type: 'component',
+        component: { ref: AddToGallery, props: { request } },
+        options: {
+          title:
+            request.action === 'replace'
+              ? 'Update Gallery Page'
+              : 'Send to Project Gallery',
+        },
+      });
+    });
+  });
+
+  // Once: reloading or sharing the address doesn't open it again
+  function takeGalleryRequest() {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(GALLERY_PARAM)) return null;
+    const request = parseGalleryRequest(url.searchParams.get(GALLERY_PARAM));
+    url.searchParams.delete(GALLERY_PARAM);
+    history.replaceState(history.state, '', url);
+    return request;
+  }
+
   // Started over after moving a project to the Trash: offer to put it back
   function showUndoTrash() {
     const trashed = takeJustTrashed();
@@ -148,8 +192,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const isProject = new URL(window.location.href).searchParams.has('project');
 
     if (isProject) {
+      const request = takeGalleryRequest();
       // Load a project from the URL
       await loadProject();
+      galleryRequest = request;
     } else {
       // Setup up a new project
       // Load the default units based on window.navigator

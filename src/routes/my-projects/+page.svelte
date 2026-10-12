@@ -14,9 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Everything someone has saved, in one place. Signed in, projects, palettes
-and the Trash sync to the account, and palettes can be shared to the gallery. -->
+and the Trash sync to the account, and each project and palette says who can
+see it: only people with its link, or everyone in the gallery. -->
 
-<script>
+<script lang="ts">
   import { LIST_ENDS } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
@@ -24,9 +25,10 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { account } from '#lib/accounts/summary.svelte.js';
-  import { getGalleryPages } from '#lib/accounts/gallery.js';
+  import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
-  import GalleryPages from '#lib/components/account/GalleryPages.svelte';
+  import GallerySharing from '#lib/components/account/GallerySharing.svelte';
+  import OtherGalleryPages from '#lib/components/account/OtherGalleryPages.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import LocalProjects from '#lib/components/LocalProjects.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
@@ -41,7 +43,14 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
     refreshAccountTrash,
   } from '#lib/storage/account-trash.svelte.js';
   import { onMount } from 'svelte';
-  import { LogInIcon, PlusIcon, Trash2Icon } from '@lucide/svelte';
+  import {
+    ExternalLinkIcon,
+    LogInIcon,
+    PlusIcon,
+    Trash2Icon,
+  } from '@lucide/svelte';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import type { GalleryPage } from '#lib/accounts/gallery.js';
 
   let trashedProjectCount = $state(0);
   let trashCount = $derived(trashedProjectCount + savedPalettes.deleted.length);
@@ -52,19 +61,40 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
   // Signed in with sync on: projects are kept in the account
   const synced = $derived(signedIn && sync.active);
 
-  // Palettes can be shared only while publishing from accounts is on
-  let canShare = $state(false);
+  // Signed in: the account's gallery pages, shown on each project and
+  // palette they came from (once for the page, not per row)
   $effect(() => {
-    if (!signedIn) {
-      canShare = false;
-      return;
-    }
-    let current = true;
-    getGalleryPages().then((gallery) => {
-      if (current) canShare = Boolean(gallery?.publishing);
-    });
-    return () => (current = false);
+    if (signedIn) return galleryPages.start();
   });
+
+  let ownerName = $derived(
+    (galleryPages.name ?? account.summary?.name ?? '').trim(),
+  );
+  let anyWithName = $derived(galleryPages.pages.some((p) => p.showOwner));
+
+  function sharePalette(
+    palette: { id: string },
+    colors: Color[],
+    label: string,
+    options: { showOwner?: boolean; replace?: GalleryPage } = {},
+  ) {
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: SharePalette,
+        props: {
+          paletteId: palette.id,
+          colors,
+          name: label,
+          showOwner: options.replace?.showOwner ?? options.showOwner,
+          replacePostId: options.replace?.postId,
+        },
+      },
+      options: {
+        title: options.replace ? 'Update Gallery Page' : 'Share to the Gallery',
+      },
+    });
+  }
 
   // The account's Trash once when the page opens (and again in the dialog),
   // not on every change: requests are shared by everyone on the free plan
@@ -118,6 +148,35 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
         {/if}
       </p>
 
+      <!-- Signed in: what "with my name" shows, and where those pages are listed -->
+      {#if browser && signedIn && galleryPages.shown}
+        <p
+          class="text-surface-700-300 -mt-6 text-center text-sm"
+          data-testid="gallery-name-status"
+        >
+          {#if ownerName}
+            Those in the gallery with your name say “By {ownerName}”.
+            {#if anyWithName && galleryPages.publicId}
+              <a
+                href={resolve('/gallery/by/[ownerId]', {
+                  ownerId: galleryPages.publicId,
+                })}
+                target="_blank"
+                class="link whitespace-nowrap"
+                data-testid="gallery-owner-page"
+                >Your public gallery page<ExternalLinkIcon
+                  class="icon-sm ml-0.5 inline"
+                  aria-hidden="true"
+                /></a
+              >
+            {/if}
+          {:else}
+            To show your name on those in the gallery, add a display name on
+            your <a href={resolve('account')} class="link">Account page</a>.
+          {/if}
+        </p>
+      {/if}
+
       <!-- Signed out: an account keeps them safe, and on every device -->
       {#if browser && __ACCOUNTS_ENABLED__ && !signedIn}
         <div
@@ -162,23 +221,31 @@ and the Trash sync to the account, and palettes can be shared to the gallery. --
           {#if synced}
             <AddToAccountButton kind="palettes" />
           {/if}
-          <SavedPalettes
-            onshare={canShare
-              ? (props) =>
-                  dialog.trigger({
-                    type: 'component',
-                    component: { ref: SharePalette, props },
-                    options: { title: 'Share to the Gallery' },
-                  })
-              : undefined}
-          />
+          <SavedPalettes>
+            {#snippet sharing({ palette, colors, label })}
+              {#if signedIn && galleryPages.shown}
+                {@const page = galleryPages.grouped.byPalette.get(palette.id)}
+                <GallerySharing
+                  kind="palette"
+                  {label}
+                  {page}
+                  changedSince={Boolean(
+                    page && palette.updatedAt > page.publishedAt,
+                  )}
+                  onadd={(showOwner) =>
+                    sharePalette(palette, colors, label, { showOwner })}
+                  onupdate={(old) =>
+                    sharePalette(palette, colors, label, { replace: old })}
+                />
+              {/if}
+            {/snippet}
+          </SavedPalettes>
         {/if}
       </section>
 
-      <!-- Signed in: pages published to the gallery from the account -->
+      <!-- Signed in: gallery pages not next to a project or palette above -->
       {#if browser && signedIn}
-        <GalleryPages
-          name={account.summary?.name ?? ''}
+        <OtherGalleryPages
           cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS} card-border"
         />
       {/if}

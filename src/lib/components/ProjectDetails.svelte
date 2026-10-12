@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SyncIcon from '#lib/components/sync/SyncIcon.svelte';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import type { Snippet } from 'svelte';
 
   interface Props {
     project: any;
@@ -34,6 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onrename?: (name: string) => void;
     /** Where the project is kept, e.g. "Synced" (see $lib/sync) */
     syncLabel?: SyncLabel;
+    /** Who can see it (My Projects, signed in) */
+    sharing?: Snippet;
   }
 
   let {
@@ -43,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick,
     onrename,
     syncLabel,
+    sharing,
   }: Props = $props();
 
   const href = $derived(project.href);
@@ -152,6 +156,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
       {/snippet}
       <PaletteStrip {colors} height="24px" label={description} />
+    {/if}
+    {#if sharing && !editing}
+      {@render sharing()}
     {/if}
   </div>
   <!-- Not while renaming, which gets the room -->

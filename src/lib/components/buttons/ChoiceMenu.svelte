@@ -41,15 +41,24 @@ You should have received a copy of the GNU General Public License along with Tem
     /** Names the setting on the button, e.g. "Units" */
     label: string;
     icon: Component<{ size?: number; 'aria-hidden'?: 'true' }>;
+    /** The button's classes, when it shouldn't look like the Sort and View menus */
+    triggerClass?: string;
   }
 
-  let { options, value, onchange, label, icon: Icon }: Props = $props();
+  let {
+    options,
+    value,
+    onchange,
+    label,
+    icon: Icon,
+    triggerClass = menuTriggerClass,
+  }: Props = $props();
 
   let current = $derived(options.find((option) => option.value === value));
 </script>
 
 <Menu positioning={menuPositioning('bottom-start')}>
-  <Menu.Trigger class={menuTriggerClass}>
+  <Menu.Trigger class={triggerClass}>
     <Icon aria-hidden="true" />
     <span>{label}: {current?.short ?? current?.label ?? ''}</span>
     <ChevronDownIcon class="icon-sm" aria-hidden="true" />

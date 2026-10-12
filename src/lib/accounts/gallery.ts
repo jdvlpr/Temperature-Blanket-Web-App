@@ -121,7 +121,8 @@ export async function publishFromAccount(
 
 export type SharePaletteResult =
   | { status: 'shared'; postId: number | null }
-  | { status: 'error'; message: string };
+  /** `code` is WordPress's, e.g. 409 when the same palette is already in the gallery */
+  | { status: 'error'; message: string; code?: number };
 
 /** Shares a saved palette to the gallery as the signed-in user. */
 export async function sharePalette(palette: {
@@ -159,10 +160,50 @@ export async function sharePalette(palette: {
         typeof data?.message === 'string' && data.message
           ? data.message
           : 'The palette couldn’t be shared. Try again later.',
+      code: Number(data?.code) || undefined,
     };
   window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
   return {
     status: 'shared',
     postId: typeof data?.id === 'number' ? data.id : null,
   };
+}
+
+/** The account's gallery pages sorted out by what they were made from. */
+export type GroupedGalleryPages = {
+  /** The newest page of each saved project here, by project ID */
+  byProject: Map<string, GalleryPage>;
+  /** The newest page of each saved palette here, by palette ID */
+  byPalette: Map<string, GalleryPage>;
+  /** The rest: older pages of the same thing, or from something not saved here */
+  others: GalleryPage[];
+};
+
+/**
+ * Puts each page next to the saved project or palette it came from, so each
+ * shows one page: its newest. The others are listed on their own.
+ */
+export function groupGalleryPages(
+  pages: readonly GalleryPage[],
+  projectIds: Iterable<string>,
+  paletteIds: Iterable<string>,
+): GroupedGalleryPages {
+  const projects = new Set(projectIds);
+  const palettes = new Set(paletteIds);
+  const byProject = new Map<string, GalleryPage>();
+  const byPalette = new Map<string, GalleryPage>();
+  const others: GalleryPage[] = [];
+
+  const newestFirst = [...pages].sort(
+    (a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId,
+  );
+  for (const page of newestFirst) {
+    const isPalette = page.kind === 'palette';
+    const saved = isPalette ? palettes : projects;
+    const shown = isPalette ? byPalette : byProject;
+    if (saved.has(page.projectId) && !shown.has(page.projectId))
+      shown.set(page.projectId, page);
+    else others.push(page);
+  }
+  return { byProject, byPalette, others };
 }

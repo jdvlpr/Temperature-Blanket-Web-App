@@ -190,6 +190,10 @@ class ProjectClass {
     title: '',
   });
 
+  // The name a shared link carried (its `m`), for a project not saved here:
+  // shown as its name, and kept as its name when it's first saved
+  linkName = $state('');
+
   // *****************
   // Methods
   // *****************

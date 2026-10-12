@@ -47,6 +47,7 @@ button to it. -->
   import { sync } from '#lib/sync/status.svelte.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+  import { withProjectName } from '#lib/utils/project-name-link.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { saveProject } from '#lib/utils/save-project.svelte.js';
@@ -121,9 +122,22 @@ button to it. -->
 
   const linkCopied = new Flash();
 
+  // The open project's name, ready before Copy Link is pressed: a clipboard
+  // write right after waiting on storage can be refused (Safari)
+  let shareName = $state('');
+  $effect(() => {
+    void project.url.href;
+    void savedProjects.version;
+    const linkName = project.linkName;
+    storedItem().then((item) => {
+      shareName = item ? (item.meta.name ?? '') : linkName;
+    });
+  });
+
   async function copyLink() {
     const ok = await copyToClipboard(
-      project.url.href,
+      // With its name, so whoever opens it sees it too
+      withProjectName(project.url.href, shareName, locations.projectTitle),
       'Link copied',
       'Unable to copy to your clipboard',
     );

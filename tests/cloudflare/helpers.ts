@@ -100,3 +100,20 @@ export function localD1(sql: string): Record<string, unknown>[] {
     `localD1 failed: ${String((lastError as { stderr?: Buffer })?.stderr ?? lastError)}`,
   );
 }
+
+/** Writes entries straight to the app's IndexedDB store (idb-keyval), as saving would. */
+export async function idbSet(page: Page, entries: Record<string, unknown>) {
+  await page.evaluate(async (entries) => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const open = indexedDB.open('keyval-store');
+      open.onupgradeneeded = () => open.result.createObjectStore('keyval');
+      open.onsuccess = () => resolve(open.result);
+      open.onerror = () => reject(open.error);
+    });
+    const tx = db.transaction('keyval', 'readwrite');
+    for (const [key, value] of Object.entries(entries))
+      tx.objectStore('keyval').put(value, key);
+    await new Promise((resolve) => (tx.oncomplete = resolve));
+    db.close();
+  }, entries);
+}

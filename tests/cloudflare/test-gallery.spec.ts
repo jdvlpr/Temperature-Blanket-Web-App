@@ -19,7 +19,7 @@
 // Local WordPress site (see the plugin's dev/README.md).
 
 import { expect, test } from '@playwright/test';
-import { localD1, randomTestIp, signIn, uniqueEmail } from './helpers';
+import { idbSet, localD1, randomTestIp, signIn, uniqueEmail } from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
   await page.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
@@ -29,16 +29,26 @@ test.beforeEach(async ({ page, context, baseURL }) => {
   ]);
 });
 
+// A browser's DELETE says where it's from. Without that (or a body type),
+// SvelteKit takes it for a cross-site form submission and refuses it (403).
+const sameOrigin = (baseURL: string | undefined) => ({
+  headers: { Origin: baseURL ?? '' },
+});
+
 const userIdFor = (email: string) =>
   String(localD1(`select "id" from "user" where "email" = '${email}'`)[0].id);
 
 test.describe('Gallery pages from accounts', () => {
-  test('signed out, the routes refuse', async ({ request }) => {
+  test('signed out, the routes refuse', async ({ request, baseURL }) => {
     expect((await request.get('/api/account/gallery')).status()).toBe(401);
     expect(
       (await request.post('/api/account/gallery', { data: {} })).status(),
     ).toBe(401);
-    expect((await request.delete('/api/account/gallery/1')).status()).toBe(401);
+    expect(
+      (
+        await request.delete('/api/account/gallery/1', sameOrigin(baseURL))
+      ).status(),
+    ).toBe(401);
     expect(
       (
         await request.patch('/api/account/gallery/1', {
@@ -51,6 +61,7 @@ test.describe('Gallery pages from accounts', () => {
   test('with publishing off, publishing pauses but settings work', async ({
     page,
     request,
+    baseURL,
   }) => {
     const email = uniqueEmail('gallery-off');
     await signIn(page, request, email);
@@ -87,9 +98,11 @@ test.describe('Gallery pages from accounts', () => {
     ).toBe(400);
 
     // Not this account's page
-    expect((await api.delete('/api/account/gallery/123456')).status()).toBe(
-      404,
-    );
+    expect(
+      (
+        await api.delete('/api/account/gallery/123456', sameOrigin(baseURL))
+      ).status(),
+    ).toBe(404);
     expect(
       (
         await api.patch('/api/account/gallery/123456', {
@@ -98,17 +111,18 @@ test.describe('Gallery pages from accounts', () => {
       ).status(),
     ).toBe(404);
 
-    // Nothing published and publishing off: no gallery section on My Projects
+    // Nothing published and publishing off: no sharing on My Projects
     await page.goto('/my-projects');
     await expect(
       page.getByRole('heading', { name: 'My Projects', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'My Public Gallery Pages' }),
+      page.getByRole('heading', { name: 'Other Gallery Pages' }),
     ).toHaveCount(0);
+    await expect(page.getByTestId('gallery-name-status')).toHaveCount(0);
   });
 
-  test('My Projects lists published pages, and deleting the account asks about them', async ({
+  test('My Projects lists pages without a project here, and deleting the account asks about them', async ({
     page,
     request,
   }) => {
@@ -121,11 +135,12 @@ test.describe('Gallery pages from accounts', () => {
        values (${postId}, '${userId}', 'p1', 'Ottawa from 2025 to 2026', ${Date.now()})`,
     );
 
+    // Its project (p1) isn't saved here, so it's listed on its own
     await page.goto('/my-projects');
     await expect(
-      page.getByRole('heading', { name: 'My Public Gallery Pages' }),
+      page.getByRole('heading', { name: 'Other Gallery Pages' }),
     ).toBeVisible();
-    const pages = page.getByRole('list', { name: 'Your gallery pages' });
+    const pages = page.getByRole('list', { name: 'Other gallery pages' });
     await expect(
       pages.getByRole('link', { name: /Ottawa from 2025 to 2026/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
@@ -133,11 +148,11 @@ test.describe('Gallery pages from accounts', () => {
     // Each page is included on the public gallery on its own; the display
     // name itself is on the Account page
     const include = pages.getByRole('checkbox', {
-      name: 'On my public gallery: Ottawa from 2025 to 2026',
+      name: 'With my name: Ottawa from 2025 to 2026',
     });
     await expect(include).not.toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
-      'Add a display name',
+      'add a display name',
     );
     await include.check();
     await expect(include).toBeChecked();
@@ -170,6 +185,115 @@ test.describe('Gallery pages from accounts', () => {
         onPublicGallery: true,
       }),
     ]);
+  });
+
+  test('a saved project shows who can see it, and changing it changes its page', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('gallery-sharing');
+    await signIn(page, request, email);
+    const userId = userIdFor(email);
+    localD1(
+      `update "user" set "name" = 'Ada Lovelace' where "id" = '${userId}'`,
+    );
+
+    // A project saved here before its page was added
+    await page.goto('/my-projects');
+    const id = String(Date.now());
+    const href = new URL(`/?project=${id}`, page.url()).href;
+    const title = 'Quito from 2025 to 2026';
+    await idbSet(page, {
+      [`p_${id}`]: {
+        createdAt: new Date().toISOString(),
+        date: 'today',
+        href,
+        isCustomWeatherData: true,
+        title,
+        weatherData: [],
+        weatherSource: { name: 'Meteostat', useSecondary: false },
+      },
+      projects_index: [
+        {
+          id,
+          meta: { date: 'today', href, title, isCustomWeatherData: true },
+          updatedAt: Date.now() - 60_000,
+        },
+      ],
+    });
+    // Its page, and an older one of the same project
+    const postId = 700_000_000 + Math.floor(Math.random() * 1e8);
+    localD1(
+      `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
+       values (${postId}, '${userId}', '${id}', '${title}', ${Date.now()}),
+              (${postId + 1}, '${userId}', '${id}', 'Older', ${Date.now() - 3_600_000})`,
+    );
+
+    await page.reload();
+    // The project isn't in the account: leave it in this browser
+    await page.getByRole('button', { name: /^Not now/ }).click();
+    const sharing = page.getByRole('group', { name: `Sharing: ${title}` });
+    const menu = sharing.getByRole('button', { name: /^Sharing:/ });
+    await expect(menu).toHaveText(/: In the gallery\s*$/);
+    await expect(
+      sharing.getByRole('link', { name: /view its gallery page/ }),
+    ).toHaveAttribute('href', `/gallery/${postId}`);
+    // Unchanged since it was added: nothing to update
+    await expect(
+      sharing.getByRole('button', { name: /Update the gallery page/ }),
+    ).toHaveCount(0);
+    // The older page is listed on its own
+    await expect(
+      page
+        .getByRole('list', { name: 'Other gallery pages' })
+        .getByRole('link', { name: /Older/ }),
+    ).toBeVisible();
+
+    // With the name
+    await menu.click();
+    await page
+      .getByRole('menuitemradio', { name: /In the gallery with my name/ })
+      .click();
+    await expect(menu).toHaveText(/with my name\s*$/);
+    await expect(page.getByTestId('gallery-name-status')).toContainText(
+      'By Ada Lovelace',
+    );
+    await expect(page.getByTestId('gallery-owner-page')).toBeVisible();
+    expect(
+      localD1(
+        `select "showOwner" from "galleryPost" where "postId" = ${postId}`,
+      )[0].showOwner,
+    ).toBe(1);
+
+    // Only the link: asks first, then takes the page off the gallery
+    await menu.click();
+    await page
+      .getByRole('menuitemradio', { name: /Only people with the link/ })
+      .click();
+    // Both its pages, so the older one doesn't take the newer one's place
+    await expect(sharing).toContainText('Remove its 2 gallery pages?');
+    await sharing.getByRole('button', { name: 'Cancel' }).click();
+    await expect(menu).toHaveText(/with my name\s*$/);
+    // (WordPress, which trashes the post, isn't running here: as if it did)
+    const removed: string[] = [];
+    await page.route(`**/api/account/gallery/*`, (route) => {
+      if (route.request().method() !== 'DELETE') return route.fallback();
+      removed.push(new URL(route.request().url()).pathname.split('/').pop()!);
+      return route.fulfill({ status: 204 });
+    });
+    await menu.click();
+    await page
+      .getByRole('menuitemradio', { name: /Only people with the link/ })
+      .click();
+    await sharing
+      .getByRole('button', { name: 'Remove from the gallery' })
+      .click();
+    await expect(sharing).toHaveCount(0);
+    expect(removed.sort()).toEqual([String(postId), String(postId + 1)]);
+    await expect(
+      page.getByRole('heading', { name: 'Other Gallery Pages' }),
+    ).toHaveCount(0);
+    // (Publishing is off here, so with no page there's nothing left to change)
   });
 
   test('an owner gets a page listing the gallery pages they include', async ({

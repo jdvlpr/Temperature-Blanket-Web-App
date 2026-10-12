@@ -20,7 +20,7 @@ Save below. It's still one line of text: Enter saves, and line breaks become
 spaces. -->
 
 <script lang="ts">
-  import { MAX_SAVED_PROJECT_NAME_LENGTH } from '#lib/storage/projects.svelte.js';
+  import { MAX_PROJECT_NAME_LENGTH } from '#lib/storage/projects.svelte.js';
   import { CheckIcon, XIcon } from '@lucide/svelte';
   import type { Attachment } from 'svelte/attachments';
 
@@ -28,7 +28,7 @@ spaces. -->
     value = $bindable(''),
     placeholder = '',
     label = 'Project name',
-    maxlength = MAX_SAVED_PROJECT_NAME_LENGTH,
+    maxlength = MAX_PROJECT_NAME_LENGTH,
     onsave,
     oncancel,
   }: {

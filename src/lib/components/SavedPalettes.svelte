@@ -35,22 +35,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import { PencilIcon, Share2Icon, Trash2Icon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
   // (the My Projects page), each palette is a link to the Yarn Palette Creator
-  // With onshare (My Projects, signed in), each palette can be shared to the gallery
+  // With sharing (My Projects, signed in), each palette says who can see it
   let {
     updateGauge,
-    onshare,
+    sharing,
   }: {
     updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
-    onshare?: (share: {
-      paletteId: string;
-      colors: Color[];
-      name: string;
-    }) => void;
+    sharing?: Snippet<
+      [{ palette: SavedPalette; colors: Color[]; label: string }]
+    >;
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -211,78 +209,69 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <!-- The name in the label is the real link or button, for keyboards and
             screen readers; a click anywhere else on the palette does the same,
             and pointing at a color still names its yarn -->
-            <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-            <div
-              class="w-full min-w-0 cursor-pointer"
-              onclick={(event) => choose(event, colors)}
-            >
-              <!-- Laid out like a saved project's details: name, then when it was saved.
+            <div class="flex w-full min-w-0 flex-col">
+              <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+              <div
+                class="w-full min-w-0 cursor-pointer"
+                onclick={(event) => choose(event, colors)}
+              >
+                <!-- Laid out like a saved project's details: name, then when it was saved.
               The name is the palette's link (My Projects) or button (Browse Palettes).
               The button has no handler of its own: its click reaches choose() -->
-              {#snippet details()}
-                <span
-                  class="flex flex-wrap items-center justify-start gap-x-4 text-xs"
-                >
-                  <!-- The name with its Rename button right by it, so it's
+                {#snippet details()}
+                  <span
+                    class="flex flex-wrap items-center justify-start gap-x-4 text-xs"
+                  >
+                    <!-- The name with its Rename button right by it, so it's
                   clear what it edits -->
-                  <span class="inline-flex items-center gap-0.5">
-                    {#if updateGauge}
+                    <span class="inline-flex items-center gap-0.5">
+                      {#if updateGauge}
+                        <button
+                          type="button"
+                          class="cursor-pointer text-left underline"
+                          ><span class="sr-only">Use </span>{label}</button
+                        >
+                      {:else}
+                        <!-- eslint-disable svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
+                        <a
+                          href={getYarnPageURL({
+                            colors,
+                            origin: window.location.origin,
+                            version,
+                          })}
+                          class="underline"
+                          title="Open in Yarn Palette Creator"
+                        >
+                          <span class="sr-only">Open</span>
+                          {label}
+                          <span class="sr-only">in Yarn Palette Creator</span>
+                        </a>
+
+                        <!-- eslint-enable svelte/no-navigation-without-resolve -->
+                      {/if}
+                      <!-- Its click stays here, not choosing the palette -->
                       <button
                         type="button"
-                        class="cursor-pointer text-left underline"
-                        ><span class="sr-only">Use </span>{label}</button
+                        class="hover:bg-surface-200-800 rounded-base -my-1 inline-flex size-6 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
+                        title="Rename Palette"
+                        aria-label="Rename {label}"
+                        onclick={(event) => {
+                          event.stopPropagation();
+                          startRename(palette);
+                        }}
                       >
-                    {:else}
-                      <!-- eslint-disable svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
-                      <a
-                        href={getYarnPageURL({
-                          colors,
-                          origin: window.location.origin,
-                          version,
-                        })}
-                        class="underline"
-                        title="Open in Yarn Palette Creator"
-                      >
-                        <span class="sr-only">Open</span>
-                        {label}
-                        <span class="sr-only">in Yarn Palette Creator</span>
-                      </a>
-
-                      <!-- eslint-enable svelte/no-navigation-without-resolve -->
-                    {/if}
-                    <!-- Its click stays here, not choosing the palette -->
-                    <button
-                      type="button"
-                      class="hover:bg-surface-200-800 rounded-base -my-1 inline-flex size-6 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
-                      title="Rename Palette"
-                      aria-label="Rename {label}"
-                      onclick={(event) => {
-                        event.stopPropagation();
-                        startRename(palette);
-                      }}
-                    >
-                      <PencilIcon class="icon-sm" />
-                    </button>
+                        <PencilIcon class="icon-sm" />
+                      </button>
+                    </span>
+                    <span>Saved {saved}</span>
                   </span>
-                  <span>Saved {saved}</span>
-                </span>
-              {/snippet}
-              <PaletteStrip {colors} insideControl label={details} />
+                {/snippet}
+                <PaletteStrip {colors} insideControl label={details} />
+              </div>
+              {@render sharing?.({ palette, colors, label })}
             </div>
             <!-- Centered on the 70px color bar, not the label under it -->
             <div class="flex h-[70px] shrink-0 items-center gap-1">
-              {#if onshare}
-                <button
-                  type="button"
-                  class="btn-icon hover:preset-tonal-surface"
-                  title="Share to the Gallery"
-                  aria-label="Share {label} to the gallery"
-                  onclick={() =>
-                    onshare({ paletteId: palette.id, colors, name: label })}
-                >
-                  <Share2Icon />
-                </button>
-              {/if}
               <button
                 type="button"
                 class="btn-icon hover:preset-tonal-surface"

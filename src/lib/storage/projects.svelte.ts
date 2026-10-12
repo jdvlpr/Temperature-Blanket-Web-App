@@ -48,7 +48,10 @@ export type StoredProjectIndexItem = {
 export const lastSavedAt = (item: StoredProjectIndexItem): number | null =>
   item.sync?.updatedAt ?? item.updatedAt ?? null;
 
+/** What's kept: names typed before the limit was 60 stay as they were */
 export const MAX_SAVED_PROJECT_NAME_LENGTH = 100;
+/** The longest name that can be typed now, short enough for a shared link */
+export { MAX_LINK_NAME_LENGTH as MAX_PROJECT_NAME_LENGTH } from '#lib/utils/project-name-link.js';
 
 /**
  * A project moved to the Trash: the whole project, so it can be put back. Kept
@@ -207,9 +210,15 @@ export class ProjectStorage {
 
     let _project = localProject || this.project();
 
-    // Re-saving from the planner keeps the name given on My Projects
+    // Re-saving from the planner keeps the name given on My Projects. Saved
+    // for the first time, it's the name its shared link carried, if any.
     if (_project.name === undefined) {
-      const name = (await this.getById(_id))?.name;
+      const stored = await this.getById(_id);
+      const name = stored
+        ? stored.name
+        : !localProject && _id === project.id
+          ? project.linkName
+          : undefined;
       if (name) _project = { ..._project, name };
     }
 
@@ -253,6 +262,9 @@ export class ProjectStorage {
     });
 
     this.onChange?.();
+    // Saved here now: its own name is the one to show from here on
+    if (_id === project.id) project.linkName = '';
+
     return indexItem;
   }
 

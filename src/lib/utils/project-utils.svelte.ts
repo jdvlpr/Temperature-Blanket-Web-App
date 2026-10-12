@@ -143,12 +143,15 @@ export const sendToProjectGallery = async (
     fromAccount = false,
     showOwner = false,
     name = '',
+    replacePostId,
   }: {
     fromAccount?: boolean;
     /** From an account: include it on the owner's public gallery, with their name */
     showOwner?: boolean;
     /** The name the project was given, shown in the gallery instead of its location title */
     name?: string;
+    /** From an account: the project's old gallery page, removed once this one is in */
+    replacePostId?: number;
   } = {},
 ) => {
   const colors: Color[][] = [];
@@ -221,13 +224,14 @@ export const sendToProjectGallery = async (
       return 'Sorry, this project is too large to add to the gallery. Try a shorter date range or fewer locations.';
     }
     // WordPress's answer, from either route
-    let response: Awaited<ReturnType<Response['json']>> | undefined;
-    if (fromAccount) {
-      const { publishFromAccount } = await import('#lib/accounts/gallery.js');
-      const result = await publishFromAccount(body, { showOwner });
-      if (result.status === 'answered') response = result.response;
-    }
-    if (!response) {
+    const publish = async () => {
+      if (fromAccount) {
+        const { publishFromAccount } = await import('#lib/accounts/gallery.js');
+        const result = await publishFromAccount(body, { showOwner });
+        if (result.status === 'answered') return result.response;
+      }
+      // Replacing a page is only from an account: never a second, anonymous one
+      if (replacePostId) return null;
       const request = await fetch('/api/project', {
         method: 'POST',
         headers: {
@@ -235,15 +239,45 @@ export const sendToProjectGallery = async (
         },
         body,
       });
-      response = await request.json();
+      return await request.json();
+    };
+    const removeOld = async () => {
+      if (!replacePostId) return true;
+      const { removeGalleryPage } = await import('#lib/accounts/gallery.js');
+      try {
+        await removeGalleryPage(replacePostId);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    let response = await publish();
+    if (!response)
+      return 'Adding to the gallery from your account is paused right now. Try again later.';
+    // Replacing with the same settings (only its name changed, say): the old
+    // page is the duplicate, so it goes first. Removed pages aren't duplicates.
+    let oldRemoved: boolean | null = null;
+    if (response.code === 409 && replacePostId) {
+      oldRemoved = await removeOld();
+      if (oldRemoved) response = (await publish()) ?? response;
     }
 
     if (response.code === 200) {
       // success
       message = `<p class="font-bold text-xl my-2">${escapeHtml(String(response.message ?? ''))}</p><p>The project gallery webpage has been created.</p>`;
+      if (replacePostId) {
+        oldRemoved ??= await removeOld();
+        message += oldRemoved
+          ? '<p>It replaces the old gallery page, which was removed.</p>'
+          : '<p>The old gallery page couldn’t be removed. You can remove it from My Projects, under Other gallery pages.</p>';
+        const { GALLERY_PAGES_CHANGED } =
+          await import('#lib/accounts/gallery.js');
+        window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+      }
       if (response.linked)
         message +=
-          '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from My Projects.</p>';
+          '<p class="text-sm opacity-80">It’s linked to your account, so you can change who sees it or remove it from My Projects.</p>';
       project.gallery.href = response.link;
       project.gallery.title = decodeHtmlEntities(String(response.title ?? ''));
       // reloadRecentGalleryProjects();
@@ -262,6 +296,13 @@ export const sendToProjectGallery = async (
     } else {
       message = 'Error :(';
       if (response.message) message += ' ' + response.message;
+    }
+    if (oldRemoved && response.code !== 200) {
+      message +=
+        '<p>Its old gallery page was removed. You can add the project to the gallery again from My Projects.</p>';
+      const { GALLERY_PAGES_CHANGED } =
+        await import('#lib/accounts/gallery.js');
+      window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
     }
   } catch (error) {
     message =

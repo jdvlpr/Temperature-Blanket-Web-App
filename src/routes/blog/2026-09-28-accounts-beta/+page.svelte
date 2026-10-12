@@ -163,10 +163,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               You choose for each project, and you can change your mind at any
-              time from My Projects, under My Public Gallery Pages. Your name
-              comes from your <a href="/account" class="link">Account</a> page, so
-              if you change it there, it changes on everything you've included. The
-              next time you share, the switch starts where you left it last time.
+              time from My Projects, where each project and palette has a
+              Sharing menu: only people with its link, in the gallery, or in the
+              gallery with your name. Your name comes from your <a
+                href="/account"
+                class="link">Account</a
+              > page, so if you change it there, it changes on everything you've included.
+              The next time you share, the switch starts where you left it last time.
             </p>
 
             <p class="font-bold">Share yarn palettes</p>

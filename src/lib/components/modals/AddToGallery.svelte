@@ -28,6 +28,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from './StickyPart.svelte';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import type { GalleryRequest } from '#lib/utils/gallery-request.js';
+
+  // From My Projects (?gallery=): add with a choice already made, or replace
+  // the project's old page with one of it as it is now
+  let { request }: { request?: GalleryRequest } = $props();
 
   // In the Project menu's narrow panel: one column, not three
   const inPanel = $derived(dialog.options.placement === 'side');
@@ -43,14 +48,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
   // The name the saved project was given, which the gallery shows as its title
   let projectName = $state('');
+  // The page this one replaces, once it's known to be the account's
+  let replacePostId = $state<number | undefined>();
 
   onMount(async () => {
-    projectName = (await ProjectStorage.getById(project.id))?.name ?? '';
+    // Not saved here: the name its shared link carried, if any
+    const stored = await ProjectStorage.getById(project.id);
+    projectName = stored ? (stored.name ?? '') : project.linkName;
     if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
     const { getGalleryPages } = await import('#lib/accounts/gallery.js');
     const gallery = await getGalleryPages();
     if (!gallery?.publishing) return;
     showOwner = gallery.settings.showOwnerDefault;
+    if (request?.action === 'add') showOwner = request.showOwner;
+    if (request?.action === 'replace') {
+      const old = gallery.posts.find((post) => post.postId === request.postId);
+      if (old) {
+        replacePostId = old.postId;
+        showOwner = old.showOwner ?? showOwner;
+      }
+    }
     if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
   });
@@ -84,6 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           fromAccount,
           showOwner: fromAccount && showOwner,
           name: projectName,
+          replacePostId: fromAccount ? replacePostId : undefined,
         }),
         icon: 'none',
       };
@@ -122,6 +140,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? ''
           : 'sm:col-span-2'}"
       >
+        {#if replacePostId}
+          <p class="bg-surface-100-900 rounded-container p-4 text-left">
+            This adds a new gallery page of the project as it is now, and
+            removes its old one. The new page has a new link, and its views
+            start over.
+          </p>
+        {/if}
         <p class="text-left text-lg font-bold">
           Do you understand and agree to the following terms and conditions?
         </p>
@@ -136,8 +161,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
           {#if fromAccount}
             <p>
-              • It will be linked to your account, so you can remove it later
-              from
+              • It will be linked to your account, so you can change who sees it
+              or remove it later from
               <a href={resolve('my-projects')} target="_blank" class="link"
                 >My Projects</a
               >.
@@ -203,7 +228,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"
-        onclick={submit}>Yes, Send to Gallery</button
+        onclick={submit}
+        >{replacePostId
+          ? 'Yes, Update Gallery Page'
+          : 'Yes, Send to Gallery'}</button
       >
     </div>
   {/if}
