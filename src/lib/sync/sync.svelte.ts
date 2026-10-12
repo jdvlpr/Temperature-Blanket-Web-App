@@ -125,16 +125,17 @@ async function runPass(userId: string) {
     // Palettes from other devices show up in open lists
     await savedPalettes.refresh().catch(() => {});
   }
-  if (signedOut && (await sessionEnded())) return;
+  if (signedOut && (await sessionEnded(userId))) return;
   await toastNewProblem(userId).catch(() => {});
 }
 
 /**
  * After a sync is refused as signed out: when the server confirms the session
- * is over, shows the app signed out, so it doesn't keep showing the account.
- * Its projects stay in this browser. False when that can't be confirmed.
+ * is over, signs out here as signing out does. The account's synced projects
+ * and palettes leave this browser; ones with changes that hadn't synced stay.
+ * False when that can't be confirmed.
  */
-async function sessionEnded(): Promise<boolean> {
+async function sessionEnded(userId: string): Promise<boolean> {
   let session: Awaited<ReturnType<typeof getSession>>;
   try {
     session = await getSession();
@@ -148,10 +149,25 @@ async function sessionEnded(): Promise<boolean> {
     sync.state = 'error';
     return false;
   }
+  const kept =
+    (await unsyncedCount(userId).catch(() => 0)) +
+    (await PaletteStorage.getAll()).filter(
+      (p) => p.sync?.ownerUserId === userId && !p.purged && p.sync.dirty,
+    ).length;
+  clearSignedInHint();
+  try {
+    await leaveAccount(userId, false);
+  } catch (e) {
+    // Signed out regardless; the account's items just stay here a while
+    console.error('Leaving the account failed', e);
+  }
+  // After leaving, as signing out does, so lists refresh without its items
+  forgetAccountSummary();
   const redirect = encodeURIComponent(location.pathname + location.search);
   toast.trigger({
-    message:
-      'You’ve been signed out. Your projects are still saved in this browser. Sign in to sync them.',
+    message: kept
+      ? 'You’ve been signed out. Changes that hadn’t synced are still saved in this browser. Sign in to sync them.'
+      : 'You’ve been signed out. Sign in to see your projects.',
     category: 'error',
     autohide: false,
     action: {
@@ -159,9 +175,6 @@ async function sessionEnded(): Promise<boolean> {
       response: () => goto(`${resolve('/auth/sign-in')}?redirect=${redirect}`),
     },
   });
-  clearSignedInHint();
-  // Stops sync (see AccountSync)
-  forgetAccountSummary();
   return true;
 }
 
