@@ -239,10 +239,14 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       sharing.getByRole('button', { name: /Update the snapshot/ }),
     ).toHaveCount(0);
+    // Its link, beside it on the row
+    await expect(
+      sharing.getByRole('button', { name: `Copy Link: ${title}` }),
+    ).toBeVisible();
     await menu.click();
     await expect(
       page.getByRole('menuitem', { name: /View Gallery Page/ }),
-    ).toBeVisible();
+    ).toHaveAttribute('href', `/gallery/${postId}`);
     await expect(
       page.getByRole('menuitem', { name: /Update Snapshot/ }),
     ).toHaveCount(0);
@@ -254,7 +258,7 @@ test.describe('Gallery pages from accounts', () => {
     ).toBeVisible();
 
     // With the name (the menu stays open, to show it took)
-    await page.getByRole('menuitemcheckbox', { name: /Show My Name/ }).click();
+    await page.getByRole('menuitemcheckbox', { name: /Show my name/ }).click();
     await page.keyboard.press('Escape');
     await expect(menu).toHaveText(/Published · By Ada Lovelace\s*$/);
     await expect(page.getByTestId('gallery-name-status')).toContainText(

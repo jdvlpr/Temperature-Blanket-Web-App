@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
   import ProjectDetails from '#lib/components/ProjectDetails.svelte';
+  import CopyLinkButton from '#lib/components/buttons/CopyLinkButton.svelte';
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import {
@@ -130,6 +131,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
+<!-- On My Projects, every saved project's link, signed in or not -->
+{#snippet copyLink(project: StoredProjectIndexItem)}
+  <CopyLinkButton
+    href={project.meta.href}
+    name={project.meta.name}
+    title={project.meta.title}
+    label={labelFor(project)}
+  />
+{/snippet}
+
 {#snippet undoAt(anchor: string | null)}
   {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
     <TrashUndo
@@ -190,7 +201,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       action: 'replace',
                       postId: old.postId,
                     })}
-                />
+                >
+                  {@render copyLink(project)}
+                </GallerySharing>
+              {:else if onMyProjectsPage}
+                <div class="mt-2 flex text-sm">
+                  {@render copyLink(project)}
+                </div>
               {/if}
             {/snippet}
           </ProjectDetails>

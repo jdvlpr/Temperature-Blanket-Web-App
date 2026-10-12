@@ -19,7 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   page, show the account's name on it or not, update its snapshot, or
   unpublish it. A gallery page is a snapshot from when it was published, so
   once the project changes it offers to update it. (Its link is a copy, always
-  shareable, so it isn't a setting here.)
+  shareable, so it isn't a setting here: Copy Link comes in as `children`,
+  first on the row.)
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -44,6 +45,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     UserIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
+  import type { Snippet } from 'svelte';
+  import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   let {
     kind,
@@ -52,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changedSince = false,
     onadd,
     onupdate,
+    children,
   }: {
     kind: 'project' | 'palette';
     /** The project's or palette's name, for screen readers */
@@ -64,6 +68,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onadd: () => void;
     /** Replaces its gallery page with a snapshot of how it is now */
     onupdate: (page: GalleryPage) => void;
+    /** First on the row, e.g. Copy Link */
+    children?: Snippet;
   } = $props();
 
   let confirming = $state(false);
@@ -109,8 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function select(value: string) {
     errorMessage = '';
-    if (value === 'view' && pageHref) window.open(pageHref, '_blank');
-    else if (value === 'update' && page) onupdate(page);
+    if (value === 'update' && page) onupdate(page);
     else if (value === 'unpublish') confirming = true;
   }
 
@@ -139,33 +144,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
         : resolve('/gallery/[id]', { id: String(page.postId) }),
   );
 
+  // First on the row, it lines up with the text above
+  let triggerClass = $derived(
+    `btn btn-sm hover:preset-tonal-surface${children ? '' : ' -ml-2'}`,
+  );
+
   const publishedOn = (time: number) =>
     new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
 </script>
 
-<!-- With publishing paused, only one with a page has anything to change -->
-{#if page || canAdd}
+<!-- With publishing paused, one without a page has only Copy Link -->
+{#if page || canAdd || children}
   <div
     class="mt-2 flex flex-col gap-1 text-sm"
     aria-label="Gallery: {label}"
     role="group"
   >
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-      {#if !page}
+      {@render children?.()}
+      {#if !page && canAdd}
         <button
           type="button"
-          class="btn btn-sm hover:preset-tonal-surface -ml-2"
+          class={triggerClass}
           onclick={publish}
-          ><SendIcon aria-hidden="true" />Publish to Gallery<span
-            class="sr-only">: {label}</span
-          ></button
+          aria-label="Publish to Gallery: {label}"
+          ><SendIcon aria-hidden="true" />Publish to Gallery</button
         >
-      {:else}
+      {:else if page}
         <Menu
           positioning={menuPositioning('bottom-start')}
           onSelect={(details) => select(details.value)}
         >
-          <Menu.Trigger class="btn btn-sm hover:preset-tonal-surface -ml-2">
+          <Menu.Trigger class={triggerClass}>
             <GlobeIcon aria-hidden="true" />
             <span><span class="sr-only">Gallery: </span>{status}</span>
             <ChevronDownIcon class="icon-sm" aria-hidden="true" />
@@ -174,17 +184,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Menu.Positioner>
               <Menu.Content class={menuContentClass}>
                 <Menu.Item value="view" class={menuItemClass}>
-                  <ExternalLinkIcon class="shrink-0" aria-hidden="true" />
-                  <span class="flex min-w-0 flex-1 flex-col">
-                    <span
-                      >View Gallery Page<span class="sr-only">
-                        (opens in a new tab)</span
-                      ></span
+                  {#snippet element(attributes)}
+                    <!-- eslint-disable svelte/no-navigation-without-resolve -- resolved above -->
+                    <a
+                      {...attributes as HTMLAnchorAttributes}
+                      href={pageHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                    <span class="text-surface-700-300 text-xs"
-                      >Published {publishedOn(page.publishedAt)}</span
-                    >
-                  </span>
+                      <ExternalLinkIcon class="shrink-0" aria-hidden="true" />
+                      <span class="flex min-w-0 flex-1 flex-col">
+                        <span
+                          >View Gallery Page<span class="sr-only">
+                            (opens in a new tab)</span
+                          ></span
+                        >
+                        <span class="text-surface-700-300 text-xs"
+                          >Published {publishedOn(page.publishedAt)}</span
+                        >
+                      </span>
+                    </a>
+                    <!-- eslint-enable svelte/no-navigation-without-resolve -->
+                  {/snippet}
                 </Menu.Item>
                 <!-- Stays open, so the check shows it took -->
                 <Menu.OptionItem
@@ -198,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   <UserIcon class="shrink-0" aria-hidden="true" />
                   <span class="flex min-w-0 flex-1 flex-col">
-                    <span>Show My Name</span>
+                    <span>Show my name</span>
                     <span class="text-surface-700-300 text-xs"
                       >{ownerName
                         ? `Its page says “By ${ownerName}” and your public gallery page lists it`

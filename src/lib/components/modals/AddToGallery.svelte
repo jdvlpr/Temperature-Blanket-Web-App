@@ -458,19 +458,6 @@ others. From My Projects, the saved project loads behind the dialog first
           disabled={busy}
         />
       {/if}
-      <details class="text-sm">
-        <summary class="link w-fit cursor-pointer"
-          >What’s on a gallery page?</summary
-        >
-        <ul class="mt-2 flex list-inside list-disc flex-col gap-1">
-          <li>
-            The name, locations and dates, yarns and colors, this preview, a
-            link to the project, and the date it was published.
-          </li>
-          <li>A snapshot can’t be edited. Update it to show changes.</li>
-          <li>Pages that look like spam or abuse may be removed.</li>
-        </ul>
-      </details>
       {#if problem}
         <div class="text-error-700-300 flex flex-col gap-1" role="alert">
           <p>{problemText}</p>
