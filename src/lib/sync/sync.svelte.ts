@@ -23,7 +23,12 @@
 
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { account } from '#lib/accounts/summary.svelte.js';
+import { clearSignedInHint, getSession } from '#lib/accounts/client.js';
+import {
+  account,
+  forgetAccountSummary,
+  rememberAccountSummary,
+} from '#lib/accounts/summary.svelte.js';
 import { toast } from '#lib/state/page-state.svelte.js';
 import { PaletteStorage, savedPalettes } from '#lib/storage/palettes.svelte.js';
 import {
@@ -90,6 +95,7 @@ async function runPass(userId: string) {
     return;
   }
   sync.state = 'syncing';
+  let signedOut = false;
   try {
     sync.lastReport = await syncAccount(
       userId,
@@ -109,15 +115,54 @@ async function runPass(userId: string) {
       console.error('Sync failed', e);
       sync.state = 'error';
     } else if (e.status === 0) sync.state = 'offline';
-    else if (e.status === 401) sync.state = 'signed-out';
-    else if (e.code === 'SYNC_PAUSED') sync.state = 'paused';
+    else if (e.status === 401) {
+      sync.state = 'signed-out';
+      signedOut = true;
+    } else if (e.code === 'SYNC_PAUSED') sync.state = 'paused';
     else sync.state = 'error';
   } finally {
     sync.version++;
     // Palettes from other devices show up in open lists
     await savedPalettes.refresh().catch(() => {});
   }
+  if (signedOut && (await sessionEnded())) return;
   await toastNewProblem(userId).catch(() => {});
+}
+
+/**
+ * After a sync is refused as signed out: when the server confirms the session
+ * is over, shows the app signed out, so it doesn't keep showing the account.
+ * Its projects stay in this browser. False when that can't be confirmed.
+ */
+async function sessionEnded(): Promise<boolean> {
+  let session: Awaited<ReturnType<typeof getSession>>;
+  try {
+    session = await getSession();
+  } catch {
+    // Offline: keep showing the account, with the signed-out notice
+    return false;
+  }
+  if (session?.user) {
+    // Still signed in after all
+    rememberAccountSummary(session.user);
+    sync.state = 'error';
+    return false;
+  }
+  const redirect = encodeURIComponent(location.pathname + location.search);
+  toast.trigger({
+    message:
+      'You’ve been signed out. Your projects are still saved in this browser. Sign in to sync them.',
+    category: 'error',
+    autohide: false,
+    action: {
+      label: 'Sign in',
+      response: () => goto(`${resolve('/auth/sign-in')}?redirect=${redirect}`),
+    },
+  });
+  clearSignedInHint();
+  // Stops sync (see AccountSync)
+  forgetAccountSummary();
+  return true;
 }
 
 type Problem = 'signed-out' | 'storage-full' | 'too-large';
