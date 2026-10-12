@@ -43,6 +43,11 @@ see it: only people with its link, or everyone in the gallery. -->
     refreshAccountTrash,
   } from '#lib/storage/account-trash.svelte.js';
   import { onMount } from 'svelte';
+  import { beforeNavigate } from '$app/navigation';
+  import {
+    loadedInPlace,
+    openGalleryDialogFromURL,
+  } from '#lib/utils/open-saved-project.js';
   import {
     ExternalLinkIcon,
     LogInIcon,
@@ -100,6 +105,17 @@ see it: only people with its link, or everyone in the gallery. -->
   // not on every change: requests are shared by everyone on the free plan
   onMount(() => {
     if (signedIn) refreshAccountTrash();
+    // Sent back here to open Send to Gallery for a project (see openGalleryDialog)
+    void openGalleryDialogFromURL();
+  });
+
+  // A project loaded here behind Send to Gallery stays in the app's state, so
+  // the next page starts fresh, not with that project's gauges
+  beforeNavigate((navigation) => {
+    if (!loadedInPlace() || navigation.willUnload || !navigation.to) return;
+    if (navigation.to.url.pathname === window.location.pathname) return;
+    navigation.cancel();
+    window.location.assign(navigation.to.url.href);
   });
 
   $effect(() => {

@@ -296,6 +296,134 @@ test.describe('Gallery pages from accounts', () => {
     // (Publishing is off here, so with no page there's nothing left to change)
   });
 
+  test('a saved project goes to the gallery from My Projects, without leaving it', async ({
+    page,
+    request,
+  }) => {
+    await signIn(page, request, uniqueEmail('gallery-in-place'));
+
+    // A saved project with its weather kept (edited, so it's always loaded)
+    await page.goto('/my-projects');
+    const id = String(Date.now());
+    const href = new URL(
+      `/?project=${id}#l=3652462'2025010120250103&temp=ff0000(0'15)0000ff(15'30)!mlh2t&u=m`,
+      page.url(),
+    ).href;
+    const title = 'Quito from 2025-01-01 to 2025-01-03';
+    const day = (date: string, t: number) => ({
+      location: 0,
+      date,
+      tavg: { metric: t, imperial: t * 1.8 + 32 },
+      tmin: { metric: t - 5, imperial: (t - 5) * 1.8 + 32 },
+      tmax: { metric: t + 5, imperial: (t + 5) * 1.8 + 32 },
+      prcp: { metric: 1, imperial: 0.04 },
+      snow: { metric: 0, imperial: 0 },
+      dayt: { metric: 43_200, imperial: 43_200 },
+    });
+    await idbSet(page, {
+      [`p_${id}`]: {
+        name: 'Gallery test',
+        createdAt: new Date().toISOString(),
+        date: 'today',
+        href,
+        isCustomWeatherData: true,
+        locations: [
+          {
+            id: 3652462,
+            label: 'Quito',
+            lat: '-0.22985',
+            lng: '-78.52495',
+            elevation: 2800,
+            from: '2025-01-01',
+            to: '2025-01-03',
+            duration: 'c',
+            source: 'Meteostat',
+          },
+        ],
+        title,
+        weatherData: [
+          day('2025-01-01', 12),
+          day('2025-01-02', 14),
+          day('2025-01-03', 16),
+        ],
+        weatherSource: { name: 'Meteostat', useSecondary: false },
+      },
+      projects_index: [
+        {
+          id,
+          meta: {
+            date: 'today',
+            href,
+            title,
+            name: 'Gallery test',
+            isCustomWeatherData: true,
+          },
+          updatedAt: Date.now(),
+        },
+      ],
+    });
+
+    // Publishing is off here: as if it were on, with nothing in the gallery
+    const sent: Record<string, unknown>[] = [];
+    await page.route('**/api/account/gallery**', async (route) => {
+      const url = new URL(route.request().url());
+      if (url.pathname !== '/api/account/gallery') return route.fallback();
+      if (route.request().method() === 'GET')
+        return route.fulfill({
+          json: {
+            posts: [],
+            publishing: true,
+            settings: {
+              showOwnerDefault: false,
+              removeOnDelete: false,
+              publicId: null,
+            },
+          },
+        });
+      sent.push(route.request().postDataJSON());
+      return route.fulfill({
+        json: { code: 200, message: 'Gallery test', link: '/gallery/1' },
+      });
+    });
+
+    await page.reload();
+    await page.getByRole('button', { name: /^Not now/ }).click();
+    const menu = page
+      .getByRole('group', { name: 'Sharing: Gallery test' })
+      .getByRole('button', { name: /^Sharing:/ });
+    await expect(menu).toHaveText(/Link only\s*$/);
+
+    // Cancel leaves everything as it was
+    await menu.click();
+    await page
+      .getByRole('menuitemradio', { name: /^In the gallery Anyone/ })
+      .click();
+    const dialog = page.getByRole('dialog', {
+      name: 'Send to Project Gallery',
+    });
+    await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
+    await expect(page).toHaveURL(/\/my-projects$/);
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+
+    // Sending it, still here
+    await menu.click();
+    await page
+      .getByRole('menuitemradio', { name: /^In the gallery Anyone/ })
+      .click();
+    await dialog.getByRole('button', { name: /Yes, Send to Gallery/ }).click();
+    await expect(dialog).toContainText(
+      'The project gallery webpage has been created.',
+    );
+    await expect(page).toHaveURL(/\/my-projects$/);
+    expect(sent).toHaveLength(1);
+    const projectUrl = new URL(String(sent[0].project_url));
+    expect(projectUrl.searchParams.get('project')).toBe(id);
+    expect(projectUrl.hash).toContain("l=3652462'2025010120250103");
+    expect(sent[0].project_name).toBe('Gallery test');
+    expect(sent[0].total_days).toBe(3);
+  });
+
   test('an owner gets a page listing the gallery pages they include', async ({
     page,
     request,

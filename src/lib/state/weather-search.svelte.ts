@@ -120,6 +120,20 @@ class WeatherSearch {
     }
   }
 
+  /**
+   * Only gets the project's weather, without the overlay or anything else a
+   * search changes, for drawing a saved project's gallery image. `label` and
+   * `index` follow along. Aborting it rejects.
+   */
+  async fetchOnly(abort: AbortController): Promise<WeatherDay[]> {
+    controller.value = abort;
+    try {
+      return await this.#fetchAll(abort.signal);
+    } finally {
+      if (controller.value === abort) controller.value = null;
+    }
+  }
+
   async #fetchAll(signal: AbortSignal): Promise<WeatherDay[]> {
     const stopIfCancelled = () => {
       if (signal.aborted) throw new AbortedError();

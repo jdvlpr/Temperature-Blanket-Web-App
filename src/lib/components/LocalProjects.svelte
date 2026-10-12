@@ -28,10 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/storage/projects.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
-  import {
-    galleryRequestLink,
-    type GalleryRequest,
-  } from '#lib/utils/gallery-request.js';
+  import type { GalleryRequest } from '#lib/utils/gallery-request.js';
+  import { openGalleryDialog } from '#lib/utils/open-saved-project.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
@@ -113,13 +111,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onMyProjectsPage && signedIn && galleryPages.shown,
   );
 
-  // Adding or updating a gallery page happens in the project, which draws the
-  // preview it needs: a full load, like opening the project from here
+  // Adding or updating a gallery page: its dialog opens here, drawing the
+  // preview from the project loaded behind it
   function openForGallery(
     item: StoredProjectIndexItem,
     request: GalleryRequest,
   ) {
-    window.location.assign(galleryRequestLink(item.meta.href, request));
+    void openGalleryDialog(item.meta.href, request);
   }
 
   $effect(() => {

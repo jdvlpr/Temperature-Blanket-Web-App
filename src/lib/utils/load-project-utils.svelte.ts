@@ -70,6 +70,8 @@ export const gaugeParamsHaveYarnDetails = (
 
 export const loadProjectFromURL = async (
   hash = window.location.hash.substring(1),
+  // Loaded behind a dialog (My Projects): no "Units set to" toast
+  { quiet = false }: { quiet?: boolean } = {},
 ) => {
   const params = getProjectParametersFromURLHash(hash);
 
@@ -78,7 +80,7 @@ export const loadProjectFromURL = async (
     const _units = $state.snapshot(preferences.value.units);
     if (params.u.value === 'i') preferences.value.units = 'imperial';
     if (params.u.value === 'm') preferences.value.units = 'metric';
-    if (_units !== preferences.value.units) {
+    if (_units !== preferences.value.units && !quiet) {
       const label =
         preferences.value.units === 'metric'
           ? `${UNIT_LABELS.temperature.metric} /

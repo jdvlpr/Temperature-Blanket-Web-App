@@ -24,15 +24,85 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import { ExternalLinkIcon } from '@lucide/svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount, untrack } from 'svelte';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
+  import { loadInPlace } from '#lib/utils/open-saved-project.js';
   import StickyPart from './StickyPart.svelte';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
 
-  // From My Projects (?gallery=): add with a choice already made, or replace
-  // the project's old page with one of it as it is now
-  let { request }: { request?: GalleryRequest } = $props();
+  let {
+    request,
+    href,
+  }: {
+    // From My Projects: add with a choice already made, or replace the
+    // project's old page with one of it as it is now
+    request?: GalleryRequest;
+    // From My Projects: the saved project's link, loaded behind the dialog
+    href?: string;
+  } = $props();
+
+  // Getting the project ready to draw: loading it (from My Projects), then
+  // its weather when that isn't kept with it
+  // (the dialog is opened for one project, so its link never changes)
+  let preparing = $state<'project' | 'weather' | 'error' | null>(
+    untrack(() => href) ? 'project' : null,
+  );
+  let failed = $state<'project' | 'weather' | 'edited' | null>(null);
+  const FAILED_TEXT = {
+    project: "Couldn't open this project. Please try again later.",
+    weather:
+      "Couldn't get the weather data for this project. Please try again.",
+    edited:
+      "This project's edited weather data isn't saved with it. Open the project to send it to the gallery.",
+  };
+  let weatherAbort: AbortController | undefined;
+  // Puts back the units and seasons the project's loading changed
+  let restorePreferences: (() => void) | undefined;
+
+  async function getWeather() {
+    if (weather.rawData.length) return (preparing = null);
+    // Edited weather can't be fetched again, and fetching would replace it
+    if (weather.isUserEdited) {
+      failed = 'edited';
+      return (preparing = 'error');
+    }
+    failed = null;
+    preparing = 'weather';
+    const abort = (weatherAbort = new AbortController());
+    try {
+      const data = await weatherSearch.fetchOnly(abort);
+      weather.setRawData(data);
+      weather.wasLoadedFromStorage = false;
+      preparing = null;
+    } catch {
+      if (abort.signal.aborted) return;
+      failed = 'weather';
+      preparing = 'error';
+    }
+  }
+
+  // Whether the project loaded; its weather comes after, alongside the rest
+  async function loadProject() {
+    if (!href) return true;
+    try {
+      restorePreferences = await loadInPlace(href);
+      return true;
+    } catch {
+      failed = 'project';
+      preparing = 'error';
+      return false;
+    }
+  }
+
+  const onpagehide = () => restorePreferences?.();
+  onDestroy(() => {
+    weatherAbort?.abort();
+    restorePreferences?.();
+    window.removeEventListener('pagehide', onpagehide);
+  });
 
   // In the Project menu's narrow panel: one column, not three
   const inPanel = $derived(dialog.options.placement === 'side');
@@ -52,6 +122,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let replacePostId = $state<number | undefined>();
 
   onMount(async () => {
+    window.addEventListener('pagehide', onpagehide);
+    if (!(await loadProject())) return;
+    void getWeather();
     // Not saved here: the name its shared link carried, if any
     const stored = await ProjectStorage.getById(project.id);
     projectName = stored ? (stored.name ?? '') : project.linkName;
@@ -77,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!active?.svg || !active?.width || !active?.height) return;
 
     submitting = true;
-    if (fromAccount) {
+    if (fromAccount && !href) {
       // Published from the account, it's kept there too, next to its gallery page
       const { saveOpenProject } =
         await import('#lib/storage/autosave.svelte.js');
@@ -134,7 +207,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? ''
       : 'sm:grid-cols-3'}"
   >
-    {#if !message}
+    {#if preparing}
+      <div
+        class="col-span-full flex w-full flex-col items-center justify-center gap-4 py-8"
+        role="status"
+        aria-live="polite"
+      >
+        {#if preparing === 'error'}
+          <p>{failed ? FAILED_TEXT[failed] : ''}</p>
+        {:else}
+          <Spinner />
+          <p>
+            {#if preparing === 'weather' && weatherSearch.label}
+              Getting weather data for {weatherSearch.label}…
+            {:else}
+              Getting the project ready…
+            {/if}
+          </p>
+        {/if}
+      </div>
+    {:else if !message}
       <div
         class="col-span-full flex flex-col gap-2 {inPanel
           ? ''
@@ -214,7 +306,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <StickyPart position="bottom">
-  {#if !submitting && !message}
+  {#if preparing}
+    <div class="flex flex-wrap items-center justify-center gap-2 p-2 py-4">
+      {#if failed === 'edited' && href}
+        <a class="btn preset-filled-primary-500" {href} data-sveltekit-reload
+          >Open Project</a
+        >
+      {:else if failed === 'weather'}
+        <button
+          class="btn preset-filled-primary-500"
+          onclick={() => void getWeather()}>Try Again</button
+        >
+      {/if}
+      <button class="btn preset-tonal" onclick={() => dialog.close()}
+        >{preparing === 'error' ? 'Close' : 'Cancel'}</button
+      >
+    </div>
+  {:else if !submitting && !message}
     <div
       class="flex flex-col items-center justify-center gap-2 p-2 py-4 text-center"
     >
@@ -228,6 +336,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"
+        disabled={!previews.active?.svg}
         onclick={submit}
         >{replacePostId
           ? 'Yes, Update Gallery Page'

@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveButton from '#lib/components/buttons/SaveButton.svelte';
   import ProjectTitle from '#lib/components/ProjectTitle.svelte';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
-  import { locations } from '#lib/state/location-state.svelte.js';
   import {
     dialog,
     isDesktop,
@@ -54,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     loadFromHistory,
     updateHistory,
   } from '#lib/utils/history-utils.svelte.js';
-  import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
+  import { loadSavedProject } from '#lib/utils/open-saved-project.js';
   import { upToDate } from '#lib/utils/other-utils.js';
   import {
     GALLERY_PARAM,
@@ -62,8 +61,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type GalleryRequest,
   } from '#lib/utils/gallery-request.js';
   import AddToGallery from '#lib/components/modals/AddToGallery.svelte';
-  import { projectNameFromHash } from '#lib/utils/project-name-link.js';
-  import { previews } from '#lib/state/preview-state.svelte.js';
   import { setUnitsFromNavigator } from '#lib/utils/unit-utils.svelte.js';
   import { RedoIcon, UndoIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
@@ -85,16 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
 
-    if (project.onLoaded.isProject) await ProjectStorage.load();
-
-    // A shared link's name, unless the project is saved here with its own
-    const linkName = projectNameFromHash(window.location.hash);
-    if (linkName && !(await ProjectStorage.getById(project.id)))
-      project.linkName = linkName;
-
-    await loadProjectFromURL();
-
-    if (locations.allValid) project.status.wasLoaded = true;
+    await loadSavedProject();
   }
 
   // Leaving for another page of the site: a change waiting to save saves now
@@ -134,11 +122,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   // Opened from My Projects to add or update its gallery page (?gallery=):
-  // the dialog shows once the project and its preview are ready
+  // the dialog shows once the project is loaded, and gets its weather if needed
   let galleryRequest = $state<GalleryRequest | null>(null);
   $effect(() => {
     const request = galleryRequest;
-    if (!request || project.status.loading || !previews.active?.svg) return;
+    if (!request || project.status.loading) return;
     untrack(() => {
       galleryRequest = null;
       dialog.trigger({
