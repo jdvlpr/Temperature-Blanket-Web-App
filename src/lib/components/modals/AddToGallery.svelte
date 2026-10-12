@@ -252,21 +252,6 @@ others. From My Projects, the saved project loads behind the dialog first
   const publishedOn = (time: number) =>
     new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
 
-  const days = $derived(weather.rawData.length);
-  const missingDays = $derived(weather.missingDaysCount());
-  const plural = (n: number, word: string) =>
-    `${n.toLocaleString()} ${word}${n === 1 ? '' : 's'}`;
-  // What's sent, under the card: "Rows preview · 365 days · 2 days missing"
-  const details = $derived(
-    [
-      previews.active && `${previews.active.name} preview`,
-      plural(days, 'day'),
-      missingDays && `${plural(missingDays, 'day')} missing`,
-    ]
-      .filter(Boolean)
-      .join(' · '),
-  );
-
   let busy = $state(false);
   let step = $state<'image' | GallerySendStep | null>(null);
   const STEP_TEXT = {
@@ -423,7 +408,6 @@ others. From My Projects, the saved project loads behind the dialog first
         {#if fromAccount && showOwner && ownerName}
           <p class="text-sm">By {ownerName}</p>
         {/if}
-        <p class="mt-auto pt-2 text-xs opacity-70">{details}</p>
       </div>
     </div>
 
