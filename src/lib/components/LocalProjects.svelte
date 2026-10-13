@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import ProjectDetails from '#lib/components/ProjectDetails.svelte';
   import SavedProjectCard from '#lib/components/SavedProjectCard.svelte';
+  import { drawInFrame, hasThumbnail } from '#lib/storage/thumbnails.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
@@ -123,6 +124,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
     void openGalleryDialog(item.meta.href, request);
   }
 
+  // On My Projects, each project without a picture of its current version
+  // gets one in the background, one at a time (see thumbnails.ts); its card
+  // shows it as soon as it's kept
+  let picturesVersion = $state(0);
+  $effect(() => {
+    if (!onMyProjectsPage || !loaded) return;
+    const queue = projects.map(({ id, meta }) => ({ id, href: meta.href }));
+    let stopped = false;
+    let cancel: (() => void) | null = null;
+    void (async () => {
+      for (const { id, href } of queue) {
+        if (stopped) return;
+        if (await hasThumbnail(id, href)) continue;
+        const drawing = drawInFrame(id, href);
+        cancel = drawing.cancel;
+        const ok = await drawing.done;
+        cancel = null;
+        if (stopped) return;
+        if (ok) picturesVersion++;
+      }
+    })();
+    return () => {
+      stopped = true;
+      cancel?.();
+    };
+  });
+
   $effect(() => {
     // Reload whenever saved projects change (here, in the Trash or by a
     // sync), and when someone signs in or out
@@ -194,6 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@render undoAt(project.id)}
             <SavedProjectCard
               item={project}
+              {picturesVersion}
               layout={grid ? 'grid' : 'list'}
               syncLabel={__ACCOUNTS_ENABLED__
                 ? syncLabelFor(project, signedIn)

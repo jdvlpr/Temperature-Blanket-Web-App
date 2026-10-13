@@ -38,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   interface Props {
     item: StoredProjectIndexItem;
+    /** Bumped when pictures were drawn in the background, to look again */
+    picturesVersion?: number;
     layout?: 'grid' | 'list';
     /** Where it's kept, e.g. "Synced" (see $lib/sync) */
     syncLabel?: SyncLabel;
@@ -52,6 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     item,
+    picturesVersion = 0,
     layout = 'grid',
     syncLabel,
     onrename,
@@ -74,6 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let thumbnail = $state<string | null>(null);
   $effect(() => {
     if (!card) return;
+    void picturesVersion;
     const id = item.id;
     const href = item.meta.href;
     let current = true;
@@ -140,9 +144,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     image={thumbnail}
     {layout}
     title="Open in the Project Planner (saved {meta.date})"
-    imageClass="rounded-container w-full object-cover {layout === 'grid'
-      ? 'h-[140px]'
-      : 'h-[70px]'}"
+    imageClass="rounded-container {layout === 'grid'
+      ? 'w-full h-auto'
+      : 'max-h-[240px] w-auto'}"
   >
     {#snippet cover()}
       {#if colors.length}

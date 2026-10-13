@@ -30,6 +30,11 @@ import {
 } from '#lib/storage/projects.svelte.js';
 import { sync } from '#lib/sync/status.svelte.js';
 import { newProjectId } from '#lib/utils/project-id-utils.js';
+import {
+  frameDone,
+  isThumbnailFrame,
+  keepThumbnail as keepPicture,
+} from './thumbnails.js';
 
 /** Saves this long after the last change */
 export const IDLE_MS = 2000;
@@ -153,6 +158,11 @@ function opened(href: string) {
   if (loaded && loaded.id === baselineId) {
     known = { at: loaded.updatedAt, synced: loaded.synced };
     void refresh();
+    // My Projects' hidden frame: only its picture, as soon as it's drawn
+    if (isThumbnailFrame()) {
+      void pictureForFrame(loaded.id, href);
+      return;
+    }
     // A saved project gets its picture for My Projects once its preview is
     // drawn, if it has none of this version yet
     setTimeout(() => {
@@ -203,6 +213,7 @@ export const changedElsewhereMessage = () =>
  * preview on the page (see thumbnails.ts), once the browser is idle.
  */
 function keepThumbnail(href: string) {
+  if (isThumbnailFrame()) return;
   const id = openProjectId();
   void Promise.all([
     import('#lib/state/preview-state.svelte.js'),
@@ -217,9 +228,35 @@ function keepThumbnail(href: string) {
     .catch(() => {});
 }
 
+/**
+ * In My Projects' hidden frame: waits for the preview (its weather comes from
+ * storage, or is fetched), keeps its picture, and says so. Gives up after a
+ * while; My Projects moves on either way.
+ */
+async function pictureForFrame(id: string, href: string) {
+  const [{ previews }, { weather }] = await Promise.all([
+    import('#lib/state/preview-state.svelte.js'),
+    import('#lib/state/weather-state.svelte.js'),
+  ]);
+  const until = Date.now() + 45_000;
+  while (Date.now() < until) {
+    const active = previews.active;
+    if (weather.data?.length && active?.svg?.isConnected && active.height) {
+      // One more moment for the preview to finish drawing
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      frameDone(id, await keepPicture(id, href, active));
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  frameDone(id, false);
+}
+
 /** Saves a waiting change now, if there is one. */
 export async function saveNow() {
   clearTimeout(timer);
+  // My Projects' hidden frame only draws a picture
+  if (isThumbnailFrame()) return;
   if (saving) await saving;
   if (autosave.state !== 'waiting') return;
   saving = (async () => {

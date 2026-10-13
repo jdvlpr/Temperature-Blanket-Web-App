@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { initializeLocalStorage } from '#lib/storage/storage-utils.svelte.js';
+  import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
   import { privacy } from '#lib/utils/privacy-utils.svelte.js';
   import { onMount, type Snippet } from 'svelte';
   // Fonts are served from this site, so pages load nothing from font services
@@ -67,7 +68,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
-    privacy.init();
+    // My Projects' hidden frame, drawing a project's picture, isn't a visit
+    if (!isThumbnailFrame()) privacy.init();
   });
 
   beforeNavigate(({ shallow, type }) => {

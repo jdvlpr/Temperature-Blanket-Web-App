@@ -25,12 +25,17 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
   } from '#lib/accounts/summary.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
+
+  // My Projects' hidden frame only draws a project's picture: no syncing there
+  const frame = isThumbnailFrame();
 
   let syncModule: typeof import('#lib/sync/sync.svelte.js') | undefined;
   let checkedSummary = false;
 
   // Summaries saved before sync have no account ID: ask the server once
   $effect(() => {
+    if (frame) return;
     const summary = account.summary;
     if (!summary || summary.id || checkedSummary) return;
     checkedSummary = true;
@@ -45,6 +50,7 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
   });
 
   $effect(() => {
+    if (frame) return;
     const userId = account.summary?.id;
     if (!userId) {
       syncModule?.stopSync();
