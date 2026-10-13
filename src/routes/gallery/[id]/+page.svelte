@@ -17,13 +17,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { withProjectName } from '#lib/utils/project-name-link.js';
   import { fromGalleryLink } from '#lib/utils/gallery-request.js';
   import { resolve } from '$app/paths';
+  import {
+    postsWithColors,
+    yarnLinksOf,
+    type LinkedGalleryPost,
+  } from '#lib/utils/gallery-link-utils.js';
+  import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { browser } from '$app/env';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
-  import GalleryOwnerBar from '#lib/components/account/GalleryOwnerBar.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import YarnSources from '#lib/components/YarnSources.svelte';
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
@@ -54,6 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTitleFromLocationsMeta,
   } from '#lib/utils/project-utils.svelte.js';
   import { recordPageView } from '#lib/utils/gallery-utils.js';
+  import { galleryTitleText } from '#lib/utils/shared-palette-utils.js';
   import {
     decodeHtmlEntities,
     stripHTMLTags,
@@ -63,6 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GlobeIcon,
     InfoIcon,
     NotebookPenIcon,
+    PaletteIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
   import {
@@ -72,6 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { yarnPageState } from '../../yarn/state.svelte';
   import type { PageData } from './$types';
   import AboutProjectDialog from './AboutProjectDialog.svelte';
+  import GalleryPageHeader from '../GalleryPageHeader.svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -129,6 +137,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let flatColors = $derived(
     gauges.flatMap((item) => (item.colors ? item.colors : [])),
   );
+
+  // Its palettes' own pages (gallery plugin 1.7.0), which come after the page
+  let palettePages = $state<LinkedGalleryPost[]>([]);
+  $effect(() => {
+    let current = true;
+    palettePages = [];
+    Promise.resolve(data.palettePages)
+      .then((pages) => {
+        if (current) palettePages = pages ?? [];
+      })
+      .catch(() => {});
+    return () => {
+      current = false;
+    };
+  });
+
+  /**
+   * Each gauge's palette page, if it has one: the gauge's own link (found by
+   * its colors, since the links aren't in the gauges' order), then a page with
+   * that link's colors, this project's first. Re-run once yarn data loads, as
+   * `gauges` is.
+   */
+  let gaugePalettePages = $derived.by(() => {
+    if (!palettePages.length) return [];
+    const links = yarnLinksOf(project?.yarnUrls).map(
+      (link) => getColorsFromInput({ string: link }) || [],
+    );
+    const hexes = (colors: { hex?: string }[]) =>
+      colors.map((color) => color?.hex?.toLowerCase()).join();
+    return gauges.map(({ colors }) => {
+      const linkColors = links.find(
+        (candidate) =>
+          candidate.length && hexes(candidate) === hexes(colors ?? []),
+      );
+      return linkColors
+        ? (postsWithColors(
+            linkColors,
+            palettePages,
+            Number(page.params.id),
+          )[0] ?? null)
+        : null;
+    });
+  });
 
   // The preview's accent/border colors, from the `x` param (only in projects
   // saved after it was added). Self-heals like `gauges` once yarn data loads.
@@ -274,7 +325,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
 </svelte:head>
 
-<AppShell pageName="Project Preview">
+<AppShell pageName="Project Gallery">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
@@ -292,53 +343,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
         <Card>
           {#snippet header()}
-            <div
-              class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
+            <GalleryPageHeader
+              postId={Number(page.params.id)}
+              kind="project"
+              bind:owner
+              date={project?.date}
+              open={projectURL && openHref
+                ? {
+                    href: openHref,
+                    icon: NotebookPenIcon,
+                    target: locations.allValid ? '_blank' : '_self',
+                    title:
+                      'Open a copy in the Project Planner. This gallery page won’t change.',
+                  }
+                : null}
             >
-              <!-- Even when the page can't be found, so its owner can unpublish it -->
-              {#if __ACCOUNTS_ENABLED__}
-                <GalleryOwnerBar
-                  postId={Number(page.params.id)}
-                  kind="project"
-                  onowner={(next) => (owner = next)}
-                />
-              {/if}
-              {#if projectName}
-                <h1 class="text-2xl font-bold break-words">{projectName}</h1>
-              {/if}
-              <p class={projectName ? '' : 'text-xl'}>
-                {#if project}
+              {#snippet heading()}
+                {#if projectName}
+                  {projectName}
+                {:else if project}
                   <!-- Escaped by getTitleFromLocationsMeta -->
                   {@html projectTitle}
                 {:else}
                   This project gallery page cannot be found.
                 {/if}
-              </p>
-              {#if project && owner}
-                <p class="text-surface-600-400" data-testid="gallery-owner">
-                  By <a
-                    class="link"
-                    href={resolve('/gallery/by/[ownerId]', {
-                      ownerId: owner.publicId,
-                    })}>{owner.name}</a
-                  >
-                </p>
-              {/if}
-
-              <div class="flex flex-wrap items-center justify-center gap-4">
-                {#if projectURL}
-                  <a
-                    class="btn preset-filled-primary-500"
-                    href={openHref}
-                    target={locations.allValid ? '_blank' : '_self'}
-                    title="Open a copy in the Project Planner. This gallery page won’t change."
-                  >
-                    <NotebookPenIcon />
-                    Open a Copy
-                  </a>
+              {/snippet}
+              {#snippet subtitle()}
+                {#if project && projectName}
+                  <!-- Escaped by getTitleFromLocationsMeta -->
+                  {@html projectTitle}
                 {/if}
+              {/snippet}
+              {#snippet actions()}
                 {#if globeLink}
-                  <!-- Secondary to the planner: tonal rather than filled. -->
                   <a
                     class="btn hover:preset-tonal-surface"
                     href={globeLink}
@@ -350,9 +387,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </a>
                 {/if}
                 {#if project}
-                  <!-- The least prominent of the three: reference details,
-                       in a dialog rather than an inline accordion that pushed
-                       the preview image down when opened. -->
+                  <!-- Reference details, in a dialog rather than an inline
+                       accordion that pushed the preview image down -->
                   <button
                     type="button"
                     class="btn hover:preset-tonal-surface"
@@ -364,8 +400,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     About
                   </button>
                 {/if}
-              </div>
-            </div>
+              {/snippet}
+            </GalleryPageHeader>
           {/snippet}
           {#snippet content()}
             <div class="grid grid-cols-1 gap-2 py-2">
@@ -402,39 +438,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           allGaugesAttributes.find((item) => item.id === id)
                             ?.label
                         } Yarn Palette`}
+                        {@const gaugeName =
+                          allGaugesAttributes.find((item) => item.id === id)
+                            ?.label ?? ''}
+                        {@const palettePage = gaugePalettePages[gaugeIndex]}
                         <div class="flex flex-col">
                           <div class="flex flex-col">
                             <PaletteStrip
                               colors={colors ?? []}
                               label={gaugeLabel}
                             />
-                            <a
-                              class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
-                              onclick={() => {
-                                if (colors) {
-                                  yarnPageState.gauge.colors = colors;
-                                }
-                              }}
-                              href="/yarn"
+                            <div
+                              class="mt-4 flex flex-wrap items-center justify-center gap-2"
                             >
-                              <SwatchBookIcon />
-
-                              Open in Yarn Palette Creator
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="size-5"
+                              <a
+                                class="btn preset-tonal-primary border-primary-500 border"
+                                aria-label="Open a copy of the {gaugeName} yarn palette"
+                                title="Open a copy in the Yarn Palette Creator. This gallery page won’t change."
+                                onclick={() => {
+                                  if (!colors) return;
+                                  yarnPageState.gauge.colors = colors;
+                                  // Its gallery name, which Save Palette offers
+                                  yarnPageState.suggestion = {
+                                    name: palettePage?.title
+                                      ? galleryTitleText(palettePage.title)
+                                      : `${projectTitleNoHTML} – ${gaugeName}`.slice(
+                                          0,
+                                          80,
+                                        ),
+                                    colors: $state.snapshot(colors),
+                                  };
+                                }}
+                                href={resolve('/yarn')}
                               >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                                ></path>
-                              </svg>
-                            </a>
+                                <PaletteIcon />
+                                Open a Copy
+                              </a>
+                              {#if palettePage}
+                                <a
+                                  class="btn hover:preset-tonal-surface"
+                                  aria-label="{gaugeName} Palette Page"
+                                  title="This yarn palette’s own gallery page"
+                                  href={resolve('/gallery/palette/[id]', {
+                                    id: String(palettePage.databaseId),
+                                  })}
+                                >
+                                  <SwatchBookIcon />
+                                  Palette Page
+                                </a>
+                              {/if}
+                            </div>
                           </div>
                           <div class="mx-auto mt-4 w-fit">
                             <ViewMenu

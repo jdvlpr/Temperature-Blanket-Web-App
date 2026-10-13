@@ -69,9 +69,7 @@ export const load: PageServerLoad = async (event) => {
     // Streamed, so the page never waits for them: the projects with these
     // colors (checked in the browser, where colorway names load), and other
     // palette pages with them
-    projects: link
-      ? fetchProjectsWithLink(link)
-      : Promise.resolve(null),
+    projects: link ? fetchProjectsWithLink(link) : Promise.resolve(null),
     samePalettes: link
       ? fetchPalettePagesForLinks([link])
       : Promise.resolve([]),
