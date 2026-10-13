@@ -183,7 +183,7 @@ new version of a published one, it asks whether to remove the old page. -->
             bare
             label="Remove the old page"
             details={replaceOld
-              ? 'Its link stops working, and its views are lost.'
+              ? 'The old gallery page is removed. Its gallery page link stops working, and its views are lost.'
               : 'Both pages stay in the gallery.'}
             bind:checked={replaceOld}
             disabled={busy}

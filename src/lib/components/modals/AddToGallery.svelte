@@ -388,8 +388,8 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
       <CheckIcon class="text-success-700-300 size-8" />
       <h2 class="h4" tabindex="-1" bind:this={removedHeading}>Unpublished</h2>
       <p class="text-sm">
-        It’s off the gallery and the globe. Your project stays saved, and its
-        link still works.
+        It’s off the gallery and the globe. Your project stays saved, and links
+        you’ve shared to the project still work.
       </p>
     </div>
   {:else if view === 'sent' && sent}
@@ -424,7 +424,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
                 sent &&
                 (await copyToClipboard(
                   sent.link,
-                  'Link copied',
+                  'Gallery page link copied',
                   'Unable to copy to your clipboard',
                 ))
               )
@@ -432,7 +432,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
             }}
           >
             <CopyIcon copied={linkCopied.is()} icon={LinkIcon} />
-            Copy Link
+            Copy Gallery Page Link
           </button>
         </div>
       {/if}
@@ -471,7 +471,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
             Unpublish this project{ownPostIds.length > 1
               ? ` (all ${ownPostIds.length} of its gallery pages)`
               : ''}? It also comes off the globe. Your project stays saved, and
-            its link still works.
+            links you’ve shared to the project still work.
           </p>
           <div class="flex flex-wrap gap-2">
             <button
@@ -512,7 +512,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
             bare
             label="Remove the old page"
             details={removeOld
-              ? `The page published ${publishedOn(oldPage.publishedAt)} is removed. Its link stops working, and its views are lost.`
+              ? `The page published ${publishedOn(oldPage.publishedAt)} is removed. Its gallery page link stops working, and its views are lost.`
               : 'Both pages stay in the gallery.'}
             bind:checked={removeOld}
             disabled={busy}

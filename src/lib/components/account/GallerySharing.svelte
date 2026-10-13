@@ -246,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <span class="flex min-w-0 flex-1 flex-col">
                     <span>Unpublish…</span>
                     <span class="text-surface-700-300 text-xs"
-                      >Take it off the gallery. Its link still works.</span
+                      >Take it off the gallery. Links to the {kind} still work.</span
                     >
                   </span>
                 </Menu.Item>
@@ -292,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Unpublish this {kind}{pageCount > 1
             ? ` (all ${pageCount} of its gallery pages)`
             : ''}?{kind === 'project' ? ' It also comes off the globe.' : ''}
-          Your {kind} stays saved, and its link still works.
+          Your {kind} stays saved, and links you’ve shared to the {kind} still work.
         </p>
         <div class="flex flex-wrap gap-2">
           <button
