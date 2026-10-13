@@ -944,7 +944,15 @@ export type GalleryPalette = {
   /** Each yarn in it once, like "Red Heart - Super Saver" */
   yarns: string[];
   /** The palette's own gallery page, or its project's */
-  page: { id: number; title: string; kind: 'palette' | 'project' };
+  page: GalleryPalettePage;
+  /** Other pages with the same colors, after this one in the list's order */
+  others: GalleryPalettePage[];
+};
+
+type GalleryPalettePage = {
+  id: number;
+  title: string;
+  kind: 'palette' | 'project';
 };
 
 export const getPalettesFromProjects = ({
@@ -984,10 +992,6 @@ export const getPalettesFromProjects = ({
         colors.some(
           (color) => color?.name && color?.brandName && color?.yarnName,
         );
-      const isUniquePalette = !_palettes
-        .map((palette) => JSON.stringify(palette.colors))
-        .includes(JSON.stringify(colors));
-
       let hasSelectedBrandAndYarn = true;
       if (selectedBrandId && selectedYarnId) {
         if (palettesContainOnlyFilteredYarn)
@@ -1020,7 +1024,6 @@ export const getPalettesFromProjects = ({
       if (
         isNotPresetScheme &&
         someColorsAreYarn &&
-        isUniquePalette &&
         hasSelectedBrandAndYarn &&
         colors &&
         colors.length > minColors
@@ -1053,7 +1056,19 @@ export const getPalettesFromProjects = ({
           };
         }
 
-        _palettes.push({ colors, postId: id, yarns, page });
+        // The same colors again: listed on the first card found, which the
+        // list's order (and the filters, applied already) decided
+        const first = _palettes.find((palette) =>
+          sameColorList(palette.colors, colors),
+        );
+        if (!first)
+          _palettes.push({ colors, postId: id, yarns, page, others: [] });
+        else if (
+          ![first.page, ...first.others].some(
+            (other) => other.id === page.id && other.kind === page.kind,
+          )
+        )
+          first.others.push(page);
       }
     });
   });

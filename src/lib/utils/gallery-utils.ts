@@ -91,9 +91,10 @@ export type FetchPaletteGalleryResult = {
 };
 
 /**
- * Projects and shared palettes for the palette galleries, in one list ordered by
- * date, so one cursor pages through both. Search and the yarn filter cover both.
- * Falls back to projects alone where the gallery has no palettes yet.
+ * Palette posts for the palette galleries: palettes shared on their own, and
+ * (gallery plugin 1.7.0) those brought across from projects by the one-time
+ * import. Falls back to projects' palettes where the gallery has no palettes
+ * yet (a plugin before 1.5.0).
  */
 export const fetchPaletteGallery = async ({
   first = 40,
@@ -114,7 +115,7 @@ export const fetchPaletteGallery = async ({
         first: $first
         after: $after
         where: {
-          contentTypes: [TEMPBLANKET_PROJECT, TEMPBLANKET_PALETTE]
+          contentTypes: [TEMPBLANKET_PALETTE]
           search: $search
           yarnUrls: $yarn
           orderby: { field: DATE, order: $order }
@@ -124,7 +125,6 @@ export const fetchPaletteGallery = async ({
         edges {
           node {
             __typename
-            ... on Project { title projectName databaseId projectUrl yarnUrls locations date }
             ... on Palette { title databaseId yarnUrls date }
           }
         }
@@ -261,18 +261,17 @@ export const recordPageView = async (id: string | number) => {
   );
 };
 
-/** Popular gallery posts. Palette galleries ask for shared palettes too. */
+/** Popular gallery posts: projects, or for the palette galleries, palette posts. */
 export const fetchPopularProjects = async ({
   months = 3,
   limit = 40,
   timeUnit = 'month',
   palettes = false,
-
-  /** Include palettes shared on their own; a gallery plugin before 1.6.0 leaves them out */
 }: {
   months?: number;
   limit?: number;
   timeUnit?: string;
+  /** Palette posts instead of projects (a gallery plugin before 1.6.0 has none) */
   palettes?: boolean;
 }): Promise<PopularProject[]> => {
   if (months == 0.25) {
@@ -284,9 +283,7 @@ export const fetchPopularProjects = async ({
     timeUnit = 'day';
     months = 1;
   }
-  const postTypes = palettes
-    ? 'tempblanket_project,tempblanket_palette'
-    : 'tempblanket_project';
+  const postTypes = palettes ? 'tempblanket_palette' : 'tempblanket_project';
   const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wordpress-popular-posts/v1/popular-posts/?post_type=${postTypes}&limit=${limit}&range=custom&time_unit=${timeUnit}&time_quantity=${months}&_fields=id,type,title,date,featured_media,featured_image_src,meta`;
 
   const response = await fetch(url);

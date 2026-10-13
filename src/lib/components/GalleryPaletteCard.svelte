@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A palette from the gallery: the colors and their yarns are one link (`href`)
   or button that uses the palette, and its gallery page is a link of its own
-  beside it, not inside it.
+  beside it, not inside it. Other pages with the same colors are listed under
+  "Also published by N others".
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -34,6 +35,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { palette, toYarnPage = false, onclick }: Props = $props();
   let count = $derived(palette.colors.length);
+  let othersCount = $derived(palette.others.length);
+
+  const pageHref = (page: GalleryPalette['page']) =>
+    page.kind === 'palette'
+      ? resolve('/gallery/palette/[id]', { id: String(page.id) })
+      : resolve('/gallery/[id]', { id: String(page.id) });
   const controlClass = 'flex w-full cursor-pointer flex-col gap-y-1 text-left';
 </script>
 
@@ -62,9 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
   {/if}
   <a
-    href={palette.page.kind === 'palette'
-      ? resolve('/gallery/palette/[id]', { id: String(palette.page.id) })
-      : resolve('/gallery/[id]', { id: String(palette.page.id) })}
+    href={pageHref(palette.page)}
     target="_blank"
     rel="noreferrer"
     class={[
@@ -78,4 +83,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <ExternalLinkIcon class="icon-sm inline" aria-hidden="true" />
     <span class="whitespace-pre-wrap">{palette.page.title}</span>
   </a>
+  {#if othersCount}
+    <details class="text-xs">
+      <summary class="w-fit cursor-pointer">
+        Also published by {othersCount}
+        {pluralize('other', othersCount)}
+      </summary>
+      <ul class="mt-1 flex flex-col gap-1 pl-4">
+        {#each palette.others as other (`${other.kind}-${other.id}`)}
+          <li>
+            <a
+              href={pageHref(other)}
+              target="_blank"
+              rel="noreferrer"
+              class="line-clamp-1 w-fit underline"
+              >{other.title}<span class="sr-only">
+                (opens in a new tab)</span
+              ></a
+            >
+          </li>
+        {/each}
+      </ul>
+    </details>
+  {/if}
 </div>

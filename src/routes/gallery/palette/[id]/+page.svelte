@@ -14,8 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- A palette shared to the gallery on its own: its colors and colorways, a
-link to open it in the Yarn Palette Creator, and "By <name>" when its owner
-included it on their public gallery. -->
+link to open it in the Yarn Palette Creator, "By <name>" when its owner
+included it on their public gallery, and "From the project <title>" when it came
+from a project that's still published. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -29,10 +30,12 @@ included it on their public gallery. -->
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { recordPageView } from '#lib/utils/gallery-utils.js';
+  import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import {
     galleryTitleText,
     sharedPaletteFrom,
   } from '#lib/utils/shared-palette-utils.js';
+  import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { ArrowLeftIcon, LinkIcon, PaletteIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -47,6 +50,14 @@ included it on their public gallery. -->
       ? new Date(data.palette.date).toLocaleDateString(undefined, {
           dateStyle: 'long',
         })
+      : '',
+  );
+
+  // The project it came from: its name, or its places and dates
+  let sourceTitle = $derived(
+    data.sourceProject
+      ? decodeHtmlEntities(data.sourceProject.projectName ?? '').trim() ||
+          getTitleTextFromLocationsMeta(data.sourceProject.locations)
       : '',
   );
 
@@ -127,6 +138,16 @@ included it on their public gallery. -->
             {/if}
             {#if sharedOn}
               <p class="text-sm opacity-70">Shared {sharedOn}</p>
+            {/if}
+            {#if data.sourceProject && sourceTitle}
+              <p class="text-sm" data-testid="gallery-source-project">
+                From the project <a
+                  class="link"
+                  href={resolve('/gallery/[id]', {
+                    id: String(data.sourceProject.databaseId),
+                  })}>{sourceTitle}</a
+                >
+              </p>
             {/if}
           </div>
         {/snippet}

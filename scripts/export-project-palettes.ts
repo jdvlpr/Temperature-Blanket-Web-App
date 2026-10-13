@@ -9,7 +9,8 @@
 // the palettes the palette gallery has shown from projects: getPalettesFromProjects'
 // own filters (yarn colors, not preset schemes) and titles (the project's name or its
 // places, with " - 2" and so on for a project's later gauges). Each palette is kept
-// once, from its oldest project; the app's own modules (and its yarn data) are loaded
+// once, from its oldest project (the same colors as the gallery groups by, with
+// sameColorList, so one project's palette never shows as two people's); the app's own modules (and its yarn data) are loaded
 // through Vite, since they need the app's aliases and environment. --verify also runs getPalettesFromProjects
 // on every project at once and checks the counts match (it's quadratic, so not for the
 // full production gallery).
@@ -107,9 +108,10 @@ const server = await createServer({
   logLevel: 'error',
 });
 try {
-  const { getPalettesFromProjects } = (await server.ssrLoadModule(
-    '/src/lib/utils/color-utils.ts',
-  )) as typeof import('../src/lib/utils/color-utils.ts');
+  const { getPalettesFromProjects, sameColorList } =
+    (await server.ssrLoadModule(
+      '/src/lib/utils/color-utils.ts',
+    )) as typeof import('../src/lib/utils/color-utils.ts');
   // The yarn dataset loads on demand in the app; without it no color is a yarn
   // color, and every palette would be filtered out
   const { ensureYarnData, isYarnDataLoaded } = (await server.ssrLoadModule(
@@ -130,8 +132,8 @@ try {
   process.stderr.write('\n');
 
   const rows: Row[] = [];
-  // The same key getPalettesFromProjects uses to drop a repeated palette
-  const seen = new Set<string>();
+  // The palettes kept so far, compared as the gallery groups them
+  const seen: Parameters<typeof sameColorList>[0][] = [];
   const counts = { links: 0, filtered: 0, repeated: 0, unreadable: 0 };
   for (const project of projects) {
     let links: string[];
@@ -165,12 +167,11 @@ try {
         counts.filtered++;
         return;
       }
-      const key = JSON.stringify(palette.colors);
-      if (seen.has(key)) {
+      if (seen.some((colors) => sameColorList(colors, palette.colors))) {
         counts.repeated++;
         return;
       }
-      seen.add(key);
+      seen.push(palette.colors);
       rows.push({
         projectId: Number(project.databaseId),
         title: i > 0 ? `${palette.page.title} - ${i + 1}` : palette.page.title,
