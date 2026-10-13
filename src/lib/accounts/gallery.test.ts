@@ -15,7 +15,7 @@ const page = (
 });
 
 describe('groupGalleryPages', () => {
-  it('shows the newest page of each saved project, the rest apart', () => {
+  it('shows the newest page of each saved project, its older ones with it', () => {
     const { byProject, others } = groupGalleryPages(
       [page(1, 'a', 100), page(2, 'a', 300), page(3, 'b', 200)],
       ['a', 'b'],
@@ -23,7 +23,7 @@ describe('groupGalleryPages', () => {
     );
     expect(byProject.get('a')?.postId).toBe(2);
     expect(byProject.get('b')?.postId).toBe(3);
-    expect(others.map((p) => p.postId)).toEqual([1]);
+    expect(others).toEqual([]);
   });
 
   it('lists pages of projects not saved here as others', () => {
@@ -59,6 +59,6 @@ describe('groupGalleryPages', () => {
       [],
     );
     expect(byProject.get('a')?.postId).toBe(2);
-    expect(others.map((p) => p.postId)).toEqual([1]);
+    expect(others).toEqual([]);
   });
 });

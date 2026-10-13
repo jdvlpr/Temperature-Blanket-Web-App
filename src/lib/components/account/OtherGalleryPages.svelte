@@ -81,8 +81,7 @@ when there are none. -->
   <section class="flex flex-col gap-2" aria-labelledby="other-gallery-pages">
     <h2 id="other-gallery-pages" class="h3">Other Gallery Pages</h2>
     <p class="text-sm opacity-70">
-      Published from your account, but not next to a project or palette above:
-      older snapshots of one you published again, or of one that’s deleted or
+      Published from your account, from projects or palettes that are deleted or
       not saved here.
     </p>
     <div class={cardClass}>

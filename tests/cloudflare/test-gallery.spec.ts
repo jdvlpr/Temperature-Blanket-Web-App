@@ -234,7 +234,7 @@ test.describe('Gallery pages from accounts', () => {
     await page.getByRole('button', { name: /^Not now/ }).click();
     const sharing = page.getByRole('group', { name: `Gallery: ${title}` });
     const menu = sharing.getByRole('button', { name: /^Gallery:/ });
-    await expect(menu).toHaveText(/Published\s*$/);
+    await expect(menu).toHaveText(/Published · 2 versions\s*$/);
     // Unchanged since it was published: nothing to update
     await expect(
       sharing.getByRole('button', { name: /Publish a new version/ }),
@@ -243,41 +243,49 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       sharing.getByRole('button', { name: `Copy Link: ${title}` }),
     ).toBeVisible();
-    await menu.click();
+    await expect(
+      page.getByRole('heading', { name: 'Other Gallery Pages' }),
+    ).toHaveCount(0);
+
+    // Each version, newest first, opens its own options
+    const versions = page.getByRole('menuitem', { name: /^Published / });
+    const open = async (which: 'first' | 'last') => {
+      await menu.click();
+      await expect(versions).toHaveCount(2);
+      await versions[which]().click();
+    };
+    await open('first');
+    await expect(versions.first()).toContainText('Latest');
     await expect(
       page.getByRole('menuitem', { name: /View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
-    await expect(
-      page.getByRole('menuitem', { name: /Publish New Version/ }),
-    ).toHaveCount(0);
-    // The older page is listed on its own
-    await expect(
-      page
-        .getByRole('list', { name: 'Other gallery pages' })
-        .getByRole('link', { name: /Older/ }),
-    ).toBeVisible();
-
-    // With the name (the menu stays open, to show it took)
-    await page.getByRole('menuitemcheckbox', { name: /Show my name/ }).click();
     await page.keyboard.press('Escape');
-    await expect(menu).toHaveText(/Published · By Ada Lovelace\s*$/);
+    await page.keyboard.press('Escape');
+    await open('last');
+    await expect(
+      page.getByRole('menuitem', { name: /View Gallery Page/ }),
+    ).toHaveAttribute('href', `/gallery/${postId + 1}`);
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
+
+    // The name on the latest only (the menu stays open, to show it took)
+    await open('first');
+    const named = page.getByRole('menuitemcheckbox', { name: /Show my name/ });
+    await named.click();
+    await expect(named).toBeChecked();
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'By Ada Lovelace',
     );
     await expect(page.getByTestId('gallery-owner-page')).toBeVisible();
     expect(
       localD1(
-        `select "showOwner" from "galleryPost" where "postId" = ${postId}`,
-      )[0].showOwner,
-    ).toBe(1);
+        `select "postId", "showOwner" from "galleryPost" where "postId" in (${postId}, ${postId + 1}) order by "postId"`,
+      ).map((row) => row.showOwner),
+    ).toEqual([1, 0]);
 
-    // Unpublish: asks first, then takes the page off the gallery
-    await menu.click();
-    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    // Both its pages, so the older one doesn't take the newer one's place
-    await expect(sharing).toContainText('all 2 of its gallery pages');
-    await sharing.getByRole('button', { name: 'Cancel' }).click();
-    await expect(menu).toHaveText(/By Ada Lovelace\s*$/);
+    // Unpublish one version: asks first
     // (WordPress, which trashes the post, isn't running here: as if it did)
     const removed: string[] = [];
     await page.route(`**/api/account/gallery/*`, (route) => {
@@ -285,14 +293,27 @@ test.describe('Gallery pages from accounts', () => {
       removed.push(new URL(route.request().url()).pathname.split('/').pop()!);
       return route.fulfill({ status: 204 });
     });
-    await menu.click();
+    await open('last');
     await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await sharing.getByRole('button', { name: 'Unpublish' }).click();
+    await expect(sharing).toContainText('Unpublish the version published');
+    await sharing.getByRole('button', { name: 'Cancel' }).click();
+    expect(removed).toEqual([]);
+    await open('last');
+    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
+    await sharing
+      .getByRole('button', { name: 'Unpublish', exact: true })
+      .click();
+    await expect(menu).toHaveText(/Published · By Ada Lovelace\s*$/);
+    expect(removed).toEqual([String(postId + 1)]);
+    // Then the last one
+    await menu.click();
+    await page.getByRole('menuitem', { name: /^Published / }).click();
+    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
+    await sharing
+      .getByRole('button', { name: 'Unpublish', exact: true })
+      .click();
     await expect(sharing).toHaveCount(0);
-    expect(removed.sort()).toEqual([String(postId), String(postId + 1)]);
-    await expect(
-      page.getByRole('heading', { name: 'Other Gallery Pages' }),
-    ).toHaveCount(0);
+    expect(removed).toEqual([String(postId + 1), String(postId)]);
     // (Publishing is off here, so with no page there's nothing left to change)
   });
 

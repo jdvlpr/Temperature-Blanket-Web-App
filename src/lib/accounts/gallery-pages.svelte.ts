@@ -109,20 +109,7 @@ class GalleryPagesState {
       .filter(
         (p) => p.projectId === page.projectId && (p.kind ?? 'project') === kind,
       )
-      .sort((a, b) => b.publishedAt - a.publishedAt);
-  }
-
-  /**
-   * Takes the project or palette off the gallery: all its pages, so an older
-   * one doesn't take the newest's place. Throws when one can't be removed
-   * (the others still are).
-   */
-  async removeAllLike(page: GalleryPage) {
-    const results = await Promise.allSettled(
-      this.pagesLike(page).map((p) => this.remove(p.postId)),
-    );
-    if (results.some((result) => result.status === 'rejected'))
-      throw new Error('Not every gallery page could be removed');
+      .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId);
   }
 }
 

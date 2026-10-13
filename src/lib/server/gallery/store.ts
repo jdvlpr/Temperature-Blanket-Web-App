@@ -28,7 +28,7 @@ export type GalleryPost = {
   publishedAt: number;
   /** Since migration 0007; older rows are projects */
   kind?: GalleryPostKind;
-  /** A palette's Yarn Palette Creator link */
+  /** A palette's Yarn Palette Creator link, or a project's link as published */
   link?: string | null;
   /**
    * Included on the owner's public gallery: the page says "By" and the owner's

@@ -109,7 +109,8 @@ describe('publishFromAccount', () => {
         title: 'Somewhere from 2025 to 2026',
         publishedAt: 1234,
         kind: 'project',
-        link: null,
+        // As published, for the page's colors on My Projects
+        link: 'https://temperature-blanket.com/?project=p1#h',
         showOwner: false,
       },
     ]);

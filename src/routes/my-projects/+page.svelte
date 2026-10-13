@@ -89,7 +89,9 @@ published to the gallery as a snapshot, with the account's name or without. -->
           colors,
           name: label,
           showOwner: options.replace?.showOwner,
-          replacePostId: options.replace?.postId,
+          versions: options.replace
+            ? galleryPages.pagesLike(options.replace)
+            : undefined,
         },
       },
       options: {

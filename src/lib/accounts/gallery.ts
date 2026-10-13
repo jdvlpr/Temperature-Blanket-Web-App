@@ -22,7 +22,7 @@ export type GalleryPage = {
   title: string;
   publishedAt: number;
   kind?: 'project' | 'palette';
-  /** A palette's Yarn Palette Creator link */
+  /** A palette's Yarn Palette Creator link, or the project's link as published (none on older pages) */
   link?: string | null;
   /** Included on the owner's public gallery, with their name */
   showOwner?: boolean;
@@ -175,7 +175,7 @@ export type GroupedGalleryPages = {
   byProject: Map<string, GalleryPage>;
   /** The newest page of each saved palette here, by palette ID */
   byPalette: Map<string, GalleryPage>;
-  /** The rest: older pages of the same thing, or from something not saved here */
+  /** Pages of something not saved here (older pages of a saved one go with it) */
   others: GalleryPage[];
 };
 
@@ -201,9 +201,8 @@ export function groupGalleryPages(
     const isPalette = page.kind === 'palette';
     const saved = isPalette ? palettes : projects;
     const shown = isPalette ? byPalette : byProject;
-    if (saved.has(page.projectId) && !shown.has(page.projectId))
-      shown.set(page.projectId, page);
-    else others.push(page);
+    if (!saved.has(page.projectId)) others.push(page);
+    else if (!shown.has(page.projectId)) shown.set(page.projectId, page);
   }
   return { byProject, byPalette, others };
 }

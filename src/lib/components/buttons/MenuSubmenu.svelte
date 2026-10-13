@@ -39,11 +39,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** A lucide icon before the label, like the menu's other items, or a
      * short mark in its place (e.g. the current choice's, like "[)") */
     icon?: typeof ChevronRightIcon | string;
+    /** More under the choice, e.g. a palette strip */
+    below?: Snippet;
     children: Snippet;
   }
 
   // The choices: `children` is also what Menu.Context names its snippet
-  let { label, current, icon: RowIcon, children: choices }: Props = $props();
+  let {
+    label,
+    current,
+    icon: RowIcon,
+    below,
+    children: choices,
+  }: Props = $props();
 
   const drill = getMenuDrill();
 
@@ -90,6 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span class="flex min-w-0 flex-1 flex-col">
     <span>{label}</span>
     <span class="text-surface-700-300 text-xs">{current}</span>
+    {@render below?.()}
   </span>
   <ChevronRightIcon class="icon-sm shrink-0" aria-hidden="true" />
 {/snippet}

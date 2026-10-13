@@ -28,7 +28,7 @@ new version of a published one, it asks whether to remove the old page. -->
   } from '#lib/accounts/gallery.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
-  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import UnpublishVersions from '#lib/components/account/UnpublishVersions.svelte';
   import { onMount } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import { getYarnPageURL } from '#lib/utils/color-utils.js';
@@ -43,20 +43,28 @@ new version of a published one, it asks whether to remove the old page. -->
     colors,
     name: savedName,
     showOwner: chosenShowOwner,
-    replacePostId: oldPostId,
+    versions = [],
   }: {
     paletteId: string;
     colors: Color[];
     name: string;
     /** Chosen already on My Projects: with or without the account's name */
     showOwner?: boolean;
-    /** Its old gallery page, removed once this one is in (if chosen) */
-    replacePostId?: number;
+    /** Publishing a new version: the versions there now, newest first */
+    versions?: { postId: number; publishedAt: number; link?: string | null }[];
   } = $props();
 
-  // Whether the new version takes the old page's place, or both stay
-  let replaceOld = $state(true);
-  let replacePostId = $derived(oldPostId && replaceOld ? oldPostId : undefined);
+  // Its versions to unpublish once the new one is in (the latest, at first)
+  // svelte-ignore state_referenced_locally
+  let unpublishIds = $state<number[]>(versions[0] ? [versions[0].postId] : []);
+  // The newest of them takes the new page's place (the gallery may say it's
+  // the same palette); the rest come off after
+  let replacePostId = $derived(
+    versions.find((v) => unpublishIds.includes(v.postId))?.postId,
+  );
+  // Of the rest: how many came off, and whether any couldn't
+  let extrasRemoved = $state(0);
+  let extrasFailed = $state(false);
 
   // svelte-ignore state_referenced_locally
   let name = $state(cleanName(savedName, MAX_NAME_LENGTH));
@@ -114,7 +122,17 @@ new version of a published one, it asks whether to remove the old page. -->
     }
     if (result.status === 'shared' && replacePostId && oldRemoved === null)
       oldRemoved = await removeOld();
-    if (replacePostId) window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+    // The other versions chosen, now that the new one is in
+    if (result.status === 'shared' && oldRemoved !== false) {
+      const extras = unpublishIds.filter((id) => id !== replacePostId);
+      const results = await Promise.allSettled(
+        extras.map((id) => removeGalleryPage(id)),
+      );
+      extrasRemoved = results.filter((r) => r.status === 'fulfilled').length;
+      extrasFailed = extrasRemoved < extras.length;
+    }
+    if (unpublishIds.length)
+      window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
     busy = false;
     if (result.status === 'shared') {
       shared = true;
@@ -136,10 +154,17 @@ new version of a published one, it asks whether to remove the old page. -->
       <CheckIcon class="text-success-700-300 size-8" />
       <p class="font-bold">Published</p>
       {#if replacePostId && oldRemoved !== null}
+        {@const count = (oldRemoved ? 1 : 0) + extrasRemoved}
         <p class="text-sm">
-          {oldRemoved
-            ? 'The old page was removed.'
-            : 'The old page couldn’t be removed. You can unpublish it from My Projects, under Other gallery pages.'}
+          {#if count}
+            {count === 1
+              ? 'The older version was unpublished.'
+              : `${count} older versions were unpublished.`}
+          {/if}
+          {#if oldRemoved === false || extrasFailed}
+            Some couldn’t be unpublished. You can unpublish them from My
+            Projects.
+          {/if}
         </p>
       {/if}
       {#if postId}
@@ -165,7 +190,7 @@ new version of a published one, it asks whether to remove the old page. -->
         />
       </label>
       <p>
-        {#if oldPostId}
+        {#if versions.length}
           Publishes a new version of this palette, as it is now.
         {:else}
           Publishes a snapshot of this palette, with this name and its colors,
@@ -177,18 +202,12 @@ new version of a published one, it asks whether to remove the old page. -->
           >.
         {/if}
       </p>
-      {#if oldPostId}
-        <div class="bg-surface-100-900 rounded-container flex flex-col">
-          <ToggleSwitch
-            bare
-            label="Remove the old page"
-            details={replaceOld
-              ? 'The old gallery page is removed. Its gallery page link stops working, and its views are lost.'
-              : 'Both pages stay in the gallery.'}
-            bind:checked={replaceOld}
-            disabled={busy}
-          />
-        </div>
+      {#if versions.length}
+        <UnpublishVersions
+          {versions}
+          bind:selected={unpublishIds}
+          disabled={busy}
+        />
       {/if}
       <ShowOwnerToggle
         bind:checked={showOwner}
@@ -205,7 +224,7 @@ new version of a published one, it asks whether to remove the old page. -->
       >
         {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
           />{/if}
-        {oldPostId ? 'Publish New Version' : 'Publish'}
+        {versions.length ? 'Publish New Version' : 'Publish'}
       </button>
     </form>
   {/if}

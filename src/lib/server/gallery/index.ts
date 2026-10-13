@@ -166,11 +166,18 @@ export async function publishFromAccount(
       cleanName(payload.project_name, MAX_TITLE_LENGTH) ||
       cleanName(payload.title, MAX_TITLE_LENGTH) ||
       'Untitled project';
+    // Its link as published, so My Projects can show the page's colors
+    const link =
+      typeof payload.project_url === 'string' &&
+      payload.project_url.length <= MAX_PALETTE_LINK_LENGTH
+        ? payload.project_url
+        : null;
     await recordPublished(gallery, {
       postId: response.id,
       projectId,
       title,
       publishedAt: now,
+      link,
       showOwner,
     });
     return json({ ...response, linked: true });
