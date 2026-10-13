@@ -37,7 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { PencilIcon, SendIcon, Trash2Icon } from '@lucide/svelte';
+  import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
@@ -46,11 +47,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     updateGauge,
     sharing,
+    onpublish,
+    canPublish,
   }: {
     updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
     sharing?: Snippet<
       [{ palette: SavedPalette; colors: Color[]; label: string }]
     >;
+    /** Publish to Gallery, in each palette's menu where `canPublish` says so */
+    onpublish?: (palette: SavedPalette, colors: Color[], label: string) => void;
+    canPublish?: (palette: SavedPalette) => boolean;
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -201,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       aria-label="Saved palettes"
     >
-      {#each palettes as { palette, colors, label, saved } (palette.id)}
+      {#each palettes as { palette, colors, label } (palette.id)}
         {@render undoAt(palette.id, true)}
         <li class="flex w-full min-w-0">
           {#if editingId === palette.id}
@@ -220,6 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <PaletteCard
               {colors}
               name={label}
+              summary={!!palette.name}
               href={updateGauge ? undefined : linkFor(colors, palette.name)}
               onclick={updateGauge ? () => use(colors) : undefined}
               title={updateGauge
@@ -227,8 +234,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : 'Open in Yarn Palette Creator'}
             >
               {#snippet nameRow()}
-                <!-- The name with its Rename button right by it, so it's clear
-                what it edits -->
                 <span class="inline-flex items-start gap-0.5">
                   {#if updateGauge}
                     <button
@@ -249,30 +254,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <span class="sr-only">in Yarn Palette Creator</span>
                     </a>
                   {/if}
-                  <button
-                    type="button"
-                    class="hover:bg-surface-200-800 rounded-base inline-flex size-6 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
-                    title="Rename Palette"
-                    aria-label="Rename {label}"
-                    onclick={() => startRename(palette)}
-                  >
-                    <PencilIcon class="icon-sm" />
-                  </button>
                 </span>
               {/snippet}
-              {#snippet details()}
-                <span class="text-surface-700-300 text-xs">Saved {saved}</span>
-              {/snippet}
               {#snippet action()}
-                <button
-                  type="button"
-                  class="btn-icon hover:preset-tonal-surface shrink-0"
-                  title="Move to Trash"
-                  aria-label="Move {label} to the Trash"
-                  onclick={() => remove(palette, label)}
-                >
-                  <Trash2Icon aria-hidden="true" />
-                </button>
+                <MoreMenu
+                  label="More for {label}"
+                  items={[
+                    {
+                      value: 'rename',
+                      label: 'Rename',
+                      icon: PencilIcon,
+                      onselect: () => startRename(palette),
+                    },
+                    ...(onpublish && canPublish?.(palette)
+                      ? [
+                          {
+                            value: 'publish',
+                            label: 'Publish to Gallery',
+                            icon: SendIcon,
+                            onselect: () => onpublish(palette, colors, label),
+                          },
+                        ]
+                      : []),
+                    {
+                      value: 'trash',
+                      label: 'Move to Trash',
+                      icon: Trash2Icon,
+                      onselect: () => remove(palette, label),
+                      separate: true,
+                    },
+                  ]}
+                />
               {/snippet}
               {#snippet footer()}
                 {@render sharing?.({ palette, colors, label })}

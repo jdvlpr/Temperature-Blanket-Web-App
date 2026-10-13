@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     popularToGalleryNodes,
     recordPageView,
   } from '#lib/utils/gallery-utils.js';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import {
     getPalettesFromProjects,
     type GalleryPalette,
@@ -54,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     )
       await search();
     else {
+      await ensureYarnData();
       showPalettes();
       loading = false;
     }
@@ -122,6 +124,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnPaletteGalleryState.projects.push(
       ...results.edges.flatMap((item) => item.node),
     );
+    // Which colors are yarns comes from the yarn data
+    await ensureYarnData();
     showPalettes();
   }
 
@@ -153,15 +157,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function fetchPopularPalettes() {
     const months = galleryFilters.timePeriod;
-    const popular = await fetchPopularProjects({
-      months,
-      limit: 5,
-      palettes: true,
-    });
-    yarnPaletteGalleryState.popularPalettes = getPalettesFromProjects({
-      projects: popularToGalleryNodes(popular),
-      minColors: 3,
-    });
+    try {
+      const [popular] = await Promise.all([
+        fetchPopularProjects({ months, limit: 5, palettes: true }),
+        ensureYarnData(),
+      ]);
+      yarnPaletteGalleryState.popularPalettes = getPalettesFromProjects({
+        projects: popularToGalleryNodes(popular),
+        minColors: 3,
+      });
+    } catch (e) {
+      // Unreachable: none to feature, rather than placeholders forever
+      console.error('Could not load popular palettes', e);
+      yarnPaletteGalleryState.popularPalettes = [];
+    }
     yarnPaletteGalleryState.popularFor = months;
   }
 
@@ -214,8 +223,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2"
       bind:this={featuredEl}
     >
-      {#if !yarnPaletteGalleryState.popularPalettes.length}
+      {#if yarnPaletteGalleryState.popularFor !== galleryFilters.timePeriod}
         {@render placeholders(5, true)}
+      {:else if !yarnPaletteGalleryState.popularPalettes.length}
+        <p class="text-surface-700-300 mx-auto py-8 text-sm">
+          Nothing popular in this period yet.
+        </p>
       {:else}
         {#each yarnPaletteGalleryState.popularPalettes as palette, i (i)}
           <div class="w-64 shrink-0 snap-start">

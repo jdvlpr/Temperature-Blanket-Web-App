@@ -42,6 +42,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** For a link that needs a full page load (a project opened in the planner) */
     reload?: boolean;
     title?: string;
+    /** In place of the image's usual size for the layout, e.g. a fixed-height cover */
+    imageClass?: string;
   }
 
   let {
@@ -56,9 +58,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     footer,
     reload = false,
     title,
+    imageClass,
   }: Props = $props();
 
-  const imageClass = {
+  const imageClasses = {
     grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
     list: 'max-h-[900px] max-w-full',
     row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
@@ -84,7 +87,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tabindex={nameRow ? -1 : undefined}
   >
     {#if image}
-      <img src={image} alt="" class={imageClass[layout]} loading="lazy" />
+      <img
+        src={image}
+        alt=""
+        class={imageClass ?? imageClasses[layout]}
+        loading="lazy"
+      />
     {:else}
       {@render cover?.()}
     {/if}

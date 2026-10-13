@@ -31,10 +31,13 @@ async function seedProject(page: Page, title: string) {
   }, title);
 }
 
-/** A card's Move to Trash button */
-async function moveToTrash(page: Page, name: string) {
-  await page.getByRole('button', { name: `Move ${name} to the Trash` }).click();
+/** A card's ⋮ menu › an item, e.g. Rename or Move to Trash */
+async function cardMenu(page: Page, name: string, item: string) {
+  await page.getByRole('button', { name: `More for ${name}` }).click();
+  await page.getByRole('menuitem', { name: item }).click();
 }
+const moveToTrash = (page: Page, name: string) =>
+  cardMenu(page, name, 'Move to Trash');
 
 test.describe('My Projects', () => {
   test.beforeEach(async ({ context, baseURL }) => {
@@ -87,7 +90,6 @@ test.describe('My Projects', () => {
     // The palette links to the Yarn Palette Creator
     const palettes = page.getByRole('list', { name: 'Saved palettes' });
     await expect(palettes.getByText('Test Meadow')).toBeVisible();
-    await expect(palettes.getByText(/^Saved .+ at .+/)).toBeVisible();
     const paletteLink = palettes.getByRole('link', {
       name: 'Open Test Meadow in Yarn Palette Creator',
     });
@@ -96,7 +98,7 @@ test.describe('My Projects', () => {
     await expect(paletteLink.getByRole('button')).toHaveCount(0);
 
     // Name the project: the name shows, with its location title in the details
-    await page.getByRole('button', { name: 'Rename Test Town, 2024' }).click();
+    await cardMenu(page, 'Test Town, 2024', 'Rename');
     await page.getByLabel('Project name').fill('Gift Blanket');
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     const named = page.getByRole('link', { name: 'Gift Blanket' });

@@ -149,6 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet gallerySharing(project: StoredProjectIndexItem)}
   {@const page = galleryPages.grouped.byProject.get(project.id)}
   <GallerySharing
+    compact
     kind="project"
     label={labelFor(project)}
     {page}
@@ -199,6 +200,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : undefined}
               onrename={(name) => rename(project.id, name)}
               onremove={() => remove(project)}
+              onpublish={showSharing &&
+              galleryPages.publishing &&
+              !galleryPages.grouped.byProject.get(project.id)
+                ? () => openForGallery(project, { action: 'add' })
+                : undefined}
             >
               {#snippet sharing()}
                 {#if showSharing}{@render gallerySharing(project)}{/if}
@@ -213,12 +219,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@const { meta } = project}
             {@render undoAt(project.id)}
             <ProjectDetails
-            project={meta}
-            canRemove={false}
-            syncLabel={__ACCOUNTS_ENABLED__
-              ? syncLabelFor(project, signedIn)
-              : undefined}
-          />
+              project={meta}
+              canRemove={false}
+              syncLabel={__ACCOUNTS_ENABLED__
+                ? syncLabelFor(project, signedIn)
+                : undefined}
+            />
           {/each}
           {@render undoAt(null)}
         </div>

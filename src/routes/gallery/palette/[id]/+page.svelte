@@ -213,11 +213,24 @@ own project first), and other palette pages with them. -->
               : null}
           >
             {#snippet heading()}{name}{/snippet}
+            {#snippet note()}
+              {#if samePalettes.length}
+                Also shared as
+                {#each samePalettes as other, i (other.databaseId)}{#if i}{', '}{/if}<a
+                    class="link"
+                    href={resolve('/gallery/palette/[id]', {
+                      id: String(other.databaseId),
+                    })}>{galleryTitleText(other.title) || 'Yarn Palette'}</a
+                  >{/each}
+              {/if}
+            {/snippet}
             {#snippet subtitle()}
               {#if palette}
                 {palette.colors.length}
-                {pluralize('color', palette.colors.length)}{#if yarns.length}
-                  · {yarns.join(', ')}{/if}
+                {pluralize(
+                  'color',
+                  palette.colors.length,
+                )}{#if yarns.length}{' · '}{yarns.join(', ')}{/if}
               {:else}
                 &nbsp;
               {/if}
@@ -231,7 +244,7 @@ own project first), and other palette pages with them. -->
                 class="placeholder rounded-container h-[70px] w-full animate-pulse"
               ></div>
             {:else if palette}
-              <PaletteStrip colors={palette.colors} label="Yarn Palette" />
+              <PaletteStrip colors={palette.colors} />
               <div class="mx-auto w-fit">
                 <ViewMenu bind:value={preferences.value.layout} fillOption />
               </div>
@@ -259,25 +272,25 @@ own project first), and other palette pages with them. -->
           >
             Projects with this palette
           </h2>
-          <div
-            class="grid grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4"
-          >
+          <div class="flex flex-wrap items-start justify-center gap-2">
             {#each projects as { databaseId, featuredImage, locations, projectName } (databaseId)}
-              <GalleryProjectCard
-                href={resolve('/gallery/[id]', { id: String(databaseId) })}
-                image={featuredImage?.node?.mediaDetails?.sizes?.[0]
-                  ?.sourceUrl || featuredImage?.node?.mediaItemUrl}
-                name={projectName ? decodeHtmlEntities(projectName) : null}
-                placesHtml={getTitleFromLocationsMeta(locations)}
-              >
-                {#snippet details()}
-                  {#if databaseId === sourceProjectId}
-                    <p class="text-surface-600-400 text-xs">
-                      Shared from this project
-                    </p>
-                  {/if}
-                {/snippet}
-              </GalleryProjectCard>
+              <div class="w-40 sm:w-56">
+                <GalleryProjectCard
+                  href={resolve('/gallery/[id]', { id: String(databaseId) })}
+                  image={featuredImage?.node?.mediaDetails?.sizes?.[0]
+                    ?.sourceUrl || featuredImage?.node?.mediaItemUrl}
+                  name={projectName ? decodeHtmlEntities(projectName) : null}
+                  placesHtml={getTitleFromLocationsMeta(locations)}
+                >
+                  {#snippet details()}
+                    {#if databaseId === sourceProjectId}
+                      <p class="text-surface-600-400 text-xs">
+                        Shared from this project
+                      </p>
+                    {/if}
+                  {/snippet}
+                </GalleryProjectCard>
+              </div>
             {/each}
           </div>
           {#if moreProjects}
@@ -305,29 +318,6 @@ own project first), and other palette pages with them. -->
           <span class="sr-only" role="status">Looking for projects…</span>
         {/if}
       </section>
-
-      {#if samePalettes.length}
-        <section
-          class="mt-4 flex flex-col items-center gap-2 px-2 text-center"
-          aria-labelledby="also-shared-as"
-        >
-          <h2 id="also-shared-as" class="text-surface-700-300 font-semibold">
-            Also shared as
-          </h2>
-          <ul class="flex flex-col gap-1 text-sm">
-            {#each samePalettes as other (other.databaseId)}
-              <li>
-                <a
-                  class="link"
-                  href={resolve('/gallery/palette/[id]', {
-                    id: String(other.databaseId),
-                  })}>{galleryTitleText(other.title) || 'Yarn Palette'}</a
-                >
-              </li>
-            {/each}
-          </ul>
-        </section>
-      {/if}
     </main>
   {/snippet}
   {#snippet footer()}

@@ -23,7 +23,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   once its name differs from its page's, renaming the page in place. A
   gallery page is a snapshot from when it was published. Its link is a copy,
   always shareable, so it isn't a setting here: Copy Link comes in as
-  `children`, first on the row.
+  `children`, first on the row. On a card (`compact`) it's only the
+  Published menu: the card's own menu has Publish to Gallery, and updating is
+  in the Published menu.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -66,6 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onadd,
     onupdate,
     children,
+    compact = false,
   }: {
     kind: 'project' | 'palette';
     /** The project's or palette's name, for screen readers */
@@ -81,6 +84,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onupdate: (page: GalleryPage) => void;
     /** First on the row, e.g. Copy Link */
     children?: Snippet;
+    /** On a card: only the Published menu (see above) */
+    compact?: boolean;
   } = $props();
 
   const drill = provideMenuDrill();
@@ -185,15 +190,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <!-- With publishing paused, one without a page has only Copy Link -->
-{#if page || canAdd || children}
+{#if page || (canAdd && !compact) || children}
   <div
-    class="mt-2 flex flex-col gap-1 text-sm"
+    class={['flex flex-col gap-1 text-sm', !compact && 'mt-2']}
     aria-label="Gallery: {label}"
     role="group"
   >
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
       {@render children?.()}
-      {#if !page && canAdd}
+      {#if !page && canAdd && !compact}
         <button
           type="button"
           class={triggerClass}
@@ -329,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    {#if page && changedSince && canAdd && confirming === null}
+    {#if page && changedSince && canAdd && confirming === null && !compact}
       <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
         {#if kind === 'palette'}
           <span class="opacity-70"

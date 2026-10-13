@@ -15,14 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A saved project on My Projects, as the gallery's project card: its picture
-  (taken when the planner saved it; until then its colors), its name with a
-  rename pencil, its places and dates, when it was saved, then its gallery
-  sharing (`sharing`) and Move to Trash. Tapping
-  it opens it in the planner.
+  (taken when the planner saved it; until then its colors), its name, its
+  places and dates when it has a name, and a ⋮ menu (Rename, Publish to
+  Gallery, Move to Trash). Once published, its Published menu (`sharing`)
+  sits under it. Tapping it opens it in the planner.
 -->
 <script lang="ts">
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import NameField from '#lib/components/NameField.svelte';
+  import MoreMenu, {
+    type MoreMenuItem,
+  } from '#lib/components/buttons/MoreMenu.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import SyncIcon from '#lib/components/sync/SyncIcon.svelte';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
@@ -30,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
-  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { PencilIcon, SendIcon, Trash2Icon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -41,6 +44,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Called with the new name ('' clears it) */
     onrename: (name: string) => void;
     onremove: () => void;
+    /** Publish to Gallery, in its menu, when it can be published */
+    onpublish?: () => void;
     /** Its gallery pages: Publish to Gallery, or Published ▾ */
     sharing?: Snippet;
   }
@@ -51,11 +56,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     syncLabel,
     onrename,
     onremove,
+    onpublish,
     sharing,
   }: Props = $props();
 
   let meta = $derived(item.meta);
   let label = $derived(meta.name || meta.title || 'Untitled Project');
+  // Its places and dates under its name, unless the name already says where
+  let places = $derived.by(() => {
+    if (!meta.name || !meta.title) return '';
+    const place = meta.title.split(' from ')[0].trim();
+    return place && meta.name.includes(place) ? '' : meta.title;
+  });
 
   // Its picture, read once the card is near the screen (there can be many)
   let card = $state<HTMLElement>();
@@ -88,6 +100,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ...extraColorsFromProjectHref(meta.href).map((extra) => extra.color),
   ]);
 
+  let menu = $derived<MoreMenuItem[]>([
+    {
+      value: 'rename',
+      label: 'Rename',
+      icon: PencilIcon,
+      onselect: () => {
+        editingName = meta.name ?? '';
+        editing = true;
+      },
+    },
+    ...(onpublish
+      ? [
+          {
+            value: 'publish',
+            label: 'Publish to Gallery',
+            icon: SendIcon,
+            onselect: onpublish,
+          },
+        ]
+      : []),
+    {
+      value: 'trash',
+      label: 'Move to Trash',
+      icon: Trash2Icon,
+      onselect: onremove,
+      separate: true,
+    },
+  ]);
+
   let editing = $state(false);
   let editingName = $state('');
 </script>
@@ -98,7 +139,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     reload
     image={thumbnail}
     {layout}
-    title="Open in the Project Planner"
+    title="Open in the Project Planner (saved {meta.date})"
+    imageClass="rounded-container w-full object-cover {layout === 'grid'
+      ? 'h-[140px]'
+      : 'h-[70px]'}"
   >
     {#snippet cover()}
       {#if colors.length}
@@ -125,63 +169,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         </div>
       {:else}
-        <div class="flex max-w-full items-start justify-center gap-1">
-          {#if syncLabel}
-            <span class="mt-0.5"><SyncIcon label={syncLabel} /></span>
-          {/if}
-          <!-- A full page load: the planner reads the project from the URL it
-          starts with, so arriving by client-side navigation skips the saved weather -->
-          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-          <a
-            href={meta.href}
-            data-sveltekit-reload
-            class="line-clamp-3 min-w-0 text-sm font-semibold break-words"
-            >{label}</a
-          >
-          <!-- Right by the name so it's clear what it edits -->
-          <button
-            type="button"
-            class="hover:bg-surface-200-800 rounded-base -my-0.5 inline-flex size-7 shrink-0 items-center justify-center opacity-70 hover:opacity-100"
-            title="Rename Project"
-            aria-label="Rename {label}"
-            onclick={() => {
-              editingName = meta.name ?? '';
-              editing = true;
-            }}
-          >
-            <PencilIcon class="icon-sm" />
-          </button>
+        <div class="flex w-full items-start gap-1 text-left">
+          <div class="flex min-w-0 grow flex-col">
+            <span class="flex items-start gap-1">
+              {#if syncLabel}
+                <span class="mt-0.5"><SyncIcon label={syncLabel} /></span>
+              {/if}
+              <!-- A full page load: the planner reads the project from the URL it
+              starts with, so arriving by client-side navigation skips the saved weather -->
+              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+              <a
+                href={meta.href}
+                data-sveltekit-reload
+                class="line-clamp-2 min-w-0 text-sm font-semibold break-words"
+                >{label}</a
+              >
+            </span>
+            {#if places}
+              <span class="text-surface-700-300 line-clamp-1 text-xs"
+                >{places}</span
+              >
+            {/if}
+            {#if syncLabel?.tone === 'error'}
+              <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
+            {/if}
+          </div>
+          <MoreMenu items={menu} label="More for {label}" />
         </div>
-      {/if}
-      {#if meta.name && meta.title}
-        <p class="line-clamp-3 text-xs">{meta.title}</p>
-      {/if}
-    {/snippet}
-    {#snippet details()}
-      <p class="text-surface-700-300 text-xs">
-        Saved {meta.date}{#if meta.isCustomWeatherData}
-          · Custom Weather Data{/if}
-      </p>
-      {#if syncLabel?.tone === 'error'}
-        <p class="text-error-700-300 text-xs">{syncLabel.text}</p>
       {/if}
     {/snippet}
     {#snippet footer()}
-      {#if !editing}
-        <div class="flex w-full items-start justify-center gap-1">
-          <div class="min-w-0">{@render sharing?.()}</div>
-          <div class="mt-2">
-            <button
-              type="button"
-              class="btn-icon hover:preset-tonal-surface"
-              title="Move to Trash"
-              aria-label="Move {label} to the Trash"
-              onclick={onremove}
-            >
-              <Trash2Icon aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+      {#if !editing && sharing}
+        <div class="w-full text-left">{@render sharing()}</div>
       {/if}
     {/snippet}
   </GalleryProjectCard>

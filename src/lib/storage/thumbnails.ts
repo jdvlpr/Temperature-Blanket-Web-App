@@ -66,8 +66,9 @@ export async function removeThumbnail(id: string): Promise<void> {
 }
 
 /**
- * Draws an SVG small, as a JPEG (white behind it), or null if it can't. With
- * Canvg, as the gallery's pictures are drawn (svgToPNG), scaled down.
+ * Draws an SVG small, as a JPEG (white behind it), or null if it can't: at
+ * full size with Canvg, as the gallery's pictures are drawn (svgToPNG), then
+ * scaled down onto a small canvas.
  */
 async function drawSmall(
   svg: SVGSVGElement,
@@ -75,35 +76,36 @@ async function drawSmall(
   height: number,
 ): Promise<string | null> {
   if (!width || !height) return null;
+  const full = document.createElement('canvas');
+  full.width = width;
+  full.height = height;
   const scale = Math.min(1, THUMBNAIL_WIDTH / width);
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(width * scale));
-  canvas.height = Math.max(1, Math.round(height * scale));
+  const small = document.createElement('canvas');
+  small.width = Math.max(1, Math.round(width * scale));
+  small.height = Math.max(1, Math.round(height * scale));
   try {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const fullCtx = full.getContext('2d');
+    const ctx = small.getContext('2d');
+    if (!fullCtx || !ctx) return null;
     const { Canvg } = await import('canvg');
-    const drawing = Canvg.fromString(
-      ctx,
+    await Canvg.fromString(
+      fullCtx,
       new XMLSerializer().serializeToString(svg),
-      {
-        ignoreAnimation: true,
-        ignoreMouse: true,
-        ignoreClear: true,
-        scaleWidth: canvas.width,
-        scaleHeight: canvas.height,
-      },
-    );
-    await drawing.render();
-    return canvas.toDataURL('image/jpeg', 0.82);
+      { ignoreAnimation: true, ignoreMouse: true },
+    ).render();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, small.width, small.height);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(full, 0, 0, small.width, small.height);
+    return small.toDataURL('image/jpeg', 0.82);
   } catch {
     return null;
   } finally {
     // Safari only frees a canvas's memory once it's sized down
-    canvas.width = 0;
-    canvas.height = 0;
+    for (const canvas of [full, small]) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
   }
 }
 

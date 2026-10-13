@@ -154,6 +154,16 @@ published to the gallery as a snapshot, with the account's name or without. -->
   <meta property="og:type" content="website" />
 </svelte:head>
 
+{#snippet viewMenu()}
+  <!-- Both sections' menus are the same setting -->
+  <ViewMenu
+    bind:value={
+      () => preferences.value.myProjectsLayout ?? 'grid',
+      (layout) => (preferences.value.myProjectsLayout = layout)
+    }
+  />
+{/snippet}
+
 <AppShell pageName="My Projects">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
@@ -223,30 +233,21 @@ published to the gallery as a snapshot, with the account's name or without. -->
         </div>
       {/if}
 
-      <!-- One View menu for both: projects and palettes as cards side by side, or one per row -->
-      {#if browser}
-        <div class="-mb-4 flex justify-center">
-          <ViewMenu
-            bind:value={
-              () => preferences.value.myProjectsLayout ?? 'grid',
-              (layout) => (preferences.value.myProjectsLayout = layout)
-            }
-          />
-        </div>
-      {/if}
-
       <section class="flex flex-col gap-2" aria-labelledby="projects">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 id="projects" class="h3">My Projects</h2>
-          <!-- A full load: the project open before stays loaded otherwise -->
-          <a
-            href={resolve('/')}
-            class="btn hover:preset-tonal-surface"
-            data-sveltekit-reload
-          >
-            <PlusIcon />
-            New Project
-          </a>
+          <div class="flex flex-wrap items-center gap-2">
+            {#if browser}{@render viewMenu()}{/if}
+            <!-- A full load: the project open before stays loaded otherwise -->
+            <a
+              href={resolve('/')}
+              class="btn hover:preset-tonal-surface"
+              data-sveltekit-reload
+            >
+              <PlusIcon />
+              New Project
+            </a>
+          </div>
         </div>
         {#if browser}
           <LocalProjects onMyProjectsPage />
@@ -256,19 +257,30 @@ published to the gallery as a snapshot, with the account's name or without. -->
       <section class="flex flex-col gap-2" aria-labelledby="palettes">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 id="palettes" class="h3">My Yarn Palettes</h2>
-          <a href={resolve('yarn')} class="btn hover:preset-tonal-surface"
-            ><PlusIcon />New Palette</a
-          >
+          <div class="flex flex-wrap items-center gap-2">
+            {#if browser}{@render viewMenu()}{/if}
+            <a href={resolve('yarn')} class="btn hover:preset-tonal-surface"
+              ><PlusIcon />New Palette</a
+            >
+          </div>
         </div>
         {#if browser}
           {#if synced}
             <AddToAccountButton kind="palettes" />
           {/if}
-          <SavedPalettes>
+          <SavedPalettes
+            onpublish={sharePalette}
+            canPublish={(palette) =>
+              signedIn &&
+              galleryPages.shown &&
+              galleryPages.publishing &&
+              !galleryPages.grouped.byPalette.get(palette.id)}
+          >
             {#snippet sharing({ palette, colors, label })}
               {#if signedIn && galleryPages.shown}
                 {@const page = galleryPages.grouped.byPalette.get(palette.id)}
                 <GallerySharing
+                  compact
                   kind="palette"
                   {label}
                   {page}

@@ -52,15 +52,15 @@ test.describe('Saved palettes', () => {
     await expect(list.getByText('Test Sunset')).toBeVisible();
 
     // Rename
-    await list.getByRole('button', { name: 'Rename Test Sunset' }).click();
+    await list.getByRole('button', { name: 'More for Test Sunset' }).click();
+    await page.getByRole('menuitem', { name: 'Rename' }).click();
     await list.getByLabel('Palette name').fill('Test Dusk');
     await list.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();
 
     // Delete, then undo
-    await list
-      .getByRole('button', { name: 'Move Test Dusk to the Trash' })
-      .click();
+    await list.getByRole('button', { name: 'More for Test Dusk' }).click();
+    await page.getByRole('menuitem', { name: 'Move to Trash' }).click();
     await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
     await dialog.getByRole('button', { name: 'Undo' }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();

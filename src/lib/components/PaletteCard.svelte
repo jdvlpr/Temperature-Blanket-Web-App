@@ -34,6 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** What tapping it does, e.g. "Open Palette Page" */
     title: string;
     reload?: boolean;
+    /** "8 colors · yarns" under the name; off when the name already says that */
+    summary?: boolean;
     /** One button beside the name, e.g. Open a Copy */
     action?: Snippet;
     /** In place of the name, outside the link; it has the link or button
@@ -52,6 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title,
     reload = false,
     action,
+    summary = true,
     nameRow,
     details,
     footer,
@@ -105,10 +108,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex items-start gap-1">
     <div class="flex min-w-0 grow flex-col gap-0.5">
       {@render nameRow?.()}
-      <span class="text-surface-700-300 line-clamp-2 text-xs">
+      <span
+        class={[
+          'text-surface-700-300 line-clamp-1 text-xs',
+          !summary && 'hidden',
+        ]}
+      >
         {colors.length}
-        {pluralize('color', colors.length)}{#if yarns.length}
-          · {yarns.join(', ')}{/if}
+        {pluralize('color', colors.length)}{#if yarns.length}{' · '}{yarns.join(
+            ', ',
+          )}{/if}
       </span>
       {@render details?.()}
     </div>

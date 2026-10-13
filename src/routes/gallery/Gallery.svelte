@@ -93,11 +93,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function fetchPopularProjectsWrapper() {
     const months = galleryFilters.timePeriod;
-    let promisePopularProjects = await fetchPopularProjects({
-      months,
-      limit: 5,
-    });
-    galleryState.popularProjects = promisePopularProjects;
+    try {
+      galleryState.popularProjects = await fetchPopularProjects({
+        months,
+        limit: 5,
+      });
+    } catch (e) {
+      // Unreachable: none to feature, rather than placeholders forever
+      console.error('Could not load popular projects', e);
+      galleryState.popularProjects = [];
+    }
     galleryState.popularFor = months;
   }
 
@@ -216,12 +221,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="mx-auto flex w-full snap-x snap-mandatory items-start gap-2 overflow-x-scroll"
       bind:this={featuredProjectsEl}
     >
-      {#if !galleryState.popularProjects.length}
+      {#if galleryState.popularFor !== galleryFilters.timePeriod}
         {#each Array(5)}
           <div
             class="placeholder rounded-container bg-surface-100 dark:bg-surface-900 h-[324px] w-[245px] shrink-0 animate-pulse snap-center"
           ></div>
         {/each}
+      {:else if !galleryState.popularProjects.length}
+        <p class="text-surface-700-300 mx-auto py-8 text-sm">
+          Nothing popular in this period yet.
+        </p>
       {:else}
         {#each galleryState.popularProjects as { featured_image_src, id, meta } (id)}
           <GalleryProjectCard

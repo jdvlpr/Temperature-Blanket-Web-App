@@ -35,6 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     heading: Snippet;
     /** A line under the name */
     subtitle?: Snippet;
+    /** A small line under "By", e.g. other pages with the same colors */
+    note?: Snippet;
     /** Open a Copy: where, its icon, and its tooltip */
     open?: {
       href: string;
@@ -53,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     date,
     heading,
     subtitle,
+    note,
     open,
     actions,
   }: Props = $props();
@@ -76,7 +79,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p>{@render subtitle()}</p>
   {/if}
   {#if owner || sharedOn}
-    <p class="text-surface-600-400 text-sm">
+    <p
+      class="text-surface-600-400 flex flex-wrap justify-center gap-x-1.5 text-sm"
+    >
       {#if owner}
         <span data-testid="gallery-owner"
           >By <a
@@ -91,6 +96,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
   {/if}
 
+  {#if note}
+    <p class="text-surface-600-400 text-sm empty:hidden">{@render note()}</p>
+  {/if}
   {#if open || actions}
     <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
       {#if open}
