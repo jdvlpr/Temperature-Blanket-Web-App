@@ -24,6 +24,7 @@ included it on their public gallery. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
+  import GalleryOwnerBar from '#lib/components/account/GalleryOwnerBar.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
@@ -38,6 +39,8 @@ included it on their public gallery. -->
 
   let { data }: { data: PageData } = $props();
 
+  // "By" and the name, which the owner bar changes in place
+  let owner = $derived(data.owner);
   let name = $derived(galleryTitleText(data.palette.title) || 'Yarn Palette');
   let sharedOn = $derived(
     data.palette.date
@@ -98,14 +101,21 @@ included it on their public gallery. -->
           <div
             class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
           >
+            {#if __ACCOUNTS_ENABLED__}
+              <GalleryOwnerBar
+                postId={data.palette.databaseId}
+                kind="palette"
+                onowner={(next) => (owner = next)}
+              />
+            {/if}
             <h1 class="text-2xl font-bold break-words">{name}</h1>
-            {#if data.owner}
+            {#if owner}
               <p class="text-surface-600-400" data-testid="gallery-owner">
                 By <a
                   class="link"
                   href={resolve('/gallery/by/[ownerId]', {
-                    ownerId: data.owner.publicId,
-                  })}>{data.owner.name}</a
+                    ownerId: owner.publicId,
+                  })}>{owner.name}</a
                 >
               </p>
             {/if}
@@ -147,9 +157,13 @@ included it on their public gallery. -->
               <div class="flex flex-wrap items-center justify-center gap-2">
                 <!-- A link on this site, built from the palette's own path -->
                 <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-                <a class="btn preset-filled-primary-500" href={palette.href}>
+                <a
+                  class="btn preset-filled-primary-500"
+                  href={palette.href}
+                  title="Open a copy in the Yarn Palette Creator. This gallery page won’t change."
+                >
                   <PaletteIcon />
-                  Open in Yarn Palette Creator
+                  Open a Copy
                 </a>
                 <button
                   type="button"

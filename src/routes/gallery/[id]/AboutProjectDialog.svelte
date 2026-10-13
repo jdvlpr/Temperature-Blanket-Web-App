@@ -158,7 +158,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <p class="italic">
       The preview image may not reflect the most recent weather information.
-      Open the project in the Project Planner to see any updates.
+      Open a copy to see the latest weather.
     </p>
   </div>
 </div>

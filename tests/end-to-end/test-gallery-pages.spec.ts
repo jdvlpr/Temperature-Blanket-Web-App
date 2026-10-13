@@ -31,7 +31,7 @@ test.describe('Project Gallery Pages', () => {
     await page.keyboard.press('Escape');
 
     // Check for the share/open buttons or similar.
-    // The "Open in Project Planner" button is a good candidate if valid.
+    // The "Open a Copy" button is a good candidate if valid.
     // Or just check for the back link.
     await expect(
       page.getByRole('link', { name: 'Project Gallery' }),

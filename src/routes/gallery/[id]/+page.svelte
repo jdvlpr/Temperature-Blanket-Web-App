@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
+  import GalleryOwnerBar from '#lib/components/account/GalleryOwnerBar.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import YarnSources from '#lib/components/YarnSources.svelte';
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
@@ -77,6 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let imageHeight = $state<number | undefined>();
 
   let project = $derived(data.project);
+  // "By" and the name, which the owner bar changes in place
+  let owner = $derived(data.owner);
   let projectURL = $derived(project?.projectUrl);
   let projectTitle = $derived(
     project ? getTitleFromLocationsMeta(project.locations) : '',
@@ -146,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         props: {
           project,
           title: projectTitleNoHTML,
-          owner: data.owner,
+          owner,
           reshapedColors,
           weatherSources,
         },
@@ -285,6 +288,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
             >
+              <!-- Even when the page can't be found, so its owner can unpublish it -->
+              {#if __ACCOUNTS_ENABLED__}
+                <GalleryOwnerBar
+                  postId={Number(page.params.id)}
+                  kind="project"
+                  onowner={(next) => (owner = next)}
+                />
+              {/if}
               {#if projectName}
                 <h1 class="text-2xl font-bold break-words">{projectName}</h1>
               {/if}
@@ -296,13 +307,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   This project gallery page cannot be found.
                 {/if}
               </p>
-              {#if project && data.owner}
+              {#if project && owner}
                 <p class="text-surface-600-400" data-testid="gallery-owner">
                   By <a
                     class="link"
                     href={resolve('/gallery/by/[ownerId]', {
-                      ownerId: data.owner.publicId,
-                    })}>{data.owner.name}</a
+                      ownerId: owner.publicId,
+                    })}>{owner.name}</a
                   >
                 </p>
               {/if}
@@ -313,11 +324,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="btn preset-filled-primary-500"
                     href={openHref}
                     target={locations.allValid ? '_blank' : '_self'}
+                    title="Open a copy in the Project Planner. This gallery page won’t change."
                   >
                     <NotebookPenIcon />
-                    Open in {#if locations.allValid}
-                      New
-                    {/if} Project Planner
+                    Open a Copy
                   </a>
                 {/if}
                 {#if globeLink}

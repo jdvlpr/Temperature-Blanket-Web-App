@@ -317,6 +317,82 @@ test.describe('Gallery pages from accounts', () => {
     // (Publishing is off here, so with no page there's nothing left to change)
   });
 
+  test('on its own gallery page, the owner can show their name or unpublish it', async ({
+    page,
+    request,
+    browser,
+    baseURL,
+  }) => {
+    const email = uniqueEmail('gallery-owner-bar');
+    await signIn(page, request, email);
+    const userId = userIdFor(email);
+    localD1(
+      `update "user" set "name" = 'Ada Lovelace' where "id" = '${userId}'`,
+    );
+    const postId = 900_000_000 + Math.floor(Math.random() * 1e7);
+    localD1(
+      `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
+       values (${postId}, '${userId}', 'p-bar', 'Lima', ${Date.now()}),
+              (${postId + 1}, '${userId}', 'p-bar', 'Lima', ${Date.now() - 3_600_000})`,
+    );
+
+    // The older version links to the newer one
+    await page.goto(`/gallery/${postId + 1}`);
+    const bar = page.getByTestId('gallery-owner-bar');
+    await expect(bar).toContainText('Your gallery page');
+    await expect(
+      bar.getByRole('link', { name: 'Newer version' }),
+    ).toHaveAttribute('href', `/gallery/${postId}`);
+
+    await page.goto(`/gallery/${postId}`);
+    await expect(bar).toContainText('Your gallery page');
+    await expect(bar.getByRole('link', { name: 'Newer version' })).toHaveCount(
+      0,
+    );
+
+    // Show my name: on this page only
+    const options = bar.getByRole('button', { name: /^Options/ });
+    await options.click();
+    const named = page.getByRole('menuitemcheckbox', { name: /Show my name/ });
+    await named.click();
+    await expect(named).toBeChecked();
+    await page.keyboard.press('Escape');
+    // ("By" shows under the project's title, which needs WordPress)
+    expect(
+      localD1(
+        `select "showOwner" from "galleryPost" where "postId" in (${postId}, ${postId + 1}) order by "postId"`,
+      ).map((row) => row.showOwner),
+    ).toEqual([1, 0]);
+
+    // Unpublish: asks first
+    // (WordPress, which trashes the post, isn't running here: as if it did)
+    const removed: string[] = [];
+    await page.route(`**/api/account/gallery/*`, (route) => {
+      if (route.request().method() !== 'DELETE') return route.fallback();
+      removed.push(new URL(route.request().url()).pathname.split('/').pop()!);
+      return route.fulfill({ status: 204 });
+    });
+    await options.click();
+    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
+    await bar.getByRole('button', { name: 'Cancel' }).click();
+    expect(removed).toEqual([]);
+    await options.click();
+    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
+    await bar.getByRole('button', { name: 'Unpublish', exact: true }).click();
+    await expect(bar).toContainText('Unpublished');
+    expect(removed).toEqual([String(postId)]);
+
+    // Anyone else sees no bar
+    const visitor = await browser.newContext({ baseURL });
+    const other = await visitor.newPage();
+    await other.goto(`/gallery/${postId + 1}`);
+    await expect(
+      other.getByRole('link', { name: 'Project Gallery' }),
+    ).toBeVisible();
+    await expect(other.getByTestId('gallery-owner-bar')).toHaveCount(0);
+    await visitor.close();
+  });
+
   test('a saved project goes to the gallery from My Projects, without leaving it', async ({
     page,
     request,
