@@ -317,6 +317,15 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
   // The page's own link, for after it's sent
   let sentHeading = $state<HTMLElement>();
   let removedHeading = $state<HTMLElement>();
+  // Cloudflare is asking the person to do something
+  let challenge = $state(false);
+  const stepText = $derived(
+    step === 'checking' && challenge
+      ? 'Complete the check below to publish.'
+      : step
+        ? STEP_TEXT[step]
+        : '',
+  );
   const linkCopied = new Flash();
   // Checks a submission without the account isn't from a robot
   let turnstile = $state<Turnstile>();
@@ -389,6 +398,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     } finally {
       busy = false;
       step = null;
+      challenge = false;
     }
   }
 
@@ -409,7 +419,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
 <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
   <!-- Always here, so screen readers announce what changes in it -->
   <p class="sr-only" role="status">
-    {view === 'preparing' ? preparingText : busy && step ? STEP_TEXT[step] : ''}
+    {view === 'preparing' ? preparingText : busy ? stepText : ''}
   </p>
 
   {#if view === 'preparing'}
@@ -503,7 +513,10 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
       {/if}
       <!-- Shows only when Cloudflare needs you to do something; outside the
       inert card, since that can be while it's sending -->
-      <Turnstile bind:this={turnstile} />
+      <Turnstile
+        bind:this={turnstile}
+        oninteractive={(needed) => (challenge = needed)}
+      />
       {#if problem}
         <div class="text-error-700-300 flex flex-col gap-1" role="alert">
           <p>{problemText}</p>
@@ -595,7 +608,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
     <div class={FOOTER}>
       {#if busy && step}
         <p class="w-full text-center text-sm" aria-hidden="true">
-          {STEP_TEXT[step]}
+          {stepText}
         </p>
       {:else if view === 'form' && !fromAccount}
         <p class="w-full text-center text-sm">

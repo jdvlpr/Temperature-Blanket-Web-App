@@ -12,7 +12,7 @@ Svelte 5 (runes) + SvelteKit 3 (config lives in `sveltekit({...})` in `vite.conf
 
 ## Setup
 
-Copy `.env.example` to `.env`. Location search needs a free GeoNames username (`SECRET_GEONAMES_USERNAME`); weather data needs a free Meteostat/RapidAPI key (`SECRET_METEOSTAT_API_KEY`). Everything else is optional for local dev — POST requests to the WordPress backend are rejected locally without the auth key, which is expected.
+Copy `.env.example` to `.env`. Location search needs a free GeoNames username (`SECRET_GEONAMES_USERNAME`); weather data needs a free Meteostat/RapidAPI key (`SECRET_METEOSTAT_API_KEY`). Everything else is optional for local dev — POST requests to the WordPress backend are rejected locally without the auth key, which is expected. Guest gallery submissions also need `PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA` (Cloudflare's always-pass test site key), which pairs with the test secret in `wrangler.jsonc`.
 
 ## Commands
 
@@ -42,7 +42,7 @@ Single unit test file: `pnpm vitest run src/lib/utils/color-utils.test.ts`. Sing
 - **`src/lib/state/*.svelte.ts`** — global reactive state (runes), one per concern: `project-state`, `location-state`, `weather-state`, `gauges-state`, `page-state`, `preview-state`. `state/gauges/` holds per-gauge-type state (temperature, rain, snow, daytime, moon-phase). Gauges — weather variable → yarn color ranges — are the core domain concept.
 - **`src/lib/storage/`** — client persistence: projects and palettes in IndexedDB (`idb-keyval`), preferences in Local Storage, `migration-manager.ts` migrates old stored shapes. Update the Local Storage/IndexedDB tables in `README.md` when adding or changing a stored key.
 - **`src/lib/features/`** — self-contained features: `pdf/` (built from composable `sections/`), `google-sheets/`, `image-palette/`, `palette-image/`, `charts/`, `diagnostics/`, etc.
-- **`src/routes/api/`** — server routes. `location/*` and `weather/v1/meteostat/*` proxy GeoNames/Meteostat to hide keys; `project/+server.ts` proxies anonymous gallery submissions to WordPress; `yarn-colorways/{v1,v3}/*` is a public, versioned yarn colorway API (documented at `/api/yarn-colorways`).
+- **`src/routes/api/`** — server routes. `location/*` and `weather/v1/meteostat/*` proxy GeoNames/Meteostat to hide keys; `project/+server.ts` proxies anonymous gallery submissions to WordPress, only with a valid Cloudflare Turnstile token in the `CF-Turnstile-Response` header (`src/lib/server/turnstile.ts`; it fails closed, so no secret or a Siteverify outage refuses the submission; the widget is `src/lib/components/Turnstile.svelte`); `yarn-colorways/{v1,v3}/*` is a public, versioned yarn colorway API (documented at `/api/yarn-colorways`).
 - **`src/lib/data/yarns/`** — static yarn/colorway data.
 - Routes map roughly 1:1 to top-level nav (`weather`, `yarn`, `yarn-colorway-finder`, `gallery/[id]`, `globe`, `blog/*` dated folders, `my-projects`, `account`, docs pages). `src/routes/.dev-tools/` is dev-only (redirected away in production by `hooks.server.ts`).
 - The Cloudflare adapter's `routes.exclude` (in `vite.config.ts`) controls which paths are static vs. hit a Function — keep API routes out of it; the free plan caps it at ~100 entries, so prefer `/*` wildcards.
@@ -52,7 +52,7 @@ Single unit test file: `pnpm vitest run src/lib/utils/color-utils.test.ts`. Sing
 Accounts are behind flags and dormant in production until launch:
 
 - `PUBLIC_ACCOUNTS_ENABLED=true` at **build time** includes the account UI (see `app.d.ts`, `vite.config.ts`).
-- Server-side, `ACCOUNTS_ENABLED`, `SYNC_ENABLED`, `GALLERY_PUBLISH_ENABLED`, `ACCOUNTS_SIGNUP_LIMIT` and `BETTER_AUTH_SECRET` are Cloudflare bindings/vars. `wrangler.jsonc` is **local-only** (no `pages_build_output_dir`); production values live in the Pages dashboard.
+- Server-side, `ACCOUNTS_ENABLED`, `SYNC_ENABLED`, `GALLERY_PUBLISH_ENABLED`, `ACCOUNTS_SIGNUP_LIMIT` and `BETTER_AUTH_SECRET` are Cloudflare bindings/vars. So is `TURNSTILE_SECRET_KEY`, which guest gallery submissions need even with accounts off (its site key, `PUBLIC_TURNSTILE_SITE_KEY`, is set at build time). `wrangler.jsonc` is **local-only** (no `pages_build_output_dir`); production values live in the Pages dashboard.
 - `src/lib/server/cloudflare.ts`: `getPlatform()` returns the bindings (`env`), `ctx.waitUntil` and `caches` from `cloudflare:workers` — adapter-cloudflare 8 no longer sets `event.platform`, so server code calls this instead (undefined while building/prerendering).
 - `src/lib/server/platform.ts`: `requireStorage()` returns 503 when the `DB` (D1) / `PROJECTS` (R2) bindings are missing; `/api/dev/*` routes exist only when `ENABLE_DEV_ROUTES=true` and otherwise 404.
 

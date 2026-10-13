@@ -276,7 +276,7 @@ export const sendToProjectGallery = async (
           return {
             code: 503,
             message:
-              "The check that you're not a robot couldn't load. Please try again later.",
+              "The check that you're not a robot couldn't load. If you use a content blocker, allow challenges.cloudflare.com, then try again.",
           };
         }
         onStep?.('sending');

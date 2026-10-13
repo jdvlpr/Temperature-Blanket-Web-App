@@ -21,7 +21,14 @@ token, since a token works once and expires after five minutes. -->
 <script lang="ts">
   import { PUBLIC_TURNSTILE_SITE_KEY } from '$app/env/public';
   import { loadTurnstile, type TurnstileApi } from '#lib/utils/turnstile.js';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
+
+  let {
+    oninteractive,
+  }: {
+    /** Cloudflare needs the person to do something (true), or no longer (false) */
+    oninteractive?: (needed: boolean) => void;
+  } = $props();
 
   let container = $state<HTMLDivElement>();
   let api: TurnstileApi | undefined;
@@ -70,6 +77,14 @@ token, since a token works once and expires after five minutes. -->
         'expired-callback': () => settle(null),
         'timeout-callback': () => settle(null),
         'unsupported-callback': () => settle(null),
+        // It's shown: say so, and bring it to keyboard and screen reader users
+        'before-interactive-callback': async () => {
+          oninteractive?.(true);
+          await tick();
+          container?.scrollIntoView({ block: 'nearest' });
+          container?.focus();
+        },
+        'after-interactive-callback': () => oninteractive?.(false),
       });
     } else {
       api.reset(widgetId);
@@ -80,9 +95,16 @@ token, since a token works once and expires after five minutes. -->
 
   onDestroy(() => {
     destroyed = true;
+    oninteractive?.(false);
     settle(null);
     if (api && widgetId !== undefined) api.remove(widgetId);
   });
 </script>
 
-<div bind:this={container} class="empty:hidden"></div>
+<div
+  bind:this={container}
+  class="empty:hidden"
+  tabindex="-1"
+  role="group"
+  aria-label="Check that you’re not a robot"
+></div>
