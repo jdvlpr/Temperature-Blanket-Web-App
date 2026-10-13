@@ -149,6 +149,28 @@ test.describe('Palette toolbar', () => {
     ).toHaveCount(0);
   });
 
+  test('Publish to Gallery, signed out, offers signing in that comes back to the colors', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    const item = page.getByRole('menuitem', { name: /^Publish to Gallery/ });
+    // Only in builds with accounts (PUBLIC_ACCOUNTS_ENABLED)
+    test.skip((await item.count()) === 0, 'Accounts aren’t built in');
+    await item.click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('needs a free account')).toBeVisible();
+    const signIn = dialog.getByRole('link', {
+      name: 'Sign In or Create Account',
+    });
+    const href = (await signIn.getAttribute('href')) ?? '';
+    const back = new URL(href, 'https://x.test').searchParams.get('redirect');
+    expect(href).toMatch(/^\/auth\/sign-in\?redirect=/);
+    expect(back).toMatch(/^\/yarn\?s=[0-9a-f]+/);
+    await expect(
+      dialog.getByRole('button', { name: 'Save Palette' }),
+    ).toBeVisible();
+  });
+
   test('Image opens a preview to download', async ({ page }) => {
     await page.getByRole('button', { name: 'Save & Export' }).click();
     await page.getByRole('menuitem', { name: /^Image/ }).click();

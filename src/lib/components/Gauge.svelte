@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '#lib/components/modals/ImportExportPalette.svelte';
   import PasteColors from '#lib/components/modals/PasteColors.svelte';
   import RandomPalette from '#lib/components/modals/RandomPalette.svelte';
+  import PublishPalette from '#lib/components/modals/PublishPalette.svelte';
   import SavePalette from '#lib/components/modals/SavePalette.svelte';
   import SortMenu from '#lib/components/SortMenu.svelte';
   import { preferences } from '#lib/storage/preferences.svelte.js';
@@ -45,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { createGaugeColors } from '#lib/state/gauges-state.svelte.js';
   import {
     BookmarkPlusIcon,
+    SendIcon,
     ChevronDownIcon,
     CircleCheckIcon,
     ClipboardCopyIcon,
@@ -231,6 +233,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       details: 'Keep it to use in any project',
       icon: BookmarkPlusIcon,
     },
+    // Accounts only (the dialog says so when signed out)
+    ...(__ACCOUNTS_ENABLED__
+      ? [
+          {
+            value: 'publish',
+            label: 'Publish to Gallery',
+            title: 'Publish to Gallery',
+            details: 'Share it in the Yarn Palette Gallery',
+            icon: SendIcon,
+          },
+        ]
+      : []),
     {
       value: 'link',
       label: 'Link',
@@ -262,13 +276,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
   ];
 
-  // Colorway names can only be copied when some colors are yarn colorways
+  // Colorway names can only be copied when some colors are yarn colorways,
+  // and there's nothing to publish without colors
   let availablePaletteOutputs = $derived(
     paletteOutputs.filter(
       (output) =>
-        !output.needsNames || gauge.colors.some((color: Color) => color.name),
+        (!('needsNames' in output) ||
+          gauge.colors.some((color: Color) => color.name)) &&
+        (output.value !== 'publish' || gauge.colors.length > 0),
     ),
   );
+
+  // Where signing in comes back to: this project as it is, or these colors
+  // on the Yarn page (with the name that came with them)
+  function returnPath(colors: Color[]) {
+    if (inProject)
+      return (
+        window.location.pathname + window.location.search + window.location.hash
+      );
+    const yarnPage = getYarnPageURL({ colors, origin: '' });
+    return suggestedName
+      ? `${yarnPage}&name=${encodeURIComponent(suggestedName)}`
+      : yarnPage;
+  }
 
   // A link needs nothing chosen first, so it's copied straight away
   async function copyPaletteLink(colors: Color[]) {
@@ -299,6 +329,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     if (value === 'link') {
       copyPaletteLink(colors);
+      return;
+    }
+    if (value === 'publish') {
+      dialog.trigger({
+        type: 'component',
+        component: {
+          ref: PublishPalette,
+          props: { colors, suggestedName, returnTo: returnPath(colors) },
+        },
+        options: { size: 'medium', title: output.title },
+      });
       return;
     }
     if (value === 'save') {
