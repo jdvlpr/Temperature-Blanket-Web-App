@@ -21,6 +21,7 @@ published to the gallery as a snapshot, with the account's name or without. -->
   import { LIST_ENDS } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
+  import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
@@ -168,7 +169,11 @@ published to the gallery as a snapshot, with the account's name or without. -->
           data-testid="gallery-name-status"
         >
           {#if ownerName}
-            Published ones that show your name say “By {ownerName}”.
+            Gallery pages you publish with “Show my name” on are credited
+            <strong>By {ownerName}</strong>.
+            <a href={DISPLAY_NAME_HREF} class="link"
+              >Change your name in Profile settings</a
+            >.
             {#if anyWithName && galleryPages.publicId}
               <a
                 href={resolve('/gallery/by/[ownerId]', {
@@ -184,9 +189,9 @@ published to the gallery as a snapshot, with the account's name or without. -->
               >
             {/if}
           {:else}
-            To show your name on published ones, add a display name on your <a
-              href={resolve('account')}
-              class="link">Account page</a
+            To be credited by name on your gallery pages, add a display name in <a
+              href={DISPLAY_NAME_HREF}
+              class="link">Profile settings</a
             >.
           {/if}
         </p>

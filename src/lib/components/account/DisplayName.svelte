@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { accountErrorMessage, updateName } from '#lib/accounts/client.js';
+  import { DISPLAY_NAME_ID } from '#lib/accounts/display-name-link.js';
   import { CheckIcon, LoaderCircleIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
 
@@ -52,12 +53,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <form class="flex flex-col gap-2 px-4 py-3" onsubmit={save}>
-  <label class="label" for="display-name">
+  <label class="label" for={DISPLAY_NAME_ID}>
     <span class="label-text">Display name</span>
   </label>
   <div class="flex items-center gap-2">
     <input
-      id="display-name"
+      id={DISPLAY_NAME_ID}
       type="text"
       class="input h-11"
       maxlength="80"

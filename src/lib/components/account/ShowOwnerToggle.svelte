@@ -18,7 +18,7 @@ page says "By" and the display name, and the owner's public gallery page lists
 it. Off: it's published without a name. -->
 
 <script lang="ts">
-  import { resolve } from '$app/paths';
+  import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import { ExternalLinkIcon } from '@lucide/svelte';
 
@@ -42,22 +42,28 @@ it. Off: it's published without a name. -->
     label="Show my name"
     details={checked
       ? shownName
-        ? `Its page will say “By ${shownName}” and your public gallery page will list it.`
+        ? `Its gallery page will say “By ${shownName}” and appear on your public gallery page.`
         : 'Your public gallery page will list it once you add a display name.'
       : 'It will be published without your name.'}
     bind:checked
     {disabled}
   />
+  <!-- Where the name comes from: in a new tab, so this dialog stays put -->
+  {#snippet profileLink()}
+    <a href={DISPLAY_NAME_HREF} target="_blank" class="link"
+      >Profile settings<ExternalLinkIcon
+        class="icon-sm ml-0.5 inline"
+        aria-hidden="true"
+      /></a
+    >
+  {/snippet}
   {#if checked && !shownName}
     <p class="text-warning-700-300 px-4 pb-3 text-sm">
-      Add a display name on your
-
-      <a href={resolve('account')} target="_blank" class="link">
-        Account page
-        <ExternalLinkIcon class="inline size-3" />
-      </a>
-
-      to show it.
+      Add a display name in your {@render profileLink()} to show it.
+    </p>
+  {:else}
+    <p class="text-surface-700-300 px-4 pb-3 text-sm">
+      Your name comes from your {@render profileLink()}.
     </p>
   {/if}
 </div>

@@ -45,7 +45,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LogOutIcon,
     MonitorSmartphoneIcon,
   } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
+  import { DISPLAY_NAME_ID } from '#lib/accounts/display-name-link.js';
 
   const CARD = `bg-surface-50-950 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden shadow-lg card-border ${LIST_ENDS}`;
   const ROW = `hover:bg-surface-100-900 flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50 ${ROW_FOCUS}`;
@@ -64,6 +65,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getGalleryPages().then(
       (gallery) => (galleryPageCount = gallery?.posts.length ?? 0),
     );
+  });
+
+  // A link to the Display name (#display-name): the page draws it only once
+  // signed in, after the browser looked for it, so go there then
+  $effect(() => {
+    if (status !== 'signed-in' || location.hash !== `#${DISPLAY_NAME_ID}`)
+      return;
+    tick().then(() => {
+      const field = document.getElementById(DISPLAY_NAME_ID);
+      field?.scrollIntoView({ block: 'center' });
+      field?.focus({ preventScroll: true });
+    });
   });
 
   let memberSince = $derived(

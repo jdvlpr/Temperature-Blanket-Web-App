@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
@@ -334,8 +335,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if versions.some((p) => p.showOwner) && !ownerName}
       <p class="text-warning-700-300">
-        Add a display name on your
-        <a href={resolve('account')} class="link">Account page</a>
+        Add a display name in your
+        <a href={DISPLAY_NAME_HREF} class="link">Profile settings</a>
         to show it.
       </p>
     {/if}

@@ -146,7 +146,7 @@ test.describe('Gallery pages from accounts', () => {
     ).toHaveAttribute('href', `/gallery/${postId}`);
 
     // Each page is included on the public gallery on its own; the display
-    // name itself is on the Account page
+    // name itself is in the Account page's Profile settings
     const include = pages.getByRole('checkbox', {
       name: 'Show my name: Ottawa from 2025 to 2026',
     });
@@ -156,8 +156,14 @@ test.describe('Gallery pages from accounts', () => {
     );
     await include.check();
     await expect(include).toBeChecked();
-    await page.getByRole('link', { name: 'Account page', exact: true }).click();
-    await expect(page).toHaveURL(/\/account$/);
+    await page
+      .getByTestId('gallery-name-status')
+      .getByRole('link', { name: 'Profile settings', exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/account#display-name$/);
+    await expect(
+      page.getByLabel('Display name', { exact: true }),
+    ).toBeFocused();
     await expect(
       page.getByText('Add a display name above to show it'),
     ).toBeVisible();
