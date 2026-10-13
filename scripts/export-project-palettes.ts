@@ -15,9 +15,8 @@
 // on every project at once and checks the counts match (it's quadratic, so not for the
 // full production gallery).
 //
-// Titles of unnamed projects show their dates in this machine's locale (the app uses
-// each viewer's), and become fixed text once imported. Choose it with LC_ALL, e.g.
-// LC_ALL=en_US.UTF-8 node scripts/export-project-palettes.ts ...
+// Titles of unnamed projects show their dates in each viewer's locale in the app; once
+// imported they're fixed text, so the export writes them as "Sep 12, 2026" everywhere.
 //
 // Rows: { projectId, title, yarnUrl, date }, with yarnUrl without v= and date as
 // WPGraphQL gives it (site-local YYYY-MM-DDTHH:MM:SS).
@@ -75,6 +74,31 @@ function withoutWww(url: string) {
   );
 }
 
+const numericDate = String.raw`(\d{1,2})[/.](\d{1,2})[/.](\d{4})`;
+const numericRange = new RegExp(`from ${numericDate} to ${numericDate}`, 'g');
+
+/**
+ * Projects before app 3.36.0 stored dates in their maker's locale. The app converts a
+ * range only when both dates parse, so one left as numbers has a day-first date in it
+ * (31/12/2021, 2.6.2023): read both dates day-first, as the other titles' dates.
+ */
+function withDayFirstDates(title: string) {
+  return title.replace(numericRange, (range, ...parts: string[]) => {
+    const dates = [parts.slice(0, 3), parts.slice(3, 6)].map(
+      ([day, month, year]) => {
+        const date = new Date(
+          Date.UTC(Number(year), Number(month) - 1, Number(day)),
+        );
+        return date.getUTCDate() === Number(day) &&
+          date.getUTCMonth() === Number(month) - 1
+          ? date.toLocaleDateString(undefined, { timeZone: 'UTC' })
+          : null;
+      },
+    );
+    return dates[0] && dates[1] ? `from ${dates[0]} to ${dates[1]}` : range;
+  });
+}
+
 // projectName is plugin 1.6.0; an older gallery rejects it, so ask without it
 let withName = true;
 async function fetchPage(after: string | null) {
@@ -108,6 +132,17 @@ async function fetchPage(after: string | null) {
     nodes: ProjectNode[];
   };
 }
+
+// The app formats location dates with toLocaleDateString(undefined, { timeZone: 'UTC' })
+const toLocaleDateString = Date.prototype.toLocaleDateString;
+Date.prototype.toLocaleDateString = function (_locales, options) {
+  return toLocaleDateString.call(this, 'en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    ...options,
+  });
+};
 
 const server = await createServer({
   root: process.cwd(),
@@ -180,9 +215,12 @@ try {
         return;
       }
       seen.push(palette.colors);
+      const title = project.projectName
+        ? palette.page.title
+        : withDayFirstDates(palette.page.title);
       rows.push({
         projectId: Number(project.databaseId),
-        title: i > 0 ? `${palette.page.title} - ${i + 1}` : palette.page.title,
+        title: i > 0 ? `${title} - ${i + 1}` : title,
         yarnUrl: withoutVersion(withoutWww(link)),
         date: project.date,
       });
@@ -193,7 +231,7 @@ try {
   console.log(
     `Wrote ${rows.length} palettes from ${projects.length} projects to ${values.out} ` +
       `(${counts.links} links: ${counts.filtered} filtered out, ${counts.repeated} repeats, ${counts.unreadable} unreadable), ` +
-      `dates in titles as ${Intl.DateTimeFormat().resolvedOptions().locale}.`,
+      `dates in titles as ${new Date(Date.UTC(2026, 8, 12)).toLocaleDateString(undefined, { timeZone: 'UTC' })}.`,
   );
 
   if (values.verify) {
