@@ -130,6 +130,32 @@ describe('project-utils', () => {
       });
     });
 
+    it('sends a guest submission with a new Turnstile token', async () => {
+      answer({ code: 200, link: 'https://example.test/gallery/3' });
+      const steps: string[] = [];
+      await projectUtils.sendToProjectGallery('img', {
+        getGuestToken: async () => 'token',
+        onStep: (step) => steps.push(step),
+      });
+      const [, init] = vi.mocked(fetch).mock.calls[0];
+      expect(new Headers(init?.headers).get('CF-Turnstile-Response')).toBe(
+        'token',
+      );
+      expect(steps).toEqual(['sending', 'checking', 'sending']);
+    });
+
+    it("says so when the check can't run, sending nothing", async () => {
+      answer({ code: 200 });
+      const result = await projectUtils.sendToProjectGallery('img', {
+        getGuestToken: async () => {
+          throw new Error('blocked');
+        },
+      });
+      expect(result).toMatchObject({ status: 'error' });
+      expect(result.status === 'error' && result.message).toMatch(/robot/);
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
     it('says when it is too large', async () => {
       const { buildGalleryRequestBody } =
         await import('#lib/utils/gallery-upload-utils.js');

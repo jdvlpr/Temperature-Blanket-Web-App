@@ -21,4 +21,12 @@ export const variables = defineEnvVars({
   PUBLIC_AFFILIATE_YARNS: { public: true, static: true },
   PUBLIC_SUPPORTERS: { public: true, static: true },
   PUBLIC_COOLORS_LINK: { public: true, static: true },
+  // Cloudflare Turnstile, for guests' gallery submissions (its secret,
+  // TURNSTILE_SECRET_KEY, is a Cloudflare binding). Optional to build, but
+  // without it /api/project refuses guests.
+  PUBLIC_TURNSTILE_SITE_KEY: {
+    public: true,
+    static: true,
+    schema: (value) => value || undefined,
+  },
 });

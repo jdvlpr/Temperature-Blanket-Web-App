@@ -33,6 +33,11 @@
     // ACCOUNTS_SIGNUP_LIMIT (a number, 0 = closed) would cap how many accounts there may be.
     // Project sync, for every account.
     "SYNC_ENABLED": "true",
+    // Cloudflare's always-pass Turnstile test secret, for guests' gallery
+    // submissions (/api/project). Pair it with the test site key
+    // PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA in .env. Production
+    // sets its real secret as an encrypted secret in the Pages dashboard.
+    "TURNSTILE_SECRET_KEY": "1x0000000000000000000000000000000AA",
     // Publishing to the gallery from accounts stays off here, since
     // PUBLIC_WORDPRESS_BASE_URL may be the live gallery. To test it, point .env at
     // the Local WordPress site (plugin dev/README.md) and pass

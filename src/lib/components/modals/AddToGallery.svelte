@@ -26,6 +26,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
   import CopyIcon from '#lib/components/CopyIcon.svelte';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
+  import Turnstile from '#lib/components/Turnstile.svelte';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import UnpublishVersions from '#lib/components/account/UnpublishVersions.svelte';
   import GalleryPageList from '#lib/components/account/GalleryPageList.svelte';
@@ -306,6 +307,7 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
   let step = $state<'image' | GallerySendStep | null>(null);
   const STEP_TEXT = {
     image: 'Drawing the preview image…',
+    checking: 'Checking you’re not a robot…',
     sending: 'Publishing… This can take a minute.',
     'removing-old': 'Removing the old page…',
   };
@@ -316,6 +318,8 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
   let sentHeading = $state<HTMLElement>();
   let removedHeading = $state<HTMLElement>();
   const linkCopied = new Flash();
+  // Checks a submission without the account isn't from a robot
+  let turnstile = $state<Turnstile>();
 
   async function submit() {
     const active = previews.active;
@@ -345,6 +349,10 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
         showOwner: fromAccount && showOwner,
         name,
         replacePostId: fromAccount ? replacePostId : undefined,
+        getGuestToken: async () => {
+          if (!turnstile) throw new Error('No Turnstile');
+          return turnstile.getToken();
+        },
         onStep: (next) => (step = next),
       });
       if (result.status === 'sent') {
@@ -493,6 +501,9 @@ behind the dialog first (with its weather, when that isn't kept with it). -->
           disabled={busy}
         />
       {/if}
+      <!-- Shows only when Cloudflare needs you to do something; outside the
+      inert card, since that can be while it's sending -->
+      <Turnstile bind:this={turnstile} />
       {#if problem}
         <div class="text-error-700-300 flex flex-col gap-1" role="alert">
           <p>{problemText}</p>

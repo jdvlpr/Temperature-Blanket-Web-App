@@ -28,6 +28,7 @@ import { weather } from '#lib/state/weather-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { colorsToCode, colorsToYarnDetails } from '#lib/utils/color-utils.js';
 import { buildGalleryRequestBody } from '#lib/utils/gallery-upload-utils.js';
+import { TURNSTILE_HEADER } from '#lib/utils/turnstile.js';
 import { convertTime } from '#lib/utils/unit-utils.svelte.js';
 import {
   dateToISO8601String,
@@ -152,7 +153,7 @@ export type GallerySendResult =
   | { status: 'error'; message: string; oldRemoved: boolean };
 
 /** Steps of a send after the image, for the dialog to say what it's doing. */
-export type GallerySendStep = 'sending' | 'removing-old';
+export type GallerySendStep = 'checking' | 'sending' | 'removing-old';
 
 /**
  * Sends the project to the gallery. `fromAccount` publishes it as the signed-in
@@ -166,6 +167,7 @@ export const sendToProjectGallery = async (
     showOwner = false,
     name = '',
     replacePostId,
+    getGuestToken,
     onStep,
   }: {
     fromAccount?: boolean;
@@ -175,6 +177,8 @@ export const sendToProjectGallery = async (
     name?: string;
     /** From an account: the project's old gallery page, removed once this one is in */
     replacePostId?: number;
+    /** A new Turnstile token, which a submission without the account needs */
+    getGuestToken?: () => Promise<string>;
     onStep?: (step: GallerySendStep) => void;
   } = {},
 ): Promise<GallerySendResult> => {
@@ -262,10 +266,26 @@ export const sendToProjectGallery = async (
       }
       // Replacing a page is only from an account: never a second, anonymous one
       if (replacePostId) return null;
+      // Got just before it's sent, since a token expires and works only once
+      let token = '';
+      if (getGuestToken) {
+        onStep?.('checking');
+        try {
+          token = await getGuestToken();
+        } catch {
+          return {
+            code: 503,
+            message:
+              "The check that you're not a robot couldn't load. Please try again later.",
+          };
+        }
+        onStep?.('sending');
+      }
       const request = await fetch('/api/project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { [TURNSTILE_HEADER]: token }),
         },
         body,
       });

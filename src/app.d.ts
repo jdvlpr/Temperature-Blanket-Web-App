@@ -30,6 +30,8 @@ declare global {
         GOOGLE_CLIENT_SECRET?: string;
         SYNC_ENABLED?: string;
         GALLERY_PUBLISH_ENABLED?: string;
+        // Checks guests' gallery submissions (/api/project); without it, they're refused
+        TURNSTILE_SECRET_KEY?: string;
       };
       ctx?: { waitUntil(promise: Promise<unknown>): void };
       caches?: CacheStorage;
