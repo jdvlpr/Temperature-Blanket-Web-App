@@ -16,15 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   The top of a gallery page, the same for projects and palettes: its owner's
   bar, its name, a line under it, "By <name> · Shared <date>", then Open a
-  Copy, Copy Page Link and any `actions` after them.
+  Copy and any `actions` after it.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { PUBLIC_BASE_URL } from '$app/env/public';
   import GalleryOwnerBar from '#lib/components/account/GalleryOwnerBar.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
-  import { LinkIcon } from '@lucide/svelte';
   import type { Component, Snippet } from 'svelte';
 
   interface Props {
@@ -45,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       title: string;
       target?: string;
     } | null;
-    /** More buttons after Copy Page Link */
+    /** More buttons after Open a Copy */
     actions?: Snippet;
   }
 
@@ -64,9 +61,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     date
       ? new Date(date).toLocaleDateString(undefined, { dateStyle: 'medium' })
       : '',
-  );
-  let pageLink = $derived(
-    `${PUBLIC_BASE_URL}/gallery/${kind === 'palette' ? 'palette/' : ''}${postId}`,
   );
 </script>
 
@@ -111,15 +105,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <open.icon />
           Open a Copy
         </a>
-        <button
-          type="button"
-          class="btn hover:preset-tonal-surface"
-          title="Copy this gallery page’s link"
-          onclick={() => copyToClipboard(pageLink, 'Page link copied')}
-        >
-          <LinkIcon />
-          Copy Page Link
-        </button>
       {/if}
       {@render actions?.()}
     </div>

@@ -32,11 +32,11 @@ own project first), and other palette pages with them. -->
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
   import {
     postsWithColors,
-    yarnLinksOf,
     type LinkedGalleryPost,
-  } from '#lib/utils/gallery-link-utils.js';
+  } from '#lib/utils/gallery-match-utils.js';
   import {
     fetchProjectsWithLink,
     recordPageView,

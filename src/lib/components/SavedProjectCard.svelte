@@ -17,23 +17,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A saved project on My Projects, as the gallery's project card: its picture
   (taken when the planner saved it; until then its colors), its name with a
   rename pencil, its places and dates, when it was saved, then its gallery
-  sharing (`sharing`) and a ⋮ menu with Copy Link and Move to Trash. Tapping
+  sharing (`sharing`) and Move to Trash. Tapping
   it opens it in the planner.
 -->
 <script lang="ts">
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import NameField from '#lib/components/NameField.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
-  import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import SyncIcon from '#lib/components/sync/SyncIcon.svelte';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import { getThumbnail } from '#lib/storage/thumbnails.js';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
-  import { withProjectName } from '#lib/utils/project-name-link.js';
-  import { LinkIcon, PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -66,12 +63,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (!card) return;
     const id = item.id;
+    const href = item.meta.href;
     let current = true;
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         observer.disconnect();
-        getThumbnail(id).then((image) => {
+        getThumbnail(id, href).then((image) => {
           if (current) thumbnail = image;
         });
       },
@@ -173,29 +171,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex w-full items-start justify-center gap-1">
           <div class="min-w-0">{@render sharing?.()}</div>
           <div class="mt-2">
-            <MoreMenu
-              label="More for {label}"
-              items={[
-                {
-                  value: 'copy-link',
-                  label: 'Copy Link',
-                  icon: LinkIcon,
-                  onselect: () =>
-                    copyToClipboard(
-                      withProjectName(meta.href, meta.name, meta.title),
-                      'Link copied',
-                      'Unable to copy to your clipboard',
-                    ),
-                },
-                {
-                  value: 'trash',
-                  label: 'Move to Trash',
-                  icon: Trash2Icon,
-                  onselect: onremove,
-                  separate: true,
-                },
-              ]}
-            />
+            <button
+              type="button"
+              class="btn-icon hover:preset-tonal-surface"
+              title="Move to Trash"
+              aria-label="Move {label} to the Trash"
+              onclick={onremove}
+            >
+              <Trash2Icon aria-hidden="true" />
+            </button>
           </div>
         </div>
       {/if}

@@ -15,10 +15,8 @@
 import { browser, dev } from '$app/env';
 
 import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
-import {
-  yarnLinkSearch,
-  type LinkedGalleryPost,
-} from '#lib/utils/gallery-link-utils.js';
+import { yarnLinkSearch } from '#lib/utils/gallery-link-utils.js';
+import type { LinkedGalleryPost } from '#lib/utils/gallery-match-utils.js';
 
 export type GalleryPageInfo = {
   hasNextPage: boolean;

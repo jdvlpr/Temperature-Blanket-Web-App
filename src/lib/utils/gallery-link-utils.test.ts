@@ -16,12 +16,12 @@
 import { describe, expect, it } from 'vitest';
 import { getColorsFromInput } from '#lib/utils/color-utils.js';
 import {
-  postsWithColors,
   withoutVersion,
   withoutWww,
   yarnLinkSearch,
   yarnLinksOf,
 } from './gallery-link-utils';
+import { postsWithColors } from './gallery-match-utils';
 
 const link = (s: string) => `https://temperature-blanket.com/yarn?s=${s}`;
 const colorsOf = (s: string) => getColorsFromInput({ string: link(s) }) || [];

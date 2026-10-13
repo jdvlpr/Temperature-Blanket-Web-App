@@ -17,11 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { withProjectName } from '#lib/utils/project-name-link.js';
   import { fromGalleryLink } from '#lib/utils/gallery-request.js';
   import { resolve } from '$app/paths';
+  import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
   import {
     postsWithColors,
-    yarnLinksOf,
     type LinkedGalleryPost,
-  } from '#lib/utils/gallery-link-utils.js';
+  } from '#lib/utils/gallery-match-utils.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { browser } from '$app/env';
   import { page } from '$app/state';

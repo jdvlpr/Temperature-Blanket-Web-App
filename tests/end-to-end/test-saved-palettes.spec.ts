@@ -58,7 +58,9 @@ test.describe('Saved palettes', () => {
     await expect(list.getByText('Test Dusk')).toBeVisible();
 
     // Delete, then undo
-    await list.getByRole('button', { name: 'Delete Test Dusk' }).click();
+    await list
+      .getByRole('button', { name: 'Move Test Dusk to the Trash' })
+      .click();
     await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
     await dialog.getByRole('button', { name: 'Undo' }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();

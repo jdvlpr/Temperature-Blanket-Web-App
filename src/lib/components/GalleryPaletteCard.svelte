@@ -15,19 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A palette from the gallery, as a card. In the gallery (`mode="page"`)
-  tapping it opens its gallery page, and its ⋮ menu has Open a Copy (`onopen`
-  runs first, to bring its colors) and Copy Page Link. In the Yarn Palette
-  Creator's Browse Palettes (`mode="use"`) tapping it uses it (`onclick`), and
-  the menu has its page (in a new tab, so the palette being made stays open).
+  tapping it opens its gallery page, and the button beside its name opens a
+  copy in the Yarn Palette Creator (`onopen` runs first, to bring its colors).
+  In the Yarn Palette Creator's Browse Palettes (`mode="use"`) tapping it uses
+  it (`onclick`), and the button opens its page in a new tab, so the palette
+  being made stays open.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { PUBLIC_BASE_URL } from '$app/env/public';
   import PaletteCard from '#lib/components/PaletteCard.svelte';
-  import type { MoreMenuItem } from '#lib/components/buttons/MoreMenu.svelte';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
-  import { LinkIcon, PaletteIcon, SwatchBookIcon } from '@lucide/svelte';
+  import { PaletteIcon, SwatchBookIcon } from '@lucide/svelte';
 
   interface Props {
     palette: GalleryPalette;
@@ -46,36 +44,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? resolve('/gallery/palette/[id]', { id: String(palette.page.id) })
       : resolve('/gallery/[id]', { id: String(palette.page.id) }),
   );
-  let copyPageLink: MoreMenuItem = $derived({
-    value: 'copy-page-link',
-    label: 'Copy Page Link',
-    icon: LinkIcon,
-    onselect: () =>
-      copyToClipboard(`${PUBLIC_BASE_URL}${pageHref}`, 'Page link copied'),
-  });
-  let menu = $derived<MoreMenuItem[]>(
-    mode === 'page'
-      ? [
-          {
-            value: 'open-copy',
-            label: 'Open a Copy',
-            icon: PaletteIcon,
-            href: resolve('/yarn'),
-            onselect: onopen,
-          },
-          copyPageLink,
-        ]
-      : [
-          {
-            value: 'page',
-            label:
-              palette.page.kind === 'palette' ? 'Palette Page' : 'Project Page',
-            icon: SwatchBookIcon,
-            href: pageHref,
-            newTab: true,
-          },
-          copyPageLink,
-        ],
+  let pageLabel = $derived(
+    palette.page.kind === 'palette' ? 'Palette Page' : 'Project Page',
   );
 </script>
 
@@ -84,10 +54,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   name={palette.page.title}
   href={mode === 'page' ? pageHref : undefined}
   onclick={mode === 'use' ? onclick : undefined}
-  title={mode === 'page'
-    ? palette.page.kind === 'palette'
-      ? 'Open Palette Page'
-      : 'Open Project Page'
-    : 'Use This Palette'}
-  {menu}
-/>
+  title={mode === 'page' ? `Open ${pageLabel}` : 'Use This Palette'}
+>
+  {#snippet action()}
+    {#if mode === 'page'}
+      <a
+        href={resolve('/yarn')}
+        onclick={onopen}
+        class="btn-icon hover:preset-tonal-surface shrink-0"
+        title="Open a copy in the Yarn Palette Creator"
+        aria-label="Open a copy of {palette.page.title}"
+      >
+        <PaletteIcon aria-hidden="true" />
+      </a>
+    {:else}
+      <a
+        href={pageHref}
+        target="_blank"
+        rel="noopener"
+        class="btn-icon hover:preset-tonal-surface shrink-0"
+        title="{pageLabel} (opens in a new tab)"
+        aria-label="{pageLabel}: {palette.page.title} (opens in a new tab)"
+      >
+        <SwatchBookIcon aria-hidden="true" />
+      </a>
+    {/if}
+  {/snippet}
+</PaletteCard>

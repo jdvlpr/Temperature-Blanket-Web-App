@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PaletteCard from '#lib/components/PaletteCard.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import { preferences } from '#lib/storage/preferences.svelte.js';
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
@@ -38,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import { LinkIcon, PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
@@ -226,26 +225,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               title={updateGauge
                 ? 'Use This Palette'
                 : 'Open in Yarn Palette Creator'}
-              menu={[
-                {
-                  value: 'copy-link',
-                  label: 'Copy Link',
-                  icon: LinkIcon,
-                  onselect: () =>
-                    copyToClipboard(
-                      linkFor(colors, palette.name),
-                      'Link copied',
-                      'Unable to copy to your clipboard',
-                    ),
-                },
-                {
-                  value: 'trash',
-                  label: 'Move to Trash',
-                  icon: Trash2Icon,
-                  onselect: () => remove(palette, label),
-                  separate: true,
-                },
-              ]}
             >
               {#snippet nameRow()}
                 <!-- The name with its Rename button right by it, so it's clear
@@ -283,6 +262,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/snippet}
               {#snippet details()}
                 <span class="text-surface-700-300 text-xs">Saved {saved}</span>
+              {/snippet}
+              {#snippet action()}
+                <button
+                  type="button"
+                  class="btn-icon hover:preset-tonal-surface shrink-0"
+                  title="Move to Trash"
+                  aria-label="Move {label} to the Trash"
+                  onclick={() => remove(palette, label)}
+                >
+                  <Trash2Icon aria-hidden="true" />
+                </button>
               {/snippet}
               {#snippet footer()}
                 {@render sharing?.({ palette, colors, label })}

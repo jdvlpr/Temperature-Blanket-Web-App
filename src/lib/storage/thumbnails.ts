@@ -20,6 +20,7 @@
 // upload again, because of its picture.
 
 import { browser } from '$app/env';
+import { withoutVersion } from '#lib/utils/gallery-link-utils.js';
 import { del, get, set } from 'idb-keyval';
 
 const THUMBNAIL_PREFIX = 'thumb_';
@@ -33,13 +34,23 @@ export type StoredThumbnail = {
   image: string;
 };
 
-/** A saved project's picture, if one was taken in this browser. */
-export async function getThumbnail(id: string): Promise<string | null> {
+/** Whether a picture shows this version of the project (its app version aside) */
+const sameProject = (a: string, b: string) =>
+  withoutVersion(a) === withoutVersion(b);
+
+/**
+ * A saved project's picture, if one of this version of it was taken in this
+ * browser: one of an older version (changed since, on another device too)
+ * isn't shown.
+ */
+export async function getThumbnail(
+  id: string,
+  href: string,
+): Promise<string | null> {
   if (!browser) return null;
   try {
-    return (
-      (await get<StoredThumbnail>(`${THUMBNAIL_PREFIX}${id}`))?.image ?? null
-    );
+    const stored = await get<StoredThumbnail>(`${THUMBNAIL_PREFIX}${id}`);
+    return stored && sameProject(stored.href, href) ? stored.image : null;
   } catch {
     return null;
   }
@@ -54,7 +65,10 @@ export async function removeThumbnail(id: string): Promise<void> {
   }
 }
 
-/** Draws an SVG small, as a JPEG (white behind it), or null if it can't. */
+/**
+ * Draws an SVG small, as a JPEG (white behind it), or null if it can't. With
+ * Canvg, as the gallery's pictures are drawn (svgToPNG), scaled down.
+ */
 async function drawSmall(
   svg: SVGSVGElement,
   width: number,
@@ -65,30 +79,28 @@ async function drawSmall(
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(width * scale));
   canvas.height = Math.max(1, Math.round(height * scale));
-  const url = URL.createObjectURL(
-    new Blob([new XMLSerializer().serializeToString(svg)], {
-      type: 'image/svg+xml',
-    }),
-  );
   try {
-    const image = new Image();
-    image.width = width;
-    image.height = height;
-    await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error('The preview could not be drawn'));
-      image.src = url;
-    });
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const { Canvg } = await import('canvg');
+    const drawing = Canvg.fromString(
+      ctx,
+      new XMLSerializer().serializeToString(svg),
+      {
+        ignoreAnimation: true,
+        ignoreMouse: true,
+        ignoreClear: true,
+        scaleWidth: canvas.width,
+        scaleHeight: canvas.height,
+      },
+    );
+    await drawing.render();
     return canvas.toDataURL('image/jpeg', 0.82);
   } catch {
     return null;
   } finally {
-    URL.revokeObjectURL(url);
     // Safari only frees a canvas's memory once it's sized down
     canvas.width = 0;
     canvas.height = 0;
@@ -112,7 +124,8 @@ export function captureThumbnail(
   idle(async () => {
     try {
       const key = `${THUMBNAIL_PREFIX}${id}`;
-      if ((await get<StoredThumbnail>(key))?.href === href) return;
+      const stored = await get<StoredThumbnail>(key);
+      if (stored && sameProject(stored.href, href)) return;
       if (!preview.svg?.isConnected) return;
       const image = await drawSmall(
         preview.svg,

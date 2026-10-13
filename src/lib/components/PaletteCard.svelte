@@ -16,14 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A palette as a card, wherever palettes are listed: its colors and name are
   one link (`href`) or button (`onclick`), "8 colors · Brand Yarn" under the
-  name, and a ⋮ menu beside it for everything else. My Projects gives its own
+  name, and one `action` button beside it. My Projects gives its own
   `nameRow` (with a rename pencil, outside the link) and a `footer`.
 -->
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
-  import MoreMenu, {
-    type MoreMenuItem,
-  } from '#lib/components/buttons/MoreMenu.svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
   import type { Snippet } from 'svelte';
@@ -37,7 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** What tapping it does, e.g. "Open Palette Page" */
     title: string;
     reload?: boolean;
-    menu?: MoreMenuItem[];
+    /** One button beside the name, e.g. Open a Copy */
+    action?: Snippet;
     /** In place of the name, outside the link; it has the link or button
     for screen readers and the keyboard then (the colors' is for the mouse) */
     nameRow?: Snippet;
@@ -53,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick,
     title,
     reload = false,
-    menu = [],
+    action,
     nameRow,
     details,
     footer,
@@ -114,9 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </span>
       {@render details?.()}
     </div>
-    {#if menu.length}
-      <MoreMenu items={menu} label="More for {name}" />
-    {/if}
+    {@render action?.()}
   </div>
   {@render footer?.()}
 </div>

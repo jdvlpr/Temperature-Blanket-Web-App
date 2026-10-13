@@ -17,10 +17,8 @@
 // palette pages are found by them: a project's palettes became palette pages
 // (gallery plugin 1.7.0's import), kept once per set of colors, so a project
 // finds its palettes' pages, and a palette page its projects, by their links,
-// checked by their colors.
-
-import { getColorsFromInput, sameColorList } from '#lib/utils/color-utils.js';
-import type { Color } from '#lib/types/yarn-types.js';
+// checked by their colors (gallery-match-utils). Nothing here imports the app,
+// so storage can use it too.
 
 /** The link without its v= parameter, every other byte as it was (as the plugin does). */
 export function withoutVersion(url: string) {
@@ -66,41 +64,4 @@ export function yarnLinkSearch(link: string): string | null {
   if (queryStart === -1) return null;
   const query = clean.slice(queryStart + 1).split('#')[0];
   return query || null;
-}
-
-/** A gallery post found by its link, and whether it has the colors asked for */
-export type LinkedGalleryPost = {
-  databaseId: number;
-  title?: string;
-  date?: string;
-  yarnUrls: string;
-  /** The project a palette page came from (gallery plugin 1.7.0) */
-  sourceProjectId?: number | null;
-};
-
-/**
- * The posts holding these colors among those the search found: the search
- * matches part of a link, so each is checked by its colors. A palette page
- * from `sourceProjectId` comes first, then the oldest.
- */
-export function postsWithColors<T extends LinkedGalleryPost>(
-  colors: Color[],
-  posts: T[],
-  sourceProjectId?: number,
-): T[] {
-  if (!colors.length) return [];
-  return posts
-    .filter((post) =>
-      yarnLinksOf(post.yarnUrls).some((link) => {
-        const linkColors = getColorsFromInput({ string: link });
-        return !!linkColors && sameColorList(linkColors, colors);
-      }),
-    )
-    .sort(
-      (a, b) =>
-        Number(b.sourceProjectId === sourceProjectId && !!sourceProjectId) -
-          Number(a.sourceProjectId === sourceProjectId && !!sourceProjectId) ||
-        (a.date ?? '').localeCompare(b.date ?? '') ||
-        a.databaseId - b.databaseId,
-    );
 }

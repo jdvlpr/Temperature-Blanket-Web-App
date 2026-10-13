@@ -241,7 +241,9 @@ test.describe('Sync in the browser', () => {
 
     // Moving it to the Trash on My Projects deletes it from the account
     await phone.goto('/my-projects');
-    await phone.getByRole('button', { name: 'Delete Doomed' }).click();
+    await phone
+      .getByRole('button', { name: 'Move Doomed to the Trash' })
+      .click();
     await expect.poll(() => serverProjectIds(phone)).toEqual([]);
 
     await laptop.reload();
@@ -262,7 +264,9 @@ test.describe('Sync in the browser', () => {
     // Deleted again on the phone (which keeps a copy in its own Trash), then
     // deleted forever on the laptop: the phone's copy doesn't bring it back
     await phone.goto('/my-projects');
-    await phone.getByRole('button', { name: 'Delete Doomed' }).click();
+    await phone
+      .getByRole('button', { name: 'Move Doomed to the Trash' })
+      .click();
     await expect.poll(() => serverProjectIds(phone)).toEqual([]);
     await laptop.goto('/my-projects');
     await laptop.getByRole('button', { name: 'Trash (1)' }).click();
@@ -317,7 +321,9 @@ test.describe('Sync in the browser', () => {
     await expect(palettes.getByText('Shared Dusk')).toBeVisible();
 
     // Deleted on the laptop: in the phone's Trash too
-    await palettes.getByRole('button', { name: 'Delete Shared Dusk' }).click();
+    await palettes
+      .getByRole('button', { name: 'Move Shared Dusk to the Trash' })
+      .click();
     await expect
       .poll(async () => (await serverPalettes())[0]?.deletedAt)
       .not.toBeNull();

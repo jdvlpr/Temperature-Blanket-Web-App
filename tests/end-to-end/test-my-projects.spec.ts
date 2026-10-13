@@ -31,10 +31,9 @@ async function seedProject(page: Page, title: string) {
   }, title);
 }
 
-/** A card's ⋮ menu › Move to Trash */
+/** A card's Move to Trash button */
 async function moveToTrash(page: Page, name: string) {
-  await page.getByRole('button', { name: `More for ${name}` }).click();
-  await page.getByRole('menuitem', { name: 'Move to Trash' }).click();
+  await page.getByRole('button', { name: `Move ${name} to the Trash` }).click();
 }
 
 test.describe('My Projects', () => {
