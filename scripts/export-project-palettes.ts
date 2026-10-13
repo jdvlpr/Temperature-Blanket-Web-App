@@ -16,7 +16,9 @@
 // full production gallery).
 //
 // Titles of unnamed projects show their dates in each viewer's locale in the app; once
-// imported they're fixed text, so the export writes them as "Sep 12, 2026" everywhere.
+// imported they're fixed text, so the export writes them as "Sep 12, 2026" everywhere,
+// with one year for a range within a year ("Jan 1 to Dec 30, 2019"), and shortens them
+// to fit the plugin's 80 characters by place, never by cutting a date (placesTitle).
 //
 // Rows: { projectId, title, yarnUrl, date }, with yarnUrl without v= and date as
 // WPGraphQL gives it (site-local YYYY-MM-DDTHH:MM:SS).
@@ -97,6 +99,85 @@ function withDayFirstDates(title: string) {
     );
     return dates[0] && dates[1] ? `from ${dates[0]} to ${dates[1]}` : range;
   });
+}
+
+// The plugin cuts longer names at this many characters
+const MAX_TITLE_LENGTH = 80;
+const length = (text: string) => [...text].length;
+const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
+
+/** "Sep 12, 2026" as a sortable number, or null when it isn't one. */
+function dateValue(text: string) {
+  const match = text.match(/^([A-Z][a-z]{2}) (\d{1,2}), (\d{4})$/);
+  const month = match ? MONTHS.indexOf(match[1]) : -1;
+  return match && month !== -1
+    ? Number(match[3]) * 10000 + month * 100 + Number(match[2])
+    : null;
+}
+
+/** "from Jan 1 to Dec 30, 2019" when both dates are in the same year. */
+function rangeText(from: string, to: string) {
+  const year = from.match(/, (\d{4})$/)?.[1];
+  return dateValue(from) !== null &&
+    dateValue(to) !== null &&
+    to.endsWith(`, ${year}`)
+    ? `from ${from.slice(0, -6)} to ${to}`
+    : `from ${from} to ${to}`;
+}
+
+/**
+ * An unnamed project's title ("place from date to date; ..."), with one year for a
+ * range within a year, and short enough for the plugin to keep whole: several places
+ * become the first with "+ N more" over the whole span, then the place loses its middle
+ * parts, then its country, and only then is it cut at a word, with an ellipsis. The
+ * dates and the " - 2" suffix always stay.
+ */
+function placesTitle(title: string, suffix: string) {
+  const ranges = title
+    .split('; ')
+    .map((part) => part.match(/^(.*) from (.+) to (.+)$/));
+  if (ranges.some((range) => !range)) return title + suffix;
+  const parsed = ranges as RegExpMatchArray[];
+
+  const full = parsed
+    .map(([, place, from, to]) => `${place} ${rangeText(from, to)}`)
+    .join('; ');
+  if (length(full + suffix) <= MAX_TITLE_LENGTH) return full + suffix;
+
+  const places = new Set(parsed.map(([, place]) => place));
+  const more = places.size > 1 ? ` + ${places.size - 1} more` : '';
+  let [from, to] = [parsed[0][2], parsed.at(-1)![3]];
+  if (
+    parsed.every(
+      ([, , start, end]) =>
+        dateValue(start) !== null && dateValue(end) !== null,
+    )
+  ) {
+    // Ranges can overlap or be out of order: the earliest start and the latest end
+    from = parsed.reduce(
+      (a, [, , b]) => (dateValue(b)! < dateValue(a)! ? b : a),
+      from,
+    );
+    to = parsed.reduce(
+      (a, [, , , b]) => (dateValue(b)! > dateValue(a)! ? b : a),
+      to,
+    );
+  }
+  const tail = `${more} ${rangeText(from, to)}${suffix}`;
+  const fits = (place: string) => length(place + tail) <= MAX_TITLE_LENGTH;
+
+  const place = parsed[0][1];
+  const parts = place.split(', ');
+  const shorter = [place, `${parts[0]}, ${parts.at(-1)}`, parts[0]].find(
+    (candidate, i) => (i === 0 || parts.length > i) && fits(candidate),
+  );
+  if (shorter) return shorter + tail;
+
+  const room = MAX_TITLE_LENGTH - length(tail) - 1;
+  let cut = [...parts[0]].slice(0, room).join('');
+  const space = cut.lastIndexOf(' ');
+  if (space > room / 2) cut = cut.slice(0, space);
+  return `${cut.replace(/[\s,;.-]+$/, '')}…${tail}`;
 }
 
 // projectName is plugin 1.6.0; an older gallery rejects it, so ask without it
@@ -215,12 +296,12 @@ try {
         return;
       }
       seen.push(palette.colors);
-      const title = project.projectName
-        ? palette.page.title
-        : withDayFirstDates(palette.page.title);
+      const suffix = i > 0 ? ` - ${i + 1}` : '';
       rows.push({
         projectId: Number(project.databaseId),
-        title: i > 0 ? `${title} - ${i + 1}` : title,
+        title: project.projectName
+          ? palette.page.title + suffix
+          : placesTitle(withDayFirstDates(palette.page.title), suffix),
         yarnUrl: withoutVersion(withoutWww(link)),
         date: project.date,
       });
