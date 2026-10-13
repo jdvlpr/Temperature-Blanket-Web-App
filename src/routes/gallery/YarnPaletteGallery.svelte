@@ -14,11 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
+  import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
+  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
-  import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
@@ -28,58 +29,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
     popularToGalleryNodes,
     recordPageView,
   } from '#lib/utils/gallery-utils.js';
-  import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import {
-    ChevronRightIcon,
-    ClockIcon,
-    EarthIcon,
-    PlusIcon,
-    XIcon,
-  } from '@lucide/svelte';
+    getPalettesFromProjects,
+    type GalleryPalette,
+  } from '#lib/utils/color-utils.js';
+  import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { yarnPageState } from '../yarn/state.svelte';
-  import { yarnPaletteGalleryState } from './state.svelte';
+  import PopularPeriodMenu from './PopularPeriodMenu.svelte';
+  import { galleryFilters, yarnPaletteGalleryState } from './state.svelte';
 
   let first = 40;
   let loading = $state(true);
   let scrollContainer: HTMLDivElement | undefined = $state();
+  let featuredEl: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
+  let totalPalettes = $state<string | undefined>();
 
   onMount(async () => {
-    if (!yarnPaletteGalleryState.projects.length) {
-      loading = true;
-      let results = await fetchPaletteGallery({
-        first,
-        after: endCursor,
-        search: yarnPaletteGalleryState.search,
-        order: yarnPaletteGalleryState.orderBy,
-      });
-      yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
-      yarnPaletteGalleryState.projects.push(
-        ...results.edges.flatMap((item) => item.node),
-      );
-      yarnPaletteGalleryState.projects = yarnPaletteGalleryState.projects;
-      yarnPaletteGalleryState.palettes = getPalettesFromProjects({
-        projects: yarnPaletteGalleryState.projects,
-        selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
-        selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
-        palettesContainOnlyFilteredYarn:
-          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-      });
+    // The first visit, or the filters changed on the other tab
+    if (
+      !yarnPaletteGalleryState.projects.length ||
+      yarnPaletteGalleryState.loadedFor !== galleryFilters.key
+    )
+      await search();
+    else {
+      showPalettes();
       loading = false;
-    } else {
-      yarnPaletteGalleryState.palettes = getPalettesFromProjects({
-        projects: yarnPaletteGalleryState.projects,
-        selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
-        selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
-        palettesContainOnlyFilteredYarn:
-          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-      });
     }
-    if (!yarnPaletteGalleryState.popularPalettes.length) {
+    if (
+      !yarnPaletteGalleryState.popularPalettes.length ||
+      yarnPaletteGalleryState.popularFor !== galleryFilters.timePeriod
+    ) {
+      yarnPaletteGalleryState.popularPalettes = [];
       await fetchPopularPalettes();
     }
-    loading = false;
     const scrollObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -90,6 +74,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       { threshold: 0 },
     );
     if (scrollContainer) scrollObserver.observe(scrollContainer);
+
+    // How many there are (none shown from a gallery without palettes)
+    try {
+      const response = await fetch(
+        `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wp/v2/palettes?per_page=1&_=${Date.now()}`,
+      );
+      const total = response.ok ? response.headers.get('x-wp-total') : null;
+      totalPalettes = total !== null ? (+total).toLocaleString() : undefined;
+    } catch {
+      totalPalettes = undefined;
+    }
   });
 
   let hasNextPage = $derived(
@@ -101,48 +96,65 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let showSearchReset = $derived(!!yarnPaletteGalleryState.search.length);
 
-  let searchTimeout: any;
+  /** The loaded posts as palettes, with the yarn filters applied */
+  function showPalettes() {
+    yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+      projects: yarnPaletteGalleryState.projects,
+      selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+      selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
+      palettesContainOnlyFilteredYarn:
+        yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
+    });
+  }
 
-  function debouncedSearch() {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(async () => {
-      yarnPaletteGalleryState.projects = [];
-      yarnPaletteGalleryState.palettes = [];
-      loading = true;
-      const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
+  async function fetchPage(after: string | null = null) {
+    const results = await fetchPaletteGallery({
+      first,
+      after,
+      search: yarnPaletteGalleryState.search,
+      order: yarnPaletteGalleryState.orderBy,
+      yarn: yarnPaletteGalleryState.getYarnSearch({
         brandId: yarnPaletteGalleryState.filteredBrandId,
         yarnId: yarnPaletteGalleryState.filteredYarnId,
-      });
-      let results = await fetchPaletteGallery({
-        search: yarnPaletteGalleryState.search,
-        order: yarnPaletteGalleryState.orderBy,
-        yarn: yarnSearch,
-      });
-      yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
-      if (yarnPaletteGalleryState.search)
-        yarnPaletteGalleryState.projects = results.edges.flatMap(
-          (item) => item.node,
-        );
-      else {
-        yarnPaletteGalleryState.projects.push(
-          ...results.edges.flatMap((item) => item.node),
-        );
-        yarnPaletteGalleryState.projects = yarnPaletteGalleryState.projects;
-      }
-      yarnPaletteGalleryState.palettes = getPalettesFromProjects({
-        projects: yarnPaletteGalleryState.projects,
-        selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
-        selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
-        palettesContainOnlyFilteredYarn:
-          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-      });
+      }),
+    });
+    yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+    yarnPaletteGalleryState.projects.push(
+      ...results.edges.flatMap((item) => item.node),
+    );
+    showPalettes();
+  }
+
+  async function search() {
+    yarnPaletteGalleryState.projects = [];
+    yarnPaletteGalleryState.palettes = [];
+    loading = true;
+    const loadedFor = galleryFilters.key;
+    try {
+      await fetchPage();
+      yarnPaletteGalleryState.loadedFor = loadedFor;
+    } catch (e) {
+      console.error('Search failed:', e);
+    } finally {
       loading = false;
-    }, 500);
+    }
+  }
+
+  let searchTimeout: ReturnType<typeof setTimeout> | undefined;
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(search, 500);
+  }
+
+  function clearFilters() {
+    galleryFilters.clear();
+    search();
   }
 
   async function fetchPopularPalettes() {
+    const months = galleryFilters.timePeriod;
     const popular = await fetchPopularProjects({
-      months: yarnPaletteGalleryState.timePeriod,
+      months,
       limit: 5,
       palettes: true,
     });
@@ -150,52 +162,65 @@ If not, see <https://www.gnu.org/licenses/>. -->
       projects: popularToGalleryNodes(popular),
       minColors: 3,
     });
+    yarnPaletteGalleryState.popularFor = months;
   }
+
+  /** Brings its colors and name to the Yarn Palette Creator (Open a Copy) */
+  function openCopy(palette: GalleryPalette) {
+    yarnPageState.gauge.colors = palette.colors;
+    // Its gallery name, which Save Palette offers
+    yarnPageState.suggestion = {
+      name: palette.page.title,
+      colors: $state.snapshot(palette.colors),
+    };
+    recordPageView(palette.postId);
+  }
+
+  let grid = $derived(yarnPaletteGalleryState.layout === 'grid');
+  const gridClass =
+    'grid w-full grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+  const listClass = 'flex w-full flex-col items-start gap-6';
 </script>
+
+{#snippet placeholders(count: number, inRow = false)}
+  {#each Array(count) as _, i (i)}
+    <div
+      class={['flex flex-col gap-2', inRow ? 'w-64 shrink-0' : 'w-full']}
+      aria-hidden="true"
+    >
+      <div
+        class="placeholder rounded-container h-[70px] w-full animate-pulse"
+      ></div>
+      <div class="placeholder h-4 w-2/3 animate-pulse"></div>
+    </div>
+  {/each}
+{/snippet}
 
 <div class="flex flex-col justify-center gap-8 px-2 lg:px-0">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2 flex flex-col items-center">
-      <p class="text-surface-700-300 text-xl font-semibold">
+      <h2 class="text-surface-700-300 text-xl font-semibold">
         Featured Yarn Palettes
-      </p>
-      <label class="label">
-        <span class="label-text">Popular in the last</span>
-        <div class="relative flex w-fit items-center">
-          <ClockIcon class={FIELD_ICON} />
-          <select
-            bind:value={yarnPaletteGalleryState.timePeriod}
-            class="select mx-auto w-fit min-w-[90px] truncate pl-11"
-            onchange={() => {
-              yarnPaletteGalleryState.popularPalettes = [];
-              fetchPopularPalettes();
-            }}
-          >
-            <option value={0.0357}>Day</option>
-            <option value={0.25}>Week</option>
-            <option value={1}>Month</option>
-            <option value={12}>Year</option>
-          </select>
-        </div>
-      </label>
+      </h2>
+      <PopularPeriodMenu
+        onchange={() => {
+          yarnPaletteGalleryState.popularPalettes = [];
+          fetchPopularPalettes();
+          if (featuredEl) featuredEl.scrollLeft = 0;
+        }}
+      />
     </div>
-    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
+    <div
+      class="flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2"
+      bind:this={featuredEl}
+    >
       {#if !yarnPaletteGalleryState.popularPalettes.length}
-        <PlaceholderPalettes items={5} maxWFull={true} wFull={true} />
+        {@render placeholders(5, true)}
       {:else}
-        {#each yarnPaletteGalleryState.popularPalettes as palette}
-          <GalleryPaletteCard
-            {palette}
-            onopen={async () => {
-              yarnPageState.gauge.colors = palette.colors;
-              // Its gallery name, which Save Palette offers
-              yarnPageState.suggestion = {
-                name: palette.page.title,
-                colors: $state.snapshot(palette.colors),
-              };
-              await recordPageView(palette.postId);
-            }}
-          />
+        {#each yarnPaletteGalleryState.popularPalettes as palette, i (i)}
+          <div class="w-64 shrink-0 snap-start">
+            <GalleryPaletteCard {palette} onopen={() => openCopy(palette)} />
+          </div>
         {/each}
       {/if}
     </div>
@@ -206,12 +231,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 pb-4 text-center"
     >
       <div class="flex flex-col">
-        <p class="text-surface-700-300 text-xl font-semibold">
+        <h2 class="text-surface-700-300 text-xl font-semibold">
           All Yarn Palettes
-        </p>
-        <p class="text-sm">
-          Palettes from user-created projects, and palettes people shared
-        </p>
+        </h2>
+        {#if totalPalettes !== undefined}
+          <p class="text-xs">{totalPalettes} total</p>
+        {/if}
       </div>
       <div class="grid w-full grid-cols-12 items-end gap-4">
         <div class="col-span-12 w-full md:col-span-5">
@@ -275,7 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </div>
-    <div class="mb-2 flex justify-center">
+    <div class="mb-2 flex flex-wrap justify-center gap-2">
       <SortSelectMenu
         options={GALLERY_ORDERS}
         current={yarnPaletteGalleryState.orderBy}
@@ -285,66 +310,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
           debouncedSearch();
         }}
       />
+      <ViewMenu bind:value={yarnPaletteGalleryState.layout} />
     </div>
-    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
-      {#each yarnPaletteGalleryState.palettes as palette}
-        <GalleryPaletteCard
-          {palette}
-          onopen={async () => {
-            yarnPageState.gauge.colors = palette.colors;
-            // Its gallery name, which Save Palette offers
-            yarnPageState.suggestion = {
-              name: palette.page.title,
-              colors: $state.snapshot(palette.colors),
-            };
-            await recordPageView(palette.postId);
-          }}
-        />
+    <div class={grid ? gridClass : listClass}>
+      {#each yarnPaletteGalleryState.palettes as palette, i (i)}
+        <GalleryPaletteCard {palette} onopen={() => openCopy(palette)} />
       {/each}
-      {#if !yarnPaletteGalleryState.palettes.length && !loading}
-        <p class="my-8 text-center">
-          No results. Try changing the filters above.
-        </p>
-      {/if}
       {#if loading}
-        <PlaceholderPalettes items={20} maxWFull={true} wFull={true} />
-      {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
-        <button
-          class="btn preset-filled m-auto my-4 flex"
-          disabled={!hasNextPage}
-          onclick={async () => {
-            loading = true;
-            const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
-              brandId: yarnPaletteGalleryState.filteredBrandId,
-              yarnId: yarnPaletteGalleryState.filteredYarnId,
-            });
-            let results = await fetchPaletteGallery({
-              first,
-              after: endCursor,
-              search: yarnPaletteGalleryState.search,
-              order: yarnPaletteGalleryState.orderBy,
-              yarn: yarnSearch,
-            });
-            yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
-            yarnPaletteGalleryState.projects.push(
-              ...results.edges.flatMap((item) => item.node),
-            );
-            yarnPaletteGalleryState.projects = yarnPaletteGalleryState.projects;
-            yarnPaletteGalleryState.palettes = getPalettesFromProjects({
-              projects: yarnPaletteGalleryState.projects,
-              selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
-              selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
-              palettesContainOnlyFilteredYarn:
-                yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-            });
-            loading = false;
-          }}
-        >
-          <PlusIcon />
-          Load More
-        </button>
+        {@render placeholders(grid ? 12 : 8)}
       {/if}
     </div>
+    {#if !yarnPaletteGalleryState.palettes.length && !loading}
+      <div class="my-8 flex flex-col items-center gap-2 text-center">
+        <p>No palettes match these filters.</p>
+        {#if galleryFilters.active}
+          <button
+            type="button"
+            class="btn preset-tonal-primary border-primary-500 border"
+            onclick={clearFilters}
+          >
+            <XIcon />
+            Clear Filters
+          </button>
+        {/if}
+      </div>
+    {:else if !loading && yarnPaletteGalleryState.palettes.length && hasNextPage}
+      <button
+        class="btn preset-filled m-auto my-4 flex"
+        disabled={!hasNextPage}
+        onclick={async () => {
+          loading = true;
+          try {
+            await fetchPage(endCursor);
+          } finally {
+            loading = false;
+          }
+        }}
+      >
+        <PlusIcon />
+        Load More
+      </button>
+    {/if}
   </div>
 </div>
 

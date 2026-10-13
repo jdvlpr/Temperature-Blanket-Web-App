@@ -68,7 +68,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : [
           {
             value: 'page',
-            label: palette.page.kind === 'palette' ? 'Palette Page' : 'Project Page',
+            label:
+              palette.page.kind === 'palette' ? 'Palette Page' : 'Project Page',
             icon: SwatchBookIcon,
             href: pageHref,
             newTab: true,

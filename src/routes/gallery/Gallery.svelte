@@ -29,16 +29,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/gallery-utils.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { getTitleFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
-  import {
-    ChevronRightIcon,
-    ClockIcon,
-    EarthIcon,
-    Grid3x3,
-    XIcon,
-    PlusIcon,
-  } from '@lucide/svelte';
+  import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
+  import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import { resolve } from '$app/paths';
+  import { EarthIcon, Grid3x3, XIcon, PlusIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { galleryState } from './state.svelte';
+  import PopularPeriodMenu from './PopularPeriodMenu.svelte';
+  import { galleryFilters, galleryState } from './state.svelte';
 
   let first = 40;
   let loading = $state(true);
@@ -47,25 +44,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectsList = $state();
   let totalProjects: number | string | undefined = $state(0);
   let featuredProjectsEl: HTMLDivElement | undefined = $state();
-  let layout = $state<'grid' | 'list'>('grid');
 
   onMount(async () => {
-    if (!galleryState.projects.length) {
-      let results = await fetchProjects({
-        first,
-        after: endCursor,
-        search: galleryState.search,
-        order: galleryState.orderBy,
-        pattern: galleryState.filteredPatternType,
-      });
-      galleryState.gallery.pageInfo = results.pageInfo;
-      galleryState.projects.push(...results.edges.flatMap((item) => item.node));
-      galleryState.projects = galleryState.projects;
-      galleryState.displayedProjects = getFilteredProjects();
-      loading = false;
-    }
+    // The first visit, or the filters changed on the other tab
+    if (
+      !galleryState.projects.length ||
+      galleryState.loadedFor !== galleryFilters.key
+    )
+      await search();
 
-    if (!galleryState.popularProjects.length) {
+    if (
+      !galleryState.popularProjects.length ||
+      galleryState.popularFor !== galleryFilters.timePeriod
+    ) {
+      galleryState.popularProjects = [];
       await fetchPopularProjectsWrapper();
     }
 
@@ -100,11 +92,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let endCursor = $derived(galleryState.gallery?.pageInfo?.endCursor);
 
   async function fetchPopularProjectsWrapper() {
+    const months = galleryFilters.timePeriod;
     let promisePopularProjects = await fetchPopularProjects({
-      months: galleryState.timePeriod,
+      months,
       limit: 5,
     });
     galleryState.popularProjects = promisePopularProjects;
+    galleryState.popularFor = months;
   }
 
   function getFilteredProjects() {
@@ -154,10 +148,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function debouncedSearch() {
     clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(async () => {
+    searchTimeout = setTimeout(search, 500);
+  }
+
+  async function search() {
+    {
       galleryState.projects = [];
       galleryState.displayedProjects = [];
       loading = true;
+      const loadedFor = galleryFilters.key;
 
       const yarnSearch = galleryState.getYarnSearch({
         brandId: galleryState.filteredBrandId,
@@ -182,41 +181,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
           galleryState.projects = galleryState.projects;
         }
         galleryState.displayedProjects = getFilteredProjects();
+        galleryState.loadedFor = loadedFor;
       } catch (e) {
         console.error('Search failed:', e);
       } finally {
         loading = false;
       }
-    }, 500);
+    }
+  }
+
+  function clearFilters() {
+    galleryFilters.clear();
+    galleryState.filteredPatternType = '';
+    search();
   }
 </script>
 
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2 flex flex-col items-center">
-      <p class="text-surface-700-300 text-xl font-semibold">
+      <h2 class="text-surface-700-300 text-xl font-semibold">
         Featured Projects
-      </p>
-      <label class="label">
-        <span class="label-text">Popular in the last</span>
-        <div class="relative flex w-fit items-center">
-          <ClockIcon class={FIELD_ICON} />
-          <select
-            bind:value={galleryState.timePeriod}
-            class="select mx-auto w-fit min-w-[100px] truncate pl-11"
-            onchange={() => {
-              galleryState.popularProjects = [];
-              fetchPopularProjectsWrapper();
-              if (featuredProjectsEl) featuredProjectsEl.scrollLeft = 0;
-            }}
-          >
-            <option value={0.0357}>Day</option>
-            <option value={0.25}>Week</option>
-            <option value={1}>Month</option>
-            <option value={12}>Year</option>
-          </select>
-        </div>
-      </label>
+      </h2>
+      <PopularPeriodMenu
+        onchange={() => {
+          galleryState.popularProjects = [];
+          fetchPopularProjectsWrapper();
+          if (featuredProjectsEl) featuredProjectsEl.scrollLeft = 0;
+        }}
+      />
     </div>
 
     <div
@@ -230,25 +223,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ></div>
         {/each}
       {:else}
-        {#each galleryState.popularProjects as { featured_image_src, id, meta }}
-          {@const title = getTitleFromLocationsMeta(meta.locations)}
-          <a
-            href="/gallery/{id}"
-            class="rounded-container group hover:bg-surface-100-900 mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
-          >
-            <img
-              src={featured_image_src}
-              alt="Preview"
-              class="max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]"
-            />
-            <p class="line-clamp-4 text-xs">
-              {#if meta.project_name}<span class="block text-sm font-semibold"
-                  >{meta.project_name}</span
-                >{/if}
-              <!-- Escaped by getTitleFromLocationsMeta -->
-              {@html title || ''}
-            </p>
-          </a>
+        {#each galleryState.popularProjects as { featured_image_src, id, meta } (id)}
+          <GalleryProjectCard
+            href={resolve('/gallery/[id]', { id: String(id) })}
+            image={featured_image_src}
+            name={meta.project_name
+              ? decodeHtmlEntities(meta.project_name)
+              : null}
+            placesHtml={getTitleFromLocationsMeta(meta.locations)}
+            layout="row"
+          />
         {/each}
       {/if}
     </div>
@@ -259,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
-      <p class="text-surface-700-300 text-xl font-semibold">All Projects</p>
+      <h2 class="text-surface-700-300 text-xl font-semibold">All Projects</h2>
       <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
@@ -364,55 +348,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
             debouncedSearch();
           }}
         />
-        <ViewMenu bind:value={layout} />
+        <ViewMenu bind:value={galleryState.layout} />
       </div>
 
       <div
-        class=" my-2 w-full gap-2 {layout === 'grid'
+        class=" my-2 w-full gap-2 {galleryState.layout === 'grid'
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'flex flex-col items-start justify-start'}"
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName }}
-          {@const title = getTitleFromLocationsMeta(locations)}
-          <a
-            href="/gallery/{databaseId}"
-            class="rounded-container group hover:bg-surface-100-900 flex gap-1 p-2 text-center {layout ===
-            'grid'
-              ? 'flex-col items-center justify-center'
-              : 'w-full flex-col items-center justify-start'}"
-          >
-            <img
-              src={featuredImage?.node?.mediaDetails.sizes?.[0].sourceUrl ||
-                featuredImage?.node?.mediaItemUrl}
-              alt="Preview"
-              class={layout === 'grid'
-                ? 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]'
-                : 'max-h-[900px] max-w-full'}
-            />
-            <p class="line-clamp-4 text-xs">
-              {#if projectName}<span class="block text-sm font-semibold"
-                  >{projectName}</span
-                >{/if}
-              <!-- Escaped by getTitleFromLocationsMeta -->
-              {@html title || ''}
-            </p>
-          </a>
+        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName } (databaseId)}
+          <GalleryProjectCard
+            href={resolve('/gallery/[id]', { id: String(databaseId) })}
+            image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
+              featuredImage?.node?.mediaItemUrl}
+            name={projectName ? decodeHtmlEntities(projectName) : null}
+            placesHtml={getTitleFromLocationsMeta(locations)}
+            layout={galleryState.layout}
+          />
         {/each}
       </div>
       {#if !galleryState.displayedProjects.length && !loading}
-        <p class="my-8 text-center">
-          No results. Try changing the filters above.
-        </p>
+        <div class="my-8 flex flex-col items-center gap-2 text-center">
+          <p>No projects match these filters.</p>
+          {#if galleryFilters.active || galleryState.filteredPatternType}
+            <button
+              type="button"
+              class="btn preset-tonal-primary border-primary-500 border"
+              onclick={clearFilters}
+            >
+              <XIcon />
+              Clear Filters
+            </button>
+          {/if}
+        </div>
       {/if}
       {#if loading}
         <div
-          class=" w-full gap-4 {layout === 'grid'
+          class=" w-full gap-4 {galleryState.layout === 'grid'
             ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
             : 'flex flex-col items-start justify-start'}"
         >
           {#each Array(20)}
             <div
-              class="placeholder card bg-surface-100 dark:bg-surface-900 rounded-container animate-pulse text-center {layout ===
+              class="placeholder card bg-surface-100 dark:bg-surface-900 rounded-container animate-pulse text-center {galleryState.layout ===
               'grid'
                 ? 'h-[350px] w-full'
                 : 'h-[120px] w-full'}"
