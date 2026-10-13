@@ -31,6 +31,12 @@ async function seedProject(page: Page, title: string) {
   }, title);
 }
 
+/** A card's ⋮ menu › Move to Trash */
+async function moveToTrash(page: Page, name: string) {
+  await page.getByRole('button', { name: `More for ${name}` }).click();
+  await page.getByRole('menuitem', { name: 'Move to Trash' }).click();
+}
+
 test.describe('My Projects', () => {
   test.beforeEach(async ({ context, baseURL }) => {
     // Pre-seed the analytics-consent cookies so the consent toast can't cover buttons
@@ -101,7 +107,7 @@ test.describe('My Projects', () => {
     await expect(named).toBeVisible();
 
     // Move to the Trash, then undo
-    await page.getByRole('button', { name: 'Delete Gift Blanket' }).click();
+    await moveToTrash(page, 'Gift Blanket');
     await expect(named).toHaveCount(0);
     await expect(page.getByRole('status')).toContainText(
       'Moved Gift Blanket to the Trash',
@@ -110,7 +116,7 @@ test.describe('My Projects', () => {
     await expect(named).toBeVisible();
 
     // Move to the Trash, then restore it from the Trash dialog
-    await page.getByRole('button', { name: 'Delete Gift Blanket' }).click();
+    await moveToTrash(page, 'Gift Blanket');
     await expect(page.getByText('No saved projects yet')).toBeVisible();
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     let trash = page.getByRole('dialog');
@@ -123,7 +129,7 @@ test.describe('My Projects', () => {
     await expect(named).toBeVisible();
 
     // Delete it forever, after confirming
-    await page.getByRole('button', { name: 'Delete Gift Blanket' }).click();
+    await moveToTrash(page, 'Gift Blanket');
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     trash = page.getByRole('dialog');
     await trash
@@ -137,15 +143,15 @@ test.describe('My Projects', () => {
     await expect(page.getByRole('button', { name: /^Trash/ })).toHaveCount(0);
 
     // Palettes go to the same Trash
-    await palettes.getByRole('button', { name: 'Delete Test Meadow' }).click();
+    await moveToTrash(page, 'Test Meadow');
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     trash = page.getByRole('dialog');
     await trash.getByRole('button', { name: 'Restore Test Meadow' }).click();
     await page.keyboard.press('Escape');
     await expect(palettes.getByText('Test Meadow')).toBeVisible();
 
-    // A click anywhere on the palette, not just its name, opens it too
-    await palettes.getByText(/^Saved .+ at .+/).click();
+    // A click on its colors, not just its name, opens it too
+    await palettes.locator('a[aria-hidden="true"]').first().click();
     await expect(page).toHaveURL(/\/yarn\?s=/);
   });
 

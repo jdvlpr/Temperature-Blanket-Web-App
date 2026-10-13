@@ -35,6 +35,8 @@ published to the gallery as a snapshot, with the account's name or without. -->
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
   import Trash from '#lib/components/Trash.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { savedPalettes } from '#lib/storage/palettes.svelte.js';
   import { savedProjects } from '#lib/storage/projects.svelte.js';
@@ -158,9 +160,9 @@ published to the gallery as a snapshot, with the account's name or without. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="m-auto mx-auto mt-2 mb-12 flex w-full max-w-3xl flex-col gap-8 px-2 text-left"
+      class="m-auto mx-auto mt-2 mb-12 flex w-full max-w-(--breakpoint-lg) flex-col gap-8 px-2 text-left"
     >
-      <p class="text-surface-700-300 text-center text-sm">
+      <p class="text-surface-700-300 mx-auto max-w-3xl text-center text-sm">
         {#if synced}
           Your projects and yarn palettes are saved to your account and show up
           on every device where you're signed in.
@@ -174,7 +176,7 @@ published to the gallery as a snapshot, with the account's name or without. -->
       <!-- Signed in: what Show My Name shows, and where those pages are listed -->
       {#if browser && signedIn && galleryPages.shown}
         <p
-          class="text-surface-700-300 -mt-6 text-center text-sm"
+          class="text-surface-700-300 mx-auto -mt-6 max-w-3xl text-center text-sm"
           data-testid="gallery-name-status"
         >
           {#if ownerName}
@@ -209,7 +211,7 @@ published to the gallery as a snapshot, with the account's name or without. -->
       <!-- Signed out: an account keeps them safe, and on every device -->
       {#if browser && __ACCOUNTS_ENABLED__ && !signedIn}
         <div
-          class="bg-surface-100-900 rounded-container flex flex-col items-center gap-3 p-4 text-center"
+          class="bg-surface-100-900 rounded-container mx-auto flex w-full max-w-3xl flex-col items-center gap-3 p-4 text-center"
         >
           <p class="text-sm">
             Sign in to keep your projects and yarn palettes on all your devices.
@@ -218,6 +220,18 @@ published to the gallery as a snapshot, with the account's name or without. -->
           <a href={resolve('account')} class="btn preset-filled-primary-500"
             ><LogInIcon />Sign In</a
           >
+        </div>
+      {/if}
+
+      <!-- One View menu for both: projects and palettes as cards side by side, or one per row -->
+      {#if browser}
+        <div class="-mb-4 flex justify-center">
+          <ViewMenu
+            bind:value={
+              () => preferences.value.myProjectsLayout ?? 'grid',
+              (layout) => (preferences.value.myProjectsLayout = layout)
+            }
+          />
         </div>
       {/if}
 

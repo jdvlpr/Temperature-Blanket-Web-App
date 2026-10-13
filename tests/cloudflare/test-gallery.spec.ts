@@ -245,10 +245,12 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       sharing.getByRole('button', { name: /Publish a new version/ }),
     ).toHaveCount(0);
-    // Its link, beside it on the row
+    // Its link, in its ⋮ menu beside its sharing
+    await page.getByRole('button', { name: `More for ${title}` }).click();
     await expect(
-      sharing.getByRole('button', { name: `Copy Link: ${title}` }),
+      page.getByRole('menuitem', { name: 'Copy Link' }),
     ).toBeVisible();
+    await page.keyboard.press('Escape');
     await expect(
       page.getByRole('heading', { name: 'Other Gallery Pages' }),
     ).toHaveCount(0);

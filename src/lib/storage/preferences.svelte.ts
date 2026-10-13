@@ -47,6 +47,8 @@ type LocalStatePreferencesType = {
   fillColor?: boolean;
   /** The PDF's last choices; its layout, fill and days start as the View menu's; missing until first downloaded */
   pdf?: SavedPdfSettings;
+  /** My Projects' View menu: projects and palettes as cards in a grid, or one per row; missing until first changed (grid) */
+  myProjectsLayout?: PageLayout;
 };
 
 export const preferences = persistedState<LocalStatePreferencesType>(

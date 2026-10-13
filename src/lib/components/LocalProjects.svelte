@@ -19,7 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
   import ProjectDetails from '#lib/components/ProjectDetails.svelte';
-  import CopyLinkButton from '#lib/components/buttons/CopyLinkButton.svelte';
+  import SavedProjectCard from '#lib/components/SavedProjectCard.svelte';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import {
@@ -38,7 +39,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { FolderOpenIcon } from '@lucide/svelte';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
-  // which shows them all under its own heading, with rename and delete
+  // which shows them all under its own heading, as cards (the gallery's), with
+  // rename and delete
   let {
     limit,
     onMyProjectsPage = false,
@@ -131,25 +133,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<!-- On My Projects, every saved project's link, signed in or not -->
-{#snippet copyLink(project: StoredProjectIndexItem)}
-  <CopyLinkButton
-    href={project.meta.href}
-    name={project.meta.name}
-    title={project.meta.title}
-    label={labelFor(project)}
-  />
-{/snippet}
-
 {#snippet undoAt(anchor: string | null)}
   {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
-    <TrashUndo
-      label={entry.label}
-      onundo={() => undoRemove(entry.id)}
-      focus={undos.focusId === entry.id}
-      onfocused={() => (undos.focusId = null)}
-    />
+    <div class="col-span-full w-full">
+      <TrashUndo
+        label={entry.label}
+        onundo={() => undoRemove(entry.id)}
+        focus={undos.focusId === entry.id}
+        onfocused={() => (undos.focusId = null)}
+      />
+    </div>
   {/each}
+{/snippet}
+
+{#snippet gallerySharing(project: StoredProjectIndexItem)}
+  {@const page = galleryPages.grouped.byProject.get(project.id)}
+  <GallerySharing
+    kind="project"
+    label={labelFor(project)}
+    {page}
+    changedSince={Boolean(
+      page && (lastSavedAt(project) ?? 0) > page.publishedAt,
+    )}
+    onadd={() => openForGallery(project, { action: 'add' })}
+    onupdate={(old) =>
+      openForGallery(project, {
+        action: 'replace',
+        postId: old.postId,
+      })}
+  />
 {/snippet}
 
 <!-- With nothing left to list, they show on their own -->
@@ -169,51 +181,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else if !onMyProjectsPage}
         <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
       {/if}
-      <div class="flex w-full flex-col items-start justify-center gap-2">
-        {#each shown as project (project.id)}
-          {@const { meta } = project}
-          {@render undoAt(project.id)}
-          <ProjectDetails
+      {#if onMyProjectsPage}
+        {@const grid =
+          (preferences.value.myProjectsLayout ?? 'grid') === 'grid'}
+        <div
+          class={grid
+            ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3'
+            : 'flex w-full flex-col items-start gap-2'}
+        >
+          {#each shown as project (project.id)}
+            {@render undoAt(project.id)}
+            <SavedProjectCard
+              item={project}
+              layout={grid ? 'grid' : 'list'}
+              syncLabel={__ACCOUNTS_ENABLED__
+                ? syncLabelFor(project, signedIn)
+                : undefined}
+              onrename={(name) => rename(project.id, name)}
+              onremove={() => remove(project)}
+            >
+              {#snippet sharing()}
+                {#if showSharing}{@render gallerySharing(project)}{/if}
+              {/snippet}
+            </SavedProjectCard>
+          {/each}
+          {@render undoAt(null)}
+        </div>
+      {:else}
+        <div class="flex w-full flex-col items-start justify-center gap-2">
+          {#each shown as project (project.id)}
+            {@const { meta } = project}
+            {@render undoAt(project.id)}
+            <ProjectDetails
             project={meta}
-            newTab={!onMyProjectsPage}
-            canRemove={onMyProjectsPage}
+            canRemove={false}
             syncLabel={__ACCOUNTS_ENABLED__
               ? syncLabelFor(project, signedIn)
               : undefined}
-            onclick={() => remove(project)}
-            onrename={onMyProjectsPage
-              ? (name) => rename(project.id, name)
-              : undefined}
-          >
-            {#snippet sharing()}
-              {#if showSharing}
-                {@const page = galleryPages.grouped.byProject.get(project.id)}
-                <GallerySharing
-                  kind="project"
-                  label={labelFor(project)}
-                  {page}
-                  changedSince={Boolean(
-                    page && (lastSavedAt(project) ?? 0) > page.publishedAt,
-                  )}
-                  onadd={() => openForGallery(project, { action: 'add' })}
-                  onupdate={(old) =>
-                    openForGallery(project, {
-                      action: 'replace',
-                      postId: old.postId,
-                    })}
-                >
-                  {@render copyLink(project)}
-                </GallerySharing>
-              {:else if onMyProjectsPage}
-                <div class="mt-2 flex text-sm">
-                  {@render copyLink(project)}
-                </div>
-              {/if}
-            {/snippet}
-          </ProjectDetails>
-        {/each}
-        {@render undoAt(null)}
-      </div>
+          />
+          {/each}
+          {@render undoAt(null)}
+        </div>
+      {/if}
       {#if limit}
         <a
           href={resolve('my-projects')}

@@ -25,6 +25,7 @@ import type {
 } from '#lib/sync/engine.js';
 import { unchangedSince } from '#lib/sync/seen.js';
 import { del, get, set, update } from 'idb-keyval';
+import { removeThumbnail } from './thumbnails';
 import { trashCutoff } from './trash';
 
 export type StoredProjectIndexItem = {
@@ -574,6 +575,7 @@ export class ProjectStorage {
     await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
       trash.filter((t) => t.item.id !== id),
     );
+    await removeThumbnail(id);
     changed();
   }
 
@@ -583,13 +585,21 @@ export class ProjectStorage {
    */
   static async emptyTrash(): Promise<void> {
     const owner = this.syncOwner();
-    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
-      owner
+    const removed: string[] = [];
+    await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) => {
+      const kept = owner
         ? trash.filter(
             ({ item }) => item.sync && item.sync.ownerUserId !== owner,
           )
-        : [],
-    );
+        : [];
+      removed.push(
+        ...trash
+          .filter((t) => !kept.includes(t))
+          .map((t) => t.item.id),
+      );
+      return kept;
+    });
+    await Promise.all(removed.map(removeThumbnail));
     changed();
   }
 

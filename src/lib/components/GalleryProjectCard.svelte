@@ -33,7 +33,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     layout?: 'grid' | 'list' | 'row';
     /** In place of the image, when there's none */
     cover?: Snippet;
-    /** In place of the name and places, outside the link */
+    /** In place of the name and places, outside the link; it has the link
+    for screen readers and the keyboard then (the picture's is for the mouse) */
     nameRow?: Snippet;
     /** Under the name */
     details?: Snippet;
@@ -79,6 +80,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {title}
     data-sveltekit-reload={reload ? '' : undefined}
     class="flex w-full flex-col items-center gap-1"
+    aria-hidden={nameRow ? 'true' : undefined}
+    tabindex={nameRow ? -1 : undefined}
   >
     {#if image}
       <img src={image} alt="" class={imageClass[layout]} loading="lazy" />

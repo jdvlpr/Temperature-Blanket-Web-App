@@ -153,6 +153,12 @@ function opened(href: string) {
   if (loaded && loaded.id === baselineId) {
     known = { at: loaded.updatedAt, synced: loaded.synced };
     void refresh();
+    // A saved project gets its picture for My Projects once its preview is
+    // drawn, if it has none of this version yet
+    setTimeout(() => {
+      if (openProjectId() === loaded.id && project.url.href === href)
+        keepThumbnail(href);
+    }, 4000);
   } else void rememberStored().then(refresh);
 }
 
@@ -192,6 +198,25 @@ export const changedElsewhereMessage = () =>
     autosave.account ? 'in another tab or on another device' : 'in another tab'
   }, so changes here aren’t being saved.`;
 
+/**
+ * Keeps the open project's picture for its card on My Projects, from the
+ * preview on the page (see thumbnails.ts), once the browser is idle.
+ */
+function keepThumbnail(href: string) {
+  const id = openProjectId();
+  void Promise.all([
+    import('#lib/state/preview-state.svelte.js'),
+    import('#lib/state/weather-state.svelte.js'),
+    import('./thumbnails.js'),
+  ])
+    .then(([{ previews }, { weather }, { captureThumbnail }]) => {
+      // Not before its weather is in: the preview would be empty
+      if (previews.active && weather.data?.length)
+        captureThumbnail(id, href, previews.active);
+    })
+    .catch(() => {});
+}
+
 /** Saves a waiting change now, if there is one. */
 export async function saveNow() {
   clearTimeout(timer);
@@ -216,6 +241,7 @@ export async function saveNow() {
       goto(new URL(href), { shallow: true, replace: true, state: '' });
       // Where it is: one only in this browser stays there
       await ProjectStorage.save({ toAccount: false });
+      keepThumbnail(href);
       await rememberStored();
       baseline = href;
       weatherEdited = false;
@@ -299,6 +325,7 @@ export async function saveOpenProject() {
   try {
     const item = await ProjectStorage.save();
     project.status.saved = true;
+    if (item) keepThumbnail(item.meta.href);
     await projectSaved();
     return item;
   } catch (e) {
@@ -335,6 +362,7 @@ export async function saveCopy() {
     item = { ...item, meta: { ...item.meta, name: copyName } };
   }
   project.status.saved = true;
+  if (item) keepThumbnail(item.meta.href);
   await projectSaved();
   return item;
 }

@@ -38,7 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title: string;
     reload?: boolean;
     menu?: MoreMenuItem[];
-    /** In place of the name, outside the link */
+    /** In place of the name, outside the link; it has the link or button
+    for screen readers and the keyboard then (the colors' is for the mouse) */
     nameRow?: Snippet;
     /** After "8 colors · yarns", e.g. "Saved Oct 13" */
     details?: Snippet;
@@ -84,12 +85,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {title}
       data-sveltekit-reload={reload ? '' : undefined}
       class={controlClass}
+      aria-hidden={nameRow ? 'true' : undefined}
+      tabindex={nameRow ? -1 : undefined}
     >
       {@render strip()}
       {#if !nameRow}{@render text()}{/if}
     </a>
   {:else}
-    <button type="button" {onclick} {title} class={controlClass}>
+    <button
+      type="button"
+      {onclick}
+      {title}
+      class={controlClass}
+      aria-hidden={nameRow ? 'true' : undefined}
+      tabindex={nameRow ? -1 : undefined}
+    >
       {@render strip()}
       {#if !nameRow}{@render text()}{/if}
     </button>
