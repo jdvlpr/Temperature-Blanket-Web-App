@@ -67,6 +67,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauge = $bindable(),
     /** A project's gauge, whose ranges mean something (the Yarn page's don't) */
     inProject = false,
+    /** Save Palette's name to start with (the Yarn page's, from the gallery) */
+    suggestedName = '',
   } = $props();
 
   // Pointing at or focusing a color highlights the days in that yarn on the preview
@@ -302,7 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (value === 'save') {
       dialog.trigger({
         type: 'component',
-        component: { ref: SavePalette, props: { colors } },
+        component: { ref: SavePalette, props: { colors, suggestedName } },
         options: { size: 'medium', title: output.title },
       });
       return;

@@ -189,6 +189,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             toYarnPage
             onclick={async () => {
               yarnPageState.gauge.colors = palette.colors;
+              // Its gallery name, which Save Palette offers
+              yarnPageState.suggestion = {
+                name: palette.page.title,
+                colors: $state.snapshot(palette.colors),
+              };
               await recordPageView(palette.postId);
             }}
           />
@@ -289,6 +294,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           toYarnPage
           onclick={async () => {
             yarnPageState.gauge.colors = palette.colors;
+            // Its gallery name, which Save Palette offers
+            yarnPageState.suggestion = {
+              name: palette.page.title,
+              colors: $state.snapshot(palette.colors),
+            };
             await recordPageView(palette.postId);
           }}
         />

@@ -57,7 +57,13 @@ included it on their public gallery. -->
     yarnDataReady = true;
   });
   let palette = $derived(
-    yarnDataReady ? sharedPaletteFrom(data.palette.yarnUrls) : null,
+    yarnDataReady
+      ? // Open a Copy brings its name along, for Save Palette
+        sharedPaletteFrom(
+          data.palette.yarnUrls,
+          galleryTitleText(data.palette.title),
+        )
+      : null,
   );
 
   // Counts a view for Popular, in the browser (once per palette shown)

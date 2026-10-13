@@ -22,14 +22,20 @@ import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
 /**
  * A shared palette's colors, and its Yarn Palette Creator link on this site
  * (path and query only, so it opens here whichever origin it was shared from).
+ * With a title, the link carries it as `name`, which Save Palette offers there.
  * Null when the link can't be read. Colorway names need the yarn data loaded.
  */
-export function sharedPaletteFrom(yarnUrls: string) {
+export function sharedPaletteFrom(yarnUrls: string, title = '') {
   try {
     const url = new URL((JSON.parse(yarnUrls) as string[])[0]);
     const colors = getColorsFromInput({ string: url.href });
+    // Only in this link: the gallery's stored link stays as it was, since
+    // duplicates are found by matching it exactly
+    const name = title
+      ? `${url.search ? '&' : '?'}name=${encodeURIComponent(title)}`
+      : '';
     return colors && colors.length
-      ? { colors, href: `${url.pathname}${url.search}` }
+      ? { colors, href: `${url.pathname}${url.search}${name}` }
       : null;
   } catch {
     return null;

@@ -68,6 +68,29 @@ test.describe('Saved palettes', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0);
   });
 
+  test('a name in the link is offered by Save Palette, for those colors', async ({
+    page,
+  }) => {
+    await page.goto('/yarn?s=ff000000ff000000ff&name=Gallery%20Sunset');
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByLabel('Name (optional)')).toHaveValue(
+      'Gallery Sunset',
+    );
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+
+    // Other colors are another palette: no name
+    await page.getByRole('button', { name: 'Sort', exact: true }).click();
+    await page.getByRole('menuitem', { name: /^Reverse/ }).click();
+    await page.getByRole('button', { name: 'Save & Export' }).click();
+    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
+    await expect(
+      page.getByRole('dialog').getByLabel('Name (optional)'),
+    ).toHaveValue('');
+  });
+
   test('export a link that opens the palette', async ({ page }) => {
     await page.getByRole('button', { name: 'Save & Export' }).click();
     await page.getByRole('menuitem', { name: /^Link/ }).click();

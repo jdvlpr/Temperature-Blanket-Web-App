@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
+  import { untrack } from 'svelte';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
@@ -29,9 +30,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPaletteFallbackName,
   } from '#lib/utils/color-utils.js';
 
-  let { colors }: { colors: Color[] } = $props();
+  let {
+    colors,
+    suggestedName = '',
+  }: {
+    colors: Color[];
+    /** The name to start with (a gallery palette's), still editable */
+    suggestedName?: string;
+  } = $props();
 
-  let name = $state('');
+  // The dialog is opened for one palette, so its suggestion never changes
+  let name = $state(untrack(() => suggestedName));
   let saving = $state(false);
   let fallbackName = $derived(getPaletteFallbackName(colors));
 

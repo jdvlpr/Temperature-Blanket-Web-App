@@ -23,6 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeCustomizer from '#lib/components/GaugeCustomizer.svelte';
   import YarnSources from '#lib/components/YarnSources.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { MAX_SAVED_PALETTE_NAME_LENGTH } from '#lib/storage/palettes.svelte.js';
+  import { cleanName } from '#lib/utils/clean-name.js';
   import {
     stringToColors,
     yarnDetailsToColors,
@@ -62,6 +64,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }) || yarnPageState.gauge.colors;
       }
     }
+
+    // A name that came with the palette (Open a Copy in the gallery)
+    const name = cleanName(
+      urlParams.get('name'),
+      MAX_SAVED_PALETTE_NAME_LENGTH,
+    );
+    if (name)
+      yarnPageState.suggestion = {
+        name,
+        colors: $state.snapshot(yarnPageState.gauge.colors),
+      };
   }
 </script>
 
@@ -114,7 +127,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/snippet}
           {#snippet content()}
             <div class=" mt-4">
-              <Gauge bind:gauge={yarnPageState.gauge} />
+              <Gauge
+                bind:gauge={yarnPageState.gauge}
+                suggestedName={yarnPageState.suggestedNameFor(
+                  yarnPageState.gauge.colors,
+                )}
+              />
 
               <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
             </div>
