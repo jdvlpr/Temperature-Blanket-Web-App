@@ -186,8 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#each yarnPaletteGalleryState.popularPalettes as palette}
           <GalleryPaletteCard
             {palette}
-            toYarnPage
-            onclick={async () => {
+            onopen={async () => {
               yarnPageState.gauge.colors = palette.colors;
               // Its gallery name, which Save Palette offers
               yarnPageState.suggestion = {
@@ -291,8 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each yarnPaletteGalleryState.palettes as palette}
         <GalleryPaletteCard
           {palette}
-          toYarnPage
-          onclick={async () => {
+          onopen={async () => {
             yarnPageState.gauge.colors = palette.colors;
             // Its gallery name, which Save Palette offers
             yarnPageState.suggestion = {

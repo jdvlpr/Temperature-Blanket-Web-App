@@ -239,6 +239,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each galleryPalettesState.palettes as palette}
         <GalleryPaletteCard
           {palette}
+          mode="use"
           onclick={() => {
             recordPageView(palette.postId);
             updateGauge({

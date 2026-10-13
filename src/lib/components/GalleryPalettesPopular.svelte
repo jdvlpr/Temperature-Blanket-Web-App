@@ -107,6 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each palettes as palette}
         <GalleryPaletteCard
           {palette}
+          mode="use"
           onclick={() => {
             recordPageView(palette.postId);
             updateGauge({
