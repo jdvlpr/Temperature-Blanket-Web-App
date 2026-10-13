@@ -288,7 +288,8 @@ export const fetchPopularProjects = async ({
 
   const response = await fetch(url);
   const popularProjects = await response.json();
-  return popularProjects;
+  // An error answer (an object) shows as none, rather than breaking the gallery
+  return Array.isArray(popularProjects) ? popularProjects : [];
 };
 
 /**
