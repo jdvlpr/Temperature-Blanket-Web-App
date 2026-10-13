@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   groupGalleryPages,
   paletteNameDiffers,
+  sharePalette,
   type GalleryPage,
 } from './gallery';
 
@@ -86,5 +87,46 @@ describe('paletteNameDiffers', () => {
   it('cuts the name to the gallery’s 80 characters first', () => {
     const long = 'x'.repeat(100);
     expect(paletteNameDiffers(long, page('x'.repeat(80)))).toBe(false);
+  });
+});
+
+describe('sharePalette', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const answer = (body: unknown) => {
+    vi.stubGlobal('window', { dispatchEvent: () => true });
+    vi.stubGlobal(
+      'fetch',
+      async () => new Response(JSON.stringify(body), { status: 200 }),
+    );
+    return sharePalette({
+      paletteId: 'p1',
+      title: 'Autumn',
+      yarnUrl: 'https://example.com/yarn?s=1',
+      showOwner: false,
+    });
+  };
+
+  it('says which page has these colors already', async () => {
+    expect(
+      await answer({
+        code: '409',
+        message: 'You’ve already published this palette.',
+        data: { status: 409, id: 42, title: 'Fall' },
+      }),
+    ).toEqual({ status: 'published-already', postId: 42, title: 'Fall' });
+  });
+
+  it('keeps an older gallery’s 409 an error', async () => {
+    expect(
+      await answer({
+        code: 409,
+        message: 'This palette is already in the gallery.',
+      }),
+    ).toEqual({
+      status: 'error',
+      message: 'This palette is already in the gallery.',
+      code: 409,
+    });
   });
 });

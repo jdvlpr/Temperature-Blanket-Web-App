@@ -17,7 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 while signed in: a snapshot of it as it is now, linked to the account. As a
 new version of a published one, it asks whether to remove the old page. With
 `rename`, it renames the published page in place instead (its link stays),
-falling back to a new version when the gallery can't rename yet. -->
+falling back to a new version when the gallery can't rename yet. When the
+gallery says these colors are published already, it shows that page, and can
+rename it. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -25,6 +27,7 @@ falling back to a new version when the gallery can't rename yet. -->
   import {
     GALLERY_PAGES_CHANGED,
     getGalleryPages,
+    paletteNameDiffers,
     removeGalleryPage,
     renameGalleryPage,
     sharePalette,
@@ -38,6 +41,7 @@ falling back to a new version when the gallery can't rename yet. -->
   import { cleanName } from '#lib/utils/string-utils.js';
   import {
     CheckIcon,
+    ExternalLinkIcon,
     LoaderCircleIcon,
     PencilIcon,
     SendIcon,
@@ -65,9 +69,14 @@ falling back to a new version when the gallery can't rename yet. -->
     rename?: { postId: number; title: string };
   } = $props();
 
+  // The page to rename: the one given, or the one the gallery says has these
+  // colors already
+  let renameTarget = $state(untrack(() => rename));
   // Renaming, until the gallery says it can't (an older plugin): then it
   // publishes a new version with the name instead
   let renaming = $state(Boolean(untrack(() => rename)));
+  // The page these colors are published on already, when the gallery says so
+  let existing = $state<{ postId: number; title: string } | null>(null);
   let renamed = $state(false);
 
   // Its versions to unpublish once the new one is in (the latest, at first)
@@ -114,18 +123,18 @@ falling back to a new version when the gallery can't rename yet. -->
     }
   }
 
-  async function share(event: Event) {
-    event.preventDefault();
+  async function share(event?: Event) {
+    event?.preventDefault();
     const title = cleanName(name, MAX_NAME_LENGTH);
     if (!title || busy) return;
     busy = true;
     errorMessage = '';
-    if (renaming && rename) {
-      const result = await renameGalleryPage(rename.postId, title);
+    if (renaming && renameTarget) {
+      const result = await renameGalleryPage(renameTarget.postId, title);
       busy = false;
       if (result.status === 'renamed') {
         renamed = shared = true;
-        postId = rename.postId;
+        postId = renameTarget.postId;
         window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
       } else if (result.status === 'unsupported') {
         renaming = false;
@@ -144,9 +153,14 @@ falling back to a new version when the gallery can't rename yet. -->
         showOwner,
       });
     let result = await share();
-    // Replacing: the old page has the same colors, so it's the one already
-    // there. It goes first (removed pages don't count).
-    if (replacePostId && result.status === 'error' && result.code === 409) {
+    // Replacing, and the gallery has these colors on the old page (or an older
+    // plugin doesn't say which): it goes first (removed pages don't count)
+    if (
+      replacePostId &&
+      ((result.status === 'error' && result.code === 409) ||
+        (result.status === 'published-already' &&
+          result.postId === replacePostId))
+    ) {
       oldRemoved = await removeOld();
       if (oldRemoved) result = await share();
     }
@@ -167,6 +181,11 @@ falling back to a new version when the gallery can't rename yet. -->
     if (result.status === 'shared') {
       shared = true;
       postId = result.postId;
+    } else if (result.status === 'published-already') {
+      existing = { postId: result.postId, title: result.title };
+      if (oldRemoved)
+        errorMessage =
+          'Its old gallery page was removed. You can share it again from My Projects.';
     } else {
       errorMessage = result.message;
       if (oldRemoved)
@@ -206,6 +225,50 @@ falling back to a new version when the gallery can't rename yet. -->
           href={resolve('/gallery/palette/[id]', { id: String(postId) })}
           target="_blank"
           class="link">View Gallery Page</a
+        >
+      {/if}
+    </div>
+  {:else if existing}
+    {@const differs = paletteNameDiffers(name, existing)}
+    <div class="flex flex-col gap-2" role="status">
+      <p>
+        You’ve published this palette already{existing.title
+          ? `, as “${existing.title}”`
+          : ''}.
+      </p>
+      {#if differs}
+        <p class="text-sm opacity-80">
+          You can give its gallery page the name “{cleanName(
+            name,
+            MAX_NAME_LENGTH,
+          )}”. Its link stays the same.
+        </p>
+      {/if}
+      {#if errorMessage}
+        <p class="text-error-700-300" role="alert">{errorMessage}</p>
+      {/if}
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a
+        href={resolve('/gallery/palette/[id]', {
+          id: String(existing.postId),
+        })}
+        target="_blank"
+        class="btn hover:preset-tonal-surface"
+        >View Gallery Page<ExternalLinkIcon class="icon-sm" /><span
+          class="sr-only">(opens in a new tab)</span
+        ></a
+      >
+      {#if differs}
+        <button
+          type="button"
+          class="btn preset-filled-primary-500"
+          onclick={() => {
+            renameTarget = existing ?? undefined;
+            renaming = true;
+            existing = null;
+            share();
+          }}><PencilIcon />Update Gallery Name</button
         >
       {/if}
     </div>

@@ -102,8 +102,10 @@ export const MAX_GALLERY_PALETTE_NAME_LENGTH = 80;
  * (its name, or the fallback when it has none), as the gallery would store it.
  * A palette's colors never change, so this is the only way it can differ.
  */
-export const paletteNameDiffers = (label: string, page: GalleryPage) =>
-  cleanName(label, MAX_GALLERY_PALETTE_NAME_LENGTH) !== page.title;
+export const paletteNameDiffers = (
+  label: string,
+  page: Pick<GalleryPage, 'title'>,
+) => cleanName(label, MAX_GALLERY_PALETTE_NAME_LENGTH) !== page.title;
 
 export type RenameGalleryPageResult =
   | { status: 'renamed'; title: string }
@@ -175,7 +177,10 @@ export async function publishFromAccount(
 
 export type SharePaletteResult =
   | { status: 'shared'; postId: number | null }
-  /** `code` is WordPress's, e.g. 409 when the same palette is already in the gallery */
+  /** This account published these colors already: its page (gallery plugin 1.7.0) */
+  | { status: 'published-already'; postId: number; title: string }
+  /** `code` is WordPress's, e.g. 409 when the same palette is already in the gallery
+   * (an older plugin doesn't say which page) */
   | { status: 'error'; message: string; code?: number };
 
 /** Shares a saved palette to the gallery as the signed-in user. */
@@ -206,6 +211,18 @@ export async function sharePalette(palette: {
     return {
       status: 'error',
       message: 'Sharing to the gallery is paused right now. Try again later.',
+    };
+  const existingId = Number(data?.data?.id);
+  if (
+    response.ok &&
+    Number(data?.code) === 409 &&
+    Number.isInteger(existingId) &&
+    existingId > 0
+  )
+    return {
+      status: 'published-already',
+      postId: existingId,
+      title: typeof data.data.title === 'string' ? data.data.title : '',
     };
   if (!response.ok || Number(data?.code) !== 200)
     return {
