@@ -25,17 +25,30 @@ import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
 import { projectNameFromHash } from '#lib/utils/project-name-link.js';
 import { timestampFromLegacyProjectId } from '#lib/utils/project-id-utils.js';
 import type { GalleryRequest } from '#lib/utils/gallery-request.js';
+import {
+  fetchGalleryWeather,
+  galleryWeatherToLoad,
+  isCustomGalleryWeather,
+} from '#lib/utils/gallery-weather.js';
+import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
 
 /**
  * Loads a project into the app's state: the one in the address bar on the
  * project page, or a saved one by its link (behind a dialog on My Projects).
  * Stored locations and weather come first, then the rest from the hash.
+ * Opened from a gallery page (`fromGallery`, its post ID), the weather that
+ * page kept loads when none is saved here.
  */
 export async function loadSavedProject(
   href?: string,
-  { quiet = false }: { quiet?: boolean } = {},
+  {
+    quiet = false,
+    fromGallery = null,
+  }: { quiet?: boolean; fromGallery?: number | null } = {},
 ) {
   const url = new URL(href ?? window.location.href);
+  // Fetched alongside the project's loading, not after it
+  const galleryWeather = fromGallery ? fetchGalleryWeather(fromGallery) : null;
   if (href) {
     project.onLoaded.href = url;
     project.onLoaded.isProject = url.searchParams.has('project');
@@ -51,7 +64,30 @@ export async function loadSavedProject(
 
   await loadProjectFromURL(url.hash.substring(1), { quiet });
 
+  if (galleryWeather && locations.allValid && !weather.rawData.length)
+    await loadGalleryWeather(galleryWeather);
+
   if (locations.allValid) project.status.wasLoaded = true;
+}
+
+/** Loads a gallery page's weather, as ProjectStorage.load() does a saved one */
+async function loadGalleryWeather(
+  galleryWeather: ReturnType<typeof fetchGalleryWeather>,
+) {
+  // A slow gallery leaves the weather to a search rather than hold up the page
+  const page = await Promise.race([
+    galleryWeather,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
+  ]);
+  if (!page) return;
+  const days = galleryWeatherToLoad(page, locations.all);
+  // A search may have started meanwhile
+  if (!days || weather.rawData.length) return;
+  weather.isUserEdited = isCustomGalleryWeather(page.weatherSources);
+  weather.setRawData(
+    days.map((day) => ({ ...day, moon: day.moon || getMoonPhase(day.date) })),
+  );
+  weather.wasLoadedFromStorage = true;
 }
 
 // The saved project last loaded on this page by loadInPlace(), with the

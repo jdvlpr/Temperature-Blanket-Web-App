@@ -56,7 +56,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { loadSavedProject } from '#lib/utils/open-saved-project.js';
   import { upToDate } from '#lib/utils/other-utils.js';
   import {
+    FROM_GALLERY_PARAM,
     GALLERY_PARAM,
+    parseFromGallery,
     parseGalleryRequest,
     type GalleryRequest,
   } from '#lib/utils/gallery-request.js';
@@ -82,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
 
-    await loadSavedProject();
+    await loadSavedProject(undefined, { fromGallery: takeFromGallery() });
   }
 
   // Leaving for another page of the site: a change waiting to save saves now
@@ -150,6 +152,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     url.searchParams.delete(GALLERY_PARAM);
     history.replaceState(history.state, '', url);
     return request;
+  }
+
+  // The gallery page this copy was opened from, once, as for ?gallery=
+  function takeFromGallery() {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(FROM_GALLERY_PARAM)) return null;
+    const postId = parseFromGallery(url.searchParams.get(FROM_GALLERY_PARAM));
+    url.searchParams.delete(FROM_GALLERY_PARAM);
+    history.replaceState(history.state, '', url);
+    return postId;
   }
 
   // Started over after moving a project to the Trash: offer to put it back

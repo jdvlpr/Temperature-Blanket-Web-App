@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { withProjectName } from '#lib/utils/project-name-link.js';
+  import { fromGalleryLink } from '#lib/utils/gallery-request.js';
   import { resolve } from '$app/paths';
   import { browser } from '$app/env';
   import { page } from '$app/state';
@@ -86,9 +87,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   // The name the project was given, if any, shown above its locations
   let projectName = $derived(project?.projectName?.trim() ?? '');
-  // Opens with the name it was given, as a shared link does
+  // Opens with the name it was given, as a shared link does, and the weather
+  // this page kept
   let openHref = $derived(
-    projectURL ? withProjectName(projectURL, projectName) : projectURL,
+    projectURL
+      ? fromGalleryLink(
+          withProjectName(projectURL, projectName),
+          Number(page.params.id),
+        )
+      : projectURL,
   );
   // As text (for the page title and the about dialog)
   let projectTitleNoHTML = $derived(

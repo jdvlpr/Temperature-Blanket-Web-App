@@ -53,3 +53,21 @@ export function parseGalleryRequest(
     return { action: 'replace', postId: Number(value) };
   return null;
 }
+
+// Opening a copy from a gallery page: the page's link plus ?fromGallery=<post
+// ID>, so the planner can load the weather the page kept (gallery-weather.ts).
+// Dropped from the address bar like ?gallery=.
+
+export const FROM_GALLERY_PARAM = 'fromGallery';
+
+/** A gallery page's project link, naming the page it came from. */
+export function fromGalleryLink(href: string, postId: number): string {
+  const url = new URL(href);
+  url.searchParams.set(FROM_GALLERY_PARAM, String(postId));
+  return url.href;
+}
+
+/** The gallery post a link was opened from, or null. */
+export function parseFromGallery(value: string | null | undefined) {
+  return value && /^[1-9]\d{0,15}$/.test(value) ? Number(value) : null;
+}
