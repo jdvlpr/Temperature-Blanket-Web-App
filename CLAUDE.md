@@ -35,6 +35,8 @@ pnpm test:e2e:cloudflare # builds with accounts on, migrates local D1, runs test
 pnpm db:migrate:local    # apply migrations/ to the local D1 database
 ```
 
+`scripts/export-project-palettes.ts --wp <gallery URL> --out <file.json> [--verify]` exports gallery projects' palettes (read-only GraphQL) for the plugin's one-time `wp tempblanket import-palettes`; see its header.
+
 Single unit test file: `pnpm vitest run src/lib/utils/color-utils.test.ts`. Single e2e spec: `pnpm playwright test tests/end-to-end/test-contact.spec.ts`. Playwright's webServer runs `build && preview` itself.
 
 ## Architecture
