@@ -67,6 +67,14 @@ function withoutVersion(url: string) {
   return url.slice(0, queryStart + 1) + params.join('&') + fragment;
 }
 
+/** Projects from 2022 stored www. links, which the plugin refuses; it's the same page. */
+function withoutWww(url: string) {
+  return url.replace(
+    /^https:\/\/www\.temperature-blanket\.com\//,
+    'https://temperature-blanket.com/',
+  );
+}
+
 // projectName is plugin 1.6.0; an older gallery rejects it, so ask without it
 let withName = true;
 async function fetchPage(after: string | null) {
@@ -175,7 +183,7 @@ try {
       rows.push({
         projectId: Number(project.databaseId),
         title: i > 0 ? `${palette.page.title} - ${i + 1}` : palette.page.title,
-        yarnUrl: withoutVersion(link),
+        yarnUrl: withoutVersion(withoutWww(link)),
         date: project.date,
       });
     });
