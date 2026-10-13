@@ -15,6 +15,8 @@
 
 // Gallery pages published from the signed-in account (/api/account/gallery).
 
+import { cleanName } from '#lib/utils/string-utils.js';
+
 export type GalleryPage = {
   postId: number;
   /** The saved project, or for a palette the saved palette */
@@ -90,6 +92,58 @@ export async function setGalleryPageShowOwner(
   if (!response.ok)
     throw new Error(`Changing the gallery page failed: ${response.status}`);
   return response.json();
+}
+
+/** The gallery's longest palette name (MAX_PALETTE_TITLE_LENGTH on the server) */
+export const MAX_GALLERY_PALETTE_NAME_LENGTH = 80;
+
+/**
+ * Whether a palette's gallery page shows another name than the palette has now
+ * (its name, or the fallback when it has none), as the gallery would store it.
+ * A palette's colors never change, so this is the only way it can differ.
+ */
+export const paletteNameDiffers = (label: string, page: GalleryPage) =>
+  cleanName(label, MAX_GALLERY_PALETTE_NAME_LENGTH) !== page.title;
+
+export type RenameGalleryPageResult =
+  | { status: 'renamed'; title: string }
+  /** The gallery plugin can't rename yet: publish a new version instead */
+  | { status: 'unsupported' }
+  | { status: 'error'; message: string };
+
+/** Renames one of the account's palette pages in place, keeping its link. */
+export async function renameGalleryPage(
+  postId: number,
+  title: string,
+): Promise<RenameGalleryPageResult> {
+  let response: Response;
+  try {
+    response = await fetch(`${PATH}/${postId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    });
+  } catch {
+    return { status: 'error', message: 'Check your connection and try again.' };
+  }
+  const data = await response.json().catch(() => null);
+  if (response.ok && typeof data?.title === 'string')
+    return { status: 'renamed', title: data.title };
+  if (response.status === 501 && data?.code === 'RENAME_UNSUPPORTED')
+    return { status: 'unsupported' };
+  if (response.status === 401)
+    return { status: 'error', message: 'Sign in again, then try again.' };
+  if (response.status === 404)
+    return {
+      status: 'error',
+      message: 'Its gallery page is gone. Refresh My Projects to see it.',
+    };
+  if (response.status === 400 && typeof data?.message === 'string')
+    return { status: 'error', message: data.message };
+  return {
+    status: 'error',
+    message: 'The gallery couldn’t be reached. Try again later.',
+  };
 }
 
 export async function removeGalleryPage(postId: number) {

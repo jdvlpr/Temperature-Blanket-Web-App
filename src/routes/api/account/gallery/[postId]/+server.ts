@@ -14,8 +14,9 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // One of the signed-in user's gallery pages: include it on their public gallery
-// or take it off (PATCH { showOwner }), or remove it (DELETE: WordPress moves it
-// to the trash).
+// or take it off (PATCH { showOwner }), rename a palette's in place (PATCH
+// { title }; 501 RENAME_UNSUPPORTED with an older gallery plugin), or remove it
+// (DELETE: WordPress moves it to the trash).
 
 import type { RequestHandler } from './$types';
 
@@ -28,7 +29,7 @@ function postIdFrom(param: string) {
 }
 
 export const PATCH: RequestHandler = async (event) => {
-  const { requireGallery, galleryError } =
+  const { requireGallery, galleryError, renamePaletteFromAccount } =
     await import('#lib/server/gallery/index.js');
   const { setPostShowOwner, getSettings } =
     await import('#lib/server/gallery/store.js');
@@ -37,6 +38,8 @@ export const PATCH: RequestHandler = async (event) => {
 
   const postId = postIdFrom(event.params.postId);
   const body = await event.request.json().catch(() => null);
+  if (postId && body && 'title' in body)
+    return renamePaletteFromAccount(gallery, postId, body.title);
   if (!postId || typeof body?.showOwner !== 'boolean')
     return galleryError(400, 'INVALID_REQUEST', 'Nothing to change');
   // Only in the app: WordPress never has the owner's name, so there's nothing to tell it

@@ -10,7 +10,9 @@ import {
   ownerPage,
   PUBLIC_ID_PATTERN,
   ownsPost,
+  postKind,
   recordPost,
+  renamePost,
   setPostShowOwner,
   updateSettings,
 } from './store';
@@ -167,5 +169,27 @@ describe('gallery store', () => {
     expect(
       sqlite.prepare(`select count(*) as n from "galleryPost"`).get(),
     ).toEqual({ n: 0 });
+  });
+});
+
+describe('renaming a palette page', () => {
+  it("renames only the user's own palette pages", async () => {
+    const { d1 } = setup();
+    await recordPost(d1, 'u1', { ...post(1), kind: 'palette' });
+    await recordPost(d1, 'u1', post(2));
+    expect(await postKind(d1, 'u1', 1)).toBe('palette');
+    expect(await postKind(d1, 'u1', 2)).toBe('project');
+    expect(await postKind(d1, 'u2', 1)).toBeNull();
+
+    expect(await renamePost(d1, 'u2', 1, 'Theirs')).toBe(false);
+    expect(await renamePost(d1, 'u1', 2, 'A project')).toBe(false);
+    expect(await renamePost(d1, 'u1', 1, 'Renamed')).toBe(true);
+    const titles = (await listPosts(d1, 'u1')).map((p) => [p.postId, p.title]);
+    expect(titles).toEqual(
+      expect.arrayContaining([
+        [1, 'Renamed'],
+        [2, 'Project 2'],
+      ]),
+    );
   });
 });

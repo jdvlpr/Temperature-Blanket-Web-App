@@ -15,7 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Publishes a saved palette to the Yarn Palette Gallery, from My Projects
 while signed in: a snapshot of it as it is now, linked to the account. As a
-new version of a published one, it asks whether to remove the old page. -->
+new version of a published one, it asks whether to remove the old page. With
+`rename`, it renames the published page in place instead (its link stays),
+falling back to a new version when the gallery can't rename yet. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -24,16 +26,22 @@ new version of a published one, it asks whether to remove the old page. -->
     GALLERY_PAGES_CHANGED,
     getGalleryPages,
     removeGalleryPage,
+    renameGalleryPage,
     sharePalette,
   } from '#lib/accounts/gallery.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import UnpublishVersions from '#lib/components/account/UnpublishVersions.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import { getYarnPageURL } from '#lib/utils/color-utils.js';
   import { cleanName } from '#lib/utils/string-utils.js';
-  import { CheckIcon, LoaderCircleIcon, SendIcon } from '@lucide/svelte';
+  import {
+    CheckIcon,
+    LoaderCircleIcon,
+    PencilIcon,
+    SendIcon,
+  } from '@lucide/svelte';
 
   // The gallery's limit (MAX_PALETTE_TITLE_LENGTH on the server)
   const MAX_NAME_LENGTH = 80;
@@ -44,6 +52,7 @@ new version of a published one, it asks whether to remove the old page. -->
     name: savedName,
     showOwner: chosenShowOwner,
     versions = [],
+    rename,
   }: {
     paletteId: string;
     colors: Color[];
@@ -52,7 +61,14 @@ new version of a published one, it asks whether to remove the old page. -->
     showOwner?: boolean;
     /** Publishing a new version: the versions there now, newest first */
     versions?: { postId: number; publishedAt: number; link?: string | null }[];
+    /** Renaming this published page in place (its name differs from the palette's) */
+    rename?: { postId: number; title: string };
   } = $props();
+
+  // Renaming, until the gallery says it can't (an older plugin): then it
+  // publishes a new version with the name instead
+  let renaming = $state(Boolean(untrack(() => rename)));
+  let renamed = $state(false);
 
   // Its versions to unpublish once the new one is in (the latest, at first)
   // svelte-ignore state_referenced_locally
@@ -104,6 +120,20 @@ new version of a published one, it asks whether to remove the old page. -->
     if (!title || busy) return;
     busy = true;
     errorMessage = '';
+    if (renaming && rename) {
+      const result = await renameGalleryPage(rename.postId, title);
+      busy = false;
+      if (result.status === 'renamed') {
+        renamed = shared = true;
+        postId = rename.postId;
+        window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+      } else if (result.status === 'unsupported') {
+        renaming = false;
+        errorMessage =
+          'The gallery can’t rename pages yet. Publish a new version with this name instead.';
+      } else errorMessage = result.message;
+      return;
+    }
     const share = () =>
       sharePalette({
         paletteId,
@@ -152,8 +182,12 @@ new version of a published one, it asks whether to remove the old page. -->
   {#if shared}
     <div class="flex flex-col items-center gap-2 text-center" role="status">
       <CheckIcon class="text-success-700-300 size-8" />
-      <p class="font-bold">Published</p>
-      {#if replacePostId && oldRemoved !== null}
+      <p class="font-bold">{renamed ? 'Renamed' : 'Published'}</p>
+      {#if renamed}
+        <p class="text-sm">
+          Its gallery page has the new name. Its link stays the same.
+        </p>
+      {:else if replacePostId && oldRemoved !== null}
         {@const count = (oldRemoved ? 1 : 0) + extrasRemoved}
         <p class="text-sm">
           {#if count}
@@ -190,7 +224,9 @@ new version of a published one, it asks whether to remove the old page. -->
         />
       </label>
       <p>
-        {#if versions.length}
+        {#if renaming}
+          Changes the name on its gallery page. Its link stays the same.
+        {:else if versions.length}
           Publishes a new version of this palette, as it is now.
         {:else}
           Publishes a snapshot of this palette, with this name and its colors,
@@ -202,18 +238,20 @@ new version of a published one, it asks whether to remove the old page. -->
           >.
         {/if}
       </p>
-      {#if versions.length}
+      {#if versions.length && !renaming}
         <UnpublishVersions
           {versions}
           bind:selected={unpublishIds}
           disabled={busy}
         />
       {/if}
-      <ShowOwnerToggle
-        bind:checked={showOwner}
-        name={ownerName}
-        disabled={busy}
-      />
+      {#if !renaming}
+        <ShowOwnerToggle
+          bind:checked={showOwner}
+          name={ownerName}
+          disabled={busy}
+        />
+      {/if}
       {#if errorMessage}
         <p class="text-error-700-300" role="alert">{errorMessage}</p>
       {/if}
@@ -222,9 +260,14 @@ new version of a published one, it asks whether to remove the old page. -->
         class="btn preset-filled-primary-500 w-full sm:w-fit"
         disabled={busy || !cleanName(name, MAX_NAME_LENGTH)}
       >
-        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
-          />{/if}
-        {versions.length ? 'Publish New Version' : 'Publish'}
+        {#if busy}<LoaderCircleIcon
+            class="animate-spin"
+          />{:else if renaming}<PencilIcon />{:else}<SendIcon />{/if}
+        {renaming
+          ? 'Update Gallery Name'
+          : versions.length
+            ? 'Publish New Version'
+            : 'Publish'}
       </button>
     </form>
   {/if}

@@ -25,6 +25,8 @@ import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import {
   countPalettesSince,
+  postKind,
+  renamePost,
   ensurePublicId,
   forgetPost,
   getSettings,
@@ -256,6 +258,56 @@ export async function publishPaletteFromAccount(
     return json({ ...response, linked: true });
   }
   return json(response);
+}
+
+/**
+ * Renames one of this user's palette pages in place, keeping its link (gallery
+ * plugin 1.7.0). 501 RENAME_UNSUPPORTED when the gallery's plugin is older, so the
+ * app can publish it again with the new name instead.
+ */
+export async function renamePaletteFromAccount(
+  gallery: GalleryContext,
+  postId: number,
+  title: unknown,
+): Promise<Response> {
+  const name = cleanName(title, MAX_PALETTE_TITLE_LENGTH);
+  if (!name)
+    return galleryError(400, 'INVALID_REQUEST', 'A palette needs a name');
+  // Ownership from the session, checked here before WordPress checks it again
+  if ((await postKind(gallery.db, gallery.userId, postId)) !== 'palette')
+    return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+
+  let result;
+  try {
+    result = await gallery.api.renamePalette(postId, name, gallery.userId);
+  } catch (e) {
+    console.error('Could not rename gallery page', e);
+    return galleryError(
+      502,
+      'GALLERY_UNAVAILABLE',
+      'The gallery couldn’t be reached. Try again later.',
+    );
+  }
+  if (result.status === 'unsupported')
+    return galleryError(
+      501,
+      'RENAME_UNSUPPORTED',
+      'The gallery can’t rename pages yet',
+    );
+  if (result.status === 'gone')
+    return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+  if (result.status === 'refused')
+    return galleryError(
+      400,
+      'INVALID_REQUEST',
+      result.message || 'That name can’t be used',
+    );
+
+  await renamePost(gallery.db, gallery.userId, postId, result.title);
+  return json(
+    { title: result.title },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
 }
 
 /**

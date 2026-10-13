@@ -18,7 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Projects. Not published: Publish to Gallery. Published: a menu with each
   version (gallery page), newest first. Each opens its own options, as in the
   Gallery dialog's list: View Gallery Page, Show my name, and Unpublish (it
-  asks first, under the row). Then Publish New Version once it has changed. A
+  asks first, under the row). Then Publish New Version once a project has
+  changed, or for a palette (whose colors never change) Update Gallery Name
+  once its name differs from its page's, renaming the page in place. A
   gallery page is a snapshot from when it was published. Its link is a copy,
   always shareable, so it isn't a setting here: Copy Link comes in as
   `children`, first on the row.
@@ -49,6 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ExternalLinkIcon,
     GlobeIcon,
     LoaderCircleIcon,
+    PencilIcon,
     SendIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
@@ -69,11 +72,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label: string;
     /** Its gallery page (the newest), if it has one */
     page?: GalleryPage;
-    /** Whether it changed after its newest gallery page was made */
+    /** Whether it changed after its newest gallery page was made (a palette: its name differs) */
     changedSince?: boolean;
     /** Publishes it (the dialog asks about the account's name) */
     onadd: () => void;
-    /** Publishes a new version after this page (the dialog asks which to unpublish) */
+    /** A project: publishes a new version after this page (the dialog asks which
+     * to unpublish). A palette: renames this page */
     onupdate: (page: GalleryPage) => void;
     /** First on the row, e.g. Copy Link */
     children?: Snippet;
@@ -293,14 +297,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {...attributes}
                         {@attach onChoose(() => page && onupdate(page))}
                       >
-                        <SendIcon class="shrink-0" aria-hidden="true" />
-                        <span class="flex min-w-0 flex-1 flex-col">
-                          <span>Publish New Version…</span>
-                          <span class="text-surface-700-300 text-xs"
-                            >As it is now. You choose which versions to
-                            unpublish.</span
-                          >
-                        </span>
+                        {#if kind === 'palette'}
+                          <PencilIcon class="shrink-0" aria-hidden="true" />
+                          <span class="flex min-w-0 flex-1 flex-col">
+                            <span>Update Gallery Name…</span>
+                            <span class="text-surface-700-300 text-xs"
+                              >To “{label}”. Its link stays the same.</span
+                            >
+                          </span>
+                        {:else}
+                          <SendIcon class="shrink-0" aria-hidden="true" />
+                          <span class="flex min-w-0 flex-1 flex-col">
+                            <span>Publish New Version…</span>
+                            <span class="text-surface-700-300 text-xs"
+                              >As it is now. You choose which versions to
+                              unpublish.</span
+                            >
+                          </span>
+                        {/if}
                       </div>
                     {/snippet}
                   </Menu.Item>
@@ -317,19 +331,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if page && changedSince && canAdd && confirming === null}
       <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span class="opacity-70"
-          >Changed since it was published on {publishedOn(
-            page.publishedAt,
-          )}.</span
-        >
-        <button
-          type="button"
-          class="btn btn-sm preset-tonal-surface"
-          onclick={() => page && onupdate(page)}
-          disabled={busy}
-          aria-label="Publish a new version of {label}"
-          ><SendIcon class="icon-sm" />Publish New Version</button
-        >
+        {#if kind === 'palette'}
+          <span class="opacity-70"
+            >Its gallery page is named “{page.title}”.</span
+          >
+          <button
+            type="button"
+            class="btn btn-sm preset-tonal-surface"
+            onclick={() => page && onupdate(page)}
+            disabled={busy}
+            aria-label="Update Gallery Name: {label}"
+            ><PencilIcon class="icon-sm" />Update Gallery Name</button
+          >
+        {:else}
+          <span class="opacity-70"
+            >Changed since it was published on {publishedOn(
+              page.publishedAt,
+            )}.</span
+          >
+          <button
+            type="button"
+            class="btn btn-sm preset-tonal-surface"
+            onclick={() => page && onupdate(page)}
+            disabled={busy}
+            aria-label="Publish a new version of {label}"
+            ><SendIcon class="icon-sm" />Publish New Version</button
+          >
+        {/if}
       </div>
     {/if}
 

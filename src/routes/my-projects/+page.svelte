@@ -53,7 +53,10 @@ published to the gallery as a snapshot, with the account's name or without. -->
     Trash2Icon,
   } from '@lucide/svelte';
   import type { Color } from '#lib/types/yarn-types.js';
-  import type { GalleryPage } from '#lib/accounts/gallery.js';
+  import {
+    paletteNameDiffers,
+    type GalleryPage,
+  } from '#lib/accounts/gallery.js';
 
   let trashedProjectCount = $state(0);
   let trashCount = $derived(trashedProjectCount + savedPalettes.deleted.length);
@@ -79,8 +82,9 @@ published to the gallery as a snapshot, with the account's name or without. -->
     palette: { id: string },
     colors: Color[],
     label: string,
-    options: { replace?: GalleryPage } = {},
+    options: { replace?: GalleryPage; rename?: GalleryPage } = {},
   ) {
+    const old = options.rename ?? options.replace;
     dialog.trigger({
       type: 'component',
       component: {
@@ -89,14 +93,19 @@ published to the gallery as a snapshot, with the account's name or without. -->
           paletteId: palette.id,
           colors,
           name: label,
-          showOwner: options.replace?.showOwner,
-          versions: options.replace
-            ? galleryPages.pagesLike(options.replace)
-            : undefined,
+          showOwner: old?.showOwner,
+          // Kept for renaming too: an older gallery plugin can't rename, so
+          // it falls back to a new version
+          versions: old ? galleryPages.pagesLike(old) : undefined,
+          rename: options.rename,
         },
       },
       options: {
-        title: options.replace ? 'Publish New Version' : 'Publish to Gallery',
+        title: options.rename
+          ? 'Update Gallery Name'
+          : options.replace
+            ? 'Publish New Version'
+            : 'Publish to Gallery',
       },
     });
   }
@@ -250,11 +259,11 @@ published to the gallery as a snapshot, with the account's name or without. -->
                   {label}
                   {page}
                   changedSince={Boolean(
-                    page && palette.updatedAt > page.publishedAt,
+                    page && paletteNameDiffers(label, page),
                   )}
                   onadd={() => sharePalette(palette, colors, label)}
                   onupdate={(old) =>
-                    sharePalette(palette, colors, label, { replace: old })}
+                    sharePalette(palette, colors, label, { rename: old })}
                 />
               {/if}
             {/snippet}

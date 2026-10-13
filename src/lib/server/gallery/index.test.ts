@@ -7,6 +7,7 @@ import {
   publishFromAccount,
   publishPaletteFromAccount,
   releaseGalleryPosts,
+  renamePaletteFromAccount,
   type GalleryContext,
 } from './index';
 import {
@@ -353,5 +354,88 @@ describe('sharing a palette', () => {
     );
     expect(response.status).toBe(429);
     expect(calls).toHaveLength(0);
+  });
+});
+
+describe('renaming a palette page', () => {
+  async function withPages(answer: (call: Call) => Response) {
+    const ctx = await setup(answer);
+    await recordPost(ctx.d1, 'u1', {
+      postId: 7,
+      projectId: 'pal1',
+      title: 'Old name',
+      publishedAt: 1,
+      kind: 'palette',
+    });
+    await recordPost(ctx.d1, 'u1', {
+      postId: 8,
+      projectId: 'p1',
+      title: 'A project',
+      publishedAt: 2,
+    });
+    return ctx;
+  }
+  const titleOf = async (d1: GalleryContext['db'], postId: number) =>
+    (await listPosts(d1, 'u1')).find((p) => p.postId === postId)?.title;
+
+  it('renames it as the user, with a cleaned name, and records it', async () => {
+    const { gallery, calls, d1 } = await withPages(() =>
+      answered({ code: 200, id: 7, title: 'New name' }),
+    );
+    const response = await renamePaletteFromAccount(
+      gallery,
+      7,
+      '  New\u200b   name ',
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ title: 'New name' });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe(
+      'https://wp.example/wp-json/tbgalleryapi/v1/palette/7/title',
+    );
+    expect(calls[0].headers['Project-Owner-Id']).toBe('u1');
+    expect(JSON.parse(calls[0].body)).toEqual({ title: 'New name' });
+    expect(await titleOf(d1, 7)).toBe('New name');
+  });
+
+  it("refuses someone else's page, a project page, or no name, without asking WordPress", async () => {
+    const { gallery, calls } = await withPages(() => answered({ code: 200 }));
+    expect((await renamePaletteFromAccount(gallery, 99, 'x')).status).toBe(404);
+    expect((await renamePaletteFromAccount(gallery, 8, 'x')).status).toBe(404);
+    expect(
+      (await renamePaletteFromAccount(gallery, 7, ' \u200b ')).status,
+    ).toBe(400);
+    expect((await renamePaletteFromAccount(gallery, 7, 42)).status).toBe(400);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('tells an older gallery plugin (no route) from a missing palette', async () => {
+    const older = await withPages(() =>
+      answered(
+        { code: 'rest_no_route', message: 'No route' } as PublishResponse,
+        404,
+      ),
+    );
+    const response = await renamePaletteFromAccount(older.gallery, 7, 'New');
+    expect(response.status).toBe(501);
+    expect((await response.json()).code).toBe('RENAME_UNSUPPORTED');
+    expect(await titleOf(older.d1, 7)).toBe('Old name');
+
+    const missing = await withPages(() =>
+      answered({ code: 404, message: 'No such palette.' }, 404),
+    );
+    expect(
+      (await renamePaletteFromAccount(missing.gallery, 7, 'New')).status,
+    ).toBe(404);
+    expect(await titleOf(missing.d1, 7)).toBe('Old name');
+  });
+
+  it('says the gallery is unavailable when WordPress fails', async () => {
+    const { gallery } = await withPages(
+      () => new Response('oops', { status: 500 }),
+    );
+    expect((await renamePaletteFromAccount(gallery, 7, 'New')).status).toBe(
+      502,
+    );
   });
 });

@@ -108,6 +108,37 @@ export async function setPostShowOwner(
   return true;
 }
 
+/** What kind of page this is, when this user published it from their account. */
+export async function postKind(
+  db: D1Database,
+  userId: string,
+  postId: number,
+): Promise<GalleryPostKind | null> {
+  const row = await db
+    .prepare(
+      `select "kind" from "galleryPost" where "postId" = ? and "userId" = ?`,
+    )
+    .bind(postId, userId)
+    .first<{ kind: GalleryPostKind }>();
+  return row?.kind ?? null;
+}
+
+/** Records a palette page's new name. False when the user has no such palette page. */
+export async function renamePost(
+  db: D1Database,
+  userId: string,
+  postId: number,
+  title: string,
+): Promise<boolean> {
+  const { meta } = await db
+    .prepare(
+      `update "galleryPost" set "title" = ? where "postId" = ? and "userId" = ? and "kind" = 'palette'`,
+    )
+    .bind(title, postId, userId)
+    .run();
+  return meta.changes > 0;
+}
+
 /** Whether this user published this page from their account. */
 export async function ownsPost(
   db: D1Database,

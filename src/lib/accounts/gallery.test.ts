@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { groupGalleryPages, type GalleryPage } from './gallery';
+import {
+  groupGalleryPages,
+  paletteNameDiffers,
+  type GalleryPage,
+} from './gallery';
 
 const page = (
   postId: number,
@@ -60,5 +64,27 @@ describe('groupGalleryPages', () => {
     );
     expect(byProject.get('a')?.postId).toBe(2);
     expect(others).toEqual([]);
+  });
+});
+
+describe('paletteNameDiffers', () => {
+  const page = (title: string): GalleryPage => ({
+    postId: 1,
+    projectId: 'pal1',
+    title,
+    publishedAt: 1,
+    kind: 'palette',
+  });
+
+  it('compares names as the gallery stores them, not when it was saved', () => {
+    // Restoring from the Trash changes updatedAt, never the name
+    expect(paletteNameDiffers('Autumn', page('Autumn'))).toBe(false);
+    expect(paletteNameDiffers('  Autumn\u200b ', page('Autumn'))).toBe(false);
+    expect(paletteNameDiffers('Autumn Mix', page('Autumn'))).toBe(true);
+  });
+
+  it('cuts the name to the gallery’s 80 characters first', () => {
+    const long = 'x'.repeat(100);
+    expect(paletteNameDiffers(long, page('x'.repeat(80)))).toBe(false);
   });
 });

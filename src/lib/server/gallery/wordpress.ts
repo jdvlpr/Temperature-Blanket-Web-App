@@ -64,6 +64,45 @@ export function galleryApi({ baseUrl, key, fetch }: GalleryApiConfig) {
     },
 
     /**
+     * Renames the owner's palette page in place (gallery plugin 1.7.0), keeping its
+     * link. 'gone' when WordPress has no such palette for this owner; 'unsupported'
+     * when the plugin is older and has no rename route, so the app can republish
+     * instead. Other refusals (an unusable name) come back as WordPress's answer.
+     */
+    async renamePalette(
+      postId: number,
+      title: string,
+      ownerId: string,
+    ): Promise<
+      | { status: 'renamed'; title: string }
+      | { status: 'gone' }
+      | { status: 'unsupported' }
+      | { status: 'refused'; message: string }
+    > {
+      const response = await post(
+        `/palette/${postId}/title`,
+        JSON.stringify({ title }),
+        ownerId,
+      );
+      const body = (await response.json().catch(() => null)) as {
+        code?: number | string;
+        message?: string;
+        title?: string;
+      } | null;
+      if (response.ok && Number(body?.code) === 200)
+        return { status: 'renamed', title: String(body?.title ?? title) };
+      // The plugin's own "no such palette" has code 404; an older plugin's
+      // missing route answers rest_no_route
+      if (response.status === 404)
+        return body?.code === 'rest_no_route'
+          ? { status: 'unsupported' }
+          : { status: 'gone' };
+      if (response.status === 400)
+        return { status: 'refused', message: String(body?.message ?? '') };
+      throw new Error(`Gallery rename failed: ${response.status}`);
+    },
+
+    /**
      * Moves the owner's page (a project or a palette) to the trash. 'gone' when WordPress has no such page
      * for this owner (already removed by hand, say), so the app can forget it.
      */
