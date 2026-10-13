@@ -16,9 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A saved project's or palette's place in the gallery, on its row in My
   Projects. Not published: Publish to Gallery. Published: a menu to view its
-  page, show the account's name on it or not, update its snapshot, or
-  unpublish it. A gallery page is a snapshot from when it was published, so
-  once the project changes it offers to update it. (Its link is a copy, always
+  page, show the account's name on it or not, publish a new version (the
+  dialog asks whether to remove the old page), or unpublish it. A gallery page
+  is a snapshot from when it was published, so once the project changes it
+  offers a new version. (Its link is a copy, always
   shareable, so it isn't a setting here: Copy Link comes in as `children`,
   first on the row.)
 -->
@@ -40,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ExternalLinkIcon,
     GlobeIcon,
     LoaderCircleIcon,
-    RefreshCwIcon,
     SendIcon,
     UserIcon,
   } from '@lucide/svelte';
@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changedSince?: boolean;
     /** Publishes it (the dialog asks about the account's name) */
     onadd: () => void;
-    /** Replaces its gallery page with a snapshot of how it is now */
+    /** Publishes a new version after this page (the dialog asks whether to remove it) */
     onupdate: (page: GalleryPage) => void;
     /** First on the row, e.g. Copy Link */
     children?: Snippet;
@@ -230,11 +230,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </Menu.OptionItem>
                 {#if changedSince && canAdd}
                   <Menu.Item value="update" class={menuItemClass}>
-                    <RefreshCwIcon class="shrink-0" aria-hidden="true" />
+                    <SendIcon class="shrink-0" aria-hidden="true" />
                     <span class="flex min-w-0 flex-1 flex-col">
-                      <span>Update Snapshot</span>
+                      <span>Publish New Version…</span>
                       <span class="text-surface-700-300 text-xs"
-                        >Publish it as it is now, in place of the old page</span
+                        >As it is now. You choose whether to remove the old
+                        page.</span
                       >
                     </span>
                   </Menu.Item>
@@ -262,7 +263,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if page && changedSince && canAdd && !confirming}
       <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span class="opacity-70"
-          >Changed since. The gallery shows the snapshot from {publishedOn(
+          >Changed since it was published on {publishedOn(
             page.publishedAt,
           )}.</span
         >
@@ -271,8 +272,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn btn-sm preset-tonal-surface"
           onclick={() => page && onupdate(page)}
           disabled={busy}
-          aria-label="Update the snapshot of {label}"
-          ><RefreshCwIcon class="icon-sm" />Update Snapshot</button
+          aria-label="Publish a new version of {label}"
+          ><SendIcon class="icon-sm" />Publish New Version</button
         >
       </div>
     {/if}

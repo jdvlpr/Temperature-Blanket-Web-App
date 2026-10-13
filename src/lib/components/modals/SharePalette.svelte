@@ -14,7 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Publishes a saved palette to the Yarn Palette Gallery, from My Projects
-while signed in: a snapshot of it as it is now, linked to the account. -->
+while signed in: a snapshot of it as it is now, linked to the account. As a
+new version of a published one, it asks whether to remove the old page. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -27,6 +28,7 @@ while signed in: a snapshot of it as it is now, linked to the account. -->
   } from '#lib/accounts/gallery.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import { onMount } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import { getYarnPageURL } from '#lib/utils/color-utils.js';
@@ -41,16 +43,20 @@ while signed in: a snapshot of it as it is now, linked to the account. -->
     colors,
     name: savedName,
     showOwner: chosenShowOwner,
-    replacePostId,
+    replacePostId: oldPostId,
   }: {
     paletteId: string;
     colors: Color[];
     name: string;
     /** Chosen already on My Projects: with or without the account's name */
     showOwner?: boolean;
-    /** Its old gallery page, removed once this one is in */
+    /** Its old gallery page, removed once this one is in (if chosen) */
     replacePostId?: number;
   } = $props();
+
+  // Whether the new version takes the old page's place, or both stay
+  let replaceOld = $state(true);
+  let replacePostId = $derived(oldPostId && replaceOld ? oldPostId : undefined);
 
   // svelte-ignore state_referenced_locally
   let name = $state(cleanName(savedName, MAX_NAME_LENGTH));
@@ -128,13 +134,12 @@ while signed in: a snapshot of it as it is now, linked to the account. -->
   {#if shared}
     <div class="flex flex-col items-center gap-2 text-center" role="status">
       <CheckIcon class="text-success-700-300 size-8" />
-      <p class="font-bold">
-        {replacePostId ? 'Snapshot updated' : 'Published'}
-      </p>
-      {#if replacePostId && !oldRemoved}
+      <p class="font-bold">Published</p>
+      {#if replacePostId && oldRemoved !== null}
         <p class="text-sm">
-          The old snapshot couldn’t be removed. You can unpublish it from My
-          Projects, under Other gallery pages.
+          {oldRemoved
+            ? 'The old page was removed.'
+            : 'The old page couldn’t be removed. You can unpublish it from My Projects, under Other gallery pages.'}
         </p>
       {/if}
       {#if postId}
@@ -160,9 +165,8 @@ while signed in: a snapshot of it as it is now, linked to the account. -->
         />
       </label>
       <p>
-        {#if replacePostId}
-          Publishes a snapshot of this palette as it is now, in place of its old
-          page. The new page has a new link, and its views start over.
+        {#if oldPostId}
+          Publishes a new version of this palette, as it is now.
         {:else}
           Publishes a snapshot of this palette, with this name and its colors,
           to the public
@@ -173,6 +177,19 @@ while signed in: a snapshot of it as it is now, linked to the account. -->
           >.
         {/if}
       </p>
+      {#if oldPostId}
+        <div class="bg-surface-100-900 rounded-container flex flex-col">
+          <ToggleSwitch
+            bare
+            label="Remove the old page"
+            details={replaceOld
+              ? 'Its link stops working, and its views are lost.'
+              : 'Both pages stay in the gallery.'}
+            bind:checked={replaceOld}
+            disabled={busy}
+          />
+        </div>
+      {/if}
       <ShowOwnerToggle
         bind:checked={showOwner}
         name={ownerName}
@@ -188,7 +205,7 @@ while signed in: a snapshot of it as it is now, linked to the account. -->
       >
         {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
           />{/if}
-        {replacePostId ? 'Update Snapshot' : 'Publish'}
+        {oldPostId ? 'Publish New Version' : 'Publish'}
       </button>
     </form>
   {/if}

@@ -93,7 +93,7 @@ published to the gallery as a snapshot, with the account's name or without. -->
         },
       },
       options: {
-        title: options.replace ? 'Update Snapshot' : 'Publish to Gallery',
+        title: options.replace ? 'Publish New Version' : 'Publish to Gallery',
       },
     });
   }

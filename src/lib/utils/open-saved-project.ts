@@ -161,7 +161,9 @@ export async function openGalleryDialog(href: string, request: GalleryRequest) {
     component: { ref: AddToGallery, props: { request, href } },
     options: {
       title:
-        request.action === 'replace' ? 'Update Snapshot' : 'Publish to Gallery',
+        request.action === 'replace'
+          ? 'Publish New Version'
+          : 'Publish to Gallery',
     },
   });
 }

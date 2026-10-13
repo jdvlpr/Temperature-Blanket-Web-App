@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 it is now. It shows the project as its gallery card will (preview, name,
 place and dates, and "By" with the account's name), then publishes it in place
 and links to the new page. A project already published shows its page first,
-with Update Snapshot for the account's own pages and Publish Again for
-others. From My Projects, the saved project loads behind the dialog first
-(with its weather, when that isn't kept with it). -->
+with Publish New Version (choosing whether its old page is removed) and, for
+the account's own pages, Unpublish. From My Projects, the saved project loads
+behind the dialog first (with its weather, when that isn't kept with it). -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -27,6 +27,7 @@ others. From My Projects, the saved project loads behind the dialog first
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -50,7 +51,7 @@ others. From My Projects, the saved project loads behind the dialog first
     ExternalLinkIcon,
     LinkIcon,
     LoaderCircleIcon,
-    RefreshCwIcon,
+    EyeOffIcon,
     SendIcon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
@@ -151,14 +152,18 @@ others. From My Projects, the saved project loads behind the dialog first
   let showOwner = $state(false);
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
-  // The page this one replaces, once it's known to be the account's
-  let replacePostId = $state<number | undefined>();
-  // The account's newest page of this project, which Update replaces
-  let accountPage = $state<{
-    postId: number;
-    showOwner?: boolean;
-    publishedAt: number;
-  } | null>(null);
+  type OwnPage = { postId: number; showOwner?: boolean; publishedAt: number };
+  // The account's page a new version is published after, once it's known
+  let oldPage = $state<OwnPage | null>(null);
+  // Whether the new version takes the old page's place, or both stay
+  let removeOld = $state(true);
+  let replacePostId = $derived(
+    oldPage && removeOld ? oldPage.postId : undefined,
+  );
+  // The account's newest page of this project
+  let accountPage = $state<OwnPage | null>(null);
+  // All of the account's pages of this project, which Unpublish removes
+  let ownPostIds = $state<number[]>([]);
 
   // The page it has already: the account's, or one sent since the page opened
   const existingHref = $derived(
@@ -177,18 +182,24 @@ others. From My Projects, the saved project loads behind the dialog first
   );
 
   // Already published (and not asked from My Projects for a new one), until
-  // Update Snapshot or Publish Again is chosen
+  // Publish New Version is chosen
   let showExisting = $state(true);
+  // Unpublish: asking first, then taken off
+  let confirmingRemove = $state(false);
+  let removed = $state(false);
+  let removeError = $state('');
   const view = $derived(
     preparing
       ? 'preparing'
       : sent
         ? 'sent'
-        : !accountChecked
-          ? 'checking'
-          : existingHref && showExisting && !request
-            ? 'existing'
-            : 'form',
+        : removed
+          ? 'removed'
+          : !accountChecked
+            ? 'checking'
+            : existingHref && showExisting && !request
+              ? 'existing'
+              : 'form',
   );
 
   onMount(async () => {
@@ -214,7 +225,7 @@ others. From My Projects, the saved project loads behind the dialog first
     if (request?.action === 'replace') {
       const old = gallery.posts.find((post) => post.postId === request.postId);
       if (old) {
-        replacePostId = old.postId;
+        oldPage = old;
         showOwner = old.showOwner ?? showOwner;
       }
     }
@@ -222,31 +233,56 @@ others. From My Projects, the saved project loads behind the dialog first
       .filter(
         (post) => post.projectId === project.id && post.kind !== 'palette',
       )
-      .sort((a, b) => b.publishedAt - a.publishedAt)[0];
-    if (own)
+      .sort((a, b) => b.publishedAt - a.publishedAt);
+    ownPostIds = own.map((post) => post.postId);
+    if (own[0])
       accountPage = {
-        postId: own.postId,
-        showOwner: own.showOwner,
-        publishedAt: own.publishedAt,
+        postId: own[0].postId,
+        showOwner: own[0].showOwner,
+        publishedAt: own[0].publishedAt,
       };
     if (typeof gallery.name === 'string') serverName = gallery.name;
     fromAccount = true;
   }
 
-  // Update Snapshot: a new page of the project as it is now, in place of the
-  // old one, showing the name or not as the old one did
-  function update() {
-    if (!accountPage) return;
-    replacePostId = accountPage.postId;
-    showOwner = accountPage.showOwner ?? showOwner;
+  // Publish New Version: the project as it is now. After the account's own
+  // page it asks whether to remove that one, and shows the name as it did.
+  function publishNew() {
+    if (accountPage) {
+      oldPage = accountPage;
+      showOwner = accountPage.showOwner ?? showOwner;
+    }
     showExisting = false;
-    void submit();
   }
 
-  // Publish Again (a page that isn't the account's): another page beside it
-  function publishAgain() {
-    replacePostId = undefined;
-    showExisting = false;
+  // Unpublish: every one of the account's pages of this project, so an older
+  // one doesn't take the newest's place
+  async function unpublish() {
+    if (!ownPostIds.length || busy) return;
+    busy = true;
+    removeError = '';
+    const { removeGalleryPage, GALLERY_PAGES_CHANGED } =
+      await import('#lib/accounts/gallery.js');
+    const results = await Promise.allSettled(
+      ownPostIds.map((postId) => removeGalleryPage(postId)),
+    );
+    window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+    busy = false;
+    if (results.some((result) => result.status === 'rejected')) {
+      removeError =
+        'Not all of its gallery pages could be removed. Try again, or remove them from My Projects.';
+      ownPostIds = ownPostIds.filter(
+        (_, i) => results[i].status === 'rejected',
+      );
+      return;
+    }
+    // The Project menu offers Publish to Gallery again
+    const ids = new Set(ownPostIds.map(String));
+    if (ids.has(project.gallery.href?.split('/').pop() ?? ''))
+      project.gallery.href = '';
+    removed = true;
+    await tick();
+    removedHeading?.focus();
   }
 
   const publishedOn = (time: number) =>
@@ -257,13 +293,14 @@ others. From My Projects, the saved project loads behind the dialog first
   const STEP_TEXT = {
     image: 'Drawing the preview image…',
     sending: 'Publishing… This can take a minute.',
-    'removing-old': 'Removing the old snapshot…',
+    'removing-old': 'Removing the old page…',
   };
   let problem = $state<Exclude<GallerySendResult, { status: 'sent' }> | null>(
     null,
   );
   // The page's own link, for after it's sent
   let sentHeading = $state<HTMLElement>();
+  let removedHeading = $state<HTMLElement>();
   const linkCopied = new Flash();
 
   async function submit() {
@@ -304,7 +341,7 @@ others. From My Projects, the saved project loads behind the dialog first
         problem = result;
         // Its old page is gone: sending again adds a new one
         if ('oldRemoved' in result && result.oldRemoved) {
-          replacePostId = undefined;
+          oldPage = null;
           accountPage = null;
         }
       }
@@ -346,16 +383,24 @@ others. From My Projects, the saved project loads behind the dialog first
       {/if}
       <p>{preparingText}</p>
     </div>
+  {:else if view === 'removed'}
+    <div class="flex flex-col items-center gap-3 py-4 text-center">
+      <CheckIcon class="text-success-700-300 size-8" />
+      <h2 class="h4" tabindex="-1" bind:this={removedHeading}>Unpublished</h2>
+      <p class="text-sm">
+        It’s off the gallery and the globe. Your project stays saved, and its
+        link still works.
+      </p>
+    </div>
   {:else if view === 'sent' && sent}
     <div class="flex flex-col items-center gap-3 py-4 text-center">
       <CheckIcon class="text-success-700-300 size-8" />
-      <h2 class="h4" tabindex="-1" bind:this={sentHeading}>
-        {sent.oldRemoved === null ? 'Published' : 'Snapshot updated'}
-      </h2>
-      {#if sent.oldRemoved === false}
+      <h2 class="h4" tabindex="-1" bind:this={sentHeading}>Published</h2>
+      {#if sent.oldRemoved !== null}
         <p class="text-sm">
-          The old snapshot couldn’t be removed. You can unpublish it from My
-          Projects, under Other gallery pages.
+          {sent.oldRemoved
+            ? 'The old page was removed.'
+            : 'The old page couldn’t be removed. You can unpublish it from My Projects, under Other gallery pages.'}
         </p>
       {/if}
       {#if sent.link}
@@ -417,17 +462,43 @@ others. From My Projects, the saved project loads behind the dialog first
           ? `Published ${publishedOn(accountPage.publishedAt)}.`
           : 'Published.'}
         The gallery shows the snapshot from then.
-        {#if accountPage}
-          <span class="opacity-70"
-            >Updating it gives the page a new link, and its views start over.</span
-          >
-        {/if}
       </p>
+      {#if confirmingRemove}
+        <div
+          class="bg-surface-100-900 rounded-container flex flex-col gap-3 p-4"
+        >
+          <p>
+            Unpublish this project{ownPostIds.length > 1
+              ? ` (all ${ownPostIds.length} of its gallery pages)`
+              : ''}? It also comes off the globe. Your project stays saved, and
+            its link still works.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="btn preset-filled-error-500 max-sm:w-full"
+              onclick={unpublish}
+              disabled={busy}
+            >
+              {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
+              Unpublish
+            </button>
+            <button
+              type="button"
+              class="btn preset-tonal-surface max-sm:w-full"
+              onclick={() => (confirmingRemove = false)}
+              disabled={busy}>Cancel</button
+            >
+          </div>
+        </div>
+      {/if}
+      {#if removeError}
+        <p class="text-error-700-300" role="alert">{removeError}</p>
+      {/if}
     {:else}
       <p>
-        {#if replacePostId}
-          Publishes a snapshot of this project as it is now, in place of its old
-          page. The new page has a new link, and its views start over.
+        {#if oldPage}
+          Publishes a new version of this project, as it is now.
         {:else}
           Publishes a snapshot of this project, as it is now, to the public
           <a href={resolve('/gallery')} target="_blank" class="link"
@@ -435,6 +506,19 @@ others. From My Projects, the saved project loads behind the dialog first
           >.
         {/if}
       </p>
+      {#if oldPage}
+        <div class="bg-surface-100-900 rounded-container flex flex-col">
+          <ToggleSwitch
+            bare
+            label="Remove the old page"
+            details={removeOld
+              ? `The page published ${publishedOn(oldPage.publishedAt)} is removed. Its link stops working, and its views are lost.`
+              : 'Both pages stay in the gallery.'}
+            bind:checked={removeOld}
+            disabled={busy}
+          />
+        </div>
+      {/if}
       {#if fromAccount}
         <ShowOwnerToggle
           bind:checked={showOwner}
@@ -459,7 +543,7 @@ others. From My Projects, the saved project loads behind the dialog first
             <!-- eslint-enable svelte/no-navigation-without-resolve -->
           {/if}
           {#if 'oldRemoved' in problem && problem.oldRemoved}
-            <p>Its old snapshot was removed.</p>
+            <p>Its old page was removed.</p>
           {/if}
         </div>
       {/if}
@@ -492,29 +576,32 @@ others. From My Projects, the saved project loads behind the dialog first
           href={existingHref}
           target="_blank"
           rel="noreferrer"
-          class="btn {accountPage
-            ? 'hover:preset-tonal-surface'
-            : 'preset-filled-primary-500'}"
+          class="btn hover:preset-tonal-surface"
         >
           View Gallery Page
           <ExternalLinkIcon class="icon-sm" />
         </a>
         <!-- eslint-enable svelte/no-navigation-without-resolve -->
-        {#if accountPage}
-          <button
-            type="button"
-            class="btn preset-filled-primary-500"
-            onclick={update}
-          >
-            <RefreshCwIcon />
-            Update Snapshot
-          </button>
-        {/if}
-      </div>
-      {#if !accountPage}
-        <button type="button" class="link text-sm" onclick={publishAgain}
-          >Publish again, as a new page</button
+        <button
+          type="button"
+          class="btn preset-filled-primary-500"
+          onclick={publishNew}
+          disabled={busy}
         >
+          <SendIcon />
+          Publish New Version
+        </button>
+      </div>
+      {#if ownPostIds.length && !confirmingRemove}
+        <button
+          type="button"
+          class="btn btn-sm hover:preset-tonal-error"
+          onclick={() => (confirmingRemove = true)}
+          disabled={busy}
+        >
+          <EyeOffIcon class="icon-sm" />
+          Unpublish
+        </button>
       {/if}
     </div>
   {:else if view === 'form' || view === 'checking'}
@@ -537,10 +624,9 @@ others. From My Projects, the saved project loads behind the dialog first
         disabled={!previews.active?.svg || view === 'checking' || busy}
         onclick={submit}
       >
-        {#if busy}<LoaderCircleIcon
-            class="animate-spin"
-          />{:else if replacePostId}<RefreshCwIcon />{:else}<SendIcon />{/if}
-        {replacePostId ? 'Update Snapshot' : 'Publish'}
+        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
+          />{/if}
+        {oldPage ? 'Publish New Version' : 'Publish'}
       </button>
     </div>
   {/if}

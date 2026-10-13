@@ -361,7 +361,7 @@ button to it. -->
               <span class="flex flex-1 flex-col">
                 <span>Gallery Page</span>
                 <span class="text-xs opacity-70"
-                  >Published. View it, or update its snapshot</span
+                  >View it, publish a new version, or unpublish it</span
                 >
               </span>
               <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />

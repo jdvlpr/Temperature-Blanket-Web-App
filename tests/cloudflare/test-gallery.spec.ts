@@ -237,7 +237,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(menu).toHaveText(/Published\s*$/);
     // Unchanged since it was published: nothing to update
     await expect(
-      sharing.getByRole('button', { name: /Update the snapshot/ }),
+      sharing.getByRole('button', { name: /Publish a new version/ }),
     ).toHaveCount(0);
     // Its link, beside it on the row
     await expect(
@@ -248,7 +248,7 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('menuitem', { name: /View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
     await expect(
-      page.getByRole('menuitem', { name: /Update Snapshot/ }),
+      page.getByRole('menuitem', { name: /Publish New Version/ }),
     ).toHaveCount(0);
     // The older page is listed on its own
     await expect(
