@@ -13,7 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { queryGallery } from '#lib/utils/gallery-utils.js';
+import {
+  fetchPalettePagesForLinks,
+  queryGallery,
+} from '#lib/utils/gallery-utils.js';
+import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
 import type { GalleryOwner } from '#lib/server/gallery/store.js';
 import type { PageServerLoad } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
@@ -23,7 +27,15 @@ export const load: PageServerLoad = async (event) => {
     getProject(event),
     getOwner(event),
   ]);
-  return { project, owner };
+  return {
+    project,
+    owner,
+    // Its palettes' own pages, streamed: the page never waits for them, and
+    // shows none if they can't be found
+    palettePages: project
+      ? fetchPalettePagesForLinks(yarnLinksOf(project.yarnUrls))
+      : Promise.resolve([]),
+  };
 };
 
 /** The account that published this page, if its owner chose to show their name. */
@@ -56,6 +68,7 @@ async function getProject(event: Parameters<PageServerLoad>[0]) {
                     projectName
                     date
                     projectUrl
+                    yarnUrls
                     totalDays
                     weatherSources
                     missingDays

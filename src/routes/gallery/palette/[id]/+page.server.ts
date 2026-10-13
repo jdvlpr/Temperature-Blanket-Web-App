@@ -20,9 +20,12 @@
 
 import type { GalleryOwner } from '#lib/server/gallery/store.js';
 import {
+  fetchPalettePagesForLinks,
+  fetchProjectsWithLink,
   queryGallery,
   type GallerySharedPaletteNode,
 } from '#lib/utils/gallery-utils.js';
+import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
@@ -58,7 +61,21 @@ export const load: PageServerLoad = async (event) => {
   const sourceProject = palette.sourceProjectId
     ? await getSourceProject(palette.sourceProjectId)
     : null;
-  return { palette, owner, sourceProject };
+  const [link] = yarnLinksOf(palette.yarnUrls);
+  return {
+    palette,
+    owner,
+    sourceProject,
+    // Streamed, so the page never waits for them: the projects with these
+    // colors (checked in the browser, where colorway names load), and other
+    // palette pages with them
+    projects: link
+      ? fetchProjectsWithLink(link)
+      : Promise.resolve(null),
+    samePalettes: link
+      ? fetchPalettePagesForLinks([link])
+      : Promise.resolve([]),
+  };
 };
 
 /** The published palette, null when there's none, undefined when the gallery can't be reached. */

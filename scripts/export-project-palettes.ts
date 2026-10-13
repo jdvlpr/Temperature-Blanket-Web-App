@@ -55,27 +55,6 @@ type ProjectNode = {
 
 type Row = { projectId: number; title: string; yarnUrl: string; date: string };
 
-/** The link without its v= parameter, every other byte as it was (as the plugin does). */
-function withoutVersion(url: string) {
-  const queryStart = url.indexOf('?');
-  if (queryStart === -1) return url;
-  const hash = url.indexOf('#', queryStart);
-  const fragment = hash === -1 ? '' : url.slice(hash);
-  const query = url.slice(queryStart + 1, hash === -1 ? undefined : hash);
-  const params = query
-    .split('&')
-    .filter((param) => param !== 'v' && !param.startsWith('v='));
-  return url.slice(0, queryStart + 1) + params.join('&') + fragment;
-}
-
-/** Projects from 2022 stored www. links, which the plugin refuses; it's the same page. */
-function withoutWww(url: string) {
-  return url.replace(
-    /^https:\/\/www\.temperature-blanket\.com\//,
-    'https://temperature-blanket.com/',
-  );
-}
-
 const numericDate = String.raw`(\d{1,2})[/.](\d{1,2})[/.](\d{4})`;
 const numericRange = new RegExp(`from ${numericDate} to ${numericDate}`, 'g');
 
@@ -236,6 +215,10 @@ try {
     (await server.ssrLoadModule(
       '/src/lib/utils/color-utils.ts',
     )) as typeof import('../src/lib/utils/color-utils.ts');
+  // Shared with the gallery pages, which find these palettes by their links
+  const { withoutVersion, withoutWww } = (await server.ssrLoadModule(
+    '/src/lib/utils/gallery-link-utils.ts',
+  )) as typeof import('../src/lib/utils/gallery-link-utils.ts');
   // The yarn dataset loads on demand in the app; without it no color is a yarn
   // color, and every palette would be filtered out
   const { ensureYarnData, isYarnDataLoaded } = (await server.ssrLoadModule(

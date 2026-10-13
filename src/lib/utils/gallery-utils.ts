@@ -15,6 +15,10 @@
 import { browser, dev } from '$app/env';
 
 import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
+import {
+  yarnLinkSearch,
+  type LinkedGalleryPost,
+} from '#lib/utils/gallery-link-utils.js';
 
 export type GalleryPageInfo = {
   hasNextPage: boolean;
@@ -250,6 +254,83 @@ export const fetchProjects = async ({
   const { result } = await queryGallery(query);
   return result.data.projects;
 };
+
+/**
+ * Palette pages whose link holds one of these links (gallery plugin 1.7.0),
+ * in one request; check each with `postsWithColors`. None when the gallery has
+ * no palettes, or can't be reached.
+ */
+export async function fetchPalettePagesForLinks(
+  links: string[],
+): Promise<LinkedGalleryPost[]> {
+  const searches = [
+    ...new Set(links.map(yarnLinkSearch).filter((s): s is string => !!s)),
+  ].slice(0, 10);
+  if (!searches.length) return [];
+  const fields = (withSource: boolean) =>
+    `nodes { databaseId title date yarnUrls ${withSource ? 'sourceProjectId' : ''} }`;
+  const query = (withSource: boolean) =>
+    `query PALETTE_PAGES(${searches.map((_, i) => `$s${i}: String`).join(', ')}) {
+      ${searches
+        .map(
+          (_, i) =>
+            `p${i}: palettes(first: 10, where: { yarnUrls: $s${i} }) { ${fields(withSource)} }`,
+        )
+        .join('\n')}
+    }`;
+  const variables = Object.fromEntries(searches.map((s, i) => [`s${i}`, s]));
+  try {
+    let { response, result } = await queryGallery(query(true), variables);
+    // A gallery before 1.7.0 has no sourceProjectId
+    if (
+      result?.errors?.some((e: { message?: string }) =>
+        e.message?.includes('sourceProjectId'),
+      )
+    )
+      ({ response, result } = await queryGallery(query(false), variables));
+    if (!response.ok || !result?.data) return [];
+    const posts = new Map<number, LinkedGalleryPost>();
+    for (const found of Object.values(result.data) as {
+      nodes?: LinkedGalleryPost[];
+    }[])
+      for (const post of found?.nodes ?? []) posts.set(post.databaseId, post);
+    return [...posts.values()];
+  } catch (e) {
+    console.error('Could not look up palette pages', e);
+    return [];
+  }
+}
+
+/**
+ * Projects whose links hold this link, oldest first, a page at a time; check
+ * each with `postsWithColors`. Null when the gallery can't be reached.
+ */
+export async function fetchProjectsWithLink(
+  link: string,
+  { first = 12, after = null }: { first?: number; after?: string | null } = {},
+): Promise<{ pageInfo: GalleryPageInfo; nodes: GalleryProjectNode[] } | null> {
+  const search = yarnLinkSearch(link);
+  if (!search) return null;
+  try {
+    const { response, result } = await queryGallery(
+      `query PROJECTS_WITH_LINK($search: String, $first: Int, $after: String) {
+        projects(first: $first, after: $after, where: { yarnUrls: $search, orderby: { field: DATE, order: ASC } }) {
+          pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+          nodes {
+            title projectName databaseId projectUrl yarnUrls locations date
+            featuredImage { node { mediaItemUrl mediaDetails { sizes(include: MEDIUM) { sourceUrl } } } }
+          }
+        }
+      }`,
+      { search, first, after },
+    );
+    if (!response.ok || !result?.data?.projects) return null;
+    return result.data.projects;
+  } catch (e) {
+    console.error('Could not look up projects with a palette', e);
+    return null;
+  }
+}
 
 export const recordPageView = async (id: string | number) => {
   if (dev || !browser) return;
