@@ -73,9 +73,12 @@ class GalleryPagesState {
       }
     })());
 
-  /** Loads now and after each change; call when the page mounts. Returns the cleanup. */
-  start() {
-    this.load();
+  /**
+   * Loads after each change, and now unless `load` is false (loaded already);
+   * call when the page mounts. Returns the cleanup.
+   */
+  start({ load = true }: { load?: boolean } = {}) {
+    if (load) this.load();
     window.addEventListener(GALLERY_PAGES_CHANGED, this.load);
     return () => {
       window.removeEventListener(GALLERY_PAGES_CHANGED, this.load);

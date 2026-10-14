@@ -81,7 +81,10 @@ in the gallery), with search, filters and sort once there are a few. -->
     <MyLibrary current="projects" currentTotal={total}>
       {#if browser}
         {@const showFilters =
-          (total ?? 0) > FILTERS_FROM || libraryFilters.activeFor('projects')}
+          (total ?? 0) > FILTERS_FROM ||
+          libraryFilters.activeFor('projects') ||
+          libraryFilters.sort !== 'recent' ||
+          libraryFilters.reversed}
         <CollectionToolbar
           kind="project"
           yarn={false}

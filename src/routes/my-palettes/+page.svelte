@@ -105,7 +105,10 @@ only in the gallery), with search, filters and sort once there are a few. -->
     <MyLibrary current="palettes" currentTotal={total}>
       {#if browser}
         {@const showFilters =
-          (total ?? 0) > FILTERS_FROM || libraryFilters.activeFor('palettes')}
+          (total ?? 0) > FILTERS_FROM ||
+          libraryFilters.activeFor('palettes') ||
+          libraryFilters.sort !== 'recent' ||
+          libraryFilters.reversed}
         <CollectionToolbar
           kind="palette"
           searchIcon="search"

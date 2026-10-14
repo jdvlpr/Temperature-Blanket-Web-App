@@ -20,6 +20,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   and the Trash sync to the account, and each project and palette can be
   published to the gallery as a snapshot, with the account's name or without.
 -->
+<script lang="ts" module>
+  // Projects | Yarn Palettes switches pages, so these ask the server once per
+  // account while the app is open, not on every switch: requests are shared
+  // by everyone on the free plan. Changes still reload the gallery pages, and
+  // the Trash dialog refreshes its own list.
+  let galleryLoadedFor: string | null = null;
+  let trashRefreshedFor: string | null = null;
+</script>
+
 <script lang="ts">
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
@@ -67,7 +76,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Signed in: the account's gallery pages, shown on each project and
   // palette they came from (once for the page, not per row)
   $effect(() => {
-    if (signedIn) return galleryPages.start();
+    const id = account.summary?.id;
+    if (!signedIn || !id) return;
+    const load = !galleryPages.loaded || galleryLoadedFor !== id;
+    galleryLoadedFor = id;
+    return galleryPages.start({ load });
   });
 
   let ownerName = $derived(
@@ -92,10 +105,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : null,
   );
 
-  // The account's Trash once when the page opens (and again in the dialog),
-  // not on every change: requests are shared by everyone on the free plan
+  // The account's Trash once (and again in the dialog), not on every change
   onMount(async () => {
-    if (signedIn) refreshAccountTrash();
+    const id = account.summary?.id;
+    if (signedIn && id && trashRefreshedFor !== id) {
+      trashRefreshedFor = id;
+      refreshAccountTrash();
+    }
     await savedPalettes.refresh();
     palettesLoaded = true;
   });
