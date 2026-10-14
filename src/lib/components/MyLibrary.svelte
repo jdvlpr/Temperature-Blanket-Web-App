@@ -200,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   are listed, and deleted things, in a dialog. Trash only shows when there's
   something in it. -->
   {#if browser && (showGallery || trashCount)}
-    <ul class={[PANEL_LIST, 'mx-auto w-full max-w-md']}>
+    <ul class={[PANEL_LIST, 'w-full']}>
       {#if showGallery}
         {#if ownerName}
           {#if anyWithName && galleryPages.publicId}
