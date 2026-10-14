@@ -36,10 +36,12 @@ export class LibraryFilters {
 
   /** Whether anything on this page is left out (sort only reorders) */
   activeFor(kind: 'projects' | 'palettes') {
-    const shared = !!this.search.trim() || this.status !== 'all';
-    return kind === 'projects'
-      ? shared || !!this.patternType
-      : shared || !!this.brandId || !!this.yarnId;
+    const shared =
+      !!this.search.trim() ||
+      this.status !== 'all' ||
+      !!this.brandId ||
+      !!this.yarnId;
+    return kind === 'projects' ? shared || !!this.patternType : shared;
   }
 
   clear() {

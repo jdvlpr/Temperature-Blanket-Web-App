@@ -42,8 +42,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { withoutVersion } from '#lib/utils/gallery-link-utils.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import type { LibraryFilters } from '#lib/state/library-filters.svelte.js';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
     matchesSearch,
+    matchesYarn,
     matchesStatus,
     patternIdOf,
     sortLibrary,
@@ -175,6 +178,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   const previewIds = previews.all.map((preview) => preview.id);
+
+  // Which yarn each color is, read from the project's link: only once a yarn
+  // is chosen, after the yarn data that tells brands apart has loaded
+  const yarnChosen = $derived(!!(filters?.brandId || filters?.yarnId));
+  let yarnDataReady = $state(false);
+  $effect(() => {
+    if (yarnChosen && !yarnDataReady)
+      ensureYarnData().then(() => (yarnDataReady = true));
+  });
+  const colorsByLink = $derived.by(() => {
+    void yarnDataReady;
+    return new Map<string, ReturnType<typeof colorsOfLink>>();
+  });
+  function colorsOfLink(link: string | null | undefined) {
+    return (link && getColorsFromInput({ string: link })) || [];
+  }
+  const colorsOf = (link: string | null | undefined) => {
+    const key = link ?? '';
+    let colors = colorsByLink.get(key);
+    if (!colors) {
+      colors = colorsOfLink(link);
+      colorsByLink.set(key, colors);
+    }
+    return colors;
+  };
+
   const cardName = (card: Card) =>
     'project' in card ? labelFor(card.project) : card.page.title;
 
@@ -185,17 +214,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? (previews.all.find((p) => p.wpTagSlug === filters.patternType)?.id ??
         null)
       : null;
+    const yarn = {
+      brandId: filters.brandId,
+      yarnId: filters.yarnId,
+      only: filters.onlyThisYarn,
+    };
     const kept = allCards.filter((card) => {
       const project = 'project' in card ? card.project : null;
       const page = 'page' in card ? card.page : null;
+      const link = project ? project.meta.href : page?.link;
       return (
+        (!yarnChosen || (yarnDataReady && matchesYarn(colorsOf(link), yarn))) &&
         matchesSearch(
           filters.search,
           project ? [project.meta.name, project.meta.title] : [page?.title],
         ) &&
-        (!patternId ||
-          patternIdOf(project ? project.meta.href : page?.link, previewIds) ===
-            patternId) &&
+        (!patternId || patternIdOf(link, previewIds) === patternId) &&
         matchesStatus(filters.status, {
           published: project
             ? galleryPages.grouped.byProject.has(project.id)

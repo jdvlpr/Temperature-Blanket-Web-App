@@ -87,11 +87,13 @@ in the gallery), with search, filters and sort once there are a few. -->
           libraryFilters.reversed}
         <CollectionToolbar
           kind="project"
-          yarn={false}
           searchIcon="search"
           searchLabel="Search Projects"
           searchPlaceholder="Name or place"
           bind:search={libraryFilters.search}
+          bind:brandId={libraryFilters.brandId}
+          bind:yarnId={libraryFilters.yarnId}
+          bind:onlyThisYarn={libraryFilters.onlyThisYarn}
           bind:patternType={libraryFilters.patternType}
           sortOptions={LIBRARY_SORTS}
           sort={libraryFilters.sort}
