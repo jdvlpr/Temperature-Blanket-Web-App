@@ -31,6 +31,16 @@ import { savedPalettes } from '#lib/storage/palettes.svelte.js';
 import { queryGallery } from '#lib/utils/gallery-utils.js';
 import { SvelteMap } from 'svelte/reactivity';
 
+/** A gallery link on this site, as the gallery page opens it, or null */
+function onThisSite(link: string) {
+  try {
+    const url = new URL(link);
+    return `${location.origin}${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
+  }
+}
+
 class GalleryPagesState {
   loaded = $state(false);
   /** Whether publishing from accounts is switched on */
@@ -108,6 +118,8 @@ class GalleryPagesState {
   /**
    * Fetches the gallery's pictures of these project pages, once each, in one
    * request: for projects only in the gallery, which have none kept here.
+   * Pages recorded before links were kept get their project link from the
+   * gallery too, so their colors filter, show and can be added back.
    */
   async loadImages(postIds: number[]) {
     const ids = postIds.filter((id) => !this.images.has(id));
@@ -120,6 +132,7 @@ class GalleryPagesState {
           projects(first: ${ids.length}, where: { in: $ids }) {
             nodes {
               databaseId
+              projectUrl
               featuredImage {
                 node {
                   mediaItemUrl
@@ -138,6 +151,9 @@ class GalleryPagesState {
           node?.featuredImage?.node?.mediaItemUrl;
         if (typeof node?.databaseId === 'number' && typeof image === 'string')
           this.images.set(node.databaseId, image);
+        const page = this.pages.find((p) => p.postId === node?.databaseId);
+        if (page && !page.link && typeof node?.projectUrl === 'string')
+          page.link = onThisSite(node.projectUrl);
       }
     } catch {
       // Their colors show instead

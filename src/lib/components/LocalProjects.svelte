@@ -249,9 +249,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
 
   // Gallery-only projects' pictures from the gallery, for those without one
-  // kept here: one request for them all
+  // kept here, and older pages' links: one request for them all, filtered out
+  // or not, as the filters need the links
   $effect(() => {
-    const postIds = cards.flatMap((card) =>
+    const postIds = allCards.flatMap((card) =>
       'page' in card ? [card.page.postId] : [],
     );
     if (postIds.length) void galleryPages.loadImages(postIds);
