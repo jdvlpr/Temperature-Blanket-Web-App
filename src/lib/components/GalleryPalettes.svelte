@@ -49,7 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import Expand from '#lib/components/Expand.svelte';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
@@ -154,40 +153,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if filtersExpanded}
     <div
-      class="grid w-full grid-cols-12 items-end justify-center gap-4 px-2"
+      class="grid w-full grid-cols-12 items-start justify-center gap-4 px-2"
       transition:safeSlide
     >
-      <div class="col-span-12 w-full md:col-span-5">
+      <div class="col-span-12 w-full md:col-span-7">
         <SelectYarn
           preselectDefaultYarn={false}
           disabled={loading}
           bind:selectedBrandId={galleryPalettesState.filteredBrandId}
           bind:selectedYarnId={galleryPalettesState.filteredYarnId}
           onselectautocomplete={debouncedSearch}
+          bind:only={galleryPalettesState.palettesContainOnlyFilteredYarn}
+          ononlychange={debouncedSearch}
         />
       </div>
 
-      {#if galleryPalettesState.filteredBrandId || galleryPalettesState.filteredYarnId}
-        <div
-          class="relative top-[2px] col-span-12 flex w-full flex-col items-start gap-0 text-left md:col-span-4"
-        >
-          <ToggleSwitch
-            disabled={loading}
-            bind:checked={galleryPalettesState.palettesContainOnlyFilteredYarn}
-            onchange={debouncedSearch}
-            label="Only This {galleryPalettesState.filteredBrandId &&
-            galleryPalettesState.filteredYarnId
-              ? 'Yarn'
-              : 'Brand'}"
-            details="All colorways in palette must be this {galleryPalettesState.filteredBrandId &&
-            galleryPalettesState.filteredYarnId
-              ? 'yarn'
-              : 'brand'}"
-          />
-        </div>
-      {/if}
-
-      <div class="col-span-12 flex w-full flex-col justify-start md:col-span-3">
+      <div class="col-span-12 flex w-full flex-col justify-start md:col-span-5">
         <span class="label-text text-left"> Search </span>
         <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
           <span class="label label-text">

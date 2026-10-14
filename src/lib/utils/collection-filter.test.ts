@@ -60,6 +60,14 @@ describe('matchesYarn', () => {
       }),
     ).toBe(true);
   });
+  it('never matches a chosen yarn with no colors, even with only', () => {
+    expect(matchesYarn([], { brandId: 'a', yarnId: '1', only: true })).toBe(
+      false,
+    );
+    expect(matchesYarn([], { brandId: 'a', yarnId: '', only: false })).toBe(
+      false,
+    );
+  });
 });
 
 describe('matchesStatus', () => {

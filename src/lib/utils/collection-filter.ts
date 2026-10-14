@@ -94,7 +94,8 @@ export function patternIdOf(
 
 /**
  * Whether a palette's colors are of this brand (and yarn, when given): some of
- * them, or with `only`, all of them. No brand or yarn chosen matches all.
+ * them, or with `only`, all of them. No brand or yarn chosen matches all; no
+ * colors (none could be read) matches no brand or yarn, even with `only`.
  */
 export function matchesYarn(
   colors: readonly Color[],
@@ -104,7 +105,7 @@ export function matchesYarn(
   const isThis = (color: Color) =>
     (!brandId || color.brandId === brandId) &&
     (!yarnId || color.yarnId === yarnId);
-  return only ? colors.every(isThis) : colors.some(isThis);
+  return only ? colors.length > 0 && colors.every(isThis) : colors.some(isThis);
 }
 
 /** Whether something with this gallery state shows for the status chosen */

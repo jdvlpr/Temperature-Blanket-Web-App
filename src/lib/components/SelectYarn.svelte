@@ -66,6 +66,11 @@ the keyboard; elsewhere the list drops down from the field. -->
       selectedBrandId: string | undefined;
       selectedYarnId: string | undefined;
     }) => void;
+    /** Offers "Only <the pick>" under the field when bound, for filters */
+    only?: boolean;
+    ononlychange?: () => void;
+    /** What the "Only" filter lists, for its description */
+    onlyKind?: string;
   }
 
   let {
@@ -75,6 +80,9 @@ the keyboard; elsewhere the list drops down from the field. -->
     disabled = false,
     preselectDefaultYarn = true,
     onselectautocomplete = () => {},
+    only = $bindable(),
+    ononlychange,
+    onlyKind = 'palette',
   }: Props = $props();
 
   const uid = $props.id();
@@ -159,6 +167,8 @@ the keyboard; elsewhere the list drops down from the field. -->
   function pick(option: YarnOption | undefined) {
     selectedBrandId = option?.brandId ?? '';
     selectedYarnId = option?.yarnId ?? '';
+    // Hidden with nothing picked, so it starts off again for the next pick
+    if (!option && only) only = false;
     query = '';
     onselectautocomplete({ selectedBrandId, selectedYarnId });
   }
@@ -249,9 +259,10 @@ the keyboard; elsewhere the list drops down from the field. -->
   }
 
   // Skeleton styles the combobox's parts on its own; these fit them into the
-  // field group and the app's list look instead
+  // field group and the app's list look instead. Positioned, so each button's
+  // invisible tap area stays on it rather than covering the whole field.
   const buttonReset =
-    'static h-auto w-auto translate-none transform-none bg-transparent text-inherit';
+    'relative inset-auto h-auto w-auto translate-none transform-none bg-transparent text-inherit';
   const listClass =
     'flex flex-col bg-surface-50 dark:bg-surface-950 overscroll-contain overflow-y-auto';
   const itemClass =
@@ -547,6 +558,27 @@ the keyboard; elsewhere the list drops down from the field. -->
         </Portal>
       {/if}
     </Combobox>
+  {/if}
+
+  {#if only !== undefined && selectedOption}
+    <label class="mt-1 flex w-fit cursor-pointer items-center gap-2 text-sm">
+      <input
+        type="checkbox"
+        class="checkbox"
+        bind:checked={only}
+        {disabled}
+        aria-describedby="{uid}-only-hint"
+        onchange={() => ononlychange?.()}
+      />
+      <span
+        >Only {selectedOption.kind === 'brand'
+          ? selectedOption.brandName
+          : `${selectedOption.brandName} ${selectedOption.yarnName}`}</span
+      >
+      <span id="{uid}-only-hint" class="sr-only"
+        >Every colorway in the {onlyKind} must be this {selectedOption.kind}</span
+      >
+    </label>
   {/if}
 
   {#if selectedOption?.unavailable}

@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
-  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import type { PageLayout } from '#lib/types/page-types.js';
@@ -55,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menus,
     actions,
   }: {
-    /** What's listed, for the "Only This Yarn" words */
+    /** What's listed, for the "Only" filter's description */
     kind: 'project' | 'palette';
     search?: string;
     searchLabel?: string;
@@ -88,7 +87,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } = $props();
 
   const searchId = $props.id();
-  const yarnWord = $derived(brandId && yarnId ? 'Yarn' : 'Brand');
   const hasPattern = $derived(patternType !== undefined);
   // Search on its own row when it's the only filter
   const searchOnly = $derived(!yarn && !hasPattern);
@@ -96,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex w-full flex-col gap-2">
   {#if showFilters}
-    <div class="grid w-full grid-cols-12 items-end gap-4 text-left">
+    <div class="grid w-full grid-cols-12 items-start gap-4 text-left">
       {#if yarn}
         <div class="col-span-12 w-full md:col-span-7">
           <SelectYarn
@@ -105,22 +103,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             bind:selectedBrandId={brandId}
             bind:selectedYarnId={yarnId}
             onselectautocomplete={() => onchange?.()}
+            bind:only={onlyThisYarn}
+            ononlychange={() => onchange?.()}
+            onlyKind={kind}
           />
         </div>
-
-        {#if brandId || yarnId}
-          <div
-            class="col-span-12 flex w-full flex-col items-start gap-1 md:col-span-5"
-          >
-            <ToggleSwitch
-              {disabled}
-              bind:checked={onlyThisYarn}
-              onchange={() => onchange?.()}
-              label="Only This {yarnWord}"
-              details="All colorways in {kind} must be this {yarnWord.toLowerCase()}"
-            />
-          </div>
-        {/if}
       {/if}
 
       <div
