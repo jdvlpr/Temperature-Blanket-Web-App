@@ -157,14 +157,14 @@ test.describe('Gallery pages from accounts', () => {
     });
     await expect(anonymous).toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
-      'add a display name',
+      'Add a Name for Gallery Pages',
     );
     await anonymous.click();
     await expect(anonymous).not.toBeChecked();
     await page.keyboard.press('Escape');
     await page
       .getByTestId('gallery-name-status')
-      .getByRole('link', { name: 'Profile settings', exact: true })
+      .getByRole('link', { name: 'Add a Name for Gallery Pages' })
       .click();
     await expect(page).toHaveURL(/\/account#display-name$/);
     await expect(

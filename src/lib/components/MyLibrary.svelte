@@ -50,7 +50,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     refreshAccountTrash,
   } from '#lib/storage/account-trash.svelte.js';
   import { onMount, type Snippet } from 'svelte';
-  import { ExternalLinkIcon, LogInIcon, Trash2Icon } from '@lucide/svelte';
+  import {
+    ExternalLinkIcon,
+    GlobeIcon,
+    LogInIcon,
+    PencilIcon,
+    Trash2Icon,
+  } from '@lucide/svelte';
 
   let {
     current,
@@ -150,39 +156,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </p>
 
-    <!-- Signed in: whose name gallery pages show, and where those pages are listed -->
+    <!-- Signed in: whose name gallery pages show (tap to change it), and where
+    those pages are listed -->
     {#if browser && showGallery}
-      <p
-        class="text-surface-700-300 mx-auto max-w-3xl text-center text-sm"
+      <div
+        class="flex flex-wrap items-center justify-center gap-2"
         data-testid="gallery-name-status"
       >
         {#if ownerName}
-          Gallery pages you publish without “Anonymous” checked are credited
-          <strong>By {ownerName}</strong>.
-          <a href={DISPLAY_NAME_HREF} class="link"
-            >Change your name in Profile settings</a
-          >.
           {#if anyWithName && galleryPages.publicId}
             <a
               href={resolve('/gallery/by/[ownerId]', {
                 ownerId: galleryPages.publicId,
               })}
               target="_blank"
-              class="link whitespace-nowrap"
+              class="btn preset-tonal-primary"
               data-testid="gallery-owner-page"
-              >Your public gallery page<ExternalLinkIcon
-                class="icon-sm ml-0.5 inline"
+              ><GlobeIcon />Your Gallery Page<ExternalLinkIcon
+                class="icon-sm opacity-70"
                 aria-hidden="true"
               /></a
             >
           {/if}
-        {:else}
-          To be credited by name on your gallery pages, add a display name in <a
+          <a
             href={DISPLAY_NAME_HREF}
-            class="link">Profile settings</a
-          >.
+            class="btn hover:preset-tonal-surface"
+            title="Change the name on your gallery pages"
+            ><PencilIcon />By {ownerName}<span class="sr-only"
+              >, change the name on your gallery pages</span
+            ></a
+          >
+        {:else}
+          <a href={DISPLAY_NAME_HREF} class="btn hover:preset-tonal-surface"
+            ><PencilIcon />Add a Name for Gallery Pages</a
+          >
         {/if}
-      </p>
+      </div>
     {/if}
   </div>
 
