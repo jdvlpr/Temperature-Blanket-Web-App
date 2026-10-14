@@ -35,8 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { streamed } from '#lib/utils/streamed.svelte.js';
   import { XIcon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
   import PopularPeriodMenu from '../../PopularPeriodMenu.svelte';
   import { ownerFilters, popularOrder } from './owner-filters.svelte.js';
   import type { PageData } from './$types';
@@ -45,18 +45,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let heading = $derived(`Projects by ${data.name}`);
 
-  const all = $derived(data.projects ?? []);
+  // Undefined while the gallery answers, null if it can't be reached
+  const list = streamed(() => data.list);
+  const projects = $derived(list.current?.projects);
+  const all = $derived(projects ?? []);
   const popular = popularOrder(
     'project',
     () => all.map((project) => project.databaseId),
-    () => data.popular,
+    () => list.current?.popular ?? null,
   );
 
   // Which colors are which yarns comes from the yarn data, loaded only here
   let yarnDataReady = $state(false);
-  onMount(async () => {
-    if (all.length) await ensureYarnData();
-    yarnDataReady = true;
+  $effect(() => {
+    if (all.length && !yarnDataReady)
+      ensureYarnData().then(() => (yarnDataReady = true));
   });
 
   // Each project's colors and pattern, read once (again with the yarn data)
@@ -124,11 +127,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
 </svelte:head>
 
-{#if data.projects === null}
+{#if projects === undefined}
+  <div
+    class={[
+      'w-full items-start gap-2 px-2',
+      ownerFilters.layout === 'grid'
+        ? 'grid grid-cols-2 justify-center md:grid-cols-3 xl:grid-cols-4'
+        : 'grid grid-cols-1 md:grid-cols-2',
+    ]}
+  >
+    {#each Array(Math.min(data.postIds.length, 20))}
+      <div
+        class={[
+          'placeholder card bg-surface-100 dark:bg-surface-900 rounded-container w-full animate-pulse',
+          ownerFilters.layout === 'grid'
+            ? 'h-[350px]'
+            : 'h-[128px] sm:h-[144px]',
+        ]}
+      ></div>
+    {/each}
+  </div>
+{:else if projects === null}
   <p class="my-8 text-center" role="alert">
     The gallery couldn’t be reached. Try again later.
   </p>
-{:else if !data.projects.length}
+{:else if !projects.length}
   <p class="my-8 text-center">No projects yet.</p>
 {:else}
   <div class="px-2 lg:px-0">

@@ -25,14 +25,20 @@ import {
 
 export const prerender = false;
 
-export const load: PageServerLoad = async ({ parent, params }) => {
+export const load: PageServerLoad = async ({
+  parent,
+  params,
+  isDataRequest,
+}) => {
   const { postIds, paletteIds } = await parent();
   if (!postIds.length && paletteIds.length)
     redirect(307, `/gallery/by/${params.ownerId}/palettes`);
   // Asked for only with IDs: an empty `in` matches everything
-  const [projects, popular] = await Promise.all([
+  const list = Promise.all([
     postIds.length ? fetchProjects(postIds) : ([] as OwnerProject[]),
     fetchPopular('project', postIds),
-  ]);
-  return { projects, popular };
+  ]).then(([projects, popular]) => ({ projects, popular }));
+  // Streamed on a move within the app, so the page shows at once; whole on a
+  // full load. Together, so Popular never reorders cards already shown.
+  return { list: isDataRequest ? list : await list };
 };

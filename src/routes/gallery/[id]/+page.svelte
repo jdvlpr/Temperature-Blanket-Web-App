@@ -77,6 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     firstLocationLabelFromLocationsMeta,
   } from '../../globe/globe-utils';
   import { yarnPageState } from '../../yarn/state.svelte';
+  import { streamed } from '#lib/utils/streamed.svelte.js';
   import type { PageData } from './$types';
   import AboutProjectDialog from './AboutProjectDialog.svelte';
   import GalleryPageHeader from '../GalleryPageHeader.svelte';
@@ -86,7 +87,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let imageWidth = $state<number | undefined>();
   let imageHeight = $state<number | undefined>();
 
-  let project = $derived(data.project);
+  // Undefined while the gallery answers (on a move within the app), null when
+  // there's no such project
+  const streamedProject = streamed(() => data.project);
+  let project = $derived(streamedProject.current);
   // "By" and the name, which the owner bar changes in place
   let owner = $derived(data.owner);
   let projectURL = $derived(project?.projectUrl);
@@ -364,6 +368,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {:else if project}
                   <!-- Escaped by getTitleFromLocationsMeta -->
                   {@html projectTitle}
+                {:else if project === undefined}
+                  <span
+                    class="placeholder inline-block h-8 w-64 max-w-full animate-pulse align-middle"
+                    ><span class="sr-only">Loading…</span></span
+                  >
                 {:else}
                   This project gallery page cannot be found.
                 {/if}
@@ -412,6 +421,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     alt="Project Preview"
                     class="m-auto max-h-[60vh]"
                   />
+                {:else if project === undefined}
+                  <div
+                    class="placeholder rounded-container m-auto h-[50vh] w-full max-w-3xl animate-pulse"
+                  ></div>
                 {/if}
               </div>
 

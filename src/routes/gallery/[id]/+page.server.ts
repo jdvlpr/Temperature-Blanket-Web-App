@@ -23,18 +23,23 @@ import type { PageServerLoad } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const load: PageServerLoad = async (event) => {
-  const [{ project }, owner] = await Promise.all([
-    getProject(event),
-    getOwner(event),
-  ]);
+  const project = getProject(event).then(
+    ({ project }) => project,
+    (e) => {
+      console.error('Could not load gallery project', e);
+      return null;
+    },
+  );
   return {
-    project,
-    owner,
+    // Streamed on a move within the app, so the page shows at once; whole on
+    // a full load, for its title and link preview
+    project: event.isDataRequest ? project : await project,
+    owner: await getOwner(event),
     // Its palettes' own pages, streamed: the page never waits for them, and
     // shows none if they can't be found
-    palettePages: project
-      ? fetchPalettePagesForLinks(yarnLinksOf(project.yarnUrls))
-      : Promise.resolve([]),
+    palettePages: project.then((found) =>
+      found ? fetchPalettePagesForLinks(yarnLinksOf(found.yarnUrls)) : [],
+    ),
   };
 };
 

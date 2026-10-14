@@ -67,6 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by the page -->
         <a
           {href}
+          data-sveltekit-preload-data="hover"
           aria-current={isCurrent ? 'page' : undefined}
           class={[
             'btn w-full justify-center gap-1',

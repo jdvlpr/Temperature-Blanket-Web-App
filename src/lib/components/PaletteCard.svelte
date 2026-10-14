@@ -84,6 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {href}
       {onclick}
       {title}
+      data-sveltekit-preload-data="tap"
       data-sveltekit-reload={reload ? '' : undefined}
       class={controlClass}
       aria-hidden={nameRow ? 'true' : undefined}

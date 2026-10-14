@@ -24,12 +24,14 @@ import {
 
 export const prerender = false;
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ parent, isDataRequest }) => {
   const { paletteIds } = await parent();
   // Asked for only with IDs: an empty `in` matches everything
-  const [palettes, popular] = await Promise.all([
+  const list = Promise.all([
     paletteIds.length ? fetchPalettes(paletteIds) : ([] as OwnerPalette[]),
     fetchPopular('palette', paletteIds),
-  ]);
-  return { palettes, popular };
+  ]).then(([palettes, popular]) => ({ palettes, popular }));
+  // Streamed on a move within the app, so the page shows at once; whole on a
+  // full load
+  return { list: isDataRequest ? list : await list };
 };

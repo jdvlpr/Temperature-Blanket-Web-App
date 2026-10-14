@@ -47,6 +47,7 @@ own project first), and other palette pages with them. -->
     galleryTitleText,
     sharedPaletteFrom,
   } from '#lib/utils/shared-palette-utils.js';
+  import { streamed } from '#lib/utils/streamed.svelte.js';
   import { decodeHtmlEntities, pluralize } from '#lib/utils/string-utils.js';
   import { ArrowLeftIcon, PaletteIcon, PlusIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
@@ -55,18 +56,30 @@ own project first), and other palette pages with them. -->
 
   let { data }: { data: PageData } = $props();
 
+  // Undefined while the gallery answers (on a move within the app), or why
+  // there's none
+  const streamedPage = streamed(() => data.palette);
+  let found = $derived(streamedPage.current);
+  let galleryPalette = $derived(typeof found === 'object' ? found : undefined);
+
   // "By" and the name, which the owner bar changes in place
   let owner = $derived(data.owner);
-  let name = $derived(galleryTitleText(data.palette.title) || 'Yarn Palette');
-  let link = $derived(yarnLinksOf(data.palette.yarnUrls)[0] ?? '');
-  let sourceProjectId = $derived(data.palette.sourceProjectId ?? null);
+  let name = $derived(
+    galleryPalette
+      ? galleryTitleText(galleryPalette.title) || 'Yarn Palette'
+      : '',
+  );
+  let link = $derived(yarnLinksOf(galleryPalette?.yarnUrls)[0] ?? '');
+  let sourceProjectId = $derived(galleryPalette?.sourceProjectId ?? null);
 
   // The project it came from, when the projects with it can't be listed: its
-  // name, or its places and dates
+  // name, or its places and dates. It comes after the page.
+  const streamedSource = streamed(() => data.sourceProject);
+  let sourceProject = $derived(streamedSource.current);
   let sourceTitle = $derived(
-    data.sourceProject
-      ? decodeHtmlEntities(data.sourceProject.projectName ?? '').trim() ||
-          getTitleTextFromLocationsMeta(data.sourceProject.locations)
+    sourceProject
+      ? decodeHtmlEntities(sourceProject.projectName ?? '').trim() ||
+          getTitleTextFromLocationsMeta(sourceProject.locations)
       : '',
   );
 
@@ -77,11 +90,11 @@ own project first), and other palette pages with them. -->
     yarnDataReady = true;
   });
   let palette = $derived(
-    yarnDataReady
+    yarnDataReady && galleryPalette
       ? // Open a Copy brings its name along, for Save Palette
         sharedPaletteFrom(
-          data.palette.yarnUrls,
-          galleryTitleText(data.palette.title),
+          galleryPalette.yarnUrls,
+          galleryTitleText(galleryPalette.title),
         )
       : null,
   );
@@ -99,7 +112,7 @@ own project first), and other palette pages with them. -->
 
   // Counts a view for Popular, in the browser (once per palette shown)
   $effect(() => {
-    recordPageView(data.palette.databaseId);
+    if (galleryPalette) recordPageView(galleryPalette.databaseId);
   });
 
   // The projects with these colors, a page at a time (they come after the
@@ -157,7 +170,7 @@ own project first), and other palette pages with them. -->
   let samePalettes = $derived(
     palette
       ? postsWithColors(palette.colors, samePalettesFound).filter(
-          (other) => other.databaseId !== data.palette.databaseId,
+          (other) => other.databaseId !== galleryPalette?.databaseId,
         )
       : [],
   );
@@ -196,10 +209,10 @@ own project first), and other palette pages with them. -->
       <Card>
         {#snippet header()}
           <GalleryPageHeader
-            postId={data.palette.databaseId}
+            postId={Number(page.params.id)}
             kind="palette"
             bind:owner
-            date={data.palette.date}
+            date={galleryPalette?.date}
             open={palette
               ? {
                   href: palette.href,
@@ -209,7 +222,18 @@ own project first), and other palette pages with them. -->
                 }
               : null}
           >
-            {#snippet heading()}{name}{/snippet}
+            {#snippet heading()}
+              {#if found === undefined}
+                <span
+                  class="placeholder inline-block h-8 w-64 max-w-full animate-pulse align-middle"
+                  ><span class="sr-only">Loading…</span></span
+                >
+              {:else if galleryPalette}
+                {name}
+              {:else}
+                This yarn palette gallery page cannot be found.
+              {/if}
+            {/snippet}
             {#snippet note()}
               {#if samePalettes.length}
                 Also shared as
@@ -236,7 +260,13 @@ own project first), and other palette pages with them. -->
         {/snippet}
         {#snippet content()}
           <div class="flex flex-col gap-4 p-4 text-center">
-            {#if !yarnDataReady}
+            {#if found === 'missing'}
+              <!-- Said in the heading -->
+            {:else if found === 'unreachable'}
+              <p role="alert">
+                The gallery couldn’t be reached. Try again later.
+              </p>
+            {:else if !yarnDataReady || !galleryPalette}
               <div
                 class="placeholder rounded-container h-[70px] w-full animate-pulse"
               ></div>
@@ -304,17 +334,17 @@ own project first), and other palette pages with them. -->
               Show More
             </button>
           {/if}
-        {:else if projectsFound === null && data.sourceProject && sourceTitle}
+        {:else if projectsFound === null && sourceProject && sourceTitle}
           <!-- The projects couldn't be looked up: the one it came from -->
           <p class="text-sm" data-testid="gallery-source-project">
             From the project <a
               class="link"
               href={resolve('/gallery/[id]', {
-                id: String(data.sourceProject.databaseId),
+                id: String(sourceProject.databaseId),
               })}>{sourceTitle}</a
             >
           </p>
-        {:else if loadingProjects && yarnDataReady}
+        {:else if loadingProjects && yarnDataReady && galleryPalette}
           <span class="sr-only" role="status">Looking for projects…</span>
         {/if}
       </section>

@@ -51,29 +51,39 @@ export const load: PageServerLoad = async (event) => {
   const id = Number(event.params.id);
   if (!Number.isSafeInteger(id) || id < 1) error(404, 'Not found');
 
-  const [palette, owner] = await Promise.all([
-    getPalette(id),
-    getOwner(event, id),
-  ]);
-  if (palette === undefined)
-    error(503, 'The gallery couldn’t be reached. Try again later.');
-  if (!palette) error(404, 'Not found');
-  const sourceProject = palette.sourceProjectId
-    ? await getSourceProject(palette.sourceProjectId)
-    : null;
-  const [link] = yarnLinksOf(palette.yarnUrls);
-  return {
-    palette,
-    owner,
-    sourceProject,
-    // Streamed, so the page never waits for them: the projects with these
-    // colors (checked in the browser, where colorway names load), and other
-    // palette pages with them
-    projects: link ? fetchProjectsWithLink(link) : Promise.resolve(null),
-    samePalettes: link
-      ? fetchPalettePagesForLinks([link])
-      : Promise.resolve([]),
+  const palette = getPalette(id);
+  const link = palette.then((found) =>
+    found ? (yarnLinksOf(found.yarnUrls)[0] ?? '') : '',
+  );
+  const rest = {
+    owner: await getOwner(event, id),
+    // Streamed, so the page never waits for them: the project it came from,
+    // the projects with these colors (checked in the browser, where colorway
+    // names load), and other palette pages with them
+    sourceProject: palette.then((found) =>
+      found?.sourceProjectId ? getSourceProject(found.sourceProjectId) : null,
+    ),
+    projects: link.then((found) =>
+      found ? fetchProjectsWithLink(found) : null,
+    ),
+    samePalettes: link.then((found) =>
+      found ? fetchPalettePagesForLinks([found]) : [],
+    ),
   };
+  // Streamed on a move within the app, so the page shows at once and says
+  // when there's none; a full load answers with the error page instead
+  if (event.isDataRequest)
+    return {
+      ...rest,
+      palette: palette.then(
+        (found) => found ?? (found === null ? 'missing' : 'unreachable'),
+      ),
+    };
+  const found = await palette;
+  if (found === undefined)
+    error(503, 'The gallery couldn’t be reached. Try again later.');
+  if (!found) error(404, 'Not found');
+  return { ...rest, palette: found };
 };
 
 /** The published palette, null when there's none, undefined when the gallery can't be reached. */

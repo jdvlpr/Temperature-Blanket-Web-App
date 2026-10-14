@@ -92,6 +92,12 @@ export function popularOrder(
     if (ownerFilters.sort !== 'POPULAR') return;
     const days = ownerFilters.popularDays;
     const list = ids();
+    // The server's, when it comes with the pages after the page shows
+    const given = initial();
+    if (given && !order) {
+      order = given;
+      forDays = POPULAR_DAYS;
+    }
     if (!list.length || (order && forDays === days)) return;
     let current = true;
     fetchPopularOrder({ type, days, ids: list })

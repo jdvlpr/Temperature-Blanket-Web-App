@@ -99,6 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <a
     {href}
     {title}
+    data-sveltekit-preload-data="tap"
     data-sveltekit-reload={reload ? '' : undefined}
     class={list
       ? ['flex min-w-0 items-center gap-3', nameRow ? 'shrink-0' : 'grow']

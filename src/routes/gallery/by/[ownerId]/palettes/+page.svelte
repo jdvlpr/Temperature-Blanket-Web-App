@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { streamed } from '#lib/utils/streamed.svelte.js';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
   import {
     FILTERS_FROM,
@@ -33,7 +34,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sharedPaletteFrom,
   } from '#lib/utils/shared-palette-utils.js';
   import { XIcon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
   import PopularPeriodMenu from '../../../PopularPeriodMenu.svelte';
   import { ownerFilters, popularOrder } from '../owner-filters.svelte.js';
   import type { PageData } from './$types';
@@ -42,19 +42,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let heading = $derived(`Yarn palettes by ${data.name}`);
 
-  // Colorway names come from the yarn data, loaded only when needed
-  let yarnDataReady = $state(false);
-  onMount(async () => {
-    if (data.palettes?.length) await ensureYarnData();
-    yarnDataReady = true;
-  });
-
-  const all = $derived(data.palettes ?? []);
+  // Undefined while the gallery answers, null if it can't be reached
+  const list = streamed(() => data.list);
+  const ownPalettes = $derived(list.current?.palettes);
+  const all = $derived(ownPalettes ?? []);
   const popular = popularOrder(
     'palette',
     () => all.map((palette) => palette.databaseId),
-    () => data.popular,
+    () => list.current?.popular ?? null,
   );
+
+  // Colorway names come from the yarn data, loaded only when needed
+  let yarnDataReady = $state(false);
+  $effect(() => {
+    if (all.length && !yarnDataReady)
+      ensureYarnData().then(() => (yarnDataReady = true));
+  });
 
   // Each palette as a card, newest first, with its date to sort by
   let cards = $derived(
@@ -112,11 +115,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
 </svelte:head>
 
-{#if data.palettes === null}
+{#if ownPalettes === undefined}
+  <div class="px-2">
+    <PlaceholderPalettes
+      items={Math.min(data.paletteIds.length, 6)}
+      maxWFull={true}
+    />
+  </div>
+{:else if ownPalettes === null}
   <p class="my-8 text-center" role="alert">
     The gallery couldn’t be reached. Try again later.
   </p>
-{:else if !data.palettes.length}
+{:else if !ownPalettes.length}
   <p class="my-8 text-center">No yarn palettes yet.</p>
 {:else if !yarnDataReady}
   <div class="px-2"><PlaceholderPalettes items={3} maxWFull={true} /></div>
