@@ -90,7 +90,7 @@ export type StoredProject = {
  * belongs to an account, otherwise its last save here (IDs are first save
  * times, for projects saved before that was kept).
  */
-function lastChanged(item: StoredProjectIndexItem): number {
+export function lastChanged(item: StoredProjectIndexItem): number {
   return lastSavedAt(item) ?? (Number(item.id) || 0);
 }
 

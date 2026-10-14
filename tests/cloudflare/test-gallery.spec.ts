@@ -116,13 +116,11 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       page.getByRole('heading', { name: 'My Projects', exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: 'Other Gallery Pages' }),
-    ).toHaveCount(0);
+    await expect(page.getByText(/Gallery only/)).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toHaveCount(0);
   });
 
-  test('My Projects lists pages without a project here, and deleting the account asks about them', async ({
+  test('My Projects shows pages without a project here as cards, and deleting the account asks about them', async ({
     page,
     request,
   }) => {
@@ -135,27 +133,35 @@ test.describe('Gallery pages from accounts', () => {
        values (${postId}, '${userId}', 'p1', 'Ottawa from 2025 to 2026', ${Date.now()})`,
     );
 
-    // Its project (p1) isn't saved here, so it's listed on its own
+    // Its project (p1) isn't saved here, so it's a card of its own among the
+    // projects; without a link kept, it opens its gallery page
     await page.goto('/my-projects');
+    await expect(page.getByText(/Gallery only · Published/)).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Other Gallery Pages' }),
-    ).toBeVisible();
-    const pages = page.getByRole('list', { name: 'Other gallery pages' });
-    await expect(
-      pages.getByRole('link', { name: /Ottawa from 2025 to 2026/ }),
+      page
+        .getByRole('link', { name: 'Ottawa from 2025 to 2026', exact: true })
+        .first(),
     ).toHaveAttribute('href', `/gallery/${postId}`);
 
     // Each page is included on the public gallery on its own; the display
     // name itself is in the Account page's Profile settings
-    const anonymous = pages.getByRole('checkbox', {
-      name: 'Anonymous: Ottawa from 2025 to 2026',
+    const sharing = page.getByRole('group', {
+      name: 'Gallery: Ottawa from 2025 to 2026',
+    });
+    await expect(sharing.getByRole('button', { name: /^Gallery:/ })).toHaveText(
+      /Published\s*$/,
+    );
+    await sharing.getByRole('button', { name: /^Gallery:/ }).click();
+    const anonymous = page.getByRole('menuitemcheckbox', {
+      name: /Anonymous/,
     });
     await expect(anonymous).toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'add a display name',
     );
-    await anonymous.uncheck();
+    await anonymous.click();
     await expect(anonymous).not.toBeChecked();
+    await page.keyboard.press('Escape');
     await page
       .getByTestId('gallery-name-status')
       .getByRole('link', { name: 'Profile settings', exact: true })
@@ -245,9 +251,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       sharing.getByRole('button', { name: /Publish a new version/ }),
     ).toHaveCount(0);
-    await expect(
-      page.getByRole('heading', { name: 'Other Gallery Pages' }),
-    ).toHaveCount(0);
+    await expect(page.getByText(/Gallery only/)).toHaveCount(0);
 
     // Each version, newest first, by its own page's name and when it was
     // published, opens its own options

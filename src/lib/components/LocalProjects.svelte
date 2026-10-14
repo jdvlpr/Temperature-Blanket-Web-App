@@ -24,7 +24,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
+  import type { GalleryPage } from '#lib/accounts/gallery.js';
   import {
+    lastChanged,
     lastSavedAt,
     ProjectStorage,
     savedProjects,
@@ -56,7 +58,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Quick undos for projects just moved to the Trash, each where it was
   const undos = new TrashUndos();
   const slots = new TrashSlots();
-  const undoSpots = $derived(undos.placed(shown.map((project) => project.id)));
   const layout = $derived(preferences.value.myProjectsLayout ?? 'grid');
 
   const labelFor = (item: StoredProjectIndexItem) =>
@@ -77,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     undos.add(
       item.id,
       labelFor(item),
-      shown.map((project) => project.id),
+      cards.map((card) => card.key),
     );
     await run(
       () => ProjectStorage.moveToTrash(item.id),
@@ -86,12 +87,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function undoRemove(id: string) {
-    undos.remove(id);
-    slots.forget(id);
     await run(
       () => ProjectStorage.restoreFromTrash(id),
       'Unable to restore the project',
     );
+    // Only once it's listed again, so its gallery-only card (when published)
+    // doesn't show in between
+    await loadProjects();
+    undos.remove(id);
+    slots.forget(id);
   }
 
   async function rename(id: string, name: string) {
@@ -122,6 +126,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const showSharing = $derived(
     onMyProjectsPage && signedIn && galleryPages.shown,
   );
+
+  // On My Projects, signed in: projects only in the gallery (deleted or not
+  // saved here) are cards too, all newest first, by when each was saved or
+  // published. One just moved to the Trash shows as its undo, not again.
+  type Card =
+    | { key: string; time: number; project: StoredProjectIndexItem }
+    | { key: string; time: number; page: GalleryPage };
+  const cards = $derived.by((): Card[] => {
+    const saved: Card[] = shown.map((project) => ({
+      key: project.id,
+      time: lastChanged(project),
+      project,
+    }));
+    // Only once the projects here are known, so none show here for a moment
+    if (!showSharing || limit || !loaded) return saved;
+    const undoing = new Set(undos.entries.map((entry) => entry.id));
+    const galleryOnly: Card[] = [
+      ...galleryPages.grouped.galleryOnlyProjects.values(),
+    ]
+      .filter((page) => !undoing.has(page.projectId))
+      .map((page) => ({
+        key: `gallery-${page.postId}`,
+        time: page.publishedAt,
+        page,
+      }));
+    if (!galleryOnly.length) return saved;
+    // A stable sort: the saved ones keep their order
+    return [...saved, ...galleryOnly].sort((a, b) => b.time - a.time);
+  });
+  const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
 
   // Adding or updating a gallery page: its dialog opens here, drawing the
   // preview from the project loaded behind it
@@ -215,12 +249,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <!-- With nothing left to list, they show on their own -->
-{#if !shown.length && undoSpots.size}
+{#if !cards.length && undoSpots.size}
   <div class="mt-2 flex w-full flex-col gap-2">{@render undoAt(null)}</div>
 {/if}
 
 {#key projects}
-  {#if projects?.length}
+  {#if cards.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
       {#if !onMyProjectsPage}
         <h2 class="mb-1 text-sm font-bold opacity-70">Recent Projects</h2>
@@ -238,26 +272,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4'
             : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
         >
-          {#each shown as project (project.id)}
-            {@render undoAt(project.id, true)}
-            <div class="w-full" {@attach slots.track(project.id)}>
-              <SavedProjectCard
-                item={project}
-                {picturesVersion}
-                pictureSettled={settled.has(
-                  pictureKey(project.id, project.meta.href),
-                )}
-                layout={grid ? 'grid' : 'list'}
-                syncLabel={__ACCOUNTS_ENABLED__
-                  ? syncLabelFor(project, signedIn)
-                  : undefined}
-                onrename={(name) => rename(project.id, name)}
-                onremove={() => remove(project)}
-              >
-                {#snippet sharing()}
-                  {#if showSharing}{@render gallerySharing(project)}{/if}
-                {/snippet}
-              </SavedProjectCard>
+          {#each cards as card (card.key)}
+            {@render undoAt(card.key, true)}
+            <div class="w-full" {@attach slots.track(card.key)}>
+              {#if 'project' in card}
+                {@const project = card.project}
+                <SavedProjectCard
+                  item={project}
+                  {picturesVersion}
+                  pictureSettled={settled.has(
+                    pictureKey(project.id, project.meta.href),
+                  )}
+                  layout={grid ? 'grid' : 'list'}
+                  syncLabel={__ACCOUNTS_ENABLED__
+                    ? syncLabelFor(project, signedIn)
+                    : undefined}
+                  onrename={(name) => rename(project.id, name)}
+                  onremove={() => remove(project)}
+                >
+                  {#snippet sharing()}
+                    {#if showSharing}{@render gallerySharing(project)}{/if}
+                  {/snippet}
+                </SavedProjectCard>
+              {:else}
+                <!-- Only in the gallery: a picture only if one is kept here,
+                never drawn (that would load the weather), else its colors -->
+                <SavedProjectCard
+                  galleryPage={card.page}
+                  pictureSettled
+                  layout={grid ? 'grid' : 'list'}
+                >
+                  {#snippet sharing()}
+                    <GallerySharing
+                      compact
+                      kind="project"
+                      label={card.page.title}
+                      page={card.page}
+                      onadd={() => {}}
+                      onupdate={() => {}}
+                    />
+                  {/snippet}
+                </SavedProjectCard>
+              {/if}
             </div>
           {/each}
           {@render undoAt(null, true)}

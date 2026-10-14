@@ -21,35 +21,43 @@ const page = (
 
 describe('groupGalleryPages', () => {
   it('shows the newest page of each saved project, its older ones with it', () => {
-    const { byProject, others } = groupGalleryPages(
+    const { byProject, galleryOnlyProjects } = groupGalleryPages(
       [page(1, 'a', 100), page(2, 'a', 300), page(3, 'b', 200)],
       ['a', 'b'],
       [],
     );
     expect(byProject.get('a')?.postId).toBe(2);
     expect(byProject.get('b')?.postId).toBe(3);
-    expect(others).toEqual([]);
+    expect(galleryOnlyProjects.size).toBe(0);
   });
 
-  it('lists pages of projects not saved here as others', () => {
-    const { byProject, others } = groupGalleryPages(
-      [page(1, 'gone', 100)],
-      ['a'],
-      [],
-    );
+  it('shows the newest page of each project or palette not saved here', () => {
+    const { byProject, galleryOnlyProjects, galleryOnlyPalettes } =
+      groupGalleryPages(
+        [
+          page(1, 'gone', 100),
+          page(2, 'gone', 300),
+          page(3, 'pal', 200, 'palette'),
+        ],
+        ['a'],
+        [],
+      );
     expect(byProject.size).toBe(0);
-    expect(others.map((p) => p.postId)).toEqual([1]);
+    expect(galleryOnlyProjects.get('gone')?.postId).toBe(2);
+    expect(galleryOnlyProjects.size).toBe(1);
+    expect(galleryOnlyPalettes.get('pal')?.postId).toBe(3);
   });
 
   it('keeps palettes apart from projects with the same ID', () => {
-    const { byProject, byPalette, others } = groupGalleryPages(
-      [page(1, 'x', 100, 'palette'), page(2, 'x', 200, 'project')],
-      ['x'],
-      ['x'],
-    );
+    const { byProject, byPalette, galleryOnlyProjects, galleryOnlyPalettes } =
+      groupGalleryPages(
+        [page(1, 'x', 100, 'palette'), page(2, 'x', 200, 'project')],
+        ['x'],
+        ['x'],
+      );
     expect(byProject.get('x')?.postId).toBe(2);
     expect(byPalette.get('x')?.postId).toBe(1);
-    expect(others).toEqual([]);
+    expect(galleryOnlyProjects.size + galleryOnlyPalettes.size).toBe(0);
   });
 
   it('treats pages without a kind as projects', () => {
@@ -58,13 +66,12 @@ describe('groupGalleryPages', () => {
   });
 
   it('breaks a tie in time by the newer post', () => {
-    const { byProject, others } = groupGalleryPages(
+    const { byProject } = groupGalleryPages(
       [page(1, 'a', 100), page(2, 'a', 100)],
       ['a'],
       [],
     );
     expect(byProject.get('a')?.postId).toBe(2);
-    expect(others).toEqual([]);
   });
 });
 

@@ -36,22 +36,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPaletteFallbackName,
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
-  import { formatDateTime } from '#lib/utils/date-utils.js';
+  import type { GalleryPage } from '#lib/accounts/gallery.js';
+  import GallerySharing from '#lib/components/account/GallerySharing.svelte';
   import { PencilIcon, Trash2Icon } from '@lucide/svelte';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
   // (the My Projects page), each palette is a link to the Yarn Palette Creator
-  // With sharing (My Projects, signed in), each palette says who can see it
+  // With sharing (My Projects, signed in), each palette says who can see it,
+  // and palettes only in the gallery (deleted or not saved here) are listed too
   let {
     updateGauge,
     sharing,
+    galleryOnly = [],
   }: {
     updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
     sharing?: Snippet<
       [{ palette: SavedPalette; colors: Color[]; label: string }]
     >;
+    /** The newest page of each palette only in the gallery */
+    galleryOnly?: GalleryPage[];
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -63,6 +68,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const undos = new TrashUndos();
   const slots = new TrashSlots();
 
+  const dateOf = (time: number) =>
+    new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
+
   let palettes = $derived(
     yarnDataReady
       ? savedPalettes.items
@@ -73,16 +81,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
               palette,
               colors,
               label: palette.name || getPaletteFallbackName(colors),
-              saved: formatDateTime(palette.createdAt),
             };
           })
           .filter((n) => n !== null)
       : [],
   );
 
-  const undoSpots = $derived(
-    undos.placed(palettes.map((item) => item.palette.id)),
+  // Every card, newest first: saved ones by when they were saved (their
+  // order), ones only in the gallery by when they were published. One just
+  // moved to the Trash shows as its undo, not again.
+  type Card = {
+    key: string;
+    time: number;
+    colors: Color[];
+    label: string;
+  } & (
+    | { palette: SavedPalette; page?: never }
+    | { palette?: never; page: GalleryPage }
   );
+  let cards = $derived.by((): Card[] => {
+    const saved: Card[] = palettes.map((item) => ({
+      ...item,
+      key: item.palette.id,
+      time: item.palette.createdAt,
+    }));
+    if (!yarnDataReady || !savedPalettes.loaded || !galleryOnly.length)
+      return saved;
+    const undoing = new Set(undos.entries.map((entry) => entry.id));
+    const pages = galleryOnly
+      .filter((page) => !undoing.has(page.projectId))
+      .map((page): Card | null => {
+        const colors = page.link && getColorsFromInput({ string: page.link });
+        if (!colors || !colors.length) return null;
+        return {
+          page,
+          colors,
+          label: page.title,
+          key: `gallery-${page.postId}`,
+          time: page.publishedAt,
+        };
+      })
+      .filter((n) => n !== null);
+    // A stable sort: the saved ones keep their order
+    return [...saved, ...pages].sort((a, b) => b.time - a.time);
+  });
+
+  const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
 
   onMount(async () => {
     await Promise.all([ensureYarnData(), savedPalettes.refresh()]);
@@ -118,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     undos.add(
       palette.id,
       label,
-      palettes.map((item) => item.palette.id),
+      cards.map((card) => card.key),
     );
     await run(
       () => PaletteStorage.remove(palette.id),
@@ -127,12 +171,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function undoRemove(id: string) {
-    undos.remove(id);
-    slots.forget(id);
+    // The list is refreshed by then, so its gallery-only card (when
+    // published) doesn't show in between
     await run(
       () => PaletteStorage.restore(id),
       'Unable to restore the palette',
     );
+    undos.remove(id);
+    slots.forget(id);
   }
 
   /** Its Yarn Palette Creator link, with its name for Save Palette there */
@@ -188,13 +234,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   <!-- With nothing left to list, they show on their own -->
-  {#if yarnDataReady && !palettes.length && undoSpots.size}
+  {#if yarnDataReady && !cards.length && undoSpots.size}
     <div class="flex w-full flex-col gap-2">{@render undoAt(null, false)}</div>
   {/if}
   {#if !yarnDataReady}
     <div class="my-1"></div>
     <PlaceholderPalettes items={3} maxWFull={true} />
-  {:else if !palettes.length}
+  {:else if !cards.length}
     <div class="my-8 flex max-w-prose flex-col gap-2 text-center">
       <p class="font-bold">No saved palettes yet</p>
     </div>
@@ -208,10 +254,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       aria-label="Saved palettes"
     >
-      {#each palettes as { palette, colors, label } (palette.id)}
-        {@render undoAt(palette.id, true)}
-        <li class="flex w-full min-w-0" {@attach slots.track(palette.id)}>
-          {#if editingId === palette.id}
+      {#each cards as card (card.key)}
+        {@const { palette, page, colors, label } = card}
+        {@render undoAt(card.key, true)}
+        <li class="flex w-full min-w-0" {@attach slots.track(card.key)}>
+          {#if page}
+            <!-- Only in the gallery: opens a copy, as its gallery page does -->
+            <PaletteCard
+              {colors}
+              name={label}
+              summary={false}
+              href={linkFor(colors, page.title)}
+              title="Open a copy in Yarn Palette Creator"
+            >
+              {#snippet details()}
+                <span class="text-surface-700-300 line-clamp-1 text-xs"
+                  >Gallery only · Published {dateOf(page.publishedAt)}</span
+                >
+              {/snippet}
+              {#snippet footer()}
+                <GallerySharing
+                  compact
+                  kind="palette"
+                  {label}
+                  {page}
+                  onadd={() => {}}
+                  onupdate={() => {}}
+                />
+              {/snippet}
+            </PaletteCard>
+          {:else if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
               <PaletteStrip {colors} />
               <NameField
@@ -227,7 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <PaletteCard
               {colors}
               name={label}
-              summary={!!palette.name}
+              summary={updateGauge ? !!palette.name : false}
               href={updateGauge ? undefined : linkFor(colors, palette.name)}
               onclick={updateGauge ? () => use(colors) : undefined}
               title={updateGauge
@@ -256,6 +328,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </a>
                   {/if}
                 </span>
+              {/snippet}
+              {#snippet details()}
+                {#if !updateGauge}
+                  <span class="text-surface-700-300 line-clamp-1 text-xs"
+                    >Saved {dateOf(palette.createdAt)}</span
+                  >
+                {/if}
               {/snippet}
               {#snippet action()}
                 <MoreMenu

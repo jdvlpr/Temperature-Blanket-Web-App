@@ -18,7 +18,6 @@ and the Trash sync to the account, and each project and palette can be
 published to the gallery as a snapshot, with the account's name or without. -->
 
 <script lang="ts">
-  import { LIST_ENDS } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
   import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
@@ -29,7 +28,6 @@ published to the gallery as a snapshot, with the account's name or without. -->
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
-  import OtherGalleryPages from '#lib/components/account/OtherGalleryPages.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import LocalProjects from '#lib/components/LocalProjects.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
@@ -268,7 +266,11 @@ published to the gallery as a snapshot, with the account's name or without. -->
           {#if synced}
             <AddToAccountButton kind="palettes" />
           {/if}
-          <SavedPalettes>
+          <SavedPalettes
+            galleryOnly={signedIn && galleryPages.shown
+              ? [...galleryPages.grouped.galleryOnlyPalettes.values()]
+              : []}
+          >
             {#snippet sharing({ palette, colors, label })}
               {#if signedIn && galleryPages.shown}
                 {@const page = galleryPages.grouped.byPalette.get(palette.id)}
@@ -289,13 +291,6 @@ published to the gallery as a snapshot, with the account's name or without. -->
           </SavedPalettes>
         {/if}
       </section>
-
-      <!-- Signed in: gallery pages not next to a project or palette above -->
-      {#if browser && signedIn}
-        <OtherGalleryPages
-          cardClass="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden {LIST_ENDS} card-border"
-        />
-      {/if}
 
       <!-- Out of the way: deleted things are in a dialog, and the button only
       shows when there's something in it -->
