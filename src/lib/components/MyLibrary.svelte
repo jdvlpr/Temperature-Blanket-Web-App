@@ -155,44 +155,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         cleared, they'll be lost.
       {/if}
     </p>
-
-    <!-- Signed in: whose name gallery pages show (tap to change it), and where
-    those pages are listed -->
-    {#if browser && showGallery}
-      <div
-        class="flex flex-wrap items-center justify-center gap-2"
-        data-testid="gallery-name-status"
-      >
-        {#if ownerName}
-          {#if anyWithName && galleryPages.publicId}
-            <a
-              href={resolve('/gallery/by/[ownerId]', {
-                ownerId: galleryPages.publicId,
-              })}
-              target="_blank"
-              class="btn preset-tonal-primary"
-              data-testid="gallery-owner-page"
-              ><GlobeIcon />Your Gallery Page<ExternalLinkIcon
-                class="icon-sm opacity-70"
-                aria-hidden="true"
-              /></a
-            >
-          {/if}
-          <a
-            href={DISPLAY_NAME_HREF}
-            class="btn hover:preset-tonal-surface"
-            title="Change the name on your gallery pages"
-            ><PencilIcon />By {ownerName}<span class="sr-only"
-              >, change the name on your gallery pages</span
-            ></a
-          >
-        {:else}
-          <a href={DISPLAY_NAME_HREF} class="btn hover:preset-tonal-surface"
-            ><PencilIcon />Add a Name for Gallery Pages</a
-          >
-        {/if}
-      </div>
-    {/if}
   </div>
 
   <!-- Signed out: an account keeps them safe, and on every device -->
@@ -230,23 +192,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@render children()}
   </section>
 
-  <!-- Out of the way: deleted things are in a dialog, and the button only
-  shows when there's something in it -->
-  {#if browser && trashCount}
-    <div class="flex justify-center">
-      <button
-        type="button"
-        class="btn hover:preset-tonal-surface"
-        onclick={() =>
-          dialog.trigger({
-            type: 'component',
-            component: { ref: Trash },
-            options: { size: 'large', title: 'Trash' },
-          })}
-      >
-        <Trash2Icon />
-        Trash ({trashCount})
-      </button>
+  <!-- Out of the way, below the list: whose name gallery pages show (tap to
+  change it), where those pages are listed, and deleted things, in a dialog.
+  Trash only shows when there's something in it. -->
+  {#if browser && (showGallery || trashCount)}
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      {#if showGallery}
+        <div class="contents" data-testid="gallery-name-status">
+          {#if ownerName}
+            {#if anyWithName && galleryPages.publicId}
+              <a
+                href={resolve('/gallery/by/[ownerId]', {
+                  ownerId: galleryPages.publicId,
+                })}
+                target="_blank"
+                class="btn hover:preset-tonal-surface"
+                data-testid="gallery-owner-page"
+                ><GlobeIcon />Your Gallery Page<ExternalLinkIcon
+                  class="icon-sm opacity-70"
+                  aria-hidden="true"
+                /></a
+              >
+            {/if}
+            <a
+              href={DISPLAY_NAME_HREF}
+              class="btn hover:preset-tonal-surface"
+              title="Change the name on your gallery pages"
+              ><PencilIcon />By {ownerName}<span class="sr-only"
+                >, change the name on your gallery pages</span
+              ></a
+            >
+          {:else}
+            <a href={DISPLAY_NAME_HREF} class="btn hover:preset-tonal-surface"
+              ><PencilIcon />Add a Name for Gallery Pages</a
+            >
+          {/if}
+        </div>
+      {/if}
+      {#if trashCount}
+        <button
+          type="button"
+          class="btn hover:preset-tonal-surface"
+          onclick={() =>
+            dialog.trigger({
+              type: 'component',
+              component: { ref: Trash },
+              options: { size: 'large', title: 'Trash' },
+            })}
+        >
+          <Trash2Icon />
+          Trash ({trashCount})
+        </button>
+      {/if}
     </div>
   {/if}
 </main>
