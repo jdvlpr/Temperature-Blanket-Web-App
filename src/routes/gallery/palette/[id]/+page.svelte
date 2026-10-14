@@ -13,10 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- A palette's gallery page: its colors and colorways as a project page shows
-a gauge's, Open a Copy (in the Yarn Palette Creator), "By <name>" when its
-owner included it on their public gallery, the projects with these colors (its
-own project first), and other palette pages with them. -->
+<!-- A palette's gallery page, laid out like a project's: its name, "By <name>"
+when its owner included it on their public gallery, Open a Copy (in the Yarn
+Palette Creator), its colors, its details (yarns, the project it came from,
+other palette pages with these colors), its colorways, then the projects with
+these colors (its own project first). -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -49,10 +50,13 @@ own project first), and other palette pages with them. -->
   } from '#lib/utils/shared-palette-utils.js';
   import { streamed } from '#lib/utils/streamed.svelte.js';
   import { decodeHtmlEntities, pluralize } from '#lib/utils/string-utils.js';
-  import { ArrowLeftIcon, PaletteIcon, PlusIcon } from '@lucide/svelte';
+  import { ArrowLeftIcon, PlusIcon, SwatchBookIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
+  import GalleryDetail from '../../GalleryDetail.svelte';
+  import GalleryDetails from '../../GalleryDetails.svelte';
   import GalleryPageHeader from '../../GalleryPageHeader.svelte';
+  import GalleryYarnLines from '../../GalleryYarnLines.svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -72,8 +76,8 @@ own project first), and other palette pages with them. -->
   let link = $derived(yarnLinksOf(galleryPalette?.yarnUrls)[0] ?? '');
   let sourceProjectId = $derived(galleryPalette?.sourceProjectId ?? null);
 
-  // The project it came from, when the projects with it can't be listed: its
-  // name, or its places and dates. It comes after the page.
+  // The project it came from (in Details): its name, or its places and
+  // dates. It comes after the page.
   const streamedSource = streamed(() => data.sourceProject);
   let sourceProject = $derived(streamedSource.current);
   let sourceTitle = $derived(
@@ -98,18 +102,6 @@ own project first), and other palette pages with them. -->
         )
       : null,
   );
-  let yarns = $derived(
-    palette
-      ? [
-          ...new Set(
-            palette.colors
-              .filter((color) => color?.brandName && color?.yarnName)
-              .map((color) => `${color.brandName} ${color.yarnName}`),
-          ),
-        ]
-      : [],
-  );
-
   // Counts a view for Popular, in the browser (once per palette shown)
   $effect(() => {
     if (galleryPalette) recordPageView(galleryPalette.databaseId);
@@ -216,7 +208,7 @@ own project first), and other palette pages with them. -->
             open={palette
               ? {
                   href: palette.href,
-                  icon: PaletteIcon,
+                  icon: SwatchBookIcon,
                   title:
                     'Open a copy in the Yarn Palette Creator. This gallery page won’t change.',
                 }
@@ -236,24 +228,10 @@ own project first), and other palette pages with them. -->
                 This yarn palette gallery page cannot be found.
               {/if}
             {/snippet}
-            {#snippet note()}
-              {#if samePalettes.length}
-                Also shared as
-                {#each samePalettes as other, i (other.databaseId)}{#if i}{', '}{/if}<a
-                    class="link"
-                    href={resolve('/gallery/palette/[id]', {
-                      id: String(other.databaseId),
-                    })}>{galleryTitleText(other.title) || 'Yarn Palette'}</a
-                  >{/each}
-              {/if}
-            {/snippet}
             {#snippet subtitle()}
               {#if palette}
                 {palette.colors.length}
-                {pluralize(
-                  'color',
-                  palette.colors.length,
-                )}{#if yarns.length}{' · '}{yarns.join(', ')}{/if}
+                {pluralize('color', palette.colors.length)}
               {:else}
                 &nbsp;
               {/if}
@@ -274,6 +252,36 @@ own project first), and other palette pages with them. -->
               ></div>
             {:else if palette}
               <PaletteStrip colors={palette.colors} />
+              <GalleryDetails>
+                {#if palette.colors.some((color) => color?.brandName && color?.yarnName)}
+                  <GalleryDetail label="Yarn">
+                    <GalleryYarnLines colors={palette.colors} />
+                  </GalleryDetail>
+                {/if}
+                {#if sourceProject && sourceTitle}
+                  <GalleryDetail label="From the project">
+                    <a
+                      class="link"
+                      data-testid="gallery-source-project"
+                      href={resolve('/gallery/[id]', {
+                        id: String(sourceProject.databaseId),
+                      })}>{sourceTitle}</a
+                    >
+                  </GalleryDetail>
+                {/if}
+                {#if samePalettes.length}
+                  <GalleryDetail label="Also shared as">
+                    {#each samePalettes as other, i (other.databaseId)}{#if i}<span
+                          >,
+                        </span>{/if}<a
+                        class="link"
+                        href={resolve('/gallery/palette/[id]', {
+                          id: String(other.databaseId),
+                        })}>{galleryTitleText(other.title) || 'Yarn Palette'}</a
+                      >{/each}
+                  </GalleryDetail>
+                {/if}
+              </GalleryDetails>
               <div class="mx-auto w-fit">
                 <ViewMenu bind:value={preferences.value.layout} fillOption />
               </div>
@@ -313,15 +321,7 @@ own project first), and other palette pages with them. -->
                     : getTitleTextFromLocationsMeta(locations)}
                   {date}
                   title={getTitleTextFromLocationsMeta(locations)}
-                >
-                  {#snippet details()}
-                    {#if databaseId === sourceProjectId}
-                      <p class="text-surface-600-400 text-xs">
-                        Shared from this project
-                      </p>
-                    {/if}
-                  {/snippet}
-                </GalleryProjectCard>
+                />
               </div>
             {/each}
           </div>
@@ -336,16 +336,6 @@ own project first), and other palette pages with them. -->
               Show More
             </button>
           {/if}
-        {:else if projectsFound === null && sourceProject && sourceTitle}
-          <!-- The projects couldn't be looked up: the one it came from -->
-          <p class="text-sm" data-testid="gallery-source-project">
-            From the project <a
-              class="link"
-              href={resolve('/gallery/[id]', {
-                id: String(sourceProject.databaseId),
-              })}>{sourceTitle}</a
-            >
-          </p>
         {:else if loadingProjects && yarnDataReady && galleryPalette}
           <span class="sr-only" role="status">Looking for projects…</span>
         {/if}

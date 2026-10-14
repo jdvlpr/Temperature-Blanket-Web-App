@@ -14,13 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  The top of a gallery page, the same for projects and palettes: its owner's
-  bar, its name, a line under it, "By <name> · Shared <date>", then Open a
-  Copy and any `actions` after it.
+  The top of a gallery page, the same for projects and palettes: its name, a
+  line under it, "By <name> · Published <date>" (the only place either shows),
+  then Open a Copy and, for its owner, Your Page ▾. Details go under the
+  page's picture or palette, in GalleryDetails.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import GalleryOwnerBar from '#lib/components/account/GalleryOwnerBar.svelte';
+  import GalleryOwnerMenu from '#lib/components/account/GalleryOwnerMenu.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
   import type { Component, Snippet } from 'svelte';
 
@@ -35,8 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     heading: Snippet;
     /** A line under the name */
     subtitle?: Snippet;
-    /** A small line under "By", e.g. other pages with the same colors */
-    note?: Snippet;
     /** Open a Copy: where, its icon, and its tooltip */
     open?: {
       href: string;
@@ -44,8 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       title: string;
       target?: string;
     } | null;
-    /** More buttons after Open a Copy */
-    actions?: Snippet;
   }
 
   let {
@@ -55,9 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     date,
     heading,
     subtitle,
-    note,
     open,
-    actions,
   }: Props = $props();
 
   let sharedOn = $derived(
@@ -70,10 +65,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
 >
-  <!-- Even when the page can't be found, so its owner can unpublish it -->
-  {#if __ACCOUNTS_ENABLED__}
-    <GalleryOwnerBar {postId} {kind} onowner={(next) => (owner = next)} />
-  {/if}
   <h1 class="text-2xl font-bold break-words">{@render heading()}</h1>
   {#if subtitle}
     <p>{@render subtitle()}</p>
@@ -92,29 +83,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ></span
         >{/if}{#if owner && sharedOn}<span aria-hidden="true">
           ·
-        </span>{/if}{#if sharedOn}<span>Shared {sharedOn}</span>{/if}
+        </span>{/if}{#if sharedOn}<span>Published {sharedOn}</span>{/if}
     </p>
   {/if}
 
-  {#if note}
-    <p class="text-surface-600-400 text-sm empty:hidden">{@render note()}</p>
-  {/if}
-  {#if open || actions}
-    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
-      {#if open}
-        <!-- A link on this site, built from the page's own link -->
-        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-        <a
-          class="btn preset-filled-primary-500"
-          href={open.href}
-          target={open.target}
-          title={open.title}
-        >
-          <open.icon />
-          Open a Copy
-        </a>
-      {/if}
-      {@render actions?.()}
-    </div>
-  {/if}
+  <div
+    class="mt-2 flex flex-wrap items-center justify-center gap-2 empty:hidden"
+  >
+    {#if open}
+      <!-- A link on this site, built from the page's own link -->
+      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+      <a
+        class="btn preset-filled-primary-500"
+        href={open.href}
+        target={open.target}
+        title={open.title}
+      >
+        <open.icon />
+        Open a Copy
+      </a>
+    {/if}
+    <!-- Even when the page can't be found, so its owner can unpublish it -->
+    {#if __ACCOUNTS_ENABLED__}
+      <GalleryOwnerMenu {postId} {kind} onowner={(next) => (owner = next)} />
+    {/if}
+  </div>
 </div>

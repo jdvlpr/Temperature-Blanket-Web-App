@@ -23,12 +23,8 @@ test.describe('Project Gallery Pages', () => {
     // Check for the presence of the main image
     await expect(page.getByAltText('Project Preview')).toBeVisible();
 
-    // The project's details open in a dialog from the "About" button.
-    await page.getByRole('button', { name: 'About this project' }).click();
-    await expect(
-      page.getByRole('heading', { name: 'About this project' }),
-    ).toBeVisible();
-    await page.keyboard.press('Escape');
+    // The project's details show under the picture
+    await expect(page.getByRole('term').first()).toBeVisible();
 
     // Check for the share/open buttons or similar.
     // The "Open a Copy" button is a good candidate if valid.

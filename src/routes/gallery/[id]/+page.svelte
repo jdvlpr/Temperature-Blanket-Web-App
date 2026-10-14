@@ -29,20 +29,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import YarnSources from '#lib/components/YarnSources.svelte';
-  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
-  import GaugeColorsView from '#lib/components/GaugeColorsView.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { allGaugesAttributes } from '#lib/state/gauges-state.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
-  import { dialog } from '#lib/state/page-state.svelte.js';
-  import { preferences } from '#lib/storage/preferences.svelte.js';
   import type {
     GaugeRange,
     GaugeRangeCategory,
   } from '#lib/types/gauge-types.js';
-  import type { Color } from '#lib/types/yarn-types.js';
   import {
     gaugeParamsHaveYarnDetails,
     parseGaugeURLHash,
@@ -59,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTitleFromLocationsMeta,
   } from '#lib/utils/project-utils.svelte.js';
   import { recordPageView } from '#lib/utils/gallery-utils.js';
-  import { galleryTitleText } from '#lib/utils/shared-palette-utils.js';
   import {
     decodeHtmlEntities,
     stripHTMLTags,
@@ -67,9 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowLeftIcon,
     GlobeIcon,
-    InfoIcon,
     NotebookPenIcon,
-    PaletteIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
   import {
@@ -79,8 +70,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { yarnPageState } from '../../yarn/state.svelte';
   import { streamed } from '#lib/utils/streamed.svelte.js';
   import type { PageData } from './$types';
-  import AboutProjectDialog from './AboutProjectDialog.svelte';
+  import GalleryDetail from '../GalleryDetail.svelte';
+  import GalleryDetails from '../GalleryDetails.svelte';
   import GalleryPageHeader from '../GalleryPageHeader.svelte';
+  import GalleryYarnLines from '../GalleryYarnLines.svelte';
+  import GaugeRanges from '../GaugeRanges.svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -109,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         )
       : projectURL,
   );
-  // As text (for the page title and the about dialog)
+  // As text (for the page title and palette names)
   let projectTitleNoHTML = $derived(
     projectName || decodeHtmlEntities(stripHTMLTags(projectTitle)),
   );
@@ -122,8 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let globeLink = $derived(
     project ? buildGlobeLinkFromLocationsMeta(project.locations) : null,
   );
-  // The link goes to the first location, so name that one: short button text,
-  // with the place spelled out for screen readers and on hover.
+  // The link goes to the first location, so name that one (in Details)
   let globeLinkLabel = $derived.by(() => {
     const place = project
       ? firstLocationLabelFromLocationsMeta(project.locations)
@@ -203,63 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ensureYarnData();
   });
 
-  function openAbout() {
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: AboutProjectDialog,
-        props: {
-          project,
-          title: projectTitleNoHTML,
-          owner,
-          reshapedColors,
-          weatherSources,
-        },
-      },
-      options: { size: 'medium' },
-    });
-  }
-
-  let reshapedColors = $derived.by(() => {
-    if (!flatColors) return null;
-    const yarns: Array<{
-      brandId: any;
-      brandName: any;
-      yarnWeightId: any;
-      yarnId: any;
-      yarnName: any;
-      colors: Array<{ name: any; hex: any }>;
-    }> = [];
-
-    const extras = extraColors.map((extra) => extra.color);
-    [...flatColors, ...extras].forEach((color: Color, colorIndex: number) => {
-      const isExtra = colorIndex >= flatColors.length;
-      const { brandId, yarnId, brandName, yarnName, name, hex, yarnWeightId } =
-        color;
-      const existingYarn = yarns.find(
-        (item) => item.brandId === brandId && item.yarnId === yarnId,
-      );
-      if (!existingYarn) {
-        yarns.push({
-          brandId,
-          brandName,
-          yarnWeightId,
-          yarnId,
-          yarnName,
-          colors: [],
-        });
-      }
-      const yarnToUpdate = yarns.find(
-        (item) => item.brandId === brandId && item.yarnId === yarnId,
-      );
-      if (yarnToUpdate) {
-        // Don't list an accent/border colorway twice if a gauge already uses it
-        if (isExtra && yarnToUpdate.colors.some((c) => c.hex === hex)) return;
-        yarnToUpdate.colors.push({ name, hex });
-      }
-    });
-    return yarns;
-  });
+  let pattern = $derived(project?.projectTags?.nodes?.[0]);
 
   let projectUnits = $derived<'imperial' | 'metric'>(
     params?.u?.value === 'i' ? 'imperial' : 'metric',
@@ -383,33 +320,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {@html projectTitle}
                 {/if}
               {/snippet}
-              {#snippet actions()}
-                {#if globeLink}
-                  <a
-                    class="btn hover:preset-tonal-surface"
-                    href={globeLink}
-                    aria-label={globeLinkLabel}
-                    title={globeLinkLabel}
-                  >
-                    <GlobeIcon />
-                    See Nearby Projects
-                  </a>
-                {/if}
-                {#if project}
-                  <!-- Reference details, in a dialog rather than an inline
-                       accordion that pushed the preview image down -->
-                  <button
-                    type="button"
-                    class="btn hover:preset-tonal-surface"
-                    aria-label="About this project"
-                    title="About this project"
-                    onclick={openAbout}
-                  >
-                    <InfoIcon />
-                    About
-                  </button>
-                {/if}
-              {/snippet}
             </GalleryPageHeader>
           {/snippet}
           {#snippet content()}
@@ -421,6 +331,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     alt="Project Preview"
                     class="m-auto max-h-[60vh]"
                   />
+                  <p class="text-surface-600-400 mt-2 px-2 text-sm">
+                    The preview shows the weather when it was published. Open a
+                    copy to see the latest.
+                  </p>
                 {:else if project === undefined}
                   <div
                     class="placeholder rounded-container m-auto h-[50vh] w-full max-w-3xl animate-pulse"
@@ -428,13 +342,79 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
               </div>
 
-              <div class="mt-2 flex flex-col gap-4 text-center">
-                <div class="flex flex-col gap-8">
-                  {#if gauges?.length}
-                    {#key gauges}
-                      {#each gauges as { colors, ranges, id, rangeOptions }, gaugeIndex}
-                        {@const gaugeType = gauges[gaugeIndex].unit.type}
-                        {@const item = (ranges ?? []).map(
+              {#if project}
+                <div class="mt-4 px-2">
+                  <GalleryDetails>
+                    {#if flatColors.length || extraColors.length}
+                      <GalleryDetail label="Yarn">
+                        <GalleryYarnLines
+                          colors={[
+                            ...flatColors,
+                            ...extraColors.map((extra) => extra.color),
+                          ]}
+                        />
+                      </GalleryDetail>
+                    {/if}
+                    {#if pattern?.name}
+                      <GalleryDetail label="Pattern">
+                        <p>{pattern.name}</p>
+                        {#if pattern.description}
+                          <p class="text-surface-600-400 text-sm">
+                            {pattern.description}
+                          </p>
+                        {/if}
+                      </GalleryDetail>
+                    {/if}
+                    {#if project.totalDays}
+                      <GalleryDetail label="Days">
+                        {project.totalDays}
+                        {#if project.missingDays}
+                          <span class="text-surface-600-400 text-sm"
+                            >· {project.missingDays} without weather data</span
+                          >
+                        {/if}
+                      </GalleryDetail>
+                    {/if}
+                    {#if weatherSources?.length}
+                      <GalleryDetail label="Weather data">
+                        {#each weatherSources as { name, url }, i (url)}{#if i}<span
+                              >,
+                            </span>{/if}<a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="link">{name}</a
+                          >{/each}
+                      </GalleryDetail>
+                    {/if}
+                    {#if globeLink}
+                      <GalleryDetail label="Nearby">
+                        <a
+                          class="link inline-flex items-center gap-1"
+                          href={globeLink}
+                          ><GlobeIcon
+                            class="icon-sm"
+                            aria-hidden="true"
+                          />{globeLinkLabel}</a
+                        >
+                      </GalleryDetail>
+                    {/if}
+                  </GalleryDetails>
+                </div>
+              {/if}
+
+              <div class="mt-4 flex flex-col gap-4 px-2 pb-4">
+                {#if gauges?.length}
+                  {#key gauges}
+                    {#each gauges as { colors, ranges, id, rangeOptions, unit }, gaugeIndex}
+                      {@const attributes = allGaugesAttributes.find(
+                        (item) => item.id === id,
+                      )}
+                      {@const gaugeName = attributes?.label ?? ''}
+                      {@const palettePage = gaugePalettePages[gaugeIndex]}
+                      <GaugeRanges
+                        heading={gaugeName}
+                        items={(ranges ?? []).map(
                           (
                             range: GaugeRange | GaugeRangeCategory,
                             index: number,
@@ -444,97 +424,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             range,
                           }),
                         )}
-                        {@const unitLabel = allGaugesAttributes.find(
-                          (item) => item.id === id,
-                        )?.unit.label[projectUnits]}
-                        {@const gaugeLabel = `${
-                          allGaugesAttributes.find((item) => item.id === id)
-                            ?.label
-                        } Yarn Palette`}
-                        {@const gaugeName =
-                          allGaugesAttributes.find((item) => item.id === id)
-                            ?.label ?? ''}
-                        {@const palettePage = gaugePalettePages[gaugeIndex]}
-                        <div class="flex flex-col">
-                          <div class="flex flex-col">
-                            <PaletteStrip
-                              colors={colors ?? []}
-                              label={gaugeLabel}
-                            />
-                            <div
-                              class="mt-4 flex flex-wrap items-center justify-center gap-2"
+                        unitLabel={attributes?.unit.label[projectUnits]}
+                        unitType={unit.type}
+                        {rangeOptions}
+                        gaugeId={id}
+                      >
+                        {#snippet action()}
+                          <!-- Its own gallery page if it has one, or else a
+                               copy in the Yarn Palette Creator -->
+                          {#if palettePage}
+                            <a
+                              class="btn hover:preset-tonal-surface"
+                              aria-label="{gaugeName} Palette Page"
+                              title="This yarn palette’s own gallery page"
+                              href={resolve('/gallery/palette/[id]', {
+                                id: String(palettePage.databaseId),
+                              })}
                             >
-                              <a
-                                class="btn preset-tonal-primary border-primary-500 border"
-                                aria-label="Open a copy of the {gaugeName} yarn palette"
-                                title="Open a copy in the Yarn Palette Creator. This gallery page won’t change."
-                                onclick={() => {
-                                  if (!colors) return;
-                                  yarnPageState.gauge.colors = colors;
-                                  // Its gallery name, which Save Palette offers
-                                  yarnPageState.suggestion = {
-                                    name: palettePage?.title
-                                      ? galleryTitleText(palettePage.title)
-                                      : `${projectTitleNoHTML} – ${gaugeName}`.slice(
-                                          0,
-                                          80,
-                                        ),
-                                    colors: $state.snapshot(colors),
-                                  };
-                                }}
-                                href={resolve('/yarn')}
-                              >
-                                <PaletteIcon />
-                                Open a Copy
-                              </a>
-                              {#if palettePage}
-                                <a
-                                  class="btn hover:preset-tonal-surface"
-                                  aria-label="{gaugeName} Palette Page"
-                                  title="This yarn palette’s own gallery page"
-                                  href={resolve('/gallery/palette/[id]', {
-                                    id: String(palettePage.databaseId),
-                                  })}
-                                >
-                                  <SwatchBookIcon />
-                                  Palette Page
-                                </a>
-                              {/if}
-                            </div>
-                          </div>
-                          <div class="mx-auto mt-4 w-fit">
-                            <ViewMenu
-                              bind:value={preferences.value.layout}
-                              fillOption
-                            />
-                          </div>
-                          <div class="mt-4 mb-2 xl:mb-4">
-                            <GaugeColorsView
-                              items={item}
-                              {unitLabel}
-                              unitType={gaugeType}
-                              {rangeOptions}
-                              gaugeId={id}
-                            />
-                          </div>
-                        </div>
-                      {/each}
-                    {/key}
-                  {/if}
-                  {#if extraColors.length}
-                    <div class="flex flex-col">
-                      <p class="text-lg font-semibold">Additional Colors</p>
-                      <div class="mt-4 mb-2 xl:mb-4">
-                        <GaugeColorsView
-                          items={extraColors.map(({ label, color }) => ({
-                            color,
-                            label,
-                          }))}
-                        />
-                      </div>
-                    </div>
-                  {/if}
-                </div>
+                              <SwatchBookIcon />
+                              Palette Page
+                            </a>
+                          {:else}
+                            <a
+                              class="btn hover:preset-tonal-surface"
+                              aria-label="Open a copy of the {gaugeName} yarn palette"
+                              title="Open a copy in the Yarn Palette Creator. This gallery page won’t change."
+                              onclick={() => {
+                                if (!colors) return;
+                                yarnPageState.gauge.colors = colors;
+                                // The name Save Palette offers
+                                yarnPageState.suggestion = {
+                                  name: `${projectTitleNoHTML} – ${gaugeName}`.slice(
+                                    0,
+                                    80,
+                                  ),
+                                  colors: $state.snapshot(colors),
+                                };
+                              }}
+                              href={resolve('/yarn')}
+                            >
+                              <SwatchBookIcon />
+                              Open a Copy
+                            </a>
+                          {/if}
+                        {/snippet}
+                      </GaugeRanges>
+                    {/each}
+                  {/key}
+                {/if}
+                {#if extraColors.length}
+                  <GaugeRanges
+                    heading="Additional Colors"
+                    items={extraColors.map(({ label, color }) => ({
+                      color,
+                      label,
+                    }))}
+                  />
+                {/if}
               </div>
             </div>
           {/snippet}

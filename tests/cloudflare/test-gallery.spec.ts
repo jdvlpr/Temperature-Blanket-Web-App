@@ -344,7 +344,7 @@ test.describe('Gallery pages from accounts', () => {
     browser,
     baseURL,
   }) => {
-    const email = uniqueEmail('gallery-owner-bar');
+    const email = uniqueEmail('gallery-owner-menu');
     await signIn(page, request, email);
     const userId = userIdFor(email);
     localD1(
@@ -359,21 +359,20 @@ test.describe('Gallery pages from accounts', () => {
 
     // The older version links to the newer one
     await page.goto(`/gallery/${postId + 1}`);
-    const bar = page.getByTestId('gallery-owner-bar');
-    await expect(bar).toContainText('Your gallery page');
+    const options = page.getByRole('button', { name: /^Your Page/ });
+    await options.click();
     await expect(
-      bar.getByRole('link', { name: 'Newer version' }),
+      page.getByRole('menuitem', { name: 'Newer Version' }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
+    await page.keyboard.press('Escape');
 
     await page.goto(`/gallery/${postId}`);
-    await expect(bar).toContainText('Your gallery page');
-    await expect(bar.getByRole('link', { name: 'Newer version' })).toHaveCount(
-      0,
-    );
+    await options.click();
+    await expect(
+      page.getByRole('menuitem', { name: 'Newer Version' }),
+    ).toHaveCount(0);
 
     // Anonymous off: the name on this page only
-    const options = bar.getByRole('button', { name: /^Options/ });
-    await options.click();
     const anonymous = page.getByRole('menuitemcheckbox', {
       name: /Anonymous/,
     });
@@ -398,22 +397,24 @@ test.describe('Gallery pages from accounts', () => {
     });
     await options.click();
     await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await bar.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: 'Cancel' }).click();
     expect(removed).toEqual([]);
     await options.click();
     await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await bar.getByRole('button', { name: 'Unpublish', exact: true }).click();
-    await expect(bar).toContainText('Unpublished');
+    await page.getByRole('button', { name: 'Unpublish', exact: true }).click();
+    await expect(page.getByTestId('gallery-owner-menu')).toContainText(
+      'Unpublished',
+    );
     expect(removed).toEqual([String(postId)]);
 
-    // Anyone else sees no bar
+    // Anyone else sees no menu
     const visitor = await browser.newContext({ baseURL });
     const other = await visitor.newPage();
     await other.goto(`/gallery/${postId + 1}`);
     await expect(
       other.getByRole('link', { name: 'Project Gallery' }),
     ).toBeVisible();
-    await expect(other.getByTestId('gallery-owner-bar')).toHaveCount(0);
+    await expect(other.getByTestId('gallery-owner-menu')).toHaveCount(0);
     await visitor.close();
   });
 
