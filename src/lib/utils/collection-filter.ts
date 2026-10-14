@@ -60,8 +60,8 @@ export const LIBRARY_SORTS = [
   details?: string;
 }[];
 
-/** Lists longer than this get search, filters and sort */
-export const FILTERS_FROM = 6;
+/** Lists longer than this get search, filters and sort: any of two or more */
+export const FILTERS_FROM = 1;
 
 const normalize = (text: string) =>
   text
