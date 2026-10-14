@@ -16,12 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   On a gallery page, only for the account that published it: when it was
   published (and a link to a newer version), the saved original, and the same
-  menu as each version on My Projects: Show my name, and Unpublish (it asks
+  menu as each version on My Projects: Anonymous, and Unpublish (it asks
   first). Found in the browser from the account's pages, so visitors get the
   same page as before and make no extra request.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import { anonymousDetail } from '#lib/accounts/anonymous.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
@@ -49,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: {
     postId: number;
     kind: 'project' | 'palette';
-    /** The name the page shows now, after Show my name changes (null for none) */
+    /** The name the page shows now, after Anonymous changes (null for none) */
     onowner?: (owner: { name: string; publicId: string } | null) => void;
   } = $props();
 
@@ -188,22 +189,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <!-- Stays open, so the check shows it took -->
                   <Menu.OptionItem
                     type="checkbox"
-                    value="named"
-                    checked={Boolean(page.showOwner)}
+                    value="anonymous"
+                    checked={!page.showOwner}
                     closeOnSelect={false}
                     disabled={busy}
-                    onCheckedChange={(checked) => void setNamed(checked)}
+                    onCheckedChange={(checked) => void setNamed(!checked)}
                     class={menuItemClass}
                   >
                     <span class="flex min-w-0 flex-1 flex-col">
-                      <span>Show my name</span>
+                      <span>Anonymous</span>
                       <span class="text-surface-700-300 text-xs"
-                        >{ownerName
-                          ? `This page says “By ${ownerName}”`
-                          : 'Once you add a display name'}</span
+                        >{anonymousDetail(!page.showOwner, ownerName)}</span
                       >
                     </span>
-                    <MenuCheckbox checked={Boolean(page.showOwner)} />
+                    <MenuCheckbox checked={!page.showOwner} />
                   </Menu.OptionItem>
                   <Menu.Item value="unpublish" class={menuItemClass}>
                     <EyeOffIcon class="shrink-0" aria-hidden="true" />

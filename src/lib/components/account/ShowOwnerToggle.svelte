@@ -13,9 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- "Show my name", when publishing to the gallery from an account. On: its
-page says "By" and the display name, and the owner's public gallery page lists
-it. Off: it's published without a name. -->
+<!-- "Anonymous", when publishing to the gallery from an account (bound the
+other way round, as `checked` = show the name). Off: its page says "By" and the
+display name, and the owner's public gallery page lists it. On: it's published
+without a name. -->
 
 <script lang="ts">
   import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
@@ -39,13 +40,13 @@ it. Off: it's published without a name. -->
 <div class="bg-surface-100-900 rounded-container flex flex-col text-left">
   <ToggleSwitch
     bare
-    label="Show my name"
+    label="Anonymous"
     details={checked
       ? shownName
-        ? `Its gallery page will say “By ${shownName}” and appear on your public gallery page.`
-        : 'Your public gallery page will list it once you add a display name.'
-      : 'It will be published without your name.'}
-    bind:checked
+        ? `Credited “By ${shownName}” and listed on your public gallery page.`
+        : 'Listed on your public gallery page once you add a display name.'
+      : 'Published without your name, and not on your public gallery page.'}
+    bind:checked={() => !checked, (anonymous) => (checked = !anonymous)}
     {disabled}
   />
   <!-- Where the name comes from: in a new tab, so this dialog stays put -->

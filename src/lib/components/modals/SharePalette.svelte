@@ -304,6 +304,7 @@ rename it. -->
       {#if versions.length && !renaming}
         <UnpublishVersions
           {versions}
+          {ownerName}
           bind:selected={unpublishIds}
           disabled={busy}
         />

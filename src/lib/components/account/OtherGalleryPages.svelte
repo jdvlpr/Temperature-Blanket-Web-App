@@ -20,8 +20,10 @@ when there are none. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import { anonymousDetail } from '#lib/accounts/anonymous.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import { account } from '#lib/accounts/summary.svelte.js';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import {
     ExternalLinkIcon,
@@ -40,6 +42,10 @@ when there are none. -->
   // Only once the projects here are known, so none show here for a moment
   let pages = $derived(
     galleryPages.projectIds ? galleryPages.grouped.others : [],
+  );
+
+  let ownerName = $derived(
+    (galleryPages.name ?? account.summary?.name ?? '').trim(),
   );
 
   const isPalette = (page: GalleryPage) => page.kind === 'palette';
@@ -114,14 +120,20 @@ when there are none. -->
                   <input
                     type="checkbox"
                     class="checkbox"
-                    aria-label="Show my name: {page.title}"
-                    checked={page.showOwner ?? false}
+                    aria-label="Anonymous: {page.title}"
+                    aria-describedby="anonymous-{page.postId}"
+                    checked={!page.showOwner}
                     onchange={(event) =>
-                      setShowOwner(page, event.currentTarget.checked)}
+                      setShowOwner(page, !event.currentTarget.checked)}
                     disabled={busy}
                   />
-                  Show my name
+                  Anonymous
                 </label>
+                <span
+                  id="anonymous-{page.postId}"
+                  class="text-surface-700-300 text-xs"
+                  >{anonymousDetail(!page.showOwner, ownerName)}</span
+                >
               </div>
               {#if confirming !== page.postId}
                 <button

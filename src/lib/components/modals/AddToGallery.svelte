@@ -164,6 +164,7 @@ choice (guests too: it's the only way they can share a palette). -->
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
   type OwnPage = {
     postId: number;
+    title: string;
     showOwner?: boolean;
     publishedAt: number;
     link?: string | null;
@@ -189,6 +190,7 @@ choice (guests too: it's the only way they can share a palette). -->
     ownPages.length
       ? ownPages.map((page) => ({
           postId: page.postId,
+          title: page.title,
           publishedAt: page.publishedAt,
           link: page.link,
           showOwner: page.showOwner,
@@ -197,7 +199,13 @@ choice (guests too: it's the only way they can share a palette). -->
       : project.gallery.href &&
           project.gallery.title &&
           project.gallery.title === locations.projectTitle
-        ? [{ postId: 0, href: project.gallery.href }]
+        ? [
+            {
+              postId: 0,
+              title: project.gallery.title,
+              href: project.gallery.href,
+            },
+          ]
         : [],
   );
 
@@ -258,8 +266,9 @@ choice (guests too: it's the only way they can share a palette). -->
         (post) => post.projectId === project.id && post.kind !== 'palette',
       )
       .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId);
-    ownPages = own.map(({ postId, showOwner, publishedAt, link }) => ({
+    ownPages = own.map(({ postId, title, showOwner, publishedAt, link }) => ({
       postId,
+      title,
       showOwner,
       publishedAt,
       link,
@@ -610,6 +619,7 @@ choice (guests too: it's the only way they can share a palette). -->
       {#if newVersion && ownPages.length}
         <UnpublishVersions
           versions={ownPages}
+          {ownerName}
           bind:selected={unpublishIds}
           disabled={busy}
         />

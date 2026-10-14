@@ -15,10 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Publishing a new version: which of the versions there now (gallery pages,
-  newest first) to unpublish once it's in, one checkbox each, with when it was
-  published and its colors then.
+  newest first) to unpublish once it's in, one checkbox each, as on My
+  Projects: its page's own name, when it was published and by whom (when it
+  says), and its colors then.
 -->
 <script lang="ts">
+  import { aboutVersion } from '#lib/accounts/gallery-version.js';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
 
@@ -26,18 +28,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     versions,
     selected = $bindable([]),
     disabled = false,
+    ownerName = '',
   }: {
-    versions: { postId: number; publishedAt: number; link?: string | null }[];
+    versions: {
+      postId: number;
+      /** Its page's name */
+      title?: string;
+      publishedAt: number;
+      link?: string | null;
+      showOwner?: boolean;
+    }[];
     /** The post IDs to unpublish */
     selected?: number[];
     disabled?: boolean;
+    /** The account's display name, for "by" */
+    ownerName?: string;
   } = $props();
-
-  const publishedOn = (time: number) =>
-    new Date(time).toLocaleString(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
 
   const colorsOf = (link?: string | null) =>
     (link && getColorsFromInput({ string: link })) || null;
@@ -50,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Checked versions come off the gallery when you publish.
   </p>
   <div class="divide-surface-200-800 flex flex-col divide-y">
-    {#each versions as version, i (version.postId)}
+    {#each versions as version (version.postId)}
       {@const colors = colorsOf(version.link)}
       <label class="flex cursor-pointer items-center gap-3 px-4 py-3">
         <input
@@ -64,9 +70,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
         <span class="flex min-w-0 flex-1 flex-col gap-1">
           <span class="flex flex-col">
-            <span>Published {publishedOn(version.publishedAt)}</span>
-            {#if i === 0 && versions.length > 1}
-              <span class="text-xs opacity-70">Latest</span>
+            {#if version.title}
+              <span>{version.title}</span>
+              <span class="text-surface-700-300 text-xs"
+                >{aboutVersion(version, ownerName)}</span
+              >
+            {:else}
+              <span>{aboutVersion(version, ownerName)}</span>
             {/if}
           </span>
           {#if colors}

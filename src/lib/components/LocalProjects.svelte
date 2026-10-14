@@ -242,11 +242,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : undefined}
               onrename={(name) => rename(project.id, name)}
               onremove={() => remove(project)}
-              onpublish={showSharing &&
-              galleryPages.publishing &&
-              !galleryPages.grouped.byProject.get(project.id)
-                ? () => openForGallery(project, { action: 'add' })
-                : undefined}
             >
               {#snippet sharing()}
                 {#if showSharing}{@render gallerySharing(project)}{/if}

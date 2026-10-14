@@ -15,20 +15,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A saved project's or palette's place in the gallery, on its row in My
-  Projects. Not published: Publish to Gallery. Published: a menu with each
-  version (gallery page), newest first. Each opens its own options, as in the
-  Gallery dialog's list: View Gallery Page, Show my name, and Unpublish (it
-  asks first, under the row). Then Publish New Version once a project has
-  changed, or for a palette (whose colors never change) Update Gallery Name
-  once its name differs from its page's, renaming the page in place. A
-  gallery page is a snapshot from when it was published. Its link is a copy,
-  always shareable, so it isn't a setting here: Copy Link comes in as
-  `children`, first on the row. On a card (`compact`) it's only the
-  Published menu: the card's own menu has Publish to Gallery, and updating is
-  in the Published menu.
+  Projects. Not published: Publish to Gallery. Published: a menu of its
+  version's options, as in the Gallery dialog's list: View Gallery Page,
+  Anonymous, and Unpublish (it asks first, under the row). With several
+  versions (gallery pages), each is listed, newest first, by the page's own
+  name, when it was published, and whose name it shows, and opens those
+  options for itself. Then Publish New Version once a
+  project has changed, or for a palette (whose colors never change) Update
+  Gallery Name once its name differs from its page's, renaming the page in
+  place. A gallery page is a snapshot from when it was published. Its link is
+  a copy, always shareable, so it isn't a setting here: Copy Link comes in as
+  `children`, first on the row. On a card (`compact`) it's one button either
+  way: Published ▾ (the menu above), or Unpublished ▾, whose menu has Publish
+  to Gallery.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import { anonymousDetail } from '#lib/accounts/anonymous.js';
+  import { aboutVersion, publishedOn } from '#lib/accounts/gallery-version.js';
   import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
@@ -52,6 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     EyeOffIcon,
     ExternalLinkIcon,
     GlobeIcon,
+    GlobeOffIcon,
     LoaderCircleIcon,
     PencilIcon,
     SendIcon,
@@ -84,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onupdate: (page: GalleryPage) => void;
     /** First on the row, e.g. Copy Link */
     children?: Snippet;
-    /** On a card: only the Published menu (see above) */
+    /** On a card: one Published ▾ or Unpublished ▾ button (see above) */
     compact?: boolean;
   } = $props();
 
@@ -102,22 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // All its versions, newest first
   let versions = $derived(page ? galleryPages.pagesLike(page) : []);
 
-  let status = $derived(
-    versions.length > 1
-      ? `Published · ${versions.length} versions`
-      : page?.showOwner && ownerName
-        ? `Published · By ${ownerName}`
-        : 'Published',
-  );
-
   // Publishing (and new versions) needs publishing on; the rest works either way
   let canAdd = $derived(galleryPages.publishing);
-
-  const publishedOn = (time: number) =>
-    new Date(time).toLocaleString(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
 
   const colorsOf = (link?: string | null) =>
     (link && getColorsFromInput({ string: link })) || null;
@@ -126,15 +117,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     p.kind === 'palette'
       ? resolve('/gallery/palette/[id]', { id: String(p.postId) })
       : resolve('/gallery/[id]', { id: String(p.postId) });
-
-  // Under a version's date: Latest (of several), and whose name it shows
-  const aboutVersion = (p: GalleryPage, i: number) =>
-    [
-      i === 0 && versions.length > 1 && 'Latest',
-      p.showOwner ? (ownerName ? `By ${ownerName}` : 'Your name') : 'Anonymous',
-    ]
-      .filter(Boolean)
-      .join(' · ');
 
   function publish() {
     errorMessage = '';
@@ -189,8 +171,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<!-- With publishing paused, one without a page has only Copy Link -->
-{#if page || (canAdd && !compact) || children}
+<!-- With publishing paused, one without a page has only Copy Link (on a card,
+Unpublished says it's paused) -->
+{#if page || compact || canAdd || children}
   <div
     class={['flex flex-col gap-1 text-sm', !compact && 'mt-2']}
     aria-label="Gallery: {label}"
@@ -206,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label="Publish to Gallery: {label}"
           ><SendIcon aria-hidden="true" />Publish to Gallery</button
         >
-      {:else if page}
+      {:else if page || compact}
         <Menu
           positioning={menuPositioning('bottom-start')}
           onOpenChange={({ open }) => {
@@ -214,27 +197,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <Menu.Trigger class={triggerClass}>
-            <GlobeIcon aria-hidden="true" />
-            <span><span class="sr-only">Gallery: </span>{status}</span>
+            {#if page}
+              <GlobeIcon aria-hidden="true" />
+            {:else}
+              <GlobeOffIcon aria-hidden="true" />
+            {/if}
+            <span
+              ><span class="sr-only">Gallery: </span>{page
+                ? versions.length > 1
+                  ? `Published · ${versions.length} versions`
+                  : 'Published'
+                : 'Unpublished'}</span
+            >
             <ChevronDownIcon class="icon-sm" aria-hidden="true" />
           </Menu.Trigger>
           <Portal>
             <Menu.Positioner class={drillPositionerClass}>
               <Menu.Content class="{menuContentClass} pointer-events-auto">
-                {#each versions as p, i (p.postId)}
-                  {@const colors = colorsOf(p.link)}
-                  <MenuSubmenu
-                    label="Published {publishedOn(p.publishedAt)}"
-                    current={aboutVersion(p, i)}
-                    icon={GlobeIcon}
-                  >
-                    {#snippet below()}
-                      {#if colors}
-                        <span class="mt-1 block w-40">
-                          <PaletteStrip {colors} height="12px" insideControl />
-                        </span>
-                      {/if}
-                    {/snippet}
+                {#if !page}
+                  {#if canAdd}
+                    <Menu.Item value="publish" class={menuItemClass}>
+                      {#snippet element(attributes)}
+                        <div {...attributes} {@attach onChoose(publish)}>
+                          <SendIcon class="shrink-0" aria-hidden="true" />
+                          <span class="min-w-0 flex-1">Publish to Gallery…</span
+                          >
+                        </div>
+                      {/snippet}
+                    </Menu.Item>
+                  {:else}
+                    <p class="text-surface-700-300 max-w-72 px-2 py-1 text-xs">
+                      Publishing to the gallery is paused right now.
+                    </p>
+                  {/if}
+                {:else}
+                  <!-- One version's options: in its submenu, or with only one, right here -->
+                  {#snippet versionItems(p: GalleryPage)}
                     <Menu.Item value="view-{p.postId}" class={menuItemClass}>
                       {#snippet element(attributes)}
                         <!-- eslint-disable svelte/no-navigation-without-resolve -- resolved above -->
@@ -260,23 +258,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <!-- Stays open, so the check shows it took -->
                     <Menu.OptionItem
                       type="checkbox"
-                      value="named-{p.postId}"
-                      checked={Boolean(p.showOwner)}
+                      value="anonymous-{p.postId}"
+                      checked={!p.showOwner}
                       closeOnSelect={false}
                       disabled={busy}
                       onCheckedChange={(checked) =>
-                        void setNamed(p.postId, checked)}
+                        void setNamed(p.postId, !checked)}
                       class={menuItemClass}
                     >
                       <span class="flex min-w-0 flex-1 flex-col">
-                        <span>Show my name</span>
+                        <span>Anonymous</span>
                         <span class="text-surface-700-300 text-xs"
-                          >{ownerName
-                            ? `This page says “By ${ownerName}”`
-                            : 'Once you add a display name'}</span
+                          >{anonymousDetail(!p.showOwner, ownerName)}</span
                         >
                       </span>
-                      <MenuCheckbox checked={Boolean(p.showOwner)} />
+                      <MenuCheckbox checked={!p.showOwner} />
                     </Menu.OptionItem>
                     <Menu.Item
                       value="unpublish-{p.postId}"
@@ -292,8 +288,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </div>
                       {/snippet}
                     </Menu.Item>
-                  </MenuSubmenu>
-                {/each}
+                  {/snippet}
+                  {#if versions.length === 1}
+                    {@render versionItems(versions[0])}
+                  {:else}
+                    {#each versions as p (p.postId)}
+                      {@const colors = colorsOf(p.link)}
+                      <MenuSubmenu
+                        label={p.title}
+                        current={aboutVersion(p, ownerName)}
+                        icon={GlobeIcon}
+                      >
+                        {#snippet below()}
+                          {#if colors}
+                            <span class="mt-1 block w-40">
+                              <PaletteStrip
+                                {colors}
+                                height="12px"
+                                insideControl
+                              />
+                            </span>
+                          {/if}
+                        {/snippet}
+                        {@render versionItems(p)}
+                      </MenuSubmenu>
+                    {/each}
+                  {/if}
+                {/if}
                 {#if changedSince && canAdd && drill.showsMenu}
                   <Menu.Separator />
                   <Menu.Item value="update" class={menuItemClass}>

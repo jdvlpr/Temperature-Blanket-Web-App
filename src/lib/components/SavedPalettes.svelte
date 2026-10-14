@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import { PencilIcon, SendIcon, Trash2Icon } from '@lucide/svelte';
+  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
@@ -47,16 +47,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     updateGauge,
     sharing,
-    onpublish,
-    canPublish,
   }: {
     updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
     sharing?: Snippet<
       [{ palette: SavedPalette; colors: Color[]; label: string }]
     >;
-    /** Publish to Gallery, in each palette's menu where `canPublish` says so */
-    onpublish?: (palette: SavedPalette, colors: Color[], label: string) => void;
-    canPublish?: (palette: SavedPalette) => boolean;
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -266,16 +261,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       icon: PencilIcon,
                       onselect: () => startRename(palette),
                     },
-                    ...(onpublish && canPublish?.(palette)
-                      ? [
-                          {
-                            value: 'publish',
-                            label: 'Publish to Gallery',
-                            icon: SendIcon,
-                            onselect: () => onpublish(palette, colors, label),
-                          },
-                        ]
-                      : []),
                     {
                       value: 'trash',
                       label: 'Move to Trash',

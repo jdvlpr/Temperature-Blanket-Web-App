@@ -15,12 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A project's or palette's gallery pages, newest first, as a list like the
-  Project menu's: each opens its page and shows when it was published and its
-  colors then (when its link is known). The account's own pages each have a
-  menu, like the versions in My Projects' Published menu: Show my name, and
+  Project menu's: each opens its page and shows, as on My Projects, its page's
+  own name, when it was published and by whom (when it says), and its colors
+  then (when its link is known). The account's own pages each have a
+  menu, like the versions in My Projects' Published menu: Anonymous, and
   Unpublish (it asks first).
 -->
 <script lang="ts">
+  import { anonymousDetail } from '#lib/accounts/anonymous.js';
+  import { aboutVersion } from '#lib/accounts/gallery-version.js';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
@@ -51,6 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pages: {
       postId: number;
       href: string;
+      /** Its page's name */
+      title?: string;
       publishedAt?: number;
       /** Its link as published, for its colors */
       link?: string | null;
@@ -71,13 +76,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let errorMessage = $state('');
   let list = $state<HTMLElement>();
 
-  const label = (publishedAt?: number) =>
-    publishedAt
-      ? `Published ${new Date(publishedAt).toLocaleString(undefined, {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        })}`
-      : 'Gallery page';
+  // Its name, or else when it was published
+  const label = (page: (typeof pages)[number]) =>
+    page.title ??
+    (page.publishedAt
+      ? aboutVersion({ publishedAt: page.publishedAt }, '')
+      : 'Gallery page');
 
   const colorsOf = (link?: string | null) =>
     (link && getColorsFromInput({ string: link })) || null;
@@ -114,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col gap-2">
   <ul class={PANEL_LIST} aria-label="Gallery pages" bind:this={list}>
-    {#each pages as page, i (page.postId)}
+    {#each pages as page (page.postId)}
       {@const colors = colorsOf(page.link)}
       <li class="flex flex-col">
         <div class="flex items-center">
@@ -127,9 +131,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <span class="flex min-w-0 flex-1 flex-col gap-1">
               <span class="flex flex-col">
-                <span>{label(page.publishedAt)}</span>
-                {#if i === 0 && pages.length > 1}
-                  <span class="text-xs opacity-70">Latest</span>
+                <span>{label(page)}</span>
+                {#if page.title && page.publishedAt}
+                  <span class="text-surface-700-300 text-xs"
+                    >{aboutVersion(
+                      {
+                        publishedAt: page.publishedAt,
+                        showOwner: page.showOwner,
+                      },
+                      ownerName,
+                    )}</span
+                  >
                 {/if}
               </span>
               {#if colors}
@@ -152,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <Menu.Trigger
                 class="btn-icon hover:preset-tonal-surface mx-1 shrink-0"
-                aria-label="Options: {label(page.publishedAt)}"
+                aria-label="Options: {label(page)}"
                 title="Options"
                 disabled={busy}><EllipsisVerticalIcon /></Menu.Trigger
               >
@@ -162,23 +174,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <!-- Stays open, so the check shows it took -->
                     <Menu.OptionItem
                       type="checkbox"
-                      value="named"
-                      checked={Boolean(page.showOwner)}
+                      value="anonymous"
+                      checked={!page.showOwner}
                       closeOnSelect={false}
                       disabled={busy}
                       onCheckedChange={(checked) =>
-                        void setNamed(page.postId, checked)}
+                        void setNamed(page.postId, !checked)}
                       class={menuItemClass}
                     >
                       <span class="flex min-w-0 flex-1 flex-col">
-                        <span>Show my name</span>
+                        <span>Anonymous</span>
                         <span class="text-surface-700-300 text-xs"
-                          >{ownerName
-                            ? `This page says “By ${ownerName}”`
-                            : 'Once you add a display name'}</span
+                          >{anonymousDetail(!page.showOwner, ownerName)}</span
                         >
                       </span>
-                      <MenuCheckbox checked={Boolean(page.showOwner)} />
+                      <MenuCheckbox checked={!page.showOwner} />
                     </Menu.OptionItem>
                     <Menu.Item value="unpublish" class={menuItemClass}>
                       <EyeOffIcon class="shrink-0" aria-hidden="true" />

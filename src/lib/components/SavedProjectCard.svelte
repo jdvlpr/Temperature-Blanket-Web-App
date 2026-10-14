@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A saved project on My Projects, as the gallery's project card: its picture
   (taken when the planner saved it; while one is being drawn, a placeholder;
   if it can't be, its colors), its name, its
-  places and dates when it has a name, and a ⋮ menu (Rename, Publish to
-  Gallery, Move to Trash). Once published, its Published menu (`sharing`)
-  sits under it. Tapping it opens it in the planner.
+  places and dates when it has a name, and a ⋮ menu (Rename, Move to
+  Trash). Its gallery button (`sharing`, Published ▾ or Unpublished ▾) sits
+  under it. Tapping it opens it in the planner.
 -->
 <script lang="ts">
   import GalleryProjectCard, {
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
-  import { PencilIcon, SendIcon, Trash2Icon } from '@lucide/svelte';
+  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -52,9 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Called with the new name ('' clears it) */
     onrename: (name: string) => void;
     onremove: () => void;
-    /** Publish to Gallery, in its menu, when it can be published */
-    onpublish?: () => void;
-    /** Its gallery pages: Publish to Gallery, or Published ▾ */
+    /** Its gallery pages: Published ▾ or Unpublished ▾ */
     sharing?: Snippet;
   }
 
@@ -66,7 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     syncLabel,
     onrename,
     onremove,
-    onpublish,
     sharing,
   }: Props = $props();
 
@@ -121,16 +118,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         editing = true;
       },
     },
-    ...(onpublish
-      ? [
-          {
-            value: 'publish',
-            label: 'Publish to Gallery',
-            icon: SendIcon,
-            onselect: onpublish,
-          },
-        ]
-      : []),
     {
       value: 'trash',
       label: 'Move to Trash',

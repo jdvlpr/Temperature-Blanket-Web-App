@@ -147,15 +147,15 @@ test.describe('Gallery pages from accounts', () => {
 
     // Each page is included on the public gallery on its own; the display
     // name itself is in the Account page's Profile settings
-    const include = pages.getByRole('checkbox', {
-      name: 'Show my name: Ottawa from 2025 to 2026',
+    const anonymous = pages.getByRole('checkbox', {
+      name: 'Anonymous: Ottawa from 2025 to 2026',
     });
-    await expect(include).not.toBeChecked();
+    await expect(anonymous).toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'add a display name',
     );
-    await include.check();
-    await expect(include).toBeChecked();
+    await anonymous.uncheck();
+    await expect(anonymous).not.toBeChecked();
     await page
       .getByTestId('gallery-name-status')
       .getByRole('link', { name: 'Profile settings', exact: true })
@@ -249,15 +249,20 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('heading', { name: 'Other Gallery Pages' }),
     ).toHaveCount(0);
 
-    // Each version, newest first, opens its own options
-    const versions = page.getByRole('menuitem', { name: /^Published / });
+    // Each version, newest first, by its own page's name and when it was
+    // published, opens its own options
+    const versions = page.getByRole('menuitem', {
+      name: new RegExp(`^(${title}|Older)\\s*Published `),
+    });
     const open = async (which: 'first' | 'last') => {
       await menu.click();
       await expect(versions).toHaveCount(2);
       await versions[which]().click();
     };
     await open('first');
-    await expect(versions.first()).toContainText('Latest');
+    await expect(versions.first()).toContainText(title);
+    await expect(versions.last()).toContainText('Older');
+    await expect(versions.first()).not.toContainText('by ');
     await expect(
       page.getByRole('menuitem', { name: /View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
@@ -272,10 +277,17 @@ test.describe('Gallery pages from accounts', () => {
 
     // The name on the latest only (the menu stays open, to show it took)
     await open('first');
-    const named = page.getByRole('menuitemcheckbox', { name: /Show my name/ });
-    await named.click();
-    await expect(named).toBeChecked();
+    const anonymous = page.getByRole('menuitemcheckbox', {
+      name: /Anonymous/,
+    });
+    await expect(anonymous).toBeChecked();
+    await anonymous.click();
+    await expect(anonymous).not.toBeChecked();
     await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
+    await menu.click();
+    await expect(versions.first()).toContainText('by Ada Lovelace');
+    await expect(versions.last()).not.toContainText('by ');
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'By Ada Lovelace',
@@ -305,11 +317,14 @@ test.describe('Gallery pages from accounts', () => {
     await sharing
       .getByRole('button', { name: 'Unpublish', exact: true })
       .click();
-    await expect(menu).toHaveText(/Published · By Ada Lovelace\s*$/);
+    await expect(menu).toHaveText(/Published\s*$/);
     expect(removed).toEqual([String(postId + 1)]);
-    // Then the last one
+    // Then the last one: with only one, its options are right in the menu
     await menu.click();
-    await page.getByRole('menuitem', { name: /^Published / }).click();
+    await expect(versions).toHaveCount(0);
+    await expect(
+      page.getByRole('menuitemcheckbox', { name: /Anonymous/ }),
+    ).not.toBeChecked();
     await page.getByRole('menuitem', { name: /Unpublish/ }).click();
     await sharing
       .getByRole('button', { name: 'Unpublish', exact: true })
@@ -352,12 +367,15 @@ test.describe('Gallery pages from accounts', () => {
       0,
     );
 
-    // Show my name: on this page only
+    // Anonymous off: the name on this page only
     const options = bar.getByRole('button', { name: /^Options/ });
     await options.click();
-    const named = page.getByRole('menuitemcheckbox', { name: /Show my name/ });
-    await named.click();
-    await expect(named).toBeChecked();
+    const anonymous = page.getByRole('menuitemcheckbox', {
+      name: /Anonymous/,
+    });
+    await expect(anonymous).toBeChecked();
+    await anonymous.click();
+    await expect(anonymous).not.toBeChecked();
     await page.keyboard.press('Escape');
     // ("By" shows under the project's title, which needs WordPress)
     expect(
@@ -507,13 +525,14 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('group', { name: `Gallery: ${name}` });
     const addToGallery = async (name: string) => {
       await rowFor(name)
-        .getByRole('button', { name: /^Publish to Gallery/ })
+        .getByRole('button', { name: /^Gallery:/ })
         .click();
+      await page.getByRole('menuitem', { name: /^Publish to Gallery/ }).click();
     };
     const dialog = page.getByRole('dialog', { name: 'Publish to Gallery' });
     await expect(
-      rowFor('First test').getByRole('button', { name: /^Publish to Gallery/ }),
-    ).toBeVisible();
+      rowFor('First test').getByRole('button', { name: /^Gallery:/ }),
+    ).toHaveText(/Unpublished\s*$/);
 
     // The first one opens over My Projects; closing it leaves everything as it was
     await addToGallery('First test');
@@ -557,8 +576,8 @@ test.describe('Gallery pages from accounts', () => {
       rowFor('Second test').getByRole('button', { name: /^Gallery:/ }),
     ).toHaveText(/Published\s*$/);
     await expect(
-      rowFor('First test').getByRole('button', { name: /^Publish to Gallery/ }),
-    ).toBeVisible();
+      rowFor('First test').getByRole('button', { name: /^Gallery:/ }),
+    ).toHaveText(/Unpublished\s*$/);
 
     // And back to the first, all of it
     await addToGallery('First test');

@@ -183,14 +183,14 @@ published to the gallery as a snapshot, with the account's name or without. -->
         {/if}
       </p>
 
-      <!-- Signed in: what Show My Name shows, and where those pages are listed -->
+      <!-- Signed in: whose name gallery pages show, and where those pages are listed -->
       {#if browser && signedIn && galleryPages.shown}
         <p
           class="text-surface-700-300 mx-auto -mt-6 max-w-3xl text-center text-sm"
           data-testid="gallery-name-status"
         >
           {#if ownerName}
-            Gallery pages you publish with “Show my name” on are credited
+            Gallery pages you publish without “Anonymous” checked are credited
             <strong>By {ownerName}</strong>.
             <a href={DISPLAY_NAME_HREF} class="link"
               >Change your name in Profile settings</a
@@ -268,14 +268,7 @@ published to the gallery as a snapshot, with the account's name or without. -->
           {#if synced}
             <AddToAccountButton kind="palettes" />
           {/if}
-          <SavedPalettes
-            onpublish={sharePalette}
-            canPublish={(palette) =>
-              signedIn &&
-              galleryPages.shown &&
-              galleryPages.publishing &&
-              !galleryPages.grouped.byPalette.get(palette.id)}
-          >
+          <SavedPalettes>
             {#snippet sharing({ palette, colors, label })}
               {#if signedIn && galleryPages.shown}
                 {@const page = galleryPages.grouped.byPalette.get(palette.id)}
