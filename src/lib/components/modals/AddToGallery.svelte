@@ -26,7 +26,6 @@ choice (guests too: it's the only way they can share a palette). -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
-  import CopyIcon from '#lib/components/CopyIcon.svelte';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
   import Turnstile from '#lib/components/Turnstile.svelte';
@@ -46,8 +45,6 @@ choice (guests too: it's the only way they can share a palette). -->
   import type { Color } from '#lib/types/yarn-types.js';
   import { colorsToPaletteCode } from '#lib/utils/color-utils.js';
   import { cleanName } from '#lib/utils/string-utils.js';
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
-  import { Flash } from '#lib/utils/feedback.svelte.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
   import { loadInPlace } from '#lib/utils/open-saved-project.js';
   import { svgToPNG } from '#lib/utils/preview-utils.svelte.js';
@@ -60,7 +57,6 @@ choice (guests too: it's the only way they can share a palette). -->
   import {
     CheckIcon,
     ExternalLinkIcon,
-    LinkIcon,
     LoaderCircleIcon,
     SendIcon,
   } from '@lucide/svelte';
@@ -408,7 +404,6 @@ choice (guests too: it's the only way they can share a palette). -->
         ? STEP_TEXT[step]
         : '',
   );
-  const linkCopied = new Flash();
   // Checks a submission without the account isn't from a robot
   let turnstile = $state<Turnstile>();
 
@@ -732,24 +727,6 @@ choice (guests too: it's the only way they can share a palette). -->
     </div>
   {:else if view === 'sent' && sent?.link}
     <div class={FOOTER}>
-      <button
-        type="button"
-        class="btn hover:preset-tonal-surface"
-        onclick={async () => {
-          if (
-            sent &&
-            (await copyToClipboard(
-              sent.link,
-              'Gallery page link copied',
-              'Unable to copy to your clipboard',
-            ))
-          )
-            linkCopied.trigger();
-        }}
-      >
-        <CopyIcon copied={linkCopied.is()} icon={LinkIcon} />
-        Copy Gallery Page Link
-      </button>
       <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
       <a
         href={sent.link}

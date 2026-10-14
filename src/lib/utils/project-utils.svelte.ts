@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { resolve } from '$app/paths';
 import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
 import PdfOptions from '#lib/components/modals/PdfOptions.svelte';
 import {
@@ -358,11 +359,12 @@ export const sendToProjectGallery = async (
     if (response.code === 200) {
       if (replacePostId) oldRemoved ??= await removeOld();
       await pagesChanged();
-      project.gallery.href = response.link;
+      const link = galleryPageHref(response.link, response.id);
+      project.gallery.href = link;
       project.gallery.title = text(response.title);
       return {
         status: 'sent',
-        link: String(response.link ?? ''),
+        link,
         linked: Boolean(response.linked),
         oldRemoved,
         ...(sharePalettes.length && {
@@ -379,7 +381,7 @@ export const sendToProjectGallery = async (
           : (response.data ?? {});
       return {
         status: 'duplicate',
-        link: String(page.permalink ?? ''),
+        link: galleryPageHref(page.permalink),
         title: text(page.title),
         oldRemoved: Boolean(oldRemoved),
       };
@@ -395,6 +397,21 @@ export const sendToProjectGallery = async (
     return { status: 'error', message: '', oldRemoved: false };
   }
 };
+
+/**
+ * The project's page in the app, from WordPress's answer: its post id, or the
+ * one in its permalink (…/project/<id>/<slug>/), so it skips the redirect.
+ * The permalink as it is when neither is there.
+ */
+function galleryPageHref(permalink: unknown, id?: unknown): string {
+  const postId =
+    typeof id === 'number' && id > 0
+      ? String(id)
+      : String(permalink ?? '').match(/\/project\/(\d+)\//)?.[1];
+  return postId
+    ? resolve('/gallery/[id]', { id: postId })
+    : String(permalink ?? '');
+}
 
 /** The gallery's answer about shared palettes, as text, or null when it gave none. */
 function sharedPalettesFrom(value: unknown): SharedPaletteResults | null {
