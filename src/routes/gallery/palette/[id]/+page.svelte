@@ -42,10 +42,7 @@ own project first), and other palette pages with them. -->
     recordPageView,
     type GalleryProjectNode,
   } from '#lib/utils/gallery-utils.js';
-  import {
-    getTitleFromLocationsMeta,
-    getTitleTextFromLocationsMeta,
-  } from '#lib/utils/project-utils.svelte.js';
+  import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import {
     galleryTitleText,
     sharedPaletteFrom,
@@ -273,14 +270,17 @@ own project first), and other palette pages with them. -->
             Projects with this palette
           </h2>
           <div class="flex flex-wrap items-start justify-center gap-2">
-            {#each projects as { databaseId, featuredImage, locations, projectName } (databaseId)}
+            {#each projects as { databaseId, featuredImage, locations, projectName, date } (databaseId)}
               <div class="w-40 sm:w-56">
                 <GalleryProjectCard
                   href={resolve('/gallery/[id]', { id: String(databaseId) })}
                   image={featuredImage?.node?.mediaDetails?.sizes?.[0]
                     ?.sourceUrl || featuredImage?.node?.mediaItemUrl}
-                  name={projectName ? decodeHtmlEntities(projectName) : null}
-                  placesHtml={getTitleFromLocationsMeta(locations)}
+                  label={projectName
+                    ? decodeHtmlEntities(projectName)
+                    : getTitleTextFromLocationsMeta(locations)}
+                  {date}
+                  title={getTitleTextFromLocationsMeta(locations)}
                 >
                   {#snippet details()}
                     {#if databaseId === sourceProjectId}

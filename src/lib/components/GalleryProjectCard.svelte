@@ -19,12 +19,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     grid: 'w-full max-w-[130px] sm:max-w-[210px] md:max-w-[215px] aspect-[4/5]',
     list: 'h-28 w-24 shrink-0 sm:h-32 sm:w-32',
   };
+  /** The picture itself in each layout: whole, at its own shape */
+  export const imageClasses = {
+    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
+    // The whole picture, in a box beside the name
+    list: 'h-28 w-24 shrink-0 object-contain sm:h-32 sm:w-32',
+    row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
+  };
 </script>
 
 <!-- @component
   A project as a card: its preview image (or a `cover` in its place), its name
-  and its places and dates, all one link. In a grid or row it stands up, the
-  picture over the name; in a list it lies down, the picture beside the name.
+  (or its places and dates) and when it was published, all one link, as on
+  My Library. In a grid or row it stands up, the picture over the name; in a
+  list it lies down, the picture beside the name.
   The gallery's cards are only that; My Projects gives its own `nameRow` (with
   its ⋮ menu, outside the link), `details` and a `footer` with its sharing.
 -->
@@ -35,10 +43,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href: string;
     /** The preview image; without it, `cover` */
     image?: string | null;
-    /** The name it was given, if any */
-    name?: string | null;
-    /** Its places and dates, as HTML (escaped by getTitleFromLocationsMeta) */
-    placesHtml?: string;
+    /** The name it was given, else its places and dates (plain text) */
+    label?: string;
+    /** When it was published (the gallery post's date) */
+    date?: string | null;
     layout?: 'grid' | 'list' | 'row';
     /** In place of the image, when there's none (sized with `coverClasses`) */
     cover?: Snippet;
@@ -56,8 +64,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     href,
     image,
-    name,
-    placesHtml = '',
+    label = '',
+    date,
     layout = 'grid',
     cover,
     nameRow,
@@ -67,14 +75,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title,
   }: Props = $props();
 
-  const imageClasses = {
-    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
-    // The whole picture, in a box beside the name
-    list: 'h-28 w-24 shrink-0 object-contain sm:h-32 sm:w-32',
-    row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
-  };
-
   let list = $derived(layout === 'list');
+
+  let dateLine = $derived(
+    date && !isNaN(new Date(date).getTime())
+      ? `Published ${new Date(date).toLocaleDateString(undefined, { dateStyle: 'medium' })}`
+      : '',
+  );
 </script>
 
 <div
@@ -105,11 +112,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {@render cover?.()}
     {/if}
     {#if !nameRow}
-      <p class={list ? 'line-clamp-3 min-w-0 text-xs' : 'line-clamp-4 text-xs'}>
-        {#if name}<span class="block text-sm font-semibold">{name}</span>{/if}
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -- escaped by getTitleFromLocationsMeta -->
-        {@html placesHtml}
-      </p>
+      <span class="flex w-full min-w-0 flex-col text-left">
+        <span class="line-clamp-2 text-sm font-semibold break-words"
+          >{label || 'Untitled Project'}</span
+        >
+        {#if dateLine}
+          <span class="text-surface-700-300 line-clamp-1 text-xs"
+            >{dateLine}</span
+          >
+        {/if}
+      </span>
     {/if}
   </a>
   {#if nameRow || details || footer}

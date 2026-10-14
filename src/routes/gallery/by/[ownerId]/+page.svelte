@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { GALLERY_SORTS } from '#lib/utils/gallery-utils.js';
   import {
     getLocationsFromMeta,
-    getTitleFromLocationsMeta,
+    getTitleTextFromLocationsMeta,
   } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
@@ -173,14 +173,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       aria-label="Projects by {data.name}"
     >
-      {#each shown as { databaseId, featuredImage, locations, projectName } (databaseId)}
+      {#each shown as { databaseId, featuredImage, locations, projectName, date } (databaseId)}
         <li>
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
             image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
               featuredImage?.node?.mediaItemUrl}
-            name={projectName ? decodeHtmlEntities(projectName) : null}
-            placesHtml={getTitleFromLocationsMeta(locations)}
+            label={projectName
+              ? decodeHtmlEntities(projectName)
+              : getTitleTextFromLocationsMeta(locations)}
+            {date}
+            title={getTitleTextFromLocationsMeta(locations)}
             layout={ownerFilters.layout}
           />
         </li>

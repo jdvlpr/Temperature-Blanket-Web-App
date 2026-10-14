@@ -20,6 +20,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import ProjectPicture from '#lib/components/ProjectPicture.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import {
@@ -44,19 +45,15 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     getPaletteFallbackName,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import {
-    ArchiveRestoreIcon,
-    NotebookPenIcon,
-    SwatchBookIcon,
-    Trash2Icon,
-    XIcon,
-  } from '@lucide/svelte';
+  import { ArchiveRestoreIcon, Trash2Icon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   type Entry = {
     kind: 'project' | 'palette';
     id: string;
     label: string;
+    /** A project's link, for its picture */
+    href?: string;
     colors: Color[];
     deletedAt: number;
     project?: ProjectTrashEntry;
@@ -77,6 +74,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
         kind: 'project' as const,
         id: project.id,
         label: project.label,
+        href,
         colors: (href && getColorsFromInput({ string: href })) || [],
         deletedAt: project.deletedAt,
         project,
@@ -173,65 +171,86 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     <ul class="flex w-full flex-col gap-4" aria-label="Trash">
       {#each entries as entry (`${entry.kind}:${entry.id}`)}
         {@const key = `${entry.kind}:${entry.id}`}
-        {@const KindIcon =
-          entry.kind === 'project' ? NotebookPenIcon : SwatchBookIcon}
+        <!-- As on My Library's list: its picture (a palette, its colors)
+        beside its name and when it was deleted, what to do below -->
         <li
-          class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full flex-col gap-3 p-4"
+          class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center gap-3 p-2"
         >
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span class="badge bg-surface-200-800 gap-1 text-sm">
-              <KindIcon />
-              {entry.kind === 'project' ? 'Project' : 'Yarn Palette'}
-            </span>
-            <span class="font-bold">{entry.label}</span>
-          </div>
-          <PaletteStrip
-            colors={entry.colors}
-            height="24px"
-            label="Deleted {formatDateTime(entry.deletedAt)}"
-          />
-          {#if confirming === key}
-            <div class="flex flex-wrap items-center gap-2" role="group">
-              <span class="text-sm">This action cannot be undone.</span>
-              <button
-                type="button"
-                class="btn preset-filled-error-500"
-                onclick={() => deleteForever(entry)}
-              >
-                <Trash2Icon />
-                Yes, Delete Forever
-              </button>
-              <button
-                type="button"
-                class="btn hover:preset-tonal-surface"
-                onclick={() => (confirming = null)}
-              >
-                <XIcon />
-                Cancel
-              </button>
-            </div>
+          {#if entry.kind === 'project'}
+            <ProjectPicture
+              id={entry.id}
+              href={entry.href ?? ''}
+              imageClass="h-24 w-20 shrink-0 object-contain"
+              coverClass="h-24 w-20 shrink-0"
+              stripHeight="50px"
+            />
           {:else}
-            <div class="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                class="btn hover:preset-tonal-surface"
-                aria-label="Restore {entry.label}"
-                onclick={() => restore(entry)}
-              >
-                <ArchiveRestoreIcon />
-                Restore
-              </button>
-              <button
-                type="button"
-                class="btn hover:preset-tonal-surface"
-                aria-label="Delete {entry.label} forever"
-                onclick={() => (confirming = key)}
-              >
-                <Trash2Icon />
-                Delete Forever
-              </button>
+            <div
+              class="flex h-24 w-20 shrink-0 items-center"
+              aria-hidden="true"
+            >
+              <div class="w-full">
+                <PaletteStrip
+                  colors={entry.colors}
+                  height="50px"
+                  insideControl
+                />
+              </div>
             </div>
           {/if}
+          <div class="flex min-w-0 grow flex-col gap-1">
+            <div class="flex min-w-0 flex-col">
+              <span class="line-clamp-2 text-sm font-semibold break-words"
+                >{entry.label}</span
+              >
+              <span class="text-surface-700-300 line-clamp-1 text-xs"
+                >{entry.kind === 'project' ? 'Project' : 'Yarn Palette'} · Deleted
+                {formatDateTime(entry.deletedAt)}</span
+              >
+            </div>
+            {#if confirming === key}
+              <div class="flex flex-wrap items-center gap-2" role="group">
+                <span class="text-sm">This action cannot be undone.</span>
+                <button
+                  type="button"
+                  class="btn preset-filled-error-500"
+                  onclick={() => deleteForever(entry)}
+                >
+                  <Trash2Icon />
+                  Yes, Delete Forever
+                </button>
+                <button
+                  type="button"
+                  class="btn hover:preset-tonal-surface"
+                  onclick={() => (confirming = null)}
+                >
+                  <XIcon />
+                  Cancel
+                </button>
+              </div>
+            {:else}
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  class="btn hover:preset-tonal-surface"
+                  aria-label="Restore {entry.label}"
+                  onclick={() => restore(entry)}
+                >
+                  <ArchiveRestoreIcon />
+                  Restore
+                </button>
+                <button
+                  type="button"
+                  class="btn hover:preset-tonal-surface"
+                  aria-label="Delete {entry.label} forever"
+                  onclick={() => (confirming = key)}
+                >
+                  <Trash2Icon />
+                  Delete Forever
+                </button>
+              </div>
+            {/if}
+          </div>
         </li>
       {/each}
     </ul>

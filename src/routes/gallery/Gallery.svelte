@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type FetchProjectsResult,
   } from '#lib/utils/gallery-utils.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
-  import { getTitleFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
+  import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import { resolve } from '$app/paths';
@@ -237,13 +237,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'grid grid-cols-1 items-start md:grid-cols-2'}"
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName } (databaseId)}
+        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, date } (databaseId)}
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
             image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
               featuredImage?.node?.mediaItemUrl}
-            name={projectName ? decodeHtmlEntities(projectName) : null}
-            placesHtml={getTitleFromLocationsMeta(locations)}
+            label={projectName
+              ? decodeHtmlEntities(projectName)
+              : getTitleTextFromLocationsMeta(locations)}
+            {date}
+            title={getTitleTextFromLocationsMeta(locations)}
             layout={galleryState.layout}
           />
         {/each}

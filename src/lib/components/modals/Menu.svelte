@@ -39,10 +39,12 @@ button to it. -->
     trashOpenProject,
   } from '#lib/storage/autosave.svelte.js';
   import {
+    lastSavedAt,
     ProjectStorage,
     savedProjects,
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
+  import ProjectPicture from '#lib/components/ProjectPicture.svelte';
   import { rememberJustTrashed, TRASH_DAYS } from '#lib/storage/trash.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
@@ -180,6 +182,19 @@ button to it. -->
       });
     }
   }
+
+  // When each was saved, as on My Library's cards
+  const savedLine = (item: StoredProjectIndexItem) => {
+    const saved = lastSavedAt(item);
+    return `Saved ${
+      saved
+        ? new Date(saved).toLocaleString(undefined, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          })
+        : item.meta.date
+    }`;
+  };
 
   // A few recent projects, not counting this one
   let recent = $state<StoredProjectIndexItem[]>([]);
@@ -448,8 +463,8 @@ button to it. -->
       </h2>
       <ul class={PANEL_LIST}>
         {#each recent as item (item.id)}
-          {@const itemColors =
-            getColorsFromInput({ string: item.meta.href }) || []}
+          {@const label =
+            item.meta.name || item.meta.title || 'Untitled Project'}
           <li>
             <!-- eslint-disable svelte/no-navigation-without-resolve -- the saved project's address -->
             <a
@@ -459,26 +474,22 @@ button to it. -->
               data-sveltekit-reload
               class={ROW}
             >
+              <!-- Its picture, as on My Library (only drawn there; until
+              then, its colors) -->
+              <ProjectPicture
+                id={item.id}
+                href={item.meta.href}
+                imageClass="h-14 w-12 shrink-0 object-contain"
+                coverClass="h-14 w-12 shrink-0"
+                stripHeight="40px"
+              />
               <span class="flex min-w-0 flex-1 flex-col">
-                <span class="truncate"
-                  >{item.meta.name ||
-                    item.meta.title ||
-                    'Untitled Project'}</span
+                <span class="line-clamp-2 text-sm font-semibold break-words"
+                  >{label}</span
                 >
-                <span class="text-xs opacity-70">Saved {item.meta.date}</span>
-                <!-- Its gauge colors, as on My Projects; just a picture here,
-                inside the link -->
-                {#if itemColors.length}
-                  <span
-                    class="rounded-container mt-1.5 flex h-4 w-full overflow-hidden"
-                    aria-hidden="true"
-                  >
-                    {#each itemColors as color, i (i)}
-                      <span class="flex-1" style="background:{color.hex}"
-                      ></span>
-                    {/each}
-                  </span>
-                {/if}
+                <span class="text-surface-700-300 line-clamp-1 text-xs"
+                  >{savedLine(item)}</span
+                >
               </span>
               <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
             </a>

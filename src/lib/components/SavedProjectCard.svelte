@@ -29,12 +29,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import GalleryProjectCard, {
     coverClasses,
+    imageClasses,
   } from '#lib/components/GalleryProjectCard.svelte';
   import NameField from '#lib/components/NameField.svelte';
   import MoreMenu, {
     type MoreMenuItem,
   } from '#lib/components/buttons/MoreMenu.svelte';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import ProjectPicture from '#lib/components/ProjectPicture.svelte';
   import SyncIcon from '#lib/components/sync/SyncIcon.svelte';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import {
@@ -43,10 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/storage/projects.svelte.js';
   import { fromGalleryLink } from '#lib/utils/gallery-request.js';
   import { resolve } from '$app/paths';
-  import { getThumbnail } from '#lib/storage/thumbnails.js';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
-  import { getColorsFromInput } from '#lib/utils/color-utils.js';
-  import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
   import {
     FolderPlusIcon,
     LoaderCircleIcon,
@@ -164,44 +162,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : `Open in the Project Planner (${dateLine})`,
   );
 
-  // Its picture, read once the card is near the screen (there can be many)
-  let card = $state<HTMLElement>();
-  let thumbnail = $state<string | null>(null);
-  $effect(() => {
-    if (!card || !projectHref) return;
-    void picturesVersion;
-    const pictureId = id;
-    const pictureHref = projectHref;
-    let current = true;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        getThumbnail(pictureId, pictureHref).then((image) => {
-          if (current) thumbnail = image;
-        });
-      },
-      { rootMargin: '400px' },
-    );
-    observer.observe(card);
-    return () => {
-      current = false;
-      observer.disconnect();
-    };
-  });
-
-  // Its colors, the cover when it can't have a picture
-  let colors = $derived(
-    projectHref
-      ? [
-          ...(getColorsFromInput({ string: projectHref }) || []),
-          ...extraColorsFromProjectHref(projectHref).map(
-            (extra) => extra.color,
-          ),
-        ]
-      : [],
-  );
-
   // A saved one can be renamed or moved to the Trash; one only in the
   // gallery, saved back
   let menu = $derived<MoreMenuItem[]>(
@@ -240,38 +200,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let editingName = $state('');
 </script>
 
-<div bind:this={card} class="w-full">
-  <GalleryProjectCard
-    {href}
-    {reload}
-    image={thumbnail ?? galleryImage}
-    {layout}
-    title={linkTitle}
-  >
+<div class="w-full">
+  <GalleryProjectCard {href} {reload} {layout} title={linkTitle}>
     {#snippet cover()}
-      {#if !pictureSettled}
-        <div
-          class="placeholder rounded-container animate-pulse {coverClasses[
-            layout
-          ]}"
-          aria-hidden="true"
-        ></div>
-      {:else if colors.length}
-        <div
-          class="flex items-center {coverClasses[layout]}"
-          aria-hidden="true"
-        >
-          <div class="w-full">
-            <PaletteStrip {colors} height="70px" insideControl />
-          </div>
-        </div>
-      {:else}
-        <!-- Nothing to show, but its place is kept, so the cards line up -->
-        <div
-          class="placeholder rounded-container {coverClasses[layout]}"
-          aria-hidden="true"
-        ></div>
-      {/if}
+      <ProjectPicture
+        {id}
+        href={projectHref}
+        fallbackImage={galleryImage}
+        {picturesVersion}
+        {pictureSettled}
+        imageClass={imageClasses[layout]}
+        coverClass={coverClasses[layout]}
+      />
     {/snippet}
     {#snippet nameRow()}
       {#if editing}
