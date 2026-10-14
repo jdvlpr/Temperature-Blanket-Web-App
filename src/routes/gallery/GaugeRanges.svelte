@@ -84,8 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <section class="{PANEL_LIST} mx-auto w-full max-w-2xl text-left">
   <div class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2">
-    <!-- On a phone, the link goes under the heading -->
-    <div class="min-w-56 flex-1">
+    <div class="min-w-0 flex-1">
       <h2 class="text-lg font-semibold">{heading}</h2>
       {#if !mixedYarns && items[0]?.color.brandName}
         <p class="text-sm">
@@ -98,7 +97,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       {/if}
     </div>
-    {@render action?.()}
+    <!-- Beside the heading, or on a phone a full-width button under it, its
+         label wrapping on the narrowest -->
+    {#if action}
+      <div
+        class="max-sm:[&>*]:bg-surface-200-800 flex max-sm:w-full max-sm:pb-1 max-sm:[&>*]:w-full max-sm:[&>*]:text-center max-sm:[&>*]:whitespace-normal"
+      >
+        {@render action()}
+      </div>
+    {/if}
   </div>
   <ol class="divide-surface-200-800 flex flex-col divide-y">
     {#each items as { color, label, range }, index (index)}
@@ -111,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex min-w-0 flex-1 flex-col gap-x-4 sm:flex-row sm:items-center"
         >
           {#if range}
-            <span class="shrink-0 sm:w-40">
+            <span class="shrink-0 sm:min-w-40">
               {#if 'from' in range}
                 <RangeValue
                   from={range.from}
@@ -124,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
             </span>
           {:else if typeof label === 'string'}
-            <span class="shrink-0 font-semibold sm:w-40">{label}</span>
+            <span class="shrink-0 font-semibold sm:min-w-40">{label}</span>
           {/if}
           <span class="flex min-w-0 flex-col">
             <span class="leading-tight text-pretty">
