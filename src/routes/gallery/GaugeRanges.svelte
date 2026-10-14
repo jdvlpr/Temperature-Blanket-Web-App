@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  A gallery project's gauge as a legend, in the same panel as its details: its
-  name and one link to its palette (its own gallery page, or a copy in the
-  Yarn Palette Creator), the rule for its ranges' ends, then a row for each
+  A gallery project's gauge as a legend: its name, its yarn, the rule for its
+  ranges' ends, and one link to its yarn palette (its own gallery page, or a
+  copy in the Yarn Palette Creator), then a row for each
   range: its numbered swatch, the range, its colorway (and yarn, when they
   differ), and the "more"
   menu (⋮) to buy or view the yarn and copy its name or hex code. Colors
@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '#lib/types/yarn-types.js';
   import { rangeRuleSentence } from '#lib/utils/range-format.js';
   import type { Snippet } from 'svelte';
+  import GalleryYarnLines from './GalleryYarnLines.svelte';
 
   interface Item {
     color: Color;
@@ -71,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hasRanges = $derived(
     items.some((item) => item.range && 'from' in item.range),
   );
-  // Each row names its yarn only when they differ (Details names the yarns)
+  // One yarn is named above the rows; different ones, on each row
   let mixedYarns = $derived(
     new Set(
       items.map(
@@ -86,6 +87,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- On a phone, the link goes under the heading -->
     <div class="min-w-56 flex-1">
       <h2 class="text-lg font-semibold">{heading}</h2>
+      {#if !mixedYarns && items[0]?.color.brandName}
+        <p class="text-sm">
+          <GalleryYarnLines colors={[items[0].color]} />
+        </p>
+      {/if}
       {#if hasRanges && rangeOptions}
         <p class="text-surface-700-300 text-xs">
           {rangeRuleSentence(rangeOptions, gaugeId)}

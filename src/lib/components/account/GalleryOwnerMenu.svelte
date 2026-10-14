@@ -14,8 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  On a gallery page, only for the account that published it: "Your Page ▾"
-  beside Open a Copy, with the same options as each version on My Projects:
+  On a gallery page, only for the account that published it: "Published ▾"
+  beside Open a Copy, the same button as on its My Library card, with the
+  same options as each version there:
   Anonymous, a link to a newer version, and Unpublish (it asks first, under the
   buttons). Found in the browser from the account's pages, so visitors get the
   same page as before and make no extra request. Shown even when the page
@@ -38,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ArrowRightIcon,
     ChevronDownIcon,
     EyeOffIcon,
+    GlobeIcon,
     LoaderCircleIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
@@ -69,7 +71,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         )
       : undefined,
   );
-  let latest = $derived(page ? galleryPages.pagesLike(page)[0] : undefined);
+  // All its versions, newest first
+  let versions = $derived(page ? galleryPages.pagesLike(page) : []);
+  let latest = $derived(versions[0]);
   let newer = $derived(latest && latest.postId !== postId ? latest : null);
 
   let ownerName = $derived(
@@ -135,11 +139,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal-surface"
       disabled={busy}
       data-testid="gallery-owner-menu"
-      >Your Page<ChevronDownIcon
-        class="icon-sm"
-        aria-hidden="true"
-      /></Menu.Trigger
     >
+      <GlobeIcon aria-hidden="true" />
+      <span
+        ><span class="sr-only">Gallery: </span>{versions.length > 1
+          ? `Published · ${versions.length} versions`
+          : 'Published'}</span
+      >
+      <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+    </Menu.Trigger>
     <Portal>
       <Menu.Positioner>
         <Menu.Content class={menuContentClass}>

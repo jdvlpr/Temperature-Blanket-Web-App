@@ -23,8 +23,10 @@ test.describe('Project Gallery Pages', () => {
     // Check for the presence of the main image
     await expect(page.getByAltText('Project Preview')).toBeVisible();
 
-    // The project's details show under the picture
-    await expect(page.getByRole('term').first()).toBeVisible();
+    // Each gauge links to its yarn palette
+    await expect(
+      page.getByRole('link', { name: /yarn palette/i }).first(),
+    ).toBeVisible();
 
     // Check for the share/open buttons or similar.
     // The "Open a Copy" button is a good candidate if valid.

@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   The top of a gallery page, the same for projects and palettes: its name, a
   line under it, "By <name> · Published <date>" (the only place either shows),
-  then Open a Copy and, for its owner, Your Page ▾. Details go under the
-  page's picture or palette, in GalleryDetails.
+  then Open a Copy and, for its owner, Published ▾ (as on its My Library
+  card).
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';

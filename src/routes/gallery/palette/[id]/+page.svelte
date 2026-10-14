@@ -13,11 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- A palette's gallery page, laid out like a project's: its name, "By <name>"
-when its owner included it on their public gallery, Open a Copy (in the Yarn
-Palette Creator), its colors, its details (yarns, the project it came from,
-other palette pages with these colors), its colorways, then the projects with
-these colors (its own project first). -->
+<!-- A palette's gallery page, laid out like a project's: its name, its colors
+and yarns, "By <name>" when its owner included it on their public gallery,
+Open a Copy (in the Yarn Palette Creator), its colors and colorways, then the
+projects with these colors (its own project first) and other palette pages
+with them. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -53,8 +53,6 @@ these colors (its own project first). -->
   import { ArrowLeftIcon, PlusIcon, SwatchBookIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
-  import GalleryDetail from '../../GalleryDetail.svelte';
-  import GalleryDetails from '../../GalleryDetails.svelte';
   import GalleryPageHeader from '../../GalleryPageHeader.svelte';
   import GalleryYarnLines from '../../GalleryYarnLines.svelte';
 
@@ -76,8 +74,8 @@ these colors (its own project first). -->
   let link = $derived(yarnLinksOf(galleryPalette?.yarnUrls)[0] ?? '');
   let sourceProjectId = $derived(galleryPalette?.sourceProjectId ?? null);
 
-  // The project it came from (in Details): its name, or its places and
-  // dates. It comes after the page.
+  // The project it came from, when the projects with it can't be listed: its
+  // name, or its places and dates. It comes after the page.
   const streamedSource = streamed(() => data.sourceProject);
   let sourceProject = $derived(streamedSource.current);
   let sourceTitle = $derived(
@@ -231,7 +229,13 @@ these colors (its own project first). -->
             {#snippet subtitle()}
               {#if palette}
                 {palette.colors.length}
-                {pluralize('color', palette.colors.length)}
+                {pluralize(
+                  'color',
+                  palette.colors.length,
+                )}{#if palette.colors.some((color) => color?.brandName && color?.yarnName)}<span
+                    class="mx-1"
+                    aria-hidden="true">·</span
+                  ><GalleryYarnLines colors={palette.colors} />{/if}
               {:else}
                 &nbsp;
               {/if}
@@ -252,36 +256,6 @@ these colors (its own project first). -->
               ></div>
             {:else if palette}
               <PaletteStrip colors={palette.colors} />
-              <GalleryDetails>
-                {#if palette.colors.some((color) => color?.brandName && color?.yarnName)}
-                  <GalleryDetail label="Yarn">
-                    <GalleryYarnLines colors={palette.colors} />
-                  </GalleryDetail>
-                {/if}
-                {#if sourceProject && sourceTitle}
-                  <GalleryDetail label="From the project">
-                    <a
-                      class="link"
-                      data-testid="gallery-source-project"
-                      href={resolve('/gallery/[id]', {
-                        id: String(sourceProject.databaseId),
-                      })}>{sourceTitle}</a
-                    >
-                  </GalleryDetail>
-                {/if}
-                {#if samePalettes.length}
-                  <GalleryDetail label="Also shared as">
-                    {#each samePalettes as other, i (other.databaseId)}{#if i}<span
-                          >,
-                        </span>{/if}<a
-                        class="link"
-                        href={resolve('/gallery/palette/[id]', {
-                          id: String(other.databaseId),
-                        })}>{galleryTitleText(other.title) || 'Yarn Palette'}</a
-                      >{/each}
-                  </GalleryDetail>
-                {/if}
-              </GalleryDetails>
               <div class="mx-auto w-fit">
                 <ViewMenu bind:value={preferences.value.layout} fillOption />
               </div>
@@ -321,7 +295,15 @@ these colors (its own project first). -->
                     : getTitleTextFromLocationsMeta(locations)}
                   {date}
                   title={getTitleTextFromLocationsMeta(locations)}
-                />
+                >
+                  {#snippet details()}
+                    {#if databaseId === sourceProjectId}
+                      <p class="text-surface-600-400 text-xs">
+                        Shared from this project
+                      </p>
+                    {/if}
+                  {/snippet}
+                </GalleryProjectCard>
               </div>
             {/each}
           </div>
@@ -336,8 +318,31 @@ these colors (its own project first). -->
               Show More
             </button>
           {/if}
+        {:else if projectsFound === null && sourceProject && sourceTitle}
+          <!-- The projects couldn't be looked up: the one it came from -->
+          <p class="text-sm" data-testid="gallery-source-project">
+            From the project <a
+              class="link"
+              href={resolve('/gallery/[id]', {
+                id: String(sourceProject.databaseId),
+              })}>{sourceTitle}</a
+            >
+          </p>
         {:else if loadingProjects && yarnDataReady && galleryPalette}
           <span class="sr-only" role="status">Looking for projects…</span>
+        {/if}
+        {#if samePalettes.length}
+          <p class="text-surface-600-400 mt-4 text-sm">
+            Also shared as
+            {#each samePalettes as other, i (other.databaseId)}{#if i}<span
+                  class="mr-1">,</span
+                >{/if}<a
+                class="link"
+                href={resolve('/gallery/palette/[id]', {
+                  id: String(other.databaseId),
+                })}>{galleryTitleText(other.title) || 'Yarn Palette'}</a
+              >{/each}
+          </p>
         {/if}
       </section>
     </main>

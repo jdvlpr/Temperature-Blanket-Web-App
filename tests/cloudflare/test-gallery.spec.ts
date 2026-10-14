@@ -359,7 +359,7 @@ test.describe('Gallery pages from accounts', () => {
 
     // The older version links to the newer one
     await page.goto(`/gallery/${postId + 1}`);
-    const options = page.getByRole('button', { name: /^Your Page/ });
+    const options = page.getByRole('button', { name: /^Gallery: Published/ });
     await options.click();
     await expect(
       page.getByRole('menuitem', { name: 'Newer Version' }),

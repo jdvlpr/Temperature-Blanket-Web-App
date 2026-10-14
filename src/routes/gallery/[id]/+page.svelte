@@ -53,8 +53,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTitleFromLocationsMeta,
   } from '#lib/utils/project-utils.svelte.js';
   import { recordPageView } from '#lib/utils/gallery-utils.js';
+  import { isCustomGalleryWeather } from '#lib/utils/gallery-weather.js';
   import {
     decodeHtmlEntities,
+    pluralize,
     stripHTMLTags,
   } from '#lib/utils/string-utils.js';
   import {
@@ -70,10 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { yarnPageState } from '../../yarn/state.svelte';
   import { streamed } from '#lib/utils/streamed.svelte.js';
   import type { PageData } from './$types';
-  import GalleryDetail from '../GalleryDetail.svelte';
-  import GalleryDetails from '../GalleryDetails.svelte';
   import GalleryPageHeader from '../GalleryPageHeader.svelte';
-  import GalleryYarnLines from '../GalleryYarnLines.svelte';
   import GaugeRanges from '../GaugeRanges.svelte';
 
   let { data }: { data: PageData } = $props();
@@ -131,9 +130,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hash = $derived(projectURL ? new URL(projectURL).hash.substring(1) : '');
   let params = $derived(getProjectParametersFromURLHash(hash));
   let gauges = $derived(getGauges(params));
-  let flatColors = $derived(
-    gauges.flatMap((item) => (item.colors ? item.colors : [])),
-  );
 
   // Its palettes' own pages (gallery plugin 1.7.0), which come after the page
   let palettePages = $state<LinkedGalleryPost[]>([]);
@@ -197,6 +193,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let pattern = $derived(project?.projectTags?.nodes?.[0]);
+
+  // Still in progress when it was published: Open a Copy searches the weather
+  // again for the days since (gallery-weather.ts); otherwise it loads the
+  // same weather as the preview, so there's nothing to say
+  let inProgress = $derived.by(() => {
+    if (!project?.date || isCustomGalleryWeather(project.weatherSources))
+      return false;
+    // Days as "2024-03-13"; a later day than it was published on wasn't in yet
+    const publishedOn = project.date.slice(0, 10);
+    try {
+      const places: { to?: string }[] = JSON.parse(project.locations ?? '[]');
+      return places.some(({ to }) => {
+        const day = to ? new Date(to) : null;
+        return (
+          day &&
+          !Number.isNaN(day.getTime()) &&
+          day.toISOString().slice(0, 10) >= publishedOn
+        );
+      });
+    } catch {
+      return false;
+    }
+  });
 
   let projectUnits = $derived<'imperial' | 'metric'>(
     params?.u?.value === 'i' ? 'imperial' : 'metric',
@@ -331,9 +350,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     alt="Project Preview"
                     class="m-auto max-h-[60vh]"
                   />
-                  <p class="text-surface-600-400 mt-2 px-2 text-sm">
-                    The preview shows the weather when it was published. Open a
-                    copy to see the latest.
+                  <!-- Only what the title, gauges and preview don't say -->
+                  <p
+                    class="text-surface-600-400 mt-2 flex flex-wrap justify-center gap-x-1.5 px-2 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']"
+                  >
+                    {#if pattern?.name}<span>{pattern.name}</span>{/if}
+                    {#if weatherSources?.length}
+                      <span
+                        >Weather from {#each weatherSources as { name, url }, i (url)}{#if i}<span
+                              class="mr-1">,</span
+                            >{/if}<a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="link">{name}</a
+                          >{/each}</span
+                      >
+                    {/if}
+                    {#if project.missingDays}
+                      <span
+                        >{project.missingDays}
+                        {pluralize('day', project.missingDays)} without weather data</span
+                      >
+                    {/if}
+                    {#if inProgress}
+                      <span
+                        >In progress when published · a copy gets the weather
+                        since</span
+                      >
+                    {/if}
+                    {#if globeLink}
+                      <span
+                        ><a
+                          class="link inline-flex items-center gap-1"
+                          href={globeLink}
+                          aria-label={globeLinkLabel}
+                          title={globeLinkLabel}
+                          ><GlobeIcon
+                            class="icon-sm"
+                            aria-hidden="true"
+                          />Nearby projects</a
+                        ></span
+                      >
+                    {/if}
                   </p>
                 {:else if project === undefined}
                   <div
@@ -341,67 +400,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ></div>
                 {/if}
               </div>
-
-              {#if project}
-                <div class="mt-4 px-2">
-                  <GalleryDetails>
-                    {#if flatColors.length || extraColors.length}
-                      <GalleryDetail label="Yarn">
-                        <GalleryYarnLines
-                          colors={[
-                            ...flatColors,
-                            ...extraColors.map((extra) => extra.color),
-                          ]}
-                        />
-                      </GalleryDetail>
-                    {/if}
-                    {#if pattern?.name}
-                      <GalleryDetail label="Pattern">
-                        <p>{pattern.name}</p>
-                        {#if pattern.description}
-                          <p class="text-surface-600-400 text-sm">
-                            {pattern.description}
-                          </p>
-                        {/if}
-                      </GalleryDetail>
-                    {/if}
-                    {#if project.totalDays}
-                      <GalleryDetail label="Days">
-                        {project.totalDays}
-                        {#if project.missingDays}
-                          <span class="text-surface-600-400 text-sm"
-                            >· {project.missingDays} without weather data</span
-                          >
-                        {/if}
-                      </GalleryDetail>
-                    {/if}
-                    {#if weatherSources?.length}
-                      <GalleryDetail label="Weather data">
-                        {#each weatherSources as { name, url }, i (url)}{#if i}<span
-                              >,
-                            </span>{/if}<a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="link">{name}</a
-                          >{/each}
-                      </GalleryDetail>
-                    {/if}
-                    {#if globeLink}
-                      <GalleryDetail label="Nearby">
-                        <a
-                          class="link inline-flex items-center gap-1"
-                          href={globeLink}
-                          ><GlobeIcon
-                            class="icon-sm"
-                            aria-hidden="true"
-                          />{globeLinkLabel}</a
-                        >
-                      </GalleryDetail>
-                    {/if}
-                  </GalleryDetails>
-                </div>
-              {/if}
 
               <div class="mt-4 flex flex-col gap-4 px-2 pb-4">
                 {#if gauges?.length}
@@ -435,20 +433,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           {#if palettePage}
                             <a
                               class="btn hover:preset-tonal-surface"
-                              aria-label="{gaugeName} Palette Page"
-                              title="This yarn palette’s own gallery page"
+                              aria-label="View the {gaugeName} yarn palette"
+                              title="This yarn palette’s gallery page"
                               href={resolve('/gallery/palette/[id]', {
                                 id: String(palettePage.databaseId),
                               })}
                             >
                               <SwatchBookIcon />
-                              Palette Page
+                              View Yarn Palette
                             </a>
                           {:else}
                             <a
                               class="btn hover:preset-tonal-surface"
                               aria-label="Open a copy of the {gaugeName} yarn palette"
-                              title="Open a copy in the Yarn Palette Creator. This gallery page won’t change."
+                              title="Its yarn colors in the Yarn Palette Creator, without the ranges. This gallery page won’t change."
                               onclick={() => {
                                 if (!colors) return;
                                 yarnPageState.gauge.colors = colors;
@@ -464,7 +462,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               href={resolve('/yarn')}
                             >
                               <SwatchBookIcon />
-                              Open a Copy
+                              Open a Copy of the Yarn Palette
                             </a>
                           {/if}
                         {/snippet}
