@@ -30,7 +30,9 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   if (!data) error(404, 'no data found.');
 
   // srtm3 is a single number giving the elevation in meters.
-  if (data.srtm3 !== NO_DATA_SRTM3) return json(data.srtm3);
+  // Elevation never changes, so the browser keeps it
+  const headers = { 'Cache-Control': 'public, max-age=31536000, immutable' };
+  if (data.srtm3 !== NO_DATA_SRTM3) return json(data.srtm3, { headers });
 
-  return json(null);
+  return json(null, { headers });
 };

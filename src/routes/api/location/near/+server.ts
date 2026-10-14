@@ -30,5 +30,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     error(404, 'no data found.');
   }
 
-  return json(data);
+  return json(data, {
+    headers: { 'Cache-Control': 'public, max-age=2592000' },
+  });
 };

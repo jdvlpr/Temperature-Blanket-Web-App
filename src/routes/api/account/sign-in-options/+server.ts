@@ -27,7 +27,9 @@ export const GET: RequestHandler = async () => {
   const result = readAuthSettings(platform?.env);
   if (result.status !== 'ready')
     return json({ message: 'Not found' }, { status: 404 });
-  return json({
-    google: Boolean(result.settings.google),
-  });
+  return json(
+    { google: Boolean(result.settings.google) },
+    // Only changes with the deployment's settings
+    { headers: { 'Cache-Control': 'private, max-age=3600' } },
+  );
 };

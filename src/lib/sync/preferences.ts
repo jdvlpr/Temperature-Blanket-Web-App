@@ -45,7 +45,7 @@ export type PreferencesUpload = Partial<
 >;
 
 // Option ids, as plain strings so the server needn't load the icons the option
-// lists in page-constants reference (as /api/preferences/theme)
+// lists in page-constants reference
 const ALLOWED: Partial<Record<SyncedPreferenceKey, readonly unknown[]>> = {
   'theme.id': [
     'classic',

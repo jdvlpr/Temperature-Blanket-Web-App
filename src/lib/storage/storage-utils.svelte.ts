@@ -21,12 +21,18 @@ import { preferences } from '#lib/storage/preferences.svelte.js';
 import type { PageLayout } from '#lib/types/page-types.js';
 import { MigrationManager } from './migration-manager';
 
-// Debounce timer for persisting theme prefs to cookies. The theme effect can
-// fire several times in quick succession (e.g. dragging a settings slider), and
-// only the final state needs to be POSTed. DOM attribute updates stay immediate;
-// only the network write is debounced.
-let themePostTimer: ReturnType<typeof setTimeout> | undefined;
-const THEME_POST_DEBOUNCE_MS = 400;
+/**
+ * Keep the theme in one cookie, so server-rendered pages (the gallery) paint
+ * it straight away. Written here rather than by a request to the server, and
+ * only when it changes. The older theme_* cookies were HttpOnly, so the browser
+ * can't overwrite them; hooks.server.ts reads this one first.
+ */
+function writeThemeCookie(value: string) {
+  const cookie = `theme_prefs=${value}`;
+  if (document.cookie.split('; ').includes(cookie)) return;
+  const secure = location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${cookie}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+}
 
 /**
  * Cleans up old local storage keys which are no longer used or which have been migrated to different locations
@@ -127,20 +133,9 @@ export async function initializeLocalStorage() {
           'data-heading-style',
           headingStyle,
         );
-        clearTimeout(themePostTimer);
-        themePostTimer = setTimeout(() => {
-          fetch('/api/preferences/theme', {
-            method: 'POST',
-            body: JSON.stringify({
-              theme,
-              mode,
-              roundness,
-              spacing,
-              textScale,
-              headingStyle,
-            }),
-          });
-        }, THEME_POST_DEBOUNCE_MS);
+        writeThemeCookie(
+          [theme, mode, roundness, spacing, textScale, headingStyle].join('.'),
+        );
       }
     });
 

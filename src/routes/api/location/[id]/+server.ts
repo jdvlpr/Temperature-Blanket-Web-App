@@ -24,5 +24,8 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 
   if (!data) throw error(500, 'no data found.');
 
-  return json(data);
+  // A place's details rarely change, so the browser keeps them for a month
+  return json(data, {
+    headers: { 'Cache-Control': 'public, max-age=2592000' },
+  });
 };

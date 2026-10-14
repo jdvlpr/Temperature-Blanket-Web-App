@@ -16,7 +16,9 @@ export const GET: RequestHandler = async ({ params, fetch, url }) => {
     searchGeonames(text, fetch),
   );
 
-  return json(data);
+  return json(data, {
+    headers: { 'Cache-Control': 'public, max-age=86400' },
+  });
 };
 
 async function searchGeonames(text: string, fetch: typeof globalThis.fetch) {

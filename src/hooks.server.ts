@@ -96,68 +96,43 @@ const accountsApi: Handle = async ({ event, resolve }) => {
   return handleAuthRequest(event);
 };
 
-// Read theme cookies and update the html accordingly
+// Read the theme cookie and update the html accordingly
+const THEME_OPTIONS = [
+  SKELETON_THEMES.map((t) => t.id),
+  THEMES.map((t) => t.id),
+  ['sharp', 'rounded', 'pill'],
+  ['compact', 'normal', 'relaxed'],
+  ['small', 'normal', 'large'],
+  ['classic', 'playful', 'refined'],
+];
+const THEME_DEFAULTS = [
+  'classic',
+  'system',
+  'pill',
+  'normal',
+  'normal',
+  'classic',
+];
+// The cookies older versions set, one per option, in the order above
+const LEGACY_THEME_COOKIES = [
+  'theme',
+  'theme_mode',
+  'theme_roundness',
+  'theme_spacing',
+  'theme_text_scale',
+  'theme_heading_style',
+];
+
 const themeCookies: Handle = async ({ event, resolve }) => {
-  let theme = '';
-  let mode = '';
-  let roundness = '';
-  let spacing = '';
-  let textScale = '';
-  let headingStyle = '';
-
-  const VALID_ROUNDNESS = ['sharp', 'rounded', 'pill'];
-  const VALID_SPACING = ['compact', 'normal', 'relaxed'];
-  const VALID_TEXT_SCALE = ['small', 'normal', 'large'];
-  const VALID_HEADING_STYLE = ['classic', 'playful', 'refined'];
-
-  const cookieTheme = event.cookies.get('theme');
-  const cookieThemeMode = event.cookies.get('theme_mode');
-  const cookieRoundness = event.cookies.get('theme_roundness');
-  const cookieSpacing = event.cookies.get('theme_spacing');
-  const cookieTextScale = event.cookies.get('theme_text_scale');
-  const cookieHeadingStyle = event.cookies.get('theme_heading_style');
-
-  if (cookieTheme && SKELETON_THEMES.map((n) => n.id).includes(cookieTheme)) {
-    theme = cookieTheme;
-  } else {
-    event.cookies.set('theme', 'classic', { path: '/' });
-    theme = 'classic';
-  }
-
-  if (cookieThemeMode && THEMES.map((t) => t.id).includes(cookieThemeMode)) {
-    mode = cookieThemeMode;
-  } else {
-    event.cookies.set('theme_mode', 'system', { path: '/' });
-    mode = 'system';
-  }
-
-  if (cookieRoundness && VALID_ROUNDNESS.includes(cookieRoundness)) {
-    roundness = cookieRoundness;
-  } else {
-    event.cookies.set('theme_roundness', 'pill', { path: '/' });
-    roundness = 'pill';
-  }
-
-  if (cookieSpacing && VALID_SPACING.includes(cookieSpacing)) {
-    spacing = cookieSpacing;
-  } else {
-    event.cookies.set('theme_spacing', 'normal', { path: '/' });
-    spacing = 'normal';
-  }
-
-  if (cookieTextScale && VALID_TEXT_SCALE.includes(cookieTextScale)) {
-    textScale = cookieTextScale;
-  } else {
-    event.cookies.set('theme_text_scale', 'normal', { path: '/' });
-    textScale = 'normal';
-  }
-
-  if (cookieHeadingStyle && VALID_HEADING_STYLE.includes(cookieHeadingStyle)) {
-    headingStyle = cookieHeadingStyle;
-  } else {
-    event.cookies.set('theme_heading_style', 'classic', { path: '/' });
-    headingStyle = 'classic';
-  }
+  // "theme.mode.roundness.spacing.textScale.headingStyle", written in the browser
+  const saved = event.cookies.get('theme_prefs')?.split('.');
+  const [theme, mode, roundness, spacing, textScale, headingStyle] =
+    THEME_OPTIONS.map((options, i) => {
+      const value = saved
+        ? saved[i]
+        : event.cookies.get(LEGACY_THEME_COOKIES[i]);
+      return value && options.includes(value) ? value : THEME_DEFAULTS[i];
+    });
 
   return await resolve(event, {
     transformPageChunk: ({ html }) =>
