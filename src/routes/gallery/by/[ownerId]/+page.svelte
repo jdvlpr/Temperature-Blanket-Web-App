@@ -26,7 +26,6 @@ linked from "By <name>" on their gallery pages. -->
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
-  import { recordPageView } from '#lib/utils/gallery-utils.js';
   import { getTitleFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import {
     galleryTitleText,
@@ -35,7 +34,6 @@ linked from "By <name>" on their gallery pages. -->
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { yarnPageState } from '../../../yarn/state.svelte';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
@@ -77,16 +75,6 @@ linked from "By <name>" on their gallery pages. -->
         })
       : [],
   );
-
-  /** Brings its colors and name to the Yarn Palette Creator (Open a Copy) */
-  function openCopy(palette: GalleryPalette) {
-    yarnPageState.gauge.colors = palette.colors;
-    yarnPageState.suggestion = {
-      name: palette.page.title,
-      colors: $state.snapshot(palette.colors),
-    };
-    recordPageView(palette.postId);
-  }
 </script>
 
 <svelte:head>
@@ -166,7 +154,7 @@ linked from "By <name>" on their gallery pages. -->
         >
           {#each palettes as palette (palette.postId)}
             <li>
-              <GalleryPaletteCard {palette} onopen={() => openCopy(palette)} />
+              <GalleryPaletteCard {palette} />
             </li>
           {/each}
         </ul>

@@ -27,16 +27,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fetchPopularProjects,
     fetchPaletteGallery,
     popularToGalleryNodes,
-    recordPageView,
   } from '#lib/utils/gallery-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
-  import {
-    getPalettesFromProjects,
-    type GalleryPalette,
-  } from '#lib/utils/color-utils.js';
+  import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { yarnPageState } from '../yarn/state.svelte';
   import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, yarnPaletteGalleryState } from './state.svelte';
 
@@ -174,17 +169,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnPaletteGalleryState.popularFor = months;
   }
 
-  /** Brings its colors and name to the Yarn Palette Creator (Open a Copy) */
-  function openCopy(palette: GalleryPalette) {
-    yarnPageState.gauge.colors = palette.colors;
-    // Its gallery name, which Save Palette offers
-    yarnPageState.suggestion = {
-      name: palette.page.title,
-      colors: $state.snapshot(palette.colors),
-    };
-    recordPageView(palette.postId);
-  }
-
   let grid = $derived(yarnPaletteGalleryState.layout === 'grid');
   const gridClass =
     'grid w-full grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
@@ -232,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else}
         {#each yarnPaletteGalleryState.popularPalettes as palette, i (i)}
           <div class="w-64 shrink-0 snap-start">
-            <GalleryPaletteCard {palette} onopen={() => openCopy(palette)} />
+            <GalleryPaletteCard {palette} />
           </div>
         {/each}
       {/if}
@@ -327,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <div class={grid ? gridClass : listClass}>
       {#each yarnPaletteGalleryState.palettes as palette, i (i)}
-        <GalleryPaletteCard {palette} onopen={() => openCopy(palette)} />
+        <GalleryPaletteCard {palette} />
       {/each}
       {#if loading}
         {@render placeholders(grid ? 12 : 8)}
