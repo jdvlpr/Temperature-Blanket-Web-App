@@ -34,7 +34,7 @@ import type {
   ProjectMeta,
   SyncErrorCode,
 } from './protocol';
-import { MAX_PALETTES_PER_UPLOAD } from './protocol';
+import { PALETTES_PER_REQUEST } from './protocol';
 import type { PreferencesRecord, PreferencesUpload } from './preferences';
 import type { Seen } from './seen';
 
@@ -533,8 +533,8 @@ export async function syncAccount(
     const changed = (await palettes.list()).filter(
       (p) => p.sync?.ownerUserId === userId && p.sync.dirty,
     );
-    for (let i = 0; i < changed.length; i += MAX_PALETTES_PER_UPLOAD) {
-      const batch = changed.slice(i, i + MAX_PALETTES_PER_UPLOAD);
+    for (let i = 0; i < changed.length; i += PALETTES_PER_REQUEST) {
+      const batch = changed.slice(i, i + PALETTES_PER_REQUEST);
       let results: PaletteUploadResult[];
       try {
         results = await server.uploadPalettes!(

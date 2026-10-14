@@ -84,6 +84,11 @@ export type PaletteInput = Omit<PaletteRecord, 'id' | 'rev'>;
 /** Palettes go up together, up to MAX_PALETTES_PER_UPLOAD a request */
 export type PaletteUpload = PaletteInput & { id: string };
 export const MAX_PALETTES_PER_UPLOAD = 100;
+/**
+ * How many this app sends at once: each takes up to five database queries, and
+ * a request may run only 50 on the free plan
+ */
+export const PALETTES_PER_REQUEST = 8;
 
 /** Per palette: the account's copy afterwards, or why it couldn't be saved */
 export type PaletteUploadResult =

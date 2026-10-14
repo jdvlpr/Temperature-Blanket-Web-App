@@ -18,7 +18,7 @@
 import { requireAccount } from '#lib/server/auth/index.js';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
-import { cleanUpUserSync } from './store';
+import { cleanUpIdleUser, cleanUpUserSync } from './store';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
 export type SyncContext = {
@@ -61,7 +61,15 @@ export async function requireSync(
   };
 }
 
-/** Runs the daily per-user cleanup after a write, without delaying the response. */
+/**
+ * Runs the daily per-user cleanup after a write, without delaying the response,
+ * and then one for someone who no longer syncs.
+ */
 export function cleanUpAfterWrite(sync: SyncContext) {
-  sync.runInBackground(cleanUpUserSync(sync.db, sync.bucket, sync.userId));
+  sync.runInBackground(
+    (async () => {
+      if (await cleanUpUserSync(sync.db, sync.bucket, sync.userId))
+        await cleanUpIdleUser(sync.db, sync.bucket);
+    })(),
+  );
 }

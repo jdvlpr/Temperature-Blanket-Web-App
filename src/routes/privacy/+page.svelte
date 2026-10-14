@@ -217,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>
             Your account data is kept until you delete your account. Sign-in
             codes expire after 5 minutes. When you change a synced project, the
-            previous version is kept for up to 7 days before it is deleted. When
+            previous version is kept for about a day before it is deleted. When
             you remove a synced project, a small record of its removal,
             including its title, is kept for up to 180 days so your other
             devices remove it too.

@@ -2,6 +2,7 @@ import type { R2Bucket } from '@cloudflare/workers-types';
 import { createTestD1 } from '#lib/server/test-d1.js';
 import { describe, expect, it } from 'vitest';
 import {
+  cleanUpIdleUser,
   cleanUpUserSync,
   DELETION_RECORD_TTL_MS,
   deleteProject,
@@ -13,6 +14,7 @@ import {
   MAX_BYTES_PER_USER,
   MAX_PALETTES_PER_USER,
   MAX_PROJECTS_PER_USER,
+  OLD_COPY_TTL_MS,
   purgeTrash,
   savePalette,
   savePreferences,
@@ -285,6 +287,23 @@ describe('cleanUpUserSync', () => {
     await saveProject(d1, bucket, input({ projectId: 'kept', baseRev: 4 }), t0);
     await cleanUpUserSync(d1, bucket, 'u1', later + 1000);
     expect(objects.size).toBe(2);
+  });
+
+  it('cleans up after someone who stopped syncing, longest overdue first', async () => {
+    const { d1, bucket, objects } = setup();
+    const t0 = Date.parse('2026-01-01T00:00:00Z');
+    await saveProject(d1, bucket, input({ userId: 'u2' }), t0);
+    await saveProject(d1, bucket, input({ userId: 'u2', baseRev: 1 }), t0);
+    await saveProject(d1, bucket, input(), t0);
+    expect(objects.size).toBe(3);
+
+    const later = t0 + OLD_COPY_TTL_MS + 1;
+    await cleanUpUserSync(d1, bucket, 'u1', later);
+    await cleanUpIdleUser(d1, bucket, later);
+    // u2's replaced copy is gone; both current copies stay
+    expect(objects.size).toBe(2);
+    // Each at most once a day
+    expect(await cleanUpUserSync(d1, bucket, 'u2', later + 1000)).toBe(false);
   });
 });
 

@@ -142,7 +142,10 @@ describe('autosave', () => {
     edit('b');
     await vi.advanceTimersByTimeAsync(IDLE_MS);
     expect(state.save).toHaveBeenCalledTimes(1);
-    expect(state.save).toHaveBeenCalledWith({ toAccount: false });
+    expect(state.save).toHaveBeenCalledWith({
+      toAccount: false,
+      waitToSync: true,
+    });
     expect(autosave.state).toBe('saved');
   });
 

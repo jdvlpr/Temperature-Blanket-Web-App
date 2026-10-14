@@ -55,8 +55,11 @@ export const MAX_PALETTE_NAME_LENGTH = 100;
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** How long deletion records are kept for devices that haven't synced since. */
 export const DELETION_RECORD_TTL_MS = 180 * DAY_MS;
-/** How long replaced project copies are kept, so one lost in a conflict can be recovered. */
-export const OLD_COPY_TTL_MS = 7 * DAY_MS;
+/**
+ * How long replaced project copies are kept: long enough for a device still
+ * downloading one, and to recover one lost in a conflict soon after.
+ */
+export const OLD_COPY_TTL_MS = DAY_MS;
 const CLEANUP_INTERVAL_MS = DAY_MS;
 // D1 allows 100 bound parameters per statement
 const OLD_COPY_CHUNK = 90;
@@ -605,21 +608,22 @@ export async function savePreferences(
 
 /**
  * Purges old deletion records and replaced copies for one user, at most once a
- * day. Pages has no scheduled jobs, so this runs in the background after a sync write.
+ * day. Pages has no scheduled jobs, so this runs in the background after a sync
+ * write. True if it ran.
  */
 export async function cleanUpUserSync(
   db: D1Database,
   bucket: R2Bucket,
   userId: string,
   now = Date.now(),
-) {
+): Promise<boolean> {
   const claimed = await db
     .prepare(
       `update "userSync" set "cleanedUpAt" = ? where "userId" = ? and "cleanedUpAt" <= ?`,
     )
     .bind(now, userId, now - CLEANUP_INTERVAL_MS)
     .run();
-  if (claimed.meta.changes === 0) return;
+  if (claimed.meta.changes === 0) return false;
 
   // The Trash: data kept longer than TRASH_DAYS goes, and palettes are purged
   const trashEnd = trashCutoff(now);
@@ -691,6 +695,28 @@ export async function cleanUpUserSync(
       .bind(...keys)
       .run();
   }
+  return true;
+}
+
+/**
+ * Cleans up after the user whose cleanup is longest overdue, so the Trash and
+ * replaced copies of someone who stopped syncing don't stay forever. One at a
+ * time, after another user's daily cleanup: a request may run only 50 queries
+ * on the free plan.
+ */
+export async function cleanUpIdleUser(
+  db: D1Database,
+  bucket: R2Bucket,
+  now = Date.now(),
+) {
+  const idle = await db
+    .prepare(
+      `select "userId" from "userSync" where "cleanedUpAt" <= ?
+       order by "cleanedUpAt" limit 1`,
+    )
+    .bind(now - CLEANUP_INTERVAL_MS)
+    .first<{ userId: string }>();
+  if (idle) await cleanUpUserSync(db, bucket, idle.userId, now);
 }
 
 /** Deletes every stored project copy for a user, before the account is deleted. */
