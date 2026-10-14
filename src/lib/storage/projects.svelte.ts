@@ -565,18 +565,24 @@ export class ProjectStorage {
     if (!trashed) return;
     // Saved again since (opened from its link): keep that newer copy
     if (!(await this.getById(id))) await this.restore(trashed);
-    await this.deleteForever(id);
+    // Its picture stays, so its card shows it again without drawing it anew
+    await this.removeFromTrash(id);
+    changed();
   }
 
   /**
    * Delete a project in the Trash for good
    */
   static async deleteForever(id: string): Promise<void> {
+    await this.removeFromTrash(id);
+    await removeThumbnail(id);
+    changed();
+  }
+
+  private static async removeFromTrash(id: string): Promise<void> {
     await update<TrashedProject[]>(PROJECTS_TRASH_KEY, (trash = []) =>
       trash.filter((t) => t.item.id !== id),
     );
-    await removeThumbnail(id);
-    changed();
   }
 
   /**
@@ -593,9 +599,7 @@ export class ProjectStorage {
           )
         : [];
       removed.push(
-        ...trash
-          .filter((t) => !kept.includes(t))
-          .map((t) => t.item.id),
+        ...trash.filter((t) => !kept.includes(t)).map((t) => t.item.id),
       );
       return kept;
     });

@@ -72,6 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function remove(item: StoredProjectIndexItem) {
     slots.remember(item.id, layout);
+    // Back from the Trash, its card waits for the drawing to look again
+    settled.delete(pictureKey(item.id, item.meta.href));
     undos.add(
       item.id,
       labelFor(item),
