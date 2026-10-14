@@ -50,7 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     refreshAccountTrash,
   } from '#lib/storage/account-trash.svelte.js';
   import { onMount, type Snippet } from 'svelte';
+  import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
+  import { TRASH_DAYS } from '#lib/storage/trash.js';
   import {
+    ChevronRightIcon,
     ExternalLinkIcon,
     GlobeIcon,
     LogInIcon,
@@ -192,58 +195,86 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@render children()}
   </section>
 
-  <!-- Out of the way, below the list: whose name gallery pages show (tap to
-  change it), where those pages are listed, and deleted things, in a dialog.
-  Trash only shows when there's something in it. -->
+  <!-- Out of the way, below the list, as rows like the Project menu's: whose
+  name gallery pages show (it's changed in Profile settings), where those pages
+  are listed, and deleted things, in a dialog. Trash only shows when there's
+  something in it. -->
   {#if browser && (showGallery || trashCount)}
-    <div class="flex flex-wrap items-center justify-center gap-2">
+    <ul class={[PANEL_LIST, 'mx-auto w-full max-w-md']}>
       {#if showGallery}
-        <div class="contents" data-testid="gallery-name-status">
-          {#if ownerName}
-            {#if anyWithName && galleryPages.publicId}
+        {#if ownerName}
+          {#if anyWithName && galleryPages.publicId}
+            <li>
               <a
                 href={resolve('/gallery/by/[ownerId]', {
                   ownerId: galleryPages.publicId,
                 })}
                 target="_blank"
-                class="btn hover:preset-tonal-surface"
+                class={PANEL_ROW}
                 data-testid="gallery-owner-page"
-                ><GlobeIcon />Your Gallery Page<ExternalLinkIcon
-                  class="icon-sm opacity-70"
-                  aria-hidden="true"
-                /></a
               >
-            {/if}
-            <a
-              href={DISPLAY_NAME_HREF}
-              class="btn hover:preset-tonal-surface"
-              title="Change the name on your gallery pages"
-              ><PencilIcon />By {ownerName}<span class="sr-only"
-                >, change the name on your gallery pages</span
-              ></a
-            >
-          {:else}
-            <a href={DISPLAY_NAME_HREF} class="btn hover:preset-tonal-surface"
-              ><PencilIcon />Add a Name for Gallery Pages</a
-            >
+                <GlobeIcon class="shrink-0 opacity-70" />
+                <span class="flex flex-1 flex-col">
+                  <span>Your Gallery Page</span>
+                  <span class="text-xs opacity-70"
+                    >Everything you've published with your name, for anyone to
+                    see</span
+                  >
+                </span>
+                <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
+              </a>
+            </li>
           {/if}
-        </div>
+          <li data-testid="gallery-name-status">
+            <a href={DISPLAY_NAME_HREF} class={PANEL_ROW}>
+              <PencilIcon class="shrink-0 opacity-70" />
+              <span class="flex flex-1 flex-col">
+                <span>Your Gallery Name</span>
+                <span class="text-xs opacity-70"
+                  >Pages you publish say “By {ownerName}” unless they're
+                  Anonymous. Change it in Profile settings.</span
+                >
+              </span>
+            </a>
+          </li>
+        {:else}
+          <li data-testid="gallery-name-status">
+            <a href={DISPLAY_NAME_HREF} class={PANEL_ROW}>
+              <PencilIcon class="shrink-0 opacity-70" />
+              <span class="flex flex-1 flex-col">
+                <span>Add a Name for Gallery Pages</span>
+                <span class="text-xs opacity-70"
+                  >Get credit for what you publish, in Profile settings</span
+                >
+              </span>
+            </a>
+          </li>
+        {/if}
       {/if}
       {#if trashCount}
-        <button
-          type="button"
-          class="btn hover:preset-tonal-surface"
-          onclick={() =>
-            dialog.trigger({
-              type: 'component',
-              component: { ref: Trash },
-              options: { size: 'large', title: 'Trash' },
-            })}
-        >
-          <Trash2Icon />
-          Trash ({trashCount})
-        </button>
+        <li>
+          <button
+            type="button"
+            class={PANEL_ROW}
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: { ref: Trash },
+                options: { size: 'large', title: 'Trash' },
+              })}
+          >
+            <Trash2Icon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>Trash ({trashCount})</span>
+              <span class="text-xs opacity-70"
+                >Restore what you deleted. It's gone for good after {TRASH_DAYS}
+                days.</span
+              >
+            </span>
+            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+          </button>
+        </li>
       {/if}
-    </div>
+    </ul>
   {/if}
 </main>
