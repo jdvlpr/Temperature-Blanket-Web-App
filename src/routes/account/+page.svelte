@@ -217,14 +217,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 }}
               />
               <GalleryProfileLink name={user.name} />
-              <ChangeEmail
-                email={user.email}
-                onchanged={(newEmail) => {
-                  if (!user) return;
-                  user.email = newEmail;
-                  rememberAccountSummary(user);
-                }}
-              />
             </div>
           </section>
 
@@ -236,6 +228,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Sign-in methods
             </h3>
             <div class={CARD}>
+            <ChangeEmail
+              email={user.email}
+              onchanged={(newEmail) => {
+                if (!user) return;
+                user.email = newEmail;
+                rememberAccountSummary(user);
+              }}
+            />
               <SignInMethods email={user.email} />
             </div>
           </section>

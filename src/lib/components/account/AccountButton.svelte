@@ -105,7 +105,7 @@ when accounts are off. -->
       </Popover.Trigger>
       <Popover.Positioner>
         <Popover.Content
-          class="card bg-surface-200-800 w-96 max-w-[calc(100vw-2rem)] shadow-xl"
+          class="card bg-surface-100-900 w-96 max-w-[calc(100vw-2rem)] shadow-xl"
         >
           {#snippet element(attributes)}
             {#if !attributes.hidden}

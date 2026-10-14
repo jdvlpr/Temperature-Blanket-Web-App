@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnGridSelect from '#lib/components/modals/YarnGridSelect.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
-  import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
   import { tick } from 'svelte';
 
   interface Props {
@@ -80,8 +79,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
   ]);
 
-  let href = $derived(affiliate_variant_href || variant_href);
-
   /** Use a colorway, or (without one) a color of the user's own */
   function setColor(value: string, color?: Color) {
     name = color?.name;
@@ -129,34 +126,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div class="p-4" bind:this={container} hidden={pickingFromPhoto}>
-  {#if href}
-    <!-- eslint-disable svelte/no-navigation-without-resolve -- yarn shops' and makers' own pages -->
-    <a
-      class="mx-auto mb-2 flex w-fit items-center justify-center gap-2 underline"
-      {href}
-      target="_blank"
-      rel="noreferrer nofollow"
-    >
-      {#if affiliate_variant_href}
-        <ShoppingCartIcon aria-hidden="true" />
-      {:else}
-        <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
-      {/if}
-      <span class="flex flex-col items-start text-left">
-        {#if name}
-          <span class="text-lg leading-tight font-semibold">{name}</span>
-        {/if}
-        {#if brandName || yarnName}
-          <span class="text-surface-700-300 text-xs">
-            {[brandName, yarnName].filter(Boolean).join(' · ')}
-          </span>
-        {/if}
-      </span>
-      <span class="sr-only">(opens in a new tab)</span>
-    </a>
-    <!-- eslint-enable svelte/no-navigation-without-resolve -->
-  {/if}
-
   <ColorSearchField
     label="Color"
     bind:hex={
