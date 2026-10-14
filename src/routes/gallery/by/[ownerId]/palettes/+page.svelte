@@ -35,15 +35,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/shared-palette-utils.js';
   import { XIcon } from '@lucide/svelte';
   import PopularPeriodMenu from '../../../PopularPeriodMenu.svelte';
-  import { ownerFilters, popularOrder } from '../owner-filters.svelte.js';
+  import {
+    lastSeen,
+    ownerFilters,
+    popularOrder,
+  } from '../owner-filters.svelte.js';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
 
   let heading = $derived(`Yarn palettes by ${data.name}`);
 
-  // Undefined while the gallery answers, null if it can't be reached
-  const list = streamed(() => data.list);
+  // Undefined while the gallery answers the first time, null if it can't be
+  // reached
+  const streamedList = streamed(() => data.list);
+  const list = lastSeen(
+    () => `palettes/${page.params.ownerId}`,
+    () => streamedList.current,
+  );
   const ownPalettes = $derived(list.current?.palettes);
   const all = $derived(ownPalettes ?? []);
   const popular = popularOrder(
@@ -117,10 +126,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if ownPalettes === undefined}
   <div class="px-2">
-    <PlaceholderPalettes
-      items={Math.min(data.paletteIds.length, 6)}
-      maxWFull={true}
-    />
+    <span class="sr-only" role="status">Loading palettes…</span>
+    <PlaceholderPalettes items={data.paletteIds.length} maxWFull={true} />
   </div>
 {:else if ownPalettes === null}
   <p class="my-8 text-center" role="alert">

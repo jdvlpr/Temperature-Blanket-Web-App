@@ -230,6 +230,8 @@ own project first), and other palette pages with them. -->
                 >
               {:else if galleryPalette}
                 {name}
+              {:else if found === 'unreachable'}
+                This yarn palette gallery page couldn’t be loaded.
               {:else}
                 This yarn palette gallery page cannot be found.
               {/if}

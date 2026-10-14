@@ -38,15 +38,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { streamed } from '#lib/utils/streamed.svelte.js';
   import { XIcon } from '@lucide/svelte';
   import PopularPeriodMenu from '../../PopularPeriodMenu.svelte';
-  import { ownerFilters, popularOrder } from './owner-filters.svelte.js';
+  import {
+    lastSeen,
+    ownerFilters,
+    popularOrder,
+  } from './owner-filters.svelte.js';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
 
   let heading = $derived(`Projects by ${data.name}`);
 
-  // Undefined while the gallery answers, null if it can't be reached
-  const list = streamed(() => data.list);
+  // Undefined while the gallery answers the first time, null if it can't be
+  // reached
+  const streamedList = streamed(() => data.list);
+  const list = lastSeen(
+    () => `projects/${page.params.ownerId}`,
+    () => streamedList.current,
+  );
   const projects = $derived(list.current?.projects);
   const all = $derived(projects ?? []);
   const popular = popularOrder(
@@ -136,7 +145,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         : 'grid grid-cols-1 md:grid-cols-2',
     ]}
   >
-    {#each Array(Math.min(data.postIds.length, 20))}
+    <span class="sr-only" role="status">Loading projects…</span>
+    {#each data.postIds as id (id)}
       <div
         class={[
           'placeholder card bg-surface-100 dark:bg-surface-900 rounded-container w-full animate-pulse',

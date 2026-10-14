@@ -23,6 +23,7 @@ import {
   POPULAR_DAYS,
   type GallerySort,
 } from '#lib/utils/gallery-utils.js';
+import { SvelteMap } from 'svelte/reactivity';
 
 class OwnerFilters {
   /** Whose pages these are for */
@@ -74,6 +75,28 @@ class OwnerFilters {
 }
 
 export const ownerFilters = new OwnerFilters();
+
+// Each owner's lists as last seen this visit, by kind and owner
+const seen = new SvelteMap<string, unknown>();
+
+/**
+ * The list from `value`, or while a fresh one comes, the one last seen for
+ * `key`: going back to a tab shows it at once, and Back keeps its place.
+ */
+export function lastSeen<T>(
+  key: () => string,
+  value: () => T | undefined,
+): { readonly current: T | undefined } {
+  $effect(() => {
+    const found = value();
+    if (found !== undefined) seen.set(key(), found);
+  });
+  return {
+    get current() {
+      return value() ?? (seen.get(key()) as T | undefined);
+    },
+  };
+}
 
 /**
  * These pages' Popular order, for the period chosen, while Popular is: the
