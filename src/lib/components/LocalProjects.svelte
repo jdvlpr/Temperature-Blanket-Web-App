@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { TrashUndos } from '#lib/utils/trash-undo.svelte.js';
+  import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
@@ -55,7 +55,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Quick undos for projects just moved to the Trash, each where it was
   const undos = new TrashUndos();
+  const slots = new TrashSlots();
   const undoSpots = $derived(undos.placed(shown.map((project) => project.id)));
+  const layout = $derived(preferences.value.myProjectsLayout ?? 'grid');
 
   const labelFor = (item: StoredProjectIndexItem) =>
     item.meta.name || item.meta.title || 'Untitled Project';
@@ -69,6 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function remove(item: StoredProjectIndexItem) {
+    slots.remember(item.id, layout);
     undos.add(
       item.id,
       labelFor(item),
@@ -82,6 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function undoRemove(id: string) {
     undos.remove(id);
+    slots.forget(id);
     await run(
       () => ProjectStorage.restoreFromTrash(id),
       'Unable to restore the project',
@@ -171,10 +175,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-{#snippet undoAt(anchor: string | null)}
+{#snippet undoAt(anchor: string | null, inSlot = false)}
   {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
-    <div class="col-span-full w-full">
+    <!-- On My Projects, it keeps the space its project left -->
+    <div
+      class={['w-full', inSlot && 'self-stretch']}
+      style={inSlot ? slots.style(entry.id, layout) : undefined}
+    >
       <TrashUndo
+        fill={inSlot}
         label={entry.label}
         onundo={() => undoRemove(entry.id)}
         focus={undos.focusId === entry.id}
@@ -221,34 +230,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
       {/if}
       {#if onMyProjectsPage}
-        {@const grid =
-          (preferences.value.myProjectsLayout ?? 'grid') === 'grid'}
+        {@const grid = layout === 'grid'}
         <div
           class={grid
             ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4'
             : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
         >
           {#each shown as project (project.id)}
-            {@render undoAt(project.id)}
-            <SavedProjectCard
-              item={project}
-              {picturesVersion}
-              pictureSettled={settled.has(
-                pictureKey(project.id, project.meta.href),
-              )}
-              layout={grid ? 'grid' : 'list'}
-              syncLabel={__ACCOUNTS_ENABLED__
-                ? syncLabelFor(project, signedIn)
-                : undefined}
-              onrename={(name) => rename(project.id, name)}
-              onremove={() => remove(project)}
-            >
-              {#snippet sharing()}
-                {#if showSharing}{@render gallerySharing(project)}{/if}
-              {/snippet}
-            </SavedProjectCard>
+            {@render undoAt(project.id, true)}
+            <div class="w-full" {@attach slots.track(project.id)}>
+              <SavedProjectCard
+                item={project}
+                {picturesVersion}
+                pictureSettled={settled.has(
+                  pictureKey(project.id, project.meta.href),
+                )}
+                layout={grid ? 'grid' : 'list'}
+                syncLabel={__ACCOUNTS_ENABLED__
+                  ? syncLabelFor(project, signedIn)
+                  : undefined}
+                onrename={(name) => rename(project.id, name)}
+                onremove={() => remove(project)}
+              >
+                {#snippet sharing()}
+                  {#if showSharing}{@render gallerySharing(project)}{/if}
+                {/snippet}
+              </SavedProjectCard>
+            </div>
           {/each}
-          {@render undoAt(null)}
+          {@render undoAt(null, true)}
         </div>
       {:else}
         <div class="flex w-full flex-col items-start justify-center gap-2">

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { TrashUndos } from '#lib/utils/trash-undo.svelte.js';
+  import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
   import NameField from '#lib/components/NameField.svelte';
@@ -61,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Undos live in the list, since the dialog is modal and a toast button behind
   // it can't be clicked: each where its palette was, so it's right there
   const undos = new TrashUndos();
+  const slots = new TrashSlots();
 
   let palettes = $derived(
     yarnDataReady
@@ -113,6 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function remove(palette: SavedPalette, label: string) {
+    slots.remember(palette.id, layout);
     undos.add(
       palette.id,
       label,
@@ -126,6 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function undoRemove(id: string) {
     undos.remove(id);
+    slots.forget(id);
     await run(
       () => PaletteStorage.restore(id),
       'Unable to restore the palette',
@@ -146,6 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let grid = $derived(
     !updateGauge && (preferences.value.myProjectsLayout ?? 'grid') === 'grid',
   );
+  const layout = $derived(grid ? 'grid' : 'list');
 
   function use(colors: Color[]) {
     updateGauge?.({ _colors: colors, _schemeId: 'Custom' });
@@ -162,8 +166,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet undoAt(anchor: string | null, asListItems: boolean)}
     {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
       {#if asListItems}
-        <li class="w-full">
+        <!-- In the space its palette left -->
+        <li class="w-full self-stretch" style={slots.style(entry.id, layout)}>
           <TrashUndo
+            fill
             label={entry.label}
             onundo={() => undoRemove(entry.id)}
             focus={undos.focusId === entry.id}
@@ -204,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {#each palettes as { palette, colors, label } (palette.id)}
         {@render undoAt(palette.id, true)}
-        <li class="flex w-full min-w-0">
+        <li class="flex w-full min-w-0" {@attach slots.track(palette.id)}>
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
               <PaletteStrip {colors} />

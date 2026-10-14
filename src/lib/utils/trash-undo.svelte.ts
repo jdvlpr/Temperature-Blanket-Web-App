@@ -1,3 +1,5 @@
+import type { Attachment } from 'svelte/attachments';
+
 /**
  * Quick undos for things just moved to the Trash from a list, each shown
  * where its item was, so it's right there to undo. Several can be open at
@@ -74,5 +76,43 @@ export class TrashUndos {
       spots.set(anchor, [...(spots.get(anchor) ?? []), entry]);
     }
     return spots;
+  }
+}
+
+/**
+ * How tall each listed item was when it went to the Trash, so its undo can
+ * keep the same space and nothing after it moves. Kept per layout, as the
+ * View menu can switch while an undo shows.
+ */
+export class TrashSlots {
+  #elements = new Map<string, HTMLElement>();
+  #heights = $state<Record<string, { layout: string; height: number }>>({});
+
+  /** Attach to each listed item's slot */
+  track(id: string): Attachment<HTMLElement> {
+    return (element) => {
+      this.#elements.set(id, element);
+      return () => {
+        if (this.#elements.get(id) === element) this.#elements.delete(id);
+      };
+    };
+  }
+
+  /** Call as the item goes, while it's still showing */
+  remember(id: string, layout: string) {
+    const height = this.#elements.get(id)?.offsetHeight;
+    if (height) this.#heights[id] = { layout, height };
+  }
+
+  forget(id: string) {
+    delete this.#heights[id];
+  }
+
+  /** A min-height style for its undo, if it was measured in this layout */
+  style(id: string, layout: string): string | undefined {
+    const saved = this.#heights[id];
+    return saved?.layout === layout
+      ? `min-height: ${saved.height}px`
+      : undefined;
   }
 }
