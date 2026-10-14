@@ -169,13 +169,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Saving a gallery-only project back: its card says so meanwhile, and
   // becomes a saved project's card once it's listed
   const adding = new SvelteSet<string>();
+  // Its card, once saved: focus moves there, as its old card is gone
+  let focusId = $state<string | null>(null);
   async function addBack(page: GalleryPage) {
+    if (adding.has(page.projectId)) return;
     adding.add(page.projectId);
     try {
       const { addProjectBack } =
         await import('#lib/accounts/gallery-add-back.js');
       await addProjectBack(page);
       await loadProjects();
+      focusId = page.projectId;
     } catch {
       toast.trigger({
         message: `“${page.title}” couldn’t be added to My Saved Projects. Try opening it and saving it in the Project Planner.`,
@@ -318,6 +322,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     : undefined}
                   onrename={(name) => rename(project.id, name)}
                   onremove={() => remove(project)}
+                  focus={focusId === project.id}
+                  onfocused={() => (focusId = null)}
                 >
                   {#snippet sharing()}
                     {#if showSharing}{@render gallerySharing(project)}{/if}
@@ -341,6 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       kind="project"
                       label={card.page.title}
                       page={card.page}
+                      galleryOnly
                       onadd={() => {}}
                       onupdate={() => {}}
                     />

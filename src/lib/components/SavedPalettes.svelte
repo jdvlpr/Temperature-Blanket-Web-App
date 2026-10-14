@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { SvelteSet } from 'svelte/reactivity';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
   // (the My Projects page), each palette is a link to the Yarn Palette Creator
@@ -76,6 +77,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const dateOf = (time: number) =>
     new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
+  const dateTimeOf = (time: number) =>
+    new Date(time).toLocaleString(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
 
   let palettes = $derived(
     yarnDataReady
@@ -190,12 +196,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Saving a gallery-only palette back: its card says so meanwhile, and
   // becomes a saved palette's card once it's listed
   const adding = new SvelteSet<string>();
+  // Its card, once saved: focus moves there, as its old card is gone
+  let focusId = $state<string | null>(null);
+  const takeFocus: Attachment<HTMLElement> = (link) => {
+    link.focus({ preventScroll: true });
+    focusId = null;
+  };
   async function addBack(page: GalleryPage, colors: Color[]) {
+    if (adding.has(page.projectId)) return;
     adding.add(page.projectId);
     try {
       const { addPaletteBack } =
         await import('#lib/accounts/gallery-add-back.js');
-      await addPaletteBack(page, colors);
+      focusId = await addPaletteBack(page, colors);
     } catch {
       toast.trigger({
         message: `“${page.title}” couldn’t be added to My Saved Palettes. Try again later.`,
@@ -309,19 +322,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
               {/snippet}
               {#snippet action()}
-                {#if !adding.has(page.projectId)}
-                  <MoreMenu
-                    label="More for {label}"
-                    items={[
-                      {
-                        value: 'add-back',
-                        label: 'Add to My Saved Palettes',
-                        icon: FolderPlusIcon,
-                        onselect: () => addBack(page, colors),
-                      },
-                    ]}
-                  />
-                {/if}
+                <MoreMenu
+                  label="More for {label}"
+                  items={[
+                    {
+                      value: 'add-back',
+                      label: 'Add to My Saved Palettes',
+                      icon: FolderPlusIcon,
+                      onselect: () => addBack(page, colors),
+                    },
+                  ]}
+                />
               {/snippet}
               {#snippet footer()}
                 <GallerySharing
@@ -329,6 +340,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   kind="palette"
                   {label}
                   {page}
+                  galleryOnly
                   onadd={() => {}}
                   onupdate={() => {}}
                 />
@@ -370,6 +382,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
                     <a
                       href={linkFor(colors, palette.name)}
+                      {@attach focusId === palette.id ? takeFocus : undefined}
                       class="font-semibold break-words"
                       title="Open in Yarn Palette Creator"
                     >
@@ -383,7 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#snippet details()}
                 {#if !updateGauge}
                   <span class="text-surface-700-300 line-clamp-1 text-xs"
-                    >Saved {dateOf(palette.createdAt)}</span
+                    >Saved {dateTimeOf(palette.createdAt)}</span
                   >
                 {/if}
               {/snippet}

@@ -30,14 +30,25 @@ import {
   getPaletteFallbackName,
 } from '#lib/utils/color-utils.js';
 import { loadInPlace } from '#lib/utils/open-saved-project.js';
+import { weather } from '#lib/state/weather-state.svelte.js';
+import { weatherSearch } from '#lib/state/weather-search.svelte.js';
+
+// One at a time: each loads its project into the page's state until it's saved
+let adding: Promise<unknown> = Promise.resolve();
 
 /**
  * Puts a project back as it was when it's in the Trash (this browser's or the
- * account's). Otherwise saves its gallery page's copy, with the weather the
- * page kept, under the same project ID, as opening and saving it would.
- * Throws when it can't.
+ * account's). Otherwise saves its gallery page's copy under the same project
+ * ID, as opening and saving it would: with the weather the page kept, or
+ * else searched as Send to Gallery does. Throws when it can't.
  */
-export async function addProjectBack(page: GalleryPage): Promise<void> {
+export function addProjectBack(page: GalleryPage): Promise<void> {
+  const next = adding.then(() => addNow(page));
+  adding = next.catch(() => {});
+  return next;
+}
+
+async function addNow(page: GalleryPage) {
   const trashed = (await loadProjectTrash()).find(
     (entry) => entry.id === page.projectId,
   );
@@ -50,6 +61,18 @@ export async function addProjectBack(page: GalleryPage): Promise<void> {
     fromGallery: page.postId,
   });
   try {
+    // Without it (edited weather can't be searched again, or the search
+    // failed), it's saved as a link is: the planner searches when it opens
+    if (!weather.rawData.length && !weather.isUserEdited) {
+      try {
+        weather.setRawData(
+          await weatherSearch.fetchOnly(new AbortController()),
+        );
+        weather.wasLoadedFromStorage = false;
+      } catch {
+        // Saved without
+      }
+    }
     await ProjectStorage.save({ id: page.projectId });
   } finally {
     restorePreferences?.();
@@ -59,19 +82,19 @@ export async function addProjectBack(page: GalleryPage): Promise<void> {
 /**
  * Puts a palette back from the Trash. One deleted for good can't have its ID
  * back (the account keeps it deleted), so it's saved anew, or found saved
- * with the same colors, and its gallery page moves to that one. Throws when
- * it can't.
+ * with the same colors, and its gallery page moves to that one. Resolves
+ * with the saved palette's ID; throws when it can't.
  */
 export async function addPaletteBack(
   page: GalleryPage,
   colors: Color[],
-): Promise<void> {
+): Promise<string> {
   const id = page.projectId;
   if ((await PaletteStorage.listDeleted()).some((p) => p.id === id)) {
     await PaletteStorage.restore(id);
     await savedPalettes.refresh();
     // Unless the same colors were saved again meanwhile (that one stays)
-    if (savedPalettes.items.some((p) => p.id === id)) return;
+    if (savedPalettes.items.some((p) => p.id === id)) return id;
   }
   const { palette } = await PaletteStorage.add({
     code: colorsToPaletteCode(colors),
@@ -83,4 +106,5 @@ export async function addPaletteBack(
   } finally {
     await savedPalettes.refresh();
   }
+  return palette.id;
 }

@@ -54,6 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Trash2Icon,
   } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
 
   type Props = {
     /** Bumped when pictures were drawn in the background, to look again */
@@ -66,6 +67,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     syncLabel?: SyncLabel;
     /** Its gallery pages: Published ▾ or Unpublished ▾ */
     sharing?: Snippet;
+    /** Takes keyboard focus (on its name), e.g. once it's been added back */
+    focus?: boolean;
+    onfocused?: () => void;
   } & (
     | {
         item: StoredProjectIndexItem;
@@ -105,10 +109,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onaddback,
     adding = false,
     sharing,
+    focus = false,
+    onfocused,
   }: Props = $props();
+
+  const takeFocus: Attachment<HTMLElement> = (link) => {
+    link.focus({ preventScroll: true });
+    onfocused?.();
+  };
 
   const dateOf = (time: number) =>
     new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
+  const dateTimeOf = (time: number) =>
+    new Date(time).toLocaleString(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
 
   // Its picture and colors are kept and read by this ID and link
   let id = $derived(item?.id ?? galleryPage?.projectId ?? '');
@@ -137,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (galleryPage)
       return `Gallery only · Published ${dateOf(galleryPage.publishedAt)}`;
     const saved = item && lastSavedAt(item);
-    return `Saved ${saved ? dateOf(saved) : item?.meta.date}`;
+    return `Saved ${saved ? dateTimeOf(saved) : item?.meta.date}`;
   });
 
   let linkTitle = $derived(
@@ -282,6 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {href}
                 data-sveltekit-reload={reload ? '' : undefined}
                 title={linkTitle}
+                {@attach focus ? takeFocus : undefined}
                 class="line-clamp-2 min-w-0 text-sm font-semibold break-words"
                 >{label}</a
               >
@@ -304,7 +321,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
             {/if}
           </div>
-          {#if menu.length && !adding}
+          {#if menu.length}
             <MoreMenu items={menu} label="More for {label}" />
           {/if}
         </div>
