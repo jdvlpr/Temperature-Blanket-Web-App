@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     loading = false;
     const scrollObserver = new IntersectionObserver(
-      (entries, observer) => {
+      (entries) => {
         entries.forEach((entry) => {
           showScrollToTopButton =
             !entry.isIntersecting && entry.boundingClientRect.top < 0;
@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
-  let searchTimeout: any;
+  let searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
   function debouncedSearch() {
     clearTimeout(searchTimeout);
@@ -333,7 +333,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               onchange={debouncedSearch}
             >
               <option value="">Any Pattern</option>
-              {#each previews.all as { name, wpTagSlug }}
+              {#each previews.all as { name, wpTagSlug } (wpTagSlug)}
                 <option value={wpTagSlug}>{name}</option>
               {/each}
             </select>
@@ -363,7 +363,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class=" my-2 w-full gap-2 {galleryState.layout === 'grid'
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
-          : 'flex flex-col items-start justify-start'}"
+          : 'grid grid-cols-1 items-start md:grid-cols-2'}"
       >
         {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName } (databaseId)}
           <GalleryProjectCard
@@ -395,14 +395,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class=" w-full gap-4 {galleryState.layout === 'grid'
             ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
-            : 'flex flex-col items-start justify-start'}"
+            : 'grid grid-cols-1 items-start md:grid-cols-2'}"
         >
           {#each Array(20)}
             <div
               class="placeholder card bg-surface-100 dark:bg-surface-900 rounded-container animate-pulse text-center {galleryState.layout ===
               'grid'
                 ? 'h-[350px] w-full'
-                : 'h-[120px] w-full'}"
+                : 'h-[128px] w-full sm:h-[144px]'}"
             ></div>
           {/each}
         </div>

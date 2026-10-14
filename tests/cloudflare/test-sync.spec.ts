@@ -503,7 +503,7 @@ async function buildProject(page: Page) {
     .getByRole('option', { name: 'Austin, Texas, United States' })
     .click();
   await page.getByRole('button', { name: 'Search', exact: true }).click();
-  await expect(page.getByText('°C / mm °F / in')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 }
 
 async function choosePattern(page: Page, label: string) {

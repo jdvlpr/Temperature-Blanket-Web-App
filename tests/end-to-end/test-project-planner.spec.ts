@@ -63,7 +63,7 @@ test.describe('Project Planner', () => {
     await page.getByRole('button', { name: 'Search', exact: true }).click();
 
     // 5. Verify Results
-    await expect(page.getByText('°C / mm °F / in')).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
   });
 
   test('Tab Navigation', async ({ page }) => {
@@ -76,7 +76,7 @@ test.describe('Project Planner', () => {
     await expect(option).toBeVisible();
     await option.click();
     await page.getByRole('button', { name: 'Search', exact: true }).click();
-    await expect(page.getByText('°C / mm °F / in')).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 
     // Dismiss any toasts that might block interactions
     const toast = page.getByTestId('toast');
@@ -125,7 +125,7 @@ test.describe('Project Planner', () => {
       .getByRole('option', { name: 'Austin, Texas, United States' })
       .click();
     await page.getByRole('button', { name: 'Search', exact: true }).click();
-    await expect(page.getByText('°C / mm °F / in')).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 
     const toast = page.getByTestId('toast');
     if (await toast.isVisible()) {
@@ -175,7 +175,9 @@ test.describe('Project Planner', () => {
     await restoredTabBar
       .getByRole('button', { name: 'Weather', exact: true })
       .click();
-    await expect(restoredPage.getByText('°C / mm °F / in')).toBeVisible();
+    await expect(
+      restoredPage.getByRole('button', { name: /^Units: / }),
+    ).toBeVisible();
 
     await restoredTabBar
       .getByRole('button', { name: 'Colors', exact: true })

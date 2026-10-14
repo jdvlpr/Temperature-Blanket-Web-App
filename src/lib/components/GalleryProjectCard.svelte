@@ -13,11 +13,20 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script lang="ts" module>
+  /** The picture's size in each layout, also for whatever stands in for it */
+  export const coverClasses = {
+    grid: 'w-full max-w-[130px] sm:max-w-[210px] md:max-w-[215px] aspect-[4/5]',
+    list: 'h-28 w-24 shrink-0 sm:h-32 sm:w-32',
+  };
+</script>
+
 <!-- @component
   A project as a card: its preview image (or a `cover` in its place), its name
-  and its places and dates, all one link. The gallery's cards are only that;
-  My Projects gives its own `nameRow` (with a rename pencil, outside the link),
-  `details` and a `footer` with its sharing and ⋮ menu.
+  and its places and dates, all one link. In a grid or row it stands up, the
+  picture over the name; in a list it lies down, the picture beside the name.
+  The gallery's cards are only that; My Projects gives its own `nameRow` (with
+  its ⋮ menu, outside the link), `details` and a `footer` with its sharing.
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
@@ -31,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Its places and dates, as HTML (escaped by getTitleFromLocationsMeta) */
     placesHtml?: string;
     layout?: 'grid' | 'list' | 'row';
-    /** In place of the image, when there's none */
+    /** In place of the image, when there's none (sized with `coverClasses`) */
     cover?: Snippet;
     /** In place of the name and places, outside the link; it has the link
     for screen readers and the keyboard then (the picture's is for the mouse) */
@@ -42,8 +51,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** For a link that needs a full page load (a project opened in the planner) */
     reload?: boolean;
     title?: string;
-    /** In place of the image's usual size for the layout, e.g. a fixed-height cover */
-    imageClass?: string;
   }
 
   let {
@@ -58,23 +65,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     footer,
     reload = false,
     title,
-    imageClass,
   }: Props = $props();
 
   const imageClasses = {
     grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
-    list: 'max-h-[900px] max-w-full',
+    // The whole picture, in a box beside the name
+    list: 'h-28 w-24 shrink-0 object-contain sm:h-32 sm:w-32',
     row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
   };
+
+  let list = $derived(layout === 'list');
 </script>
 
 <div
   class={[
-    'rounded-container hover:bg-surface-100-900 flex flex-col gap-1 p-2 text-center',
+    'rounded-container hover:bg-surface-100-900 flex gap-1 p-2',
     layout === 'row'
       ? 'mx-auto min-h-[200px] max-w-[245px] shrink-0 snap-center lg:max-w-[350px]'
       : 'w-full',
-    layout === 'list' ? 'items-center justify-start' : 'items-center',
+    list
+      ? 'flex-row items-center gap-3 text-left'
+      : 'flex-col items-center text-center',
   ]}
 >
   <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
@@ -82,29 +93,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {href}
     {title}
     data-sveltekit-reload={reload ? '' : undefined}
-    class="flex w-full flex-col items-center gap-1"
+    class={list
+      ? ['flex min-w-0 items-center gap-3', nameRow ? 'shrink-0' : 'grow']
+      : 'flex w-full flex-col items-center gap-1'}
     aria-hidden={nameRow ? 'true' : undefined}
     tabindex={nameRow ? -1 : undefined}
   >
     {#if image}
-      <img
-        src={image}
-        alt=""
-        class={imageClass ?? imageClasses[layout]}
-        loading="lazy"
-      />
+      <img src={image} alt="" class={imageClasses[layout]} loading="lazy" />
     {:else}
       {@render cover?.()}
     {/if}
     {#if !nameRow}
-      <p class="line-clamp-4 text-xs">
+      <p class={list ? 'line-clamp-3 min-w-0 text-xs' : 'line-clamp-4 text-xs'}>
         {#if name}<span class="block text-sm font-semibold">{name}</span>{/if}
-        <!-- Escaped by getTitleFromLocationsMeta -->
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -- escaped by getTitleFromLocationsMeta -->
         {@html placesHtml}
       </p>
     {/if}
   </a>
-  {@render nameRow?.()}
-  {@render details?.()}
-  {@render footer?.()}
+  {#if nameRow || details || footer}
+    <div class={list ? 'flex min-w-0 grow flex-col gap-1' : 'contents'}>
+      {@render nameRow?.()}
+      {@render details?.()}
+      {@render footer?.()}
+    </div>
+  {/if}
 </div>

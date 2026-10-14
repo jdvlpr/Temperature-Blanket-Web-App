@@ -1,15 +1,46 @@
 import adapter from '@sveltejs/adapter-cloudflare';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { createRequire, register } from 'node:module';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import fs from 'node:fs';
 
 const file = fileURLToPath(new URL('package.json', import.meta.url));
 const json = readFileSync(file, 'utf8');
 const pkg = JSON.parse(json);
+
+/**
+ * adapter-cloudflare 8.0.0 points the built server's `cloudflare:workers` imports
+ * back at the real module for the deployed Worker, in the same files `vite preview`
+ * runs in Node, which can't load it. Under preview, they get the adapter's stand-in
+ * again (bindings from wrangler.jsonc), as in dev.
+ */
+function previewCloudflareWorkers(): Plugin {
+  return {
+    name: 'preview-cloudflare-workers',
+    enforce: 'pre',
+    configurePreviewServer() {
+      const adapterDir = new URL(
+        '.',
+        pathToFileURL(
+          createRequire(import.meta.url).resolve(
+            '@sveltejs/adapter-cloudflare/package.json',
+          ),
+        ),
+      );
+      const standIn = new URL('src/virtual-cloudflare-workers.js', adapterDir);
+      const hook = `export async function resolve(specifier, context, next) {
+        if (specifier === 'cloudflare:workers')
+          return { url: ${JSON.stringify(standIn.href)}, shortCircuit: true };
+        return next(specifier, context);
+      }`;
+      register(`data:text/javascript,${encodeURIComponent(hook)}`);
+    },
+  };
+}
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
@@ -59,6 +90,7 @@ export default defineConfig(({ mode }) => {
       ),
     },
     plugins: [
+      previewCloudflareWorkers(),
       tailwindcss(),
       sveltekit({
         // Consult https://kit.svelte.dev/docs/integrations#preprocessors

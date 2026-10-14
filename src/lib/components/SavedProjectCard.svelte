@@ -15,13 +15,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A saved project on My Projects, as the gallery's project card: its picture
-  (taken when the planner saved it; until then its colors), its name, its
+  (taken when the planner saved it; while one is being drawn, a placeholder;
+  if it can't be, its colors), its name, its
   places and dates when it has a name, and a ⋮ menu (Rename, Publish to
   Gallery, Move to Trash). Once published, its Published menu (`sharing`)
   sits under it. Tapping it opens it in the planner.
 -->
 <script lang="ts">
-  import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import GalleryProjectCard, {
+    coverClasses,
+  } from '#lib/components/GalleryProjectCard.svelte';
   import NameField from '#lib/components/NameField.svelte';
   import MoreMenu, {
     type MoreMenuItem,
@@ -40,6 +43,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     item: StoredProjectIndexItem;
     /** Bumped when pictures were drawn in the background, to look again */
     picturesVersion?: number;
+    /** The background drawing is done with it: without a picture by now,
+    it shows its colors instead of a placeholder */
+    pictureSettled?: boolean;
     layout?: 'grid' | 'list';
     /** Where it's kept, e.g. "Synced" (see $lib/sync) */
     syncLabel?: SyncLabel;
@@ -55,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     item,
     picturesVersion = 0,
+    pictureSettled = false,
     layout = 'grid',
     syncLabel,
     onrename,
@@ -98,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   });
 
-  // Its colors, the cover until it has a picture
+  // Its colors, the cover when it can't have a picture
   let colors = $derived([
     ...(getColorsFromInput({ string: meta.href }) || []),
     ...extraColorsFromProjectHref(meta.href).map((extra) => extra.color),
@@ -144,19 +151,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     image={thumbnail}
     {layout}
     title="Open in the Project Planner (saved {meta.date})"
-    imageClass="rounded-container {layout === 'grid'
-      ? 'w-full h-auto'
-      : 'max-h-[240px] w-auto'}"
   >
     {#snippet cover()}
-      {#if colors.length}
-        <div class="w-full" aria-hidden="true">
-          <PaletteStrip
-            {colors}
-            height={layout === 'grid' ? '140px' : '70px'}
-            insideControl
-          />
+      {#if !pictureSettled}
+        <div
+          class="placeholder rounded-container animate-pulse {coverClasses[
+            layout
+          ]}"
+          aria-hidden="true"
+        ></div>
+      {:else if colors.length}
+        <div
+          class="flex items-center {coverClasses[layout]}"
+          aria-hidden="true"
+        >
+          <div class="w-full">
+            <PaletteStrip {colors} height="70px" insideControl />
+          </div>
         </div>
+      {:else}
+        <!-- Nothing to show, but its place is kept, so the cards line up -->
+        <div
+          class="placeholder rounded-container {coverClasses[layout]}"
+          aria-hidden="true"
+        ></div>
       {/if}
     {/snippet}
     {#snippet nameRow()}

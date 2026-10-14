@@ -37,7 +37,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
   import { sync, syncLabelFor } from '#lib/sync/status.svelte.js';
+  import { withoutVersion } from '#lib/utils/gallery-link-utils.js';
   import { FolderOpenIcon } from '@lucide/svelte';
+  import { SvelteSet } from 'svelte/reactivity';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
   // which shows them all under its own heading, as cards (the gallery's), with
@@ -126,8 +128,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // On My Projects, each project without a picture of its current version
   // gets one in the background, one at a time (see thumbnails.ts); its card
-  // shows it as soon as it's kept
+  // shows it as soon as it's kept, and a placeholder until the drawing is
+  // done with it (by version: an edited project is drawn again)
   let picturesVersion = $state(0);
+  const settled = new SvelteSet<string>();
+  const pictureKey = (id: string, href: string) =>
+    `${id} ${withoutVersion(href)}`;
   $effect(() => {
     if (!onMyProjectsPage || !loaded) return;
     const queue = projects.map(({ id, meta }) => ({ id, href: meta.href }));
@@ -136,12 +142,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     void (async () => {
       for (const { id, href } of queue) {
         if (stopped) return;
-        if (await hasThumbnail(id, href)) continue;
+        if (await hasThumbnail(id, href)) {
+          settled.add(pictureKey(id, href));
+          continue;
+        }
         const drawing = drawInFrame(id, href);
         cancel = drawing.cancel;
         const ok = await drawing.done;
         cancel = null;
         if (stopped) return;
+        settled.add(pictureKey(id, href));
         if (ok) picturesVersion++;
       }
     })();
@@ -215,14 +225,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           (preferences.value.myProjectsLayout ?? 'grid') === 'grid'}
         <div
           class={grid
-            ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3'
-            : 'flex w-full flex-col items-start gap-2'}
+            ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4'
+            : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
         >
           {#each shown as project (project.id)}
             {@render undoAt(project.id)}
             <SavedProjectCard
               item={project}
               {picturesVersion}
+              pictureSettled={settled.has(
+                pictureKey(project.id, project.meta.href),
+              )}
               layout={grid ? 'grid' : 'list'}
               syncLabel={__ACCOUNTS_ENABLED__
                 ? syncLabelFor(project, signedIn)
