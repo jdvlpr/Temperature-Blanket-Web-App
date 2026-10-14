@@ -15,15 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
-  import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
+  import { GALLERY_SORTS } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
-  import {
-    fetchPopularProjects,
-    fetchPaletteGallery,
-    popularToGalleryNodes,
-  } from '#lib/utils/gallery-utils.js';
+  import { fetchPaletteGallery } from '#lib/utils/gallery-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import { PlusIcon, XIcon } from '@lucide/svelte';
@@ -34,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let first = 40;
   let loading = $state(true);
   let scrollContainer: HTMLDivElement | undefined = $state();
-  let featuredEl: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
   let totalPalettes = $state<string | undefined>();
 
@@ -49,13 +44,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       await ensureYarnData();
       showPalettes();
       loading = false;
-    }
-    if (
-      !yarnPaletteGalleryState.popularPalettes.length ||
-      yarnPaletteGalleryState.popularFor !== galleryFilters.timePeriod
-    ) {
-      yarnPaletteGalleryState.popularPalettes = [];
-      await fetchPopularPalettes();
     }
     const scrollObserver = new IntersectionObserver(
       (entries) => {
@@ -104,11 +92,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       after,
       search: yarnPaletteGalleryState.search,
       order: yarnPaletteGalleryState.orderBy,
+      days: yarnPaletteGalleryState.popularDays,
       yarn: yarnPaletteGalleryState.getYarnSearch({
         brandId: yarnPaletteGalleryState.filteredBrandId,
         yarnId: yarnPaletteGalleryState.filteredYarnId,
       }),
     });
+    // The gallery can't sort by Popular yet (an older plugin): say Newest
+    if (results.popularUnavailable) yarnPaletteGalleryState.orderBy = 'DESC';
     yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
     yarnPaletteGalleryState.projects.push(
       ...results.edges.flatMap((item) => item.node),
@@ -122,10 +113,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnPaletteGalleryState.projects = [];
     yarnPaletteGalleryState.palettes = [];
     loading = true;
-    const loadedFor = galleryFilters.key;
     try {
       await fetchPage();
-      yarnPaletteGalleryState.loadedFor = loadedFor;
+      yarnPaletteGalleryState.loadedFor = galleryFilters.key;
     } catch (e) {
       console.error('Search failed:', e);
     } finally {
@@ -144,37 +134,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     search();
   }
 
-  async function fetchPopularPalettes() {
-    const months = galleryFilters.timePeriod;
-    try {
-      const [popular] = await Promise.all([
-        fetchPopularProjects({ months, limit: 5, palettes: true }),
-        ensureYarnData(),
-      ]);
-      yarnPaletteGalleryState.popularPalettes = getPalettesFromProjects({
-        projects: popularToGalleryNodes(popular),
-        minColors: 3,
-      });
-    } catch (e) {
-      // Unreachable: none to feature, rather than placeholders forever
-      console.error('Could not load popular palettes', e);
-      yarnPaletteGalleryState.popularPalettes = [];
-    }
-    yarnPaletteGalleryState.popularFor = months;
-  }
-
   let grid = $derived(yarnPaletteGalleryState.layout === 'grid');
   const gridClass =
     'grid w-full grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
   const listClass = 'flex w-full flex-col items-start gap-6';
 </script>
 
-{#snippet placeholders(count: number, inRow = false)}
+{#snippet placeholders(count: number)}
   {#each Array(count) as _, i (i)}
-    <div
-      class={['flex flex-col gap-2', inRow ? 'w-64 shrink-0' : 'w-full']}
-      aria-hidden="true"
-    >
+    <div class="flex w-full flex-col gap-2" aria-hidden="true">
       <div
         class="placeholder rounded-container h-[70px] w-full animate-pulse"
       ></div>
@@ -185,50 +153,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col justify-center gap-8 px-2 lg:px-0">
   <div class="inline-grid gap-2 text-center">
-    <div class="my-2 flex flex-col items-center">
-      <h2 class="text-surface-700-300 text-xl font-semibold">
-        Featured Yarn Palettes
-      </h2>
-      <PopularPeriodMenu
-        onchange={() => {
-          yarnPaletteGalleryState.popularPalettes = [];
-          fetchPopularPalettes();
-          if (featuredEl) featuredEl.scrollLeft = 0;
-        }}
-      />
-    </div>
-    <div
-      class="flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2"
-      bind:this={featuredEl}
-    >
-      {#if yarnPaletteGalleryState.popularFor !== galleryFilters.timePeriod}
-        {@render placeholders(5, true)}
-      {:else if !yarnPaletteGalleryState.popularPalettes.length}
-        <p class="text-surface-700-300 mx-auto py-8 text-sm">
-          Nothing popular in this period yet.
-        </p>
-      {:else}
-        {#each yarnPaletteGalleryState.popularPalettes as palette, i (i)}
-          <div class="w-64 shrink-0 snap-start">
-            <GalleryPaletteCard {palette} />
-          </div>
-        {/each}
-      {/if}
-    </div>
-  </div>
-  <div class="inline-grid gap-2 text-center">
     <div
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 pb-4 text-center"
     >
-      <div class="flex flex-col">
-        <h2 class="text-surface-700-300 text-xl font-semibold">
-          All Yarn Palettes
-        </h2>
-        {#if totalPalettes !== undefined}
-          <p class="text-xs">{totalPalettes} total</p>
-        {/if}
-      </div>
+      {#if totalPalettes !== undefined}
+        <p class="text-xs">{totalPalettes} total</p>
+      {/if}
       <CollectionToolbar
         kind="palette"
         disabled={loading}
@@ -238,15 +169,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:onlyThisYarn={
           yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
         }
-        sortOptions={GALLERY_ORDERS}
+        sortOptions={GALLERY_SORTS}
         sort={yarnPaletteGalleryState.orderBy}
         onsort={(order) => {
           yarnPaletteGalleryState.orderBy = order;
-          debouncedSearch();
+          search();
         }}
         bind:layout={yarnPaletteGalleryState.layout}
         onchange={debouncedSearch}
-      />
+      >
+        {#snippet menus()}
+          {#if yarnPaletteGalleryState.orderBy === 'POPULAR'}
+            <PopularPeriodMenu onchange={search} />
+          {/if}
+        {/snippet}
+      </CollectionToolbar>
     </div>
     <div class={grid ? gridClass : listClass}>
       {#each yarnPaletteGalleryState.palettes as palette, i (i)}

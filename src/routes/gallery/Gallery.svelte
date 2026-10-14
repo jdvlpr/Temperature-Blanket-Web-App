@@ -17,10 +17,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
-  import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import {
-    fetchPopularProjects,
     fetchProjects,
+    GALLERY_SORTS,
+    type FetchProjectsResult,
   } from '#lib/utils/gallery-utils.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { getTitleFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
@@ -38,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let scrollContainer: HTMLDivElement | undefined = $state();
   let projectsList = $state();
   let totalProjects: number | string | undefined = $state(0);
-  let featuredProjectsEl: HTMLDivElement | undefined = $state();
 
   onMount(async () => {
     // The first visit, or the filters changed on the other tab
@@ -47,14 +46,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       galleryState.loadedFor !== galleryFilters.key
     )
       await search();
-
-    if (
-      !galleryState.popularProjects.length ||
-      galleryState.popularFor !== galleryFilters.timePeriod
-    ) {
-      galleryState.popularProjects = [];
-      await fetchPopularProjectsWrapper();
-    }
 
     loading = false;
     const scrollObserver = new IntersectionObserver(
@@ -84,19 +75,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hasNextPage = $derived(galleryState.gallery?.pageInfo?.hasNextPage);
   let endCursor = $derived(galleryState.gallery?.pageInfo?.endCursor);
 
-  async function fetchPopularProjectsWrapper() {
-    const months = galleryFilters.timePeriod;
-    try {
-      galleryState.popularProjects = await fetchPopularProjects({
-        months,
-        limit: 5,
-      });
-    } catch (e) {
-      // Unreachable: none to feature, rather than placeholders forever
-      console.error('Could not load popular projects', e);
-      galleryState.popularProjects = [];
-    }
-    galleryState.popularFor = months;
+  /** A page of projects for the filters and sort, after `after` */
+  function fetchPage(after: string | null = null) {
+    return fetchProjects({
+      first,
+      after,
+      search: galleryState.search,
+      order: galleryState.orderBy,
+      days: galleryState.popularDays,
+      yarn: galleryState.getYarnSearch({
+        brandId: galleryState.filteredBrandId,
+        yarnId: galleryState.filteredYarnId,
+      }),
+      pattern: galleryState.filteredPatternType,
+    });
+  }
+
+  /** The gallery can't sort by Popular yet (an older plugin): say Newest */
+  function noteSort(results: FetchProjectsResult) {
+    if (results.popularUnavailable) galleryState.orderBy = 'DESC';
   }
 
   function getFilteredProjects() {
@@ -154,20 +151,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       galleryState.projects = [];
       galleryState.displayedProjects = [];
       loading = true;
-      const loadedFor = galleryFilters.key;
-
-      const yarnSearch = galleryState.getYarnSearch({
-        brandId: galleryState.filteredBrandId,
-        yarnId: galleryState.filteredYarnId,
-      });
 
       try {
-        let results = await fetchProjects({
-          search: galleryState.search,
-          order: galleryState.orderBy,
-          yarn: yarnSearch,
-          pattern: galleryState.filteredPatternType,
-        });
+        let results = await fetchPage();
+        noteSort(results);
 
         galleryState.gallery.pageInfo = results.pageInfo;
         if (galleryState.search) {
@@ -179,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           galleryState.projects = galleryState.projects;
         }
         galleryState.displayedProjects = getFilteredProjects();
-        galleryState.loadedFor = loadedFor;
+        galleryState.loadedFor = galleryFilters.key;
       } catch (e) {
         console.error('Search failed:', e);
       } finally {
@@ -196,56 +183,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col justify-center gap-8">
-  <div class="inline-grid gap-2 text-center">
-    <div class="my-2 flex flex-col items-center">
-      <h2 class="text-surface-700-300 text-xl font-semibold">
-        Featured Projects
-      </h2>
-      <PopularPeriodMenu
-        onchange={() => {
-          galleryState.popularProjects = [];
-          fetchPopularProjectsWrapper();
-          if (featuredProjectsEl) featuredProjectsEl.scrollLeft = 0;
-        }}
-      />
-    </div>
-
-    <div
-      class="mx-auto flex w-full snap-x snap-mandatory items-start gap-2 overflow-x-scroll"
-      bind:this={featuredProjectsEl}
-    >
-      {#if galleryState.popularFor !== galleryFilters.timePeriod}
-        {#each Array(5)}
-          <div
-            class="placeholder rounded-container bg-surface-100 dark:bg-surface-900 h-[324px] w-[245px] shrink-0 animate-pulse snap-center"
-          ></div>
-        {/each}
-      {:else if !galleryState.popularProjects.length}
-        <p class="text-surface-700-300 mx-auto py-8 text-sm">
-          Nothing popular in this period yet.
-        </p>
-      {:else}
-        {#each galleryState.popularProjects as { featured_image_src, id, meta } (id)}
-          <GalleryProjectCard
-            href={resolve('/gallery/[id]', { id: String(id) })}
-            image={featured_image_src}
-            name={meta.project_name
-              ? decodeHtmlEntities(meta.project_name)
-              : null}
-            placesHtml={getTitleFromLocationsMeta(meta.locations)}
-            layout="row"
-          />
-        {/each}
-      {/if}
-    </div>
-  </div>
-
   <div class="flex flex-col gap-2 px-2 text-center lg:px-0">
     <div
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
-      <h2 class="text-surface-700-300 text-xl font-semibold">All Projects</h2>
       <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
@@ -264,15 +206,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:yarnId={galleryState.filteredYarnId}
         bind:onlyThisYarn={galleryState.palettesContainOnlyFilteredYarn}
         bind:patternType={galleryState.filteredPatternType}
-        sortOptions={GALLERY_ORDERS}
+        sortOptions={GALLERY_SORTS}
         sort={galleryState.orderBy}
         onsort={(order) => {
           galleryState.orderBy = order;
-          debouncedSearch();
+          search();
         }}
         bind:layout={galleryState.layout}
         onchange={debouncedSearch}
-      />
+      >
+        {#snippet menus()}
+          {#if galleryState.orderBy === 'POPULAR'}
+            <PopularPeriodMenu onchange={search} />
+          {/if}
+        {/snippet}
+      </CollectionToolbar>
     </div>
     <div
       class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
@@ -330,18 +278,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={!hasNextPage}
           onclick={async () => {
             loading = true;
-            const yarnSearch = galleryState.getYarnSearch({
-              brandId: galleryState.filteredBrandId,
-              yarnId: galleryState.filteredYarnId,
-            });
-            let results = await fetchProjects({
-              first,
-              after: endCursor,
-              search: galleryState.search,
-              order: galleryState.orderBy,
-              pattern: galleryState.filteredPatternType,
-              yarn: yarnSearch,
-            });
+            let results = await fetchPage(endCursor);
             galleryState.gallery.pageInfo = results.pageInfo;
             galleryState.projects.push(
               ...results.edges.flatMap((item) => item.node),

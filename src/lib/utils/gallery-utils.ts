@@ -71,6 +71,8 @@ export type GalleryProjectNode = {
 export type FetchProjectsResult = {
   pageInfo: GalleryPageInfo;
   edges: { node: GalleryProjectNode }[];
+  /** Asked for Popular, but the gallery can't sort by it (a plugin before 1.8.0): Newest instead */
+  popularUnavailable?: boolean;
 };
 
 /** A palette shared to the gallery on its own, from an account (plugin 1.5.0). */
@@ -90,6 +92,8 @@ export type PaletteGalleryNode =
 export type FetchPaletteGalleryResult = {
   pageInfo: GalleryPageInfo;
   edges: { node: PaletteGalleryNode }[];
+  /** As for projects: Newest instead of Popular */
+  popularUnavailable?: boolean;
 };
 
 /**
@@ -104,13 +108,39 @@ export const fetchPaletteGallery = async ({
   search = '',
   order = 'DESC',
   yarn = '',
+  days = POPULAR_DAYS,
 }: {
   first?: number;
   after?: string | null;
   search?: string;
   order?: string;
   yarn?: string;
+  days?: number;
 }): Promise<FetchPaletteGalleryResult> => {
+  if (order === 'POPULAR') {
+    const popular = await fetchPopularIds({
+      type: 'palette',
+      days,
+      search,
+      yarn,
+      offset: Number(after) || 0,
+      limit: first,
+    });
+    if (popular) {
+      const nodes = await fetchNodesByIds<PaletteGalleryNode>(
+        `contentNodes(first: $first, where: { contentTypes: [TEMPBLANKET_PALETTE], in: $ids }) {
+          nodes { __typename ... on Palette { title databaseId yarnUrls date } }
+        }`,
+        'contentNodes',
+        popular.ids,
+      );
+      return { pageInfo: popularPageInfo(popular, after), edges: nodes };
+    }
+    return {
+      ...(await fetchPaletteGallery({ first, search, yarn, order: 'DESC' })),
+      popularUnavailable: true,
+    };
+  }
   const query = `
     query PALETTE_GALLERY($first: Int, $after: String, $search: String, $yarn: String, $order: OrderEnum!) {
       contentNodes(
@@ -173,6 +203,115 @@ export type PopularProject = {
   meta: PopularProjectMeta;
 };
 
+const PROJECT_NODE_FIELDS = `
+  title
+  projectName
+  databaseId
+  projectUrl
+  yarnUrls
+  locations
+  featuredImage {
+    node {
+      mediaItemUrl
+      mediaDetails {
+        sizes(include: MEDIUM) {
+          sourceUrl
+        }
+      }
+    }
+  }
+  date`;
+
+/** How far back Popular counts views by default, in days */
+export const POPULAR_DAYS = 30;
+
+type PopularIds = { ids: number[]; total: number; hasMore: boolean };
+
+/** Whether the gallery has answered that it can't sort by Popular */
+let popularMissing = false;
+
+/**
+ * The IDs of the gallery's projects or palettes matching these filters, most
+ * viewed in the last `days` first, then newest (gallery plugin 1.8.0). Null
+ * when the gallery can't sort by views, so the caller shows Newest instead.
+ */
+async function fetchPopularIds({
+  type,
+  days,
+  search = '',
+  yarn = '',
+  pattern = '',
+  offset = 0,
+  limit = 40,
+}: {
+  type: 'project' | 'palette';
+  days: number;
+  search?: string;
+  yarn?: string;
+  pattern?: string;
+  offset?: number;
+  limit?: number;
+}): Promise<PopularIds | null> {
+  if (popularMissing) return null;
+  const params = new URLSearchParams({
+    type,
+    days: String(days),
+    offset: String(offset),
+    limit: String(limit),
+  });
+  if (search) params.set('search', search);
+  if (yarn) params.set('yarn', yarn);
+  if (pattern) params.set('pattern', pattern);
+  try {
+    const response = await fetch(
+      `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/popular?${params}`,
+    );
+    const result = await response.json().catch(() => null);
+    if (response.ok && Array.isArray(result?.ids)) return result;
+    // An older plugin: don't ask again this visit
+    if (result?.code === 'rest_no_route') popularMissing = true;
+  } catch (e) {
+    console.error('Could not sort by popular', e);
+  }
+  return null;
+}
+
+/** Popular results as a page, its "cursor" being how many are shown */
+function popularPageInfo(
+  { ids, hasMore }: PopularIds,
+  after: string | null,
+): GalleryPageInfo {
+  const offset = Number(after) || 0;
+  return {
+    hasNextPage: hasMore,
+    hasPreviousPage: offset > 0,
+    startCursor: String(offset),
+    endCursor: String(offset + ids.length),
+  };
+}
+
+/**
+ * These posts' fields, in the order of `ids` (GraphQL's `in` doesn't keep
+ * it). `connection` takes `$first` and `$ids` and lists `nodes`.
+ */
+async function fetchNodesByIds<T extends { databaseId: number }>(
+  connection: string,
+  field: string,
+  ids: number[],
+): Promise<{ node: T }[]> {
+  if (!ids.length) return [];
+  const { result } = await queryGallery(
+    `query BY_IDS($first: Int, $ids: [ID]) { ${connection} }`,
+    { first: ids.length, ids },
+  );
+  const nodes: T[] = result?.data?.[field]?.nodes ?? [];
+  const byId = new Map(nodes.map((node) => [node.databaseId, node]));
+  return ids.flatMap((id) => {
+    const node = byId.get(id);
+    return node ? [{ node }] : [];
+  });
+}
+
 export const fetchProjects = async ({
   first = 40,
   last = null, // TODO: is this being used by anything? I don't think so.
@@ -182,6 +321,7 @@ export const fetchProjects = async ({
   order = 'DESC',
   yarn = '',
   pattern = '',
+  days = POPULAR_DAYS,
 }: {
   first?: number;
   last?: string | null;
@@ -191,7 +331,31 @@ export const fetchProjects = async ({
   order?: string;
   yarn?: string;
   pattern?: string;
+  days?: number;
 }): Promise<FetchProjectsResult> => {
+  if (order === 'POPULAR') {
+    const popular = await fetchPopularIds({
+      type: 'project',
+      days,
+      search,
+      yarn,
+      pattern,
+      offset: Number(after) || 0,
+      limit: first,
+    });
+    if (popular) {
+      const edges = await fetchNodesByIds<GalleryProjectNode>(
+        `projects(first: $first, where: { in: $ids }) { nodes { ${PROJECT_NODE_FIELDS} } }`,
+        'projects',
+        popular.ids,
+      );
+      return { pageInfo: popularPageInfo(popular, after), edges };
+    }
+    return {
+      ...(await fetchProjects({ first, search, yarn, pattern, order: 'DESC' })),
+      popularUnavailable: true,
+    };
+  }
   const query = `
             query GET_PAGINATED_PROJECTS
               {
@@ -226,25 +390,7 @@ export const fetchProjects = async ({
                     endCursor
                   }
                   edges {
-                    node {
-                      title
-                      projectName
-                      databaseId
-                      projectUrl
-                      yarnUrls
-                      locations
-                      featuredImage {
-                        node {
-                          mediaItemUrl
-                          mediaDetails {
-                            sizes(include: MEDIUM) {
-                              sourceUrl
-                            }
-                          }
-                        }
-                      }
-                      date
-                    }
+                    node { ${PROJECT_NODE_FIELDS} }
                   }
                 }
               }`;
@@ -402,3 +548,16 @@ export const GALLERY_ORDERS = [
 ] as const;
 
 export type GalleryOrder = (typeof GALLERY_ORDERS)[number]['value'];
+
+/** The gallery pages' sorts: most viewed first by default */
+export const GALLERY_SORTS = [
+  {
+    value: 'POPULAR',
+    label: 'Popular',
+    details: 'Most viewed first, then newest',
+  },
+  { value: 'DESC', label: 'Newest' },
+  { value: 'ASC', label: 'Oldest' },
+] as const;
+
+export type GallerySort = (typeof GALLERY_SORTS)[number]['value'];

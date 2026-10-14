@@ -1,31 +1,34 @@
 import type { GalleryPalette } from '#lib/utils/color-utils.js';
-import type {
-  GalleryOrder,
-  GalleryPageInfo,
-  GalleryProjectNode,
-  PaletteGalleryNode,
-  PopularProject,
+import {
+  POPULAR_DAYS,
+  type GalleryPageInfo,
+  type GalleryProjectNode,
+  type GallerySort,
+  type PaletteGalleryNode,
 } from '#lib/utils/gallery-utils.js';
 
 /**
- * The filters both tabs share: someone looking for a yarn's projects who
- * switches to palettes is still looking for that yarn.
+ * The filters and sort both pages share: someone looking for a yarn's popular
+ * projects who switches to palettes is still looking for that yarn's popular ones.
  */
 class GalleryFilters {
   search = $state('');
   filteredBrandId = $state('');
   filteredYarnId = $state('');
   palettesContainOnlyFilteredYarn = $state(false);
-  /** Popular in the last … months */
-  timePeriod = $state(0.25);
+  orderBy = $state<GallerySort>('POPULAR');
+  /** Popular counts views in the last … days */
+  popularDays = $state(POPULAR_DAYS);
 
-  /** The filters as one value, to tell whether a tab's results are for them */
+  /** The filters and sort as one value, to tell whether a page's results are for them */
   get key() {
     return JSON.stringify([
       this.search,
       this.filteredBrandId,
       this.filteredYarnId,
       this.palettesContainOnlyFilteredYarn,
+      this.orderBy,
+      this.orderBy === 'POPULAR' ? this.popularDays : null,
     ]);
   }
 
@@ -82,34 +85,34 @@ class SharedFilters {
   set palettesContainOnlyFilteredYarn(value) {
     galleryFilters.palettesContainOnlyFilteredYarn = value;
   }
-  get timePeriod() {
-    return galleryFilters.timePeriod;
+  get orderBy() {
+    return galleryFilters.orderBy;
   }
-  set timePeriod(value) {
-    galleryFilters.timePeriod = value;
+  set orderBy(value) {
+    galleryFilters.orderBy = value;
   }
-  /** The filters this tab's results were found with */
+  get popularDays() {
+    return galleryFilters.popularDays;
+  }
+  set popularDays(value) {
+    galleryFilters.popularDays = value;
+  }
+  /** The filters this page's results were found with */
   loadedFor = $state<string | null>(null);
-  /** The popular period this tab's featured items are for */
-  popularFor = $state<number | null>(null);
   getYarnSearch = getYarnSearch;
 }
 
 class GalleryState extends SharedFilters {
   filteredPatternType = $state('');
-  orderBy = $state<GalleryOrder>('DESC');
   projects: GalleryProjectNode[] = $state([]);
   displayedProjects: GalleryProjectNode[] = $state([]);
-  popularProjects: PopularProject[] = $state([]);
   gallery: { pageInfo?: GalleryPageInfo } = $state({});
   layout = $state<'grid' | 'list'>('grid');
 }
 
 class YarnPaletteGalleryState extends SharedFilters {
-  orderBy = $state<GalleryOrder>('DESC');
   projects: PaletteGalleryNode[] = $state([]);
   palettes: GalleryPalette[] = $state([]);
-  popularPalettes: GalleryPalette[] = $state([]);
   gallery: { pageInfo?: GalleryPageInfo } = $state({});
   layout = $state<'grid' | 'list'>('grid');
 }

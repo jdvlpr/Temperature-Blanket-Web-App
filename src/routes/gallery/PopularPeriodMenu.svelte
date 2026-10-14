@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  How far back Featured counts views, as a menu like View and Sort:
-  "Popular: Past Week". Shared by both tabs.
+  How far back the Popular sort counts views, as a menu beside Sort:
+  "Views: Past Month". Shared by both gallery pages.
 -->
 <script lang="ts">
   import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
@@ -28,24 +28,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { onchange }: Props = $props();
 
-  // Months, as the popular posts endpoint takes them
+  // Days, as the gallery's popular route takes them
   const options = [
-    { value: '0.0357', label: 'Past Day' },
-    { value: '0.25', label: 'Past Week' },
-    { value: '1', label: 'Past Month' },
-    { value: '12', label: 'Past Year' },
+    { value: '1', label: 'Past Day' },
+    { value: '7', label: 'Past Week' },
+    { value: '30', label: 'Past Month' },
+    { value: '365', label: 'Past Year' },
   ] as const;
 </script>
 
 <ChoiceMenu
   {options}
   value={options.find(
-    (option) => Number(option.value) === galleryFilters.timePeriod,
+    (option) => Number(option.value) === galleryFilters.popularDays,
   )?.value}
   onchange={(value) => {
-    galleryFilters.timePeriod = Number(value);
+    galleryFilters.popularDays = Number(value);
     onchange();
   }}
-  label="Popular"
+  label="Views"
   icon={ClockIcon}
 />

@@ -95,7 +95,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: ImageIcon,
-                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. Visits to project pages now count toward Popular.`,
+                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. The gallery now opens sorted by Popular, the most viewed in the past month (or day, week or year), and Popular works together with search and the yarn and pattern filters. Visits to project pages now count toward Popular.`,
                 title: 'Project Gallery',
               },
               {
