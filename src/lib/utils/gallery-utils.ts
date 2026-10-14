@@ -136,6 +136,8 @@ export const fetchPaletteGallery = async ({
       );
       return { pageInfo: popularPageInfo(popular, after), edges: nodes };
     }
+    // Newest from the start, never as a next page of Popular
+    if (after) throw new Error('Popular sort unavailable');
     return {
       ...(await fetchPaletteGallery({ first, search, yarn, order: 'DESC' })),
       popularUnavailable: true,
@@ -233,7 +235,8 @@ let popularMissing = false;
 /**
  * The IDs of the gallery's projects or palettes matching these filters, most
  * viewed in the last `days` first, then newest (gallery plugin 1.8.0). Null
- * when the gallery can't sort by views, so the caller shows Newest instead.
+ * when the gallery has no such route (an older plugin), so the caller shows
+ * Newest instead; any other failure throws, like the other gallery queries.
  */
 async function fetchPopularIds({
   type,
@@ -262,18 +265,17 @@ async function fetchPopularIds({
   if (search) params.set('search', search);
   if (yarn) params.set('yarn', yarn);
   if (pattern) params.set('pattern', pattern);
-  try {
-    const response = await fetch(
-      `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/popular?${params}`,
-    );
-    const result = await response.json().catch(() => null);
-    if (response.ok && Array.isArray(result?.ids)) return result;
+  const response = await fetch(
+    `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/popular?${params}`,
+  );
+  const result = await response.json().catch(() => null);
+  if (response.ok && Array.isArray(result?.ids)) return result;
+  if (result?.code === 'rest_no_route') {
     // An older plugin: don't ask again this visit
-    if (result?.code === 'rest_no_route') popularMissing = true;
-  } catch (e) {
-    console.error('Could not sort by popular', e);
+    popularMissing = true;
+    return null;
   }
-  return null;
+  throw new Error(`Popular sort failed (${response.status})`);
 }
 
 /** Popular results as a page, its "cursor" being how many are shown */
@@ -351,6 +353,8 @@ export const fetchProjects = async ({
       );
       return { pageInfo: popularPageInfo(popular, after), edges };
     }
+    // Newest from the start, never as a next page of Popular
+    if (after) throw new Error('Popular sort unavailable');
     return {
       ...(await fetchProjects({ first, search, yarn, pattern, order: 'DESC' })),
       popularUnavailable: true,

@@ -215,6 +215,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           loading = true;
           try {
             await fetchPage(endCursor);
+          } catch (e) {
+            console.error('Could not load more palettes', e);
           } finally {
             loading = false;
           }

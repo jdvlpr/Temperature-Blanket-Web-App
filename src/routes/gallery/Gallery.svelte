@@ -278,14 +278,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={!hasNextPage}
           onclick={async () => {
             loading = true;
-            let results = await fetchPage(endCursor);
-            galleryState.gallery.pageInfo = results.pageInfo;
-            galleryState.projects.push(
-              ...results.edges.flatMap((item) => item.node),
-            );
-            galleryState.projects = galleryState.projects;
-            galleryState.displayedProjects = getFilteredProjects();
-            loading = false;
+            try {
+              let results = await fetchPage(endCursor);
+              galleryState.gallery.pageInfo = results.pageInfo;
+              galleryState.projects.push(
+                ...results.edges.flatMap((item) => item.node),
+              );
+              galleryState.projects = galleryState.projects;
+              galleryState.displayedProjects = getFilteredProjects();
+            } catch (e) {
+              console.error('Could not load more projects', e);
+            } finally {
+              loading = false;
+            }
           }}
         >
           <PlusIcon />
