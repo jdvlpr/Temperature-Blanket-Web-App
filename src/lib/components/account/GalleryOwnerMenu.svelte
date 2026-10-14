@@ -35,6 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuPositioning,
   } from '#lib/components/menu-styles.js';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { PaletteStorage } from '#lib/storage/palettes.svelte.js';
+  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
   import {
     ArrowRightIcon,
     ChevronDownIcon,
@@ -79,6 +81,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let ownerName = $derived(
     (galleryPages.name ?? account.summary?.name ?? '').trim(),
   );
+
+  // Whether the project or palette it came from is saved in this browser;
+  // null until checked, so Unpublish says only what's true
+  let saved = $state<boolean | null>(null);
+  $effect(() => {
+    const projectId = page?.projectId;
+    saved = null;
+    if (!projectId) return;
+    let current = true;
+    (kind === 'palette'
+      ? PaletteStorage.list()
+      : ProjectStorage.getProjectsForDisplay()
+    )
+      .then((items) => {
+        if (current) saved = items.some((item) => item.id === projectId);
+      })
+      .catch(() => {});
+    return () => (current = false);
+  });
 
   let confirming = $state(false);
   let busy = $state(false);
@@ -200,8 +221,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Unpublish this version? Its gallery page link stops working{kind ===
         'project'
           ? ', and it comes off the globe'
-          : ''}. Your {kind} stays saved, and links you’ve shared to the {kind}
-        still work.
+          : ''}.
+        {#if saved}
+          Your {kind} stays saved, and links you’ve shared to the {kind} still work.
+        {:else}
+          {#if saved === false}
+            {versions.length > 1
+              ? 'Its other versions stay published.'
+              : `It isn’t in your saved ${kind}s, so it won’t be in My Library anymore.`}
+          {/if}
+          Links you’ve shared to the {kind} still work.
+        {/if}
       </p>
       <div class="flex flex-wrap justify-center gap-2">
         <button
