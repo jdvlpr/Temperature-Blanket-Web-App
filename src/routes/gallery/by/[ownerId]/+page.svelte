@@ -34,7 +34,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTitleFromLocationsMeta,
   } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { XIcon } from '@lucide/svelte';
+  import { onMount } from 'svelte';
   import PopularPeriodMenu from '../../PopularPeriodMenu.svelte';
   import { ownerFilters, popularOrder } from './owner-filters.svelte.js';
   import type { PageData } from './$types';
@@ -50,10 +52,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     () => data.popular,
   );
 
-  // Each project's colors and pattern, read once
+  // Which colors are which yarns comes from the yarn data, loaded only here
+  let yarnDataReady = $state(false);
+  onMount(async () => {
+    if (all.length) await ensureYarnData();
+    yarnDataReady = true;
+  });
+
+  // Each project's colors and pattern, read once (again with the yarn data)
   const previewIds = previews.all.map((preview) => preview.id);
-  const details = $derived(
-    new Map(
+  const details = $derived.by(() => {
+    void yarnDataReady;
+    return new Map(
       all.map((project) => {
         let urls: string[];
         try {
@@ -77,8 +87,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         ];
       }),
-    ),
-  );
+    );
+  });
 
   const shown = $derived.by(() => {
     const f = ownerFilters;
@@ -99,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const filtering = $derived(ownerFilters.activeFor('projects'));
   const showFilters = $derived(
-    all.length > FILTERS_FROM || filtering || ownerFilters.sort !== 'POPULAR',
+    all.length > FILTERS_FROM || filtering || ownerFilters.sorted,
   );
 </script>
 

@@ -37,6 +37,13 @@ class OwnerFilters {
   /** Popular counts views in the last … days */
   popularDays = $state(POPULAR_DAYS);
   layout = $state<PageLayout>('grid');
+  /** The gallery can't sort by views (an older plugin), so Newest is the default */
+  popularUnavailable = $state(false);
+
+  /** Whether the sort is other than the default */
+  get sorted() {
+    return this.sort !== (this.popularUnavailable ? 'DESC' : 'POPULAR');
+  }
 
   /** Whether anything on this page is left out (sort only reorders) */
   activeFor(kind: 'projects' | 'palettes') {
@@ -61,7 +68,7 @@ class OwnerFilters {
     if (ownerId === this.ownerId) return;
     this.ownerId = ownerId;
     this.clear();
-    this.sort = 'POPULAR';
+    this.sort = this.popularUnavailable ? 'DESC' : 'POPULAR';
     this.popularDays = POPULAR_DAYS;
   }
 }
@@ -93,7 +100,10 @@ export function popularOrder(
         if (found) {
           order = found;
           forDays = days;
-        } else ownerFilters.sort = 'DESC';
+        } else {
+          ownerFilters.popularUnavailable = true;
+          ownerFilters.sort = 'DESC';
+        }
       })
       .catch((e) => console.error('Could not sort by popular', e));
     return () => {

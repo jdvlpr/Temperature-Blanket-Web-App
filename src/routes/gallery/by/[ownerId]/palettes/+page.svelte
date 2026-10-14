@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const filtering = $derived(ownerFilters.activeFor('palettes'));
   const showFilters = $derived(
-    all.length > FILTERS_FROM || filtering || ownerFilters.sort !== 'POPULAR',
+    all.length > FILTERS_FROM || filtering || ownerFilters.sorted,
   );
 </script>
 
