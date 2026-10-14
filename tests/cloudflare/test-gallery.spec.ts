@@ -641,4 +641,48 @@ test.describe('Gallery pages from accounts', () => {
     });
     expect((await request.get(`/gallery/by/${publicId}`)).status()).toBe(404);
   });
+  test('a palette only in the gallery is saved back from its card, keeping its page', async ({
+    page,
+    request,
+    baseURL,
+  }) => {
+    const email = uniqueEmail('gallery-add-back');
+    await signIn(page, request, email);
+    const userId = userIdFor(email);
+    const postId = 600_000_000 + Math.floor(Math.random() * 1e8);
+    // Its palette was deleted for good, so the page is the only copy
+    localD1(
+      `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt", "kind", "link")
+       values (${postId}, '${userId}', 'gone-palette', 'Sunset', ${Date.now()}, 'palette', '${baseURL}/yarn?s=ff0000ffa5000000ff')`,
+    );
+
+    await page.goto('/my-projects');
+    await expect(page.getByText(/Gallery only · Published/)).toBeVisible();
+    await page.getByRole('button', { name: 'More for Sunset' }).click();
+    await page
+      .getByRole('menuitem', { name: 'Add to My Saved Palettes' })
+      .click();
+
+    // Now a saved palette, still showing its page
+    await expect(page.getByText(/Gallery only/)).toHaveCount(0);
+    await expect(page.getByText(/^Saved /).first()).toBeVisible();
+    await expect(
+      page
+        .getByRole('group', { name: 'Gallery: Sunset' })
+        .getByRole('button', { name: /^Gallery:/ }),
+    ).toHaveText(/Published\s*$/);
+    const [{ projectId }] = localD1(
+      `select "projectId" from "galleryPost" where "postId" = ${postId}`,
+    );
+    expect(projectId).not.toBe('gone-palette');
+
+    // Another account can't move it
+    expect(
+      (
+        await request.patch(`/api/account/gallery/${postId}`, {
+          data: { paletteId: 'x' },
+        })
+      ).status(),
+    ).not.toBe(200);
+  });
 });

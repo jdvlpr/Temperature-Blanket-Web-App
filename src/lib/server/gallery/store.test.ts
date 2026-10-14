@@ -12,6 +12,7 @@ import {
   ownsPost,
   postKind,
   recordPost,
+  relinkPalettePages,
   renamePost,
   setPostShowOwner,
   updateSettings,
@@ -115,6 +116,36 @@ describe('gallery store', () => {
     expect(await setPostShowOwner(d1, 'u1', 10, false)).toBe(true);
     expect(await ownerForPost(d1, 10)).toBeNull();
     expect(await setPostShowOwner(d1, 'u1', 99, true)).toBe(false);
+  });
+
+  it('moves a palette’s pages, every version, to another saved palette', async () => {
+    const { d1 } = setup();
+    const palette = (postId: number, projectId: string) => ({
+      ...post(postId),
+      projectId,
+      kind: 'palette' as const,
+    });
+    await recordPost(d1, 'u1', palette(10, 'old'));
+    await recordPost(d1, 'u1', palette(11, 'old'));
+    await recordPost(d1, 'u1', palette(12, 'other'));
+    await recordPost(d1, 'u1', { ...post(13), projectId: 'old' });
+    await recordPost(d1, 'u2', palette(14, 'old'));
+
+    expect(await relinkPalettePages(d1, 'u2', 10, 'new')).toBe(false);
+    expect(await relinkPalettePages(d1, 'u1', 13, 'new')).toBe(false);
+    expect(await relinkPalettePages(d1, 'u1', 11, 'new')).toBe(true);
+
+    const ids = async (userId: string) =>
+      Object.fromEntries(
+        (await listPosts(d1, userId)).map((p) => [p.postId, p.projectId]),
+      );
+    expect(await ids('u1')).toEqual({
+      10: 'new',
+      11: 'new',
+      12: 'other',
+      13: 'old',
+    });
+    expect(await ids('u2')).toEqual({ 14: 'old' });
   });
 
   it('keeps the owner page ID once made', async () => {

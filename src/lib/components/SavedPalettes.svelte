@@ -38,7 +38,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/color-utils.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
-  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import {
+    FolderPlusIcon,
+    LoaderCircleIcon,
+    PencilIcon,
+    Trash2Icon,
+  } from '@lucide/svelte';
+  import { SvelteSet } from 'svelte/reactivity';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
@@ -181,6 +187,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     slots.forget(id);
   }
 
+  // Saving a gallery-only palette back: its card says so meanwhile, and
+  // becomes a saved palette's card once it's listed
+  const adding = new SvelteSet<string>();
+  async function addBack(page: GalleryPage, colors: Color[]) {
+    adding.add(page.projectId);
+    try {
+      const { addPaletteBack } =
+        await import('#lib/accounts/gallery-add-back.js');
+      await addPaletteBack(page, colors);
+    } catch {
+      toast.trigger({
+        message: `“${page.title}” couldn’t be added to My Saved Palettes. Try again later.`,
+        category: 'error',
+      });
+    } finally {
+      adding.delete(page.projectId);
+    }
+  }
+
   /** Its Yarn Palette Creator link, with its name for Save Palette there */
   function linkFor(colors: Color[], name: string) {
     const url = getYarnPageURL({
@@ -268,9 +293,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
               title="Open a copy in Yarn Palette Creator"
             >
               {#snippet details()}
-                <span class="text-surface-700-300 line-clamp-1 text-xs"
-                  >Gallery only · Published {dateOf(page.publishedAt)}</span
+                <span
+                  class="text-surface-700-300 line-clamp-1 text-xs"
+                  aria-live="polite"
                 >
+                  {#if adding.has(page.projectId)}
+                    <LoaderCircleIcon
+                      class="icon-sm inline animate-spin"
+                      aria-hidden="true"
+                    />
+                    Adding to My Saved Palettes…
+                  {:else}
+                    Gallery only · Published {dateOf(page.publishedAt)}
+                  {/if}
+                </span>
+              {/snippet}
+              {#snippet action()}
+                {#if !adding.has(page.projectId)}
+                  <MoreMenu
+                    label="More for {label}"
+                    items={[
+                      {
+                        value: 'add-back',
+                        label: 'Add to My Saved Palettes',
+                        icon: FolderPlusIcon,
+                        onselect: () => addBack(page, colors),
+                      },
+                    ]}
+                  />
+                {/if}
               {/snippet}
               {#snippet footer()}
                 <GallerySharing

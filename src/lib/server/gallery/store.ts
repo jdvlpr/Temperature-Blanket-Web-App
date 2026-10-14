@@ -108,6 +108,30 @@ export async function setPostShowOwner(
   return true;
 }
 
+/**
+ * Moves a palette page, with its other versions, to another of this user's
+ * saved palettes: one saved again after the first was deleted for good, so
+ * the page shows on it. Returns whether there was such a page.
+ */
+export async function relinkPalettePages(
+  db: D1Database,
+  userId: string,
+  postId: number,
+  paletteId: string,
+): Promise<boolean> {
+  const { meta } = await db
+    .prepare(
+      `update "galleryPost" set "projectId" = ?
+       where "userId" = ? and "kind" = 'palette' and "projectId" = (
+         select "projectId" from "galleryPost"
+         where "postId" = ? and "userId" = ? and "kind" = 'palette'
+       )`,
+    )
+    .bind(paletteId, userId, postId, userId)
+    .run();
+  return meta.changes > 0;
+}
+
 /** What kind of page this is, when this user published it from their account. */
 export async function postKind(
   db: D1Database,

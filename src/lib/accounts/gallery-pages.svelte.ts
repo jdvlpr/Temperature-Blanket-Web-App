@@ -22,11 +22,14 @@ import {
   GALLERY_PAGES_CHANGED,
   getGalleryPages,
   groupGalleryPages,
+  relinkGalleryPalette,
   removeGalleryPage,
   setGalleryPageShowOwner,
   type GalleryPage,
 } from '#lib/accounts/gallery.js';
 import { savedPalettes } from '#lib/storage/palettes.svelte.js';
+import { queryGallery } from '#lib/utils/gallery-utils.js';
+import { SvelteMap } from 'svelte/reactivity';
 
 class GalleryPagesState {
   loaded = $state(false);
@@ -94,6 +97,60 @@ class GalleryPagesState {
       if (page) page.showOwner = before;
       throw error;
     }
+  }
+
+  /** Pages' pictures from the gallery, by page ID (null: it has none) */
+  images = new SvelteMap<number, string | null>();
+
+  /**
+   * Fetches the gallery's pictures of these project pages, once each, in one
+   * request: for projects only in the gallery, which have none kept here.
+   */
+  async loadImages(postIds: number[]) {
+    const ids = postIds.filter((id) => !this.images.has(id));
+    if (!ids.length) return;
+    // Asked for once, whether or not the gallery answers
+    for (const id of ids) this.images.set(id, null);
+    try {
+      const { response, result } = await queryGallery(
+        `query MY_PROJECT_IMAGES($ids: [ID]) {
+          projects(first: ${ids.length}, where: { in: $ids }) {
+            nodes {
+              databaseId
+              featuredImage {
+                node {
+                  mediaItemUrl
+                  mediaDetails { sizes(include: MEDIUM) { sourceUrl } }
+                }
+              }
+            }
+          }
+        }`,
+        { ids },
+      );
+      if (!response.ok) return;
+      for (const node of result?.data?.projects?.nodes ?? []) {
+        const image =
+          node?.featuredImage?.node?.mediaDetails?.sizes?.[0]?.sourceUrl ||
+          node?.featuredImage?.node?.mediaItemUrl;
+        if (typeof node?.databaseId === 'number' && typeof image === 'string')
+          this.images.set(node.databaseId, image);
+      }
+    } catch {
+      // Their colors show instead
+    }
+  }
+
+  /**
+   * Moves a palette page, with its other versions, to this saved palette, here
+   * and in the account. Throws when it fails.
+   */
+  async relinkPalette(postId: number, paletteId: string) {
+    await relinkGalleryPalette(postId, paletteId);
+    const from = this.pages.find((p) => p.postId === postId)?.projectId;
+    for (const page of this.pages)
+      if (page.kind === 'palette' && page.projectId === from)
+        page.projectId = paletteId;
   }
 
   /** Takes a page off the gallery. Throws when it fails. */

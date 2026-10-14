@@ -15,8 +15,10 @@
 
 // One of the signed-in user's gallery pages: include it on their public gallery
 // or take it off (PATCH { showOwner }), rename a palette's in place (PATCH
-// { title }; 501 RENAME_UNSUPPORTED with an older gallery plugin), or remove it
-// (DELETE: WordPress moves it to the trash).
+// { title }; 501 RENAME_UNSUPPORTED with an older gallery plugin), move a
+// palette's pages to another saved palette (PATCH { paletteId }: saved again
+// after the first was deleted for good), or remove it (DELETE: WordPress moves
+// it to the trash).
 
 import type { RequestHandler } from './$types';
 
@@ -29,9 +31,13 @@ function postIdFrom(param: string) {
 }
 
 export const PATCH: RequestHandler = async (event) => {
-  const { requireGallery, galleryError, renamePaletteFromAccount } =
-    await import('#lib/server/gallery/index.js');
-  const { setPostShowOwner, getSettings } =
+  const {
+    requireGallery,
+    galleryError,
+    renamePaletteFromAccount,
+    SAVED_PALETTE_ID,
+  } = await import('#lib/server/gallery/index.js');
+  const { setPostShowOwner, getSettings, relinkPalettePages } =
     await import('#lib/server/gallery/store.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
@@ -40,6 +46,27 @@ export const PATCH: RequestHandler = async (event) => {
   const body = await event.request.json().catch(() => null);
   if (postId && body && 'title' in body)
     return renamePaletteFromAccount(gallery, postId, body.title);
+  // Only in the app: WordPress doesn't know which saved palette a page is of
+  if (postId && body && 'paletteId' in body) {
+    if (
+      typeof body.paletteId !== 'string' ||
+      !SAVED_PALETTE_ID.test(body.paletteId)
+    )
+      return galleryError(400, 'INVALID_REQUEST', 'Invalid palette');
+    if (
+      !(await relinkPalettePages(
+        gallery.db,
+        gallery.userId,
+        postId,
+        body.paletteId,
+      ))
+    )
+      return galleryError(404, 'NOT_FOUND', 'No such palette page');
+    return Response.json(
+      { paletteId: body.paletteId },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
   if (!postId || typeof body?.showOwner !== 'boolean')
     return galleryError(400, 'INVALID_REQUEST', 'Nothing to change');
   // Only in the app: WordPress never has the owner's name, so there's nothing to tell it

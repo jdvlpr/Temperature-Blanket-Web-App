@@ -139,20 +139,29 @@ function resetProjectState(id: string | null) {
 let loading: Promise<unknown> = Promise.resolve();
 
 /**
- * Loads a saved project behind a dialog, in place of the one loaded before.
+ * Loads a saved project behind a dialog, in place of the one loaded before
+ * (or one only in the gallery, `fromGallery` its page, to save it again).
  * It needs the units and seasons preferences set to the project's while it
  * shows; the returned function puts back the ones from before. If the dialog
  * closed meanwhile (`closed`), it puts them back itself and returns nothing.
  */
-export function loadInPlace(href: string, closed: () => boolean) {
+export function loadInPlace(
+  href: string,
+  closed: () => boolean,
+  { fromGallery = null }: { fromGallery?: number | null } = {},
+) {
   const load = loading.then(() =>
-    closed() ? undefined : loadNow(href, closed),
+    closed() ? undefined : loadNow(href, closed, fromGallery),
   );
   loading = load.catch(() => {});
   return load;
 }
 
-async function loadNow(href: string, closed: () => boolean) {
+async function loadNow(
+  href: string,
+  closed: () => boolean,
+  fromGallery: number | null,
+) {
   const id = new URL(href).searchParams.get('project');
   // Only for this tab: a project open in another one keeps its units (and
   // doesn't record the change in its history)
@@ -168,7 +177,7 @@ async function loadNow(href: string, closed: () => boolean) {
     loadedHere = { id, ...before };
     try {
       resetProjectState(id);
-      await loadSavedProject(href, { quiet: true });
+      await loadSavedProject(href, { quiet: true, fromGallery });
       // As the project page does for a link naming no preview (Previews.svelte)
       if (!previews.activeId) await previews.load('rows');
     } catch (error) {

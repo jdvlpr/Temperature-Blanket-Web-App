@@ -157,6 +157,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
   const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
 
+  // Gallery-only projects' pictures from the gallery, for those without one
+  // kept here: one request for them all
+  $effect(() => {
+    const postIds = cards.flatMap((card) =>
+      'page' in card ? [card.page.postId] : [],
+    );
+    if (postIds.length) void galleryPages.loadImages(postIds);
+  });
+
+  // Saving a gallery-only project back: its card says so meanwhile, and
+  // becomes a saved project's card once it's listed
+  const adding = new SvelteSet<string>();
+  async function addBack(page: GalleryPage) {
+    adding.add(page.projectId);
+    try {
+      const { addProjectBack } =
+        await import('#lib/accounts/gallery-add-back.js');
+      await addProjectBack(page);
+      await loadProjects();
+    } catch {
+      toast.trigger({
+        message: `“${page.title}” couldn’t be added to My Saved Projects. Try opening it and saving it in the Project Planner.`,
+        category: 'error',
+      });
+    } finally {
+      adding.delete(page.projectId);
+    }
+  }
+
   // Adding or updating a gallery page: its dialog opens here, drawing the
   // preview from the project loaded behind it
   function openForGallery(
@@ -295,12 +324,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/snippet}
                 </SavedProjectCard>
               {:else}
-                <!-- Only in the gallery: a picture only if one is kept here,
-                never drawn (that would load the weather), else its colors -->
+                <!-- Only in the gallery: its picture kept here or the
+                gallery's, never drawn (that would load the weather), else
+                its colors -->
                 <SavedProjectCard
                   galleryPage={card.page}
+                  galleryImage={galleryPages.images.get(card.page.postId)}
                   pictureSettled
                   layout={grid ? 'grid' : 'list'}
+                  adding={adding.has(card.page.projectId)}
+                  onaddback={() => addBack(card.page)}
                 >
                   {#snippet sharing()}
                     <GallerySharing

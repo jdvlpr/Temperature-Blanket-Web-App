@@ -21,9 +21,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Unpublished ▾) sits under it. Tapping it opens it in the planner.
 
   With `galleryPage` instead of `item`, a project that's only in the gallery
-  (deleted or not saved here): when it was published, a picture only if one
-  is kept here, and no ⋮ menu. Tapping it opens a copy in the planner, under
-  the same project ID, so saving it there makes it a saved project again.
+  (deleted or not saved here): when it was published, its picture kept here
+  or else the gallery's (`galleryImage`), and a ⋮ menu with Add to My Saved
+  Projects. Tapping it opens a copy in the planner, under the same project
+  ID, so saving it there makes it a saved project again too.
 -->
 <script lang="ts">
   import GalleryProjectCard, {
@@ -46,7 +47,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
-  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import {
+    FolderPlusIcon,
+    LoaderCircleIcon,
+    PencilIcon,
+    Trash2Icon,
+  } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
 
   type Props = {
@@ -67,11 +73,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         /** Called with the new name ('' clears it) */
         onrename: (name: string) => void;
         onremove: () => void;
+        galleryImage?: never;
+        onaddback?: never;
+        adding?: never;
       }
     | {
         item?: never;
         /** The newest gallery page of a project not saved here */
         galleryPage: GalleryPage;
+        /** Its picture on the gallery, when none is kept here */
+        galleryImage?: string | null;
+        /** Saves it back to My Projects */
+        onaddback: () => void;
+        /** While it's being saved back */
+        adding?: boolean;
         onrename?: never;
         onremove?: never;
       }
@@ -86,6 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     syncLabel,
     onrename,
     onremove,
+    galleryImage,
+    onaddback,
+    adding = false,
     sharing,
   }: Props = $props();
 
@@ -168,28 +186,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : [],
   );
 
-  // Only a saved one can be renamed or moved to the Trash
+  // A saved one can be renamed or moved to the Trash; one only in the
+  // gallery, saved back
   let menu = $derived<MoreMenuItem[]>(
-    item && onremove
+    onaddback
       ? [
           {
-            value: 'rename',
-            label: 'Rename',
-            icon: PencilIcon,
-            onselect: () => {
-              editingName = item.meta.name ?? '';
-              editing = true;
-            },
-          },
-          {
-            value: 'trash',
-            label: 'Move to Trash',
-            icon: Trash2Icon,
-            onselect: onremove,
-            separate: true,
+            value: 'add-back',
+            label: 'Add to My Saved Projects',
+            icon: FolderPlusIcon,
+            onselect: onaddback,
           },
         ]
-      : [],
+      : item && onremove
+        ? [
+            {
+              value: 'rename',
+              label: 'Rename',
+              icon: PencilIcon,
+              onselect: () => {
+                editingName = item.meta.name ?? '';
+                editing = true;
+              },
+            },
+            {
+              value: 'trash',
+              label: 'Move to Trash',
+              icon: Trash2Icon,
+              onselect: onremove,
+              separate: true,
+            },
+          ]
+        : [],
   );
 
   let editing = $state(false);
@@ -200,7 +228,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <GalleryProjectCard
     {href}
     {reload}
-    image={thumbnail}
+    image={thumbnail ?? galleryImage}
     {layout}
     title={linkTitle}
   >
@@ -258,14 +286,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >{label}</a
               >
             </span>
-            <span class="text-surface-700-300 line-clamp-1 text-xs"
-              >{dateLine}</span
+            <span
+              class="text-surface-700-300 line-clamp-1 text-xs"
+              aria-live="polite"
             >
+              {#if adding}
+                <LoaderCircleIcon
+                  class="icon-sm inline animate-spin"
+                  aria-hidden="true"
+                />
+                Adding to My Saved Projects…
+              {:else}
+                {dateLine}
+              {/if}
+            </span>
             {#if syncLabel?.tone === 'error'}
               <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
             {/if}
           </div>
-          {#if menu.length}
+          {#if menu.length && !adding}
             <MoreMenu items={menu} label="More for {label}" />
           {/if}
         </div>

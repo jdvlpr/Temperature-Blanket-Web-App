@@ -46,7 +46,7 @@ export const MAX_PALETTE_TITLE_LENGTH = 80;
 export const PALETTES_PER_DAY = 20;
 const DAY = 24 * 60 * 60 * 1000;
 const MAX_PALETTE_LINK_LENGTH = 8000;
-const SAVED_PALETTE_ID = /^[A-Za-z0-9_-]{1,64}$/;
+export const SAVED_PALETTE_ID = /^[A-Za-z0-9_-]{1,64}$/;
 
 /** The WordPress gallery, reached with the shared key. */
 export function defaultGalleryApi(): GalleryApi {

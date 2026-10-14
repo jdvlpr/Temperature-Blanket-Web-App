@@ -94,6 +94,20 @@ export async function setGalleryPageShowOwner(
   return response.json();
 }
 
+/** Moves a palette page, with its other versions, to another saved palette. Throws when it fails. */
+export async function relinkGalleryPalette(
+  postId: number,
+  paletteId: string,
+): Promise<void> {
+  const response = await fetch(`${PATH}/${postId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paletteId }),
+  });
+  if (!response.ok)
+    throw new Error(`Moving the palette page failed: ${response.status}`);
+}
+
 /** The gallery's longest palette name (MAX_PALETTE_TITLE_LENGTH on the server) */
 export const MAX_GALLERY_PALETTE_NAME_LENGTH = 80;
 
