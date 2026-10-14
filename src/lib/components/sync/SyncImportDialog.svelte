@@ -221,7 +221,7 @@ and device, after signing in, and again whenever someone asks to add projects
         <span class="flex-1">
           <span class="block font-bold">{later ? 'Cancel' : 'Not now'}</span>
           <span class={DETAIL}>
-            They stay in this browser. Add them later from My Projects.
+            They stay in this browser. Add them later from My Library.
           </span>
         </span>
       </button>

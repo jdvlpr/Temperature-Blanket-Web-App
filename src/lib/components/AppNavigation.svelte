@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CloudyIcon,
     CodeIcon,
     ExternalLinkIcon,
-    FolderOpenIcon,
+    LibraryBigIcon,
     GiftIcon,
     GlobeIcon,
     HeartIcon,
@@ -131,11 +131,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href={resolve('my-projects')}
     class={[
       'btn hover:preset-tonal-surface w-fit',
-      page.url.pathname === '/my-projects' && 'preset-tonal-secondary',
+      ['/my-projects', '/my-palettes'].includes(page.url.pathname) &&
+        'preset-tonal-secondary',
     ]}
   >
-    <FolderOpenIcon />
-    My Projects
+    <LibraryBigIcon />
+    My Library
   </a>
 
   <button
@@ -256,7 +257,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 href="/gallery"
                 class={[
                   'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/gallery' && 'preset-tonal-secondary',
+                  (page.url.pathname === '/gallery' ||
+                    page.url.pathname === '/gallery/palettes') &&
+                    'preset-tonal-secondary',
                 ]}
               >
                 <LandmarkIcon />

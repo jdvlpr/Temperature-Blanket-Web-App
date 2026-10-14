@@ -190,7 +190,7 @@ own project first), and other palette pages with them. -->
       class="m-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-start gap-2 pb-8"
     >
       <a
-        href="{resolve('/gallery')}?view=yarn-palettes"
+        href={resolve('/gallery/palettes')}
         class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
       >
         <ArrowLeftIcon />

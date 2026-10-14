@@ -160,10 +160,8 @@ names differ. -->
     {#if view.name === 'signed-out'}
       <p>
         Publishing a palette to the
-        <a
-          href="{resolve('gallery')}?view=yarn-palettes"
-          target="_blank"
-          class="link">Yarn Palette Gallery</a
+        <a href={resolve('/gallery/palettes')} target="_blank" class="link"
+          >Yarn Palette Gallery</a
         >
         needs a free account. Sign in or create one, and you’ll come back to these
         colors to publish them.

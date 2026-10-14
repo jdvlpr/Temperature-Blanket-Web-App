@@ -152,7 +152,7 @@ export async function renameGalleryPage(
   if (response.status === 404)
     return {
       status: 'error',
-      message: 'Its gallery page is gone. Refresh My Projects to see it.',
+      message: 'Its gallery page is gone. Refresh My Library to see it.',
     };
   if (response.status === 400 && typeof data?.message === 'string')
     return { status: 'error', message: data.message };

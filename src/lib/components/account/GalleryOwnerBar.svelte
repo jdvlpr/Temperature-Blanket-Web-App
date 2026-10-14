@@ -144,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if removed}
       <p role="status">
         Unpublished. This page is no longer in the gallery.
-        <a href={resolve('my-projects')} class="link">My Projects</a>
+        <a href={resolve('my-projects')} class="link">My Library</a>
       </p>
     {:else if page}
       <div class="flex flex-wrap items-center justify-center gap-2">
@@ -166,9 +166,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           {:else if kind === 'palette'}
             <a
-              href="{resolve('my-projects')}#palettes"
+              href={resolve('my-palettes')}
               class="btn btn-sm hover:preset-tonal-surface"
-              ><FolderOpenIcon />My Projects</a
+              ><FolderOpenIcon />My Palettes</a
             >
           {/if}
           <Menu

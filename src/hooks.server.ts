@@ -70,7 +70,7 @@ const legacyRedirects: Handle = async ({ event, resolve }) => {
 
   // Redirect old Yarn Palette Gallery to unified Gallery
   if (path === '/yarn-palette-gallery' || path === '/yarn-palette-gallery/') {
-    redirect(301, '/gallery?view=yarn-palettes');
+    redirect(301, '/gallery/palettes');
   }
 
   return resolve(event);

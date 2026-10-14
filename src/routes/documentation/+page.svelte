@@ -590,13 +590,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Open Project</h3>
             <p>
               Saved projects are stored in your browser. To open one, go to My
-              Projects in the site menu, or press Project in the Project
-              Planner, and select a project to load its settings and weather
-              data. My Projects also lists your
+              Library in the site menu, or press Project in the Project Planner,
+              and select a project to load its settings and weather data. My
+              Library also has a page for your
               <a href="#saved-palettes" class="link">saved palettes</a>.
             </p>
             <p>
-              On My Projects, use the pencil button to name a project (you can
+              In My Library, use the pencil button to name a project (you can
               also name the open project above the Project Planner, or in the
               Project menu on phones), or the trash button to move it to the
               Trash. To delete the open project, choose Move to Trash in the
@@ -1608,7 +1608,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               You can also see all your saved palettes on the
-              <a href="/my-projects" class="link">My Projects</a> page, and open any
+              <a href="/my-palettes" class="link">My Palettes</a> page, and open any
               of them in the Yarn Palette Creator.
             </p>
           </section>

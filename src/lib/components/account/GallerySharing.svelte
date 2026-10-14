@@ -410,7 +410,7 @@ Unpublished says it's paused) -->
           {#if galleryOnly}
             {versions.length > 1
               ? `Its other versions stay published.`
-              : `It isn’t in your saved ${kind}s, so it won’t be on My Projects anymore; to keep it, choose Add to My Saved ${kind === 'project' ? 'Projects' : 'Palettes'} first.`}
+              : `It isn’t in your saved ${kind}s, so it won’t be in My Library anymore; to keep it, choose Add to My Saved ${kind === 'project' ? 'Projects' : 'Palettes'} first.`}
             Links you’ve shared to the {kind} still work.
           {:else}
             Your {kind} stays saved, and links you’ve shared to the {kind} still work.

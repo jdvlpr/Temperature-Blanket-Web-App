@@ -15,14 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
-  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
-  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
-  import SelectYarn from '#lib/components/SelectYarn.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
-  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import {
     fetchPopularProjects,
     fetchPaletteGallery,
@@ -30,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/gallery-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
-  import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
+  import { PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, yarnPaletteGalleryState } from './state.svelte';
@@ -90,8 +86,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let endCursor = $derived(
     yarnPaletteGalleryState.gallery?.pageInfo?.endCursor,
   );
-
-  let showSearchReset = $derived(!!yarnPaletteGalleryState.search.length);
 
   /** The loaded posts as palettes, with the yarn filters applied */
   function showPalettes() {
@@ -235,79 +229,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="text-xs">{totalPalettes} total</p>
         {/if}
       </div>
-      <div class="grid w-full grid-cols-12 items-end gap-4">
-        <div class="col-span-12 w-full md:col-span-5">
-          <SelectYarn
-            preselectDefaultYarn={false}
-            disabled={loading}
-            bind:selectedBrandId={yarnPaletteGalleryState.filteredBrandId}
-            bind:selectedYarnId={yarnPaletteGalleryState.filteredYarnId}
-            onselectautocomplete={debouncedSearch}
-          />
-        </div>
-
-        {#if yarnPaletteGalleryState.filteredBrandId || yarnPaletteGalleryState.filteredYarnId}
-          <div
-            class="relative top-[2px] col-span-12 flex w-full flex-col items-start gap-0 text-left md:col-span-4"
-          >
-            <ToggleSwitch
-              disabled={loading}
-              bind:checked={
-                yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
-              }
-              onchange={debouncedSearch}
-              label="Only This {yarnPaletteGalleryState.filteredBrandId &&
-              yarnPaletteGalleryState.filteredYarnId
-                ? 'Yarn'
-                : 'Brand'}"
-              details="All colorways in palette must be this {yarnPaletteGalleryState.filteredBrandId &&
-              yarnPaletteGalleryState.filteredYarnId
-                ? 'yarn'
-                : 'brand'}"
-            />
-          </div>
-        {/if}
-
-        <div class="label col-span-12 w-full md:col-span-3">
-          <span class="label-text"> Search </span>
-          <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
-            <span class="label label-text"><EarthIcon /></span>
-            <input
-              type="text"
-              class="input truncate"
-              autocomplete="off"
-              placeholder="e.g., Kansas, 2003"
-              bind:value={yarnPaletteGalleryState.search}
-              oninput={debouncedSearch}
-            />
-
-            {#if showSearchReset}
-              <button
-                class="btn hover:preset-tonal-surface"
-                title="Reset Search"
-                onclick={() => {
-                  yarnPaletteGalleryState.search = '';
-                  debouncedSearch();
-                }}
-              >
-                <XIcon />
-              </button>
-            {/if}
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="mb-2 flex flex-wrap justify-center gap-2">
-      <SortSelectMenu
-        options={GALLERY_ORDERS}
-        current={yarnPaletteGalleryState.orderBy}
+      <CollectionToolbar
+        kind="palette"
         disabled={loading}
+        bind:search={yarnPaletteGalleryState.search}
+        bind:brandId={yarnPaletteGalleryState.filteredBrandId}
+        bind:yarnId={yarnPaletteGalleryState.filteredYarnId}
+        bind:onlyThisYarn={
+          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
+        }
+        sortOptions={GALLERY_ORDERS}
+        sort={yarnPaletteGalleryState.orderBy}
         onsort={(order) => {
           yarnPaletteGalleryState.orderBy = order;
           debouncedSearch();
         }}
+        bind:layout={yarnPaletteGalleryState.layout}
+        onchange={debouncedSearch}
       />
-      <ViewMenu bind:value={yarnPaletteGalleryState.layout} />
     </div>
     <div class={grid ? gridClass : listClass}>
       {#each yarnPaletteGalleryState.palettes as palette, i (i)}

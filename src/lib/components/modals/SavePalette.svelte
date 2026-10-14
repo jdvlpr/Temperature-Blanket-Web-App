@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
       toast.trigger({
         message: added
-          ? 'Palette saved. Find it on My Projects, or press Get Colors, then Browse Palettes.'
+          ? 'Palette saved. Find it in My Library, or press Get Colors, then Browse Palettes.'
           : 'This palette is already saved',
         category: added ? 'success' : 'info',
       });

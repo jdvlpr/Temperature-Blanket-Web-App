@@ -14,15 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
-  import SelectYarn from '#lib/components/SelectYarn.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
-  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
-  import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
-  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
-  import { previews } from '#lib/state/preview-state.svelte.js';
   import {
     fetchPopularProjects,
     fetchProjects,
@@ -32,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import { resolve } from '$app/paths';
-  import { EarthIcon, Grid3x3, XIcon, PlusIcon } from '@lucide/svelte';
+  import { XIcon, PlusIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, galleryState } from './state.svelte';
@@ -85,8 +80,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? totalProjects.toLocaleString()
         : undefined;
   });
-
-  let showSearchReset = $derived(!!galleryState.search.length);
 
   let hasNextPage = $derived(galleryState.gallery?.pageInfo?.hasNextPage);
   let endCursor = $derived(galleryState.gallery?.pageInfo?.endCursor);
@@ -262,104 +255,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       </div>
-      <div class="grid w-full grid-cols-12 items-end gap-4">
-        <div class="col-span-12 w-full md:col-span-7">
-          <SelectYarn
-            preselectDefaultYarn={false}
-            disabled={loading}
-            bind:selectedBrandId={galleryState.filteredBrandId}
-            bind:selectedYarnId={galleryState.filteredYarnId}
-            onselectautocomplete={debouncedSearch}
-          />
-        </div>
-
-        {#if galleryState.filteredBrandId || galleryState.filteredYarnId}
-          <div
-            class="col-span-12 flex w-full flex-col items-start gap-1 text-left md:col-span-5"
-          >
-            <ToggleSwitch
-              disabled={loading}
-              bind:checked={galleryState.palettesContainOnlyFilteredYarn}
-              onchange={debouncedSearch}
-              label="Only This {galleryState.filteredBrandId &&
-              galleryState.filteredYarnId
-                ? 'Yarn'
-                : 'Brand'}"
-              details="All colorways in project must be this {galleryState.filteredBrandId &&
-              galleryState.filteredYarnId
-                ? 'yarn'
-                : 'brand'}"
-            />
-          </div>
-        {/if}
-
-        <div class="label col-span-12 md:col-span-5">
-          <span class="label-text">Search Projects</span>
-          <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
-            <span class="label label-text"><EarthIcon /></span>
-            <input
-              type="text"
-              class="input w-full truncate"
-              autocomplete="off"
-              placeholder="e.g., Kansas, 2003"
-              bind:value={galleryState.search}
-              oninput={debouncedSearch}
-            />
-
-            {#if showSearchReset}
-              <button
-                class="btn hover:preset-tonal-surface"
-                title="Reset Search"
-                onclick={() => {
-                  galleryState.search = '';
-                  debouncedSearch();
-                }}
-              >
-                <XIcon />
-              </button>
-            {/if}
-          </div>
-        </div>
-
-        <label class="label col-span-12 w-full md:col-span-7">
-          <span class="label-text"> Pattern Type </span>
-          <div class="relative flex items-center">
-            <Grid3x3 class={FIELD_ICON} />
-            <select
-              disabled={loading}
-              class="select truncate pl-11"
-              id="select-gallery-pattern-type"
-              bind:value={galleryState.filteredPatternType}
-              onchange={debouncedSearch}
-            >
-              <option value="">Any Pattern</option>
-              {#each previews.all as { name, wpTagSlug } (wpTagSlug)}
-                <option value={wpTagSlug}>{name}</option>
-              {/each}
-            </select>
-          </div>
-        </label>
-      </div>
+      <CollectionToolbar
+        kind="project"
+        searchLabel="Search Projects"
+        disabled={loading}
+        bind:search={galleryState.search}
+        bind:brandId={galleryState.filteredBrandId}
+        bind:yarnId={galleryState.filteredYarnId}
+        bind:onlyThisYarn={galleryState.palettesContainOnlyFilteredYarn}
+        bind:patternType={galleryState.filteredPatternType}
+        sortOptions={GALLERY_ORDERS}
+        sort={galleryState.orderBy}
+        onsort={(order) => {
+          galleryState.orderBy = order;
+          debouncedSearch();
+        }}
+        bind:layout={galleryState.layout}
+        onchange={debouncedSearch}
+      />
     </div>
     <div
       class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}
     >
-      <div
-        class="mx-auto my-2 flex flex-wrap items-center justify-center gap-2"
-      >
-        <SortSelectMenu
-          options={GALLERY_ORDERS}
-          current={galleryState.orderBy}
-          disabled={loading}
-          onsort={(order) => {
-            galleryState.orderBy = order;
-            debouncedSearch();
-          }}
-        />
-        <ViewMenu bind:value={galleryState.layout} />
-      </div>
-
       <div
         class=" my-2 w-full gap-2 {galleryState.layout === 'grid'
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '

@@ -149,7 +149,7 @@ async function openSavedProjects(page: Page, { empty = false } = {}) {
   await page.goto('/my-projects');
   if (!empty)
     await expect(
-      page.getByRole('heading', { name: 'My Projects', exact: true }),
+      page.getByRole('heading', { name: 'My Library', exact: true }),
     ).toBeVisible();
 }
 
@@ -275,7 +275,7 @@ test.describe('Sync in the browser', () => {
 
     await phone.goto('/my-projects');
     await expect(
-      phone.getByRole('heading', { name: 'My Projects', exact: true }),
+      phone.getByRole('heading', { name: 'My Library', exact: true }),
     ).toBeVisible();
     await expect(phone.getByRole('button', { name: /^Trash/ })).toHaveCount(0);
   });
@@ -313,8 +313,8 @@ test.describe('Sync in the browser', () => {
       .poll(async () => (await serverPalettes()).map((p) => p.name))
       .toEqual(['Shared Dusk']);
 
-    // On the laptop, in My Projects
-    await laptop.goto('/my-projects');
+    // On the laptop, in My Library
+    await laptop.goto('/my-palettes');
     const palettes = laptop.getByRole('list', { name: 'Saved palettes' });
     await expect(palettes.getByText('Shared Dusk')).toBeVisible();
 

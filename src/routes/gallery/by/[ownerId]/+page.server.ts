@@ -13,106 +13,22 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// An owner's gallery pages: those they included on their public gallery. The list
-// comes from D1; titles and images from the gallery, which leaves out any page
-// that's been removed there.
+// The owner's projects; with none but some palettes, their palettes instead.
 
-import {
-  queryGallery,
-  type GalleryProjectNode,
-  type GallerySharedPaletteNode,
-} from '#lib/utils/gallery-utils.js';
-import { error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getPlatform } from '#lib/server/cloudflare.js';
+import { fetchProjects, type OwnerProject } from './owner-gallery.js';
 
 export const prerender = false;
 
-// More than any owner is likely to publish; the gallery answers 100 at most
-const MAX_PAGES = 100;
-
-export type OwnerProject = Pick<
-  GalleryProjectNode,
-  'databaseId' | 'locations' | 'featuredImage' | 'projectName'
->;
-
-export type OwnerPalette = Pick<
-  GallerySharedPaletteNode,
-  'databaseId' | 'title' | 'yarnUrls'
->;
-
-export const load: PageServerLoad = async (event) => {
-  const env = getPlatform()?.env;
-  const { ownerPage, PUBLIC_ID_PATTERN } =
-    await import('#lib/server/gallery/store.js');
-  if (
-    env?.ACCOUNTS_ENABLED !== 'true' ||
-    !env.DB ||
-    !PUBLIC_ID_PATTERN.test(event.params.ownerId)
-  )
-    error(404, 'Not found');
-
-  const owner = await ownerPage(env.DB, event.params.ownerId);
-  if (!owner) error(404, 'Not found');
-
-  // Each list is asked for only when it has IDs: an empty `in` matches everything
-  const [projects, palettes] = await Promise.all([
-    owner.postIds.length
-      ? fetchProjects(owner.postIds.slice(0, MAX_PAGES))
+export const load: PageServerLoad = async ({ parent, params }) => {
+  const { postIds, paletteIds } = await parent();
+  if (!postIds.length && paletteIds.length)
+    redirect(307, `/gallery/by/${params.ownerId}/palettes`);
+  // Asked for only with IDs: an empty `in` matches everything
+  return {
+    projects: postIds.length
+      ? await fetchProjects(postIds)
       : ([] as OwnerProject[]),
-    owner.paletteIds.length
-      ? fetchPalettes(owner.paletteIds.slice(0, MAX_PAGES))
-      : ([] as OwnerPalette[]),
-  ]);
-  return { name: owner.name, projects, palettes };
+  };
 };
-
-/** The gallery's published projects among these IDs, newest first; null if it can't be reached. */
-async function fetchProjects(ids: number[]): Promise<OwnerProject[] | null> {
-  try {
-    const { response, result } = await queryGallery(
-      `query OWNER_PROJECTS($ids: [ID]) {
-          projects(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
-            nodes {
-              databaseId
-              projectName
-              locations
-              featuredImage {
-                node {
-                  mediaItemUrl
-                  mediaDetails { sizes(include: MEDIUM) { sourceUrl } }
-                }
-              }
-            }
-          }
-        }`,
-      { ids },
-    );
-    return response.ok && Array.isArray(result?.data?.projects?.nodes)
-      ? result.data.projects.nodes
-      : null;
-  } catch (e) {
-    console.error('Could not load owner gallery pages', e);
-    return null;
-  }
-}
-
-/** The gallery's shared palettes among these IDs, newest first; null if it can't be reached. */
-async function fetchPalettes(ids: number[]): Promise<OwnerPalette[] | null> {
-  try {
-    const { response, result } = await queryGallery(
-      `query OWNER_PALETTES($ids: [ID]) {
-          palettes(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
-            nodes { databaseId title yarnUrls }
-          }
-        }`,
-      { ids },
-    );
-    return response.ok && Array.isArray(result?.data?.palettes?.nodes)
-      ? result.data.palettes.nodes
-      : null;
-  } catch (e) {
-    console.error('Could not load owner palettes', e);
-    return null;
-  }
-}

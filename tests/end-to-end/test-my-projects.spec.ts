@@ -52,10 +52,17 @@ test.describe('My Projects', () => {
   test('shows empty states and is in the site menu', async ({ page }) => {
     await page.goto('/my-projects');
     await expect(page.getByText('No saved projects yet')).toBeVisible();
-    await expect(page.getByText('No saved palettes yet')).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'My Projects' }).first(),
+      page.getByRole('link', { name: 'My Library' }).first(),
     ).toHaveAttribute('href', '/my-projects');
+
+    // Palettes have a page of their own, a link away
+    await page
+      .getByRole('navigation', { name: 'My Library' })
+      .getByRole('link', { name: /Palettes/ })
+      .click();
+    await expect(page).toHaveURL(/\/my-palettes$/);
+    await expect(page.getByText('No saved palettes yet')).toBeVisible();
   });
 
   test('lists saved projects and palettes', async ({ page }) => {
@@ -87,7 +94,8 @@ test.describe('My Projects', () => {
     // A full page load, so the planner loads the saved weather
     await expect(project).toHaveAttribute('data-sveltekit-reload');
 
-    // The palette links to the Yarn Palette Creator
+    // The palette links to the Yarn Palette Creator, from its own page
+    await page.goto('/my-palettes');
     const palettes = page.getByRole('list', { name: 'Saved palettes' });
     await expect(palettes.getByText('Test Meadow')).toBeVisible();
     const paletteLink = palettes.getByRole('link', {
@@ -96,14 +104,14 @@ test.describe('My Projects', () => {
     await expect(paletteLink).toHaveAttribute('href', /\/yarn\?s=/);
     // Nothing clickable inside the link
     await expect(paletteLink.getByRole('button')).toHaveCount(0);
+    await page.goto('/my-projects');
 
-    // Name the project: the name shows, with its location title in the details
+    // Name the project: the name shows instead of its location title
     await cardMenu(page, 'Test Town, 2024', 'Rename');
     await page.getByLabel('Project name').fill('Gift Blanket');
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     const named = page.getByRole('link', { name: 'Gift Blanket' });
     await expect(named).toBeVisible();
-    await expect(page.getByText('Test Town, 2024')).toBeVisible();
     await page.reload();
     await expect(named).toBeVisible();
 
@@ -144,6 +152,7 @@ test.describe('My Projects', () => {
     await expect(page.getByRole('button', { name: /^Trash/ })).toHaveCount(0);
 
     // Palettes go to the same Trash
+    await page.goto('/my-palettes');
     await moveToTrash(page, 'Test Meadow');
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     trash = page.getByRole('dialog');

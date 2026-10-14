@@ -13,61 +13,41 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import { browser } from '$app/env';
+<script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import { onMount } from 'svelte';
+  import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { NotebookPenIcon, SwatchBookIcon } from '@lucide/svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import CollectionNav from '#lib/components/CollectionNav.svelte';
   import Gallery from './Gallery.svelte';
-  import YarnPaletteGallery from './YarnPaletteGallery.svelte';
 
-  // Use URL hash to set initial view but default to 'projects'
-  let view = $state('projects');
-
-  $effect(() => {
-    if (browser && page.url.searchParams.get('view') === 'yarn-palettes') {
-      view = 'yarn-palettes';
-    } else if (browser && page.url.searchParams.get('view') === 'projects') {
-      view = 'projects';
-    }
+  // Links from before the gallery had a page for each kind
+  onMount(() => {
+    if (page.url.searchParams.get('view') === 'yarn-palettes')
+      goto(resolve('/gallery/palettes'), { replaceState: true });
   });
 </script>
 
 <svelte:head>
-  <title
-    >Temperature Blanket {view === 'projects' ? 'Project' : 'Yarn Palette'} Gallery</title
-  >
+  <title>Temperature Blanket Project Gallery</title>
   <meta
     name="description"
-    content={view === 'projects'
-      ? 'Browse a collection of temperature blanket projects.'
-      : 'Browse a collection of yarn palettes from user-created projects.'}
+    content="Browse a collection of temperature blanket projects."
   />
 
-  <meta
-    property="og:title"
-    content="Temperature Blanket {view === 'projects'
-      ? 'Project'
-      : 'Yarn Palette'} Gallery"
-  />
+  <meta property="og:title" content="Temperature Blanket Project Gallery" />
   <meta
     property="og:description"
-    content={view === 'projects'
-      ? 'Browse a collection of temperature blanket projects.'
-      : 'Browse a collection of yarn palettes from user-created projects.'}
+    content="Browse a collection of temperature blanket projects."
   />
-  <meta
-    property="og:url"
-    content="{PUBLIC_BASE_URL || ''}/gallery?view={view}"
-  />
+  <meta property="og:url" content="{PUBLIC_BASE_URL || ''}/gallery" />
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<AppShell pageName="{view === 'projects' ? 'Project' : 'Yarn Palette'} Gallery">
+<AppShell pageName="Project Gallery">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
@@ -76,50 +56,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-8 flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
     >
-      <!-- <h2 class="h2 text-gradient text-center">Gallery</h2> -->
-      <h2 class="h1 text-gradient mt-4 text-center">Gallery</h2>
-      <div class="mx-auto w-full max-w-sm px-2">
-        <SegmentedControl
-          value={view}
-          onValueChange={(e) => {
-            view = e.value ?? 'projects';
-            // Optionally update search params so links can be shared to specific views
-            if (browser) {
-              goto(`?view=${e.value ?? 'projects'}`);
-            }
-          }}
-        >
-          <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
-            <SegmentedControl.Indicator />
-            <SegmentedControl.Item value={'projects'}>
-              <SegmentedControl.ItemText
-                ><div class="flex items-center justify-center gap-1">
-                  <NotebookPenIcon />
-                  <span class="">Projects</span>
-                </div></SegmentedControl.ItemText
-              >
-              <SegmentedControl.ItemHiddenInput />
-            </SegmentedControl.Item>
-            <SegmentedControl.Item value={'yarn-palettes'}>
-              <SegmentedControl.ItemText
-                ><div class="flex items-center justify-center gap-1">
-                  <SwatchBookIcon />
-                  <span class=""
-                    ><span class="max-sm:hidden">Yarn</span> Palettes</span
-                  >
-                </div></SegmentedControl.ItemText
-              >
-              <SegmentedControl.ItemHiddenInput />
-            </SegmentedControl.Item>
-          </SegmentedControl.Control>
-        </SegmentedControl>
-      </div>
-
-      {#if view === 'projects'}
-        <Gallery />
-      {:else}
-        <YarnPaletteGallery />
-      {/if}
+      <h1 class="h1 text-gradient mt-4 text-center">Gallery</h1>
+      <CollectionNav
+        label="Gallery"
+        current="projects"
+        projectsHref={resolve('/gallery')}
+        palettesHref={resolve('/gallery/palettes')}
+      />
+      <Gallery />
     </main>
   {/snippet}
 </AppShell>

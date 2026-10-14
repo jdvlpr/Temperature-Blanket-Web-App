@@ -38,11 +38,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/color-utils.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
+  import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import type { LibraryFilters } from '#lib/state/library-filters.svelte.js';
+  import {
+    matchesSearch,
+    matchesStatus,
+    matchesYarn,
+    sortLibrary,
+  } from '#lib/utils/collection-filter.js';
   import {
     FolderPlusIcon,
     LoaderCircleIcon,
     PencilIcon,
     Trash2Icon,
+    XIcon,
   } from '@lucide/svelte';
   import { SvelteSet } from 'svelte/reactivity';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
@@ -53,10 +62,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // (the My Projects page), each palette is a link to the Yarn Palette Creator
   // With sharing (My Projects, signed in), each palette says who can see it,
   // and palettes only in the gallery (deleted or not saved here) are listed too
+  // With filters (My Library), only what matches shows, sorted as chosen;
+  // oncount says how many
   let {
     updateGauge,
     sharing,
     galleryOnly = [],
+    filters,
+    oncount,
   }: {
     updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
     sharing?: Snippet<
@@ -64,6 +77,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >;
     /** The newest page of each palette only in the gallery */
     galleryOnly?: GalleryPage[];
+    filters?: LibraryFilters;
+    /** How many there are without the filters, once known, and how many show */
+    oncount?: (count: { total: number; matching: number }) => void;
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -111,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     | { palette: SavedPalette; page?: never }
     | { palette?: never; page: GalleryPage }
   );
-  let cards = $derived.by((): Card[] => {
+  let allCards = $derived.by((): Card[] => {
     const saved: Card[] = palettes.map((item) => ({
       ...item,
       key: item.palette.id,
@@ -138,6 +154,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return [...saved, ...pages].sort((a, b) => b.time - a.time);
   });
 
+  // What the filters let through, sorted as chosen
+  let cards = $derived.by((): Card[] => {
+    if (!filters) return allCards;
+    const yarn = {
+      brandId: filters.brandId,
+      yarnId: filters.yarnId,
+      only: filters.onlyThisYarn,
+    };
+    const kept = allCards.filter(
+      (card) =>
+        matchesSearch(filters.search, [
+          card.label,
+          ...card.colors.flatMap((color) => [
+            color.name,
+            color.brandName,
+            color.yarnName,
+          ]),
+        ]) &&
+        matchesYarn(card.colors, yarn) &&
+        matchesStatus(filters.status, {
+          published: card.palette
+            ? galleryPages.grouped.byPalette.has(card.palette.id)
+            : true,
+          galleryOnly: !card.palette,
+        }),
+    );
+    return sortLibrary(kept, filters.sort, filters.reversed, {
+      time: (card) => card.time,
+      name: (card) => card.label,
+    });
+  });
+
+  $effect(() => {
+    if (yarnDataReady && savedPalettes.loaded)
+      oncount?.({ total: allCards.length, matching: cards.length });
+  });
   const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
 
   onMount(async () => {
@@ -278,6 +330,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if !yarnDataReady}
     <div class="my-1"></div>
     <PlaceholderPalettes items={3} maxWFull={true} />
+  {:else if !cards.length && filters && allCards.length}
+    <div class="my-8 flex flex-col items-center gap-2 text-center">
+      <p>No palettes match these filters.</p>
+      <button
+        type="button"
+        class="btn preset-tonal-primary border-primary-500 border"
+        onclick={() => filters.clear()}
+      >
+        <XIcon />
+        Clear Filters
+      </button>
+    </div>
   {:else if !cards.length}
     <div class="my-8 flex max-w-prose flex-col gap-2 text-center">
       <p class="font-bold">No saved palettes yet</p>

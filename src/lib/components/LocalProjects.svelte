@@ -40,16 +40,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
   import { sync, syncLabelFor } from '#lib/sync/status.svelte.js';
   import { withoutVersion } from '#lib/utils/gallery-link-utils.js';
-  import { FolderOpenIcon } from '@lucide/svelte';
+  import { previews } from '#lib/state/preview-state.svelte.js';
+  import type { LibraryFilters } from '#lib/state/library-filters.svelte.js';
+  import {
+    matchesSearch,
+    matchesStatus,
+    patternIdOf,
+    sortLibrary,
+  } from '#lib/utils/collection-filter.js';
+  import { FolderOpenIcon, XIcon } from '@lucide/svelte';
   import { SvelteSet } from 'svelte/reactivity';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
   // which shows them all under its own heading, as cards (the gallery's), with
   // rename and delete
+  // With filters (My Library), only what matches shows, sorted as chosen;
+  // oncount says how many
   let {
     limit,
     onMyProjectsPage = false,
-  }: { limit?: number; onMyProjectsPage?: boolean } = $props();
+    filters,
+    oncount,
+  }: {
+    limit?: number;
+    onMyProjectsPage?: boolean;
+    filters?: LibraryFilters;
+    /** How many there are without the filters, once known, and how many show */
+    oncount?: (count: { total: number; matching: number }) => void;
+  } = $props();
 
   let projects = $state<StoredProjectIndexItem[]>([]);
   let loaded = $state(false);
@@ -133,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   type Card =
     | { key: string; time: number; project: StoredProjectIndexItem }
     | { key: string; time: number; page: GalleryPage };
-  const cards = $derived.by((): Card[] => {
+  const allCards = $derived.by((): Card[] => {
     const saved: Card[] = shown.map((project) => ({
       key: project.id,
       time: lastChanged(project),
@@ -154,6 +172,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!galleryOnly.length) return saved;
     // A stable sort: the saved ones keep their order
     return [...saved, ...galleryOnly].sort((a, b) => b.time - a.time);
+  });
+
+  const previewIds = previews.all.map((preview) => preview.id);
+  const cardName = (card: Card) =>
+    'project' in card ? labelFor(card.project) : card.page.title;
+
+  // What the filters let through, sorted as chosen
+  const cards = $derived.by((): Card[] => {
+    if (!filters) return allCards;
+    const patternId = filters.patternType
+      ? (previews.all.find((p) => p.wpTagSlug === filters.patternType)?.id ??
+        null)
+      : null;
+    const kept = allCards.filter((card) => {
+      const project = 'project' in card ? card.project : null;
+      const page = 'page' in card ? card.page : null;
+      return (
+        matchesSearch(
+          filters.search,
+          project ? [project.meta.name, project.meta.title] : [page?.title],
+        ) &&
+        (!patternId ||
+          patternIdOf(project ? project.meta.href : page?.link, previewIds) ===
+            patternId) &&
+        matchesStatus(filters.status, {
+          published: project
+            ? galleryPages.grouped.byProject.has(project.id)
+            : true,
+          galleryOnly: !project,
+        })
+      );
+    });
+    return sortLibrary(kept, filters.sort, filters.reversed, {
+      time: (card) => card.time,
+      name: cardName,
+    });
+  });
+  $effect(() => {
+    if (loaded) oncount?.({ total: allCards.length, matching: cards.length });
   });
   const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
 
@@ -385,6 +442,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             : 'My Projects'}
         </a>
       {/if}
+    </div>
+  {:else if onMyProjectsPage && loaded && filters && allCards.length}
+    <div class="my-8 flex w-full flex-col items-center gap-2 text-center">
+      <p>No projects match these filters.</p>
+      <button
+        type="button"
+        class="btn preset-tonal-primary border-primary-500 border"
+        onclick={() => filters.clear()}
+      >
+        <XIcon />
+        Clear Filters
+      </button>
     </div>
   {:else if onMyProjectsPage && loaded}
     <div class="my-8 flex w-full flex-col gap-2 text-center">

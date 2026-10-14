@@ -114,7 +114,7 @@ test.describe('Gallery pages from accounts', () => {
     // Nothing published and publishing off: no sharing on My Projects
     await page.goto('/my-projects');
     await expect(
-      page.getByRole('heading', { name: 'My Projects', exact: true }),
+      page.getByRole('heading', { name: 'My Library', exact: true }),
     ).toBeVisible();
     await expect(page.getByText(/Gallery only/)).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toHaveCount(0);
@@ -656,7 +656,7 @@ test.describe('Gallery pages from accounts', () => {
        values (${postId}, '${userId}', 'gone-palette', 'Sunset', ${Date.now()}, 'palette', '${baseURL}/yarn?s=ff0000ffa5000000ff')`,
     );
 
-    await page.goto('/my-projects');
+    await page.goto('/my-palettes');
     await expect(page.getByText(/Gallery only · Published/)).toBeVisible();
     await page.getByRole('button', { name: 'More for Sunset' }).click();
     await page

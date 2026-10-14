@@ -432,7 +432,7 @@ button to it. -->
             <span class="flex flex-1 flex-col">
               <span>Move to Trash</span>
               <span class="text-xs opacity-70"
-                >Restore it from My Projects for {TRASH_DAYS} days</span
+                >Restore it from My Library for {TRASH_DAYS} days</span
               >
             </span>
           </button>

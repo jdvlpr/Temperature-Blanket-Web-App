@@ -631,10 +631,8 @@ choice (guests too: it's the only way they can share a palette). -->
           <legend class="mb-2 font-bold">
             Also share {shareable.length === 1 ? 'its palette' : 'its palettes'}
             to the
-            <a
-              href="{resolve('gallery')}?view=yarn-palettes"
-              target="_blank"
-              class="link">Yarn Palette Gallery</a
+            <a href={resolve('/gallery/palettes')} target="_blank" class="link"
+              >Yarn Palette Gallery</a
             >
           </legend>
           {#each shareable as option (option.index)}
