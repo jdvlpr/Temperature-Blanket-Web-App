@@ -51,6 +51,9 @@ export type ProjectSyncState = {
   lastSyncedAt: number | null;
   /** Why the last upload failed, for errors that retrying won't fix */
   error: SyncErrorCode | null;
+  /** The fingerprint of the content at `rev`, so saving it unchanged doesn't
+   * upload it again */
+  contentHash?: string;
 };
 
 export type LocalItem = { id: string; sync?: ProjectSyncState };
@@ -189,6 +192,11 @@ export type SyncOptions = {
   palettes?: PaletteLocal;
   /** Preferences to sync too */
   preferences?: PreferencesLocal;
+  /** False to only send what changed here. Uploads are checked against the
+   * server's revision anyway, so a pass made for them needn't ask what changed
+   * there first. A device that never pulled, or has deletions waiting, still
+   * pulls. */
+  pull?: boolean;
 };
 
 export type SyncReport = {
@@ -268,6 +276,7 @@ export async function syncAccount(
     rev: number,
     base?: ProjectSyncState,
     editedAt?: number,
+    contentHash?: string,
   ): ProjectSyncState => ({
     ownerUserId: userId,
     rev,
@@ -275,6 +284,7 @@ export async function syncAccount(
     updatedAt: editedAt ?? base?.updatedAt ?? now(),
     lastSyncedAt: now(),
     error: null,
+    ...(contentHash && { contentHash }),
   });
 
   const fingerprint = (project: StoredProject) =>
@@ -289,11 +299,16 @@ export async function syncAccount(
    * Marks a project synced at `rev`, unless it was saved again since `seen`:
    * then it stays changed, now based on `rev`.
    */
-  const settle = (id: string, rev: number, seen: ProjectSyncState) =>
+  const settle = (
+    id: string,
+    rev: number,
+    seen: ProjectSyncState,
+    contentHash?: string,
+  ) =>
     local.updateSync(id, (s) =>
       s && s.updatedAt !== seen.updatedAt
         ? { ...s, rev, error: null }
-        : syncedState(rev, s),
+        : syncedState(rev, s, undefined, contentHash),
     );
 
   /**
@@ -306,10 +321,13 @@ export async function syncAccount(
     const project = JSON.parse(data.json) as StoredProject;
     project.href = rehomeHref(project.href, options.origin, id);
     const base = seen === 'absent' ? undefined : seen;
-    if (
-      await local.put(id, project, syncedState(data.rev, base, editedAt), seen)
-    )
-      report.downloaded.push(id);
+    const synced = syncedState(
+      data.rev,
+      base,
+      editedAt,
+      await fingerprint(project),
+    );
+    if (await local.put(id, project, synced, seen)) report.downloaded.push(id);
     return 'done';
   }
 
@@ -375,11 +393,15 @@ export async function syncAccount(
   }
 
   // 2. Pull what changed on the server
+  const pull =
+    options.pull !== false ||
+    state.since === 0 ||
+    state.pendingDeletes.length > 0;
   let fullResync = false;
   const seenOnServer = new Set<string>();
   const palettesOnServer = new Set<string>();
   let since = state.since;
-  for (;;) {
+  while (pull) {
     const page = await server.changes(since);
     if (page.fullResyncRequired) {
       fullResync = true;
@@ -410,7 +432,7 @@ export async function syncAccount(
       if (sync?.dirty) {
         const hash = await localHash(meta.id);
         if (hash && hash === meta.contentHash)
-          await settle(meta.id, meta.rev, sync);
+          await settle(meta.id, meta.rev, sync, hash);
         else await keepBoth(meta.id, sync, meta.clientUpdatedAt);
         continue;
       }
@@ -454,6 +476,11 @@ export async function syncAccount(
     if (!project) continue;
 
     const contentHash = await fingerprint(project);
+    // Saved again without a change since its last upload
+    if (sync.rev !== null && sync.contentHash === contentHash) {
+      await settle(id, sync.rev, sync, contentHash);
+      continue;
+    }
     const attempt = (baseRev: number | null) =>
       server.upload(id, {
         baseRev,
@@ -485,7 +512,7 @@ export async function syncAccount(
 
     if (outcome.ok) {
       // Saved again while uploading: stays changed, now based on the new revision
-      await settle(id, outcome.meta.rev, sync);
+      await settle(id, outcome.meta.rev, sync, contentHash);
       report.uploaded.push(id);
       continue;
     }
@@ -493,7 +520,7 @@ export async function syncAccount(
     // Another device saved first
     const current = outcome.current;
     if (current && current.contentHash === contentHash)
-      await settle(id, current.rev, sync);
+      await settle(id, current.rev, sync, contentHash);
     else {
       const copyId = await keepBoth(id, sync, current?.clientUpdatedAt);
       if (copyId) queue.push(copyId);

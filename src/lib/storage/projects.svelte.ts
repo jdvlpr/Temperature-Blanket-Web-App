@@ -195,10 +195,13 @@ export class ProjectStorage {
     toAccount = true,
 
     /** false: it stays where it is, only in this browser if it is now */
+    waitToSync = false,
+    /** true: an automatic save, which can wait for more edits before syncing */
   }: {
     id?: string | null;
     localProject?: StoredProject | null;
     toAccount?: boolean;
+    waitToSync?: boolean;
   } = {}): Promise<StoredProjectIndexItem | null> {
     if (!browser) return null;
 
@@ -251,6 +254,9 @@ export class ProjectStorage {
             lastSyncedAt:
               existing?.ownerUserId === owner ? existing.lastSyncedAt : null,
             error: null,
+            // What it was at `rev`, so an unchanged save isn't uploaded again
+            ...(existing?.ownerUserId === owner &&
+              existing.contentHash && { contentHash: existing.contentHash }),
           }
         : undefined;
 
@@ -262,7 +268,7 @@ export class ProjectStorage {
       return item;
     });
 
-    this.onChange?.();
+    this.onChange?.(waitToSync);
     // Saved here now: its own name is the one to show from here on
     if (_id === project.id) project.linkName = '';
 
@@ -327,7 +333,8 @@ export class ProjectStorage {
   } | null = null;
 
   /** Called after a save or removal, to schedule a sync. Set by $lib/sync. */
-  static onChange: (() => void) | undefined;
+  /** `wait`: an automatic save, which can wait for more edits to sync */
+  static onChange: ((wait?: boolean) => void) | undefined;
 
   static async accountSyncState(userId: string): Promise<AccountSyncState> {
     const saved = await get<AccountSyncState>(

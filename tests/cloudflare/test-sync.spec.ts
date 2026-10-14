@@ -563,6 +563,16 @@ async function saveState(page: Page) {
   return page.getByTestId('project-button').getAttribute('data-save-status');
 }
 
+/** Hides or shows the page as switching tabs does. */
+const setHidden = (page: Page, hidden: boolean) =>
+  page.evaluate((hidden) => {
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => (hidden ? 'hidden' : 'visible'),
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  }, hidden);
+
 test.describe('Auto-save', () => {
   test('after the first Save, changes save and sync by themselves', async ({
     browser,
@@ -579,12 +589,21 @@ test.describe('Auto-save', () => {
     // An edit, and no Save: once saved, the address bar holds the edited project
     await choosePattern(laptop, 'Calendar');
     await expect(laptop).toHaveURL(/clnr=/);
+    // Saved here at once; it syncs once edits stop, or when the tab is hidden
     await expect
       .poll(async () => {
         const item = (await savedIndex(laptop)).find((i) => i.id === id);
-        return item?.sync?.dirty === false && item.meta.href === laptop.url();
+        return item?.sync?.dirty === true && item.meta.href === laptop.url();
       })
       .toBe(true);
+    await setHidden(laptop, true);
+    await expect
+      .poll(async () => {
+        const item = (await savedIndex(laptop)).find((i) => i.id === id);
+        return item?.sync?.dirty;
+      })
+      .toBe(false);
+    await setHidden(laptop, false);
     await expect.poll(() => saveState(laptop)).toBe('Saved to your account');
 
     // The other device gets the edited project

@@ -277,7 +277,7 @@ export async function saveNow() {
       // eslint-disable-next-line svelte/no-navigation-without-resolve
       goto(new URL(href), { shallow: true, replace: true, state: '' });
       // Where it is: one only in this browser stays there
-      await ProjectStorage.save({ toAccount: false });
+      await ProjectStorage.save({ toAccount: false, waitToSync: true });
       keepThumbnail(href);
       await rememberStored();
       baseline = href;

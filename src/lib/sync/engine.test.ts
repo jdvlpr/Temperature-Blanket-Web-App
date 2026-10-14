@@ -185,6 +185,7 @@ class FakeDevice implements LocalStore {
             updatedAt: this.clock,
             lastSyncedAt: existing?.sync?.lastSyncedAt ?? null,
             error: null,
+            contentHash: existing?.sync?.contentHash,
           }
         : undefined,
     });
@@ -201,14 +202,28 @@ class FakeDevice implements LocalStore {
     }
   }
 
-  sync() {
+  pulls = 0;
+  uploads = 0;
+
+  sync(pull?: boolean) {
     let n = 0;
-    return syncAccount(this.userId, this, this.server.api(), {
-      origin: this.origin,
-      sha256,
-      now: () => (this.clock += 1),
-      newId: () => `copy-${this.origin.length}-${++n}`,
-    });
+    const api = this.server.api();
+    return syncAccount(
+      this.userId,
+      this,
+      {
+        ...api,
+        changes: (since) => (this.pulls++, api.changes(since)),
+        upload: (id, upload) => (this.uploads++, api.upload(id, upload)),
+      },
+      {
+        origin: this.origin,
+        sha256,
+        now: () => (this.clock += 1),
+        newId: () => `copy-${this.origin.length}-${++n}`,
+        pull,
+      },
+    );
   }
 
   titles() {
@@ -267,6 +282,54 @@ describe('syncAccount', () => {
 
     // Nothing to do the second time
     expect(await laptop.sync()).toMatchObject({ uploaded: [], downloaded: [] });
+  });
+
+  it('only sends when asked not to pull, once it has pulled before', async () => {
+    const { phone, laptop } = twoDevices();
+    phone.edit('a', 'Draft');
+    // Never pulled anything: pulls anyway
+    await phone.sync(false);
+    await phone.sync(false);
+    expect(phone.pulls).toBe(2);
+
+    phone.edit('a', 'Final');
+    expect((await phone.sync(false)).uploaded).toEqual(['a']);
+    expect(phone.pulls).toBe(2);
+    await laptop.sync();
+    expect(laptop.titles()).toEqual({ a: 'Final' });
+  });
+
+  it('still keeps both versions when an upload without a pull finds a newer one', async () => {
+    const { phone, laptop } = twoDevices();
+    phone.edit('a', 'Original');
+    await phone.sync();
+    await laptop.sync();
+    laptop.edit('a', 'Laptop');
+    await laptop.sync();
+    phone.edit('a', 'Phone');
+    const report = await phone.sync(false);
+    expect(report.copies).toHaveLength(1);
+    expect(Object.values(phone.titles()).sort()).toEqual([
+      'Laptop',
+      'Phone (copy from this device, Jan 1)',
+    ]);
+  });
+
+  it('doesn’t upload a project saved again without a change', async () => {
+    const { phone, laptop } = twoDevices();
+    phone.edit('a', 'Same');
+    await phone.sync();
+    phone.edit('a', 'Same');
+    const uploads = phone.uploads;
+    expect((await phone.sync()).uploaded).toEqual([]);
+    expect(phone.uploads).toBe(uploads);
+    expect(phone.status('a')).toBe('synced');
+
+    // Nor one downloaded from another device
+    await laptop.sync();
+    laptop.edit('a', 'Same');
+    await laptop.sync();
+    expect(laptop.uploads).toBe(0);
   });
 
   it('brings edits across', async () => {
@@ -329,7 +392,7 @@ describe('syncAccount', () => {
     expect(server.rows.get('a')?.title).toBe('Gift Blanket');
     await laptop.sync();
 
-    phone.edit('a', 'Lisbon, 2025');
+    phone.edit('a', 'Lisbon, 2025 and 2026');
     laptop.edit('a', 'Lisbon, 2026');
     await phone.sync();
     const report = await laptop.sync();

@@ -16,10 +16,20 @@
 // When to sync, and what the app shows about it. Loaded only once someone signs
 // in, so guests never download it.
 //
-// Sync runs after a save (debounced), on sign-in, when the tab regains focus (at
-// most once a minute) and when the browser comes back online. There's no timer:
-// the free plan's daily request cap is shared by everyone. Only one tab syncs at
-// a time, and a change during a sync schedules another pass.
+// Every request counts against the free plan's daily cap, shared by everyone,
+// so there's no timer, and sending and looking are kept apart:
+// - Automatic saves of the open project are sent a little over a minute after
+//   the last one (at most five minutes after the first), and straight away when
+//   the tab is hidden. Saving here is instant either way; until then the
+//   project shows "Waiting to sync" on My Projects. Other changes (Save, Save a
+//   Copy, renaming, the Trash, palettes) are sent straight away, and
+//   preferences after a few seconds.
+// - What changed elsewhere is looked for on sign-in and page load, when the tab
+//   regains focus (at most once a minute), when the browser comes back online
+//   and when someone opens their sync status. Sending alone doesn't look: the
+//   server refuses an upload based on an old copy anyway.
+// Only one tab syncs at a time, and a change during a sync schedules another
+// pass.
 
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
@@ -52,6 +62,10 @@ export { sync, type SyncState } from './status.svelte';
 
 // Only long enough to fold writes that land together into one pass
 const SAVE_DELAY_MS = 300;
+// Longer than autosave's once a minute while someone keeps editing, so a long
+// session sends a few copies rather than one a minute
+const SEND_DELAY_MS = 75_000;
+const SEND_MAX_WAIT_MS = 5 * 60_000;
 const FOCUS_INTERVAL_MS = 60_000;
 const BUSY_RETRY_MS = 10_000;
 // Long enough that trying out colors or settings one after another sends only
@@ -60,9 +74,16 @@ const PREFERENCES_DELAY_MS = 5_000;
 
 let started = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
+let dueAt = 0;
+/** Whether the pass due is waiting for edits to stop, so another edit moves it */
+let waitingForEdits = false;
 let running: Promise<void> | null = null;
 let again = false;
 let lastFocusSync = 0;
+/** Whether the next pass looks for changes made elsewhere */
+let pullNext = false;
+/** When the oldest change not yet sent was made, or 0 */
+let unsentSince = 0;
 /** The problem last shown in a toast, so each one is shown once */
 let shownProblem: Problem | null = null;
 
@@ -82,11 +103,40 @@ const preferencesLocal: PreferencesLocal = {
   pending: pendingPreferences,
 };
 
-/** Syncs soon, folding several quick changes into one pass. */
-export function scheduleSync(delay = SAVE_DELAY_MS) {
+/**
+ * Syncs soon, folding several quick changes into one pass. `pull` also looks
+ * for changes made elsewhere; `edits` waits for edits to stop.
+ */
+export function scheduleSync(
+  delay = SAVE_DELAY_MS,
+  pull = true,
+  edits = false,
+) {
   if (!started) return;
+  if (pull) pullNext = true;
+  const at = Date.now() + delay;
+  // A pass due sooner does this too
+  if (timer && dueAt <= at && !(edits && waitingForEdits)) return;
   clearTimeout(timer);
+  dueAt = at;
+  waitingForEdits = edits;
   timer = setTimeout(() => void syncNow(), delay);
+}
+
+/**
+ * Sends a change made here. One that can `wait` (an automatic save) goes once
+ * edits stop, or soon when the tab is hidden.
+ */
+function scheduleSend(wait = false) {
+  if (!started) return;
+  if (!wait) return scheduleSync(SAVE_DELAY_MS, false);
+  const now = Date.now();
+  unsentSince ||= now;
+  const delay =
+    document.visibilityState === 'hidden'
+      ? SAVE_DELAY_MS
+      : Math.min(SEND_DELAY_MS, unsentSince + SEND_MAX_WAIT_MS - now);
+  scheduleSync(Math.max(delay, SAVE_DELAY_MS), false, true);
 }
 
 async function runPass(userId: string) {
@@ -96,6 +146,9 @@ async function runPass(userId: string) {
   }
   sync.state = 'syncing';
   let signedOut = false;
+  const pull = pullNext;
+  pullNext = false;
+  unsentSince = 0;
   try {
     sync.lastReport = await syncAccount(
       userId,
@@ -106,11 +159,14 @@ async function runPass(userId: string) {
         sha256,
         palettes: paletteLocal,
         preferences: preferencesLocal,
+        pull,
       },
     );
     sync.state = 'idle';
     sync.lastSyncedAt = Date.now();
   } catch (e) {
+    // Try again next time
+    if (pull) pullNext = true;
     if (!(e instanceof SyncHttpError)) {
       console.error('Sync failed', e);
       sync.state = 'error';
@@ -227,6 +283,7 @@ async function toastNewProblem(userId: string) {
 /** Syncs now, or right after the pass in progress. */
 export async function syncNow(): Promise<void> {
   clearTimeout(timer);
+  timer = undefined;
   const userId = account.summary?.id;
   if (!started || !userId) return;
   if (running) {
@@ -245,7 +302,7 @@ export async function syncNow(): Promise<void> {
           { ifAvailable: true },
           async (lock) => {
             if (lock) await runPass(userId);
-            else scheduleSync(BUSY_RETRY_MS);
+            else scheduleSync(BUSY_RETRY_MS, false);
           },
         );
       else await runPass(userId);
@@ -257,7 +314,11 @@ export async function syncNow(): Promise<void> {
 }
 
 function onFocus() {
-  if (document.visibilityState !== 'visible') return;
+  // Leaving: send what's waiting while the page can still run
+  if (document.visibilityState === 'hidden') {
+    if (unsentSince) scheduleSync(0, false);
+    return;
+  }
   if (Date.now() - lastFocusSync < FOCUS_INTERVAL_MS) return;
   lastFocusSync = Date.now();
   scheduleSync(0);
@@ -278,9 +339,9 @@ export function startSync() {
   if (started) return;
   started = true;
   sync.active = true;
-  ProjectStorage.onChange = () => scheduleSync();
-  PaletteStorage.onChange = () => scheduleSync();
-  onPreferencesChange(() => scheduleSync(PREFERENCES_DELAY_MS));
+  ProjectStorage.onChange = scheduleSend;
+  PaletteStorage.onChange = scheduleSend;
+  onPreferencesChange(() => scheduleSync(PREFERENCES_DELAY_MS, false));
   document.addEventListener('visibilitychange', onFocus);
   window.addEventListener('focus', onFocus);
   window.addEventListener('online', onOnline);
@@ -293,6 +354,9 @@ export function stopSync() {
   started = false;
   sync.active = false;
   clearTimeout(timer);
+  timer = undefined;
+  pullNext = false;
+  unsentSince = 0;
   ProjectStorage.onChange = undefined;
   PaletteStorage.onChange = undefined;
   onPreferencesChange(undefined);
