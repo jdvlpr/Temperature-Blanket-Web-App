@@ -221,17 +221,6 @@ button to it. -->
   >
     {#if !inTopBar}
       <RenameProject />
-
-      {#if colors.length}
-        <div
-          class="rounded-base flex h-3 w-full overflow-hidden"
-          aria-hidden="true"
-        >
-          {#each colors as color, i (i)}
-            <div class="flex-1" style:background-color={color.hex}></div>
-          {/each}
-        </div>
-      {/if}
     {/if}
 
     <!-- Where it's saved -->
