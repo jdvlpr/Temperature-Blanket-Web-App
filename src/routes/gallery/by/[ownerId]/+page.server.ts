@@ -17,7 +17,11 @@
 
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { fetchProjects, type OwnerProject } from './owner-gallery.js';
+import {
+  fetchPopular,
+  fetchProjects,
+  type OwnerProject,
+} from './owner-gallery.js';
 
 export const prerender = false;
 
@@ -26,9 +30,9 @@ export const load: PageServerLoad = async ({ parent, params }) => {
   if (!postIds.length && paletteIds.length)
     redirect(307, `/gallery/by/${params.ownerId}/palettes`);
   // Asked for only with IDs: an empty `in` matches everything
-  return {
-    projects: postIds.length
-      ? await fetchProjects(postIds)
-      : ([] as OwnerProject[]),
-  };
+  const [projects, popular] = await Promise.all([
+    postIds.length ? fetchProjects(postIds) : ([] as OwnerProject[]),
+    fetchPopular('project', postIds),
+  ]);
+  return { projects, popular };
 };

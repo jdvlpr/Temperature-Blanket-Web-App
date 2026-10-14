@@ -217,7 +217,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#snippet menus()}
           {#if galleryState.orderBy === 'POPULAR'}
-            <PopularPeriodMenu onchange={search} />
+            <PopularPeriodMenu
+              days={galleryState.popularDays}
+              onchange={(days) => {
+                galleryState.popularDays = days;
+                search();
+              }}
+            />
           {/if}
         {/snippet}
       </CollectionToolbar>

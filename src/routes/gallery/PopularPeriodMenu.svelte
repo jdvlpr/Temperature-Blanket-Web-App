@@ -15,18 +15,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   How far back the Popular sort counts views, as a menu beside Sort:
-  "Views: Past Month". Shared by both gallery pages.
+  "Views: Past Month". On the gallery pages and an owner's.
 -->
 <script lang="ts">
   import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
   import { ClockIcon } from '@lucide/svelte';
-  import { galleryFilters } from './state.svelte';
 
   interface Props {
-    onchange: () => void;
+    /** Days back */
+    days: number;
+    onchange: (days: number) => void;
   }
 
-  let { onchange }: Props = $props();
+  let { days, onchange }: Props = $props();
 
   // Days, as the gallery's popular route takes them
   const options = [
@@ -39,12 +40,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <ChoiceMenu
   {options}
-  value={options.find(
-    (option) => Number(option.value) === galleryFilters.popularDays,
-  )?.value}
+  value={options.find((option) => Number(option.value) === days)?.value}
   onchange={(value) => {
-    galleryFilters.popularDays = Number(value);
-    onchange();
+    onchange(Number(value));
   }}
   label="Views"
   icon={ClockIcon}

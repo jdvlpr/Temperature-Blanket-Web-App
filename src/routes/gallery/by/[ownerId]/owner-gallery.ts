@@ -18,6 +18,8 @@
 // Yarn Palettes pages.
 
 import {
+  fetchPopularOrder,
+  POPULAR_DAYS,
   queryGallery,
   type GalleryProjectNode,
   type GallerySharedPaletteNode,
@@ -28,12 +30,18 @@ export const MAX_PAGES = 100;
 
 export type OwnerProject = Pick<
   GalleryProjectNode,
-  'databaseId' | 'locations' | 'featuredImage' | 'projectName'
+  | 'databaseId'
+  | 'locations'
+  | 'featuredImage'
+  | 'projectName'
+  | 'projectUrl'
+  | 'yarnUrls'
+  | 'date'
 >;
 
 export type OwnerPalette = Pick<
   GallerySharedPaletteNode,
-  'databaseId' | 'title' | 'yarnUrls'
+  'databaseId' | 'title' | 'yarnUrls' | 'date'
 >;
 
 /** The gallery's published projects among these IDs, newest first; null if it can't be reached. */
@@ -47,7 +55,10 @@ export async function fetchProjects(
             nodes {
               databaseId
               projectName
+              projectUrl
+              yarnUrls
               locations
+              date
               featuredImage {
                 node {
                   mediaItemUrl
@@ -76,7 +87,7 @@ export async function fetchPalettes(
     const { response, result } = await queryGallery(
       `query OWNER_PALETTES($ids: [ID]) {
           palettes(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
-            nodes { databaseId title yarnUrls }
+            nodes { databaseId title yarnUrls date }
           }
         }`,
       { ids },
@@ -86,6 +97,23 @@ export async function fetchPalettes(
       : null;
   } catch (e) {
     console.error('Could not load owner palettes', e);
+    return null;
+  }
+}
+
+/**
+ * These pages most viewed first, for the default period, so Popular shows in
+ * order from the start; null when the gallery can't say (the page asks again).
+ */
+export async function fetchPopular(
+  type: 'project' | 'palette',
+  ids: number[],
+): Promise<number[] | null> {
+  if (!ids.length) return null;
+  try {
+    return await fetchPopularOrder({ type, days: POPULAR_DAYS, ids });
+  } catch (e) {
+    console.error('Could not load owner popular order', e);
     return null;
   }
 }

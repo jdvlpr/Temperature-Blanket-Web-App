@@ -16,15 +16,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
+  import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
   import {
+    FILTERS_FROM,
+    matchesSearch,
+    matchesYarn,
+    sortGalleryPages,
+  } from '#lib/utils/collection-filter.js';
+  import { GALLERY_SORTS } from '#lib/utils/gallery-utils.js';
+  import {
     galleryTitleText,
     sharedPaletteFrom,
   } from '#lib/utils/shared-palette-utils.js';
+  import { XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import PopularPeriodMenu from '../../../PopularPeriodMenu.svelte';
+  import { ownerFilters, popularOrder } from '../owner-filters.svelte.js';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
@@ -38,9 +49,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnDataReady = true;
   });
 
-  let palettes = $derived(
+  const all = $derived(data.palettes ?? []);
+  const popular = popularOrder(
+    'palette',
+    () => all.map((palette) => palette.databaseId),
+    () => data.popular,
+  );
+
+  // Each palette as a card, newest first, with its date to sort by
+  let cards = $derived(
     yarnDataReady
-      ? (data.palettes ?? []).flatMap(({ databaseId, title, yarnUrls }) => {
+      ? all.flatMap(({ databaseId, title, yarnUrls, date }) => {
           const palette = sharedPaletteFrom(yarnUrls);
           if (!palette) return [];
           const card: GalleryPalette = {
@@ -54,9 +73,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             others: [],
           };
-          return [card];
+          return [{ databaseId, date, card }];
         })
       : [],
+  );
+
+  const palettes = $derived.by(() => {
+    const f = ownerFilters;
+    const yarn = { brandId: f.brandId, yarnId: f.yarnId, only: f.onlyThisYarn };
+    const kept = cards.filter(
+      ({ card }) =>
+        matchesSearch(f.search, [
+          card.page?.title,
+          ...card.colors.flatMap((color) => [
+            color.name,
+            color.brandName,
+            color.yarnName,
+          ]),
+        ]) && matchesYarn(card.colors, yarn),
+    );
+    return sortGalleryPages(kept, f.sort, popular.ids).map(({ card }) => card);
+  });
+
+  const filtering = $derived(ownerFilters.activeFor('palettes'));
+  const showFilters = $derived(
+    all.length > FILTERS_FROM || filtering || ownerFilters.sort !== 'POPULAR',
   );
 </script>
 
@@ -80,14 +121,64 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else if !yarnDataReady}
   <div class="px-2"><PlaceholderPalettes items={3} maxWFull={true} /></div>
 {:else}
-  <ul
-    class="grid w-full grid-cols-1 items-start gap-x-4 gap-y-6 px-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    aria-label="Yarn palettes by {data.name}"
-  >
-    {#each palettes as palette (palette.postId)}
-      <li>
-        <GalleryPaletteCard {palette} />
-      </li>
-    {/each}
-  </ul>
+  <div class="px-2 lg:px-0">
+    <CollectionToolbar
+      kind="palette"
+      searchIcon="search"
+      searchLabel="Search Palettes"
+      searchPlaceholder="Name or colorway"
+      bind:search={ownerFilters.search}
+      bind:brandId={ownerFilters.brandId}
+      bind:yarnId={ownerFilters.yarnId}
+      bind:onlyThisYarn={ownerFilters.onlyThisYarn}
+      sortOptions={GALLERY_SORTS}
+      sort={ownerFilters.sort}
+      onsort={(sort) => (ownerFilters.sort = sort)}
+      bind:layout={ownerFilters.layout}
+      {showFilters}
+    >
+      {#snippet menus()}
+        {#if ownerFilters.sort === 'POPULAR'}
+          <PopularPeriodMenu
+            days={ownerFilters.popularDays}
+            onchange={(days) => (ownerFilters.popularDays = days)}
+          />
+        {/if}
+      {/snippet}
+    </CollectionToolbar>
+  </div>
+  <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
+    {#if filtering}
+      {palettes.length} of {cards.length} palettes
+    {/if}
+  </p>
+  {#if palettes.length}
+    <ul
+      class={[
+        'w-full items-start gap-x-4 gap-y-6 px-2',
+        ownerFilters.layout === 'grid'
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+          : 'flex flex-col',
+      ]}
+      aria-label="Yarn palettes by {data.name}"
+    >
+      {#each palettes as palette (palette.postId)}
+        <li class="w-full">
+          <GalleryPaletteCard {palette} />
+        </li>
+      {/each}
+    </ul>
+  {:else}
+    <div class="my-8 flex flex-col items-center gap-2 text-center">
+      <p>No palettes match these filters.</p>
+      <button
+        type="button"
+        class="btn preset-tonal-primary border-primary-500 border"
+        onclick={() => ownerFilters.clear()}
+      >
+        <XIcon />
+        Clear Filters
+      </button>
+    </div>
+  {/if}
 {/if}

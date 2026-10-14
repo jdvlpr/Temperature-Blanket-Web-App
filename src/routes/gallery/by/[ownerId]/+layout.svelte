@@ -26,6 +26,7 @@ palettes, each on a page of its own. -->
   import { ArrowLeftIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
   import type { LayoutData } from './$types';
+  import { ownerFilters } from './owner-filters.svelte.js';
 
   let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
@@ -33,6 +34,8 @@ palettes, each on a page of its own. -->
     page.url.pathname.endsWith('/palettes') ? 'palettes' : 'projects',
   );
   const ownerId = $derived(page.params.ownerId ?? '');
+  // Another person's pages start with no filters
+  $effect.pre(() => ownerFilters.forOwner(ownerId));
 </script>
 
 <AppShell pageName="Gallery">

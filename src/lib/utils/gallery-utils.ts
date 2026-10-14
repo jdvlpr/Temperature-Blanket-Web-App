@@ -244,6 +244,7 @@ async function fetchPopularIds({
   search = '',
   yarn = '',
   pattern = '',
+  include = [],
   offset = 0,
   limit = 40,
 }: {
@@ -252,6 +253,8 @@ async function fetchPopularIds({
   search?: string;
   yarn?: string;
   pattern?: string;
+  /** Only these posts (at most 100) */
+  include?: number[];
   offset?: number;
   limit?: number;
 }): Promise<PopularIds | null> {
@@ -265,6 +268,7 @@ async function fetchPopularIds({
   if (search) params.set('search', search);
   if (yarn) params.set('yarn', yarn);
   if (pattern) params.set('pattern', pattern);
+  if (include.length) params.set('include', include.join(','));
   const response = await fetch(
     `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/popular?${params}`,
   );
@@ -277,6 +281,22 @@ async function fetchPopularIds({
   }
   throw new Error(`Popular sort failed (${response.status})`);
 }
+
+/**
+ * These posts' IDs, most viewed in the last `days` first, then newest: one
+ * person's pages. Null when the gallery can't sort by views (an older plugin).
+ */
+export const fetchPopularOrder = async ({
+  type,
+  days,
+  ids,
+}: {
+  type: 'project' | 'palette';
+  days: number;
+  ids: number[];
+}): Promise<number[] | null> =>
+  (await fetchPopularIds({ type, days, include: ids, limit: 100 }))?.ids ??
+  null;
 
 /** Popular results as a page, its "cursor" being how many are shown */
 function popularPageInfo(

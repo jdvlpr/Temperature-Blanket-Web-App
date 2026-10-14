@@ -4,6 +4,7 @@ import {
   matchesStatus,
   matchesYarn,
   patternIdOf,
+  sortGalleryPages,
   sortLibrary,
 } from './collection-filter.js';
 
@@ -97,5 +98,26 @@ describe('sortLibrary', () => {
       'B2',
       'b10',
     ]);
+  });
+});
+
+describe('sortGalleryPages', () => {
+  const pages = [
+    { databaseId: 1, date: '2024-01-01T00:00:00' },
+    { databaseId: 2, date: '2026-01-01T00:00:00' },
+    { databaseId: 3, date: '2025-01-01T00:00:00' },
+  ];
+  const ids = (list: typeof pages) => list.map((p) => p.databaseId);
+  it('sorts by date either way', () => {
+    expect(ids(sortGalleryPages(pages, 'DESC', null))).toEqual([2, 3, 1]);
+    expect(ids(sortGalleryPages(pages, 'ASC', [1]))).toEqual([1, 3, 2]);
+  });
+  it('sorts popular ones first, the rest newest first', () => {
+    expect(ids(sortGalleryPages(pages, 'POPULAR', [1]))).toEqual([1, 2, 3]);
+    expect(ids(sortGalleryPages(pages, 'POPULAR', [3, 1, 2]))).toEqual([
+      3, 1, 2,
+    ]);
+    // Not known yet: newest first
+    expect(ids(sortGalleryPages(pages, 'POPULAR', null))).toEqual([2, 3, 1]);
   });
 });

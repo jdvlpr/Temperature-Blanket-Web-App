@@ -16,16 +16,20 @@
 // The owner's yarn palettes.
 
 import type { PageServerLoad } from './$types';
-import { fetchPalettes, type OwnerPalette } from '../owner-gallery.js';
+import {
+  fetchPalettes,
+  fetchPopular,
+  type OwnerPalette,
+} from '../owner-gallery.js';
 
 export const prerender = false;
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { paletteIds } = await parent();
   // Asked for only with IDs: an empty `in` matches everything
-  return {
-    palettes: paletteIds.length
-      ? await fetchPalettes(paletteIds)
-      : ([] as OwnerPalette[]),
-  };
+  const [palettes, popular] = await Promise.all([
+    paletteIds.length ? fetchPalettes(paletteIds) : ([] as OwnerPalette[]),
+    fetchPopular('palette', paletteIds),
+  ]);
+  return { palettes, popular };
 };

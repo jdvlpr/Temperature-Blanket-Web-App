@@ -180,7 +180,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#snippet menus()}
           {#if yarnPaletteGalleryState.orderBy === 'POPULAR'}
-            <PopularPeriodMenu onchange={search} />
+            <PopularPeriodMenu
+              days={yarnPaletteGalleryState.popularDays}
+              onchange={(days) => {
+                yarnPaletteGalleryState.popularDays = days;
+                search();
+              }}
+            />
           {/if}
         {/snippet}
       </CollectionToolbar>

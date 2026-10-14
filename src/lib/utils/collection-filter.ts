@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// My Library's search, filters and sort, on what's saved here (the Gallery's
-// are answered by the server instead).
+// My Library's search, filters and sort, on what's saved here, and an owner's
+// gallery pages' (the Gallery's are answered by the server instead).
 
 import type { Color } from '#lib/types/yarn-types.js';
 
@@ -143,5 +143,31 @@ export function sortLibrary<T>(
     sort === 'name'
       ? direction * collator.compare(name(a), name(b))
       : direction * (time(b) - time(a)),
+  );
+}
+
+/**
+ * Gallery pages in a gallery sort: Popular as `popularIds` has them (any it
+ * leaves out, and all while it's not known, newest first after), or by date,
+ * newest (`DESC`) or oldest (`ASC`) first.
+ */
+export function sortGalleryPages<
+  T extends { databaseId: number; date: string },
+>(
+  items: readonly T[],
+  sort: 'POPULAR' | 'DESC' | 'ASC',
+  popularIds: readonly number[] | null,
+): T[] {
+  const time = (item: T) => Date.parse(item.date) || 0;
+  const byDate = [...items].sort((a, b) =>
+    sort === 'ASC' ? time(a) - time(b) : time(b) - time(a),
+  );
+  if (sort !== 'POPULAR' || !popularIds) return byDate;
+  const rank = new Map(popularIds.map((id, i) => [id, i]));
+  const last = popularIds.length;
+  // Stable, so those it leaves out stay newest first
+  return byDate.sort(
+    (a, b) =>
+      (rank.get(a.databaseId) ?? last) - (rank.get(b.databaseId) ?? last),
   );
 }
