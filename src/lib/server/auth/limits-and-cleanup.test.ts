@@ -2,8 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { cleanUpExpired } from './cleanup';
 import {
   allowCodeRequest,
+  allowIpCodeRequest,
   CODE_REQUESTS_PER_EMAIL,
   CODE_REQUEST_WINDOW_MS,
+  countEmailSent,
+  emailsLeftToday,
+  readLimit,
 } from './code-request-limit';
 import { createTestD1 } from '#lib/server/test-d1.js';
 
@@ -34,6 +38,58 @@ describe('allowCodeRequest', () => {
     const rows = sqlite.prepare('select "key" from "codeRequestLimit"').all();
     expect(rows).toHaveLength(1);
     expect(String(rows[0].key)).toMatch(/^[0-9a-f]{64}$/);
+  });
+});
+
+describe('allowIpCodeRequest', () => {
+  it('allows the limit per IP per hour, for any addresses, storing a hash', async () => {
+    const { d1, sqlite } = createTestD1();
+    const now = Date.parse('2026-09-25T10:00:00Z');
+    for (let i = 0; i < 3; i++)
+      expect(await allowIpCodeRequest(d1, '203.0.113.7', 3, now + i)).toBe(
+        true,
+      );
+    expect(await allowIpCodeRequest(d1, '203.0.113.7', 3, now + 10)).toBe(
+      false,
+    );
+    expect(await allowIpCodeRequest(d1, '203.0.113.8', 3, now + 10)).toBe(true);
+    expect(
+      await allowIpCodeRequest(
+        d1,
+        '203.0.113.7',
+        3,
+        now + CODE_REQUEST_WINDOW_MS,
+      ),
+    ).toBe(true);
+    const keys = sqlite
+      .prepare('select "key" from "codeRequestLimit"')
+      .all()
+      .map((row) => String(row.key));
+    expect(keys.every((key) => /^ip:[0-9a-f]{64}$/.test(key))).toBe(true);
+  });
+});
+
+describe('daily email limit', () => {
+  it('counts sends per UTC day, and checking doesn’t count', async () => {
+    const { d1 } = createTestD1();
+    const now = Date.parse('2026-09-25T10:00:00Z');
+    expect(await emailsLeftToday(d1, 2, now)).toBe(true);
+    expect(await emailsLeftToday(d1, 2, now)).toBe(true);
+    expect(await countEmailSent(d1, 2, now)).toBe(true);
+    expect(await countEmailSent(d1, 2, now + 1)).toBe(true);
+    expect(await emailsLeftToday(d1, 2, now + 2)).toBe(false);
+    expect(await countEmailSent(d1, 2, now + 2)).toBe(false);
+    // A new UTC day starts fresh
+    const tomorrow = Date.parse('2026-09-26T00:00:00Z');
+    expect(await emailsLeftToday(d1, 2, tomorrow)).toBe(true);
+    expect(await countEmailSent(d1, 2, tomorrow)).toBe(true);
+  });
+
+  it('reads limits, falling back when unset or not a whole number', () => {
+    expect(readLimit(undefined, 95, 'X')).toBe(95);
+    expect(readLimit(' 40 ', 95, 'X')).toBe(40);
+    expect(readLimit('0', 95, 'X')).toBe(0);
+    expect(readLimit('lots', 95, 'X')).toBe(95);
   });
 });
 

@@ -15,7 +15,12 @@
 
 // Shared by the wrangler e2e specs (pnpm test:e2e:cloudflare).
 
-import { expect, type APIRequestContext, type Page } from '@playwright/test';
+import {
+  expect,
+  type APIRequestContext,
+  type BrowserContext,
+  type Page,
+} from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 
 /** Polls the dev outbox for the newest code sent to an address. */
@@ -49,8 +54,37 @@ export async function latestCode(
 export const randomTestIp = () =>
   `10.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`;
 
+/**
+ * Gives a page's (or browser's) requests to the app its own test IP. Only the
+ * app's: Cloudflare refuses a CF-Connecting-IP header sent to its own sites,
+ * such as Turnstile's.
+ */
+export async function useTestIp(target: Page | BrowserContext) {
+  const ip = randomTestIp();
+  await target.route(
+    (url) => url.hostname === 'localhost',
+    (route) =>
+      route.fallback({
+        headers: { ...route.request().headers(), 'CF-Connecting-IP': ip },
+      }),
+  );
+}
+
 export const uniqueEmail = (label: string) =>
   `${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
+
+/**
+ * A Turnstile token for signed-out code requests. Cloudflare's always-pass
+ * test secret in wrangler.jsonc accepts it.
+ */
+export const TEST_TURNSTILE_HEADERS = {
+  'CF-Turnstile-Response': 'XXXX.DUMMY.TOKEN.XXXX',
+};
+
+/** Shows the email form, which waits behind "Use email instead" while Google is on. */
+export async function openEmailSignIn(page: Page) {
+  await page.getByRole('button', { name: 'Use email instead' }).click();
+}
 
 /** Signs in through the sign-in page and waits for the account page. */
 export async function signIn(
@@ -59,6 +93,7 @@ export async function signIn(
   email: string,
 ) {
   await page.goto('/auth/sign-in');
+  await openEmailSignIn(page);
   await page.getByLabel('Email').fill(email);
   await page.getByRole('button', { name: 'Email me a code' }).click();
   await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();

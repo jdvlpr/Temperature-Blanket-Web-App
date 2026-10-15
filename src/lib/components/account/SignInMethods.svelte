@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     providerErrorMessage,
     sendSignInCode,
     signInWithCode,
+    signInWithProvider,
     unlinkAccount,
     type LinkedAccount,
     type SignInProvider,
@@ -50,6 +51,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Set while waiting for a code to confirm an unlink
   let reconfirming: { id: SignInProvider; name: string } | null = $state(null);
   let code = $state('');
+  // Confirming with Google when it's linked (no email used), until a code is
+  // asked for instead
+  let withGoogle = $state(false);
 
   const isLinked = (provider: SignInProvider) =>
     linked.some((account) => account.providerId === provider);
@@ -89,18 +93,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
       reconfirming = null;
     } catch (e) {
       if (needsFreshSession(e)) {
-        // More than 10 minutes since sign-in: confirm with a new code first
-        try {
-          await sendSignInCode(email);
-          code = '';
-          reconfirming = provider;
-        } catch (sendError) {
-          errorMessage = accountErrorMessage(sendError);
-        }
+        // More than 10 minutes since sign-in: confirm it's you first
+        reconfirming = provider;
+        withGoogle = available.google && isLinked('google');
+        if (!withGoogle) await sendCode();
       } else {
         errorMessage = accountErrorMessage(e);
       }
     } finally {
+      busy = false;
+    }
+  }
+
+  async function sendCode() {
+    busy = true;
+    errorMessage = '';
+    try {
+      await sendSignInCode(email);
+      code = '';
+      withGoogle = false;
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
+      reconfirming = null;
+    } finally {
+      busy = false;
+    }
+  }
+
+  // Signing in with Google again makes a fresh session; back on the account
+  // page, unlinking works without a code
+  async function confirmWithGoogle() {
+    busy = true;
+    errorMessage = '';
+    try {
+      await signInWithProvider('google', '/account', '/account');
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
       busy = false;
     }
   }
@@ -169,7 +197,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/each}
   {/if}
-  {#if reconfirming}
+  {#if reconfirming && withGoogle}
+    <div class="flex flex-col gap-3 px-4 py-3" in:safeSlide>
+      <p>
+        To unlink {reconfirming.name}, confirm it’s you with Google, then choose
+        Unlink again.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="btn preset-outlined-surface-300-700 hover:preset-tonal-surface max-sm:w-full"
+          onclick={confirmWithGoogle}
+          disabled={busy}><GoogleIcon /> Confirm with Google</button
+        >
+        <button
+          type="button"
+          class="btn preset-tonal-surface max-sm:w-full"
+          onclick={() => (reconfirming = null)}
+          disabled={busy}>Cancel</button
+        >
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm hover:preset-tonal-surface w-fit"
+        onclick={sendCode}
+        disabled={busy}>Email me a code instead</button
+      >
+    </div>
+  {:else if reconfirming}
     <form
       class="flex flex-col gap-3 px-4 py-3"
       onsubmit={reconfirm}

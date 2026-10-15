@@ -16,12 +16,21 @@
 // Accounts are loaded only for /api/auth/* requests (see hooks.server.ts), so the
 // rest of the site never pays for them.
 
-import { getEmailSender } from '#lib/server/email/index.js';
+import { getEmailSender, type EmailMessage } from '#lib/server/email/index.js';
+import { TURNSTILE_HEADER, verifyTurnstile } from '#lib/server/turnstile.js';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { cleanUpExpired } from './cleanup';
-import { allowCodeRequest } from './code-request-limit';
+import {
+  allowCodeRequest,
+  allowIpCodeRequest,
+  CODE_REQUESTS_PER_IP,
+  countEmailSent,
+  EMAILS_PER_DAY,
+  emailsLeftToday,
+  readLimit,
+} from './code-request-limit';
 import { emailChangedNotice, signInCodeEmail } from './emails';
 import { withSignedInHint } from './hint-cookie';
 import { deleteUserProjectData } from '#lib/server/sync/store.js';
@@ -44,6 +53,32 @@ function runInBackground(promise: Promise<unknown>) {
   requestPlatform.getStore()?.ctx?.waitUntil(logged);
 }
 
+const dailyEmailLimit = (env: NonNullable<App.Platform['env']>) =>
+  readLimit(env.EMAIL_DAILY_LIMIT, EMAILS_PER_DAY, 'EMAIL_DAILY_LIMIT');
+
+// Only Resend's sends count against the daily limit; the dev outbox is free
+const emailIsCapped = (env: App.Platform['env']) =>
+  env?.EMAIL_SENDER === 'resend' && !!env.DB;
+
+/**
+ * Sends an email, if today's limit allows it. Every email is counted here,
+ * whichever route asked for it; requests check emailsLeftToday first so they
+ * can say so instead of claiming a code is on its way.
+ */
+async function sendEmail(
+  platform: App.Platform | undefined,
+  message: EmailMessage,
+) {
+  const env = platform?.env;
+  if (
+    env &&
+    emailIsCapped(env) &&
+    !(await countEmailSent(env.DB!, dailyEmailLimit(env)))
+  )
+    throw new Error('Daily email limit reached, so this email was not sent');
+  await getEmailSender(platform).send(message);
+}
+
 function createAuth(
   platform: App.Platform,
   settings: Extract<
@@ -55,10 +90,11 @@ function createAuth(
     buildAuthOptions({
       ...settings,
       database: platform.env!.DB!,
-      sendSignInCode: async (email, code, purpose) => {
-        const sender = getEmailSender(requestPlatform.getStore());
-        await sender.send(signInCodeEmail(email, code, purpose));
-      },
+      sendSignInCode: (email, code, purpose) =>
+        sendEmail(
+          requestPlatform.getStore(),
+          signInCodeEmail(email, code, purpose),
+        ),
       runInBackground,
       deleteUserData: async (userId) => {
         const env = requestPlatform.getStore()?.env;
@@ -130,21 +166,74 @@ export async function handleAuthRequest(
     // this email has an account, so it doesn't reveal which emails do
     let signUpsPaused = false;
 
-    if (isPost(event, '/api/auth/email-otp/send-verification-otp')) {
+    const sendsSignInCode = isPost(
+      event,
+      '/api/auth/email-otp/send-verification-otp',
+    );
+    // Both routes that email a code. (The password reset ones are disabled.)
+    if (
+      sendsSignInCode ||
+      isPost(event, '/api/auth/email-otp/request-email-change')
+    ) {
       const body = await jsonBody(event.request);
+      const env = platform!.env!;
+      const ip = event.request.headers.get('cf-connecting-ip');
+
+      // Signed out, a code request needs a Turnstile token, checked before
+      // the counters so bots can't fill them. A real session, not just a
+      // cookie: signed in, changing email or confirming it's you skips it
       if (
-        typeof body?.email === 'string' &&
-        !(await allowCodeRequest(db, body.email))
+        sendsSignInCode &&
+        !(await auth.api.getSession({ headers: event.request.headers }))
+      ) {
+        const turnstile = await verifyTurnstile({
+          token: event.request.headers.get(TURNSTILE_HEADER),
+          secret: env.TURNSTILE_SECRET_KEY,
+          remoteIp: ip,
+        });
+        if (turnstile !== 'ok')
+          return turnstile === 'rejected'
+            ? json(
+                {
+                  code: 'TURNSTILE_REJECTED',
+                  message: "We couldn't check that you're not a robot",
+                },
+                { status: 403 },
+              )
+            : json(
+                {
+                  code: 'TURNSTILE_UNAVAILABLE',
+                  message: "The check that you're not a robot isn't working",
+                },
+                { status: 503 },
+              );
+      }
+
+      const email = sendsSignInCode ? body?.email : body?.newEmail;
+      if (
+        // No address under plain vite dev
+        (ip &&
+          !(await allowIpCodeRequest(
+            db,
+            ip,
+            readLimit(
+              env.ACCOUNTS_CODE_LIMIT_PER_IP,
+              CODE_REQUESTS_PER_IP,
+              'ACCOUNTS_CODE_LIMIT_PER_IP',
+            ),
+          ))) ||
+        (typeof email === 'string' && !(await allowCodeRequest(db, email)))
       )
         return json(
           {
             code: 'TOO_MANY_REQUESTS',
-            message: 'Too many codes requested for this email',
+            message: 'Too many codes requested',
           },
           { status: 429 },
         );
 
       if (
+        sendsSignInCode &&
         body?.type === 'sign-in' &&
         typeof body.email === 'string' &&
         !(await signUpsOpen(
@@ -157,6 +246,18 @@ export async function handleAuthRequest(
           return json({ success: true, signUpsPaused: true });
         signUpsPaused = true;
       }
+
+      if (
+        emailIsCapped(env) &&
+        !(await emailsLeftToday(db, dailyEmailLimit(env)))
+      )
+        return json(
+          {
+            code: 'EMAIL_LIMIT_REACHED',
+            message: 'No more emails can be sent today',
+          },
+          { status: 503 },
+        );
     }
 
     if (isPost(event, '/api/auth/update-user')) {
@@ -194,7 +295,8 @@ export async function handleAuthRequest(
 
     if (emailChange && response.ok)
       runInBackground(
-        getEmailSender(platform).send(
+        sendEmail(
+          platform,
           emailChangedNotice(emailChange.from, emailChange.to),
         ),
       );

@@ -38,13 +38,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     MailCheckIcon,
     MailIcon,
   } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
+  import Turnstile from '#lib/components/Turnstile.svelte';
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';
   import GoogleIcon from './GoogleIcon.svelte';
 
-  const CODE_LIFETIME_MS = 5 * 60 * 1000;
-  const RESEND_WAIT_MS = 30 * 1000;
+  const CODE_LIFETIME_MS = 10 * 60 * 1000;
+  const RESEND_WAIT_MS = 60 * 1000;
 
   let {
     redirectTo = '/account',
@@ -67,6 +68,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // The page is prerendered: until it hydrates, submitting would reload it
   let ready = $state(false);
   let providers: Record<SignInProvider, boolean> = $state({ google: false });
+  let providersLoaded = $state(false);
+  // With Google on, the email form waits behind "Use email instead": Google
+  // sign-ins don't use up the daily email limit
+  let showEmail = $state(false);
+  let emailOpen = $derived(providersLoaded && (!providers.google || showEmail));
+  let emailInput = $state<HTMLInputElement>();
+  let turnstile = $state<Turnstile>();
   let sentAt = $state(0);
   let now = $state(Date.now());
 
@@ -93,7 +101,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const error = new URL(window.location.href).searchParams.get('error');
     if (error) errorMessage = providerErrorMessage(error);
     providers = await getSignInOptions();
+    providersLoaded = true;
   });
+
+  async function openEmail() {
+    showEmail = true;
+    await tick();
+    emailInput?.focus();
+  }
+
+  /** A Turnstile token for the code request; signed out, the server needs one. */
+  async function turnstileToken() {
+    try {
+      if (!turnstile) throw new Error('No Turnstile');
+      return await turnstile.getToken();
+    } catch {
+      throw new AccountError(503, 'TURNSTILE_UNAVAILABLE', 'Turnstile failed');
+    }
+  }
 
   async function continueWith(provider: SignInProvider) {
     errorMessage = '';
@@ -111,13 +136,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     noticeMessage = '';
     busy = true;
     try {
-      ({ signUpsPaused = false } = await sendSignInCode(email.trim()));
+      ({ signUpsPaused = false } = await sendSignInCode(
+        email.trim(),
+        await turnstileToken(),
+      ));
       code = '';
       sentAt = now = Date.now();
       step = 'code';
       return true;
     } catch (e) {
       errorMessage = accountErrorMessage(e);
+      if (
+        e instanceof AccountError &&
+        e.code === 'EMAIL_LIMIT_REACHED' &&
+        providers.google
+      )
+        errorMessage += ' Or continue with Google.';
       return false;
     } finally {
       busy = false;
@@ -160,6 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function changeEmail() {
     step = 'email';
+    showEmail = true;
     errorMessage = '';
     noticeMessage = '';
   }
@@ -177,49 +212,69 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => continueWith('google')}
           disabled={busy}><GoogleIcon /> Continue with Google</button
         >
-        <div
-          class="flex items-center gap-3 text-sm opacity-70"
-          role="separator"
-        >
-          <hr class="border-surface-300-700 flex-1" />
-          or
-          <hr class="border-surface-300-700 flex-1" />
-        </div>
+        {#if emailOpen}
+          <div
+            class="flex items-center gap-3 text-sm opacity-70"
+            role="separator"
+          >
+            <hr class="border-surface-300-700 flex-1" />
+            or
+            <hr class="border-surface-300-700 flex-1" />
+          </div>
+        {/if}
       {/if}
-      <form class="flex flex-col gap-4" onsubmit={requestCode}>
-        <label class="label">
-          <span class="label-text">Email</span>
-          <input
-            type="email"
-            class="input h-12"
-            autocomplete="email"
-            autocapitalize="off"
-            spellcheck="false"
-            inputmode="email"
-            enterkeyhint="send"
-            placeholder="you@example.com"
-            required
-            bind:value={email}
-            disabled={busy}
-          />
-        </label>
+      {#if !providersLoaded}
+        <!-- Until it's known whether Google is on, so the form doesn't show, then hide -->
+        <div class="h-12" aria-hidden="true"></div>
+      {:else if !emailOpen}
         {#if errorMessage}
-          <p class="text-error-700-300" role="alert">{errorMessage}</p>
+          <p class="text-error-700-300 text-center" role="alert">
+            {errorMessage}
+          </p>
         {/if}
         <button
-          type="submit"
-          class="btn preset-filled-primary-500 h-12 w-full"
-          disabled={busy || !ready}
+          type="button"
+          class="btn btn-sm hover:preset-tonal-surface self-center"
+          onclick={openEmail}
+          disabled={busy}><MailIcon /> Use email instead</button
         >
-          {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<MailIcon
-            />{/if}
-          Email me a code
-        </button>
-        <p class="text-center text-sm opacity-80">
-          You don't need a password for this web app. Instead, you'll be emailed
-          sign-in codes.
-        </p>
-      </form>
+      {:else}
+        <form class="flex flex-col gap-4" onsubmit={requestCode} in:safeSlide>
+          <label class="label">
+            <span class="label-text">Email</span>
+            <input
+              type="email"
+              class="input h-12"
+              autocomplete="email"
+              autocapitalize="off"
+              spellcheck="false"
+              inputmode="email"
+              enterkeyhint="send"
+              placeholder="you@example.com"
+              required
+              bind:value={email}
+              bind:this={emailInput}
+              disabled={busy}
+            />
+          </label>
+          {#if errorMessage}
+            <p class="text-error-700-300" role="alert">{errorMessage}</p>
+          {/if}
+          <button
+            type="submit"
+            class="btn preset-filled-primary-500 h-12 w-full"
+            disabled={busy || !ready}
+          >
+            {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<MailIcon
+              />{/if}
+            Email me a code
+          </button>
+          <p class="text-center text-sm opacity-80">
+            You don't need a password for this web app. Instead, you'll be
+            emailed sign-in codes.
+          </p>
+        </form>
+      {/if}
     </div>
   {:else}
     <form class="flex flex-col gap-4" onsubmit={submitCode} in:safeSlide>
@@ -281,4 +336,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </form>
   {/if}
+  <!-- Outside both steps, so a resend can use it too; shows only when
+  Cloudflare needs you to do something -->
+  <Turnstile bind:this={turnstile} />
 </div>

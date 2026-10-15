@@ -16,16 +16,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     accountErrorMessage,
+    canConfirmWithGoogle,
     clearSignedInHint,
     deleteAccount,
     needsFreshSession,
     sendSignInCode,
     signInWithCode,
+    signInWithProvider,
   } from '#lib/accounts/client.js';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { LoaderCircleIcon, Trash2Icon } from '@lucide/svelte';
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';
+  import GoogleIcon from './GoogleIcon.svelte';
 
   let {
     email,
@@ -44,6 +47,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let code = $state('');
   let busy = $state(false);
   let errorMessage = $state('');
+  // Confirming it's you: with Google when it's linked (no email used), until
+  // a code is asked for instead
+  let withGoogle = $state(false);
 
   async function remove() {
     busy = true;
@@ -64,18 +70,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ondeleted();
     } catch (e) {
       if (needsFreshSession(e)) {
-        // More than 10 minutes since sign-in: confirm with a new code first
-        try {
-          await sendSignInCode(email);
-          code = '';
-          step = 'reconfirm';
-        } catch (sendError) {
-          errorMessage = accountErrorMessage(sendError);
-        }
+        // More than 10 minutes since sign-in: confirm it's you first
+        withGoogle = await canConfirmWithGoogle();
+        if (withGoogle) step = 'reconfirm';
+        else await sendCode();
       } else {
         errorMessage = accountErrorMessage(e);
       }
     } finally {
+      busy = false;
+    }
+  }
+
+  async function sendCode() {
+    busy = true;
+    errorMessage = '';
+    try {
+      await sendSignInCode(email);
+      code = '';
+      withGoogle = false;
+      step = 'reconfirm';
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
+    } finally {
+      busy = false;
+    }
+  }
+
+  // Signing in with Google again makes a fresh session; back on the account
+  // page, deleting works without a code
+  async function confirmWithGoogle() {
+    busy = true;
+    errorMessage = '';
+    try {
+      await signInWithProvider('google', '/account', '/account');
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
       busy = false;
     }
   }
@@ -157,6 +187,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={busy}>Cancel</button
         >
       </div>
+    </div>
+  {:else if withGoogle}
+    <div class="flex flex-col gap-3" in:safeSlide>
+      <p>
+        To delete your account, confirm it’s you with Google, then choose Delete
+        account again.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="btn preset-outlined-surface-300-700 hover:preset-tonal-surface max-sm:w-full"
+          onclick={confirmWithGoogle}
+          disabled={busy}><GoogleIcon /> Confirm with Google</button
+        >
+        <button
+          type="button"
+          class="btn preset-tonal-surface max-sm:w-full"
+          onclick={() => (step = 'idle')}
+          disabled={busy}>Cancel</button
+        >
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm hover:preset-tonal-surface w-fit"
+        onclick={sendCode}
+        disabled={busy}>Email me a code instead</button
+      >
     </div>
   {:else}
     <form class="flex flex-col gap-3" onsubmit={reconfirm} in:safeSlide>

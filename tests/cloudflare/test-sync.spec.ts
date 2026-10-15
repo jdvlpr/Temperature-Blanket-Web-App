@@ -25,7 +25,7 @@ import {
   type BrowserContext,
   type Page,
 } from '@playwright/test';
-import { idbSet, localD1, randomTestIp, signIn, uniqueEmail } from './helpers';
+import { idbSet, localD1, signIn, uniqueEmail, useTestIp } from './helpers';
 
 // A sync pass is several requests, slower while the other specs run alongside
 const expect = baseExpect.configure({ timeout: 15_000 });
@@ -45,9 +45,8 @@ type IndexItem = {
 
 /** A new browser, as another device would be. */
 async function device(browser: Browser, baseURL: string) {
-  const context = await browser.newContext({
-    extraHTTPHeaders: { 'CF-Connecting-IP': randomTestIp() },
-  });
+  const context = await browser.newContext();
+  await useTestIp(context);
   // Pre-answer the analytics consent toast, which covers bottom buttons
   await context.addCookies([
     { name: '_clck', value: '1', url: baseURL },
@@ -358,7 +357,11 @@ test.describe('Sync in the browser', () => {
     // Everything synced: no question, and the project leaves the laptop
     await laptop.goto('/account');
     await laptop.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(laptop.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      laptop.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     await expect(laptop.getByRole('dialog')).toHaveCount(0);
     expect(await savedIndex(laptop)).toEqual([]);
 
@@ -383,7 +386,11 @@ test.describe('Sync in the browser', () => {
       .getByRole('dialog')
       .getByRole('button', { name: 'Sign out', exact: true })
       .click();
-    await expect(phone.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      phone.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     const kept = await savedIndex(phone);
     expect(kept.map((i) => i.meta.title)).toEqual(['Not synced yet']);
     expect(kept[0].sync).toBeUndefined();
@@ -416,7 +423,11 @@ test.describe('Sync in the browser', () => {
     // Visiting the account page finds the session over and forgets the account;
     // the project still shows
     await phone.goto('/account');
-    await expect(phone.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      phone.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     await openSavedProjects(phone);
     await expect(phone.getByRole('link', { name: 'Still here' })).toBeVisible();
     await expect(phone.getByTestId('sync-label')).toHaveText('Sign in to sync');
@@ -512,21 +523,13 @@ async function choosePattern(page: Page, label: string) {
   await page.locator('#select-pattern-type').selectOption({ label });
 }
 
-/**
- * Two devices for the Project Planner: the test IP header goes only to this
- * site, since weather services reject cross-site requests that carry it.
- */
+/** Two devices for the Project Planner (useTestIp keeps the IP header to this site). */
 async function plannerDevices(browser: Browser, baseURL: string) {
   const pages: Page[] = [];
   for (let i = 0; i < 2; i++) {
     const context = await browser.newContext();
     contexts.push(context);
-    const ip = randomTestIp();
-    await context.route(`${new URL(baseURL).origin}/**`, (route) =>
-      route.continue({
-        headers: { ...route.request().headers(), 'CF-Connecting-IP': ip },
-      }),
-    );
+    await useTestIp(context);
     await context.addCookies([
       { name: '_clck', value: '1', url: baseURL },
       { name: '_clsk', value: '1', url: baseURL },

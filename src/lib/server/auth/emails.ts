@@ -33,7 +33,7 @@ function codeEmailHtml(action: string, code: string): string {
 <p style="margin:0 0 4px;font-size:15px;color:#3d6b8c;font-weight:600">Temperature Blanket</p>
 <p style="margin:0 0 20px;font-size:16px">Your code to ${action}:</p>
 <p style="margin:0 0 20px;font-size:36px;font-weight:700;letter-spacing:8px;font-family:ui-monospace,Menlo,Consolas,monospace;background:#fdf3e1;border-radius:12px;padding:14px 0 14px 8px">${code}</p>
-<p style="margin:0 0 24px;font-size:14px;color:#52606d">It expires in 5 minutes. If you didn’t ask for it, you can ignore this email.</p>
+<p style="margin:0 0 24px;font-size:14px;color:#52606d">It expires in 10 minutes. If you didn’t ask for it, you can ignore this email.</p>
 </td></tr>
 </table>
 <p style="text-align:center;font-size:12px;color:#7b8794;margin:16px 0 0">temperature-blanket.com</p>
@@ -61,7 +61,7 @@ export function signInCodeEmail(
       '',
       code,
       '',
-      'It expires in 5 minutes. If you didn’t ask for it, you can ignore this email.',
+      'It expires in 10 minutes. If you didn’t ask for it, you can ignore this email.',
     ].join('\n'),
     // The code is only digits and the action a fixed phrase, so nothing needs escaping
     html: codeEmailHtml(action, code),

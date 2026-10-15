@@ -35,3 +35,14 @@ describe('creating a user', () => {
     });
   });
 });
+
+describe('email codes', () => {
+  it('turns off the password reset routes, which would email codes', () => {
+    expect(config().disabledPaths).toEqual(
+      expect.arrayContaining([
+        '/email-otp/request-password-reset',
+        '/forget-password/email-otp',
+      ]),
+    );
+  });
+});

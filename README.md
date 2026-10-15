@@ -59,22 +59,25 @@ Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact vers
 
 Server settings, read from the Cloudflare environment (local values are in `wrangler.jsonc`):
 
-| Variable                                   | Purpose                                                                                                                                                               |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ACCOUNTS_ENABLED`                         | `"true"` turns on `/api/auth/*`; anything else returns 404                                                                                                            |
-| `BETTER_AUTH_SECRET`                       | At least 32 characters; signs session cookies. Set as an encrypted secret in production                                                                               |
-| `AUTH_ALLOWED_HOSTS`                       | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews                                                    |
-| `AUTH_PROTOCOL`                            | `https` (default), `http`, or `auto`                                                                                                                                  |
-| `EMAIL_SENDER`                             | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503 |
-| `RESEND_API_KEY`, `EMAIL_FROM`             | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                        |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                            |
-| `ACCOUNTS_SIGNUP_LIMIT`                    | Optional: the most accounts there may be. Unset means no limit, `0` closes sign-ups. Existing accounts keep signing in either way                                     |
+| Variable                                   | Purpose                                                                                                                                                                 |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACCOUNTS_ENABLED`                         | `"true"` turns on `/api/auth/*`; anything else returns 404                                                                                                              |
+| `BETTER_AUTH_SECRET`                       | At least 32 characters; signs session cookies. Set as an encrypted secret in production                                                                                 |
+| `AUTH_ALLOWED_HOSTS`                       | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews                                                      |
+| `AUTH_PROTOCOL`                            | `https` (default), `http`, or `auto`                                                                                                                                    |
+| `EMAIL_SENDER`                             | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503   |
+| `RESEND_API_KEY`, `EMAIL_FROM`             | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                          |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                              |
+| `ACCOUNTS_SIGNUP_LIMIT`                    | Optional: the most accounts there may be. Unset means no limit, `0` closes sign-ups. Existing accounts keep signing in either way                                       |
+| `ACCOUNTS_CODE_LIMIT_PER_IP`               | Optional: emailed codes one IP address may request an hour, for any addresses (default 10). Each address also gets at most 5 an hour                                    |
+| `EMAIL_DAILY_LIMIT`                        | Optional: emails Resend may send per UTC day (default 95, under the free plan's 100 a day and 3,000 a month). Past it, code requests say so (503 `EMAIL_LIMIT_REACHED`) |
+| `TURNSTILE_SECRET_KEY`                     | Also checks signed-out code requests (with `PUBLIC_TURNSTILE_SITE_KEY` at build time). Without it, signed-out email sign-in is refused; Google still works              |
 
 Secrets for local development (for example real Google credentials) go in `.dev.vars`, which wrangler reads and git ignores.
 
 Saved projects, palettes and some preferences sync to the signed-in account through `/api/sync` (metadata, palettes and preferences in D1, gzipped project JSON in R2; see `src/lib/sync/protocol.ts`). The server needs `SYNC_ENABLED=true` and the `PROJECTS` R2 binding; every account may sync.
 
-To try accounts in the dev server, run `pnpm dev:accounts` (`pnpm dev` with `PUBLIC_ACCOUNTS_ENABLED=true`). No real email is sent: open `/api/dev/outbox?to=<email>` to read the code. It works over HTTPS on the tailnet too (`AUTH_ALLOWED_HOSTS` allows `*.ts.net:5173`). For Google, put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.dev.vars`, add `https://<host>:5173/api/auth/callback/google` as a redirect URI on the Google client, and restart the dev server.
+To try accounts in the dev server, run `pnpm dev:accounts` (`pnpm dev` with `PUBLIC_ACCOUNTS_ENABLED=true`). No real email is sent: open `/api/dev/outbox?to=<email>` to read the code. Email sign-in needs `PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA` in `.env` (the test site key that pairs with the test secret in `wrangler.jsonc`). It works over HTTPS on the tailnet too (`AUTH_ALLOWED_HOSTS` allows `*.ts.net:5173`). For Google, put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.dev.vars`, add `https://<host>:5173/api/auth/callback/google` as a redirect URI on the Google client, and restart the dev server.
 
 After changing Better Auth plugins or options, generate the matching migration and apply it:
 

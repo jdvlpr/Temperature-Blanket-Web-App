@@ -78,6 +78,13 @@ export function buildAuthOptions(config: AuthConfig) {
     database: config.database,
     // No passwords: sign in with an emailed code or Google
     emailAndPassword: { enabled: false },
+    // The email OTP plugin's password reset routes email codes too; with no
+    // passwords they're only a way to spend the daily email limit
+    disabledPaths: [
+      '/email-otp/request-password-reset',
+      '/forget-password/email-otp',
+      '/email-otp/reset-password',
+    ],
     session: {
       expiresIn: SESSION_EXPIRES_DAYS * DAY,
       // Extend the session at most once a day while it's in use
@@ -161,7 +168,7 @@ export function buildAuthOptions(config: AuthConfig) {
     plugins: [
       emailOTP({
         otpLength: 6,
-        expiresIn: 5 * 60,
+        expiresIn: 10 * 60,
         allowedAttempts: 3,
         storeOTP: 'hashed',
         // A code to the current address and another to the new one

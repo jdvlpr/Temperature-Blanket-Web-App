@@ -25,14 +25,17 @@ import {
 import { execFileSync } from 'node:child_process';
 import {
   latestCode,
+  openEmailSignIn,
+  TEST_TURNSTILE_HEADERS,
   localD1,
   randomTestIp,
   signIn,
   uniqueEmail,
+  useTestIp,
 } from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
-  await page.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
+  await useTestIp(page);
   // Pre-answer the analytics consent toast, which otherwise covers buttons at the
   // bottom of the page (as in test-project-planner.spec.ts)
   await context.addCookies([
@@ -46,6 +49,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const email = uniqueEmail('sign-in');
 
     await page.goto('/auth/sign-in');
+    await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
     await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();
@@ -60,9 +64,17 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await expect(page.getByTestId('account-email')).toHaveText(email);
 
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     await page.reload();
-    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
   });
 
   test('the account menu in the top bar shows the account and signs out', async ({
@@ -105,6 +117,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const email = uniqueEmail('wrong-code');
 
     await page.goto('/auth/sign-in');
+    await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
     const code = await latestCode(request, email);
@@ -124,6 +137,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
   }) => {
     const email = uniqueEmail('redirect');
     await page.goto('/auth/sign-in?redirect=/faq');
+    await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
     // Pasted codes may carry spaces
@@ -134,8 +148,13 @@ test.describe('Accounts: sign in with an emailed code', () => {
     // A redirect to another site is ignored
     await page.goto('/account');
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     await page.goto('/auth/sign-in?redirect=//evil.example');
+    await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
     await page.getByLabel('Code').fill(await latestCode(request, email, code));
@@ -148,7 +167,12 @@ test.describe('Accounts: sign in with an emailed code', () => {
   }) => {
     const email = uniqueEmail('in-place');
     await page.goto('/account');
-    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
+    await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
     await page.getByLabel('Code').fill(await latestCode(request, email));
@@ -163,6 +187,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
         headers: {
           Origin: 'https://evil.example',
           'CF-Connecting-IP': randomTestIp(),
+          ...TEST_TURNSTILE_HEADERS,
         },
         data: { email: uniqueEmail('csrf'), type: 'sign-in' },
       },
@@ -174,7 +199,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const ip = randomTestIp();
     const send = () =>
       request.post('/api/auth/email-otp/send-verification-otp', {
-        headers: { 'CF-Connecting-IP': ip },
+        headers: { 'CF-Connecting-IP': ip, ...TEST_TURNSTILE_HEADERS },
         data: { email: uniqueEmail('rate-limit'), type: 'sign-in' },
       });
     // The email code plugin allows 3 a minute
@@ -188,13 +213,45 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const email = uniqueEmail('per-email');
     const send = () =>
       request.post('/api/auth/email-otp/send-verification-otp', {
-        headers: { 'CF-Connecting-IP': randomTestIp() },
+        headers: {
+          'CF-Connecting-IP': randomTestIp(),
+          ...TEST_TURNSTILE_HEADERS,
+        },
         data: { email, type: 'sign-in' },
       });
     for (let i = 0; i < 5; i++) expect((await send()).status()).toBe(200);
     const blocked = await send();
     expect(blocked.status()).toBe(429);
     expect((await blocked.json()).code).toBe('TOO_MANY_REQUESTS');
+  });
+
+  test('signed out, a code request needs a Turnstile token', async ({
+    request,
+  }) => {
+    const response = await request.post(
+      '/api/auth/email-otp/send-verification-otp',
+      {
+        headers: { 'CF-Connecting-IP': randomTestIp() },
+        data: { email: uniqueEmail('no-turnstile'), type: 'sign-in' },
+      },
+    );
+    expect(response.status()).toBe(403);
+    expect((await response.json()).code).toBe('TURNSTILE_REJECTED');
+  });
+
+  test('the password reset routes, which would email codes, are off', async ({
+    request,
+  }) => {
+    for (const path of [
+      '/api/auth/email-otp/request-password-reset',
+      '/api/auth/forget-password/email-otp',
+    ]) {
+      const response = await request.post(path, {
+        headers: { 'CF-Connecting-IP': randomTestIp() },
+        data: { email: uniqueEmail('reset') },
+      });
+      expect(response.status()).toBe(404);
+    }
   });
 });
 
@@ -211,7 +268,11 @@ test.describe('Accounts: signed-in hint and sessions', () => {
     });
 
     await page.goto('/account');
-    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     expect(sessionRequests).toHaveLength(0);
 
     await signIn(page, request, uniqueEmail('hint'));
@@ -223,7 +284,11 @@ test.describe('Accounts: signed-in hint and sessions', () => {
     expect(session?.httpOnly).toBe(true);
 
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      page.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
     expect(
       (await context.cookies()).some((c) => c.name === 'tb_signed_in'),
     ).toBe(false);
@@ -240,17 +305,25 @@ test.describe('Accounts: signed-in hint and sessions', () => {
     ]);
     const pageA = await first.newPage();
     const pageB = await second.newPage();
-    await pageA.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
-    await pageB.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
+    await useTestIp(pageA);
+    await useTestIp(pageB);
 
     await signIn(pageA, request, email);
     await signIn(pageB, request, email);
 
     await pageA.getByRole('button', { name: 'Sign out everywhere' }).click();
-    await expect(pageA.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      pageA.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
 
     await pageB.reload();
-    await expect(pageB.getByText('You’re not signed in.')).toBeVisible();
+    await expect(
+      pageB.getByText(
+        'Sign in to keep your projects and yarn palettes on all your devices.',
+      ),
+    ).toBeVisible();
 
     await Promise.all([first.close(), second.close()]);
   });
@@ -450,12 +523,12 @@ test.describe('Accounts: Google', () => {
     await expect(google.getByText('Linked')).toBeVisible();
     await google.getByRole('button', { name: 'Unlink Google' }).click();
     await expect(
-      google.getByRole('button', { name: 'Link Google' }),
+      google.getByRole('button', { name: 'Link Google', exact: true }),
     ).toBeVisible();
     expect(googleAccountCount(userId)).toBe(0);
   });
 
-  test('unlink with an old session asks for a new code first', async ({
+  test('unlink with an old session offers Google, or a new code', async ({
     page,
     request,
   }) => {
@@ -474,12 +547,17 @@ test.describe('Accounts: Google', () => {
 
     const google = page.getByTestId('provider-google');
     await google.getByRole('button', { name: 'Unlink Google' }).click();
+    // Google is linked, so confirming with it comes first: no email sent
     await expect(
-      page.getByText('To unlink Google, confirm it’s you'),
+      page.getByRole('button', { name: 'Confirm with Google' }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Email me a code instead' }).click();
+    await expect(
+      page.getByText('To unlink Google, confirm it’s you: we sent a code'),
     ).toBeVisible();
     await page.getByLabel('Code').fill(await latestCode(request, email));
     await expect(
-      google.getByRole('button', { name: 'Link Google' }),
+      google.getByRole('button', { name: 'Link Google', exact: true }),
     ).toBeVisible();
     expect(googleAccountCount(userId)).toBe(0);
   });

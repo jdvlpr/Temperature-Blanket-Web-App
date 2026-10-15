@@ -15,6 +15,8 @@
 
 // Browser-side calls to the account API (Better Auth, under /api/auth).
 
+import { TURNSTILE_HEADER } from '#lib/utils/turnstile.js';
+
 export type AccountUser = {
   id: string;
   email: string;
@@ -52,7 +54,13 @@ export function accountErrorMessage(error: unknown): string {
   if (!(error instanceof AccountError))
     return 'Something went wrong. Check your connection and try again.';
   if (error.code === 'TOO_MANY_REQUESTS')
-    return 'Too many codes have been sent to this email. Try again in an hour.';
+    return 'Too many codes have been requested. Try again in an hour.';
+  if (error.code === 'EMAIL_LIMIT_REACHED')
+    return 'We can’t send any more emails today. Try again tomorrow.';
+  if (error.code === 'TURNSTILE_REJECTED')
+    return 'We couldn’t check that you’re not a robot. Try again.';
+  if (error.code === 'TURNSTILE_UNAVAILABLE')
+    return 'The check that you’re not a robot isn’t working right now. Try again later.';
   if (error.code === 'NAME_TOO_LONG') return 'Use 80 characters or fewer.';
   if (error.code === 'SIGN_UPS_PAUSED') return SIGN_UPS_PAUSED_MESSAGE;
   if (error.code === 'TOO_MANY_ATTEMPTS')
@@ -67,7 +75,11 @@ export function accountErrorMessage(error: unknown): string {
   return 'Something went wrong. Try again.';
 }
 
-async function call<T>(path: string, body?: unknown): Promise<T> {
+async function call<T>(
+  path: string,
+  body?: unknown,
+  headers: Record<string, string> = {},
+): Promise<T> {
   let response: Response;
   try {
     response = await fetch(
@@ -76,7 +88,7 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
         ? {}
         : {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...headers },
             body: JSON.stringify(body),
           },
     );
@@ -95,15 +107,17 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
 
 /**
  * Sends a sign-in code. With signUpsPaused, only an email that already has an
- * account gets one (the reply is the same either way).
+ * account gets one (the reply is the same either way). Signed out, it needs a
+ * Turnstile token.
  */
-export const sendSignInCode = (email: string) =>
+export const sendSignInCode = (email: string, turnstileToken?: string) =>
   call<{ success: boolean; signUpsPaused?: boolean }>(
     '/email-otp/send-verification-otp',
     {
       email,
       type: 'sign-in',
     },
+    turnstileToken ? { [TURNSTILE_HEADER]: turnstileToken } : {},
   );
 
 export const signInWithCode = (email: string, otp: string) =>
@@ -195,6 +209,19 @@ export async function linkProvider(provider: SignInProvider) {
 export type LinkedAccount = { id: string; providerId: string };
 
 export const listLinkedAccounts = () => call<LinkedAccount[]>('/list-accounts');
+
+/**
+ * Whether the signed-in account can confirm it's you with Google (Google
+ * sign-in is on and linked) instead of with an emailed code.
+ */
+export async function canConfirmWithGoogle(): Promise<boolean> {
+  try {
+    if (!(await getSignInOptions()).google) return false;
+    return (await listLinkedAccounts()).some((a) => a.providerId === 'google');
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Unlinks one linked account, by its record ID from listLinkedAccounts. Needs a

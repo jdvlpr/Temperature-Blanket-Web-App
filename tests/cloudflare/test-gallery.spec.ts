@@ -19,10 +19,10 @@
 // Local WordPress site (see the plugin's dev/README.md).
 
 import { expect, test } from '@playwright/test';
-import { idbSet, localD1, randomTestIp, signIn, uniqueEmail } from './helpers';
+import { idbSet, localD1, signIn, uniqueEmail, useTestIp } from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
-  await page.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
+  await useTestIp(page);
   await context.addCookies([
     { name: '_clck', value: '1', url: baseURL },
     { name: '_clsk', value: '1', url: baseURL },

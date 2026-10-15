@@ -26,7 +26,13 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { gunzipSync, gzipSync } from 'node:zlib';
 import { SYNC_HEADERS } from '../../src/lib/sync/protocol';
-import { latestCode, localD1, randomTestIp, uniqueEmail } from './helpers';
+import {
+  latestCode,
+  localD1,
+  randomTestIp,
+  TEST_TURNSTILE_HEADERS,
+  uniqueEmail,
+} from './helpers';
 
 /** An API client signed in with an emailed code. */
 async function signedInApi(
@@ -38,6 +44,7 @@ async function signedInApi(
     extraHTTPHeaders: { Origin: baseURL, 'CF-Connecting-IP': randomTestIp() },
   });
   const sent = await api.post('/api/auth/email-otp/send-verification-otp', {
+    headers: TEST_TURNSTILE_HEADERS,
     data: { email, type: 'sign-in' },
   });
   expect(sent.ok()).toBe(true);

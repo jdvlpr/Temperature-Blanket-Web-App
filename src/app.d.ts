@@ -21,6 +21,8 @@ declare global {
         EMAIL_SENDER?: string;
         ACCOUNTS_ENABLED?: string;
         ACCOUNTS_SIGNUP_LIMIT?: string;
+        ACCOUNTS_CODE_LIMIT_PER_IP?: string;
+        EMAIL_DAILY_LIMIT?: string;
         BETTER_AUTH_SECRET?: string;
         AUTH_ALLOWED_HOSTS?: string;
         AUTH_PROTOCOL?: string;

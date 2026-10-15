@@ -207,16 +207,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <li>
               <span class="font-bold">Security records</span>: to prevent abuse,
               counts of recent sign-in requests from each IP address, and of
-              sign-in codes requested for each email address (stored in a
-              scrambled form that can’t be turned back into the address). These
-              are kept for about a day.
+              sign-in codes requested for each IP address and email address
+              (stored in a scrambled form that can’t be turned back into the
+              address). These are kept for about a day. Before emailing you a
+              code while you’re signed out, Cloudflare Turnstile checks that
+              you’re not a robot.
             </li>
           </ul>
 
           <p class="font-bold">How long it is kept</p>
           <p>
             Your account data is kept until you delete your account. Sign-in
-            codes expire after 5 minutes. When you change a synced project, the
+            codes expire after 10 minutes. When you change a synced project, the
             previous version is kept for about a day before it is deleted. When
             you remove a synced project, a small record of its removal,
             including its title, is kept for up to 180 days so your other
