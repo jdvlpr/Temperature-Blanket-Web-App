@@ -19,6 +19,7 @@
 import type { BetterAuthOptions } from 'better-auth';
 import { APIError } from 'better-auth/api';
 import { emailOTP } from 'better-auth/plugins/email-otp';
+import { genericOAuth } from 'better-auth/plugins/generic-oauth';
 import { cleanName } from '../../utils/clean-name';
 
 export type SignInCodePurpose =
@@ -42,6 +43,8 @@ export type AuthConfig = {
   validateSchema: boolean;
   /** Sign in with Google, when configured */
   google?: { clientId: string; clientSecret: string };
+  /** Link a Ravelry account, when configured. Never a way to sign in */
+  ravelry?: { clientId: string; clientSecret: string };
   /** Sign in with an emailed code (EMAIL_SIGN_IN); off in production, where Google is the only way in */
   emailSignIn: boolean;
   /** Deletes what the account stores outside the auth tables (synced projects in R2), and releases its gallery pages */
@@ -53,6 +56,8 @@ export type AuthConfig = {
 export const AUTH_BASE_PATH = '/api/auth';
 export const SESSION_EXPIRES_DAYS = 60;
 export const MAX_DISPLAY_NAME_LENGTH = 80;
+/** The provider ID of a linked Ravelry account (see $lib/server/ravelry) */
+export const RAVELRY_PROVIDER_ID = 'ravelry';
 /** The error code, and ?error= after Google, when sign-ups are closed or full */
 export const SIGN_UPS_PAUSED = 'SIGN_UPS_PAUSED';
 
@@ -110,10 +115,15 @@ export function buildAuthOptions(config: AuthConfig) {
       backgroundTasks: { handler: config.runInBackground },
     },
     account: {
-      // Sign-in doesn't need provider tokens afterwards; don't keep them readable
+      // Google's tokens aren't needed after sign-in; Ravelry's are, for calls
+      // to its API from the server only. Neither is kept readable
       encryptOAuthTokens: true,
       accountLinking: {
         enabled: true,
+        // Ravelry shares no email, so none can be verified; linking happens
+        // only while signed in, and Ravelry can't sign in (no email, and
+        // handleAuthRequest refuses it)
+        trustedProviders: config.ravelry ? [RAVELRY_PROVIDER_ID] : [],
         // Linking happens while signed in, so a Google account with another address is fine
         allowDifferentEmails: true,
         // Only with emailed codes is there still a way in after unlinking the last provider
@@ -167,22 +177,71 @@ export function buildAuthOptions(config: AuthConfig) {
       },
     },
     telemetry: { enabled: false },
-    // Without the plugin, every /email-otp route is a 404 and no email is ever sent
-    plugins: config.emailSignIn
-      ? [
-          emailOTP({
-            otpLength: 6,
-            expiresIn: 10 * 60,
-            allowedAttempts: 3,
-            storeOTP: 'hashed',
-            // A code to the current address and another to the new one
-            changeEmail: { enabled: true, verifyCurrentEmail: true },
-            // Not awaited, so response time doesn't reveal whether an account exists
-            sendVerificationOTP: async ({ email, otp, type }) => {
-              config.runInBackground(config.sendSignInCode(email, otp, type));
-            },
-          }),
-        ]
-      : [],
+    // Ravelry linking where configured, and email codes where they're on
+    plugins: [
+      ...(config.ravelry ? [ravelryOAuth(config.ravelry)] : []),
+      ...emailOTPPlugin(config),
+    ],
   } satisfies BetterAuthOptions;
+}
+
+/**
+ * Ravelry's OAuth 2.0 (see ravelry-api-documentation.md): the client ID and
+ * secret go in a Basic auth header, tokens last 24 hours, and "offline" adds
+ * a refresh token. Link-only: it never creates an account.
+ */
+function ravelryOAuth(ravelry: NonNullable<AuthConfig['ravelry']>) {
+  return genericOAuth({
+    config: [
+      {
+        providerId: RAVELRY_PROVIDER_ID,
+        name: 'Ravelry',
+        clientId: ravelry.clientId,
+        clientSecret: ravelry.clientSecret,
+        authorizationUrl: 'https://www.ravelry.com/oauth2/auth',
+        tokenUrl: 'https://www.ravelry.com/oauth2/token',
+        tokenEndpointAuth: { method: 'client_secret_basic' },
+        scopes: ['offline'],
+        disableSignUp: true,
+        getUserInfo: async (tokens) => {
+          const response = await fetch(
+            'https://api.ravelry.com/current_user.json',
+            { headers: { Authorization: `Bearer ${tokens.accessToken}` } },
+          );
+          if (!response.ok) return null;
+          const { user } = (await response.json()) as {
+            user?: { id: number; username: string; photo_url?: string };
+          };
+          if (!user) return null;
+          // No email: Ravelry doesn't share one
+          return {
+            id: String(user.id),
+            name: user.username,
+            image: user.photo_url,
+            emailVerified: false,
+          };
+        },
+      },
+    ],
+  });
+}
+
+function emailOTPPlugin(config: AuthConfig) {
+  // Without the plugin, every /email-otp route is a 404 and no email is ever sent
+  return config.emailSignIn
+    ? [
+        emailOTP({
+          otpLength: 6,
+          expiresIn: 10 * 60,
+          allowedAttempts: 3,
+          storeOTP: 'hashed',
+          // A code to the current address and another to the new one
+          changeEmail: { enabled: true, verifyCurrentEmail: true },
+          // Not awaited, so response time doesn't reveal whether an account exists
+          sendVerificationOTP: async ({ email, otp, type }) => {
+            config.runInBackground(config.sendSignInCode(email, otp, type));
+          },
+        }),
+      ]
+    : [];
 }

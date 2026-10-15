@@ -61,8 +61,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     // A failed link returns here with ?error=
-    const error = new URL(window.location.href).searchParams.get('error');
-    if (error) errorMessage = providerErrorMessage(error);
+    const params = new URL(window.location.href).searchParams;
+    const error = params.get('error');
+    // A failed Ravelry connect shows its error in its own row
+    if (error && !params.has('ravelry'))
+      errorMessage = providerErrorMessage(error);
     try {
       available = await getSignInOptions();
       if (available.google) linked = await listLinkedAccounts();

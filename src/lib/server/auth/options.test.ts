@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { buildAuthOptions, SIGN_UPS_PAUSED } from './options';
 
-const config = (signUpsOpen?: () => Promise<boolean>, emailSignIn = true) =>
+const config = (
+  signUpsOpen?: () => Promise<boolean>,
+  emailSignIn = true,
+  ravelry?: { clientId: string; clientSecret: string },
+) =>
   buildAuthOptions({
     database: undefined,
     secret: 'x'.repeat(32),
@@ -12,6 +16,7 @@ const config = (signUpsOpen?: () => Promise<boolean>, emailSignIn = true) =>
     validateSchema: false,
     signUpsOpen,
     emailSignIn,
+    ravelry,
   });
 
 const newUser = {
@@ -59,5 +64,25 @@ describe('Google-only sign-in', () => {
       config(undefined, false).account.accountLinking.allowUnlinkingAll,
     ).toBe(false);
     expect(config().account.accountLinking.allowUnlinkingAll).toBe(true);
+  });
+});
+
+describe('Ravelry', () => {
+  const ravelry = { clientId: 'id', clientSecret: 'secret' };
+
+  it('is linked through the generic OAuth plugin only when configured', () => {
+    expect(config().plugins.map((plugin) => plugin.id)).not.toContain(
+      'generic-oauth',
+    );
+    expect(
+      config(undefined, false, ravelry).plugins.map((plugin) => plugin.id),
+    ).toEqual(['generic-oauth']);
+  });
+
+  it('is trusted for linking (it shares no email) only when configured', () => {
+    expect(config().account.accountLinking.trustedProviders).toEqual([]);
+    expect(
+      config(undefined, true, ravelry).account.accountLinking.trustedProviders,
+    ).toEqual(['ravelry']);
   });
 });

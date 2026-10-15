@@ -35,7 +35,11 @@ import { emailChangedNotice, signInCodeEmail } from './emails';
 import { withSignedInHint } from './hint-cookie';
 import { deleteUserProjectData } from '#lib/server/sync/store.js';
 import { cleanName } from '#lib/utils/string-utils.js';
-import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
+import {
+  buildAuthOptions,
+  MAX_DISPLAY_NAME_LENGTH,
+  RAVELRY_PROVIDER_ID,
+} from './options';
 import { emailSignInOn, readAuthSettings } from './settings';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
 import { getPlatform } from '#lib/server/cloudflare.js';
@@ -148,6 +152,12 @@ async function jsonBody(request: Request) {
     .json()
     .catch(() => null);
 }
+
+const TOKEN_ROUTES = new Set([
+  '/api/auth/get-access-token',
+  '/api/auth/refresh-token',
+  '/api/auth/account-info',
+]);
 
 const isPost = (event: RequestEvent, path: string) =>
   event.request.method === 'POST' && event.url.pathname === path;
@@ -267,6 +277,59 @@ export async function handleAuthRequest(
           },
           { status: 503 },
         );
+    }
+
+    // Provider tokens stay on the server: $lib/server/ravelry asks auth.api
+    // for them directly, so these routes have no use from a browser
+    if (TOKEN_ROUTES.has(event.url.pathname))
+      return json({ message: 'Not found' }, { status: 404 });
+
+    // A linked Ravelry account is for Ravelry's API only, never a way in
+    if (isPost(event, '/api/auth/sign-in/oauth2')) {
+      const body = await jsonBody(event.request);
+      if (body?.providerId === RAVELRY_PROVIDER_ID)
+        return json(
+          {
+            code: 'NOT_A_SIGN_IN_METHOD',
+            message: 'Ravelry is not a sign-in method',
+          },
+          { status: 400 },
+        );
+    }
+
+    // Better Auth keeps one account of any kind; a Ravelry one doesn't count,
+    // so without email codes, Google can't be unlinked while only Ravelry
+    // would be left
+    if (!emailSignIn && isPost(event, '/api/auth/unlink-account')) {
+      const [session, body] = await Promise.all([
+        auth.api.getSession({ headers: event.request.headers }),
+        jsonBody(event.request),
+      ]);
+      if (session && typeof body?.accountId === 'string') {
+        const { results } = await db
+          .prepare(
+            'select "id", "providerId" from "account" where "userId" = ?',
+          )
+          .bind(session.user.id)
+          .all<{ id: string; providerId: string }>();
+        const target = results.find((a) => a.id === body.accountId);
+        const waysIn = results.filter(
+          (a) =>
+            a.id !== body.accountId && a.providerId !== RAVELRY_PROVIDER_ID,
+        );
+        if (
+          target &&
+          target.providerId !== RAVELRY_PROVIDER_ID &&
+          !waysIn.length
+        )
+          return json(
+            {
+              code: 'FAILED_TO_UNLINK_LAST_ACCOUNT',
+              message: 'You can’t unlink your last way to sign in',
+            },
+            { status: 400 },
+          );
+      }
     }
 
     if (isPost(event, '/api/auth/update-user')) {

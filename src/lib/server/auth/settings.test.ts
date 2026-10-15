@@ -136,4 +136,16 @@ describe('emailChangedNotice', () => {
     expect(notice.text).toContain('changed to n***@example.test');
     expect(notice.text).not.toContain('newname');
   });
+
+  it('turns Ravelry linking on only when both its ID and secret are set', () => {
+    const ravelryOf = (env: Record<string, string | undefined>) => {
+      const result = readAuthSettings({ ...ready, ...env });
+      return result.status === 'ready' ? result.settings.ravelry : 'not ready';
+    };
+    expect(ravelryOf({})).toBeUndefined();
+    expect(ravelryOf({ RAVELRY_CLIENT_ID: 'id' })).toBeUndefined();
+    expect(
+      ravelryOf({ RAVELRY_CLIENT_ID: 'id', RAVELRY_CLIENT_SECRET: 'secret' }),
+    ).toEqual({ clientId: 'id', clientSecret: 'secret' });
+  });
 });

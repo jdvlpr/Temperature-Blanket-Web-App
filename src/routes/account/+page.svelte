@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryProfileLink from '#lib/components/account/GalleryProfileLink.svelte';
   import SignInCard from '#lib/components/account/SignInCard.svelte';
   import SignInMethods from '#lib/components/account/SignInMethods.svelte';
+  import RavelryConnection from '#lib/components/account/RavelryConnection.svelte';
   import { getGalleryPages } from '#lib/accounts/gallery.js';
   import {
     ChevronRightIcon,
@@ -228,17 +229,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Sign-in methods
             </h3>
             <div class={CARD}>
-            <ChangeEmail
-              email={user.email}
-              onchanged={(newEmail) => {
-                if (!user) return;
-                user.email = newEmail;
-                rememberAccountSummary(user);
-              }}
-            />
+              <ChangeEmail
+                email={user.email}
+                onchanged={(newEmail) => {
+                  if (!user) return;
+                  user.email = newEmail;
+                  rememberAccountSummary(user);
+                }}
+              />
               <SignInMethods email={user.email} />
             </div>
           </section>
+
+          <RavelryConnection cardClass={CARD} />
 
           <section class="flex flex-col gap-2" aria-labelledby="devices-data">
             <h3 id="devices-data" class="px-2 text-sm font-bold opacity-70">
@@ -336,15 +339,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="text-sm opacity-80">
             Sign in to keep your projects and yarn palettes on all your devices.
           </p>
-
         </div>
         <SignInCard onsignedin={showSignedIn} />
-          <p class="mx-auto max-w-md px-2 py-4 text-center text-sm opacity-80">
-            Accounts are in beta; if something doesn't work as expected,
-            please
-            <a href={resolve('contact')} class="link">get in touch</a>
-            .
-          </p>
+        <p class="mx-auto max-w-md px-2 py-4 text-center text-sm opacity-80">
+          Accounts are in beta; if something doesn't work as expected, please
+          <a href={resolve('contact')} class="link">get in touch</a>
+          .
+        </p>
       {:else}
         <div class="flex flex-col gap-2 px-2 py-4 text-center">
           <h2 class="h1 text-gradient mb-0">Account</h2>

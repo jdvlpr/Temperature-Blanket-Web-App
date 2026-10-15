@@ -30,6 +30,9 @@ declare global {
         EMAIL_FROM?: string;
         GOOGLE_CLIENT_ID?: string;
         GOOGLE_CLIENT_SECRET?: string;
+        // Linking a Ravelry account (never a way to sign in); secrets in .dev.vars / the dashboard
+        RAVELRY_CLIENT_ID?: string;
+        RAVELRY_CLIENT_SECRET?: string;
         SYNC_ENABLED?: string;
         GALLERY_PUBLISH_ENABLED?: string;
         // Checks guests' gallery submissions (/api/project); without it, they're refused

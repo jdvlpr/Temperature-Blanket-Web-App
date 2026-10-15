@@ -24,6 +24,9 @@ export type AuthEnv = EmailEnv & {
   AUTH_PROTOCOL?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
+  /** Linking a Ravelry account (never a way to sign in), when both are set */
+  RAVELRY_CLIENT_ID?: string;
+  RAVELRY_CLIENT_SECRET?: string;
   /** "true" turns on emailed sign-in codes (local dev and e2e); production signs in with Google only */
   EMAIL_SIGN_IN?: string;
 };
@@ -35,7 +38,12 @@ export type AuthSettings =
       status: 'ready';
       settings: Pick<
         AuthConfig,
-        'secret' | 'allowedHosts' | 'protocol' | 'google' | 'emailSignIn'
+        | 'secret'
+        | 'allowedHosts'
+        | 'protocol'
+        | 'google'
+        | 'ravelry'
+        | 'emailSignIn'
       >;
     };
 
@@ -104,8 +112,17 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
         'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are needed when EMAIL_SIGN_IN is off',
     };
 
+  // Ravelry linking is on only when both its ID and secret are set
+  const ravelry =
+    env.RAVELRY_CLIENT_ID && env.RAVELRY_CLIENT_SECRET
+      ? {
+          clientId: env.RAVELRY_CLIENT_ID,
+          clientSecret: env.RAVELRY_CLIENT_SECRET,
+        }
+      : undefined;
+
   return {
     status: 'ready',
-    settings: { secret, allowedHosts, protocol, google, emailSignIn },
+    settings: { secret, allowedHosts, protocol, google, ravelry, emailSignIn },
   };
 }
