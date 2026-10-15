@@ -13,27 +13,20 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
-  import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
-  let openedNavigationItems = $state(['tools', 'explore']);
-</script>
-
 <script>
   import { version } from '$app/env';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import PreferencesDialog from '#lib/components/modals/PreferencesDialog.svelte';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
+  import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,
-    ChevronDownIcon,
     CircleQuestionMarkIcon,
     CloudyIcon,
-    CodeIcon,
     ExternalLinkIcon,
     LibraryBigIcon,
     GiftIcon,
@@ -41,67 +34,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     HeartIcon,
     Icon,
     LandmarkIcon,
-    MailIcon,
     NotebookPenIcon,
     RssIcon,
-    ShieldAlertIcon,
     SlidersHorizontalIcon,
-    SquareTerminalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
 
-  // Set opened navigation items based on current page
-  $effect(() => {
-    page.route.id;
-    untrack(() => {
-      switch (page.route.id) {
-        case '/':
-        case '/yarn-colorway-finder':
-        case '/yarn':
-        case '/weather':
-          if (!openedNavigationItems.includes('tools'))
-            openedNavigationItems = [...openedNavigationItems, 'tools'];
-          break;
-        case '/globe':
-        case '/gallery':
-          if (!openedNavigationItems.includes('explore'))
-            openedNavigationItems = [...openedNavigationItems, 'explore'];
-          break;
-        case '/faq':
-        case '/contact':
-        case '/documentation':
-          if (!openedNavigationItems.includes('help'))
-            openedNavigationItems = [...openedNavigationItems, 'help'];
-          break;
-        case '/privacy':
-        case '/changelog':
-          if (!openedNavigationItems.includes('more'))
-            openedNavigationItems = [...openedNavigationItems, 'more'];
-          break;
-        case '/supporters':
-          if (!openedNavigationItems.includes(''))
-            openedNavigationItems = [...openedNavigationItems, ''];
-          break;
-      }
+  const pathname = $derived(page.url.pathname);
+  const library = $derived(['/my-projects', '/my-palettes'].includes(pathname));
+  const gallery = $derived(
+    ['/gallery', '/gallery/palettes'].includes(pathname),
+  );
+  const blog = $derived(pathname.includes('/blog'));
 
-      if (page.route.id?.includes('api')) {
-        openedNavigationItems = [...openedNavigationItems, 'more'];
-      }
-
-      if (page.route.id?.includes('/blog')) {
-        if (!openedNavigationItems.includes('explore'))
-          openedNavigationItems = [...openedNavigationItems, 'explore'];
-      }
-    });
-  });
+  const LINK = 'btn hover:preset-tonal-surface w-fit';
+  const CURRENT = 'preset-tonal-secondary';
+  const HEADING =
+    'text-surface-700-300 px-3 pt-1 text-xs font-semibold tracking-wide uppercase';
+  const FOOTER_LINK = 'py-1 hover:underline';
 </script>
 
 <!-- Icons line up by what's drawn, with the site logo's edge -->
-<div
+<nav
+  aria-label="Site"
   class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
   {@attach alignIconInk}
@@ -129,11 +86,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     href={resolve('my-projects')}
-    class={[
-      'btn hover:preset-tonal-surface w-fit',
-      ['/my-projects', '/my-palettes'].includes(page.url.pathname) &&
-        'preset-tonal-secondary',
-    ]}
+    class={[LINK, library && CURRENT]}
+    aria-current={library ? 'page' : undefined}
   >
     <LibraryBigIcon />
     My Library
@@ -151,259 +105,161 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   >
     <SlidersHorizontalIcon />
-    Preferences
+    My Preferences
   </button>
+
+  <hr class="border-surface-300-700 w-full" />
 
   <a
     href="/supporters"
-    class={[
-      'btn hover:preset-tonal-surface w-fit',
-      page.url.pathname === '/supporters' && 'preset-tonal-secondary',
-    ]}
+    class={[LINK, pathname === '/supporters' && CURRENT]}
+    aria-current={pathname === '/supporters' ? 'page' : undefined}
   >
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
     Supporters
   </a>
 
-  {#snippet indicator()}
-    <Accordion.ItemIndicator class="">
-      <ChevronDownIcon
-        class="icon-sm transition group-data-[state=open]:rotate-180"
-      />
-    </Accordion.ItemIndicator>
-  {/snippet}
+  <hr class="border-surface-300-700 w-full" />
 
-  <Accordion
-    value={openedNavigationItems}
-    onValueChange={(e) => {
-      openedNavigationItems = e.value;
-    }}
-    collapsible
-    multiple
+  <h2 class={HEADING}>Create</h2>
+
+  <a
+    href="/"
+    class={[LINK, pathname === '/' && CURRENT]}
+    aria-current={pathname === '/' ? 'page' : undefined}
   >
-    <Accordion.Item value="tools" class="group gap-0">
-      <h3>
-        <Accordion.ItemTrigger class="flex items-center justify-between">
-          Tools
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
+    <NotebookPenIcon />
+    Project Planner
+  </a>
 
-      <Accordion.ItemContent class="flex w-full flex-col gap-2">
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <a
-                href="/"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/' && 'preset-tonal-secondary',
-                ]}
-              >
-                <NotebookPenIcon />
-                Project Planner
-              </a>
+  <a
+    href="/yarn"
+    class={[LINK, pathname === '/yarn' && CURRENT]}
+    aria-current={pathname === '/yarn' ? 'page' : undefined}
+  >
+    <SwatchBookIcon />
+    Yarn Palette Creator
+  </a>
 
-              <a
-                href="/yarn-colorway-finder"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/yarn-colorway-finder' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <Icon iconNode={yarnBall} />
-                Yarn Colorway Finder
-              </a>
+  <hr class="border-surface-300-700 w-full" />
 
-              <a
-                href="/yarn"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/yarn' && 'preset-tonal-secondary',
-                ]}
-              >
-                <SwatchBookIcon />
-                Yarn Palette Creator
-              </a>
+  <h2 class={HEADING}>Explore</h2>
 
-              <a
-                href="/weather"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/weather' && 'preset-tonal-secondary',
-                ]}
-              >
-                <CloudyIcon />
-                Weather Forecast
-              </a>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-    <Accordion.Item value="explore" class="group gap-0">
-      <h3>
-        <Accordion.ItemTrigger class="flex items-center justify-between">
-          Explore
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent class="flex w-full flex-col gap-2">
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <a
-                href="/gallery"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  (page.url.pathname === '/gallery' ||
-                    page.url.pathname === '/gallery/palettes') &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <LandmarkIcon />
-                Gallery
-              </a>
+  <a
+    href="/gallery"
+    class={[LINK, gallery && CURRENT]}
+    aria-current={gallery ? 'page' : undefined}
+  >
+    <LandmarkIcon />
+    Gallery
+  </a>
 
-              <a
-                href="/globe"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/globe' && 'preset-tonal-secondary',
-                ]}
-              >
-                <GlobeIcon />
-                Globe
-              </a>
+  <a
+    href="/globe"
+    class={[LINK, pathname === '/globe' && CURRENT]}
+    aria-current={pathname === '/globe' ? 'page' : undefined}
+  >
+    <GlobeIcon />
+    Globe
+  </a>
 
-              <a
-                href="/blog"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit text-left',
-                  (page.url.pathname === '/blog' ||
-                    page.url.pathname.includes('/blog')) &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <RssIcon /> Blog
-              </a>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
+  <a
+    href="/yarn-colorway-finder"
+    class={[LINK, pathname === '/yarn-colorway-finder' && CURRENT]}
+    aria-current={pathname === '/yarn-colorway-finder' ? 'page' : undefined}
+  >
+    <Icon iconNode={yarnBall} />
+    Yarn Colorway Finder
+  </a>
 
-    <Accordion.Item value="help" class="group gap-0">
-      <h3>
-        <Accordion.ItemTrigger class="flex items-center justify-between">
-          Help
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent class="flex w-full flex-col gap-2">
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <a
-                href="/faq"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/faq' && 'preset-tonal-secondary',
-                ]}
-              >
-                <CircleQuestionMarkIcon />
-                FAQ
-              </a>
+  <a
+    href="/weather"
+    class={[LINK, pathname === '/weather' && CURRENT]}
+    aria-current={pathname === '/weather' ? 'page' : undefined}
+  >
+    <CloudyIcon />
+    Weather Forecast
+  </a>
 
-              <a
-                href="/contact"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/contact' && 'preset-tonal-secondary',
-                ]}
-              >
-                <MailIcon />
-                Contact
-              </a>
+  <hr class="border-surface-300-700 w-full" />
 
-              <a
-                href="/documentation"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/documentation' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <BookOpenTextIcon />
-                Documentation
-              </a>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-    <Accordion.Item value="more" class="group gap-0">
-      <h3>
-        <Accordion.ItemTrigger class="flex items-center justify-between">
-          More
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent class="flex w-full flex-col gap-2">
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div {...attributes} transition:safeSlide>
-              <a
-                href="/changelog"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/changelog' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <GiftIcon />
-                What's New
-                <span class="text-surface-700-300 text-xs">v{version}</span>
-              </a>
+  <h2 class={HEADING}>Learn</h2>
 
-              <a
-                href="/privacy"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/privacy' && 'preset-tonal-secondary',
-                ]}
-              >
-                <ShieldAlertIcon />
-                Privacy
-              </a>
+  <a
+    href="/faq"
+    class={[LINK, pathname === '/faq' && CURRENT]}
+    aria-current={pathname === '/faq' ? 'page' : undefined}
+  >
+    <CircleQuestionMarkIcon />
+    FAQ
+  </a>
 
-              <a
-                href="/api/yarn-colorways"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/api/yarn-colorways' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <SquareTerminalIcon /> API
-              </a>
+  <a
+    href="/blog"
+    class={[LINK, 'text-left', blog && CURRENT]}
+    aria-current={blog ? 'page' : undefined}
+  >
+    <RssIcon /> Blog
+  </a>
 
-              {#if PUBLIC_GITHUB_LINK}
-                <a
-                  href={PUBLIC_GITHUB_LINK}
-                  class="btn hover:preset-tonal-surface w-fit"
-                  target="_blank"
-                >
-                  <CodeIcon />
-                  GitHub
-                  <ExternalLinkIcon class="icon-sm relative -top-[1px]" />
-                </a>
-              {/if}
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-  </Accordion>
-</div>
+  <a
+    href="/documentation"
+    class={[LINK, pathname === '/documentation' && CURRENT]}
+    aria-current={pathname === '/documentation' ? 'page' : undefined}
+  >
+    <BookOpenTextIcon />
+    Documentation
+  </a>
+
+  <a
+    href="/changelog"
+    class={[LINK, pathname === '/changelog' && CURRENT]}
+    aria-current={pathname === '/changelog' ? 'page' : undefined}
+  >
+    <GiftIcon />
+    What's New
+    <span class="text-surface-700-300 text-xs">v{version}</span>
+  </a>
+
+  <hr class="border-surface-300-700 w-full" />
+
+  <!-- Small links, one row that wraps -->
+  <div
+    class="text-surface-700-300 flex flex-wrap items-center gap-x-2 px-3 text-sm"
+  >
+    <a
+      href="/contact"
+      class={[FOOTER_LINK, pathname === '/contact' && 'text-secondary-700-300']}
+      aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a
+    >
+    <span aria-hidden="true">·</span>
+    <a
+      href="/privacy"
+      class={[FOOTER_LINK, pathname === '/privacy' && 'text-secondary-700-300']}
+      aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
+    >
+    <span aria-hidden="true">·</span>
+    <a
+      href="/api/yarn-colorways"
+      class={[
+        FOOTER_LINK,
+        pathname === '/api/yarn-colorways' && 'text-secondary-700-300',
+      ]}
+      aria-current={pathname === '/api/yarn-colorways' ? 'page' : undefined}
+      >API</a
+    >
+    {#if PUBLIC_GITHUB_LINK}
+      <span aria-hidden="true">·</span>
+      <a
+        href={PUBLIC_GITHUB_LINK}
+        class={[FOOTER_LINK, 'inline-flex items-center gap-1']}
+        target="_blank"
+        rel="noopener"
+      >
+        GitHub
+        <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
+    {/if}
+  </div>
+</nav>
