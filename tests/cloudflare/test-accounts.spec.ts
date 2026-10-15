@@ -239,6 +239,24 @@ test.describe('Accounts: sign in with an emailed code', () => {
     expect((await response.json()).code).toBe('TURNSTILE_REJECTED');
   });
 
+  test('signed in, only codes to your own address skip Turnstile', async ({
+    page,
+    request,
+    baseURL,
+  }) => {
+    const email = uniqueEmail('own-address');
+    await signIn(page, request, email);
+    const send = (to: string) =>
+      page.request.post('/api/auth/email-otp/send-verification-otp', {
+        headers: { Origin: baseURL!, 'CF-Connecting-IP': randomTestIp() },
+        data: { email: to, type: 'sign-in' },
+      });
+    expect((await send(email.toUpperCase())).status()).toBe(200);
+    const other = await send(uniqueEmail('someone-else'));
+    expect(other.status()).toBe(403);
+    expect((await other.json()).code).toBe('TURNSTILE_REJECTED');
+  });
+
   test('the password reset routes, which would email codes, are off', async ({
     request,
   }) => {

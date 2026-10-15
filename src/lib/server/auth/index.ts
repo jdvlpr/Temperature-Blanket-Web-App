@@ -179,13 +179,22 @@ export async function handleAuthRequest(
       const env = platform!.env!;
       const ip = event.request.headers.get('cf-connecting-ip');
 
-      // Signed out, a code request needs a Turnstile token, checked before
-      // the counters so bots can't fill them. A real session, not just a
-      // cookie: signed in, changing email or confirming it's you skips it
-      if (
-        sendsSignInCode &&
-        !(await auth.api.getSession({ headers: event.request.headers }))
-      ) {
+      // A code request needs a Turnstile token, checked before the counters
+      // so bots can't fill them, unless it's for the signed-in account's own
+      // address (confirming it's you, changing email). A real session, not
+      // just a cookie, and not any address: a Google sign-in costs no
+      // Turnstile check, so it mustn't open codes to other addresses
+      const ownAddress = async () => {
+        const session = await auth.api.getSession({
+          headers: event.request.headers,
+        });
+        return (
+          !!session &&
+          typeof body?.email === 'string' &&
+          body.email.trim().toLowerCase() === session.user.email.toLowerCase()
+        );
+      };
+      if (sendsSignInCode && !(await ownAddress())) {
         const turnstile = await verifyTurnstile({
           token: event.request.headers.get(TURNSTILE_HEADER),
           secret: env.TURNSTILE_SECRET_KEY,

@@ -12,7 +12,7 @@ Svelte 5 (runes) + SvelteKit 3 (config lives in `sveltekit({...})` in `vite.conf
 
 ## Setup
 
-Copy `.env.example` to `.env`. Location search needs a free GeoNames username (`SECRET_GEONAMES_USERNAME`); weather data needs a free Meteostat/RapidAPI key (`SECRET_METEOSTAT_API_KEY`). Everything else is optional for local dev — POST requests to the WordPress backend are rejected locally without the auth key, which is expected. Guest gallery submissions also need `PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA` (Cloudflare's always-pass test site key), which pairs with the test secret in `wrangler.jsonc`.
+Copy `.env.example` to `.env`. Location search needs a free GeoNames username (`SECRET_GEONAMES_USERNAME`); weather data needs a free Meteostat/RapidAPI key (`SECRET_METEOSTAT_API_KEY`). Everything else is optional for local dev — POST requests to the WordPress backend are rejected locally without the auth key, which is expected. Guest gallery submissions and signed-out email sign-in also need `PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA` (Cloudflare's always-pass test site key), which pairs with the test secret in `wrangler.jsonc`.
 
 ## Commands
 
@@ -60,7 +60,7 @@ Accounts are behind flags and dormant in production until launch:
 
 Pieces:
 
-- **Auth** — Better Auth (pinned version) in `src/lib/server/auth/`, mounted from `hooks.server.ts` at `/api/auth/*`. Email sign-in codes; `server/email/` sends via Resend, or a dev outbox locally. Client side in `src/lib/accounts/`.
+- **Auth** — Better Auth (pinned version) in `src/lib/server/auth/`, mounted from `hooks.server.ts` at `/api/auth/*`. Email sign-in codes; `server/email/` sends via Resend, or a dev outbox locally. Client side in `src/lib/accounts/`. Resend's free plan is small, so email is kept to a minimum: Google is the main sign-in, a code request needs a Turnstile token unless it's for the signed-in account's own address, codes are limited per IP (`ACCOUNTS_CODE_LIMIT_PER_IP`) and per address, and `EMAIL_DAILY_LIMIT` caps Resend sends a day (every send goes through `sendEmail` in `auth/index.ts`). Better Auth routes that would email but aren't used are listed in `disabledPaths`.
 - **Database** — D1 schema in `migrations/NNNN_*.sql`; add a new numbered file, never edit an applied one. Remote migrations are run by the owner, not by agents.
 - **Sync** — `src/lib/sync/engine.ts` is a pure, fetch/IndexedDB-free sync pass (unit-tested against a fake server); `sync.svelte.ts` drives it. Server side: `src/lib/server/sync/` + `src/routes/api/sync/{changes,projects,palettes,preferences,trash}`. Project bodies go to R2, metadata to D1. Rules: optimistic revisions (stale save → 409); never lose data — on conflict the device copy becomes a new "(copy from this device…)" project; an edit beats a deletion; palettes and preferences are last-write-wins per item.
 - **Gallery from accounts** — `src/lib/server/gallery/` (`/api/account/gallery`) publishes to WordPress on behalf of a signed-in user; guests still go through `/api/project`.
@@ -76,5 +76,6 @@ Server unit tests that need a database use `src/lib/server/test-d1.ts`, an in-me
 
 - Unit tests are colocated next to the code as `*.test.ts`.
 - `tests/integration/` hits real dev-server routes (yarn colorway API).
+- Under `tests/cloudflare/`, give pages a test IP with `useTestIp()` (helpers.ts), never `setExtraHTTPHeaders`: Cloudflare refuses a `CF-Connecting-IP` header sent to its own sites, such as Turnstile's.
 - `tests/end-to-end/test-*.spec.ts` run against the preview build; `tests/cloudflare/` covers accounts, sync and gallery routes and only runs under `pnpm test:e2e:cloudflare`.
 - Optional HTTPS dev via a Tailscale cert/key (`PRIVATE_TAILSCALE_CRT_PATH`/`PRIVATE_TAILSCALE_KEY_PATH` in `.env`) for testing on other tailnet devices.
