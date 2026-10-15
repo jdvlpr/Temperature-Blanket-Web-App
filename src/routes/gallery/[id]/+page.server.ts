@@ -30,11 +30,16 @@ export const load: PageServerLoad = async (event) => {
       return null;
     },
   );
+  const owner = await getOwner(event);
   return {
     // Streamed on a move within the app, so the page shows at once; whole on
     // a full load, for its title and link preview
     project: event.isDataRequest ? project : await project,
-    owner: await getOwner(event),
+    owner,
+    // Its Ravelry photos, streamed, when its owner linked the project there.
+    // Only on a page that shows its owner: the photos and link name their
+    // Ravelry account
+    ravelry: owner ? getRavelryPhotos(event) : null,
     // Its palettes' own pages, streamed: the page never waits for them, and
     // shows none if they can't be found
     palettePages: project.then((found) =>
@@ -42,6 +47,23 @@ export const load: PageServerLoad = async (event) => {
     ),
   };
 };
+
+/** The Ravelry project (and its kept photos) of the project behind this page, if any. */
+async function getRavelryPhotos(event: Parameters<PageServerLoad>[0]) {
+  const env = getPlatform()?.env;
+  const id = Number(event.params.id);
+  if (!env?.DB || !Number.isSafeInteger(id)) return null;
+  try {
+    const { photosForGalleryPost } =
+      await import('#lib/server/ravelry/store.js');
+    const found = await photosForGalleryPost(env.DB, id);
+    return found?.photos.length ? found : null;
+  } catch (e) {
+    // Before migration 0011: the page shows without them
+    console.error('Could not look up Ravelry photos', e);
+    return null;
+  }
+}
 
 /** The account that published this page, if its owner chose to show their name. */
 async function getOwner(

@@ -86,6 +86,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let project = $derived(streamedProject.current);
   // "By" and the name, which the owner bar changes in place
   let owner = $derived(data.owner);
+
+  // The project's photos on Ravelry, when its owner linked it there (streamed)
+  type RavelryPhotos = Awaited<NonNullable<PageData['ravelry']>>;
+  let ravelry = $state<RavelryPhotos>(null);
+  $effect(() => {
+    let current = true;
+    ravelry = null;
+    Promise.resolve(data.ravelry)
+      .then((found) => {
+        if (current) ravelry = found ?? null;
+      })
+      .catch(() => {});
+    return () => {
+      current = false;
+    };
+  });
   let projectURL = $derived(project?.projectUrl);
   let projectTitle = $derived(
     project ? getTitleFromLocationsMeta(project.locations) : '',
@@ -350,6 +366,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     alt="Project Preview"
                     class="m-auto max-h-[60vh]"
                   />
+                  {#if ravelry}
+                    <!-- Photos of the made project, kept on Ravelry -->
+                    <section
+                      class="mx-auto mt-4 flex max-w-3xl flex-col gap-2 px-2"
+                      aria-labelledby="ravelry-photos"
+                    >
+                      <h2 id="ravelry-photos" class="text-sm font-bold">
+                        Photos on Ravelry
+                      </h2>
+                      <ul class="flex flex-wrap justify-center gap-2">
+                        {#each ravelry.photos as photo, i (photo.photoId)}
+                          <li>
+                            <a
+                              href={ravelry.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="block"
+                              ><img
+                                src={photo.smallUrl ?? photo.squareUrl ?? ''}
+                                alt={photo.isPicture
+                                  ? `${projectName || 'The project'}: its picture from Temperature Blanket (opens Ravelry in a new tab)`
+                                  : `${projectName || 'The project'}: photo ${i + 1} on Ravelry (opens in a new tab)`}
+                                class="rounded-base size-24 object-cover sm:size-32"
+                                loading="lazy"
+                              /></a
+                            >
+                          </li>
+                        {/each}
+                      </ul>
+                      <a
+                        class="link self-center text-sm"
+                        href={ravelry.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >See the project on Ravelry<span class="sr-only">
+                          (opens in a new tab)</span
+                        ></a
+                      >
+                    </section>
+                  {/if}
                   <!-- Only what the title, gauges and preview don't say -->
                   <p
                     class="text-surface-600-400 mt-2 flex flex-wrap justify-center gap-x-1.5 px-2 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']"
