@@ -219,19 +219,54 @@ export const unlinkRavelryProject = (projectId: string) =>
   });
 
 /** Adds a photo to the linked Ravelry project; as `picture`, it replaces the app's last one. */
-export function addRavelryPhoto(
+type PhotoResult = { photos: RavelryPhoto[]; processing: boolean };
+
+/**
+ * Adds a photo to the linked project. It goes straight from the browser to
+ * Ravelry (with a one-use token, so big photos skip this server), or through
+ * this server if that upload doesn't reach Ravelry.
+ */
+export async function addRavelryPhoto(
   projectId: string,
   file: Blob,
   { picture = false } = {},
-) {
+): Promise<PhotoResult> {
+  const path = `/projects/${encodeURIComponent(projectId)}/photos`;
+  try {
+    const { uploadToken, uploadUrl } = await request<{
+      uploadToken: string;
+      uploadUrl: string;
+    }>(`${path}/upload`, { method: 'POST' });
+    const form = new FormData();
+    form.set('upload_token', uploadToken);
+    form.set('file0', file, photoFilename(file));
+    // Ravelry's answer may be hidden by CORS; the server asks Ravelry instead
+    await fetch(uploadUrl, {
+      method: 'POST',
+      body: form,
+      mode: 'no-cors',
+    }).catch(() => {});
+    return await request<PhotoResult>(
+      path,
+      jsonInit('POST', { uploadToken, picture }),
+    );
+  } catch (e) {
+    // Only an upload that didn't arrive falls back; other errors are real
+    if (!(e instanceof RavelryRequestError) || e.code !== 'UPLOAD_NOT_FOUND')
+      throw e;
+  }
   const form = new FormData();
   form.set('file', file, 'photo');
   if (picture) form.set('picture', '1');
-  return request<{ photos: RavelryPhoto[]; processing: boolean }>(
-    `/projects/${encodeURIComponent(projectId)}/photos`,
-    { method: 'POST', body: form },
-  );
+  return request<PhotoResult>(path, { method: 'POST', body: form });
 }
+
+const photoFilename = (file: Blob) =>
+  file.type === 'image/png'
+    ? 'photo.png'
+    : file.type.includes('hei')
+      ? 'photo.heic'
+      : 'photo.jpg';
 
 /** Deletes a photo of the linked project, on Ravelry too. */
 export const deleteRavelryPhoto = (projectId: string, photoId: number) =>

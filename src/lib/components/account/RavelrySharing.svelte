@@ -53,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } = $props();
 
   const link = $derived(ravelryLinks.links.get(item.id) ?? null);
-  const shownPhotos = $derived(link?.photos.slice(0, 3) ?? []);
 
   // Choosing an item, by pointer or keyboard, sends it this event
   const onChoose = (handler: () => void) => (el: HTMLElement) => {
@@ -149,18 +148,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Menu.Positioner>
       </Portal>
     </Menu>
-    {#if shownPhotos.length}
-      <!-- The first photos, as a glance; Photos… lists them all -->
-      <span class="flex -space-x-2" aria-hidden="true">
-        {#each shownPhotos as photo (photo.photoId)}
-          <img
-            src={photo.squareUrl ?? photo.smallUrl ?? ''}
-            alt=""
-            class="ring-surface-50-950 size-6 rounded-full object-cover ring-2"
-            loading="lazy"
-          />
-        {/each}
-      </span>
-    {/if}
   </div>
 {/if}

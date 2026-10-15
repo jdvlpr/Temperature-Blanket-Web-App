@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   bind:this={container}
   tabindex="-1"
-  class="flex flex-1 flex-col gap-4 p-2 outline-none"
+  class="flex flex-1 flex-col gap-4 p-4 outline-none"
   hidden={!!picking}
 >
   {#if loading}
@@ -188,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <img
                   src={entry.photo.small}
                   alt=""
-                  class="rounded-base size-12 shrink-0 object-cover"
+                  class="bg-surface-200-800 size-12 shrink-0 object-contain"
                   loading="lazy"
                 />
               {/if}

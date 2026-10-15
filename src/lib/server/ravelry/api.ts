@@ -224,6 +224,23 @@ export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
       return imageIdOf(uploads);
     },
 
+    /** The image_id uploaded with a token (by the browser), or null if none yet. */
+    uploadStatus: async (uploadToken: string) => {
+      const { uploads } = await call<{
+        uploads?:
+          | Record<string, { image_id: number }>
+          | Record<string, { image_id: number }>[]
+          | null;
+      }>(
+        `/upload/image/status.json?upload_token=${encodeURIComponent(uploadToken)}`,
+      );
+      try {
+        return uploads ? imageIdOf(uploads) : null;
+      } catch {
+        return null;
+      }
+    },
+
     /** Starts adding a photo to a project; poll photoStatus with the token. */
     createProjectPhoto: async (
       username: string,

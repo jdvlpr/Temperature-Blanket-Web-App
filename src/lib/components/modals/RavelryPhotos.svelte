@@ -108,7 +108,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (fileInput) fileInput.value = '';
   }
 
-  async function remove(photoId: number) {
+  /** After a delete, focus goes to the photo that took its place, else the
+   * one before it, else Add Photos */
+  async function focusAfterDelete(index: number) {
+    await tick();
+    const next = photos[index] ?? photos[index - 1];
+    const target = next
+      ? root?.querySelector<HTMLElement>(
+          `[data-confirm="photo-${next.photoId}"]`,
+        )
+      : fileInput;
+    target?.focus({ preventScroll: true });
+  }
+
+  async function remove(photoId: number, index: number) {
     busy = 'Deleting the photo on Ravelry…';
     errorMessage = '';
     message = '';
@@ -116,6 +129,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       setPhotos(await deleteRavelryPhoto(projectId, photoId));
       message = 'Photo deleted.';
       confirmingDelete = null;
+      busy = null;
+      await focusAfterDelete(index);
     } catch (e) {
       errorMessage = ravelryErrorMessage(e);
     } finally {
@@ -137,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4" bind:this={root}>
+<div class="flex flex-col gap-4 p-4 text-left" bind:this={root}>
   {#if link}
     <p class="text-sm">
       Photos you add here are stored on Ravelry, on this project’s page, and
@@ -145,27 +160,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
 
     {#if photos.length}
-      <ul class="grid grid-cols-3 gap-2 sm:grid-cols-4" aria-label="Photos">
+      <ul class="columns-2 gap-3 sm:columns-3" aria-label="Photos">
         {#each photos as photo, i (photo.photoId)}
-          <li class="relative">
+          <li class="relative mb-3 break-inside-avoid">
             <img
-              src={photo.smallUrl ?? photo.squareUrl ?? ''}
+              src={photo.mediumUrl ?? photo.smallUrl ?? photo.squareUrl ?? ''}
               alt={photo.isPicture
                 ? `${name}: its picture from Temperature Blanket`
-                : `${name}: photo ${i + 1}`}
-              class="rounded-base aspect-square w-full object-cover"
+                : `${name}: photo ${i + 1} of ${photos.length}`}
+              class="bg-surface-100-900 h-auto w-full"
               loading="lazy"
             />
             {#if confirmingDelete === photo.photoId}
               <div
-                class="bg-surface-50-950/95 rounded-base absolute inset-0 flex flex-col items-center justify-center gap-1 p-1 text-center text-xs"
+                class="bg-surface-50-950/95 absolute inset-0 flex flex-col items-center justify-center gap-2 p-2 text-center text-sm"
               >
-                <span>Delete on Ravelry too?</span>
-                <div class="flex gap-1">
+                <span>Delete this photo on Ravelry too?</span>
+                <div class="flex flex-wrap justify-center gap-2">
                   <button
                     type="button"
                     class="btn btn-sm preset-filled-error-500"
-                    onclick={() => remove(photo.photoId)}
+                    onclick={() => remove(photo.photoId, i)}
                     disabled={!!busy}
                     {@attach takeFocus}>Delete</button
                   >
@@ -182,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {:else}
               <button
                 type="button"
-                class="btn-icon btn-icon-sm preset-filled-surface-50-950 absolute top-1 right-1"
+                class="btn-icon btn-icon-sm preset-filled-surface-50-950 absolute top-2 right-2 shadow"
                 aria-label={`Delete photo ${i + 1}`}
                 data-confirm="photo-{photo.photoId}"
                 onclick={() => (confirmingDelete = photo.photoId)}
@@ -267,7 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else}
         <button
           type="button"
-          class="btn btn-sm hover:preset-tonal-surface -ml-2 self-start"
+          class="btn btn-sm hover:preset-tonal-surface self-start"
           data-confirm="unlink"
           onclick={() => (confirmingUnlink = true)}
           disabled={!!busy}

@@ -384,11 +384,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               rel="noopener noreferrer"
                               class="block"
                               ><img
-                                src={photo.smallUrl ?? photo.squareUrl ?? ''}
+                                src={photo.mediumUrl ??
+                                  photo.smallUrl ??
+                                  photo.squareUrl ??
+                                  ''}
                                 alt={photo.isPicture
                                   ? `${projectName || 'The project'}: its picture from Temperature Blanket (opens Ravelry in a new tab)`
                                   : `${projectName || 'The project'}: photo ${i + 1} on Ravelry (opens in a new tab)`}
-                                class="rounded-base size-24 object-cover sm:size-32"
+                                class="bg-surface-100-900 h-32 w-auto max-w-full sm:h-48"
                                 loading="lazy"
                               /></a
                             >

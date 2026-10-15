@@ -346,7 +346,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if done}
-  <div class="flex flex-col gap-4" role="status">
+  <div class="flex flex-col gap-4 p-4 text-left" role="status">
     <p class="flex items-center gap-2 font-bold">
       <CheckIcon aria-hidden="true" />
       {updating ? 'Updated on Ravelry' : 'Posted to Ravelry'}
@@ -378,7 +378,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 {:else}
-  <form class="flex flex-col gap-4" onsubmit={send} inert={!!step}>
+  <form
+    class="flex flex-col gap-4 p-4 text-left"
+    onsubmit={send}
+    inert={!!step}
+  >
     <div
       class="bg-surface-50 dark:bg-surface-950 rounded-container flex items-center gap-4 p-4"
     >

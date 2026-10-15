@@ -18,14 +18,16 @@ import type { RequestHandler } from './$types';
 export const prerender = false;
 
 /**
- * Adds a photo (multipart "file") to the linked Ravelry project. With
- * picture=1 it's the project's picture from the app, replacing the last one.
+ * Adds a photo to the linked Ravelry project: JSON { uploadToken }
+ * for one the browser uploaded itself (see photos/upload), or multipart
+ * "file" through here. With picture=1 it's the project's picture from the
+ * app, replacing the last one.
  */
 export const POST: RequestHandler = async (event) => {
   const { withRavelry, ravelryError, NO_STORE } =
     await import('#lib/server/ravelry/index.js');
   const { getProjectLink } = await import('#lib/server/ravelry/store.js');
-  const { addPhoto, PHOTO_TYPES, MAX_PHOTO_BYTES } =
+  const { addPhoto, attachImage, PHOTO_TYPES, MAX_PHOTO_BYTES } =
     await import('#lib/server/ravelry/photos.js');
   const { PROJECT_ID_PATTERN } = await import('#lib/server/sync/store.js');
   const projectId = event.params.projectId;
@@ -36,6 +38,28 @@ export const POST: RequestHandler = async (event) => {
     const link = await getProjectLink(session.db, session.userId, projectId);
     if (!link)
       return ravelryError(404, 'NOT_LINKED', 'Post it to Ravelry first');
+
+    if (event.request.headers.get('content-type')?.includes('json')) {
+      const body = (await event.request.json().catch(() => null)) as {
+        uploadToken?: unknown;
+        picture?: unknown;
+      } | null;
+      if (typeof body?.uploadToken !== 'string' || !body.uploadToken)
+        return ravelryError(400, 'INVALID_REQUEST', 'Missing upload token');
+      // Ravelry says what was uploaded with the token (the browser may not
+      // see Ravelry's answer, and isn't trusted with an image_id)
+      const imageId = await session.api.uploadStatus(body.uploadToken);
+      if (imageId === null)
+        return ravelryError(
+          409,
+          'UPLOAD_NOT_FOUND',
+          'The upload didn’t reach Ravelry',
+        );
+      const result = await attachImage(session, link, imageId, {
+        picture: body.picture === true,
+      });
+      return Response.json(result, { headers: NO_STORE });
+    }
 
     const form = await event.request.formData().catch(() => null);
     const file = form?.get('file');

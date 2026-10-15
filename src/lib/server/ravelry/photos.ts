@@ -67,9 +67,13 @@ export async function refreshPhotos(
   return listPhotos(session.db, session.userId, link.projectId);
 }
 
+/** Where the browser uploads a photo itself, with a one-use token. */
+export const RAVELRY_UPLOAD_URL = 'https://api.ravelry.com/upload/image.json';
+
 /**
- * Uploads a photo to the project on Ravelry and waits (briefly) for Ravelry
- * to finish it. As the project's `picture`, it replaces the last one.
+ * Uploads a photo to the project on Ravelry through this server, then adds
+ * it (see attachImage). The browser uploads it straight to Ravelry when it
+ * can, which keeps big photos off the Worker.
  */
 export async function addPhoto(
   session: RavelrySession,
@@ -86,6 +90,20 @@ export async function addPhoto(
         ? 'heic'
         : 'jpg';
   const imageId = await api.uploadImage(token, file, `photo.${extension}`);
+  return attachImage(session, link, imageId, { picture });
+}
+
+/**
+ * Adds an uploaded image to the project on Ravelry and waits (briefly) for
+ * Ravelry to finish it. As the project's `picture`, it replaces the last one.
+ */
+export async function attachImage(
+  session: RavelrySession,
+  link: RavelryProjectLink,
+  imageId: number,
+  { picture = false } = {},
+) {
+  const { api } = session;
   const statusToken = await api.createProjectPhoto(
     link.ravelryUsername,
     link.ravelryProjectId,
