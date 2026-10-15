@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- Icons line up by what's drawn, with the site logo's edge -->
 <nav
   aria-label="Site"
-  class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-2 text-left lg:px-2"
+  class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-2 text-left lg:pr-2 lg:pl-3"
   data-sveltekit-preload-data="hover"
   {@attach alignIconInk}
 >
@@ -105,11 +105,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     My Preferences
   </button>
 
-  <hr class="border-surface-200-800 w-full" />
-
+  <!-- Groups are set apart by space, not lines -->
   <a
     href="/supporters"
-    class={[LINK, pathname === '/supporters' && CURRENT]}
+    class={[LINK, 'mt-3', pathname === '/supporters' && CURRENT]}
     aria-current={pathname === '/supporters' ? 'page' : undefined}
   >
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
@@ -174,12 +173,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Weather Forecast
   </a>
 
-  <hr class="border-surface-200-800 w-full" />
-
   <!-- Small links, spaced apart in one row that wraps. It takes the
   sidebar's width rather than setting it, or the sidebar would stretch to
   fit every link on one line -->
-  <div class={[SMALL_LINKS, 'w-0 min-w-full px-3']}>
+  <div class={[SMALL_LINKS, 'mt-5 w-0 min-w-full px-3']}>
     <a
       href="/faq"
       class={['py-1', SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}

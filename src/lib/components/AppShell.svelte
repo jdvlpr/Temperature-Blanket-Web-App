@@ -39,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
 
   let sidebarWidth = $state(0);
+  let topBarHeight = $state(0);
 
   // The sidebar folds both ways at once, so the button under it glides to
   // its place rather than jumping when the navigation is gone
@@ -75,6 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ]}
     data-sticky-bar
     id="top-navbar"
+    bind:clientHeight={topBarHeight}
   >
     <div
       class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
@@ -82,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <!-- Wide screens: shows or hides the sidebar, in the spot the menu
       button takes on narrow ones, so it never moves -->
       <button
-        class="btn-icon hover:preset-tonal-surface my-2 hidden lg:flex"
+        class="btn-icon hover:preset-tonal-surface my-2 hidden lg:ml-1 lg:flex"
         title={showNavigationSideBar.value ? 'Hide sidebar' : 'Show sidebar'}
         aria-label={showNavigationSideBar.value
           ? 'Hide sidebar'
@@ -146,16 +148,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div class="mx-auto flex max-w-(--breakpoint-xl) justify-start">
+    <!-- Stays in view under the top bar as the page scrolls, scrolling on its
+    own when the window is too short for all of it -->
     <div
       id="app-sidebar"
-      class="flex h-fit flex-col items-start justify-start [view-transition-name:sidebar-navigation]"
+      class="sticky flex h-fit [scrollbar-width:thin] flex-col items-start justify-start self-start overflow-y-auto [view-transition-name:sidebar-navigation]"
+      style:top="{topBarHeight}px"
+      style:max-height="calc(100dvh - {topBarHeight}px)"
       bind:clientWidth={sidebarWidth}
     >
       {#if showNavigationSideBar.value}
         <div class="hidden w-fit flex-col lg:flex" transition:sidebarSlide>
-          <!-- A quiet panel, like the page's cards, so the navigation's lines
-          end at an edge rather than in the page's background -->
-          <div class="card preset-tonal-surface mt-2 mr-4 mb-4 w-fit">
+          <div class="mb-4 w-fit">
             <AppNavigation />
           </div>
         </div>
