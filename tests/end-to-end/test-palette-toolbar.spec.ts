@@ -221,12 +221,12 @@ test.describe('Palette toolbar', () => {
     await dialog.getByRole('button', { name: 'Use 3 Colors' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
-    // The pasted colors are now the palette; Link copies it straight away
+    // The pasted colors are now the palette; Copy Link copies it straight away
     await page
       .context()
       .grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Link/ }).click();
+    await page.getByRole('menuitem', { name: /^Copy Link/ }).click();
     await expect(page.getByText('Palette link copied')).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(

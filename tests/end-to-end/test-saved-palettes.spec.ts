@@ -93,14 +93,21 @@ test.describe('Saved palettes', () => {
     ).toHaveValue('');
   });
 
-  test('export a link that opens the palette', async ({ page }) => {
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Link/ }).click();
-    const dialog = page.getByRole('dialog');
-    const link = dialog.getByText(/\/yarn\?s=/);
-    await expect(link).toBeVisible();
+  test('Copy Link copies a link that opens the palette', async ({ page }) => {
+    await page
+      .context()
+      .grantPermissions(['clipboard-read', 'clipboard-write']);
+    // Retried: a click before the page finishes loading does nothing
+    await expect(async () => {
+      await page.getByRole('button', { name: 'Save & Export' }).click();
+      await page
+        .getByRole('menuitem', { name: /^Copy Link/ })
+        .click({ timeout: 1000 });
+    }).toPass();
+    await expect(page.getByText('Palette link copied')).toBeVisible();
 
-    const url = new URL((await link.textContent())!.trim());
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    const url = new URL(copied.trim());
     expect(url.pathname).toBe('/yarn');
     expect(url.searchParams.get('s')).toMatch(/^([0-9a-f]{6})+$/i);
   });
