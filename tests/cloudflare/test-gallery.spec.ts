@@ -16,9 +16,12 @@
 // Gallery pages from accounts under `wrangler pages dev`, with publishing from
 // accounts switched off (GALLERY_PUBLISH_ENABLED unset), as on Pages previews.
 // These tests never reach WordPress: publishing itself is tested against the
-// Local WordPress site (see the plugin's dev/README.md).
+// Local WordPress site (see the plugin's dev/README.md), and the server's side
+// of publishing and updating in place by src/lib/server/gallery/index.test.ts.
+// Where a test needs publishing on, fakeGallery stands in for the app's routes
+// in the browser.
 
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { idbSet, localD1, signIn, uniqueEmail, useTestIp } from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
@@ -38,6 +41,110 @@ const sameOrigin = (baseURL: string | undefined) => ({
 const userIdFor = (email: string) =>
   String(localD1(`select "id" from "user" where "email" = '${email}'`)[0].id);
 
+type FakePost = {
+  postId: number;
+  projectId: string;
+  title: string;
+  publishedAt: number;
+  updatedAt?: number | null;
+  kind?: 'project' | 'palette';
+  link?: string | null;
+  showOwner?: boolean;
+};
+
+/**
+ * Stands in for the account's gallery routes, which can't publish here
+ * (GALLERY_PUBLISH_ENABLED is off and WordPress isn't running): a list of
+ * pages kept by the test that publishing adds to, PUT updates in place (the
+ * page keeps its ID, so its link stays the same), PATCH changes Anonymous on
+ * and DELETE removes. WordPress's side of an update (plugin route
+ * `tbgalleryapi/v1/project/<id>` or `palette/<id>`, 404 for an unknown page)
+ * is covered by src/lib/server/gallery/index.test.ts. Set on the context,
+ * which also sees the service worker's requests.
+ */
+async function fakeGallery(page: Page, initial: FakePost[] = []) {
+  const posts = [...initial];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const calls: { method: string; postId?: number; body?: any }[] = [];
+  let nextId = 900;
+  await page.context().route('**/api/account/gallery**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const match = url.pathname.match(/^\/api\/account\/gallery(?:\/(\d+))?$/);
+    if (!match) return route.fallback();
+    const postId = match[1] ? Number(match[1]) : undefined;
+    const method = request.method();
+    const body =
+      method === 'GET' || method === 'DELETE'
+        ? undefined
+        : request.postDataJSON();
+    if (method !== 'GET') calls.push({ method, postId, body });
+    const post = posts.find((p) => p.postId === postId);
+    const answer = (p: FakePost) => ({
+      code: 200,
+      id: p.postId,
+      link: `https://wp.example.test/${p.kind ?? 'project'}/${p.postId}/x/`,
+      title: p.title,
+      message: 'Success!',
+    });
+
+    if (method === 'GET' && postId === undefined)
+      return route.fulfill({
+        json: {
+          posts,
+          publishing: true,
+          settings: {
+            showOwnerDefault: false,
+            removeOnDelete: false,
+            publicId: null,
+          },
+          name: 'Ada Lovelace',
+        },
+      });
+    if (method === 'POST' && postId === undefined) {
+      const created: FakePost = {
+        postId: nextId++,
+        projectId: new URL(String(body.project_url)).searchParams.get(
+          'project',
+        )!,
+        title: String(body.project_name || body.title),
+        publishedAt: Date.now(),
+        updatedAt: null,
+        kind: 'project',
+        showOwner: url.searchParams.get('showOwner') === 'true',
+      };
+      posts.push(created);
+      return route.fulfill({ json: answer(created) });
+    }
+    if (postId === undefined) return route.fallback();
+    if (!post)
+      return route.fulfill({
+        status: 404,
+        json: { code: 'NOT_FOUND', message: 'No such gallery page' },
+      });
+    if (method === 'PUT') {
+      if (post.kind === 'palette') {
+        post.title = body.title;
+        post.link = body.yarnUrl;
+      } else post.title = String(body.project_name || body.title);
+      post.updatedAt = Date.now();
+      return route.fulfill({ json: answer(post) });
+    }
+    if (method === 'PATCH' && typeof body?.showOwner === 'boolean') {
+      post.showOwner = body.showOwner;
+      return route.fulfill({
+        json: { showOwner: body.showOwner, publicId: 'AAAAAAAAAAAA' },
+      });
+    }
+    if (method === 'DELETE') {
+      posts.splice(posts.indexOf(post), 1);
+      return route.fulfill({ status: 204 });
+    }
+    return route.fallback();
+  });
+  return { posts, calls };
+}
+
 test.describe('Gallery pages from accounts', () => {
   test('signed out, the routes refuse', async ({ request, baseURL }) => {
     expect((await request.get('/api/account/gallery')).status()).toBe(401);
@@ -55,6 +162,10 @@ test.describe('Gallery pages from accounts', () => {
           data: { showOwner: true },
         })
       ).status(),
+    ).toBe(401);
+    // Updating a page in place is the account's too
+    expect(
+      (await request.put('/api/account/gallery/1', { data: {} })).status(),
     ).toBe(401);
   });
 
@@ -96,6 +207,11 @@ test.describe('Gallery pages from accounts', () => {
     expect(
       (await api.patch('/api/account/gallery', { data: {} })).status(),
     ).toBe(400);
+
+    // Updating a page in place pauses with publishing
+    const updated = await api.put('/api/account/gallery/123456', { data: {} });
+    expect(updated.status()).toBe(503);
+    expect((await updated.json()).code).toBe('GALLERY_PAUSED');
 
     // Not this account's page
     expect(
@@ -143,25 +259,29 @@ test.describe('Gallery pages from accounts', () => {
         .first(),
     ).toHaveAttribute('href', `/gallery/${postId}`);
 
-    // Each page is included on the public gallery on its own; the display
-    // name itself is in the Account page's Profile settings
-    const sharing = page.getByRole('group', {
-      name: 'Gallery: Ottawa from 2025 to 2026',
+    // Each page is included on the public gallery on its own, from its Share
+    // dialog; the display name itself is in the Account page's Profile settings
+    await page
+      .getByRole('button', { name: 'Share Ottawa from 2025 to 2026' })
+      .click();
+    const dialog = page.getByRole('dialog', {
+      name: 'Share “Ottawa from 2025 to 2026”',
     });
-    await expect(sharing.getByRole('button', { name: /^Gallery:/ })).toHaveText(
-      /Published\s*$/,
-    );
-    await sharing.getByRole('button', { name: /^Gallery:/ }).click();
-    const anonymous = page.getByRole('menuitemcheckbox', {
-      name: /Anonymous/,
-    });
+    await expect(
+      dialog.getByRole('heading', { name: 'Gallery Page' }),
+    ).toBeVisible();
+    const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'Add a Name for Gallery Pages',
     );
-    await anonymous.click();
+    await anonymous.uncheck();
     await expect(anonymous).not.toBeChecked();
+    await expect(
+      dialog.getByRole('link', { name: 'Profile settings' }),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
     await page
       .getByTestId('gallery-name-status')
       .getByRole('link', { name: 'Add a Name for Gallery Pages' })
@@ -199,7 +319,7 @@ test.describe('Gallery pages from accounts', () => {
     ]);
   });
 
-  test('a saved project shows if it is published, and its menu changes its page', async ({
+  test('a saved project shows if it is published, and its Share dialog changes its one page', async ({
     page,
     request,
   }) => {
@@ -233,77 +353,73 @@ test.describe('Gallery pages from accounts', () => {
         },
       ],
     });
-    // Its page, and an older one of the same project
+    // Its page, published before the project was last saved
     const postId = 700_000_000 + Math.floor(Math.random() * 1e8);
     localD1(
       `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
-       values (${postId}, '${userId}', '${id}', '${title}', ${Date.now()}),
-              (${postId + 1}, '${userId}', '${id}', 'Older', ${Date.now() - 3_600_000})`,
+       values (${postId}, '${userId}', '${id}', '${title}', ${Date.now() - 3_600_000})`,
     );
 
     await page.reload();
     // The project isn't in the account: leave it in this browser
     await page.getByRole('button', { name: /^Not now/ }).click();
-    const sharing = page.getByRole('group', { name: `Gallery: ${title}` });
-    const menu = sharing.getByRole('button', { name: /^Gallery:/ });
-    await expect(menu).toHaveText(/Published · 2 versions\s*$/);
-    // Unchanged since it was published: nothing to update
-    await expect(
-      sharing.getByRole('button', { name: /Publish a new version/ }),
-    ).toHaveCount(0);
+    const share = page.getByRole('button', { name: `Share ${title}` });
+    await expect(share).toBeVisible();
+    // One page, one status: Published, and changed since
+    await expect(share.locator('..')).toContainText(
+      'Published · changed since',
+    );
     await expect(page.getByText(/Gallery only/)).toHaveCount(0);
+    // Versions are gone
+    await expect(page.getByText(/versions?\b/)).toHaveCount(0);
 
-    // Each version, newest first, by its own page's name and when it was
-    // published, opens its own options
-    const versions = page.getByRole('menuitem', {
-      name: new RegExp(`^(${title}|Older)\\s*Published `),
-    });
-    const open = async (which: 'first' | 'last') => {
-      await menu.click();
-      await expect(versions).toHaveCount(2);
-      await versions[which]().click();
-    };
-    await open('first');
-    await expect(versions.first()).toContainText(title);
-    await expect(versions.last()).toContainText('Older');
-    await expect(versions.first()).not.toContainText('by ');
+    await share.click();
+    const dialog = page.getByRole('dialog', { name: `Share “${title}”` });
+    // Link: a copy anyone can open
     await expect(
-      page.getByRole('menuitem', { name: /View Gallery Page/ }),
+      dialog.getByRole('heading', { name: 'Link', exact: true }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: /^Copy Link/ }),
+    ).toBeVisible();
+    // Gallery Page: its state, then its options
+    const status = dialog.locator('#share-gallery + p');
+    await expect(status).toContainText('Published');
+    await expect(status).toContainText('Anonymous');
+    await expect(status).toContainText('changed since');
+    await expect(
+      dialog.getByRole('link', { name: /^View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
-    await page.keyboard.press('Escape');
-    await page.keyboard.press('Escape');
-    await open('last');
+    // (Publishing is off here: nothing to publish or update with)
     await expect(
-      page.getByRole('menuitem', { name: /View Gallery Page/ }),
-    ).toHaveAttribute('href', `/gallery/${postId + 1}`);
-    await page.keyboard.press('Escape');
-    await page.keyboard.press('Escape');
+      dialog.getByRole('button', { name: /^Update Gallery Page/ }),
+    ).toHaveCount(0);
+    await expect(
+      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
+    ).toHaveCount(0);
 
-    // The name on the latest only (the menu stays open, to show it took)
-    await open('first');
-    const anonymous = page.getByRole('menuitemcheckbox', {
-      name: /Anonymous/,
-    });
+    // The name on the page
+    const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
-    await anonymous.click();
+    await anonymous.uncheck();
     await expect(anonymous).not.toBeChecked();
+    await expect(status).toContainText('By Ada Lovelace');
+    await expect
+      .poll(
+        () =>
+          localD1(
+            `select "showOwner" from "galleryPost" where "postId" = ${postId}`,
+          )[0].showOwner,
+      )
+      .toBe(1);
     await page.keyboard.press('Escape');
-    await page.keyboard.press('Escape');
-    await menu.click();
-    await expect(versions.first()).toContainText('by Ada Lovelace');
-    await expect(versions.last()).not.toContainText('by ');
-    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'By Ada Lovelace',
     );
     await expect(page.getByTestId('gallery-owner-page')).toBeVisible();
-    expect(
-      localD1(
-        `select "postId", "showOwner" from "galleryPost" where "postId" in (${postId}, ${postId + 1}) order by "postId"`,
-      ).map((row) => row.showOwner),
-    ).toEqual([1, 0]);
 
-    // Unpublish one version: asks first
+    // Unpublish: asks first
     // (WordPress, which trashes the post, isn't running here: as if it did)
     const removed: string[] = [];
     await page.route(`**/api/account/gallery/*`, (route) => {
@@ -311,34 +427,29 @@ test.describe('Gallery pages from accounts', () => {
       removed.push(new URL(route.request().url()).pathname.split('/').pop()!);
       return route.fulfill({ status: 204 });
     });
-    await open('last');
-    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await expect(sharing).toContainText('Unpublish the version published');
-    await sharing.getByRole('button', { name: 'Cancel' }).click();
-    expect(removed).toEqual([]);
-    await open('last');
-    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await sharing
-      .getByRole('button', { name: 'Unpublish', exact: true })
-      .click();
-    await expect(menu).toHaveText(/Published\s*$/);
-    expect(removed).toEqual([String(postId + 1)]);
-    // Then the last one: with only one, its options are right in the menu
-    await menu.click();
-    await expect(versions).toHaveCount(0);
+    await share.click();
+    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
+    await expect(dialog).toContainText(`Unpublish “${title}”?`);
     await expect(
-      page.getByRole('menuitemcheckbox', { name: /Anonymous/ }),
-    ).not.toBeChecked();
-    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await sharing
+      dialog.getByRole('button', { name: 'Unpublish', exact: true }),
+    ).toBeFocused();
+    await dialog.getByRole('button', { name: 'Keep Published' }).click();
+    expect(removed).toEqual([]);
+    await expect(
+      dialog.getByRole('button', { name: /^Unpublish…/ }),
+    ).toBeFocused();
+    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
+    await dialog
       .getByRole('button', { name: 'Unpublish', exact: true })
       .click();
-    await expect(sharing).toHaveCount(0);
-    expect(removed).toEqual([String(postId + 1), String(postId)]);
+    await expect(status).toContainText('Not published');
+    expect(removed).toEqual([String(postId)]);
+    await page.keyboard.press('Escape');
+    await expect(share.locator('..')).not.toContainText('Published');
     // (Publishing is off here, so with no page there's nothing left to change)
   });
 
-  test('on its own gallery page, the owner can show their name or unpublish it', async ({
+  test('on its own gallery page, the owner can show their name, find where to update it, or unpublish it', async ({
     page,
     request,
     browser,
@@ -353,26 +464,21 @@ test.describe('Gallery pages from accounts', () => {
     const postId = 900_000_000 + Math.floor(Math.random() * 1e7);
     localD1(
       `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
-       values (${postId}, '${userId}', 'p-bar', 'Lima', ${Date.now()}),
-              (${postId + 1}, '${userId}', 'p-bar', 'Lima', ${Date.now() - 3_600_000})`,
+       values (${postId}, '${userId}', 'p-bar', 'Lima', ${Date.now()})`,
     );
 
-    // The older version links to the newer one
-    await page.goto(`/gallery/${postId + 1}`);
+    await page.goto(`/gallery/${postId}`);
     const options = page.getByRole('button', { name: /^Gallery: Published/ });
     await options.click();
-    await expect(
-      page.getByRole('menuitem', { name: 'Newer Version' }),
-    ).toHaveAttribute('href', `/gallery/${postId}`);
-    await page.keyboard.press('Escape');
-
-    await page.goto(`/gallery/${postId}`);
-    await options.click();
+    // No versions to move between; updating is from the project's card
     await expect(
       page.getByRole('menuitem', { name: 'Newer Version' }),
     ).toHaveCount(0);
+    await expect(
+      page.getByRole('menuitem', { name: /^Update from My Library/ }),
+    ).toHaveAttribute('href', '/my-projects');
 
-    // Anonymous off: the name on this page only
+    // Anonymous off: the name on this page
     const anonymous = page.getByRole('menuitemcheckbox', {
       name: /Anonymous/,
     });
@@ -381,11 +487,14 @@ test.describe('Gallery pages from accounts', () => {
     await expect(anonymous).not.toBeChecked();
     await page.keyboard.press('Escape');
     // ("By" shows under the project's title, which needs WordPress)
-    expect(
-      localD1(
-        `select "showOwner" from "galleryPost" where "postId" in (${postId}, ${postId + 1}) order by "postId"`,
-      ).map((row) => row.showOwner),
-    ).toEqual([1, 0]);
+    await expect
+      .poll(
+        () =>
+          localD1(
+            `select "showOwner" from "galleryPost" where "postId" = ${postId}`,
+          )[0].showOwner,
+      )
+      .toBe(1);
 
     // Unpublish: asks first
     // (WordPress, which trashes the post, isn't running here: as if it did)
@@ -397,6 +506,7 @@ test.describe('Gallery pages from accounts', () => {
     });
     await options.click();
     await page.getByRole('menuitem', { name: /Unpublish/ }).click();
+    await expect(page.getByText('Unpublish this page?')).toBeVisible();
     await page.getByRole('button', { name: 'Cancel' }).click();
     expect(removed).toEqual([]);
     await options.click();
@@ -410,7 +520,7 @@ test.describe('Gallery pages from accounts', () => {
     // Anyone else sees no menu
     const visitor = await browser.newContext({ baseURL });
     const other = await visitor.newPage();
-    await other.goto(`/gallery/${postId + 1}`);
+    await other.goto(`/gallery/${postId}`);
     await expect(
       other.getByRole('link', { name: 'Project Gallery' }),
     ).toBeVisible();
@@ -418,7 +528,7 @@ test.describe('Gallery pages from accounts', () => {
     await visitor.close();
   });
 
-  test('a saved project goes to the gallery from My Projects, without leaving it', async ({
+  test('a saved project is published, then updated in place, from Share on My Projects, without leaving it', async ({
     page,
     request,
   }) => {
@@ -491,81 +601,57 @@ test.describe('Gallery pages from accounts', () => {
       projects_index: [a.item, b.item],
     });
 
-    // Publishing is off here: as if it were on, listing what's been sent (on
-    // the context, which also sees the service worker's requests)
-    const sent: Record<string, unknown>[] = [];
-    await page.context().route('**/api/account/gallery**', async (route) => {
-      const url = new URL(route.request().url());
-      if (url.pathname !== '/api/account/gallery') return route.fallback();
-      if (route.request().method() === 'GET')
-        return route.fulfill({
-          json: {
-            posts: sent.map((body, i) => ({
-              postId: 900 + i,
-              projectId: new URL(String(body.project_url)).searchParams.get(
-                'project',
-              ),
-              title: body.title,
-              publishedAt: Date.now(),
-              kind: 'project',
-              showOwner: false,
-            })),
-            publishing: true,
-            settings: {
-              showOwnerDefault: false,
-              removeOnDelete: false,
-              publicId: null,
-            },
-          },
-        });
-      sent.push(route.request().postDataJSON());
-      return route.fulfill({
-        json: { code: 200, message: 'Sent', link: '/gallery/900' },
-      });
-    });
+    // Publishing is off here: as if it were on
+    const gallery = await fakeGallery(page);
+    const sent = () => gallery.calls.filter((call) => call.method === 'POST');
+    const updates = () => gallery.calls.filter((call) => call.method === 'PUT');
 
     await page.reload();
     await page.getByRole('button', { name: /^Not now/ }).click();
-    const rowFor = (name: string) =>
-      page.getByRole('group', { name: `Gallery: ${name}` });
-    const addToGallery = async (name: string) => {
-      await rowFor(name)
-        .getByRole('button', { name: /^Gallery:/ })
-        .click();
-      await page.getByRole('menuitem', { name: /^Publish to Gallery/ }).click();
+    const card = (name: string) =>
+      page.getByRole('button', { name: `Share ${name}` }).locator('..');
+    const shareDialog = (name: string) =>
+      page.getByRole('dialog', { name: `Share “${name}”` });
+    // From the card's Share dialog to the publish dialog
+    const openFromShare = async (name: string, row: RegExp) => {
+      await page.getByRole('button', { name: `Share ${name}` }).click();
+      await shareDialog(name).getByRole('button', { name: row }).click();
     };
-    const dialog = page.getByRole('dialog', { name: 'Publish to Gallery' });
-    await expect(
-      rowFor('First test').getByRole('button', { name: /^Gallery:/ }),
-    ).toHaveText(/Unpublished\s*$/);
+    const publishDialog = page.getByRole('dialog', {
+      name: 'Publish to Gallery',
+    });
+    const updateDialog = page.getByRole('dialog', {
+      name: 'Update Gallery Page',
+    });
+    await expect(card('First test')).not.toContainText('Published');
 
-    // The first one opens over My Projects; closing it leaves everything as it was
-    await addToGallery('First test');
-    await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
+    // The first opens over My Projects; closing it leaves everything as it was
+    await openFromShare('First test', /^Publish to Gallery…/);
+    await expect(publishDialog.locator('svg#preview-svg-image')).toBeVisible();
     await expect(page).toHaveURL(/\/my-projects$/);
     await page.keyboard.press('Escape');
-    await expect(dialog).toHaveCount(0);
-    expect(sent).toHaveLength(0);
+    await expect(publishDialog).toHaveCount(0);
+    expect(sent()).toHaveLength(0);
 
     // Another one opens over the page too: it doesn't load again
     // (gone if the page loads again)
     await page.evaluate(() => Object.assign(window, { __notReloaded: true }));
-    const send = async () => {
+    const send = async (
+      dialog: typeof publishDialog,
+      button: string,
+      done: string,
+    ) => {
       await expect(dialog.locator('svg#preview-svg-image')).toBeVisible();
       await expect(page).toHaveURL(/\/my-projects$/);
-      await dialog
-        .getByRole('button', { name: 'Publish', exact: true })
-        .click();
-      await expect(
-        dialog.getByRole('heading', { name: 'Published' }),
-      ).toBeVisible();
-      await page.keyboard.press('Escape');
-      await expect(dialog).toHaveCount(0);
+      await dialog.getByRole('button', { name: button, exact: true }).click();
+      await expect(dialog.getByRole('heading', { name: done })).toBeVisible();
     };
-    await addToGallery('Second test');
-    await send();
-    expect(sent).toHaveLength(1);
-    const projectUrl = new URL(String(sent[0].project_url));
+    await openFromShare('Second test', /^Publish to Gallery…/);
+    await send(publishDialog, 'Publish', 'Published');
+    await page.keyboard.press('Escape');
+    await expect(publishDialog).toHaveCount(0);
+    expect(sent()).toHaveLength(1);
+    const projectUrl = new URL(String(sent()[0].body.project_url));
     expect(projectUrl.searchParams.get('project')).toBe(second);
     // Only its own: nothing of the first one's is left
     expect(projectUrl.hash).toContain("l=3652462'2025010120250103");
@@ -573,29 +659,205 @@ test.describe('Gallery pages from accounts', () => {
     expect(projectUrl.hash).not.toContain('prcp=');
     expect(projectUrl.hash).not.toContain('&w=');
     expect(projectUrl.hash).not.toContain('&n=');
-    expect(sent[0].project_name).toBe('Second test');
-    expect(sent[0].total_days).toBe(3);
+    expect(sent()[0].body.project_name).toBe('Second test');
+    expect(sent()[0].body.total_days).toBe(3);
 
-    // Its row says so, without leaving the page
-    await expect(
-      rowFor('Second test').getByRole('button', { name: /^Gallery:/ }),
-    ).toHaveText(/Published\s*$/);
-    await expect(
-      rowFor('First test').getByRole('button', { name: /^Gallery:/ }),
-    ).toHaveText(/Unpublished\s*$/);
+    // Its card says so, without leaving the page
+    await expect(card('Second test')).toContainText('Published');
+    await expect(card('First test')).not.toContainText('Published');
+    const postId = gallery.posts[0].postId;
 
-    // And back to the first, all of it
-    await addToGallery('First test');
-    await send();
-    expect(sent).toHaveLength(2);
-    const firstUrl = new URL(String(sent[1].project_url));
+    // And the first, all of it
+    await openFromShare('First test', /^Publish to Gallery…/);
+    await send(publishDialog, 'Publish', 'Published');
+    await page.keyboard.press('Escape');
+    expect(sent()).toHaveLength(2);
+    const firstUrl = new URL(String(sent()[1].body.project_url));
     expect(firstUrl.searchParams.get('project')).toBe(first);
     expect(firstUrl.hash).toContain("l=3652462'2025010120250102");
     expect(firstUrl.hash).toContain("prcp=ff0000(0'5)0000ff(5'10)");
     expect(firstUrl.hash).toContain("&rows=tmax'tmin'tavg'tmax(123)");
     expect(firstUrl.hash).toContain('&w=1');
-    expect(sent[1].total_days).toBe(2);
+    expect(sent()[1].body.total_days).toBe(2);
+    await expect(card('First test')).toContainText('Published');
+
+    // Published: Share has its page, and updating it, not publishing again
+    await page.getByRole('button', { name: 'Share Second test' }).click();
+    const dialog = shareDialog('Second test');
+    await expect(
+      dialog.getByRole('button', { name: /^Publish to Gallery…/ }),
+    ).toHaveCount(0);
+    await expect(
+      dialog.getByRole('link', { name: /^View Gallery Page/ }),
+    ).toHaveAttribute('href', `/gallery/${postId}`);
+    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+    await send(updateDialog, 'Update', 'Updated');
+    // The same page: its link is the same, and nothing new was published
+    await expect(
+      updateDialog.getByRole('link', { name: /^View Gallery Page/ }),
+    ).toHaveAttribute('href', `/gallery/${postId}`);
+    expect(updates()).toHaveLength(1);
+    expect(updates()[0].postId).toBe(postId);
+    expect(
+      new URL(String(updates()[0].body.project_url)).searchParams.get(
+        'project',
+      ),
+    ).toBe(second);
+    expect(updates()[0].body.project_name).toBe('Second test');
+    expect(sent()).toHaveLength(2);
+    expect(gallery.posts).toHaveLength(2);
+    await page.keyboard.press('Escape');
+    await expect(updateDialog).toHaveCount(0);
+    await expect(card('Second test')).toContainText('Published');
+    await expect(card('Second test')).not.toContainText('changed since');
+
+    // Anonymous, from the Share dialog: the name on the page
+    await page.getByRole('button', { name: 'Share Second test' }).click();
+    const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
+    await expect(anonymous).toBeChecked();
+    await anonymous.uncheck();
+    await expect(dialog.locator('#share-gallery + p')).toContainText(
+      'By Ada Lovelace',
+    );
+    expect(gallery.posts.find((p) => p.postId === postId)?.showOwner).toBe(
+      true,
+    );
+    await anonymous.check();
+    await expect(dialog.locator('#share-gallery + p')).toContainText(
+      'Anonymous',
+    );
+    expect(gallery.posts.find((p) => p.postId === postId)?.showOwner).toBe(
+      false,
+    );
+
+    // Unpublish, from the Share dialog: asks first, then it can be published again
+    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
+    await dialog.getByRole('button', { name: 'Keep Published' }).click();
+    expect(gallery.posts).toHaveLength(2);
+    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
+    await dialog
+      .getByRole('button', { name: 'Unpublish', exact: true })
+      .click();
+    await expect(
+      dialog.getByRole('button', { name: /^Publish to Gallery…/ }),
+    ).toBeVisible();
+    expect(gallery.calls.filter((call) => call.method === 'DELETE')).toEqual([
+      { method: 'DELETE', postId, body: undefined },
+    ]);
+    expect(gallery.posts.map((p) => p.postId)).not.toContain(postId);
+    await page.keyboard.press('Escape');
+    await expect(card('Second test')).not.toContainText('Published');
+    await expect(card('First test')).toContainText('Published');
     expect(await page.evaluate(() => '__notReloaded' in window)).toBe(true);
+  });
+
+  test('a saved palette is updated in place from Share, keeping its page', async ({
+    page,
+    request,
+    baseURL,
+  }) => {
+    await signIn(page, request, uniqueEmail('gallery-palette-update'));
+    await page.goto('/my-palettes');
+    const colors = 'ff0000ffa500';
+    const now = Date.now();
+    await idbSet(page, {
+      saved_palettes: [
+        {
+          id: 'pal-sunset',
+          name: 'Sunset',
+          code: `palette:${colors}`,
+          createdAt: now - 60_000,
+          updatedAt: now - 60_000,
+        },
+      ],
+    });
+    const gallery = await fakeGallery(page, [
+      {
+        postId: 777,
+        projectId: 'pal-sunset',
+        kind: 'palette',
+        title: 'Sunset',
+        link: `${baseURL}/yarn?s=${colors}`,
+        publishedAt: now,
+        showOwner: false,
+      },
+    ]);
+    await page.reload();
+    await page.getByRole('button', { name: /^Not now/ }).click();
+
+    const share = page.getByRole('button', { name: 'Share Sunset' });
+    await expect(share.locator('..')).toContainText('Published');
+    await share.click();
+    const dialog = page.getByRole('dialog', { name: 'Share “Sunset”' });
+    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+
+    // Updates its name and colors in place
+    const update = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await expect(update.getByLabel('Name')).toHaveValue('Sunset');
+    await update.getByLabel('Name').fill('Sunset, Updated');
+    await update.getByRole('button', { name: 'Update', exact: true }).click();
+    await expect(update.getByText('Updated', { exact: true })).toBeVisible();
+    await expect(
+      update.getByRole('link', { name: 'View Gallery Page' }),
+    ).toHaveAttribute('href', '/gallery/palette/777');
+    expect(gallery.calls.filter((call) => call.method === 'PUT')).toEqual([
+      {
+        method: 'PUT',
+        postId: 777,
+        body: {
+          title: 'Sunset, Updated',
+          yarnUrl: `${baseURL}/yarn?s=${colors}`,
+        },
+      },
+    ]);
+    expect(gallery.posts).toHaveLength(1);
+    expect(gallery.posts[0].title).toBe('Sunset, Updated');
+  });
+
+  test('signed out, Share offers Copy Link and signing in to publish', async ({
+    page,
+    request,
+  }) => {
+    // Publishing needs an account: the old anonymous route is gone
+    const gone = await request.post('/api/project', { data: {} });
+    expect(gone.status()).toBe(410);
+    expect((await gone.json()).code).toBe('SIGN_IN_TO_PUBLISH');
+
+    await page.goto('/my-projects');
+    const id = String(Date.now());
+    const href = new URL(`/?project=${id}`, page.url()).href;
+    const title = 'Oslo from 2025 to 2026';
+    await idbSet(page, {
+      [`p_${id}`]: {
+        createdAt: new Date().toISOString(),
+        date: 'today',
+        href,
+        isCustomWeatherData: true,
+        title,
+        weatherData: [],
+        weatherSource: { name: 'Meteostat', useSecondary: false },
+      },
+      projects_index: [
+        {
+          id,
+          meta: { date: 'today', href, title, isCustomWeatherData: true },
+          updatedAt: Date.now() - 60_000,
+        },
+      ],
+    });
+    await page.reload();
+
+    await page.getByRole('button', { name: `Share ${title}` }).click();
+    const dialog = page.getByRole('dialog', { name: `Share “${title}”` });
+    await expect(
+      dialog.getByRole('button', { name: /^Copy Link/ }),
+    ).toBeVisible();
+    await expect(dialog.getByText('Not published')).toBeVisible();
+    const signIn = dialog.getByRole('link', { name: /^Sign In to Publish/ });
+    await expect(signIn).toHaveAttribute('href', /^\/auth\/sign-in/);
+    await expect(
+      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
+    ).toHaveCount(0);
   });
 
   test('an owner gets a page listing the gallery pages they include', async ({
@@ -668,10 +930,8 @@ test.describe('Gallery pages from accounts', () => {
     await expect(page.getByText(/Gallery only/)).toHaveCount(0);
     await expect(page.getByText(/^Saved /).first()).toBeVisible();
     await expect(
-      page
-        .getByRole('group', { name: 'Gallery: Sunset' })
-        .getByRole('button', { name: /^Gallery:/ }),
-    ).toHaveText(/Published\s*$/);
+      page.getByRole('button', { name: 'Share Sunset' }).locator('..'),
+    ).toContainText('Published');
     const [{ projectId }] = localD1(
       `select "projectId" from "galleryPost" where "postId" = ${postId}`,
     );
