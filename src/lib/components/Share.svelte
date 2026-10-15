@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   async function copyURL() {
     const ok = await copyToClipboard(
       href,
-      { message: 'URL copied to clipboard', icon: ClipboardCheckIcon },
+      { message: 'Link copied', icon: ClipboardCheckIcon },
       'Unable to copy to your clipboard',
     );
     if (ok) copied.trigger();
@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if !attributes.hidden}
           <div {...attributes} transition:safeSlide>
             <div class="flex flex-col gap-2 p-4">
-              <p class="text-sm">Shareable Page URL</p>
+              <p class="text-sm">Link to this page</p>
 
               <p
                 class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onclick={() => copyURL()}
                 >
                   <CopyIcon copied={copied.is()} />
-                  Copy URL</button
+                  Copy Link</button
                 >
 
                 <button

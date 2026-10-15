@@ -18,15 +18,14 @@ Planner). Publishing a palette on its own needs an account: signed out, it says
 so, with a way to sign in that comes back to these colors, and Save Palette.
 Signed in, the palette is saved first (the gallery page belongs to a saved
 palette, as on My Projects), then it's published with SharePalette, or, when
-it's published already, its page is shown, with Update Gallery Name when the
-names differ. -->
+it's published already, its page is shown, with Update Gallery Page (its
+name and colors, in place). -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
   import {
     getGalleryPages,
     groupGalleryPages,
-    paletteNameDiffers,
     type GalleryPage,
   } from '#lib/accounts/gallery.js';
   import { account } from '#lib/accounts/summary.svelte.js';
@@ -41,7 +40,7 @@ names differ. -->
     colorsToPaletteCode,
     getPaletteFallbackName,
   } from '#lib/utils/color-utils.js';
-  import { ExternalLinkIcon, LogInIcon, PencilIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon, LogInIcon, RefreshCwIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   let {
@@ -62,7 +61,7 @@ names differ. -->
     | { name: 'problem'; message: string }
     | { name: 'share'; paletteId: string; label: string }
     | { name: 'existing'; paletteId: string; label: string; page: GalleryPage }
-    | { name: 'rename'; paletteId: string; label: string; page: GalleryPage };
+    | { name: 'update'; paletteId: string; label: string; page: GalleryPage };
 
   let view = $state<View>(
     __ACCOUNTS_ENABLED__ && account.summary?.id
@@ -71,7 +70,6 @@ names differ. -->
   );
   // Saved here, so the dialog says so
   let savedNow = $state(false);
-  let versions = $state<GalleryPage[]>([]);
 
   const signInHref = $derived(
     `${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(returnTo)}`,
@@ -111,9 +109,6 @@ names differ. -->
       [palette.id],
     ).byPalette.get(palette.id);
     if (page) {
-      versions = gallery.posts
-        .filter((p) => p.kind === 'palette' && p.projectId === palette.id)
-        .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId);
       view = { name: 'existing', paletteId: palette.id, label, page };
       return;
     }
@@ -144,14 +139,13 @@ names differ. -->
     </p>
   {/if}
   <SharePalette paletteId={view.paletteId} {colors} name={view.label} />
-{:else if view.name === 'rename'}
+{:else if view.name === 'update'}
   <SharePalette
     paletteId={view.paletteId}
     {colors}
     name={view.label}
     showOwner={view.page.showOwner}
-    {versions}
-    rename={view.page}
+    update={view.page}
   />
 {:else}
   <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
@@ -186,18 +180,15 @@ names differ. -->
     {:else if view.name === 'problem'}
       <p class="text-error-700-300" role="alert">{view.message}</p>
     {:else if view.name === 'existing'}
-      {@const differs = paletteNameDiffers(view.label, view.page)}
       <div class="flex flex-col gap-2" role="status">
         <p>
           You’ve published this palette already, as “{view.page.title}”.
           {#if savedNow}It’s saved to your palettes now too.{/if}
         </p>
-        {#if differs}
-          <p class="text-sm opacity-80">
-            It’s saved as “{view.label}”. You can give its gallery page that
-            name.
-          </p>
-        {/if}
+        <p class="text-sm opacity-80">
+          You can update its gallery page to “{view.label}” with these colors.
+          Its link stays the same.
+        </p>
       </div>
       <div class="flex flex-wrap gap-2">
         <a
@@ -210,15 +201,13 @@ names differ. -->
             class="sr-only">(opens in a new tab)</span
           ></a
         >
-        {#if differs}
-          {@const { paletteId, label, page } = view}
-          <button
-            type="button"
-            class="btn preset-filled-primary-500"
-            onclick={() => (view = { name: 'rename', paletteId, label, page })}
-            ><PencilIcon />Update Gallery Name</button
-          >
-        {/if}
+        <button
+          type="button"
+          class="btn preset-filled-primary-500"
+          onclick={() => {
+            if (view.name === 'existing') view = { ...view, name: 'update' };
+          }}><RefreshCwIcon />Update Gallery Page</button
+        >
       </div>
     {/if}
   </div>

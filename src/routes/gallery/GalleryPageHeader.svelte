@@ -32,6 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     owner: GalleryOwner | null;
     /** When it was published, as the gallery gives it */
     date?: string | null;
+    /** When it was last changed (updated in place), as the gallery gives it */
+    modified?: string | null;
     /** The page's name (h1) */
     heading: Snippet;
     /** A line under the name */
@@ -50,14 +52,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     kind,
     owner = $bindable(),
     date,
+    modified,
     heading,
     subtitle,
     open,
   }: Props = $props();
 
-  let sharedOn = $derived(
-    date
-      ? new Date(date).toLocaleDateString(undefined, { dateStyle: 'medium' })
+  const dayOf = (value?: string | null) =>
+    value
+      ? new Date(value).toLocaleDateString(undefined, { dateStyle: 'medium' })
+      : '';
+  let sharedOn = $derived(dayOf(date));
+  // Only when it's a later day than it was published on
+  let updatedOn = $derived(
+    modified && date && modified.slice(0, 10) > date.slice(0, 10)
+      ? dayOf(modified)
       : '',
   );
 </script>
@@ -83,7 +92,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ></span
         >{/if}{#if owner && sharedOn}<span aria-hidden="true">
           ·
-        </span>{/if}{#if sharedOn}<span>Published {sharedOn}</span>{/if}
+        </span>{/if}{#if sharedOn}<span>Published {sharedOn}</span
+        >{/if}{#if updatedOn}<span aria-hidden="true"> · </span><span
+          >Updated {updatedOn}</span
+        >{/if}
     </p>
   {/if}
 

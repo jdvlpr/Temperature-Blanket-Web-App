@@ -84,11 +84,19 @@ vi.mock('#lib/utils/gallery-upload-utils.js', () => ({
 
 describe('project-utils', () => {
   describe('sendToProjectGallery', () => {
-    const answer = (response: unknown) =>
+    const answer = (response: unknown, status = 200) =>
       vi.stubGlobal(
         'fetch',
-        vi.fn(async () => ({ json: async () => response })),
+        vi.fn(async () => ({
+          ok: status < 300,
+          status,
+          json: async () => response,
+        })),
       );
+    vi.stubGlobal('window', {
+      location: { origin: 'https://app.test' },
+      dispatchEvent: vi.fn(),
+    });
 
     it('gives the new page, as text', async () => {
       answer({
@@ -99,9 +107,39 @@ describe('project-utils', () => {
       expect(await projectUtils.sendToProjectGallery('img')).toEqual({
         status: 'sent',
         link: 'https://example.test/gallery/1',
-        linked: false,
-        oldRemoved: null,
+        updated: false,
       });
+      const [url, init] = vi.mocked(fetch).mock.calls[0];
+      expect(url).toBe('/api/account/gallery?showOwner=false');
+      expect(init?.method).toBe('POST');
+    });
+
+    it('updates the page in place with postId', async () => {
+      answer({ code: 200, id: 8, link: 'https://example.test/project/8/x/' });
+      expect(
+        await projectUtils.sendToProjectGallery('img', { postId: 8 }),
+      ).toEqual({ status: 'sent', link: '/gallery/8', updated: true });
+      const [url, init] = vi.mocked(fetch).mock.calls[0];
+      expect(url).toBe('/api/account/gallery/8');
+      expect(init?.method).toBe('PUT');
+    });
+
+    it('never falls back to an anonymous submission', async () => {
+      answer({ code: 'GALLERY_PAUSED' }, 503);
+      expect(await projectUtils.sendToProjectGallery('img')).toEqual({
+        status: 'paused',
+      });
+      answer({ code: 'UNAUTHORIZED' }, 401);
+      expect(await projectUtils.sendToProjectGallery('img')).toEqual({
+        status: 'signed-out',
+      });
+      answer({ code: 'UPDATE_UNSUPPORTED' }, 501);
+      expect(
+        await projectUtils.sendToProjectGallery('img', { postId: 2 }),
+      ).toEqual({ status: 'unsupported' });
+      expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).not.toContain(
+        '/api/project',
+      );
     });
 
     it('gives the page it duplicates', async () => {
@@ -117,7 +155,6 @@ describe('project-utils', () => {
         status: 'duplicate',
         link: 'https://example.test/gallery/2',
         title: '<b>Ottawa</b> & Paris',
-        oldRemoved: false,
       });
     });
 
@@ -126,34 +163,7 @@ describe('project-utils', () => {
       expect(await projectUtils.sendToProjectGallery('img')).toEqual({
         status: 'error',
         message: 'Image upload error',
-        oldRemoved: false,
       });
-    });
-
-    it('sends a guest submission with a new Turnstile token', async () => {
-      answer({ code: 200, link: 'https://example.test/gallery/3' });
-      const steps: string[] = [];
-      await projectUtils.sendToProjectGallery('img', {
-        getGuestToken: async () => 'token',
-        onStep: (step) => steps.push(step),
-      });
-      const [, init] = vi.mocked(fetch).mock.calls[0];
-      expect(new Headers(init?.headers).get('CF-Turnstile-Response')).toBe(
-        'token',
-      );
-      expect(steps).toEqual(['sending', 'checking', 'sending']);
-    });
-
-    it("says so when the check can't run, sending nothing", async () => {
-      answer({ code: 200 });
-      const result = await projectUtils.sendToProjectGallery('img', {
-        getGuestToken: async () => {
-          throw new Error('blocked');
-        },
-      });
-      expect(result).toMatchObject({ status: 'error' });
-      expect(result.status === 'error' && result.message).toMatch(/robot/);
-      expect(fetch).not.toHaveBeenCalled();
     });
 
     it('shares chosen palettes with each gauge’s own link, and reports them', async () => {
@@ -161,7 +171,6 @@ describe('project-utils', () => {
       const { buildGalleryRequestBody } =
         await import('#lib/utils/gallery-upload-utils.js');
       (gauges.allCreated as unknown[]).push({ colors: [], label: 'Temp' });
-      vi.stubGlobal('window', { location: { origin: 'https://app.test' } });
       try {
         answer({
           code: 200,
@@ -203,7 +212,6 @@ describe('project-utils', () => {
         ).toMatchObject({ status: 'sent', palettes: null });
       } finally {
         (gauges.allCreated as unknown[]).length = 0;
-        vi.unstubAllGlobals();
       }
     });
 

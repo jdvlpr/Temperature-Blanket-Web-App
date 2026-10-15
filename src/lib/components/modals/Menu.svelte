@@ -52,11 +52,6 @@ button to it. -->
   import ProjectPicture from '#lib/components/ProjectPicture.svelte';
   import { rememberJustTrashed, TRASH_DAYS } from '#lib/storage/trash.js';
   import { sync } from '#lib/sync/status.svelte.js';
-  import CopyIcon from '#lib/components/CopyIcon.svelte';
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
-  import { withProjectName } from '#lib/utils/project-name-link.js';
-  import { Flash } from '#lib/utils/feedback.svelte.js';
-  import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
@@ -65,20 +60,18 @@ button to it. -->
     CopyPlusIcon,
     DownloadIcon,
     ExternalLinkIcon,
+    Share2Icon,
     FolderOpenIcon,
-    GlobeIcon,
-    LinkIcon,
     LoaderCircleIcon,
     LogInIcon,
     MonitorIcon,
     MonitorXIcon,
     PlusIcon,
     RefreshCwIcon,
-    SendIcon,
     Trash2Icon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
-  import AddToGallery from './AddToGallery.svelte';
+  import { openProjectShare } from '#lib/utils/open-project-share.js';
   import ExportOptions from './ExportOptions.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
@@ -89,22 +82,12 @@ button to it. -->
 
   const hasWeather = $derived(weather.data.length > 0);
   const hasProject = $derived(hasWeather && locations.allValid);
-  const hasGalleryPage = $derived(
-    Boolean(
-      project.gallery.href &&
-      project.gallery.title &&
-      project.gallery.title === locations.projectTitle,
-    ),
-  );
   // Wider screens show its name in the top bar, so the card here just says
   // where it's saved
   const inTopBar = $derived(isDesktop.current && hasWeather);
   const problem = $derived(
     autosave.on &&
       (autosave.state === 'conflict' || autosave.state === 'error'),
-  );
-  const colors = $derived(
-    hasProject ? getColorsFromInput({ string: project.url.href }) || [] : [],
   );
 
   // Opens in the panel, in place of the menu, with Back to it; a returnable
@@ -127,29 +110,23 @@ button to it. -->
     }
   }
 
-  const linkCopied = new Flash();
-
   // The open project's name, ready before Copy Link is pressed: a clipboard
   // write right after waiting on storage can be refused (Safari)
   let shareName = $state('');
+  let shareItem = $state<StoredProjectIndexItem>();
   $effect(() => {
     void project.url.href;
     void savedProjects.version;
     const linkName = project.linkName;
     storedItem().then((item) => {
       shareName = item ? (item.meta.name ?? '') : linkName;
+      shareItem = item;
     });
   });
 
-  async function copyLink() {
-    const ok = await copyToClipboard(
-      // With its name, so whoever opens it sees it too
-      withProjectName(project.url.href, shareName, locations.projectTitle),
-      'Link copied',
-      'Unable to copy to your clipboard',
-    );
-    if (ok) linkCopied.trigger();
-  }
+  // Copy Link and its gallery page, in the panel with Back to this menu
+  const share = () =>
+    openProjectShare(shareName, { returnable: true, item: shareItem });
 
   async function copyProject() {
     try {
@@ -325,23 +302,6 @@ button to it. -->
   {#if hasWeather}
     <section aria-label="Project actions">
       <ul class={PANEL_LIST}>
-        {#if hasProject}
-          <li>
-            <button type="button" class={ROW} onclick={copyLink}>
-              <CopyIcon
-                copied={linkCopied.is()}
-                icon={LinkIcon}
-                class="shrink-0 opacity-70"
-              />
-              <span class="flex flex-1 flex-col">
-                <span>Copy Link</span>
-                <span class="text-xs opacity-70"
-                  >Anyone with the link gets their own copy</span
-                >
-              </span>
-            </button>
-          </li>
-        {/if}
         <li>
           <button
             type="button"
@@ -359,37 +319,16 @@ button to it. -->
           </button>
         </li>
         <li>
-          {#if hasGalleryPage}
-            <button
-              type="button"
-              class={ROW}
-              onclick={() => open(AddToGallery, 'Gallery Page')}
-            >
-              <GlobeIcon class="shrink-0 opacity-70" />
-              <span class="flex flex-1 flex-col">
-                <span>Gallery Page</span>
-                <span class="text-xs opacity-70"
-                  >View it, publish a new version, or unpublish it</span
-                >
-              </span>
-              <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
-            </button>
-          {:else}
-            <button
-              type="button"
-              class={ROW}
-              onclick={() => open(AddToGallery, 'Publish to Gallery')}
-            >
-              <SendIcon class="shrink-0 opacity-70" />
-              <span class="flex flex-1 flex-col">
-                <span>Publish to Gallery</span>
-                <span class="text-xs opacity-70"
-                  >A public snapshot, as it is now</span
-                >
-              </span>
-              <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
-            </button>
-          {/if}
+          <button type="button" class={ROW} onclick={share}>
+            <Share2Icon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>Share</span>
+              <span class="text-xs opacity-70"
+                >Copy Link, or publish it to the gallery</span
+              >
+            </span>
+            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+          </button>
         </li>
         {#if hasProject}
           <li>

@@ -29,6 +29,8 @@ export type GalleryWeather = {
   weatherSources: string | null;
   /** When the page was published, in UTC without a zone ("2026-10-13T01:44:43") */
   dateGmt: string | null;
+  /** When it was last updated in place (its weather is from then), the same way */
+  modifiedGmt?: string | null;
 };
 
 /** A gallery page's weather, or null if it can't be had. */
@@ -42,6 +44,7 @@ export async function fetchGalleryWeather(
           rawWeatherData
           weatherSources
           dateGmt
+          modifiedGmt
         }
       }`,
       { id: postId },
@@ -85,7 +88,7 @@ const isStoredDay = (day: any) =>
  * in progress when published, so later days would be missing.
  */
 export function galleryWeatherToLoad(
-  { rawWeatherData, weatherSources, dateGmt }: GalleryWeather,
+  { rawWeatherData, weatherSources, dateGmt, modifiedGmt }: GalleryWeather,
   locations: { from?: TISO8601DateString; to?: TISO8601DateString }[],
 ): WeatherDay[] | null {
   let stored: unknown;
@@ -119,8 +122,8 @@ export function galleryWeatherToLoad(
   // Edited weather can't be searched again, so it loads however it ends
   if (isCustomGalleryWeather(weatherSources)) return days;
 
-  // The days from the one it was published on weren't all in yet
-  const publishedAt = new Date(`${dateGmt}Z`);
+  // The days from the one it was published (or last updated) on weren't all in yet
+  const publishedAt = new Date(`${modifiedGmt ?? dateGmt}Z`);
   if (Number.isNaN(publishedAt.getTime())) return null;
   const publishedOn = stringToDate(dateToISO8601String(publishedAt));
   if (days.some((day) => day.date >= publishedOn)) return null;

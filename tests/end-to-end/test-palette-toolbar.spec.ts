@@ -129,7 +129,12 @@ test.describe('Palette toolbar', () => {
 
   test('Save & Export lists saving and every export', async ({ page }) => {
     await page.getByRole('button', { name: 'Save & Export' }).click();
-    for (const name of ['Save Palette', 'Link', 'HTML Color Codes', 'Image']) {
+    for (const name of [
+      'Save Palette',
+      'Copy Link',
+      'HTML Color Codes',
+      'Image',
+    ]) {
       await expect(
         page.getByRole('menuitem', { name: new RegExp(`^${name}`) }),
       ).toBeVisible();

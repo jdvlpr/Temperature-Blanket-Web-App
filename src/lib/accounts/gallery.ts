@@ -28,6 +28,8 @@ export type GalleryPage = {
   link?: string | null;
   /** Included on the owner's public gallery, with their name */
   showOwner?: boolean;
+  /** When it was last updated in place, or null */
+  updatedAt?: number | null;
 };
 
 /** Fired on window when the account's gallery pages change, so lists reload. */
@@ -121,47 +123,6 @@ export const paletteNameDiffers = (
   page: Pick<GalleryPage, 'title'>,
 ) => cleanName(label, MAX_GALLERY_PALETTE_NAME_LENGTH) !== page.title;
 
-export type RenameGalleryPageResult =
-  | { status: 'renamed'; title: string }
-  /** The gallery plugin can't rename yet: publish a new version instead */
-  | { status: 'unsupported' }
-  | { status: 'error'; message: string };
-
-/** Renames one of the account's palette pages in place, keeping its link. */
-export async function renameGalleryPage(
-  postId: number,
-  title: string,
-): Promise<RenameGalleryPageResult> {
-  let response: Response;
-  try {
-    response = await fetch(`${PATH}/${postId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title }),
-    });
-  } catch {
-    return { status: 'error', message: 'Check your connection and try again.' };
-  }
-  const data = await response.json().catch(() => null);
-  if (response.ok && typeof data?.title === 'string')
-    return { status: 'renamed', title: data.title };
-  if (response.status === 501 && data?.code === 'RENAME_UNSUPPORTED')
-    return { status: 'unsupported' };
-  if (response.status === 401)
-    return { status: 'error', message: 'Sign in again, then try again.' };
-  if (response.status === 404)
-    return {
-      status: 'error',
-      message: 'Its gallery page is gone. Refresh My Library to see it.',
-    };
-  if (response.status === 400 && typeof data?.message === 'string')
-    return { status: 'error', message: data.message };
-  return {
-    status: 'error',
-    message: 'The gallery couldn’t be reached. Try again later.',
-  };
-}
-
 export async function removeGalleryPage(postId: number) {
   const response = await fetch(`${PATH}/${postId}`, { method: 'DELETE' });
   if (!response.ok && response.status !== 404)
@@ -169,24 +130,69 @@ export async function removeGalleryPage(postId: number) {
 }
 
 export type AccountPublishResult =
-  /** WordPress's answer, as /api/project gives it; `linked` when recorded to the account */
+  /** WordPress's answer (200, 400, 409 duplicate…); `linked` when recorded to the account */
   | { status: 'answered'; response: Record<string, unknown> }
-  /** Publishing from accounts is off or unavailable: publish anonymously instead */
-  | { status: 'fallback' };
+  /** Publishing is paused (GALLERY_PUBLISH_ENABLED off) */
+  | { status: 'paused' }
+  /** The gallery's plugin is too old to update pages in place */
+  | { status: 'unsupported' }
+  /** Not signed in anymore */
+  | { status: 'signed-out' }
+  /** The page being updated is gone */
+  | { status: 'gone' }
+  | { status: 'error'; message: string };
 
-/** Publishes the gallery payload as the signed-in user. */
+/**
+ * Publishes the gallery payload as the signed-in user, or with `postId`
+ * updates that page in place. Never falls back to an anonymous submission:
+ * every page has an owner who can update or unpublish it.
+ */
 export async function publishFromAccount(
   body: string,
-  { showOwner = false } = {},
+  { showOwner = false, postId }: { showOwner?: boolean; postId?: number } = {},
 ): Promise<AccountPublishResult> {
-  const response = await fetch(`${PATH}?showOwner=${showOwner}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  return sendPage(
+    postId ? `${PATH}/${postId}` : `${PATH}?showOwner=${showOwner}`,
+    postId ? 'PUT' : 'POST',
     body,
-  });
-  if (response.ok)
-    return { status: 'answered', response: await response.json() };
-  return { status: 'fallback' };
+  );
+}
+
+/** Updates one of the account's palette pages in place: its name and colors. */
+export const updatePalettePage = (
+  postId: number,
+  palette: { title: string; yarnUrl: string },
+) => sendPage(`${PATH}/${postId}`, 'PUT', JSON.stringify(palette));
+
+async function sendPage(
+  url: string,
+  method: string,
+  body: string,
+): Promise<AccountPublishResult> {
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+  } catch {
+    return { status: 'error', message: 'Check your connection and try again.' };
+  }
+  const data = await response.json().catch(() => null);
+  if (response.ok && data) return { status: 'answered', response: data };
+  if (response.status === 503 && data?.code === 'GALLERY_PAUSED')
+    return { status: 'paused' };
+  if (response.status === 501) return { status: 'unsupported' };
+  if (response.status === 401) return { status: 'signed-out' };
+  if (response.status === 404) return { status: 'gone' };
+  return {
+    status: 'error',
+    message:
+      typeof data?.message === 'string'
+        ? data.message
+        : 'The gallery couldn’t be reached. Try again later.',
+  };
 }
 
 export type SharePaletteResult =

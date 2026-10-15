@@ -37,6 +37,11 @@ only in the gallery), with search, filters and sort once there are a few. -->
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
+  import {
+    colorsToPaletteCode,
+    getColorsFromInput,
+    getYarnPageURL,
+  } from '#lib/utils/color-utils.js';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
@@ -57,9 +62,8 @@ only in the gallery), with search, filters and sort once there are a few. -->
     palette: { id: string },
     colors: Color[],
     label: string,
-    options: { replace?: GalleryPage; rename?: GalleryPage } = {},
+    update?: GalleryPage,
   ) {
-    const old = options.rename ?? options.replace;
     dialog.trigger({
       type: 'component',
       component: {
@@ -68,22 +72,24 @@ only in the gallery), with search, filters and sort once there are a few. -->
           paletteId: palette.id,
           colors,
           name: label,
-          showOwner: old?.showOwner,
-          // Kept for renaming too: an older gallery plugin can't rename, so
-          // it falls back to a new version
-          versions: old ? galleryPages.pagesLike(old) : undefined,
-          rename: options.rename,
+          showOwner: update?.showOwner,
+          update,
         },
       },
       options: {
-        title: options.rename
-          ? 'Update Gallery Name'
-          : options.replace
-            ? 'Publish New Version'
-            : 'Publish to Gallery',
+        title: update ? 'Update Gallery Page' : 'Publish to Gallery',
       },
     });
   }
+
+  /** Its name or colors differ from its gallery page's */
+  const paletteChanged = (colors: Color[], label: string, page: GalleryPage) =>
+    paletteNameDiffers(label, page) ||
+    Boolean(
+      page.link &&
+      colorsToPaletteCode(getColorsFromInput({ string: page.link }) || []) !==
+        colorsToPaletteCode(colors),
+    );
 </script>
 
 <svelte:head>
@@ -154,19 +160,25 @@ only in the gallery), with search, filters and sort once there are a few. -->
           oncount={(count) => ({ total, matching } = count)}
         >
           {#snippet sharing({ palette, colors, label })}
-            {#if showGallery}
-              {@const page = galleryPages.grouped.byPalette.get(palette.id)}
-              <GallerySharing
-                compact
-                kind="palette"
-                {label}
-                {page}
-                changedSince={Boolean(page && paletteNameDiffers(label, page))}
-                onadd={() => sharePalette(palette, colors, label)}
-                onupdate={(old) =>
-                  sharePalette(palette, colors, label, { rename: old })}
-              />
-            {/if}
+            {@const page = showGallery
+              ? galleryPages.grouped.byPalette.get(palette.id)
+              : undefined}
+            <GallerySharing
+              kind="palette"
+              id={palette.id}
+              {label}
+              link={getYarnPageURL({
+                colors,
+                origin: browser ? location.origin : PUBLIC_BASE_URL,
+              })}
+              {page}
+              changedSince={Boolean(
+                page && paletteChanged(colors, label, page),
+              )}
+              changed={(p) => paletteChanged(colors, label, p)}
+              onadd={() => sharePalette(palette, colors, label)}
+              onupdate={(old) => sharePalette(palette, colors, label, old)}
+            />
           {/snippet}
         </SavedPalettes>
       {/if}

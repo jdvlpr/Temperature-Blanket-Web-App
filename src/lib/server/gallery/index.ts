@@ -13,8 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Publishing to the gallery from an account (/api/account/gallery). Guests keep
-// submitting anonymously through /api/project.
+// Publishing to the gallery from an account (/api/account/gallery). Publishing
+// needs an account: /api/project only refuses now. A project or palette has one
+// gallery page, updated in place (gallery plugin 1.9.0).
 import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$app/env/private';
 
 import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
@@ -27,6 +28,7 @@ import {
   countPalettesSince,
   postKind,
   renamePost,
+  updatePost,
   ensurePublicId,
   forgetPost,
   getSettings,
@@ -36,7 +38,7 @@ import {
   type GalleryPost,
   type GallerySettings,
 } from './store';
-import { galleryApi, type GalleryApi } from './wordpress';
+import { galleryApi, type GalleryApi, type PublishResponse } from './wordpress';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
 const MAX_TITLE_LENGTH = 200;
@@ -73,9 +75,9 @@ export type GalleryContext = {
 /**
  * The signed-in user's gallery pages, or a Response: 404 with accounts off, 401
  * when signed out, 503 GALLERY_PAUSED when publishing from accounts is switched
- * off (GALLERY_PUBLISH_ENABLED) and this is a publish. For all of these the
- * browser falls back to anonymous submission. Listing and removing pages keep
- * working while publishing is paused.
+ * off (GALLERY_PUBLISH_ENABLED) and this is a publish or update. The browser
+ * shows these; it never falls back to an anonymous submission. Listing and
+ * removing pages keep working while publishing is paused.
  */
 export async function requireGallery(
   event: RequestEvent,
@@ -138,6 +140,8 @@ type SharePaletteRequest = {
 /** What WordPress says about the palettes shared with a project (plugin 1.7.0) */
 export type SharedPalettes = {
   created: { id: number; title: string; yarn_url: string }[];
+  /** On an update (plugin 1.9.0): this project's palette pages changed in place */
+  updated?: { id: number; title: string; yarn_url: string }[];
   /** reason: 'title' | 'link' | 'duplicate' (with the existing `id`) | 'error', or 'limit' (this server's daily limit) */
   skipped: { title: string; yarn_url: string; reason: string; id?: number }[];
 };
@@ -155,16 +159,18 @@ function paletteLinkKey(link: unknown) {
 }
 
 /**
- * Publishes the browser's gallery payload (as sent to /api/project) as this user.
+ * Publishes the browser's gallery payload as this user, or with `postId`
+ * updates that page of theirs in place (same link, views and settings).
  * Ownership comes from the session, so the project needn't be saved to the
- * account; its ID (?project=) is kept to tie the page to it. WordPress's own answers
- * (400, 409 duplicate, 500) come back unchanged with status 200, as /api/project
- * does, adding `linked: true` when the page was recorded to the account.
+ * account; its ID (?project=) is kept to tie the page to it. WordPress's own
+ * answers (400, 409 duplicate, 500) come back unchanged with status 200, adding
+ * `linked: true` when the page was recorded to the account. Updating answers 404
+ * for a page that isn't theirs and 501 UPDATE_UNSUPPORTED with an older plugin.
  */
 export async function publishFromAccount(
   gallery: GalleryContext,
   payloadText: string,
-  { showOwner = false } = {},
+  { showOwner = false, postId }: { showOwner?: boolean; postId?: number } = {},
   now = Date.now(),
 ): Promise<Response> {
   let payload: {
@@ -181,6 +187,18 @@ export async function publishFromAccount(
 
   // Every planner link has one; '' just leaves the page unconnected to a project
   const projectId = projectIdFromLink(payload?.project_url) ?? '';
+
+  // An update keeps the page's own choice of showing its owner
+  let existing: GalleryPost | undefined;
+  if (postId !== undefined) {
+    existing = (await listPosts(gallery.db, gallery.userId)).find(
+      (post) =>
+        post.postId === postId && (post.kind ?? 'project') === 'project',
+    );
+    if (!existing)
+      return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+    showOwner = existing.showOwner ?? false;
+  }
 
   // Palettes shared with it count towards the daily limit: past it, they're
   // left out (and said so), never the project
@@ -205,7 +223,36 @@ export async function publishFromAccount(
   }
 
   // Otherwise forwarded as sent, so a large payload is parsed once and never re-encoded
-  const response = await gallery.api.publish(forwarded, gallery.userId);
+  let response: PublishResponse;
+  if (postId !== undefined) {
+    let result;
+    try {
+      result = await gallery.api.updateProject(
+        postId,
+        forwarded,
+        gallery.userId,
+      );
+    } catch (e) {
+      console.error('Could not update gallery page', e);
+      return galleryError(
+        502,
+        'GALLERY_UNAVAILABLE',
+        'The gallery couldn’t be reached. Try again later.',
+      );
+    }
+    if (result.status === 'unsupported')
+      return galleryError(
+        501,
+        'UPDATE_UNSUPPORTED',
+        'The gallery can’t update pages yet',
+      );
+    if (result.status === 'gone') {
+      // Removed on WordPress (by hand, say): nothing left to update
+      await forgetPost(gallery.db, gallery.userId, postId);
+      return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+    }
+    response = result.response;
+  } else response = await gallery.api.publish(forwarded, gallery.userId);
 
   if (Number(response.code) === 200) {
     if (typeof response.id !== 'number') {
@@ -224,14 +271,21 @@ export async function publishFromAccount(
       payload.project_url.length <= MAX_PALETTE_LINK_LENGTH
         ? payload.project_url
         : null;
-    await recordPublished(gallery, {
-      postId: response.id,
-      projectId,
-      title,
-      publishedAt: now,
-      link,
-      showOwner,
-    });
+    if (existing)
+      await updatePost(gallery.db, gallery.userId, existing.postId, {
+        title,
+        link,
+        updatedAt: now,
+      });
+    else
+      await recordPublished(gallery, {
+        postId: response.id,
+        projectId,
+        title,
+        publishedAt: now,
+        link,
+        showOwner,
+      });
 
     // Its palettes, each recorded as the account's own palette page (on its
     // saved palette's row when there is one), with the project's name choice.
@@ -260,6 +314,15 @@ export async function publishFromAccount(
           showOwner,
         });
       }
+      // An update changes the project's palette pages that were already there
+      for (const palette of Array.isArray(shared.updated) ? shared.updated : [])
+        if (typeof palette?.id === 'number')
+          await updatePost(gallery.db, gallery.userId, palette.id, {
+            title: cleanName(palette.title, MAX_PALETTE_TITLE_LENGTH),
+            link:
+              typeof palette.yarn_url === 'string' ? palette.yarn_url : null,
+            updatedAt: now,
+          });
       shared.skipped = [
         ...(Array.isArray(shared.skipped) ? shared.skipped : []),
         ...overLimit.map((r) => ({
@@ -395,6 +458,69 @@ export async function renamePaletteFromAccount(
     { title: result.title },
     { headers: { 'Cache-Control': 'no-store' } },
   );
+}
+
+/**
+ * Updates one of this user's palette pages in place from { title, yarnUrl },
+ * keeping its link (gallery plugin 1.9.0). 501 UPDATE_UNSUPPORTED when the
+ * plugin is older, so the app can publish it again instead.
+ */
+export async function updatePaletteFromAccount(
+  gallery: GalleryContext,
+  postId: number,
+  body: unknown,
+  origin: string,
+  now = Date.now(),
+): Promise<Response> {
+  const input = (body ?? {}) as Record<string, unknown>;
+  const title = cleanName(input.title, MAX_PALETTE_TITLE_LENGTH);
+  const yarnUrl = paletteLink(input.yarnUrl, origin);
+  if (!title || !yarnUrl)
+    return galleryError(
+      400,
+      'INVALID_REQUEST',
+      'A palette needs a name and a Yarn Palette Creator link',
+    );
+  // Ownership from the session, checked here before WordPress checks it again
+  if ((await postKind(gallery.db, gallery.userId, postId)) !== 'palette')
+    return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+
+  let result;
+  try {
+    result = await gallery.api.updatePalette(
+      postId,
+      { title, yarn_url: yarnUrl },
+      gallery.userId,
+    );
+  } catch (e) {
+    console.error('Could not update gallery page', e);
+    return galleryError(
+      502,
+      'GALLERY_UNAVAILABLE',
+      'The gallery couldn’t be reached. Try again later.',
+    );
+  }
+  if (result.status === 'unsupported')
+    return galleryError(
+      501,
+      'UPDATE_UNSUPPORTED',
+      'The gallery can’t update pages yet',
+    );
+  if (result.status === 'gone') {
+    await forgetPost(gallery.db, gallery.userId, postId);
+    return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+  }
+  const { response } = result;
+  if (Number(response.code) === 200) {
+    const saved = cleanName(response.title, MAX_PALETTE_TITLE_LENGTH) || title;
+    await updatePost(gallery.db, gallery.userId, postId, {
+      title: saved,
+      link: yarnUrl,
+      updatedAt: now,
+    });
+    return json({ ...response, title: saved, linked: true });
+  }
+  return json(response);
 }
 
 /**

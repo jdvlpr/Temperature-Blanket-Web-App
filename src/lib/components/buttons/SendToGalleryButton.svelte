@@ -13,58 +13,42 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<!-- The preview's Share button: the open project's Share dialog (Copy Link
+and its gallery page), as in the Project menu. -->
 <script>
-  import { locations } from '#lib/state/location-state.svelte.js';
-  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { storedItem } from '#lib/storage/autosave.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
-  import { ExternalLinkIcon, SendIcon } from '@lucide/svelte';
-  import AddToGallery from '../modals/AddToGallery.svelte';
+  import { savedProjects } from '#lib/storage/projects.svelte.js';
+  import { openProjectShare } from '#lib/utils/open-project-share.js';
+  import { Share2Icon } from '@lucide/svelte';
 
   let { isPrimary = false } = $props();
 
-  // Already published: a link to its gallery page instead, as in the Project menu
-  const hasGalleryPage = $derived(
-    Boolean(
-      project.gallery.href &&
-      project.gallery.title &&
-      project.gallery.title === locations.projectTitle,
-    ),
-  );
+  // The project's name, ready before the dialog opens (see openProjectShare)
+  let name = $state('');
+  /** @type {import('#lib/storage/projects.svelte.js').StoredProjectIndexItem | undefined} */
+  let shareItem = $state();
+  $effect(() => {
+    void project.url.href;
+    void savedProjects.version;
+    const linkName = project.linkName;
+    storedItem().then((item) => {
+      name = item ? (item.meta.name ?? '') : linkName;
+      shareItem = item;
+    });
+  });
 </script>
 
-{#if hasGalleryPage}
-  <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
-  <a
-    href={project.gallery.href}
-    target="_blank"
-    rel="noreferrer"
-    class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap"
-    title="Open this project's gallery page"
-  >
-    <SendIcon />
-    View Gallery Page
-    <ExternalLinkIcon class="icon-sm opacity-60" />
-  </a>
-  <!-- eslint-enable svelte/no-navigation-without-resolve -->
-{:else}
-  <button
-    class={[
-      'btn w-fit whitespace-pre-wrap',
-      isPrimary
-        ? 'bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border'
-        : 'hover:preset-tonal-surface',
-    ]}
-    onclick={() =>
-      dialog.trigger({
-        type: 'component',
-        component: {
-          ref: AddToGallery,
-        },
-        options: { title: 'Publish to Gallery' },
-      })}
-    title="Publish a snapshot of this project to the gallery"
-  >
-    <SendIcon />
-    Publish to Gallery
-  </button>
-{/if}
+<button
+  class={[
+    'btn w-fit whitespace-pre-wrap',
+    isPrimary
+      ? 'bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border'
+      : 'hover:preset-tonal-surface',
+  ]}
+  onclick={() => openProjectShare(name, { item: shareItem })}
+  title="Copy a link, or publish it to the gallery"
+>
+  <Share2Icon />
+  Share
+</button>

@@ -17,10 +17,20 @@ import type { RequestHandler } from './$types';
 
 export const prerender = false;
 
-/** The account's projects linked to Ravelry, with their kept photos. */
+/** At most this many linked projects' photos are read again per listing */
+const REFRESH_PER_LIST = 3;
+const REFRESH_AFTER = 24 * 60 * 60 * 1000;
+
+/**
+ * The account's projects linked to Ravelry, with their kept photos. Afterwards,
+ * in the background, the photos of the few read longest ago (over a day) are
+ * read from Ravelry again, so ones added there show here and on gallery pages.
+ */
 export const GET: RequestHandler = async (event) => {
-  const { requireRavelry, NO_STORE } =
+  const { requireRavelry, ravelrySession, NO_STORE } =
     await import('#lib/server/ravelry/index.js');
+  const { refreshPhotos } = await import('#lib/server/ravelry/photos.js');
+  const { getPlatform } = await import('#lib/server/cloudflare.js');
   const { listProjectLinks, listPhotos, linkForClient } =
     await import('#lib/server/ravelry/store.js');
   const ctx = await requireRavelry(event);
@@ -31,5 +41,25 @@ export const GET: RequestHandler = async (event) => {
       linkForClient(link, await listPhotos(ctx.db, ctx.userId, link.projectId)),
     ),
   );
+
+  const now = Date.now();
+  const stale = links
+    .filter((link) => (link.photosRefreshedAt ?? 0) < now - REFRESH_AFTER)
+    .sort((a, b) => (a.photosRefreshedAt ?? 0) - (b.photosRefreshedAt ?? 0))
+    .slice(0, REFRESH_PER_LIST);
+  const waitUntil = getPlatform()?.ctx?.waitUntil;
+  if (stale.length && waitUntil)
+    waitUntil(
+      (async () => {
+        // Reconnecting, Ravelry down, or a project gone there: the kept
+        // photos stay
+        const session = await ravelrySession(ctx).catch(() => null);
+        if (!session) return;
+        for (const link of stale)
+          await refreshPhotos(session, link).catch((e) =>
+            console.error('Could not refresh Ravelry photos', e),
+          );
+      })(),
+    );
   return Response.json({ projects }, { headers: NO_STORE });
 };

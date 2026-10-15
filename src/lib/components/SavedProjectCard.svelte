@@ -63,10 +63,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     layout?: 'grid' | 'list';
     /** Where it's kept, e.g. "Synced" (see $lib/sync) */
     syncLabel?: SyncLabel;
-    /** Its gallery pages: Published ▾ or Unpublished ▾ */
+    /** Its Share button */
     sharing?: Snippet;
-    /** More items for its ⋮ menu, before Move to Trash (e.g. Ravelry's) */
-    moreItems?: MoreMenuItem[];
     /** Takes keyboard focus (on its name), e.g. once it's been added back */
     focus?: boolean;
     onfocused?: () => void;
@@ -109,7 +107,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onaddback,
     adding = false,
     sharing,
-    moreItems = [],
     focus = false,
     onfocused,
   }: Props = $props();
@@ -188,7 +185,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 editing = true;
               },
             },
-            ...moreItems,
             {
               value: 'trash',
               label: 'Move to Trash',

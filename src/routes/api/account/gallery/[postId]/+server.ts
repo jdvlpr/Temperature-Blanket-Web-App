@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// One of the signed-in user's gallery pages: include it on their public gallery
+// One of the signed-in user's gallery pages: update it in place (PUT: a project
+// with the same payload as publishing, a palette with { title, yarnUrl }; 501
+// UPDATE_UNSUPPORTED with a gallery plugin before 1.9.0), include it on their public gallery
 // or take it off (PATCH { showOwner }), rename a palette's in place (PATCH
 // { title }; 501 RENAME_UNSUPPORTED with an older gallery plugin), move a
 // palette's pages to another saved palette (PATCH { paletteId }: saved again
@@ -29,6 +31,34 @@ function postIdFrom(param: string) {
   const postId = Number(param);
   return Number.isSafeInteger(postId) && postId > 0 ? postId : null;
 }
+
+export const PUT: RequestHandler = async (event) => {
+  const {
+    requireGallery,
+    galleryError,
+    publishFromAccount,
+    updatePaletteFromAccount,
+  } = await import('#lib/server/gallery/index.js');
+  const { postKind } = await import('#lib/server/gallery/store.js');
+  const gallery = await requireGallery(event, { publishing: true });
+  if (gallery instanceof Response) return gallery;
+
+  const postId = postIdFrom(event.params.postId);
+  if (!postId)
+    return galleryError(400, 'INVALID_REQUEST', 'Invalid gallery page');
+  const kind = await postKind(gallery.db, gallery.userId, postId);
+  if (kind === 'palette')
+    return updatePaletteFromAccount(
+      gallery,
+      postId,
+      await event.request.json().catch(() => null),
+      event.url.origin,
+    );
+  if (kind === 'project')
+    // As sent, so the payload goes to WordPress exactly as the browser built it
+    return publishFromAccount(gallery, await event.request.text(), { postId });
+  return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+};
 
 export const PATCH: RequestHandler = async (event) => {
   const {

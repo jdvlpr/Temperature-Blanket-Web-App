@@ -27,6 +27,8 @@ export type RavelryProjectLink = {
   picturePhotoId: number | null;
   postedAt: number;
   updatedAt: number;
+  /** When its photos were last read from Ravelry, or null (migration 0013) */
+  photosRefreshedAt?: number | null;
 };
 
 export type StoredRavelryPhoto = {
@@ -98,7 +100,7 @@ export async function listProjectLinks(
   const { results } = await db
     .prepare(
       `select "projectId", "ravelryProjectId", "ravelryUsername", "permalink",
-              "picturePhotoId", "postedAt", "updatedAt"
+              "picturePhotoId", "postedAt", "updatedAt", "photosRefreshedAt"
        from "ravelryProject" where "userId" = ? order by "postedAt" desc`,
     )
     .bind(userId)
@@ -187,6 +189,11 @@ export async function replacePhotos(
 ) {
   const now = Date.now();
   await db.batch([
+    db
+      .prepare(
+        'update "ravelryProject" set "photosRefreshedAt" = ? where "userId" = ? and "projectId" = ?',
+      )
+      .bind(now, userId, projectId),
     db
       .prepare(
         'delete from "ravelryPhoto" where "userId" = ? and "projectId" = ?',

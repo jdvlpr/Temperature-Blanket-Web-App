@@ -35,6 +35,16 @@ export type PublishResponse = {
   data?: unknown;
 };
 
+/**
+ * An in-place update's answer (gallery plugin 1.9.0): WordPress's own answer
+ * (200 updated, 400, 409 duplicate), 'gone' when WordPress has no such page for
+ * this owner, or 'unsupported' when the plugin is older and has no update route.
+ */
+export type UpdateResult =
+  | { status: 'answered'; response: PublishResponse }
+  | { status: 'gone' }
+  | { status: 'unsupported' };
+
 export function galleryApi({ baseUrl, key, fetch }: GalleryApiConfig) {
   const post = (path: string, body: string, ownerId?: string) =>
     fetch(`${baseUrl}/wp-json/tbgalleryapi/v1${path}`, {
@@ -47,7 +57,37 @@ export function galleryApi({ baseUrl, key, fetch }: GalleryApiConfig) {
       body,
     });
 
+  const update = async (
+    path: string,
+    body: string,
+    ownerId: string,
+  ): Promise<UpdateResult> => {
+    const response = await post(path, body, ownerId);
+    const answer = (await response
+      .json()
+      .catch(() => null)) as PublishResponse | null;
+    // The plugin's own "no such page" has code 404; an older plugin's
+    // missing route answers rest_no_route
+    if (response.status === 404)
+      return answer?.code === 'rest_no_route'
+        ? { status: 'unsupported' }
+        : { status: 'gone' };
+    if (!answer) throw new Error(`Gallery update failed: ${response.status}`);
+    return { status: 'answered', response: answer };
+  };
+
   return {
+    /** Updates the owner's project page in place from the browser's payload, forwarded unchanged. */
+    updateProject: (postId: number, payload: string, ownerId: string) =>
+      update(`/project/${postId}`, payload, ownerId),
+
+    /** Updates the owner's palette page ({ title, yarn_url }) in place. */
+    updatePalette: (
+      postId: number,
+      payload: { title: string; yarn_url: string },
+      ownerId: string,
+    ) => update(`/palette/${postId}`, JSON.stringify(payload), ownerId),
+
     /** Creates a gallery page from the browser's payload, forwarded unchanged. */
     async publish(payload: string, ownerId: string): Promise<PublishResponse> {
       const response = await post('/project', payload, ownerId);

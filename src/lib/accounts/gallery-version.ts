@@ -21,15 +21,3 @@ export const publishedOn = (time: number) =>
     dateStyle: 'medium',
     timeStyle: 'short',
   });
-
-/** "Published Oct 12, 2026, 3:04 PM · by Ada", "by" only when it says so */
-export const aboutVersion = (
-  page: { publishedAt: number; showOwner?: boolean },
-  ownerName: string,
-) =>
-  [
-    `Published ${publishedOn(page.publishedAt)}`,
-    page.showOwner && ownerName && `by ${ownerName}`,
-  ]
-    .filter(Boolean)
-    .join(' · ');
