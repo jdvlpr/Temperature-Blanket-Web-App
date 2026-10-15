@@ -128,16 +128,19 @@ type Fetch = typeof fetch;
 export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
   async function call<T>(
     path: string,
-    init: { method?: string; json?: unknown; form?: FormData } = {},
+    init: {
+      method?: string;
+      /** Form fields; a POST type's object goes in as data=<JSON>, as Ravelry recommends */
+      params?: Record<string, string>;
+      form?: FormData;
+    } = {},
   ): Promise<T> {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${accessToken}`,
     };
     let body: BodyInit | undefined;
-    if (init.json !== undefined) {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(init.json);
-    } else if (init.form) body = init.form;
+    if (init.params) body = new URLSearchParams(init.params);
+    else if (init.form) body = init.form;
     const response = await fetchFn(`${API}${path}`, {
       method: init.method ?? (body ? 'POST' : 'GET'),
       headers,
@@ -177,7 +180,7 @@ export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
       (
         await call<{ project: RavelryProject }>(
           `/projects/${user(username)}/create.json`,
-          { json: { data } },
+          { params: { data: JSON.stringify(data) } },
         )
       ).project,
 
@@ -189,7 +192,7 @@ export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
       (
         await call<{ project: RavelryProject }>(
           `/projects/${user(username)}/${id}.json`,
-          { json: { data } },
+          { params: { data: JSON.stringify(data) } },
         )
       ).project,
 
@@ -230,7 +233,12 @@ export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
       (
         await call<{ status_token: string }>(
           `/projects/${user(username)}/${projectId}/create_photo.json`,
-          { json: source },
+          {
+            params:
+              'image_id' in source
+                ? { image_id: String(source.image_id) }
+                : { source_url: source.source_url },
+          },
         )
       ).status_token,
 

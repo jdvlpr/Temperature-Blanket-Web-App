@@ -88,7 +88,10 @@ and plan from your stash), or disconnect it. Hidden where Ravelry isn't set up. 
           <div class="min-w-0 flex-1">
             <p class="font-bold">Ravelry</p>
             <p class="text-sm opacity-70">
-              {#if status.connected && status.needsReconnect}
+              {#if status.connected && status.failed}
+                Connected, but Ravelry couldn’t be checked just now. Try again
+                later.
+              {:else if status.connected && status.needsReconnect}
                 Ravelry stopped accepting this connection. Connect it again.
               {:else if status.connected}
                 Connected{status.username ? ` as ${status.username}` : ''}

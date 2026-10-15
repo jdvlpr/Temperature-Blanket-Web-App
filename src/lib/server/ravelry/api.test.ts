@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { imageIdOf, ravelryApi, RavelryApiError } from './api';
 
 describe('ravelryApi', () => {
-  it('sends the token and JSON data, and reads the result', async () => {
+  it('sends the token and data=<JSON> as a form, and reads the result', async () => {
     const fetchFn = vi.fn(async () =>
       Response.json({ project: { id: 1, name: 'B', permalink: 'b' } }),
     );
@@ -18,7 +18,9 @@ describe('ravelryApi', () => {
     expect((init.headers as Record<string, string>).Authorization).toBe(
       'Bearer token',
     );
-    expect(JSON.parse(String(init.body))).toEqual({ data: { name: 'B' } });
+    const form = init.body as URLSearchParams;
+    expect(form).toBeInstanceOf(URLSearchParams);
+    expect(JSON.parse(form.get('data') ?? '')).toEqual({ name: 'B' });
   });
 
   it('says to reconnect on 401', async () => {

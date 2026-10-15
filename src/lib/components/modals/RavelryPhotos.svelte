@@ -37,7 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Trash2Icon,
     UnlinkIcon,
   } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
+  import type { Attachment } from 'svelte/attachments';
 
   let { projectId, name }: { projectId: string; name: string } = $props();
 
@@ -50,6 +51,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let confirmingDelete = $state<number | null>(null);
   let confirmingUnlink = $state(false);
   let fileInput = $state<HTMLInputElement>();
+
+  let root: HTMLElement | null = $state(null);
+
+  /** A confirm's first button takes the focus, as the button that asked is gone */
+  const takeFocus: Attachment<HTMLButtonElement> = (button) => {
+    button.focus({ preventScroll: true });
+  };
+
+  /** Back to the button that asked (by its data-confirm value), on Keep */
+  async function focusAsker(value: string) {
+    await tick();
+    root
+      ?.querySelector<HTMLElement>(`[data-confirm="${value}"]`)
+      ?.focus({ preventScroll: true });
+  }
 
   const setPhotos = (next: RavelryPhoto[]) => {
     if (link) ravelryLinks.set({ ...link, photos: next });
@@ -121,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4" bind:this={root}>
   {#if link}
     <p class="text-sm">
       Photos you add here are stored on Ravelry, on this project’s page, and
@@ -150,12 +166,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     type="button"
                     class="btn btn-sm preset-filled-error-500"
                     onclick={() => remove(photo.photoId)}
-                    disabled={!!busy}>Delete</button
+                    disabled={!!busy}
+                    {@attach takeFocus}>Delete</button
                   >
                   <button
                     type="button"
                     class="btn btn-sm preset-tonal-surface"
-                    onclick={() => (confirmingDelete = null)}>Keep</button
+                    onclick={() => {
+                      confirmingDelete = null;
+                      void focusAsker(`photo-${photo.photoId}`);
+                    }}>Keep</button
                   >
                 </div>
               </div>
@@ -164,6 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 type="button"
                 class="btn-icon btn-icon-sm preset-filled-surface-50-950 absolute top-1 right-1"
                 aria-label={`Delete photo ${i + 1}`}
+                data-confirm="photo-{photo.photoId}"
                 onclick={() => (confirmingDelete = photo.photoId)}
                 disabled={!!busy}><Trash2Icon class="icon-sm" /></button
               >
@@ -231,18 +252,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
             type="button"
             class="btn btn-sm preset-filled-error-500"
             onclick={unlink}
-            disabled={!!busy}>Unlink</button
+            disabled={!!busy}
+            {@attach takeFocus}>Unlink</button
           >
           <button
             type="button"
             class="btn btn-sm preset-tonal-surface"
-            onclick={() => (confirmingUnlink = false)}>Keep Linked</button
+            onclick={() => {
+              confirmingUnlink = false;
+              void focusAsker('unlink');
+            }}>Keep Linked</button
           >
         </div>
       {:else}
         <button
           type="button"
           class="btn btn-sm hover:preset-tonal-surface -ml-2 self-start"
+          data-confirm="unlink"
           onclick={() => (confirmingUnlink = true)}
           disabled={!!busy}
           ><UnlinkIcon class="icon-sm" aria-hidden="true" />Unlink from Ravelry</button

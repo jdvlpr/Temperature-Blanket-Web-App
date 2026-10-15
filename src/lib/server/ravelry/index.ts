@@ -96,20 +96,25 @@ export class RavelryReconnect extends Error {
 export async function ravelryAccessToken(ctx: RavelryContext): Promise<string> {
   const linked = await linkedRavelryAccount(ctx.db, ctx.userId);
   if (!linked) throw new RavelryReconnect('Ravelry isn’t connected');
+  let accessToken: string | undefined;
   try {
     // With the request's headers, Better Auth also checks it's this session's account
-    const { accessToken } = await ctx.auth.api.getAccessToken({
+    ({ accessToken } = await ctx.auth.api.getAccessToken({
       body: { accountId: linked.id },
       headers: ctx.headers,
-    });
-    if (!accessToken) throw new RavelryReconnect();
-    return accessToken;
+    }));
   } catch (e) {
-    if (e instanceof RavelryReconnect) throw e;
-    // A refresh token Ravelry no longer accepts (revoked, or expired)
-    console.error('Could not get a Ravelry access token', e);
-    throw new RavelryReconnect();
+    // Only a token Better Auth couldn't refresh (revoked, or expired) means
+    // connect again; anything else is a fault to see, not to hide
+    const code = (e as { body?: { code?: string } }).body?.code;
+    if (code === 'FAILED_TO_GET_ACCESS_TOKEN') {
+      console.error('Could not refresh the Ravelry access token', e);
+      throw new RavelryReconnect();
+    }
+    throw e;
   }
+  if (!accessToken) throw new RavelryReconnect();
+  return accessToken;
 }
 
 /**

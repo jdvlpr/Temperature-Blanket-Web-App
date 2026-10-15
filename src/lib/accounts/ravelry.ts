@@ -28,6 +28,8 @@ export type RavelryStatus =
       photoUrl?: string | null;
       /** Linked, but Ravelry no longer accepts it: connect again */
       needsReconnect?: boolean;
+      /** Linked, but it couldn't be checked just now (see the server log) */
+      failed?: boolean;
     };
 
 const CONNECTED_HINT = 'tb-ravelry-connected';
@@ -66,7 +68,10 @@ export async function getRavelryStatus(): Promise<RavelryStatus | null> {
     }
     const status: RavelryStatus = await response.json();
     setConnectedHint(
-      status.available && status.connected && !status.needsReconnect,
+      status.available &&
+        status.connected &&
+        !status.needsReconnect &&
+        !status.failed,
     );
     return status;
   } catch {

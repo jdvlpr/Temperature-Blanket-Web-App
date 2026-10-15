@@ -34,7 +34,8 @@ class RavelryLinksState {
     return (
       !!this.status?.available &&
       this.status.connected &&
-      !this.status.needsReconnect
+      !this.status.needsReconnect &&
+      !this.status.failed
     );
   }
 

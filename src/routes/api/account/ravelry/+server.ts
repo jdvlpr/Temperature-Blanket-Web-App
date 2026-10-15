@@ -64,7 +64,12 @@ export const GET: RequestHandler = async (event) => {
         { available: true, connected: true, needsReconnect: true },
         { headers: NO_STORE },
       );
-    throw e;
+    // Anything else: said on the page, and logged with its details
+    console.error('Could not check the Ravelry connection', e);
+    return Response.json(
+      { available: true, connected: true, failed: true },
+      { headers: NO_STORE },
+    );
   }
 };
 
