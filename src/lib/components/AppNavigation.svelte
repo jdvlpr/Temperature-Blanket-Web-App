@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     My Preferences
   </button>
 
-  <hr class="border-surface-300-700 w-full" />
+  <hr class="border-surface-200-800 w-full" />
 
   <a
     href="/supporters"
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Weather Forecast
   </a>
 
-  <hr class="border-surface-300-700 w-full" />
+  <hr class="border-surface-200-800 w-full" />
 
   <!-- Small links, spaced apart in one row that wraps. It takes the
   sidebar's width rather than setting it, or the sidebar would stretch to

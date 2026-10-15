@@ -153,7 +153,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {#if showNavigationSideBar.value}
         <div class="hidden w-fit flex-col lg:flex" transition:sidebarSlide>
-          <div class="mb-4 w-fit">
+          <!-- A quiet panel, like the page's cards, so the navigation's lines
+          end at an edge rather than in the page's background -->
+          <div class="card preset-tonal-surface mt-2 mr-4 mb-4 w-fit">
             <AppNavigation />
           </div>
         </div>
