@@ -33,6 +33,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/storage/projects.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
+  import RavelrySharing from '#lib/components/account/RavelrySharing.svelte';
+  import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
+  import {
+    openRavelryPhotos,
+    openRavelryPost,
+  } from '#lib/utils/open-ravelry.js';
+  import type { MoreMenuItem } from '#lib/components/buttons/MoreMenu.svelte';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
   import { openGalleryDialog } from '#lib/utils/open-saved-project.js';
   import { account } from '#lib/accounts/summary.svelte.js';
@@ -51,7 +58,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     patternIdOf,
     sortLibrary,
   } from '#lib/utils/collection-filter.js';
-  import { FolderOpenIcon, XIcon } from '@lucide/svelte';
+  import {
+    FolderOpenIcon,
+    ImagesIcon,
+    RefreshCwIcon,
+    SendIcon,
+    XIcon,
+  } from '@lucide/svelte';
   import { SvelteSet } from 'svelte/reactivity';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
@@ -147,6 +160,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const showSharing = $derived(
     onMyProjectsPage && signedIn && galleryPages.shown,
   );
+
+  // Signed in on My Projects with Ravelry connected: each card's Ravelry button
+  // and ⋮ items (one request for the whole page)
+  $effect(() => {
+    if (onMyProjectsPage && signedIn) void ravelryLinks.load();
+  });
+  const showRavelry = $derived(
+    onMyProjectsPage && signedIn && ravelryLinks.connected,
+  );
+  const ravelryMenuItems = (project: StoredProjectIndexItem): MoreMenuItem[] =>
+    !showRavelry
+      ? []
+      : ravelryLinks.links.has(project.id)
+        ? [
+            {
+              value: 'ravelry-update',
+              label: 'Update on Ravelry…',
+              icon: RefreshCwIcon,
+              onselect: () => void openRavelryPost(project),
+              separate: true,
+            },
+            {
+              value: 'ravelry-photos',
+              label: 'Photos on Ravelry…',
+              icon: ImagesIcon,
+              onselect: () => void openRavelryPhotos(project),
+            },
+          ]
+        : [
+            {
+              value: 'ravelry-post',
+              label: 'Post to Ravelry…',
+              icon: SendIcon,
+              onselect: () => void openRavelryPost(project),
+              separate: true,
+            },
+          ];
 
   // On My Projects, signed in: projects only in the gallery (deleted or not
   // saved here) are cards too, all newest first, by when each was saved or
@@ -416,9 +466,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onremove={() => remove(project)}
                   focus={focusId === project.id}
                   onfocused={() => (focusId = null)}
+                  moreItems={ravelryMenuItems(project)}
                 >
                   {#snippet sharing()}
-                    {#if showSharing}{@render gallerySharing(project)}{/if}
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      {#if showSharing}{@render gallerySharing(project)}{/if}
+                      {#if showRavelry}<RavelrySharing
+                          item={project}
+                          label={labelFor(project)}
+                        />{/if}
+                    </div>
                   {/snippet}
                 </SavedProjectCard>
               {:else}
