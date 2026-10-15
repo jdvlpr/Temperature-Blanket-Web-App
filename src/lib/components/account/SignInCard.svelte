@@ -13,8 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Sign in with an emailed code or Google. Used by /auth/sign-in and by the
-     account page when signed out. -->
+<!-- Sign in with Google, or an emailed code where that's on (not in
+     production). Used by /auth/sign-in and by the account page when signed out. -->
 <script lang="ts">
   import { goto } from '$app/navigation';
   import {
@@ -67,12 +67,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let signUpsPaused = $state(false);
   // The page is prerendered: until it hydrates, submitting would reload it
   let ready = $state(false);
-  let providers: Record<SignInProvider, boolean> = $state({ google: false });
+  let providers: Record<SignInProvider | 'email', boolean> = $state({
+    google: false,
+    email: false,
+  });
   let providersLoaded = $state(false);
   // With Google on, the email form waits behind "Use email instead": Google
   // sign-ins don't use up the daily email limit
   let showEmail = $state(false);
-  let emailOpen = $derived(providersLoaded && (!providers.google || showEmail));
+  let emailOpen = $derived(
+    providersLoaded && providers.email && (!providers.google || showEmail),
+  );
   let emailInput = $state<HTMLInputElement>();
   let turnstile = $state<Turnstile>();
   let sentAt = $state(0);
@@ -232,12 +237,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {errorMessage}
           </p>
         {/if}
-        <button
-          type="button"
-          class="btn btn-sm hover:preset-tonal-surface self-center"
-          onclick={openEmail}
-          disabled={busy}><MailIcon /> Use email instead</button
-        >
+        {#if providers.email}
+          <button
+            type="button"
+            class="btn btn-sm hover:preset-tonal-surface self-center"
+            onclick={openEmail}
+            disabled={busy}><MailIcon /> Use email instead</button
+          >
+        {/if}
       {:else}
         <form class="flex flex-col gap-4" onsubmit={requestCode} in:safeSlide>
           <label class="label">
@@ -338,5 +345,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
   <!-- Outside both steps, so a resend can use it too; shows only when
   Cloudflare needs you to do something -->
-  <Turnstile bind:this={turnstile} />
+  {#if providers.email}
+    <Turnstile bind:this={turnstile} />
+  {/if}
 </div>

@@ -164,17 +164,17 @@ export const deleteAccount = () =>
 
 export type SignInProvider = 'google';
 
-/** Which providers are configured on the server. */
+/** Which sign-in methods are on: Google, and emailed codes (off in production). */
 export async function getSignInOptions(): Promise<
-  Record<SignInProvider, boolean>
+  Record<SignInProvider | 'email', boolean>
 > {
   try {
     const response = await fetch('/api/account/sign-in-options');
     if (response.ok) return await response.json();
   } catch {
-    // Fall through: offer email only
+    // Fall through: offer what production offers
   }
-  return { google: false };
+  return { google: true, email: false };
 }
 
 /**
@@ -211,15 +211,22 @@ export type LinkedAccount = { id: string; providerId: string };
 export const listLinkedAccounts = () => call<LinkedAccount[]>('/list-accounts');
 
 /**
- * Whether the signed-in account can confirm it's you with Google (Google
- * sign-in is on and linked) instead of with an emailed code.
+ * How the signed-in account can confirm it's you: with Google (Google sign-in
+ * is on and linked), and/or with an emailed code (where codes are on).
  */
-export async function canConfirmWithGoogle(): Promise<boolean> {
+export async function reconfirmOptions(): Promise<{
+  google: boolean;
+  email: boolean;
+}> {
+  const options = await getSignInOptions();
   try {
-    if (!(await getSignInOptions()).google) return false;
-    return (await listLinkedAccounts()).some((a) => a.providerId === 'google');
+    const google =
+      options.google &&
+      (await listLinkedAccounts()).some((a) => a.providerId === 'google');
+    // Without email codes, Google is the only way an account signs in
+    return { google: google || !options.email, email: options.email };
   } catch {
-    return false;
+    return { google: !options.email, email: options.email };
   }
 }
 
@@ -233,10 +240,10 @@ export const unlinkAccount = (id: string) =>
 /** A message for the ?error= that a failed provider sign-in or link returns with. */
 export function providerErrorMessage(error: string): string {
   if (error === 'account_not_linked')
-    return 'An account with this email already exists. Sign in with your email, then link it from your account page.';
+    return 'An account with this email already exists, but it isn’t linked to this Google account.';
   if (error === 'access_denied') return 'Sign-in was canceled.';
   if (error === 'SIGN_UPS_PAUSED') return SIGN_UPS_PAUSED_MESSAGE;
-  return 'That didn’t work. Try again, or use your email.';
+  return 'That didn’t work. Try again.';
 }
 
 /** Ends every session for this account, including this one. */

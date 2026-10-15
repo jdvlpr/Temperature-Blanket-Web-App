@@ -50,6 +50,7 @@ const options = buildAuthOptions({
   validateSchema: false,
   // Optional providers on, so their schema needs are included
   google: { clientId: 'x', clientSecret: 'x' },
+  emailSignIn: true,
 });
 
 const { compileMigrations } = await getMigrations(options);

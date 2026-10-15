@@ -514,7 +514,7 @@ test.describe('Accounts: Google', () => {
     baseURL,
   }) => {
     const options = await request.get('/api/account/sign-in-options');
-    expect(await options.json()).toEqual({ google: true });
+    expect(await options.json()).toEqual({ google: true, email: true });
     await page.goto('/auth/sign-in');
     await expect(
       page.getByRole('button', { name: 'Continue with Google' }),

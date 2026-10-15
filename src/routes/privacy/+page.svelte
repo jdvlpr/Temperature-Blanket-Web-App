@@ -170,19 +170,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="font-bold">What is stored</p>
           <ul class="list-disc space-y-1 pl-6">
             <li>
-              <span class="font-bold">Your email address</span>, to sign you in
-              and to send you sign-in codes and security notices, such as a
-              notice when your email address is changed. It is not used for
-              newsletters or marketing. While project sync is in a private beta,
-              invited email addresses are also kept in the site’s settings.
+              <span class="font-bold">Your email address</span>, from the Google
+              account you sign in with, to identify your account. This site
+              doesn’t send you email, and it is not used for newsletters or
+              marketing. While project sync is in a private beta, invited email
+              addresses are also kept in the site’s settings.
             </li>
             <li>
-              <span class="font-bold">A display name and profile picture</span>,
-              if you add a name or sign in with Google. If you sign in with
-              Google, Google shares your name, email address and profile picture
-              link. Your picture is loaded from Google’s servers. The sign-in
-              tokens Google provides are stored encrypted and aren’t used to
-              access your Google account.
+              <span class="font-bold">A display name and profile picture</span>.
+              You sign in with Google, which shares your name, email address and
+              profile picture link; you can change the name. Your picture is
+              loaded from Google’s servers. The sign-in tokens Google provides
+              are stored encrypted and aren’t used to access your Google
+              account.
             </li>
             <li>
               <span class="font-bold">Sign-in sessions</span>: for each device
@@ -206,23 +206,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </li>
             <li>
               <span class="font-bold">Security records</span>: to prevent abuse,
-              counts of recent sign-in requests from each IP address, and of
-              sign-in codes requested for each IP address and email address
-              (stored in a scrambled form that can’t be turned back into the
-              address). These are kept for about a day. Before emailing you a
-              code while you’re signed out, Cloudflare Turnstile checks that
-              you’re not a robot.
+              counts of recent sign-in requests from each IP address, kept for
+              about a day. Before you send a project to the gallery while signed
+              out, Cloudflare Turnstile checks that you’re not a robot.
             </li>
           </ul>
 
           <p class="font-bold">How long it is kept</p>
           <p>
-            Your account data is kept until you delete your account. Sign-in
-            codes expire after 10 minutes. When you change a synced project, the
-            previous version is kept for about a day before it is deleted. When
-            you remove a synced project, a small record of its removal,
-            including its title, is kept for up to 180 days so your other
-            devices remove it too.
+            Your account data is kept until you delete your account. When you
+            change a synced project, the previous version is kept for about a
+            day before it is deleted. When you remove a synced project, a small
+            record of its removal, including its title, is kept for up to 180
+            days so your other devices remove it too.
           </p>
 
           <p class="font-bold">Who processes it</p>
@@ -233,14 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="link"
               rel="noreferrer noopener"
               target="_blank">Cloudflare</a
-            >, which hosts this site. Emails are sent through
-            <a
-              href="https://resend.com/legal/privacy-policy"
-              class="link"
-              rel="noreferrer noopener"
-              target="_blank">Resend</a
-            >, which receives your email address and the email’s contents. If
-            you sign in with Google, Google’s
+            >, which hosts this site. Google’s
             <a
               href="https://policies.google.com/privacy"
               class="link"
@@ -253,11 +242,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="font-bold">Your choices</p>
           <p>
             On your <a href="/account" class="link">account page</a> you can change
-            your name and email address, unlink Google, sign out of every device,
-            download your account data and synced projects, and delete your account.
-            Deleting your account removes your account data and synced projects from
-            this site straight away; projects saved in your browser stay there. For
-            anything else, contact info@temperature-blanket.com.
+            your name, sign out of every device, download your account data and synced
+            projects, and delete your account. Deleting your account removes your
+            account data and synced projects from this site straight away; projects
+            saved in your browser stay there. For anything else, contact info@temperature-blanket.com.
           </p>
 
           <p>
@@ -398,8 +386,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <ul class="list-disc space-y-1 pl-6">
           <li>
             <span class="font-bold">To provide a service you ask for</span>
-            (Article 6(1)(b), a contract): your account, syncing your projects, and
-            the emails that come with them.
+            (Article 6(1)(b), a contract): your account and syncing your projects.
           </li>
           <li>
             <span class="font-bold">With your consent</span>
@@ -416,7 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </li>
         </ul>
         <p>
-          Giving personal data is optional. An email address is needed only to
+          Giving personal data is optional. A Google account is needed only to
           create an account; everything else works without one. No decisions
           about you are made by automated means, and no profiles are built for
           advertising.
@@ -426,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col gap-2">
         <p class="text-xl font-bold">Transfers outside the EU and UK</p>
         <p>
-          Some of the services above, including Cloudflare, Resend, Google and
+          Some of the services above, including Cloudflare, Google and
           Microsoft, are based in the United States or may process data there.
           These transfers rely on the EU–U.S. Data Privacy Framework (and its UK
           extension) where the provider is certified, or otherwise on the
@@ -460,8 +447,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-xl font-bold">Age and security</p>
         <p>
           Accounts are for people aged 16 and over. This site uses encrypted
-          connections (HTTPS), has no passwords to leak, stores sign-in codes
-          only in a scrambled form, and limits repeated sign-in attempts.
+          connections (HTTPS), has no passwords to leak (you sign in with
+          Google), and limits repeated sign-in attempts.
         </p>
       </div>
 
@@ -475,7 +462,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="link">GitHub</a
           >.
         </p>
-        <p class="italic">Last updated September 28, 2026</p>
+        <p class="italic">Last updated October 15, 2026</p>
       </div>
     </main>
   {/snippet}

@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     accountErrorMessage,
     confirmEmailChange,
+    getSignInOptions,
     requestEmailChange,
     sendCurrentEmailCode,
   } from '#lib/accounts/client.js';
@@ -24,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { LoaderCircleIcon, MailIcon } from '@lucide/svelte';
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';
+  import { onMount } from 'svelte';
 
   let {
     email,
@@ -37,6 +39,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let busy = $state(false);
   let errorMessage = $state('');
   let doneMessage = $state('');
+  // Changing it takes emailed codes; without them the address comes from Google
+  let canChange = $state(false);
+
+  onMount(async () => {
+    canChange = (await getSignInOptions()).email;
+  });
 
   async function run(action: () => Promise<void>) {
     busy = true;
@@ -92,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="text-sm opacity-70">Email</p>
       <p><EmailText {email} testid="account-email" /></p>
     </div>
-    {#if step === 'idle'}
+    {#if step === 'idle' && canChange}
       <button
         type="button"
         class="btn btn-sm preset-outlined-surface-300-700 hover:preset-tonal-surface shrink-0"

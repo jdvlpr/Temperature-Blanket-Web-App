@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     accountErrorMessage,
-    canConfirmWithGoogle,
+    reconfirmOptions,
     clearSignedInHint,
     deleteAccount,
     needsFreshSession,
@@ -50,6 +50,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Confirming it's you: with Google when it's linked (no email used), until
   // a code is asked for instead
   let withGoogle = $state(false);
+  // Whether "Email me a code instead" is offered (emailed codes are off in production)
+  let emailCodes = $state(false);
 
   async function remove() {
     busy = true;
@@ -71,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } catch (e) {
       if (needsFreshSession(e)) {
         // More than 10 minutes since sign-in: confirm it's you first
-        withGoogle = await canConfirmWithGoogle();
+        ({ google: withGoogle, email: emailCodes } = await reconfirmOptions());
         if (withGoogle) step = 'reconfirm';
         else await sendCode();
       } else {
@@ -208,12 +210,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={busy}>Cancel</button
         >
       </div>
-      <button
-        type="button"
-        class="btn btn-sm hover:preset-tonal-surface w-fit"
-        onclick={sendCode}
-        disabled={busy}>Email me a code instead</button
-      >
+      {#if emailCodes}
+        <button
+          type="button"
+          class="btn btn-sm hover:preset-tonal-surface w-fit"
+          onclick={sendCode}
+          disabled={busy}>Email me a code instead</button
+        >
+      {/if}
     </div>
   {:else}
     <form class="flex flex-col gap-3" onsubmit={reconfirm} in:safeSlide>

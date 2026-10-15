@@ -36,7 +36,7 @@ import { withSignedInHint } from './hint-cookie';
 import { deleteUserProjectData } from '#lib/server/sync/store.js';
 import { cleanName } from '#lib/utils/string-utils.js';
 import { buildAuthOptions, MAX_DISPLAY_NAME_LENGTH } from './options';
-import { readAuthSettings } from './settings';
+import { emailSignInOn, readAuthSettings } from './settings';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -166,14 +166,14 @@ export async function handleAuthRequest(
     // this email has an account, so it doesn't reveal which emails do
     let signUpsPaused = false;
 
-    const sendsSignInCode = isPost(
-      event,
-      '/api/auth/email-otp/send-verification-otp',
-    );
+    // With email codes off these routes don't exist; Better Auth answers 404
+    const emailSignIn = emailSignInOn(platform!.env);
+    const sendsSignInCode =
+      emailSignIn && isPost(event, '/api/auth/email-otp/send-verification-otp');
     // Both routes that email a code. (The password reset ones are disabled.)
     if (
       sendsSignInCode ||
-      isPost(event, '/api/auth/email-otp/request-email-change')
+      (emailSignIn && isPost(event, '/api/auth/email-otp/request-email-change'))
     ) {
       const body = await jsonBody(event.request);
       const env = platform!.env!;
@@ -284,7 +284,7 @@ export async function handleAuthRequest(
     // Who to notify, and of what, if this request changes the account's email.
     // Read before Better Auth consumes the request body.
     let emailChange: { from: string; to: string } | undefined;
-    if (isPost(event, '/api/auth/email-otp/change-email')) {
+    if (emailSignIn && isPost(event, '/api/auth/email-otp/change-email')) {
       const [session, body] = await Promise.all([
         auth.api.getSession({ headers: event.request.headers }),
         jsonBody(event.request),

@@ -24,6 +24,8 @@ export type AuthEnv = EmailEnv & {
   AUTH_PROTOCOL?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
+  /** "true" turns on emailed sign-in codes (local dev and e2e); production signs in with Google only */
+  EMAIL_SIGN_IN?: string;
 };
 
 export type AuthSettings =
@@ -33,11 +35,15 @@ export type AuthSettings =
       status: 'ready';
       settings: Pick<
         AuthConfig,
-        'secret' | 'allowedHosts' | 'protocol' | 'google'
+        'secret' | 'allowedHosts' | 'protocol' | 'google' | 'emailSignIn'
       >;
     };
 
 const MIN_SECRET_LENGTH = 32;
+
+/** Whether emailed sign-in codes are on; otherwise Google is the only way in. */
+export const emailSignInOn = (env: AuthEnv | undefined) =>
+  env?.EMAIL_SIGN_IN === 'true';
 
 /**
  * Reads and checks the account settings. Fails closed: accounts are off unless
@@ -76,8 +82,12 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
       reason: 'AUTH_PROTOCOL must be https, http or auto',
     };
 
-  const emailProblem = emailConfigProblem(env);
-  if (emailProblem) return { status: 'misconfigured', reason: emailProblem };
+  // Emailed codes are off unless asked for, so nothing spends the email quota
+  const emailSignIn = emailSignInOn(env);
+  if (emailSignIn) {
+    const emailProblem = emailConfigProblem(env);
+    if (emailProblem) return { status: 'misconfigured', reason: emailProblem };
+  }
 
   // Google sign-in is on only when both its ID and secret are set
   const google =
@@ -87,9 +97,15 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
           clientSecret: env.GOOGLE_CLIENT_SECRET,
         }
       : undefined;
+  if (!emailSignIn && !google)
+    return {
+      status: 'misconfigured',
+      reason:
+        'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are needed when EMAIL_SIGN_IN is off',
+    };
 
   return {
     status: 'ready',
-    settings: { secret, allowedHosts, protocol, google },
+    settings: { secret, allowedHosts, protocol, google, emailSignIn },
   };
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildAuthOptions, SIGN_UPS_PAUSED } from './options';
 
-const config = (signUpsOpen?: () => Promise<boolean>) =>
+const config = (signUpsOpen?: () => Promise<boolean>, emailSignIn = true) =>
   buildAuthOptions({
     database: undefined,
     secret: 'x'.repeat(32),
@@ -11,6 +11,7 @@ const config = (signUpsOpen?: () => Promise<boolean>) =>
     runInBackground: () => undefined,
     validateSchema: false,
     signUpsOpen,
+    emailSignIn,
   });
 
 const newUser = {
@@ -44,5 +45,19 @@ describe('email codes', () => {
         '/forget-password/email-otp',
       ]),
     );
+  });
+});
+
+describe('Google-only sign-in', () => {
+  it('leaves out the email code routes when emailSignIn is off', () => {
+    expect(config(undefined, false).plugins).toEqual([]);
+    expect(config().plugins.map((plugin) => plugin.id)).toEqual(['email-otp']);
+  });
+
+  it('won’t unlink the last provider when there’s no email code to fall back on', () => {
+    expect(
+      config(undefined, false).account.accountLinking.allowUnlinkingAll,
+    ).toBe(false);
+    expect(config().account.accountLinking.allowUnlinkingAll).toBe(true);
   });
 });

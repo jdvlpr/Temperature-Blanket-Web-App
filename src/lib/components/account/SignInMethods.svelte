@@ -41,8 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     { id: 'google', name: 'Google' },
   ];
 
-  let available: Record<SignInProvider, boolean> = $state({
+  let available: Record<SignInProvider | 'email', boolean> = $state({
     google: false,
+    email: false,
   });
   let linked: LinkedAccount[] = $state([]);
   let loading = $state(true);
@@ -150,16 +151,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="divide-surface-200-800 flex flex-col divide-y">
-  <div class="flex min-h-14 items-center gap-3 px-4 py-3">
-    <MailIcon class="shrink-0 opacity-70" />
-    <div class="min-w-0 flex-1">
-      <p class="font-bold">Email code</p>
-      <p class="text-sm opacity-70">A 6-digit code sent to your email</p>
+  {#if available.email}
+    <div class="flex min-h-14 items-center gap-3 px-4 py-3">
+      <MailIcon class="shrink-0 opacity-70" />
+      <div class="min-w-0 flex-1">
+        <p class="font-bold">Email code</p>
+        <p class="text-sm opacity-70">A 6-digit code sent to your email</p>
+      </div>
+      <span class="flex shrink-0 items-center gap-1 text-sm opacity-80"
+        ><CheckIcon /> Always on</span
+      >
     </div>
-    <span class="flex shrink-0 items-center gap-1 text-sm opacity-80"
-      ><CheckIcon /> Always on</span
-    >
-  </div>
+  {/if}
   {#if loading}
     <div class="flex min-h-14 items-center px-4 py-3">
       <LoaderCircleIcon class="animate-spin" />
@@ -177,7 +180,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if isLinked(provider.id)}Linked{:else}Sign in with one tap{/if}
           </p>
         </div>
-        {#if isLinked(provider.id)}
+        {#if isLinked(provider.id) && !available.email}
+          <!-- Without email codes it's the only way in, so it can't be unlinked -->
+          <span class="flex shrink-0 items-center gap-1 text-sm opacity-80"
+            ><CheckIcon /> Always on</span
+          >
+        {:else if isLinked(provider.id)}
           <button
             type="button"
             class="btn btn-sm preset-tonal-surface shrink-0"
@@ -217,12 +225,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={busy}>Cancel</button
         >
       </div>
-      <button
-        type="button"
-        class="btn btn-sm hover:preset-tonal-surface w-fit"
-        onclick={sendCode}
-        disabled={busy}>Email me a code instead</button
-      >
+      {#if available.email}
+        <button
+          type="button"
+          class="btn btn-sm hover:preset-tonal-surface w-fit"
+          onclick={sendCode}
+          disabled={busy}>Email me a code instead</button
+        >
+      {/if}
     </div>
   {:else if reconfirming}
     <form

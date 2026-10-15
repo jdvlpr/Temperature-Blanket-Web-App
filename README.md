@@ -55,7 +55,7 @@ It also enables dev-only routes, which return 404 anywhere `ENABLE_DEV_ROUTES` i
 
 #### Accounts
 
-Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact version) on D1, with sign-in by emailed code; there are no passwords. Its API is `/api/auth/*`, loaded only for those requests. The UI (`/auth/sign-in`, `/account` and the Account link) is built in only when `PUBLIC_ACCOUNTS_ENABLED=true` at build time; `pnpm test:e2e:cloudflare` builds with it on.
+Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact version) on D1, with sign-in by Google; there are no passwords. Emailed sign-in codes exist only where `EMAIL_SIGN_IN=true` (local dev and e2e, via `wrangler.jsonc`), so production sends no email. Its API is `/api/auth/*`, loaded only for those requests. The UI (`/auth/sign-in`, `/account` and the Account link) is built in only when `PUBLIC_ACCOUNTS_ENABLED=true` at build time; `pnpm test:e2e:cloudflare` builds with it on.
 
 Server settings, read from the Cloudflare environment (local values are in `wrangler.jsonc`):
 
@@ -65,9 +65,10 @@ Server settings, read from the Cloudflare environment (local values are in `wran
 | `BETTER_AUTH_SECRET`                       | At least 32 characters; signs session cookies. Set as an encrypted secret in production                                                                                 |
 | `AUTH_ALLOWED_HOSTS`                       | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews                                                      |
 | `AUTH_PROTOCOL`                            | `https` (default), `http`, or `auto`                                                                                                                                    |
+| `EMAIL_SIGN_IN`                            | `"true"` turns on emailed sign-in codes (and the email settings below). Leave unset in production: Google is then the only sign-in, and required                        |
 | `EMAIL_SENDER`                             | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503   |
 | `RESEND_API_KEY`, `EMAIL_FROM`             | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                          |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                              |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Turns on “Continue with Google”; required unless `EMAIL_SIGN_IN` is on. Redirect URI: `<site>/api/auth/callback/google`                                                 |
 | `ACCOUNTS_SIGNUP_LIMIT`                    | Optional: the most accounts there may be. Unset means no limit, `0` closes sign-ups. Existing accounts keep signing in either way                                       |
 | `ACCOUNTS_CODE_LIMIT_PER_IP`               | Optional: emailed codes one IP address may request an hour, for any addresses (default 10). Each address also gets at most 5 an hour                                    |
 | `EMAIL_DAILY_LIMIT`                        | Optional: emails Resend may send per UTC day (default 95, under the free plan's 100 a day and 3,000 a month). Past it, code requests say so (503 `EMAIL_LIMIT_REACHED`) |

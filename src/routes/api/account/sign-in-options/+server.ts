@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Which sign-in providers are configured, for the sign-in and account pages.
+// Which sign-in methods are on (Google, emailed codes), for the sign-in and account pages.
 
 import { readAuthSettings } from '#lib/server/auth/settings.js';
 import { json } from '@sveltejs/kit';
@@ -28,7 +28,10 @@ export const GET: RequestHandler = async () => {
   if (result.status !== 'ready')
     return json({ message: 'Not found' }, { status: 404 });
   return json(
-    { google: Boolean(result.settings.google) },
+    {
+      google: Boolean(result.settings.google),
+      email: result.settings.emailSignIn,
+    },
     // Only changes with the deployment's settings
     { headers: { 'Cache-Control': 'private, max-age=3600' } },
   );

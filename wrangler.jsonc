@@ -24,6 +24,10 @@
     // Enables the /api/dev/* routes and the dev email outbox. Never set in production.
     "ENABLE_DEV_ROUTES": "true",
     "EMAIL_SENDER": "dev-outbox",
+    // Emailed sign-in codes, for local dev and e2e (Google can't be driven there).
+    // Production leaves this unset: Google is then the only sign-in and no email is sent,
+    // so it needs GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET and no EMAIL_SENDER/RESEND_*.
+    "EMAIL_SIGN_IN": "true",
     // Accounts, with local-only values. Production sets these in the Pages dashboard,
     // with BETTER_AUTH_SECRET as an encrypted secret.
     "ACCOUNTS_ENABLED": "true",

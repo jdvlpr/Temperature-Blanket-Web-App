@@ -42,6 +42,8 @@ export type AuthConfig = {
   validateSchema: boolean;
   /** Sign in with Google, when configured */
   google?: { clientId: string; clientSecret: string };
+  /** Sign in with an emailed code (EMAIL_SIGN_IN); off in production, where Google is the only way in */
+  emailSignIn: boolean;
   /** Deletes what the account stores outside the auth tables (synced projects in R2), and releases its gallery pages */
   deleteUserData?: (userId: string) => Promise<void>;
   /** Whether a new account may be created now (ACCOUNTS_SIGNUP_LIMIT) */
@@ -76,7 +78,7 @@ export function buildAuthOptions(config: AuthConfig) {
     trustedOrigins: trustedOriginsFor(config.allowedHosts, config.protocol),
     secret: config.secret,
     database: config.database,
-    // No passwords: sign in with an emailed code or Google
+    // No passwords: sign in with Google, or an emailed code where emailSignIn is on
     emailAndPassword: { enabled: false },
     // The email OTP plugin's password reset routes email codes too; with no
     // passwords they're only a way to spend the daily email limit
@@ -114,15 +116,15 @@ export function buildAuthOptions(config: AuthConfig) {
         enabled: true,
         // Linking happens while signed in, so a Google account with another address is fine
         allowDifferentEmails: true,
-        // Every account can still sign in with an emailed code
-        allowUnlinkingAll: true,
+        // Only with emailed codes is there still a way in after unlinking the last provider
+        allowUnlinkingAll: config.emailSignIn,
       },
     },
     socialProviders: config.google
       ? { google: { ...config.google, prompt: 'select_account' as const } }
       : undefined,
     user: {
-      // Needs a session less than freshAge old; the account page confirms with a new code first
+      // Needs a session less than freshAge old; the account page confirms with Google (or a new code) first
       deleteUser: {
         enabled: true,
         // Before the user row goes, so a failure here leaves nothing orphaned
@@ -165,19 +167,22 @@ export function buildAuthOptions(config: AuthConfig) {
       },
     },
     telemetry: { enabled: false },
-    plugins: [
-      emailOTP({
-        otpLength: 6,
-        expiresIn: 10 * 60,
-        allowedAttempts: 3,
-        storeOTP: 'hashed',
-        // A code to the current address and another to the new one
-        changeEmail: { enabled: true, verifyCurrentEmail: true },
-        // Not awaited, so response time doesn't reveal whether an account exists
-        sendVerificationOTP: async ({ email, otp, type }) => {
-          config.runInBackground(config.sendSignInCode(email, otp, type));
-        },
-      }),
-    ],
+    // Without the plugin, every /email-otp route is a 404 and no email is ever sent
+    plugins: config.emailSignIn
+      ? [
+          emailOTP({
+            otpLength: 6,
+            expiresIn: 10 * 60,
+            allowedAttempts: 3,
+            storeOTP: 'hashed',
+            // A code to the current address and another to the new one
+            changeEmail: { enabled: true, verifyCurrentEmail: true },
+            // Not awaited, so response time doesn't reveal whether an account exists
+            sendVerificationOTP: async ({ email, otp, type }) => {
+              config.runInBackground(config.sendSignInCode(email, otp, type));
+            },
+          }),
+        ]
+      : [],
   } satisfies BetterAuthOptions;
 }

@@ -11,6 +11,7 @@ const ready = {
   EMAIL_SENDER: 'resend',
   RESEND_API_KEY: 're_test',
   EMAIL_FROM: 'Temperature Blanket <sign-in@example.test>',
+  EMAIL_SIGN_IN: 'true',
 };
 
 describe('readAuthSettings', () => {
@@ -47,6 +48,25 @@ describe('readAuthSettings', () => {
     ).toBe('misconfigured');
   });
 
+  it('needs no email sender when email codes are off, but then needs Google', () => {
+    const googleOnly = {
+      ...ready,
+      EMAIL_SIGN_IN: undefined,
+      EMAIL_SENDER: undefined,
+      RESEND_API_KEY: undefined,
+      EMAIL_FROM: undefined,
+    };
+    expect(readAuthSettings(googleOnly).status).toBe('misconfigured');
+    const result = readAuthSettings({
+      ...googleOnly,
+      GOOGLE_CLIENT_ID: 'id',
+      GOOGLE_CLIENT_SECRET: 'secret',
+    });
+    expect(result.status === 'ready' && result.settings.emailSignIn).toBe(
+      false,
+    );
+  });
+
   it('rejects an unknown protocol and defaults to https', () => {
     expect(readAuthSettings({ ...ready, AUTH_PROTOCOL: 'ftp' }).status).toBe(
       'misconfigured',
@@ -57,6 +77,7 @@ describe('readAuthSettings', () => {
         secret: SECRET,
         allowedHosts: ['temperature-blanket.com'],
         protocol: 'https',
+        emailSignIn: true,
       },
     });
   });
