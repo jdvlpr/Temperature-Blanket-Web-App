@@ -105,10 +105,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     My Preferences
   </button>
 
-  <!-- Groups are set apart by space, not lines -->
   <a
     href="/supporters"
-    class={[LINK, 'mt-3', pathname === '/supporters' && CURRENT]}
+    class={[LINK, pathname === '/supporters' && CURRENT]}
     aria-current={pathname === '/supporters' ? 'page' : undefined}
   >
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
