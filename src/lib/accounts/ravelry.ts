@@ -45,11 +45,12 @@ export async function getRavelryStatus(): Promise<RavelryStatus | null> {
  * ?error= if it failed.
  */
 export async function connectRavelry(returnTo = '/account') {
-  const response = await fetch('/api/auth/oauth2/link', {
+  // Better Auth's generic OAuth providers link like the built-in ones
+  const response = await fetch('/api/auth/link-social', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      providerId: 'ravelry',
+      provider: 'ravelry',
       callbackURL: returnTo,
       // Marked, so only the Ravelry row shows the error
       errorCallbackURL: `${returnTo}${returnTo.includes('?') ? '&' : '?'}ravelry=failed`,

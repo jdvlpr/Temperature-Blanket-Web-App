@@ -285,9 +285,9 @@ export async function handleAuthRequest(
       return json({ message: 'Not found' }, { status: 404 });
 
     // A linked Ravelry account is for Ravelry's API only, never a way in
-    if (isPost(event, '/api/auth/sign-in/oauth2')) {
+    if (isPost(event, '/api/auth/sign-in/social')) {
       const body = await jsonBody(event.request);
-      if (body?.providerId === RAVELRY_PROVIDER_ID)
+      if (body?.provider === RAVELRY_PROVIDER_ID)
         return json(
           {
             code: 'NOT_A_SIGN_IN_METHOD',
