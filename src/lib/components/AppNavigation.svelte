@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import PreferencesDialog from '#lib/components/modals/PreferencesDialog.svelte';
+  import { SMALL_LINK, SMALL_LINKS } from '#lib/constants/class-constants.js';
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
@@ -49,9 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const CURRENT = 'preset-tonal-secondary';
   const HEADING =
     'text-surface-700-300 mt-3 px-3 text-xs font-semibold tracking-wide uppercase';
-  // Learn and the footer row are quieter text links
-  const SMALL_LINK = 'py-1 hover:underline';
-  const SMALL_CURRENT = 'text-secondary-700-300';
+  const SMALL_CURRENT = 'text-secondary-700-300 opacity-100!';
 </script>
 
 <!-- Icons line up by what's drawn, with the site logo's edge -->
@@ -175,63 +174,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Weather Forecast
   </a>
 
-  <h2 class={HEADING}>Learn</h2>
+  <hr class="border-surface-300-700 w-full" />
 
-  <div class="text-surface-700-300 flex flex-col items-start px-3 text-sm">
+  <!-- Small links, spaced apart in one row that wraps -->
+  <div class={[SMALL_LINKS, 'px-3']}>
     <a
       href="/faq"
-      class={[SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}
+      class={['py-1', SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}
       aria-current={pathname === '/faq' ? 'page' : undefined}>FAQ</a
     >
     <a
       href="/blog"
-      class={[SMALL_LINK, blog && SMALL_CURRENT]}
+      class={['py-1', SMALL_LINK, blog && SMALL_CURRENT]}
       aria-current={blog ? 'page' : undefined}>Blog</a
     >
     <a
       href="/documentation"
-      class={[SMALL_LINK, pathname === '/documentation' && SMALL_CURRENT]}
+      class={[
+        'py-1',
+        SMALL_LINK,
+        pathname === '/documentation' && SMALL_CURRENT,
+      ]}
       aria-current={pathname === '/documentation' ? 'page' : undefined}
       >Documentation</a
     >
     <a
       href="/changelog"
-      class={[SMALL_LINK, pathname === '/changelog' && SMALL_CURRENT]}
+      class={['py-1', SMALL_LINK, pathname === '/changelog' && SMALL_CURRENT]}
       aria-current={pathname === '/changelog' ? 'page' : undefined}
     >
       What's New <span class="text-xs">v{version}</span>
     </a>
-  </div>
-
-  <hr class="border-surface-300-700 w-full" />
-
-  <!-- One row that wraps -->
-  <div
-    class="text-surface-700-300 flex flex-wrap items-center gap-x-2 px-3 text-sm"
-  >
     <a
       href="/contact"
-      class={[SMALL_LINK, pathname === '/contact' && SMALL_CURRENT]}
+      class={['py-1', SMALL_LINK, pathname === '/contact' && SMALL_CURRENT]}
       aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a
     >
-    <span aria-hidden="true">·</span>
     <a
       href="/privacy"
-      class={[SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
+      class={['py-1', SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
       aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
     >
-    <span aria-hidden="true">·</span>
     <a
       href="/api/yarn-colorways"
-      class={[SMALL_LINK, pathname === '/api/yarn-colorways' && SMALL_CURRENT]}
+      class={[
+        'py-1',
+        SMALL_LINK,
+        pathname === '/api/yarn-colorways' && SMALL_CURRENT,
+      ]}
       aria-current={pathname === '/api/yarn-colorways' ? 'page' : undefined}
       >API</a
     >
     {#if PUBLIC_GITHUB_LINK}
-      <span aria-hidden="true">·</span>
       <a
         href={PUBLIC_GITHUB_LINK}
-        class={[SMALL_LINK, 'inline-flex items-center gap-1']}
+        class={['inline-flex items-center gap-1 py-1', SMALL_LINK]}
         target="_blank"
         rel="noopener"
       >

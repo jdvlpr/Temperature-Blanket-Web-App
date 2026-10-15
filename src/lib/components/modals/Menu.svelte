@@ -21,7 +21,12 @@ of help links. Save itself is in the top bar. A side panel on large screens
 button to it. -->
 
 <script lang="ts">
-  import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
+  import {
+    PANEL_LIST,
+    PANEL_ROW,
+    SMALL_LINK,
+    SMALL_LINKS,
+  } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
   import { account } from '#lib/accounts/summary.svelte.js';
@@ -80,7 +85,6 @@ button to it. -->
   import { pluralize } from '#lib/utils/string-utils.js';
 
   const ROW = PANEL_ROW;
-  const LINK = 'hover:underline opacity-80 hover:opacity-100';
   const LINK_ICON = 'icon-sm inline opacity-60';
 
   const hasWeather = $derived(weather.data.length > 0);
@@ -501,38 +505,50 @@ button to it. -->
 
   <!-- Help, in one line: the site menu has the rest -->
   <nav
-    class="border-surface-200-800 flex flex-wrap gap-x-4 gap-y-2 border-t pt-4"
+    class={[SMALL_LINKS, 'border-surface-200-800 border-t pt-4']}
     aria-label="Help"
   >
     <button
       type="button"
-      class={LINK}
+      class={SMALL_LINK}
       onclick={() => open(GettingStarted, 'Getting Started')}
       >Getting Started</button
     >
     <button
       type="button"
-      class={LINK}
+      class={SMALL_LINK}
       onclick={() => open(KeyboardShortcuts, 'Keyboard Shortcuts')}
       >Keyboard Shortcuts</button
     >
 
-    <a href={resolve('faq')} target="_blank" class={LINK}
-      >FAQ <ExternalLinkIcon class={LINK_ICON} /></a
+    <a href={resolve('faq')} target="_blank" class={SMALL_LINK}
+      >FAQ <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
+        >(opens in a new tab)</span
+      ></a
     >
 
-    <a href={resolve('documentation')} target="_blank" class={LINK}>
+    <a href={resolve('documentation')} target="_blank" class={SMALL_LINK}>
       Documentation
-      <ExternalLinkIcon class={LINK_ICON} />
+      <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
+        >(opens in a new tab)</span
+      >
     </a>
 
-    <a href={resolve('contact')} target="_blank" class={LINK}
-      >Contact <ExternalLinkIcon class={LINK_ICON} /></a
+    <a href={resolve('contact')} target="_blank" class={SMALL_LINK}
+      >Contact <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
+        >(opens in a new tab)</span
+      ></a
     >
 
-    <a href="{resolve('documentation')}#credits" target="_blank" class={LINK}>
+    <a
+      href="{resolve('documentation')}#credits"
+      target="_blank"
+      class={SMALL_LINK}
+    >
       Data Sources & Credits
-      <ExternalLinkIcon class={LINK_ICON} />
+      <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
+        >(opens in a new tab)</span
+      >
     </a>
   </nav>
 </div>

@@ -48,3 +48,9 @@ export const FIELD_GROUP =
 // group's icon cell puts its icon. The select needs pl-11, so its text starts
 // where a field group's does. Inside a `relative flex items-center` wrapper.
 export const FIELD_ICON = 'pointer-events-none absolute left-3';
+
+// A row of small text links that wraps, spaced apart with no separators (a dot
+// would dangle at the end of a wrapped line): the sidebar's footer links and
+// the Project menu's Help links.
+export const SMALL_LINKS = 'flex flex-wrap gap-x-4 gap-y-2 text-sm';
+export const SMALL_LINK = 'hover:underline opacity-80 hover:opacity-100';
