@@ -400,13 +400,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/snippet}
               {#snippet footer()}
                 <GallerySharing
-                  compact
                   kind="palette"
+                  id={page.projectId}
                   {label}
+                  link={page.link ?? undefined}
                   {page}
                   galleryOnly
-                  onadd={() => {}}
-                  onupdate={() => {}}
                 />
               {/snippet}
             </PaletteCard>

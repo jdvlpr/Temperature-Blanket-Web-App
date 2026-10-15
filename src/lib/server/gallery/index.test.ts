@@ -113,9 +113,116 @@ describe('publishFromAccount', () => {
         // As published, for the page's colors on My Projects
         link: 'https://temperature-blanket.com/?project=p1#h',
         showOwner: false,
+        updatedAt: null,
       },
     ]);
     expect((await getSettings(d1, 'u1')).publicId).toBeNull();
+  });
+
+  it('updates its page in place, keeping the page and its name choice', async () => {
+    const { d1, gallery, calls } = await setup(() =>
+      answered({
+        code: 200,
+        id: 77,
+        link: 'l',
+        shared_palettes: {
+          created: [],
+          updated: [
+            { id: 90, title: 'Warm', yarn_url: 'https://t.com/yarn?s=2' },
+          ],
+          skipped: [],
+        },
+      } as PublishResponse),
+    );
+    await recordPost(d1, 'u1', {
+      postId: 77,
+      projectId: 'p1',
+      title: 'Old',
+      publishedAt: 10,
+      showOwner: true,
+    });
+    await recordPost(d1, 'u1', {
+      postId: 90,
+      projectId: '',
+      title: 'Cold',
+      publishedAt: 10,
+      kind: 'palette',
+      link: 'https://t.com/yarn?s=1',
+    });
+    const body = payload('https://t.com/?project=p1#new', 'New name');
+    const response = await publishFromAccount(
+      gallery,
+      body,
+      { postId: 77, showOwner: false },
+      2000,
+    );
+
+    expect(await response.json()).toMatchObject({ code: 200, linked: true });
+    expect(calls[0].url).toBe(
+      'https://wp.example/wp-json/tbgalleryapi/v1/project/77',
+    );
+    const posts = await listPosts(d1, 'u1');
+    expect(posts.find((p) => p.postId === 77)).toMatchObject({
+      title: 'New name',
+      link: 'https://t.com/?project=p1#new',
+      publishedAt: 10,
+      updatedAt: 2000,
+      // The page's own choice, not the one sent
+      showOwner: true,
+    });
+    expect(posts.find((p) => p.postId === 90)).toMatchObject({
+      title: 'Warm',
+      link: 'https://t.com/yarn?s=2',
+      updatedAt: 2000,
+    });
+    expect(posts).toHaveLength(2);
+  });
+
+  it('refuses to update a page that isn’t this user’s, without asking WordPress', async () => {
+    const { gallery, calls } = await setup(() => answered({ code: 200 }));
+    const response = await publishFromAccount(
+      gallery,
+      payload('https://t.com/?project=p1#h'),
+      { postId: 5 },
+    );
+    expect(response.status).toBe(404);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('says when the gallery plugin can’t update yet, and forgets a page gone there', async () => {
+    const { d1, gallery } = await setup(() =>
+      Response.json({ code: 'rest_no_route' }, { status: 404 }),
+    );
+    await recordPost(d1, 'u1', {
+      postId: 77,
+      projectId: 'p1',
+      title: 'Old',
+      publishedAt: 10,
+    });
+    const body = payload('https://t.com/?project=p1#h');
+    const unsupported = await publishFromAccount(gallery, body, { postId: 77 });
+    expect(unsupported.status).toBe(501);
+    expect(await unsupported.json()).toMatchObject({
+      code: 'UPDATE_UNSUPPORTED',
+    });
+
+    const gone = await setup(() =>
+      Response.json(
+        { code: '404', message: 'No such project.' },
+        { status: 404 },
+      ),
+    );
+    await recordPost(gone.d1, 'u1', {
+      postId: 77,
+      projectId: 'p1',
+      title: 'Old',
+      publishedAt: 10,
+    });
+    const response = await publishFromAccount(gone.gallery, body, {
+      postId: 77,
+    });
+    expect(response.status).toBe(404);
+    expect(await listPosts(gone.d1, 'u1')).toEqual([]);
   });
 
   it('includes it on the public gallery when chosen, and remembers the choice', async () => {
@@ -301,6 +408,7 @@ describe('sharing a palette', () => {
         kind: 'palette',
         link,
         showOwner: true,
+        updatedAt: null,
       },
     ]);
     expect((await getSettings(d1, 'u1')).showOwnerDefault).toBe(true);

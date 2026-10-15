@@ -29,7 +29,6 @@ import { weather } from '#lib/state/weather-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { colorsToCode, colorsToYarnDetails } from '#lib/utils/color-utils.js';
 import { buildGalleryRequestBody } from '#lib/utils/gallery-upload-utils.js';
-import { TURNSTILE_HEADER } from '#lib/utils/turnstile.js';
 import { convertTime } from '#lib/utils/unit-utils.svelte.js';
 import {
   dateToISO8601String,
@@ -157,54 +156,52 @@ export type SharePaletteChoice = {
 export type GallerySendResult =
   | {
       status: 'sent';
-      /** The new gallery page */
+      /** Its gallery page */
       link: string;
+      /** An existing page was updated in place (same link) */
+      updated: boolean;
       /**
        * Its palettes, when some were shared with it: null when the gallery
        * didn't say (a plugin before 1.7.0 doesn't share them)
        */
       palettes?: SharedPaletteResults | null;
-      /** Recorded to the signed-in account, so it can be changed or removed later */
-      linked: boolean;
-      /** Replacing a page: whether the old one came off (null when not replacing) */
-      oldRemoved: boolean | null;
     }
   /** The same project is in the gallery already: that page */
-  | { status: 'duplicate'; link: string; title: string; oldRemoved: boolean }
+  | { status: 'duplicate'; link: string; title: string }
   | { status: 'too-large' }
-  /** Publishing from accounts is paused, and a replaced page can't go anonymously */
+  /** Publishing from accounts is paused */
   | { status: 'paused' }
+  /** Publishing needs an account, and it isn't signed in */
+  | { status: 'signed-out' }
+  /** The gallery's plugin can't update pages yet (before 1.9.0) */
+  | { status: 'unsupported' }
+  /** The page being updated is gone (unpublished elsewhere) */
+  | { status: 'gone' }
   /** WordPress's own message, if it gave one (plain text) */
-  | { status: 'error'; message: string; oldRemoved: boolean };
+  | { status: 'error'; message: string };
 
 /** Steps of a send after the image, for the dialog to say what it's doing. */
-export type GallerySendStep = 'checking' | 'sending' | 'removing-old';
+export type GallerySendStep = 'sending';
 
 /**
- * Sends the project to the gallery. `fromAccount` publishes it as the signed-in
- * user when it's saved to their account, falling back to an anonymous submission
- * when that isn't possible.
+ * Sends the project to the gallery as the signed-in user: a new page, or with
+ * `postId` an update of that page in place (same link, views and settings).
  */
 export const sendToProjectGallery = async (
   img: string,
   {
-    fromAccount = false,
     showOwner = false,
     name = '',
-    replacePostId,
-    getGuestToken,
+    postId,
     sharePalettes = [],
     onStep,
   }: {
-    fromAccount?: boolean;
-    /** From an account: include it on the owner's public gallery, with their name */
+    /** A new page: include it on the owner's public gallery, with their name (an update keeps the page's choice) */
     showOwner?: boolean;
     /** The name the project was given, shown in the gallery instead of its location title */
     name?: string;
-    /** From an account: the project's old gallery page, removed once this one is in */
-    replacePostId?: number;
-    /** A new Turnstile token, which a submission without the account needs */
-    getGuestToken?: () => Promise<string>;
+    /** The project's gallery page, updated in place */
+    postId?: number;
     /** Gauges' palettes to share to the palette gallery with it */
     sharePalettes?: SharePaletteChoice[];
     onStep?: (step: GallerySendStep) => void;
@@ -284,117 +281,65 @@ export const sendToProjectGallery = async (
         })),
     }),
   };
-  // My Projects' Sharing rows show the new page (and not the old one)
-  const pagesChanged = async () => {
-    if (!fromAccount) return;
-    const { GALLERY_PAGES_CHANGED } = await import('#lib/accounts/gallery.js');
-    window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-  };
   // WordPress's messages are text, never HTML
   const text = (value: unknown) =>
     decodeHtmlEntities(String(value ?? '')).trim();
   try {
     const body = await buildGalleryRequestBody(data);
     if (!body) return { status: 'too-large' };
-    // WordPress's answer, from either route
-    const publish = async () => {
-      if (fromAccount) {
-        const { publishFromAccount } = await import('#lib/accounts/gallery.js');
-        const result = await publishFromAccount(body, { showOwner });
-        if (result.status === 'answered') return result.response;
-      }
-      // Replacing a page is only from an account: never a second, anonymous one
-      if (replacePostId) return null;
-      // Got just before it's sent, since a token expires and works only once
-      let token = '';
-      if (getGuestToken) {
-        onStep?.('checking');
-        try {
-          token = await getGuestToken();
-        } catch {
-          return {
-            code: 503,
-            message:
-              "The check that you're not a robot couldn't load. If you use a content blocker, allow challenges.cloudflare.com, then try again.",
-          };
-        }
-        onStep?.('sending');
-      }
-      const request = await fetch('/api/project', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { [TURNSTILE_HEADER]: token }),
-        },
-        body,
-      });
-      return await request.json();
-    };
-    const removeOld = async () => {
-      if (!replacePostId) return true;
-      onStep?.('removing-old');
-      const { removeGalleryPage } = await import('#lib/accounts/gallery.js');
-      try {
-        await removeGalleryPage(replacePostId);
-        return true;
-      } catch {
-        return false;
-      }
-    };
-
+    const { publishFromAccount, GALLERY_PAGES_CHANGED } =
+      await import('#lib/accounts/gallery.js');
     onStep?.('sending');
-    let response = await publish();
-    if (!response) return { status: 'paused' };
-    // Replacing with the same settings (only its name changed, say): the old
-    // page is the duplicate, so it goes first. Removed pages aren't duplicates.
-    let oldRemoved: boolean | null = null;
-    if (response.code === 409 && replacePostId) {
-      oldRemoved = await removeOld();
-      if (oldRemoved) {
-        onStep?.('sending');
-        response = (await publish()) ?? response;
-      }
+    const result = await publishFromAccount(body, { showOwner, postId });
+    if (result.status === 'error')
+      return { status: 'error', message: text(result.message) };
+    if (result.status !== 'answered') {
+      if (result.status === 'gone')
+        window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+      return { status: result.status };
     }
+    const response = result.response as {
+      code?: unknown;
+      id?: unknown;
+      link?: unknown;
+      title?: unknown;
+      message?: unknown;
+      data?: unknown;
+      shared_palettes?: unknown;
+    };
 
-    if (response.code === 200) {
-      if (replacePostId) oldRemoved ??= await removeOld();
-      await pagesChanged();
-      const link = galleryPageHref(response.link, response.id);
+    if (Number(response.code) === 200) {
+      // My Library shows the page
+      window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+      const link = galleryPageHref(response.link, response.id ?? postId);
       project.gallery.href = link;
       project.gallery.title = text(response.title);
       return {
         status: 'sent',
         link,
-        linked: Boolean(response.linked),
-        oldRemoved,
+        updated: postId !== undefined,
         ...(sharePalettes.length && {
           palettes: sharedPalettesFrom(response.shared_palettes),
         }),
       };
     }
-    if (oldRemoved) await pagesChanged();
-    if (response.code === 409) {
+    if (Number(response.code) === 409) {
       // The same project's page, already in the gallery
       const page =
         typeof response.data === 'string'
           ? JSON.parse(response.data)
-          : (response.data ?? {});
+          : ((response.data as { permalink?: unknown; title?: unknown }) ?? {});
       return {
         status: 'duplicate',
         link: galleryPageHref(page.permalink),
         title: text(page.title),
-        oldRemoved: Boolean(oldRemoved),
       };
     }
     // 400: unexpected or missing request param; 500: pattern type, image
     // upload or attachment error
-    return {
-      status: 'error',
-      message: text(response.message),
-      oldRemoved: Boolean(oldRemoved),
-    };
+    return { status: 'error', message: text(response.message) };
   } catch {
-    return { status: 'error', message: '', oldRemoved: false };
+    return { status: 'error', message: '' };
   }
 };
 
@@ -417,13 +362,18 @@ function galleryPageHref(permalink: unknown, id?: unknown): string {
 function sharedPalettesFrom(value: unknown): SharedPaletteResults | null {
   const shared = value as {
     created?: { id?: unknown; title?: unknown }[];
+    /** On an update: its palette pages changed in place (shown as shared) */
+    updated?: { id?: unknown; title?: unknown }[];
     skipped?: { title?: unknown; reason?: unknown; id?: unknown }[];
   } | null;
   if (!shared || !Array.isArray(shared.created)) return null;
   const text = (value: unknown) =>
     decodeHtmlEntities(String(value ?? '')).trim();
   return {
-    created: shared.created
+    created: [
+      ...shared.created,
+      ...(Array.isArray(shared.updated) ? shared.updated : []),
+    ]
       .filter((palette) => typeof palette?.id === 'number')
       .map((palette) => ({
         id: palette.id as number,

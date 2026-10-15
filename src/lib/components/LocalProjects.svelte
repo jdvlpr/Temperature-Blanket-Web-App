@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
   import { openGalleryDialog } from '#lib/utils/open-saved-project.js';
+  import { withProjectName } from '#lib/utils/project-name-link.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
@@ -355,15 +356,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 {#snippet gallerySharing(project: StoredProjectIndexItem)}
-  {@const page = galleryPages.grouped.byProject.get(project.id)}
+  {@const page = showSharing
+    ? galleryPages.grouped.byProject.get(project.id)
+    : undefined}
+  {@const changed = (p: GalleryPage) =>
+    (lastSavedAt(project) ?? 0) > (p.updatedAt ?? p.publishedAt)}
   <GallerySharing
-    compact
     kind="project"
+    id={project.id}
     label={labelFor(project)}
-    {page}
-    changedSince={Boolean(
-      page && (lastSavedAt(project) ?? 0) > page.publishedAt,
+    link={withProjectName(
+      project.meta.href,
+      project.meta.name,
+      project.meta.title,
     )}
+    {page}
+    changedSince={Boolean(page && changed(page))}
+    {changed}
     onadd={() => openForGallery(project, { action: 'add' })}
     onupdate={(old) =>
       openForGallery(project, {
@@ -418,7 +427,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onfocused={() => (focusId = null)}
                 >
                   {#snippet sharing()}
-                    {#if showSharing}{@render gallerySharing(project)}{/if}
+                    {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}
                   {/snippet}
                 </SavedProjectCard>
               {:else}
@@ -435,13 +444,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   {#snippet sharing()}
                     <GallerySharing
-                      compact
                       kind="project"
+                      id={card.page.projectId}
                       label={card.page.title}
+                      link={card.page.link ?? undefined}
                       page={card.page}
                       galleryOnly
-                      onadd={() => {}}
-                      onupdate={() => {}}
                     />
                   {/snippet}
                 </SavedProjectCard>

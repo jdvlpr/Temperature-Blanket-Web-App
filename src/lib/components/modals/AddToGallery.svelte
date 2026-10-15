@@ -13,25 +13,21 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Publishes the open project to the Project Gallery: a snapshot of it as
-it is now. It shows the project as its gallery card will (preview, name,
-place and dates, and "By" with the account's name), then publishes it in place
-and links to the new page. A project already published shows its page first,
-with Publish New Version (choosing whether its old page is removed) and, for
-the account's own pages, Unpublish. From My Projects, the saved project loads
-behind the dialog first (with its weather, when that isn't kept with it).
-Each gauge's yarn palette can be shared to the palette gallery with it, by
-choice (guests too: it's the only way they can share a palette). -->
+<!-- Publishes the open project to the Project Gallery, or updates its gallery
+page in place (same link, views and settings) when it has one: each project has
+one page. It shows the project as its gallery card will (preview, name, and "By"
+with the account's name), then publishes it and links to the page. Publishing
+needs an account; signed out, it says so with a way to sign in. From My
+Library, the saved project loads behind the dialog first (with its weather,
+when that isn't kept with it). Each gauge's yarn palette can be shared to the
+palette gallery with it, by choice. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
-  import Turnstile from '#lib/components/Turnstile.svelte';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
-  import UnpublishVersions from '#lib/components/account/UnpublishVersions.svelte';
-  import GalleryPageList from '#lib/components/account/GalleryPageList.svelte';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -67,8 +63,8 @@ choice (guests too: it's the only way they can share a palette). -->
     request,
     href,
   }: {
-    // From My Projects: add with a choice already made, or replace the
-    // project's old page with one of it as it is now
+    // From My Library: add with a choice already made, or update that page
+    // to the project as it is now
     request?: GalleryRequest;
     // From My Projects: the saved project's link, loaded behind the dialog
     href?: string;
@@ -149,84 +145,32 @@ choice (guests too: it's the only way they can share a palette). -->
     window.removeEventListener('pagehide', onpagehide);
   });
 
-  // Signed in with publishing from accounts on: the page is linked to the account
-  let fromAccount = $state(false);
-  // Until it's known whether it's from the account, it can't be sent: it would
-  // otherwise go without the account (and a replaced page would stay)
+  // Why it can't be published from here, once the account is checked
+  let blocked = $state<'signed-out' | 'paused' | null>(null);
   let accountChecked = $state(false);
-  // Include it on the account's public gallery, starting from the last choice
+  // Include a new page on the account's public gallery, starting from the last
+  // choice (an update keeps the page's own)
   let showOwner = $state(false);
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
-  type OwnPage = {
-    postId: number;
-    title: string;
-    showOwner?: boolean;
-    publishedAt: number;
-    link?: string | null;
-  };
-  // The account's pages of this project, newest first
-  let ownPages = $state<OwnPage[]>([]);
-  let accountPage = $derived(ownPages[0] ?? null);
-  // Publishing a new version, after the pages it has
-  let newVersion = $state(false);
-  // Its versions to unpublish once the new one is in (the latest, at first)
-  let unpublishIds = $state<number[]>([]);
-  // The newest of them takes the new page's place (it may be the one the
-  // gallery says is the same); the rest come off after
-  let replacePostId = $derived(
-    ownPages.find((page) => unpublishIds.includes(page.postId))?.postId,
-  );
-  // Of the rest: how many came off, and whether any couldn't
-  let extrasRemoved = $state(0);
-  let extrasFailed = $state(false);
+  // The project's gallery page, updated in place, if it has one
+  let page = $state<{ postId: number; showOwner?: boolean } | null>(null);
 
-  // The pages it has already: the account's, or one sent since the page opened
-  const existingPages = $derived(
-    ownPages.length
-      ? ownPages.map((page) => ({
-          postId: page.postId,
-          title: page.title,
-          publishedAt: page.publishedAt,
-          link: page.link,
-          showOwner: page.showOwner,
-          href: resolve('/gallery/[id]', { id: String(page.postId) }),
-        }))
-      : project.gallery.href &&
-          project.gallery.title &&
-          project.gallery.title === locations.projectTitle
-        ? [
-            {
-              postId: 0,
-              title: project.gallery.title,
-              href: project.gallery.href,
-            },
-          ]
-        : [],
-  );
-
-  // Sent: the new page
+  // Sent: its page
   let sent = $state<Extract<GallerySendResult, { status: 'sent' }> | null>(
     null,
   );
 
-  // Already published (and not asked from My Projects for a new one), until
-  // Publish New Version is chosen
-  let showExisting = $state(true);
-  // Every page unpublished, here
-  let removed = $state(false);
   const view = $derived(
     preparing
       ? 'preparing'
       : sent
         ? 'sent'
-        : removed
-          ? 'removed'
-          : !accountChecked
-            ? 'checking'
-            : existingPages.length && showExisting && !request
-              ? 'existing'
-              : 'form',
+        : !accountChecked
+          ? 'checking'
+          : blocked
+            ? 'blocked'
+            : 'form',
   );
 
   onMount(async () => {
@@ -235,82 +179,44 @@ choice (guests too: it's the only way they can share a palette). -->
     void getWeather();
     try {
       await checkAccount();
+    } catch {
+      blocked = 'paused';
     } finally {
       accountChecked = true;
     }
   });
 
-  // Whether (and how) it's sent from the account, and its page there if any
+  // Whether it can be sent, and its page in the account if it has one
   async function checkAccount() {
-    if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
+    if (!__ACCOUNTS_ENABLED__ || !account.summary) {
+      blocked = 'signed-out';
+      return;
+    }
     const { getGalleryPages } = await import('#lib/accounts/gallery.js');
     const gallery = await getGalleryPages();
-    if (!gallery?.publishing) return;
+    if (!gallery) {
+      blocked = 'signed-out';
+      return;
+    }
+    if (!gallery.publishing) {
+      blocked = 'paused';
+      return;
+    }
     showOwner = gallery.settings.showOwnerDefault;
     if (request?.action === 'add' && request.showOwner !== undefined)
       showOwner = request.showOwner;
-    if (request?.action === 'replace') {
-      const old = gallery.posts.find((post) => post.postId === request.postId);
-      newVersion = true;
-      if (old) {
-        unpublishIds = [old.postId];
-        showOwner = old.showOwner ?? showOwner;
-      }
-    }
+    // Its newest page (older versions came from before pages were updated)
     const own = gallery.posts
       .filter(
-        (post) => post.projectId === project.id && post.kind !== 'palette',
+        (post) =>
+          post.kind !== 'palette' &&
+          (request?.action === 'replace'
+            ? post.postId === request.postId
+            : post.projectId === project.id),
       )
-      .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId);
-    ownPages = own.map(({ postId, title, showOwner, publishedAt, link }) => ({
-      postId,
-      title,
-      showOwner,
-      publishedAt,
-      link,
-    }));
+      .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId)[0];
+    if (own) page = { postId: own.postId, showOwner: own.showOwner };
     if (typeof gallery.name === 'string') serverName = gallery.name;
-    fromAccount = true;
-  }
-
-  // Publish New Version: the project as it is now. With the account's own
-  // pages, it asks which to unpublish (the latest, at first), and shows the
-  // name as the latest did.
-  function publishNew() {
-    newVersion = true;
-    if (accountPage) {
-      unpublishIds = [accountPage.postId];
-      showOwner = accountPage.showOwner ?? showOwner;
-    }
-    showExisting = false;
-  }
-
-  // Show the name on one of the account's pages, or not. Throws when it can't.
-  async function setPageShowOwner(postId: number, next: boolean) {
-    const { setGalleryPageShowOwner, GALLERY_PAGES_CHANGED } =
-      await import('#lib/accounts/gallery.js');
-    await setGalleryPageShowOwner(postId, next);
-    ownPages = ownPages.map((page) =>
-      page.postId === postId ? { ...page, showOwner: next } : page,
-    );
-    window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-  }
-
-  // Unpublish one of the account's pages. Throws when it can't.
-  async function removePage(postId: number) {
-    const { removeGalleryPage, GALLERY_PAGES_CHANGED } =
-      await import('#lib/accounts/gallery.js');
-    await removeGalleryPage(postId);
-    ownPages = ownPages.filter((page) => page.postId !== postId);
-    window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-    // The Project menu offers Publish to Gallery again
-    if (project.gallery.href?.split('/').pop() === String(postId))
-      project.gallery.href = '';
-    if (!ownPages.length) {
-      removed = true;
-      await tick();
-      removedHeading?.focus();
-    }
   }
 
   // Palettes to share with it: each gauge with yarn colors (the palette
@@ -350,9 +256,7 @@ choice (guests too: it's the only way they can share a palette). -->
   // when there is one, so My Projects shows its page on that row
   async function sharePaletteChoices(): Promise<SharePaletteChoice[]> {
     if (!shareChoices.length) return [];
-    const saved = fromAccount
-      ? await PaletteStorage.list().catch(() => [])
-      : [];
+    const saved = await PaletteStorage.list().catch(() => []);
     return shareChoices.map((option) => {
       const code = colorsToPaletteCode(option.colors);
       return {
@@ -366,9 +270,7 @@ choice (guests too: it's the only way they can share a palette). -->
   // Why a palette wasn't shared, as people would say it
   const skippedText = (reason: string) =>
     reason === 'duplicate'
-      ? fromAccount
-        ? 'You’ve published it already.'
-        : 'It’s in the gallery already.'
+      ? 'You’ve published it already.'
       : reason === 'title'
         ? 'Its name can’t be used.'
         : reason === 'link'
@@ -385,27 +287,14 @@ choice (guests too: it's the only way they can share a palette). -->
   let step = $state<'image' | GallerySendStep | null>(null);
   const STEP_TEXT = {
     image: 'Drawing the preview image…',
-    checking: 'Checking you’re not a robot…',
     sending: 'Publishing… This can take a minute.',
-    'removing-old': 'Removing the old page…',
   };
   let problem = $state<Exclude<GallerySendResult, { status: 'sent' }> | null>(
     null,
   );
   // The page's own link, for after it's sent
   let sentHeading = $state<HTMLElement>();
-  let removedHeading = $state<HTMLElement>();
-  // Cloudflare is asking the person to do something
-  let challenge = $state(false);
-  const stepText = $derived(
-    step === 'checking' && challenge
-      ? 'Complete the check below to publish.'
-      : step
-        ? STEP_TEXT[step]
-        : '',
-  );
-  // Checks a submission without the account isn't from a robot
-  let turnstile = $state<Turnstile>();
+  const stepText = $derived(step ? STEP_TEXT[step] : '');
 
   async function submit() {
     const active = previews.active;
@@ -413,7 +302,7 @@ choice (guests too: it's the only way they can share a palette). -->
     busy = true;
     problem = null;
     try {
-      if (fromAccount && !href) {
+      if (!href) {
         // Published from the account, it's kept there too, next to its gallery page
         const { saveOpenProject } =
           await import('#lib/storage/autosave.svelte.js');
@@ -433,51 +322,25 @@ choice (guests too: it's the only way they can share a palette). -->
       const sharePalettes = await sharePaletteChoices();
       const result = await sendToProjectGallery(img, {
         sharePalettes,
-        fromAccount,
-        showOwner: fromAccount && showOwner,
+        showOwner,
         name,
-        replacePostId: fromAccount ? replacePostId : undefined,
-        getGuestToken: async () => {
-          if (!turnstile) throw new Error('No Turnstile');
-          return turnstile.getToken();
-        },
+        postId: page?.postId,
         onStep: (next) => (step = next),
       });
       if (result.status === 'sent') {
-        // The other versions chosen, now that the new one is in
-        if (fromAccount && result.oldRemoved !== false) {
-          const extras = unpublishIds.filter((id) => id !== replacePostId);
-          if (extras.length) {
-            const { removeGalleryPage, GALLERY_PAGES_CHANGED } =
-              await import('#lib/accounts/gallery.js');
-            const results = await Promise.allSettled(
-              extras.map((id) => removeGalleryPage(id)),
-            );
-            extrasRemoved = results.filter(
-              (r) => r.status === 'fulfilled',
-            ).length;
-            extrasFailed = extrasRemoved < extras.length;
-            window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-          }
-        }
         sent = result;
         await tick();
         sentHeading?.focus();
       } else {
         problem = result;
-        // Its old page is gone: sending again adds a new one
-        if ('oldRemoved' in result && result.oldRemoved) {
-          const gone = replacePostId;
-          unpublishIds = unpublishIds.filter((id) => id !== gone);
-          ownPages = ownPages.filter((page) => page.postId !== gone);
-        }
+        // Unpublished elsewhere: sending again publishes a new page
+        if (result.status === 'gone') page = null;
       }
     } catch {
-      problem = { status: 'error', message: '', oldRemoved: false };
+      problem = { status: 'error', message: '' };
     } finally {
       busy = false;
       step = null;
-      challenge = false;
     }
   }
 
@@ -487,6 +350,12 @@ choice (guests too: it's the only way they can share a palette). -->
       return 'This project is too large for the gallery. Try a shorter date range or fewer locations.';
     if (problem.status === 'paused')
       return 'Publishing to the gallery is paused right now. Try again later.';
+    if (problem.status === 'signed-out')
+      return 'You’re signed out. Sign in again, then try again.';
+    if (problem.status === 'unsupported')
+      return 'The gallery can’t update pages yet. Try again later.';
+    if (problem.status === 'gone')
+      return 'Its gallery page was unpublished, so this publishes a new one.';
     if (problem.status === 'duplicate')
       return 'This project is already in the gallery, just as it is now.';
     return problem.message
@@ -511,19 +380,32 @@ choice (guests too: it's the only way they can share a palette). -->
       {/if}
       <p>{preparingText}</p>
     </div>
-  {:else if view === 'removed'}
+  {:else if view === 'blocked'}
     <div class="flex flex-col items-center gap-2 py-6 text-center">
-      <CheckIcon class="text-success-700-300 size-8" />
-      <h2 class="h4" tabindex="-1" bind:this={removedHeading}>Unpublished</h2>
-      <p class="text-sm opacity-80">
-        It’s off the gallery and the globe. Your project stays saved, and links
-        you’ve shared to the project still work.
-      </p>
+      {#if blocked === 'signed-out'}
+        <p>
+          Publishing to the gallery needs a free account, so you can update or
+          unpublish your page later.
+        </p>
+        <p class="text-sm opacity-80">
+          Without one, you can still share this project with Copy Link.
+        </p>
+      {:else}
+        <p>Publishing to the gallery is paused right now. Try again later.</p>
+      {/if}
     </div>
   {:else if view === 'sent' && sent}
     <div class="flex flex-col items-center gap-2 py-6 text-center">
       <CheckIcon class="text-success-700-300 size-8" />
-      <h2 class="h4" tabindex="-1" bind:this={sentHeading}>Published</h2>
+      <h2 class="h4" tabindex="-1" bind:this={sentHeading}>
+        {sent.updated ? 'Updated' : 'Published'}
+      </h2>
+      {#if sent.updated}
+        <p class="text-sm opacity-80">
+          Its gallery page shows the project as it is now. Its link stays the
+          same.
+        </p>
+      {/if}
       {#if sent.palettes === null}
         <p class="text-sm opacity-80">
           Its palettes weren’t shared: the gallery can’t do that yet.
@@ -559,20 +441,6 @@ choice (guests too: it's the only way they can share a palette). -->
           {/each}
         </ul>
       {/if}
-      {#if sent.oldRemoved !== null}
-        {@const count = (sent.oldRemoved ? 1 : 0) + extrasRemoved}
-        <p class="text-sm opacity-80">
-          {#if count}
-            {count === 1
-              ? 'The older version was unpublished.'
-              : `${count} older versions were unpublished.`}
-          {/if}
-          {#if sent.oldRemoved === false || extrasFailed}
-            Some couldn’t be unpublished. You can unpublish them from My
-            Projects.
-          {/if}
-        </p>
-      {/if}
     </div>
   {:else}
     <!-- The project as its gallery card will show it -->
@@ -587,39 +455,19 @@ choice (guests too: it's the only way they can share a palette). -->
       </div>
       <div class="flex min-w-0 flex-1 flex-col gap-1">
         <RenameProject saveToName={view === 'form'} />
-        {#if view === 'form' && fromAccount && showOwner && ownerName}
+        {#if view === 'form' && (page ? page.showOwner : showOwner) && ownerName}
           <p class="text-sm">By {ownerName}</p>
         {/if}
       </div>
     </div>
 
-    {#if view === 'existing'}
+    {#if view === 'form'}
       <p class="text-sm opacity-80">
-        Each gallery page is a snapshot of the project from when it was
-        published.
+        {page
+          ? 'Updates its gallery page to the project as it is now. Its link stays the same.'
+          : 'Publishes this project, as it is now, to the public Project Gallery. You can update or unpublish it later.'}
       </p>
-      <GalleryPageList
-        pages={existingPages}
-        kind="project"
-        {ownerName}
-        onremove={ownPages.length ? removePage : undefined}
-        onshowowner={ownPages.length ? setPageShowOwner : undefined}
-      />
-    {:else}
-      <p class="text-sm opacity-80">
-        {newVersion
-          ? 'Publishes a new version of this project, as it is now.'
-          : 'Publishes a snapshot of this project, as it is now, to the public Project Gallery.'}
-      </p>
-      {#if newVersion && ownPages.length}
-        <UnpublishVersions
-          versions={ownPages}
-          {ownerName}
-          bind:selected={unpublishIds}
-          disabled={busy}
-        />
-      {/if}
-      {#if fromAccount}
+      {#if !page}
         <ShowOwnerToggle
           bind:checked={showOwner}
           name={ownerName}
@@ -673,12 +521,6 @@ choice (guests too: it's the only way they can share a palette). -->
           {/each}
         </fieldset>
       {/if}
-      <!-- Shows only when Cloudflare needs you to do something; outside the
-      inert card, since that can be while it's sending -->
-      <Turnstile
-        bind:this={turnstile}
-        oninteractive={(needed) => (challenge = needed)}
-      />
       {#if problem}
         <div class="text-error-700-300 flex flex-col gap-1" role="alert">
           <p>{problemText}</p>
@@ -694,9 +536,6 @@ choice (guests too: it's the only way they can share a palette). -->
               <ExternalLinkIcon class="icon-sm inline" />
             </a>
             <!-- eslint-enable svelte/no-navigation-without-resolve -->
-          {/if}
-          {#if 'oldRemoved' in problem && problem.oldRemoved}
-            <p>Its old page was removed.</p>
           {/if}
         </div>
       {/if}
@@ -737,31 +576,28 @@ choice (guests too: it's the only way they can share a palette). -->
       </a>
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
     </div>
-  {:else if view === 'existing'}
+  {:else if view === 'blocked'}
     <div class={FOOTER}>
       <button
-        type="button"
-        class="btn preset-filled-primary-500"
-        onclick={publishNew}
+        class="btn hover:preset-tonal-surface"
+        onclick={() => dialog.close()}>Close</button
       >
-        <SendIcon />
-        Publish New Version
-      </button>
+      {#if blocked === 'signed-out' && __ACCOUNTS_ENABLED__}
+        <!-- Back to this project after signing in -->
+        <a
+          class="btn preset-filled-primary-500"
+          href={`${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(
+            href ?? project.url.href.replace(window.location.origin, ''),
+          )}`}
+          data-sveltekit-reload>Sign In or Create Account</a
+        >
+      {/if}
     </div>
   {:else if view === 'form' || view === 'checking'}
     <div class={FOOTER}>
       {#if busy && step}
         <p class="w-full text-center text-sm" aria-hidden="true">
           {stepText}
-        </p>
-      {:else if view === 'form' && !fromAccount}
-        <p class="w-full text-center text-sm">
-          <span class="font-bold">It can’t be unpublished later.</span>
-          {#if __ACCOUNTS_ENABLED__ && !account.summary}
-            <a href={resolve('/account')} target="_blank" class="link"
-              >Sign in</a
-            > first if you might want to.
-          {/if}
         </p>
       {/if}
       <button
@@ -775,7 +611,7 @@ choice (guests too: it's the only way they can share a palette). -->
       >
         {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
           />{/if}
-        {newVersion ? 'Publish New Version' : 'Publish'}
+        {page ? 'Update' : 'Publish'}
       </button>
     </div>
   {/if}

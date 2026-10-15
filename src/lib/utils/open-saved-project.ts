@@ -207,7 +207,7 @@ export async function openGalleryDialog(href: string, request: GalleryRequest) {
     options: {
       title:
         request.action === 'replace'
-          ? 'Publish New Version'
+          ? 'Update Gallery Page'
           : 'Publish to Gallery',
     },
   });

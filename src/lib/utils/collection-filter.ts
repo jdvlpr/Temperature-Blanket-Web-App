@@ -31,7 +31,7 @@ export const LIBRARY_STATUSES = [
   },
   {
     value: 'unpublished',
-    label: 'Not Published',
+    label: 'Unpublished',
     details: 'Only saved here',
   },
   {

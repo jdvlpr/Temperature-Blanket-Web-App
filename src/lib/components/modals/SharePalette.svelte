@@ -13,13 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Publishes a saved palette to the Yarn Palette Gallery, from My Projects
-while signed in: a snapshot of it as it is now, linked to the account. As a
-new version of a published one, it asks whether to remove the old page. With
-`rename`, it renames the published page in place instead (its link stays),
-falling back to a new version when the gallery can't rename yet. When the
+<!-- Publishes a saved palette to the Yarn Palette Gallery while signed in,
+linked to the account, or with `update` updates its gallery page in place (its
+name and colors; its link stays the same). Each palette has one page. When the
 gallery says these colors are published already, it shows that page, and can
-rename it. -->
+update it. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -27,14 +25,11 @@ rename it. -->
   import {
     GALLERY_PAGES_CHANGED,
     getGalleryPages,
-    paletteNameDiffers,
-    removeGalleryPage,
-    renameGalleryPage,
     sharePalette,
+    updatePalettePage,
   } from '#lib/accounts/gallery.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
-  import UnpublishVersions from '#lib/components/account/UnpublishVersions.svelte';
   import { onMount, untrack } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import { getYarnPageURL } from '#lib/utils/color-utils.js';
@@ -43,7 +38,7 @@ rename it. -->
     CheckIcon,
     ExternalLinkIcon,
     LoaderCircleIcon,
-    PencilIcon,
+    RefreshCwIcon,
     SendIcon,
   } from '@lucide/svelte';
 
@@ -55,50 +50,31 @@ rename it. -->
     colors,
     name: savedName,
     showOwner: chosenShowOwner,
-    versions = [],
-    rename,
+    update,
   }: {
     paletteId: string;
     colors: Color[];
     name: string;
-    /** Chosen already on My Projects: with or without the account's name */
+    /** Chosen already: with or without the account's name */
     showOwner?: boolean;
-    /** Publishing a new version: the versions there now, newest first */
-    versions?: { postId: number; publishedAt: number; link?: string | null }[];
-    /** Renaming this published page in place (its name differs from the palette's) */
-    rename?: { postId: number; title: string };
+    /** Updating this published page in place */
+    update?: { postId: number; title: string };
   } = $props();
 
-  // The page to rename: the one given, or the one the gallery says has these
+  // The page to update: the one given, or the one the gallery says has these
   // colors already
-  let renameTarget = $state(untrack(() => rename));
-  // Renaming, until the gallery says it can't (an older plugin): then it
-  // publishes a new version with the name instead
-  let renaming = $state(Boolean(untrack(() => rename)));
+  let target = $state(untrack(() => update));
   // The page these colors are published on already, when the gallery says so
   let existing = $state<{ postId: number; title: string } | null>(null);
-  let renamed = $state(false);
-
-  // Its versions to unpublish once the new one is in (the latest, at first)
-  // svelte-ignore state_referenced_locally
-  let unpublishIds = $state<number[]>(versions[0] ? [versions[0].postId] : []);
-  // The newest of them takes the new page's place (the gallery may say it's
-  // the same palette); the rest come off after
-  let replacePostId = $derived(
-    versions.find((v) => unpublishIds.includes(v.postId))?.postId,
-  );
-  // Of the rest: how many came off, and whether any couldn't
-  let extrasRemoved = $state(0);
-  let extrasFailed = $state(false);
 
   // svelte-ignore state_referenced_locally
   let name = $state(cleanName(savedName, MAX_NAME_LENGTH));
   let busy = $state(false);
-  let shared = $state(false);
+  let done = $state<'published' | 'updated' | null>(null);
   // The palette's gallery page, once shared
   let postId = $state<number | null>(null);
   let errorMessage = $state('');
-  // Include it on the account's public gallery, starting from the last choice
+  // Include a new page on the account's public gallery, starting from the last choice
   let showOwner = $state(false);
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
@@ -110,17 +86,40 @@ rename it. -->
     if (typeof gallery.name === 'string') serverName = gallery.name;
   });
 
-  // Whether the old page came off, when replacing one
-  let oldRemoved = $state<boolean | null>(null);
+  // Without the app version, so the same palette is the same link and the
+  // gallery can tell it's already there
+  const yarnUrl = () =>
+    getYarnPageURL({ colors, origin: window.location.origin });
 
-  async function removeOld() {
-    if (!replacePostId) return true;
-    try {
-      await removeGalleryPage(replacePostId);
-      return true;
-    } catch {
-      return false;
-    }
+  async function updatePage(page: { postId: number }, title: string) {
+    const result = await updatePalettePage(page.postId, {
+      title,
+      yarnUrl: yarnUrl(),
+    });
+    if (result.status === 'answered') {
+      const code = Number(result.response.code);
+      if (code === 200) {
+        done = 'updated';
+        postId = page.postId;
+        window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
+        return;
+      }
+      errorMessage =
+        code === 409
+          ? 'Another of your palette pages has these colors already.'
+          : String(result.response.message ?? '') ||
+            'It couldn’t be updated. Try again later.';
+    } else
+      errorMessage =
+        result.status === 'error'
+          ? result.message
+          : result.status === 'unsupported'
+            ? 'The gallery can’t update pages yet. Try again later.'
+            : result.status === 'paused'
+              ? 'Publishing to the gallery is paused right now. Try again later.'
+              : result.status === 'signed-out'
+                ? 'Sign in again, then try again.'
+                : 'Its gallery page is gone. Refresh My Library to see it.';
   }
 
   async function share(event?: Event) {
@@ -129,68 +128,22 @@ rename it. -->
     if (!title || busy) return;
     busy = true;
     errorMessage = '';
-    if (renaming && renameTarget) {
-      const result = await renameGalleryPage(renameTarget.postId, title);
-      busy = false;
-      if (result.status === 'renamed') {
-        renamed = shared = true;
-        postId = renameTarget.postId;
-        window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-      } else if (result.status === 'unsupported') {
-        renaming = false;
-        errorMessage =
-          'The gallery can’t rename pages yet. Publish a new version with this name instead.';
-      } else errorMessage = result.message;
-      return;
-    }
-    const share = () =>
-      sharePalette({
+    try {
+      if (target) return await updatePage(target, title);
+      const result = await sharePalette({
         paletteId,
         title,
-        // Without the app version, so the same palette is the same link and
-        // the gallery can tell it's already there
-        yarnUrl: getYarnPageURL({ colors, origin: window.location.origin }),
+        yarnUrl: yarnUrl(),
         showOwner,
       });
-    let result = await share();
-    // Replacing, and the gallery has these colors on the old page (or an older
-    // plugin doesn't say which): it goes first (removed pages don't count)
-    if (
-      replacePostId &&
-      ((result.status === 'error' && result.code === 409) ||
-        (result.status === 'published-already' &&
-          result.postId === replacePostId))
-    ) {
-      oldRemoved = await removeOld();
-      if (oldRemoved) result = await share();
-    }
-    if (result.status === 'shared' && replacePostId && oldRemoved === null)
-      oldRemoved = await removeOld();
-    // The other versions chosen, now that the new one is in
-    if (result.status === 'shared' && oldRemoved !== false) {
-      const extras = unpublishIds.filter((id) => id !== replacePostId);
-      const results = await Promise.allSettled(
-        extras.map((id) => removeGalleryPage(id)),
-      );
-      extrasRemoved = results.filter((r) => r.status === 'fulfilled').length;
-      extrasFailed = extrasRemoved < extras.length;
-    }
-    if (unpublishIds.length)
-      window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-    busy = false;
-    if (result.status === 'shared') {
-      shared = true;
-      postId = result.postId;
-    } else if (result.status === 'published-already') {
-      existing = { postId: result.postId, title: result.title };
-      if (oldRemoved)
-        errorMessage =
-          'Its old gallery page was removed. You can share it again from My Palettes.';
-    } else {
-      errorMessage = result.message;
-      if (oldRemoved)
-        errorMessage +=
-          ' Its old gallery page was removed. You can share it again from My Palettes.';
+      if (result.status === 'shared') {
+        done = 'published';
+        postId = result.postId;
+      } else if (result.status === 'published-already')
+        existing = { postId: result.postId, title: result.title };
+      else errorMessage = result.message;
+    } finally {
+      busy = false;
     }
   }
 </script>
@@ -198,26 +151,14 @@ rename it. -->
 <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
   <PaletteStrip {colors} />
 
-  {#if shared}
+  {#if done}
     <div class="flex flex-col items-center gap-2 text-center" role="status">
       <CheckIcon class="text-success-700-300 size-8" />
-      <p class="font-bold">{renamed ? 'Renamed' : 'Published'}</p>
-      {#if renamed}
+      <p class="font-bold">{done === 'updated' ? 'Updated' : 'Published'}</p>
+      {#if done === 'updated'}
         <p class="text-sm">
-          Its gallery page has the new name. Its link stays the same.
-        </p>
-      {:else if replacePostId && oldRemoved !== null}
-        {@const count = (oldRemoved ? 1 : 0) + extrasRemoved}
-        <p class="text-sm">
-          {#if count}
-            {count === 1
-              ? 'The older version was unpublished.'
-              : `${count} older versions were unpublished.`}
-          {/if}
-          {#if oldRemoved === false || extrasFailed}
-            Some couldn’t be unpublished. You can unpublish them from My
-            Projects.
-          {/if}
+          Its gallery page has this name and these colors. Its link stays the
+          same.
         </p>
       {/if}
       {#if postId}
@@ -229,21 +170,12 @@ rename it. -->
       {/if}
     </div>
   {:else if existing}
-    {@const differs = paletteNameDiffers(name, existing)}
     <div class="flex flex-col gap-2" role="status">
       <p>
         You’ve published this palette already{existing.title
           ? `, as “${existing.title}”`
           : ''}.
       </p>
-      {#if differs}
-        <p class="text-sm opacity-80">
-          You can give its gallery page the name “{cleanName(
-            name,
-            MAX_NAME_LENGTH,
-          )}”. Its link stays the same.
-        </p>
-      {/if}
       {#if errorMessage}
         <p class="text-error-700-300" role="alert">{errorMessage}</p>
       {/if}
@@ -259,18 +191,16 @@ rename it. -->
           class="sr-only">(opens in a new tab)</span
         ></a
       >
-      {#if differs}
-        <button
-          type="button"
-          class="btn preset-filled-primary-500"
-          onclick={() => {
-            renameTarget = existing ?? undefined;
-            renaming = true;
-            existing = null;
-            share();
-          }}><PencilIcon />Update Gallery Name</button
-        >
-      {/if}
+      <button
+        type="button"
+        class="btn preset-filled-primary-500"
+        disabled={busy}
+        onclick={() => {
+          target = existing ?? undefined;
+          existing = null;
+          share();
+        }}><RefreshCwIcon />Update Gallery Page</button
+      >
     </div>
   {:else}
     <form class="flex flex-col gap-4" onsubmit={share}>
@@ -287,27 +217,17 @@ rename it. -->
         />
       </label>
       <p>
-        {#if renaming}
-          Changes the name on its gallery page. Its link stays the same.
-        {:else if versions.length}
-          Publishes a new version of this palette, as it is now.
+        {#if target}
+          Updates its gallery page to this name and these colors. Its link stays
+          the same.
         {:else}
-          Publishes a snapshot of this palette, with this name and its colors,
-          to the public
+          Publishes this palette, with this name and its colors, to the public
           <a href={resolve('/gallery/palettes')} target="_blank" class="link"
             >Yarn Palette Gallery</a
-          >.
+          >. You can update or unpublish it later.
         {/if}
       </p>
-      {#if versions.length && !renaming}
-        <UnpublishVersions
-          {versions}
-          {ownerName}
-          bind:selected={unpublishIds}
-          disabled={busy}
-        />
-      {/if}
-      {#if !renaming}
+      {#if !target}
         <ShowOwnerToggle
           bind:checked={showOwner}
           name={ownerName}
@@ -324,12 +244,8 @@ rename it. -->
       >
         {#if busy}<LoaderCircleIcon
             class="animate-spin"
-          />{:else if renaming}<PencilIcon />{:else}<SendIcon />{/if}
-        {renaming
-          ? 'Update Gallery Name'
-          : versions.length
-            ? 'Publish New Version'
-            : 'Publish'}
+          />{:else if target}<RefreshCwIcon />{:else}<SendIcon />{/if}
+        {target ? 'Update' : 'Publish'}
       </button>
     </form>
   {/if}

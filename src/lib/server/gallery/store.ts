@@ -35,6 +35,8 @@ export type GalleryPost = {
    * display name, and their owner page lists it (migration 0009)
    */
   showOwner?: boolean;
+  /** When it was last updated in place, or null (migration 0012) */
+  updatedAt?: number | null;
 };
 
 export type GallerySettings = {
@@ -79,7 +81,7 @@ export async function listPosts(
 ): Promise<GalleryPost[]> {
   const { results } = await db
     .prepare(
-      `select "postId", "projectId", "title", "publishedAt", "kind", "link", "showOwner" from "galleryPost"
+      `select "postId", "projectId", "title", "publishedAt", "kind", "link", "showOwner", "updatedAt" from "galleryPost"
        where "userId" = ? order by "publishedAt" desc`,
     )
     .bind(userId)
@@ -159,6 +161,22 @@ export async function renamePost(
       `update "galleryPost" set "title" = ? where "postId" = ? and "userId" = ? and "kind" = 'palette'`,
     )
     .bind(title, postId, userId)
+    .run();
+  return meta.changes > 0;
+}
+
+/** After a page is updated in place: its name, link and when. */
+export async function updatePost(
+  db: D1Database,
+  userId: string,
+  postId: number,
+  update: { title: string; link: string | null; updatedAt: number },
+): Promise<boolean> {
+  const { meta } = await db
+    .prepare(
+      `update "galleryPost" set "title" = ?, "link" = ?, "updatedAt" = ? where "postId" = ? and "userId" = ?`,
+    )
+    .bind(update.title, update.link, update.updatedAt, postId, userId)
     .run();
   return meta.changes > 0;
 }

@@ -177,16 +177,6 @@ class GalleryPagesState {
     await removeGalleryPage(postId);
     this.pages = this.pages.filter((p) => p.postId !== postId);
   }
-
-  /** Every page made from the same project or palette as this one, newest first. */
-  pagesLike(page: GalleryPage) {
-    const kind = page.kind ?? 'project';
-    return this.pages
-      .filter(
-        (p) => p.projectId === page.projectId && (p.kind ?? 'project') === kind,
-      )
-      .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId);
-  }
 }
 
 export const galleryPages = new GalleryPagesState();

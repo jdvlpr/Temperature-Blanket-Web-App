@@ -15,10 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   On a gallery page, only for the account that published it: "Published ▾"
-  beside Open a Copy, the same button as on its My Library card, with the
-  same options as each version there:
-  Anonymous, a link to a newer version, and Unpublish (it asks first, under the
-  buttons). Found in the browser from the account's pages, so visitors get the
+  beside Open a Copy, with the gallery page options its Share dialog has:
+  Anonymous, Update from My Library (where its project or palette is), and
+  Unpublish (it asks first, under the buttons). Found in the browser from the account's pages, so visitors get the
   same page as before and make no extra request. Shown even when the page
   can't be loaded, so its owner can still unpublish it.
 -->
@@ -73,10 +72,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         )
       : undefined,
   );
-  // All its versions, newest first
-  let versions = $derived(page ? galleryPages.pagesLike(page) : []);
-  let latest = $derived(versions[0]);
-  let newer = $derived(latest && latest.postId !== postId ? latest : null);
 
   let ownerName = $derived(
     (galleryPages.name ?? account.summary?.name ?? '').trim(),
@@ -105,11 +100,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let busy = $state(false);
   let removed = $state(false);
   let errorMessage = $state('');
-
-  const pageHref = (p: GalleryPage) =>
-    (p.kind ?? 'project') === 'palette'
-      ? resolve('/gallery/palette/[id]', { id: String(p.postId) })
-      : resolve('/gallery/[id]', { id: String(p.postId) });
 
   async function setNamed(next: boolean) {
     busy = true;
@@ -162,11 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       data-testid="gallery-owner-menu"
     >
       <GlobeIcon aria-hidden="true" />
-      <span
-        ><span class="sr-only">Gallery: </span>{versions.length > 1
-          ? `Published · ${versions.length} versions`
-          : 'Published'}</span
-      >
+      <span><span class="sr-only">Gallery: </span>Published</span>
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
     </Menu.Trigger>
     <Portal>
@@ -190,20 +176,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </span>
             <MenuCheckbox checked={!page.showOwner} />
           </Menu.OptionItem>
-          {#if newer}
-            <Menu.Item value="newer" class={menuItemClass}>
-              {#snippet element(attributes)}
-                <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved in pageHref -->
-                <a
-                  {...attributes as HTMLAnchorAttributes}
-                  href={pageHref(newer)}
-                >
-                  <ArrowRightIcon class="shrink-0" aria-hidden="true" />
-                  <span class="min-w-0 flex-1">Newer Version</span>
-                </a>
-              {/snippet}
-            </Menu.Item>
-          {/if}
+          <Menu.Item value="update" class={menuItemClass}>
+            {#snippet element(attributes)}
+              <a
+                {...attributes as HTMLAnchorAttributes}
+                href={kind === 'palette'
+                  ? resolve('/my-palettes')
+                  : resolve('/my-projects')}
+              >
+                <ArrowRightIcon class="shrink-0" aria-hidden="true" />
+                <span class="flex min-w-0 flex-1 flex-col">
+                  <span>Update from My Library</span>
+                  <span class="text-surface-700-300 text-xs"
+                    >Its card’s Share button updates this page</span
+                  >
+                </span>
+              </a>
+            {/snippet}
+          </Menu.Item>
           <Menu.Item value="unpublish" class={menuItemClass}>
             <EyeOffIcon class="shrink-0" aria-hidden="true" />
             <span class="min-w-0 flex-1">Unpublish…</span>
@@ -218,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       in:safeSlide
     >
       <p>
-        Unpublish this version? Its gallery page link stops working{kind ===
+        Unpublish this page? Its gallery page link stops working{kind ===
         'project'
           ? ', and it comes off the globe'
           : ''}.
@@ -226,9 +216,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Your {kind} stays saved, and links you’ve shared to the {kind} still work.
         {:else}
           {#if saved === false}
-            {versions.length > 1
-              ? 'Its other versions stay published.'
-              : `It isn’t in your saved ${kind}s, so it won’t be in My Library anymore.`}
+            It isn’t in your saved {kind}s, so it won’t be in My Library
+            anymore.
           {/if}
           Links you’ve shared to the {kind} still work.
         {/if}

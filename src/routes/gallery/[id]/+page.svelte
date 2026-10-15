@@ -194,14 +194,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let pattern = $derived(project?.projectTags?.nodes?.[0]);
 
-  // Still in progress when it was published: Open a Copy searches the weather
-  // again for the days since (gallery-weather.ts); otherwise it loads the
-  // same weather as the preview, so there's nothing to say
+  // Still in progress when it was published or last updated: Open a Copy
+  // searches the weather again for the days since (gallery-weather.ts);
+  // otherwise it loads the same weather as the preview, so there's nothing to say
   let inProgress = $derived.by(() => {
-    if (!project?.date || isCustomGalleryWeather(project.weatherSources))
-      return false;
-    // Days as "2024-03-13"; a later day than it was published on wasn't in yet
-    const publishedOn = project.date.slice(0, 10);
+    const asOf = project?.modified ?? project?.date;
+    if (!asOf || isCustomGalleryWeather(project?.weatherSources)) return false;
+    // Days as "2024-03-13"; a later day than its weather is from wasn't in yet
+    const publishedOn = asOf.slice(0, 10);
     try {
       const places: { to?: string }[] = JSON.parse(project.locations ?? '[]');
       return places.some(({ to }) => {
@@ -308,6 +308,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               kind="project"
               bind:owner
               date={project?.date}
+              modified={project?.modified}
               open={projectURL && openHref
                 ? {
                     href: openHref,

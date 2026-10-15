@@ -247,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : []),
     {
       value: 'link',
-      label: 'Link',
+      label: 'Copy Link',
       title: 'Palette Link',
       details: 'Copy a link to share it, or to paste into another palette',
       icon: LinkIcon,

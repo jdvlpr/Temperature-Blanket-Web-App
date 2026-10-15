@@ -72,6 +72,7 @@ async function getProject(event: Parameters<PageServerLoad>[0]) {
                     title
                     projectName
                     date
+                    modified
                     projectUrl
                     yarnUrls
                     totalDays
