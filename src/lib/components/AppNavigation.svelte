@@ -24,18 +24,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { yarnBall } from '@lucide/lab';
   import {
-    BookOpenTextIcon,
-    CircleQuestionMarkIcon,
     CloudyIcon,
     ExternalLinkIcon,
     LibraryBigIcon,
-    GiftIcon,
     GlobeIcon,
     HeartIcon,
     Icon,
     LandmarkIcon,
     NotebookPenIcon,
-    RssIcon,
     SlidersHorizontalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
@@ -52,8 +48,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const LINK = 'btn hover:preset-tonal-surface w-fit';
   const CURRENT = 'preset-tonal-secondary';
   const HEADING =
-    'text-surface-700-300 px-3 pt-1 text-xs font-semibold tracking-wide uppercase';
-  const FOOTER_LINK = 'py-1 hover:underline';
+    'text-surface-700-300 mt-3 px-3 text-xs font-semibold tracking-wide uppercase';
+  // Learn and the footer row are quieter text links
+  const SMALL_LINK = 'py-1 hover:underline';
+  const SMALL_CURRENT = 'text-secondary-700-300';
 </script>
 
 <!-- Icons line up by what's drawn, with the site logo's edge -->
@@ -119,8 +117,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Supporters
   </a>
 
-  <hr class="border-surface-300-700 w-full" />
-
   <h2 class={HEADING}>Create</h2>
 
   <a
@@ -140,8 +136,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SwatchBookIcon />
     Yarn Palette Creator
   </a>
-
-  <hr class="border-surface-300-700 w-full" />
 
   <h2 class={HEADING}>Explore</h2>
 
@@ -181,70 +175,55 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Weather Forecast
   </a>
 
-  <hr class="border-surface-300-700 w-full" />
-
   <h2 class={HEADING}>Learn</h2>
 
-  <a
-    href="/faq"
-    class={[LINK, pathname === '/faq' && CURRENT]}
-    aria-current={pathname === '/faq' ? 'page' : undefined}
-  >
-    <CircleQuestionMarkIcon />
-    FAQ
-  </a>
-
-  <a
-    href="/blog"
-    class={[LINK, 'text-left', blog && CURRENT]}
-    aria-current={blog ? 'page' : undefined}
-  >
-    <RssIcon /> Blog
-  </a>
-
-  <a
-    href="/documentation"
-    class={[LINK, pathname === '/documentation' && CURRENT]}
-    aria-current={pathname === '/documentation' ? 'page' : undefined}
-  >
-    <BookOpenTextIcon />
-    Documentation
-  </a>
-
-  <a
-    href="/changelog"
-    class={[LINK, pathname === '/changelog' && CURRENT]}
-    aria-current={pathname === '/changelog' ? 'page' : undefined}
-  >
-    <GiftIcon />
-    What's New
-    <span class="text-surface-700-300 text-xs">v{version}</span>
-  </a>
+  <div class="text-surface-700-300 flex flex-col items-start px-3 text-sm">
+    <a
+      href="/faq"
+      class={[SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}
+      aria-current={pathname === '/faq' ? 'page' : undefined}>FAQ</a
+    >
+    <a
+      href="/blog"
+      class={[SMALL_LINK, blog && SMALL_CURRENT]}
+      aria-current={blog ? 'page' : undefined}>Blog</a
+    >
+    <a
+      href="/documentation"
+      class={[SMALL_LINK, pathname === '/documentation' && SMALL_CURRENT]}
+      aria-current={pathname === '/documentation' ? 'page' : undefined}
+      >Documentation</a
+    >
+    <a
+      href="/changelog"
+      class={[SMALL_LINK, pathname === '/changelog' && SMALL_CURRENT]}
+      aria-current={pathname === '/changelog' ? 'page' : undefined}
+    >
+      What's New <span class="text-xs">v{version}</span>
+    </a>
+  </div>
 
   <hr class="border-surface-300-700 w-full" />
 
-  <!-- Small links, one row that wraps -->
+  <!-- One row that wraps -->
   <div
     class="text-surface-700-300 flex flex-wrap items-center gap-x-2 px-3 text-sm"
   >
     <a
       href="/contact"
-      class={[FOOTER_LINK, pathname === '/contact' && 'text-secondary-700-300']}
+      class={[SMALL_LINK, pathname === '/contact' && SMALL_CURRENT]}
       aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a
     >
     <span aria-hidden="true">·</span>
     <a
       href="/privacy"
-      class={[FOOTER_LINK, pathname === '/privacy' && 'text-secondary-700-300']}
+      class={[SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
       aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
     >
     <span aria-hidden="true">·</span>
     <a
       href="/api/yarn-colorways"
-      class={[
-        FOOTER_LINK,
-        pathname === '/api/yarn-colorways' && 'text-secondary-700-300',
-      ]}
+      class={[SMALL_LINK, pathname === '/api/yarn-colorways' && SMALL_CURRENT]}
       aria-current={pathname === '/api/yarn-colorways' ? 'page' : undefined}
       >API</a
     >
@@ -252,7 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span aria-hidden="true">·</span>
       <a
         href={PUBLIC_GITHUB_LINK}
-        class={[FOOTER_LINK, 'inline-flex items-center gap-1']}
+        class={[SMALL_LINK, 'inline-flex items-center gap-1']}
         target="_blank"
         rel="noopener"
       >

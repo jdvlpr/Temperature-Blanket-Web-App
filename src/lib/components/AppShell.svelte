@@ -16,19 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import AppNavigation from '#lib/components/AppNavigation.svelte';
   import AccountButton from '#lib/components/account/AccountButton.svelte';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
-  import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import {
     drawerState,
     showNavigationSideBar,
   } from '#lib/state/page-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { motion } from '#lib/utils/feedback.svelte.js';
-  import {
-    MenuIcon,
-    PanelLeftClose,
-    PanelRightCloseIcon,
-  } from '@lucide/svelte';
+  import { MenuIcon, PanelLeftClose, PanelLeftOpen } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { cubicOut } from 'svelte/easing';
   import type { TransitionConfig } from 'svelte/transition';
@@ -85,6 +79,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
     >
+      <!-- Wide screens: shows or hides the sidebar, in the spot the menu
+      button takes on narrow ones, so it never moves -->
+      <button
+        class="btn-icon hover:preset-tonal-surface my-2 hidden lg:flex"
+        title={showNavigationSideBar.value ? 'Hide sidebar' : 'Show sidebar'}
+        aria-label={showNavigationSideBar.value
+          ? 'Hide sidebar'
+          : 'Show sidebar'}
+        aria-expanded={showNavigationSideBar.value}
+        aria-controls="app-sidebar"
+        onclick={() => {
+          showNavigationSideBar.value = !showNavigationSideBar.value;
+        }}
+      >
+        {#if showNavigationSideBar.value}
+          <PanelLeftClose />
+        {:else}
+          <PanelLeftOpen />
+        {/if}
+      </button>
+
       <div class="lg:hidden">
         <Dialog
           onOpenChange={(e) => {
@@ -132,40 +147,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="mx-auto flex max-w-(--breakpoint-xl) justify-start">
     <div
+      id="app-sidebar"
       class="flex h-fit flex-col items-start justify-start [view-transition-name:sidebar-navigation]"
       bind:clientWidth={sidebarWidth}
     >
       {#if showNavigationSideBar.value}
         <div class="hidden w-fit flex-col lg:flex" transition:sidebarSlide>
-          <div class="w-fit">
+          <div class="mb-4 w-fit">
             <AppNavigation />
           </div>
         </div>
       {/if}
-      <!-- Below the navigation, so as it folds away (up as well as in) the
-      button rises with it to the top -->
-      <button
-        class={[
-          'hover:preset-tonal-surface mx-2 hidden justify-center lg:flex',
-          // Open, it follows the menu at the menu's own spacing, with room
-          // below it when the menu reaches the end of the page
-          showNavigationSideBar.value
-            ? 'btn mb-4'
-            : 'btn-icon relative -top-0.5 mt-2 ml-4',
-        ]}
-        title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
-        {@attach alignIconInk}
-        onclick={async () => {
-          showNavigationSideBar.value = !showNavigationSideBar.value;
-        }}
-      >
-        {#if showNavigationSideBar.value}
-          <PanelLeftClose />
-          <span in:safeSlide={{ axis: 'x' }}>Hide Sidebar</span>
-        {:else}
-          <PanelRightCloseIcon />
-        {/if}
-      </button>
     </div>
 
     <div class="min-w-0 flex-1">
