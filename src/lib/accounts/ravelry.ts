@@ -30,11 +30,45 @@ export type RavelryStatus =
       needsReconnect?: boolean;
     };
 
+const CONNECTED_HINT = 'tb-ravelry-connected';
+
+/**
+ * Whether Ravelry was connected when this browser last checked (the Account
+ * page and My Projects check), so the planner can offer the stash without
+ * asking the server each time it opens.
+ */
+export function ravelryConnectedHint(): boolean {
+  try {
+    return localStorage.getItem(CONNECTED_HINT) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function setConnectedHint(connected: boolean) {
+  try {
+    if (connected) localStorage.setItem(CONNECTED_HINT, '1');
+    else localStorage.removeItem(CONNECTED_HINT);
+  } catch {
+    // Without it, the planner doesn't offer the stash
+  }
+}
+
 /** Whether Ravelry can be connected and to whom it is; null when that can't be told. */
 export async function getRavelryStatus(): Promise<RavelryStatus | null> {
   try {
     const response = await fetch(PATH);
-    return response.ok ? await response.json() : null;
+    if (!response.ok) {
+      // Signed out, or Ravelry off
+      if (response.status === 401 || response.status === 404)
+        setConnectedHint(false);
+      return null;
+    }
+    const status: RavelryStatus = await response.json();
+    setConnectedHint(
+      status.available && status.connected && !status.needsReconnect,
+    );
+    return status;
   } catch {
     return null;
   }
@@ -67,6 +101,7 @@ export async function disconnectRavelry() {
   const response = await fetch(PATH, { method: 'DELETE' });
   if (!response.ok)
     throw new Error(`Disconnect Ravelry failed: ${response.status}`);
+  setConnectedHint(false);
 }
 
 export type RavelryPhoto = {

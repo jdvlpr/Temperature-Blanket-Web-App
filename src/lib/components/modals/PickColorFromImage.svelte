@@ -51,9 +51,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Shown inside another dialog rather than as its own: back to that one,
      * by Back, Cancel, or once a color is used */
     onBack?: () => void;
+    /** Opens on this photo (on this site, e.g. a Ravelry stash photo through
+     * its proxy) instead of asking for one */
+    src?: string;
   }
 
-  let { onPick, onBack }: Props = $props();
+  let { onPick, onBack, src }: Props = $props();
 
   /** Leave: back to the dialog this is shown in, or else close */
   const leave = () => (onBack ? onBack() : dialog.close());
@@ -235,11 +238,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       errorMessage = check.error;
       return;
     }
+    const url = URL.createObjectURL(file);
+    await openImage(url, check.failMessage);
+    URL.revokeObjectURL(url);
+  }
+
+  onMount(() => {
+    if (src) void openImage(src, 'Couldn’t open that photo. Try again.');
+  });
+
+  async function openImage(url: string, failMessage: string) {
     const id = ++loadId;
     errorMessage = null;
     loading = true;
     step = 'picker';
-    const url = URL.createObjectURL(file);
     try {
       const image = await decodeImage(url);
       if (id !== loadId) return;
@@ -254,11 +266,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       };
     } catch {
       if (id !== loadId) return;
-      errorMessage = check.failMessage;
+      errorMessage = failMessage;
       // Keep showing the previous photo, if there was one
       if (!pixels) step = 'start';
     } finally {
-      URL.revokeObjectURL(url);
       if (id === loadId) loading = false;
     }
   }
