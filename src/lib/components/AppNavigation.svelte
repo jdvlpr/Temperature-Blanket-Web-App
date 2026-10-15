@@ -176,8 +176,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <hr class="border-surface-300-700 w-full" />
 
-  <!-- Small links, spaced apart in one row that wraps -->
-  <div class={[SMALL_LINKS, 'px-3']}>
+  <!-- Small links, spaced apart in one row that wraps. It takes the
+  sidebar's width rather than setting it, or the sidebar would stretch to
+  fit every link on one line -->
+  <div class={[SMALL_LINKS, 'w-0 min-w-full px-3']}>
     <a
       href="/faq"
       class={['py-1', SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}
