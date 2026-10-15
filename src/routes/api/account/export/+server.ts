@@ -29,22 +29,26 @@ export const GET: RequestHandler = async (event) => {
   if (account instanceof Response) return account;
 
   const headers = event.request.headers;
-  const [signInMethods, sessions, gallery, palettes, preferences] =
+  const [signInMethods, sessions, gallery, palettes, preferences, ravelry] =
     await Promise.all([
       account.auth.api.listUserAccounts({ headers }),
       account.auth.api.listSessions({ headers }),
       galleryPages(getPlatform()?.env?.DB, account.user.id, event.url.origin),
       savedPalettes(getPlatform()?.env?.DB, account.user.id),
       savedPreferences(getPlatform()?.env?.DB, account.user.id),
+      ravelryLinks(getPlatform()?.env?.DB, account.user.id),
     ]);
 
   const data = {
     exportedAt: new Date().toISOString(),
     account: account.user,
-    signInMethods: signInMethods.map((method) => ({
-      provider: method.providerId,
-      linkedAt: method.createdAt,
-    })),
+    // A linked Ravelry account isn't a way to sign in; it's under `ravelry`
+    signInMethods: signInMethods
+      .filter((method) => method.providerId !== 'ravelry')
+      .map((method) => ({
+        provider: method.providerId,
+        linkedAt: method.createdAt,
+      })),
     sessions: sessions.map((session) => ({
       createdAt: session.createdAt,
       expiresAt: session.expiresAt,
@@ -53,6 +57,7 @@ export const GET: RequestHandler = async (event) => {
     gallery,
     palettes,
     preferences,
+    ravelry,
   };
 
   return json(data, {
@@ -63,6 +68,34 @@ export const GET: RequestHandler = async (event) => {
     },
   });
 };
+
+/** The linked Ravelry account's username, and the projects posted there with their photos. */
+async function ravelryLinks(db: D1Database | undefined, userId: string) {
+  if (!db) return null;
+  try {
+    const { ravelryUsername, listProjectLinks, listPhotos, ravelryProjectUrl } =
+      await import('#lib/server/ravelry/store.js');
+    const username = await ravelryUsername(db, userId);
+    const links = await listProjectLinks(db, userId);
+    if (!username && !links.length) return null;
+    return {
+      username,
+      projects: await Promise.all(
+        links.map(async (link) => ({
+          projectId: link.projectId,
+          url: ravelryProjectUrl(link),
+          postedAt: new Date(link.postedAt).toISOString(),
+          photos: (await listPhotos(db, userId, link.projectId)).map(
+            (photo) => photo.medium2Url ?? photo.mediumUrl,
+          ),
+        })),
+      ),
+    };
+  } catch {
+    // Not set up yet (migration 0011)
+    return null;
+  }
+}
 
 /** Palettes saved to the account, including ones in the Trash. */
 async function savedPalettes(db: D1Database | undefined, userId: string) {

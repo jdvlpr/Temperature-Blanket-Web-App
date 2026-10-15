@@ -23,6 +23,8 @@ import { requireAccount } from '#lib/server/auth/index.js';
 import { RAVELRY_PROVIDER_ID } from '#lib/server/auth/options.js';
 import { readAuthSettings } from '#lib/server/auth/settings.js';
 import { getPlatform } from '#lib/server/cloudflare.js';
+import { ravelryApi, RavelryApiError, type RavelryApi } from './api';
+import { rememberRavelryUser, ravelryUsername } from './store';
 
 export const NO_STORE = { 'Cache-Control': 'no-store' };
 
@@ -115,9 +117,65 @@ export async function ravelryAccessToken(ctx: RavelryContext): Promise<string> {
  * linked. Nothing on Ravelry changes.
  */
 export async function disconnectRavelry(db: D1Database, userId: string) {
+  const { forgetRavelryStatements } = await import('./store');
   await db.batch([
+    ...forgetRavelryStatements(db, userId),
     db
       .prepare('delete from "account" where "userId" = ? and "providerId" = ?')
       .bind(userId, RAVELRY_PROVIDER_ID),
   ]);
+}
+
+export type RavelrySession = RavelryContext & {
+  api: RavelryApi;
+  /** The Ravelry username, which its API paths need */
+  username: string;
+};
+
+/** The API with the account's token, and its Ravelry username (looked up once, then kept). */
+export async function ravelrySession(
+  ctx: RavelryContext,
+): Promise<RavelrySession> {
+  const api = ravelryApi(await ravelryAccessToken(ctx));
+  let username = await ravelryUsername(ctx.db, ctx.userId);
+  if (!username) {
+    const user = await api.currentUser();
+    await rememberRavelryUser(ctx.db, ctx.userId, user);
+    username = user.username;
+  }
+  return { ...ctx, api, username };
+}
+
+/** A Response for a failed Ravelry call: connect again, or Ravelry's own failure. */
+export function ravelryFailure(e: unknown): Response {
+  if (
+    e instanceof RavelryReconnect ||
+    (e instanceof RavelryApiError && e.reconnect)
+  )
+    return ravelryError(409, 'RAVELRY_RECONNECT', 'Connect Ravelry again');
+  if (e instanceof RavelryApiError) {
+    console.error(e.message);
+    return ravelryError(
+      502,
+      'RAVELRY_ERROR',
+      e.status === 404
+        ? 'That isn’t on Ravelry anymore'
+        : 'Ravelry didn’t answer as expected',
+    );
+  }
+  throw e;
+}
+
+/** Runs a route's work with the account's Ravelry session, answering failures. */
+export async function withRavelry(
+  event: RequestEvent,
+  work: (session: RavelrySession) => Promise<Response>,
+): Promise<Response> {
+  const ctx = await requireRavelry(event);
+  if (ctx instanceof Response) return ctx;
+  try {
+    return await work(await ravelrySession(ctx));
+  } catch (e) {
+    return ravelryFailure(e);
+  }
 }

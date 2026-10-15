@@ -19,8 +19,14 @@ export const prerender = false;
 
 /** Whether Ravelry can be connected, and to whom it is (checked with Ravelry). */
 export const GET: RequestHandler = async (event) => {
-  const { requireRavelry, ravelryAvailable, linkedRavelryAccount, NO_STORE } =
-    await import('#lib/server/ravelry/index.js');
+  const {
+    requireRavelry,
+    ravelryAvailable,
+    linkedRavelryAccount,
+    ravelryAccessToken,
+    RavelryReconnect,
+    NO_STORE,
+  } = await import('#lib/server/ravelry/index.js');
   if (!ravelryAvailable())
     return Response.json({ available: false }, { headers: NO_STORE });
   const ctx = await requireRavelry(event);
@@ -32,11 +38,13 @@ export const GET: RequestHandler = async (event) => {
       { headers: NO_STORE },
     );
 
-  const { ravelryAccessToken, RavelryReconnect } =
-    await import('#lib/server/ravelry/index.js');
-  const { ravelryApi } = await import('#lib/server/ravelry/api.js');
+  const { ravelryApi, RavelryApiError } =
+    await import('#lib/server/ravelry/api.js');
+  const { rememberRavelryUser } = await import('#lib/server/ravelry/store.js');
   try {
     const user = await ravelryApi(await ravelryAccessToken(ctx)).currentUser();
+    // Kept for the API's paths; a renamed Ravelry account is picked up here
+    await rememberRavelryUser(ctx.db, ctx.userId, user);
     return Response.json(
       {
         available: true,
@@ -50,7 +58,7 @@ export const GET: RequestHandler = async (event) => {
     // Linked, but Ravelry no longer accepts it: offer to connect again
     if (
       e instanceof RavelryReconnect ||
-      (e as { reconnect?: boolean }).reconnect
+      (e instanceof RavelryApiError && e.reconnect)
     )
       return Response.json(
         { available: true, connected: true, needsReconnect: true },
