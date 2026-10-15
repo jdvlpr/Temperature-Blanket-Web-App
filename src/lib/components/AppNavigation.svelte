@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-current={pathname === '/' ? 'page' : undefined}
   >
     <NotebookPenIcon />
-    Project Planner
+    Project
   </a>
 
   <a
@@ -131,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-current={pathname === '/yarn' ? 'page' : undefined}
   >
     <SwatchBookIcon />
-    Yarn Palette Creator
+    Yarn Palette
   </a>
 
   <h2 class={HEADING}>Explore</h2>

@@ -35,6 +35,8 @@ export type RavelryContext = {
   db: D1Database;
   userId: string;
   auth: Auth;
+  /** The request's, which auth.api needs to work out this site's URL */
+  headers: Headers;
 };
 
 /** A JSON error the client can tell apart by `code`. */
@@ -57,7 +59,12 @@ export async function requireRavelry(
   const env = getPlatform()?.env;
   if (!env?.DB || !ravelryAvailable(env))
     return ravelryError(404, 'RAVELRY_OFF', 'Ravelry isn’t available');
-  return { db: env.DB, userId: account.user.id, auth: account.auth };
+  return {
+    db: env.DB,
+    userId: account.user.id,
+    auth: account.auth,
+    headers: event.request.headers,
+  };
 }
 
 /** The account's linked Ravelry account record, if any. */
@@ -88,8 +95,10 @@ export async function ravelryAccessToken(ctx: RavelryContext): Promise<string> {
   const linked = await linkedRavelryAccount(ctx.db, ctx.userId);
   if (!linked) throw new RavelryReconnect('Ravelry isn’t connected');
   try {
+    // With the request's headers, Better Auth also checks it's this session's account
     const { accessToken } = await ctx.auth.api.getAccessToken({
-      body: { accountId: linked.id, userId: ctx.userId },
+      body: { accountId: linked.id },
+      headers: ctx.headers,
     });
     if (!accessToken) throw new RavelryReconnect();
     return accessToken;
