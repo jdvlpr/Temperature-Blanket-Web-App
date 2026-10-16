@@ -73,3 +73,53 @@ export function cleanUpAfterWrite(sync: SyncContext) {
     })(),
   );
 }
+
+/**
+ * Hides, restores or forgets an item's gallery pages to match where it is now
+ * (see $lib/server/gallery/visibility), without delaying the response.
+ */
+export function matchGalleryAfterWrite(
+  sync: SyncContext,
+  kind: 'project' | 'palette',
+  itemId: string,
+  state: 'live' | 'trash' | 'purged',
+) {
+  sync.runInBackground(
+    (async () => {
+      const { matchGalleryToItem } =
+        await import('#lib/server/gallery/visibility.js');
+      const { defaultGalleryApi } =
+        await import('#lib/server/gallery/index.js');
+      await matchGalleryToItem(
+        sync.db,
+        defaultGalleryApi(),
+        sync.userId,
+        kind,
+        itemId,
+        state,
+      );
+    })(),
+  );
+}
+
+/** After projects are deleted forever: forgets their gallery pages and Ravelry links. */
+export function forgetPurgedAfterWrite(
+  sync: SyncContext,
+  projectIds: string[],
+) {
+  if (!projectIds.length) return;
+  sync.runInBackground(
+    (async () => {
+      const { forgetPurgedProjects } =
+        await import('#lib/server/gallery/visibility.js');
+      const { defaultGalleryApi } =
+        await import('#lib/server/gallery/index.js');
+      await forgetPurgedProjects(
+        sync.db,
+        defaultGalleryApi(),
+        sync.userId,
+        projectIds,
+      );
+    })(),
+  );
+}

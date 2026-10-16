@@ -153,6 +153,18 @@ export function galleryApi({ baseUrl, key, fetch }: GalleryApiConfig) {
       throw new Error(`Gallery trash failed: ${response.status}`);
     },
 
+    /**
+     * Brings back a page trashed above, with the same ID and link (gallery plugin
+     * 1.10.0). 'gone' when WordPress no longer has it for this owner: emptied from
+     * its trash, or an older plugin without the route.
+     */
+    async restore(postId: number, ownerId: string): Promise<'ok' | 'gone'> {
+      const response = await post(`/project/${postId}/restore`, '{}', ownerId);
+      if (response.ok) return 'ok';
+      if (response.status === 404) return 'gone';
+      throw new Error(`Gallery restore failed: ${response.status}`);
+    },
+
     /** Leaves all the owner's pages in the gallery without an owner. */
     async clearOwner(ownerId: string) {
       const response = await post('/owner/clear', '{}', ownerId);

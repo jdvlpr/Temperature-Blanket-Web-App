@@ -68,5 +68,7 @@ export const DELETE: RequestHandler = async (event) => {
     sync.userId,
     event.params.id,
   );
-  return Response.json({ purged }, { headers: NO_STORE });
+  const { forgetPurgedAfterWrite } = await import('#lib/server/sync/index.js');
+  forgetPurgedAfterWrite(sync, purged);
+  return Response.json({ purged: purged.length }, { headers: NO_STORE });
 };

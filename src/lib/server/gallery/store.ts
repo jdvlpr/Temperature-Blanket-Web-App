@@ -74,7 +74,11 @@ export async function recordPost(
     .run();
 }
 
-/** The user's gallery pages, newest first. */
+// Pages hidden because their project or palette is in the Trash (migration 0014)
+// are left out everywhere until it's restored.
+const LIVE = `"hiddenAt" is null`;
+
+/** The user's gallery pages, newest first; not those hidden with their item in the Trash. */
 export async function listPosts(
   db: D1Database,
   userId: string,
@@ -82,7 +86,7 @@ export async function listPosts(
   const { results } = await db
     .prepare(
       `select "postId", "projectId", "title", "publishedAt", "kind", "link", "showOwner", "updatedAt" from "galleryPost"
-       where "userId" = ? order by "publishedAt" desc`,
+       where "userId" = ? and ${LIVE} order by "publishedAt" desc`,
     )
     .bind(userId)
     .all<Omit<GalleryPost, 'showOwner'> & { showOwner: number }>();
@@ -101,7 +105,7 @@ export async function setPostShowOwner(
 ): Promise<boolean> {
   const { meta } = await db
     .prepare(
-      `update "galleryPost" set "showOwner" = ? where "postId" = ? and "userId" = ?`,
+      `update "galleryPost" set "showOwner" = ? where "postId" = ? and "userId" = ? and ${LIVE}`,
     )
     .bind(Number(showOwner), postId, userId)
     .run();
@@ -142,7 +146,7 @@ export async function postKind(
 ): Promise<GalleryPostKind | null> {
   const row = await db
     .prepare(
-      `select "kind" from "galleryPost" where "postId" = ? and "userId" = ?`,
+      `select "kind" from "galleryPost" where "postId" = ? and "userId" = ? and ${LIVE}`,
     )
     .bind(postId, userId)
     .first<{ kind: GalleryPostKind }>();
@@ -189,7 +193,7 @@ export async function ownsPost(
 ): Promise<boolean> {
   const row = await db
     .prepare(
-      `select 1 as "owned" from "galleryPost" where "postId" = ? and "userId" = ?`,
+      `select 1 as "owned" from "galleryPost" where "postId" = ? and "userId" = ? and ${LIVE}`,
     )
     .bind(postId, userId)
     .first();
@@ -220,6 +224,41 @@ export async function forgetPost(
   await db
     .prepare(`delete from "galleryPost" where "postId" = ? and "userId" = ?`)
     .bind(postId, userId)
+    .run();
+}
+
+/** A project's or palette's pages, live or hidden, for hiding or restoring them with it. */
+export async function postsForItem(
+  db: D1Database,
+  userId: string,
+  kind: GalleryPostKind,
+  itemId: string,
+): Promise<{ postId: number; hidden: boolean }[]> {
+  const { results } = await db
+    .prepare(
+      `select "postId", "hiddenAt" from "galleryPost"
+       where "userId" = ? and "projectId" = ? and coalesce("kind", 'project') = ?`,
+    )
+    .bind(userId, itemId, kind)
+    .all<{ postId: number; hiddenAt: number | null }>();
+  return results.map((r) => ({
+    postId: r.postId,
+    hidden: r.hiddenAt !== null,
+  }));
+}
+
+/** Hides a page with its item in the Trash (a time), or shows it again (null). */
+export async function setPostHidden(
+  db: D1Database,
+  userId: string,
+  postId: number,
+  hiddenAt: number | null,
+) {
+  await db
+    .prepare(
+      `update "galleryPost" set "hiddenAt" = ? where "postId" = ? and "userId" = ?`,
+    )
+    .bind(hiddenAt, postId, userId)
     .run();
 }
 
@@ -337,7 +376,8 @@ export async function ownerForPost(
        from "galleryPost"
        join "galleryOwner" on "galleryOwner"."userId" = "galleryPost"."userId"
        join "user" on "user"."id" = "galleryPost"."userId"
-       where "galleryPost"."postId" = ? and "galleryPost"."showOwner" = 1 and ${NAMED_OWNER}`,
+       where "galleryPost"."postId" = ? and "galleryPost"."showOwner" = 1
+         and "galleryPost"."hiddenAt" is null and ${NAMED_OWNER}`,
     )
     .bind(postId)
     .first<GalleryOwner>();

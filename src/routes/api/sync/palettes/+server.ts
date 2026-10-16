@@ -26,7 +26,7 @@ import type { RequestHandler } from './$types';
 export const prerender = false;
 
 export const PUT: RequestHandler = async (event) => {
-  const { requireSync, syncError, cleanUpAfterWrite } =
+  const { requireSync, syncError, cleanUpAfterWrite, matchGalleryAfterWrite } =
     await import('#lib/server/sync/index.js');
   const store = await import('#lib/server/sync/store.js');
   const { isProjectId, parsePaletteInput } =
@@ -66,6 +66,18 @@ export const PUT: RequestHandler = async (event) => {
         ? { id, error: 'QUOTA_EXCEEDED' }
         : { id, palette: result.palette, applied: result.status === 'saved' },
     );
+    // Its gallery page follows it into and out of the Trash
+    if (result.status === 'saved')
+      matchGalleryAfterWrite(
+        sync,
+        'palette',
+        id,
+        result.palette.purged
+          ? 'purged'
+          : result.palette.deletedAt !== null
+            ? 'trash'
+            : 'live',
+      );
   }
 
   cleanUpAfterWrite(sync);

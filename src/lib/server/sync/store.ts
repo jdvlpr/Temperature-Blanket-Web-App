@@ -438,14 +438,14 @@ export async function getTrashedProjectData(
 /**
  * Deletes the kept data of deleted projects for good: one, or with `projectId`
  * null, the whole Trash. The deletion records stay, for devices that haven't
- * synced since. Returns how many were deleted.
+ * synced since. Returns the IDs of the projects deleted.
  */
 export async function purgeTrash(
   db: D1Database,
   bucket: R2Bucket,
   userId: string,
   projectId: string | null,
-): Promise<number> {
+): Promise<string[]> {
   const { results } = await db
     .prepare(
       `select "projectId", "blobKey" from "project"
@@ -456,7 +456,7 @@ export async function purgeTrash(
     .all<{ projectId: string; blobKey: string }>();
   for (let i = 0; i < results.length; i += OLD_COPY_CHUNK)
     await forgetBlobs(db, bucket, userId, results.slice(i, i + OLD_COPY_CHUNK));
-  return results.length;
+  return results.map((r) => r.projectId);
 }
 
 /**

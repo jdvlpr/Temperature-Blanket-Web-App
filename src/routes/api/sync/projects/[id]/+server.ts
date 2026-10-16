@@ -30,7 +30,7 @@ const conflict = (current: ProjectMeta | null) =>
   );
 
 async function load(event: Parameters<RequestHandler>[0]) {
-  const { requireSync, syncError, cleanUpAfterWrite } =
+  const { requireSync, syncError, cleanUpAfterWrite, matchGalleryAfterWrite } =
     await import('#lib/server/sync/index.js');
   const store = await import('#lib/server/sync/store.js');
   const request = await import('#lib/server/sync/request.js');
@@ -39,7 +39,14 @@ async function load(event: Parameters<RequestHandler>[0]) {
   if (sync instanceof Response) return sync;
   if (!request.isProjectId(event.params.id))
     return syncError(400, 'INVALID_REQUEST', 'Invalid project ID');
-  return { sync, syncError, cleanUpAfterWrite, store, request };
+  return {
+    sync,
+    syncError,
+    cleanUpAfterWrite,
+    matchGalleryAfterWrite,
+    store,
+    request,
+  };
 }
 
 export const GET: RequestHandler = async (event) => {
@@ -72,7 +79,14 @@ export const GET: RequestHandler = async (event) => {
 export const PUT: RequestHandler = async (event) => {
   const loaded = await load(event);
   if (loaded instanceof Response) return loaded;
-  const { sync, store, request, syncError, cleanUpAfterWrite } = loaded;
+  const {
+    sync,
+    store,
+    request,
+    syncError,
+    cleanUpAfterWrite,
+    matchGalleryAfterWrite,
+  } = loaded;
 
   const headers = request.parseSaveHeaders(event.request.headers);
   if (!headers.ok)
@@ -101,6 +115,7 @@ export const PUT: RequestHandler = async (event) => {
         : 'This account is out of sync storage',
     );
 
+  matchGalleryAfterWrite(sync, 'project', event.params.id, 'live');
   cleanUpAfterWrite(sync);
   return Response.json({ meta: result.meta }, { headers: NO_STORE });
 };
@@ -108,7 +123,14 @@ export const PUT: RequestHandler = async (event) => {
 export const DELETE: RequestHandler = async (event) => {
   const loaded = await load(event);
   if (loaded instanceof Response) return loaded;
-  const { sync, store, request, syncError, cleanUpAfterWrite } = loaded;
+  const {
+    sync,
+    store,
+    request,
+    syncError,
+    cleanUpAfterWrite,
+    matchGalleryAfterWrite,
+  } = loaded;
 
   const baseRev = request.parseRev(event.url.searchParams.get('baseRev'));
 
@@ -126,6 +148,7 @@ export const DELETE: RequestHandler = async (event) => {
     return syncError(404, 'NOT_FOUND', 'No such project');
   if (result.status === 'conflict') return conflict(result.current);
 
+  matchGalleryAfterWrite(sync, 'project', event.params.id, 'trash');
   cleanUpAfterWrite(sync);
   return Response.json({ meta: result.meta }, { headers: NO_STORE });
 };

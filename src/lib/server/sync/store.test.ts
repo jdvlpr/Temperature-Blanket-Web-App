@@ -368,11 +368,11 @@ describe('the Trash', () => {
     await deleteProject(d1, 'u1', 'b', 2);
     expect(objects.size).toBe(3);
 
-    expect(await purgeTrash(d1, bucket, 'u1', 'a')).toBe(1);
+    expect(await purgeTrash(d1, bucket, 'u1', 'a')).toEqual(['a']);
     expect((await listTrash(d1, 'u1')).map((t) => t.id)).toEqual(['b']);
     expect(objects.size).toBe(2);
 
-    expect(await purgeTrash(d1, bucket, 'u1', null)).toBe(1);
+    expect(await purgeTrash(d1, bucket, 'u1', null)).toHaveLength(1);
     expect(await listTrash(d1, 'u1')).toEqual([]);
     expect(objects.size).toBe(1);
     // Other devices still learn the projects were deleted

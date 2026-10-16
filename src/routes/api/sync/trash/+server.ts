@@ -34,11 +34,13 @@ export const GET: RequestHandler = async (event) => {
 
 /** Empty Trash: deletes everything in it forever, in one request. */
 export const DELETE: RequestHandler = async (event) => {
-  const { requireSync } = await import('#lib/server/sync/index.js');
+  const { requireSync, forgetPurgedAfterWrite } =
+    await import('#lib/server/sync/index.js');
   const { purgeTrash } = await import('#lib/server/sync/store.js');
   const sync = await requireSync(event);
   if (sync instanceof Response) return sync;
 
   const purged = await purgeTrash(sync.db, sync.bucket, sync.userId, null);
-  return Response.json({ purged }, { headers: NO_STORE });
+  forgetPurgedAfterWrite(sync, purged);
+  return Response.json({ purged: purged.length }, { headers: NO_STORE });
 };
