@@ -60,6 +60,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   {#if children}
-    <p class="text-sm opacity-80">{@render children()}</p>
+    <p id="{id}-status" class="text-sm opacity-80">{@render children()}</p>
   {/if}
 </div>

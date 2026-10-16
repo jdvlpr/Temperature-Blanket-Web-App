@@ -393,15 +393,13 @@ test.describe('Gallery pages from accounts', () => {
 
     await share.click();
     const dialog = page.getByRole('dialog', { name: `Share “${title}”` });
-    // Link: a copy anyone can open
-    await expect(
-      dialog.getByRole('heading', { name: 'Link', exact: true }),
-    ).toBeVisible();
+    // Link: a copy anyone can open, first
+    await expect(dialog.getByRole('list', { name: 'Link' })).toBeVisible();
     await expect(
       dialog.getByRole('button', { name: /^Copy Link/ }),
     ).toBeVisible();
     // Gallery Page: its state, then its options
-    const status = dialog.locator('#share-gallery + p');
+    const status = dialog.locator('#share-gallery-status');
     await expect(status).toContainText('Published');
     await expect(status).toContainText('Anonymous');
     await expect(status).toContainText('changed since');
@@ -625,7 +623,8 @@ test.describe('Gallery pages from accounts', () => {
     const updates = () => gallery.calls.filter((call) => call.method === 'PUT');
 
     await page.reload();
-    await page.getByRole('button', { name: /^Not now/ }).click();
+    // In the account: a project's page follows the account's copy into the Trash
+    await page.getByRole('button', { name: /^Add all/ }).click();
     const card = (name: string) =>
       page.getByRole('button', { name: `Share ${name}` }).locator('..');
     const shareDialog = (name: string) =>
@@ -734,14 +733,14 @@ test.describe('Gallery pages from accounts', () => {
     const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
     await anonymous.uncheck();
-    await expect(dialog.locator('#share-gallery + p')).toContainText(
+    await expect(dialog.locator('#share-gallery-status')).toContainText(
       'By Ada Lovelace',
     );
     expect(gallery.posts.find((p) => p.postId === postId)?.showOwner).toBe(
       true,
     );
     await anonymous.check();
-    await expect(dialog.locator('#share-gallery + p')).toContainText(
+    await expect(dialog.locator('#share-gallery-status')).toContainText(
       'Anonymous',
     );
     expect(gallery.posts.find((p) => p.postId === postId)?.showOwner).toBe(
