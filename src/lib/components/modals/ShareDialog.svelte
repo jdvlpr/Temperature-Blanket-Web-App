@@ -53,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label,
     link,
     changed,
-    galleryOnly = false,
     onpublish,
     onupdate,
     signInHref,
@@ -69,8 +68,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     link?: string;
     /** Whether it changed since its page was published or updated */
     changed?: (page: GalleryPage) => boolean;
-    /** Not saved here: unpublishing leaves no copy in My Library */
-    galleryOnly?: boolean;
     /** Publishes it (opens the publish dialog) */
     onpublish?: () => void;
     /** Updates its page in place (opens the publish dialog) */
@@ -329,10 +326,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Unpublish “{page.title}”? Its gallery page link stops working{kind ===
                 'project'
                   ? ', and it comes off the globe'
-                  : ''}.
-                {galleryOnly
-                  ? `It isn’t in your saved ${kind}s, so it won’t be in My Library anymore.`
-                  : `Your ${kind} stays saved, and links you’ve shared to it still work.`}
+                  : ''}. Your {kind} stays saved, and links you’ve shared to it still
+                work.
               </p>
               <div class="flex flex-wrap gap-2">
                 <button

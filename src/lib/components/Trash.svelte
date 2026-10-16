@@ -22,6 +22,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import ProjectPicture from '#lib/components/ProjectPicture.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import {
     accountTrash,
@@ -134,14 +135,17 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     await savedPalettes.refresh();
   }
 
-  const restore = ({ kind, id, project }: Entry) =>
-    run(
+  const restore = async ({ kind, id, project }: Entry) => {
+    await run(
       () =>
         kind === 'project'
           ? restoreTrashEntry(project!)
           : PaletteStorage.restore(id),
       'Unable to restore it',
     );
+    // Its gallery page, if it had one, comes back too
+    galleryPages.refreshSoon();
+  };
 
   const deleteForever = ({ kind, id, project }: Entry) =>
     run(
@@ -210,7 +214,10 @@ device, restored everywhere (see $lib/storage/account-trash). -->
             </div>
             {#if confirming === key}
               <div class="flex flex-wrap items-center gap-2" role="group">
-                <span class="text-sm">This action cannot be undone.</span>
+                <span class="text-sm"
+                  >This action cannot be undone. Its gallery page, if it has
+                  one, is removed for good.</span
+                >
                 <button
                   type="button"
                   class="btn preset-filled-error-500"
@@ -258,7 +265,8 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     {#if confirming === 'all'}
       <div class="mt-4 flex flex-wrap items-center gap-2" role="group">
         <span class="text-sm"
-          >Delete everything in the Trash forever? This can't be undone.</span
+          >Delete everything in the Trash forever? Their gallery pages are
+          removed for good too. This can't be undone.</span
         >
         <button
           type="button"

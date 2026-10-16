@@ -96,20 +96,6 @@ export async function setGalleryPageShowOwner(
   return response.json();
 }
 
-/** Moves a palette page, with its other versions, to another saved palette. Throws when it fails. */
-export async function relinkGalleryPalette(
-  postId: number,
-  paletteId: string,
-): Promise<void> {
-  const response = await fetch(`${PATH}/${postId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ paletteId }),
-  });
-  if (!response.ok)
-    throw new Error(`Moving the palette page failed: ${response.status}`);
-}
-
 /** The gallery's longest palette name (MAX_PALETTE_TITLE_LENGTH on the server) */
 export const MAX_GALLERY_PALETTE_NAME_LENGTH = 80;
 
@@ -266,15 +252,12 @@ export type GroupedGalleryPages = {
   byProject: Map<string, GalleryPage>;
   /** The newest page of each saved palette here, by palette ID */
   byPalette: Map<string, GalleryPage>;
-  /** The newest page of each project not saved here, by project ID */
-  galleryOnlyProjects: Map<string, GalleryPage>;
-  /** The newest page of each palette not saved here, by palette ID */
-  galleryOnlyPalettes: Map<string, GalleryPage>;
 };
 
 /**
  * Puts each page with the project or palette it came from, so each shows one
- * page: its newest. Ones not saved here show as cards of their own.
+ * page: its newest. A page goes with its project or palette (into the Trash
+ * and out), so ones not saved here aren't shown.
  */
 export function groupGalleryPages(
   pages: readonly GalleryPage[],
@@ -286,8 +269,6 @@ export function groupGalleryPages(
   const grouped: GroupedGalleryPages = {
     byProject: new Map(),
     byPalette: new Map(),
-    galleryOnlyProjects: new Map(),
-    galleryOnlyPalettes: new Map(),
   };
 
   const newestFirst = [...pages].sort(
@@ -295,14 +276,8 @@ export function groupGalleryPages(
   );
   for (const page of newestFirst) {
     const isPalette = page.kind === 'palette';
-    const saved = (isPalette ? palettes : projects).has(page.projectId);
-    const shown = isPalette
-      ? saved
-        ? grouped.byPalette
-        : grouped.galleryOnlyPalettes
-      : saved
-        ? grouped.byProject
-        : grouped.galleryOnlyProjects;
+    if (!(isPalette ? palettes : projects).has(page.projectId)) continue;
+    const shown = isPalette ? grouped.byPalette : grouped.byProject;
     if (!shown.has(page.projectId)) shown.set(page.projectId, page);
   }
   return grouped;

@@ -37,11 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changed,
     onadd,
     onupdate,
-    galleryOnly = false,
     ravelryItem,
   }: {
     kind: 'project' | 'palette';
-    /** The saved project's or palette's ID (a gallery-only one: its page's) */
+    /** The saved project's or palette's ID */
     id: string;
     /** The project's or palette's name */
     label: string;
@@ -57,8 +56,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onadd?: () => void;
     /** Updates its page in place */
     onupdate?: (page: GalleryPage) => void;
-    /** Not saved here: unpublishing leaves no copy in My Library */
-    galleryOnly?: boolean;
     /** A saved project, signed in: its Ravelry part too */
     ravelryItem?: StoredProjectIndexItem;
   } = $props();
@@ -79,7 +76,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id,
           label,
           link,
-          galleryOnly,
           changed,
           onpublish: onadd,
           onupdate,

@@ -97,21 +97,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   let anyWithName = $derived(galleryPages.pages.some((p) => p.showOwner));
 
-  // How many of each, for Projects | Yarn Palettes: saved here, and signed in,
-  // those only in the gallery too, as the lists show them
+  // How many of each, for Projects | Yarn Palettes: saved here
   let projectIds = $state<string[] | null>(null);
   let palettesLoaded = $state(false);
   const projectsCount = $derived(
-    projectIds === null
-      ? null
-      : projectIds.length +
-          (showGallery ? galleryPages.grouped.galleryOnlyProjects.size : 0),
+    projectIds === null ? null : projectIds.length,
   );
   const palettesCount = $derived(
-    palettesLoaded
-      ? savedPalettes.items.length +
-          (showGallery ? galleryPages.grouped.galleryOnlyPalettes.size : 0)
-      : null,
+    palettesLoaded ? savedPalettes.items.length : null,
   );
 
   // The account's Trash once (and again in the dialog), not on every change

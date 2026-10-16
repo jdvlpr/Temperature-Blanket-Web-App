@@ -15,13 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import CloseButton from '#lib/components/modals/CloseButton.svelte';
-  import { CheckIcon } from '@lucide/svelte';
+  import { CheckIcon, Trash2Icon } from '@lucide/svelte';
 
   interface Props {
     onSave: any;
     onClose: any;
     saveText?: string;
     disabled?: boolean;
+    /** Destructive: red, with a trash can */
+    danger?: boolean;
   }
 
   let {
@@ -29,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onClose,
     saveText = 'Save',
     disabled = false,
+    danger = false,
   }: Props = $props();
 </script>
 
@@ -38,12 +41,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <CloseButton {onClose} text="Cancel" />
 
   <button
-    class="btn preset-filled-primary-500"
+    class={[
+      'btn',
+      danger ? 'preset-filled-error-500' : 'preset-filled-primary-500',
+    ]}
     onclick={onSave}
     {disabled}
     title={saveText}
   >
-    <CheckIcon />
+    {#if danger}<Trash2Icon />{:else}<CheckIcon />{/if}
     {saveText}
   </button>
 </div>

@@ -72,6 +72,7 @@ button to it. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import { openProjectShare } from '#lib/utils/open-project-share.js';
+  import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
   import ExportOptions from './ExportOptions.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
@@ -147,6 +148,8 @@ button to it. -->
     try {
       const item = await storedItem();
       if (!item) return;
+      // Its gallery page comes down with it, so it asks first
+      if (!(await confirmTrashProject(item.id))) return;
       await trashOpenProject();
       rememberJustTrashed({
         id: item.id,

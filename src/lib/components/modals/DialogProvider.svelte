@@ -619,7 +619,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {/if}
                     <div>
                       <SaveAndCloseButtons
-                        saveText="Yes"
+                        saveText={dialog.confirmText ?? 'Yes'}
+                        danger={dialog.danger}
                         onSave={() => {
                           dialog.response(true);
                           dialog.close();

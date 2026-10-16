@@ -153,9 +153,6 @@ only in the gallery), with search, filters and sort once there are a few. -->
           {/if}
         </p>
         <SavedPalettes
-          galleryOnly={showGallery
-            ? [...galleryPages.grouped.galleryOnlyPalettes.values()]
-            : []}
           filters={libraryFilters}
           oncount={(count) => ({ total, matching } = count)}
         >

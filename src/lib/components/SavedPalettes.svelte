@@ -36,9 +36,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPaletteFallbackName,
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
-  import type { GalleryPage } from '#lib/accounts/gallery.js';
-  import GallerySharing from '#lib/components/account/GallerySharing.svelte';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import { confirmTrash } from '#lib/utils/confirm-trash.js';
   import type { LibraryFilters } from '#lib/state/library-filters.svelte.js';
   import {
     matchesSearch,
@@ -46,28 +45,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     matchesYarn,
     sortLibrary,
   } from '#lib/utils/collection-filter.js';
-  import {
-    FolderPlusIcon,
-    LoaderCircleIcon,
-    PencilIcon,
-    Trash2Icon,
-    XIcon,
-  } from '@lucide/svelte';
-  import { SvelteSet } from 'svelte/reactivity';
+  import { PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
-  import type { Attachment } from 'svelte/attachments';
 
   // With updateGauge (Browse Palettes), choosing a palette uses it; without it
   // (the My Projects page), each palette is a link to the Yarn Palette Creator
-  // With sharing (My Projects, signed in), each palette says who can see it,
-  // and palettes only in the gallery (deleted or not saved here) are listed too
+  // With sharing (My Projects, signed in), each palette says who can see it
   // With filters (My Library), only what matches shows, sorted as chosen;
   // oncount says how many
   let {
     updateGauge,
     sharing,
-    galleryOnly = [],
     filters,
     oncount,
   }: {
@@ -75,8 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sharing?: Snippet<
       [{ palette: SavedPalette; colors: Color[]; label: string }]
     >;
-    /** The newest page of each palette only in the gallery */
-    galleryOnly?: GalleryPage[];
     filters?: LibraryFilters;
     /** How many there are without the filters, once known, and how many show */
     oncount?: (count: { total: number; matching: number }) => void;
@@ -91,8 +78,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const undos = new TrashUndos();
   const slots = new TrashSlots();
 
-  const dateOf = (time: number) =>
-    new Date(time).toLocaleDateString(undefined, { dateStyle: 'medium' });
   const dateTimeOf = (time: number) =>
     new Date(time).toLocaleString(undefined, {
       dateStyle: 'medium',
@@ -115,47 +100,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : [],
   );
 
-  // Every card, newest first: saved ones by when they were saved (their
-  // order), ones only in the gallery by when they were published. One just
-  // moved to the Trash shows as its undo, not again.
-  type Card = {
-    key: string;
-    time: number;
-    colors: Color[];
-    label: string;
-  } & (
-    | { palette: SavedPalette; page?: never }
-    | { palette?: never; page: GalleryPage }
-  );
-  let allCards = $derived.by((): Card[] => {
-    const saved: Card[] = palettes.map((item) => ({
+  // Every card, newest first (the order they were saved in)
+  let allCards = $derived(
+    palettes.map((item) => ({
       ...item,
       key: item.palette.id,
       time: item.palette.createdAt,
-    }));
-    if (!yarnDataReady || !savedPalettes.loaded || !galleryOnly.length)
-      return saved;
-    const undoing = new Set(undos.entries.map((entry) => entry.id));
-    const pages = galleryOnly
-      .filter((page) => !undoing.has(page.projectId))
-      .map((page): Card | null => {
-        const colors = page.link && getColorsFromInput({ string: page.link });
-        if (!colors || !colors.length) return null;
-        return {
-          page,
-          colors,
-          label: page.title,
-          key: `gallery-${page.postId}`,
-          time: page.publishedAt,
-        };
-      })
-      .filter((n) => n !== null);
-    // A stable sort: the saved ones keep their order
-    return [...saved, ...pages].sort((a, b) => b.time - a.time);
-  });
+    })),
+  );
 
   // What the filters let through, sorted as chosen
-  let cards = $derived.by((): Card[] => {
+  let cards = $derived.by(() => {
     if (!filters) return allCards;
     const yarn = {
       brandId: filters.brandId,
@@ -174,10 +129,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ]) &&
         matchesYarn(card.colors, yarn) &&
         matchesStatus(filters.status, {
-          published: card.palette
-            ? galleryPages.grouped.byPalette.has(card.palette.id)
-            : true,
-          galleryOnly: !card.palette,
+          published: galleryPages.grouped.byPalette.has(card.palette.id),
+          galleryOnly: false,
         }),
     );
     return sortLibrary(kept, filters.sort, filters.reversed, {
@@ -222,6 +175,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function remove(palette: SavedPalette, label: string) {
+    // Its gallery page comes down with it, so it asks first
+    if (
+      galleryPages.grouped.byPalette.has(palette.id) &&
+      !(await confirmTrash())
+    )
+      return;
     slots.remember(palette.id, layout);
     undos.add(
       palette.id,
@@ -235,40 +194,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function undoRemove(id: string) {
-    // The list is refreshed by then, so its gallery-only card (when
-    // published) doesn't show in between
     await run(
       () => PaletteStorage.restore(id),
       'Unable to restore the palette',
     );
     undos.remove(id);
     slots.forget(id);
-  }
-
-  // Saving a gallery-only palette back: its card says so meanwhile, and
-  // becomes a saved palette's card once it's listed
-  const adding = new SvelteSet<string>();
-  // Its card, once saved: focus moves there, as its old card is gone
-  let focusId = $state<string | null>(null);
-  const takeFocus: Attachment<HTMLElement> = (link) => {
-    link.focus({ preventScroll: true });
-    focusId = null;
-  };
-  async function addBack(page: GalleryPage, colors: Color[]) {
-    if (adding.has(page.projectId)) return;
-    adding.add(page.projectId);
-    try {
-      const { addPaletteBack } =
-        await import('#lib/accounts/gallery-add-back.js');
-      focusId = await addPaletteBack(page, colors);
-    } catch {
-      toast.trigger({
-        message: `“${page.title}” couldn’t be added to My Saved Palettes. Try again later.`,
-        category: 'error',
-      });
-    } finally {
-      adding.delete(page.projectId);
-    }
+    // Its gallery page, if it had one, comes back too
+    galleryPages.refreshSoon();
   }
 
   /** Its Yarn Palette Creator link, with its name for Save Palette there */
@@ -357,59 +290,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Saved palettes"
     >
       {#each cards as card (card.key)}
-        {@const { palette, page, colors, label } = card}
+        {@const { palette, colors, label } = card}
         {@render undoAt(card.key, true)}
         <li class="flex w-full min-w-0" {@attach slots.track(card.key)}>
-          {#if page}
-            <!-- Only in the gallery: opens a copy, as its gallery page does -->
-            <PaletteCard
-              {colors}
-              name={label}
-              summary={false}
-              href={linkFor(colors, page.title)}
-              title="Open a copy in Yarn Palette Creator"
-            >
-              {#snippet details()}
-                <span
-                  class="text-surface-700-300 line-clamp-1 text-xs"
-                  aria-live="polite"
-                >
-                  {#if adding.has(page.projectId)}
-                    <LoaderCircleIcon
-                      class="icon-sm inline animate-spin"
-                      aria-hidden="true"
-                    />
-                    Adding to My Saved Palettes…
-                  {:else}
-                    Gallery only · Published {dateOf(page.publishedAt)}
-                  {/if}
-                </span>
-              {/snippet}
-              {#snippet action()}
-                <MoreMenu
-                  label="More for {label}"
-                  items={[
-                    {
-                      value: 'add-back',
-                      label: 'Add to My Saved Palettes',
-                      icon: FolderPlusIcon,
-                      onselect: () => addBack(page, colors),
-                    },
-                  ]}
-                />
-              {/snippet}
-              {#snippet footer()}
-                <GallerySharing
-                  kind="palette"
-                  id={page.projectId}
-                  {label}
-                  link={page.link ?? undefined}
-                  {page}
-                  galleryOnly
-                />
-              {/snippet}
-            </PaletteCard>
-          {:else if editingId === palette.id}
+          {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
               <PaletteStrip {colors} />
               <NameField
@@ -445,7 +329,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
                     <a
                       href={linkFor(colors, palette.name)}
-                      {@attach focusId === palette.id ? takeFocus : undefined}
                       class="font-semibold break-words"
                       title="Open in Yarn Palette Creator"
                     >

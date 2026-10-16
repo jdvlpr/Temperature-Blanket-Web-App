@@ -67,6 +67,11 @@ class DialogClass {
 
   response = $state<any>(null);
 
+  /** A confirm dialog's button text (default Yes), and whether it's a
+   * destructive one (red) */
+  confirmText = $state<string | null>(null);
+  danger = $state(false);
+
   options = $state<DialogOptions>({
     showCloseButton: true,
     size: 'small',
@@ -105,11 +110,15 @@ class DialogClass {
     title,
     body,
     response,
+    confirmText,
+    danger,
   }: {
     type: 'component' | 'confirm';
     title?: string | null;
     body?: string | null;
     response?: any;
+    confirmText?: string;
+    danger?: boolean;
     component?: any;
     options?: DialogOptions;
   }) => {
@@ -160,6 +169,8 @@ class DialogClass {
       this.title = title || null;
       this.body = body || null;
       this.response = response || null;
+      this.confirmText = confirmText || null;
+      this.danger = Boolean(danger);
     }
     // Open the modal
     this.#openings++;

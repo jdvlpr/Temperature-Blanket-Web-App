@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
+  import { confirmTrash } from '#lib/utils/confirm-trash.js';
   import {
     lastChanged,
     lastSavedAt,
@@ -95,6 +96,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function remove(item: StoredProjectIndexItem) {
+    // Its gallery page comes down with it, so it asks first
+    if (
+      galleryPages.grouped.byProject.has(item.id) &&
+      !(await confirmTrash({ ravelry: ravelryLinks.links.has(item.id) }))
+    )
+      return;
     slots.remember(item.id, layout);
     // Back from the Trash, its card waits for the drawing to look again
     settled.delete(pictureKey(item.id, item.meta.href));
@@ -114,11 +121,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       () => ProjectStorage.restoreFromTrash(id),
       'Unable to restore the project',
     );
-    // Only once it's listed again, so its gallery-only card (when published)
-    // doesn't show in between
     await loadProjects();
     undos.remove(id);
     slots.forget(id);
+    // Its gallery page, if it had one, comes back too
+    galleryPages.refreshSoon();
   }
 
   async function rename(id: string, name: string) {
@@ -156,34 +163,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (onMyProjectsPage && signedIn) void ravelryLinks.load();
   });
 
-  // On My Projects, signed in: projects only in the gallery (deleted or not
-  // saved here) are cards too, all newest first, by when each was saved or
-  // published. One just moved to the Trash shows as its undo, not again.
-  type Card =
-    | { key: string; time: number; project: StoredProjectIndexItem }
-    | { key: string; time: number; page: GalleryPage };
-  const allCards = $derived.by((): Card[] => {
-    const saved: Card[] = shown.map((project) => ({
+  // Newest first, by when each was saved
+  const allCards = $derived(
+    shown.map((project) => ({
       key: project.id,
       time: lastChanged(project),
       project,
-    }));
-    // Only once the projects here are known, so none show here for a moment
-    if (!showSharing || limit || !loaded) return saved;
-    const undoing = new Set(undos.entries.map((entry) => entry.id));
-    const galleryOnly: Card[] = [
-      ...galleryPages.grouped.galleryOnlyProjects.values(),
-    ]
-      .filter((page) => !undoing.has(page.projectId))
-      .map((page) => ({
-        key: `gallery-${page.postId}`,
-        time: page.publishedAt,
-        page,
-      }));
-    if (!galleryOnly.length) return saved;
-    // A stable sort: the saved ones keep their order
-    return [...saved, ...galleryOnly].sort((a, b) => b.time - a.time);
-  });
+    })),
+  );
 
   const previewIds = previews.all.map((preview) => preview.id);
 
@@ -212,11 +199,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return colors;
   };
 
-  const cardName = (card: Card) =>
-    'project' in card ? labelFor(card.project) : card.page.title;
-
   // What the filters let through, sorted as chosen
-  const cards = $derived.by((): Card[] => {
+  const cards = $derived.by(() => {
     if (!filters) return allCards;
     const patternId = filters.patternType
       ? (previews.all.find((p) => p.wpTagSlug === filters.patternType)?.id ??
@@ -227,68 +211,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarnId: filters.yarnId,
       only: filters.onlyThisYarn,
     };
-    const kept = allCards.filter((card) => {
-      const project = 'project' in card ? card.project : null;
-      const page = 'page' in card ? card.page : null;
-      const link = project ? project.meta.href : page?.link;
+    const kept = allCards.filter(({ project }) => {
+      const link = project.meta.href;
       return (
         (!yarnChosen || (yarnDataReady && matchesYarn(colorsOf(link), yarn))) &&
-        matchesSearch(
-          filters.search,
-          project ? [project.meta.name, project.meta.title] : [page?.title],
-        ) &&
+        matchesSearch(filters.search, [
+          project.meta.name,
+          project.meta.title,
+        ]) &&
         (!patternId || patternIdOf(link, previewIds) === patternId) &&
         matchesStatus(filters.status, {
-          published: project
-            ? galleryPages.grouped.byProject.has(project.id)
-            : true,
-          galleryOnly: !project,
+          published: galleryPages.grouped.byProject.has(project.id),
+          galleryOnly: false,
         })
       );
     });
     return sortLibrary(kept, filters.sort, filters.reversed, {
       time: (card) => card.time,
-      name: cardName,
+      name: (card) => labelFor(card.project),
     });
   });
   $effect(() => {
     if (loaded) oncount?.({ total: allCards.length, matching: cards.length });
   });
   const undoSpots = $derived(undos.placed(cards.map((card) => card.key)));
-
-  // Gallery-only projects' pictures from the gallery, for those without one
-  // kept here, and older pages' links: one request for them all, filtered out
-  // or not, as the filters need the links
-  $effect(() => {
-    const postIds = allCards.flatMap((card) =>
-      'page' in card ? [card.page.postId] : [],
-    );
-    if (postIds.length) void galleryPages.loadImages(postIds);
-  });
-
-  // Saving a gallery-only project back: its card says so meanwhile, and
-  // becomes a saved project's card once it's listed
-  const adding = new SvelteSet<string>();
-  // Its card, once saved: focus moves there, as its old card is gone
-  let focusId = $state<string | null>(null);
-  async function addBack(page: GalleryPage) {
-    if (adding.has(page.projectId)) return;
-    adding.add(page.projectId);
-    try {
-      const { addProjectBack } =
-        await import('#lib/accounts/gallery-add-back.js');
-      await addProjectBack(page);
-      await loadProjects();
-      focusId = page.projectId;
-    } catch {
-      toast.trigger({
-        message: `“${page.title}” couldn’t be added to My Saved Projects. Try opening it and saving it in the Project Planner.`,
-        category: 'error',
-      });
-    } finally {
-      adding.delete(page.projectId);
-    }
-  }
 
   // Adding or updating a gallery page: its dialog opens here, drawing the
   // preview from the project loaded behind it
@@ -415,53 +361,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
             : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
         >
           {#each cards as card (card.key)}
+            {@const project = card.project}
             {@render undoAt(card.key, true)}
             <div class="w-full" {@attach slots.track(card.key)}>
-              {#if 'project' in card}
-                {@const project = card.project}
-                <SavedProjectCard
-                  item={project}
-                  {picturesVersion}
-                  pictureSettled={settled.has(
-                    pictureKey(project.id, project.meta.href),
-                  )}
-                  layout={grid ? 'grid' : 'list'}
-                  syncLabel={__ACCOUNTS_ENABLED__
-                    ? syncLabelFor(project, signedIn)
-                    : undefined}
-                  onrename={(name) => rename(project.id, name)}
-                  onremove={() => remove(project)}
-                  focus={focusId === project.id}
-                  onfocused={() => (focusId = null)}
-                >
-                  {#snippet sharing()}
-                    {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}
-                  {/snippet}
-                </SavedProjectCard>
-              {:else}
-                <!-- Only in the gallery: its picture kept here or the
-                gallery's, never drawn (that would load the weather), else
-                its colors -->
-                <SavedProjectCard
-                  galleryPage={card.page}
-                  galleryImage={galleryPages.images.get(card.page.postId)}
-                  pictureSettled
-                  layout={grid ? 'grid' : 'list'}
-                  adding={adding.has(card.page.projectId)}
-                  onaddback={() => addBack(card.page)}
-                >
-                  {#snippet sharing()}
-                    <GallerySharing
-                      kind="project"
-                      id={card.page.projectId}
-                      label={card.page.title}
-                      link={card.page.link ?? undefined}
-                      page={card.page}
-                      galleryOnly
-                    />
-                  {/snippet}
-                </SavedProjectCard>
-              {/if}
+              <SavedProjectCard
+                item={project}
+                {picturesVersion}
+                pictureSettled={settled.has(
+                  pictureKey(project.id, project.meta.href),
+                )}
+                layout={grid ? 'grid' : 'list'}
+                syncLabel={__ACCOUNTS_ENABLED__
+                  ? syncLabelFor(project, signedIn)
+                  : undefined}
+                onrename={(name) => rename(project.id, name)}
+                onremove={() => remove(project)}
+              >
+                {#snippet sharing()}
+                  {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}
+                {/snippet}
+              </SavedProjectCard>
             </div>
           {/each}
           {@render undoAt(null, true)}

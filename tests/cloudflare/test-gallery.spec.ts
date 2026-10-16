@@ -232,11 +232,10 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       page.getByRole('heading', { name: 'My Library', exact: true }),
     ).toBeVisible();
-    await expect(page.getByText(/Gallery only/)).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toHaveCount(0);
   });
 
-  test('My Projects shows pages without a project here as cards, and deleting the account asks about them', async ({
+  test('a saved project’s page is included on the public gallery from its Share dialog, and deleting the account asks about it', async ({
     page,
     request,
   }) => {
@@ -244,20 +243,40 @@ test.describe('Gallery pages from accounts', () => {
     await signIn(page, request, email);
     const userId = userIdFor(email);
     const postId = 900_000_000 + Math.floor(Math.random() * 1e8);
+
+    // A saved project with a page
+    await page.goto('/my-projects');
+    const id = String(Date.now());
+    const href = new URL(`/?project=${id}`, page.url()).href;
+    const title = 'Ottawa from 2025 to 2026';
+    await idbSet(page, {
+      [`p_${id}`]: {
+        createdAt: new Date().toISOString(),
+        date: 'today',
+        href,
+        isCustomWeatherData: true,
+        title,
+        weatherData: [],
+        weatherSource: { name: 'Meteostat', useSecondary: false },
+      },
+      projects_index: [
+        {
+          id,
+          meta: { date: 'today', href, title, isCustomWeatherData: true },
+          updatedAt: Date.now() - 60_000,
+        },
+      ],
+    });
     localD1(
       `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
-       values (${postId}, '${userId}', 'p1', 'Ottawa from 2025 to 2026', ${Date.now()})`,
+       values (${postId}, '${userId}', '${id}', '${title}', ${Date.now()})`,
     );
-
-    // Its project (p1) isn't saved here, so it's a card of its own among the
-    // projects; without a link kept, it opens its gallery page
-    await page.goto('/my-projects');
-    await expect(page.getByText(/Gallery only · Published/)).toBeVisible();
+    await page.reload();
+    // The project isn't in the account: leave it in this browser
+    await page.getByRole('button', { name: /^Not now/ }).click();
     await expect(
-      page
-        .getByRole('link', { name: 'Ottawa from 2025 to 2026', exact: true })
-        .first(),
-    ).toHaveAttribute('href', `/gallery/${postId}`);
+      page.getByRole('button', { name: `Share ${title}` }),
+    ).toBeVisible();
 
     // Each page is included on the public gallery on its own, from its Share
     // dialog; the display name itself is in the Account page's Profile settings
@@ -369,7 +388,6 @@ test.describe('Gallery pages from accounts', () => {
     await expect(share.locator('..')).toContainText(
       'Published · changed since',
     );
-    await expect(page.getByText(/Gallery only/)).toHaveCount(0);
     // Versions are gone
     await expect(page.getByText(/versions?\b/)).toHaveCount(0);
 
@@ -903,47 +921,5 @@ test.describe('Gallery pages from accounts', () => {
       data: { showOwner: false },
     });
     expect((await request.get(`/gallery/by/${publicId}`)).status()).toBe(404);
-  });
-  test('a palette only in the gallery is saved back from its card, keeping its page', async ({
-    page,
-    request,
-    baseURL,
-  }) => {
-    const email = uniqueEmail('gallery-add-back');
-    await signIn(page, request, email);
-    const userId = userIdFor(email);
-    const postId = 600_000_000 + Math.floor(Math.random() * 1e8);
-    // Its palette was deleted for good, so the page is the only copy
-    localD1(
-      `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt", "kind", "link")
-       values (${postId}, '${userId}', 'gone-palette', 'Sunset', ${Date.now()}, 'palette', '${baseURL}/yarn?s=ff0000ffa5000000ff')`,
-    );
-
-    await page.goto('/my-palettes');
-    await expect(page.getByText(/Gallery only · Published/)).toBeVisible();
-    await page.getByRole('button', { name: 'More for Sunset' }).click();
-    await page
-      .getByRole('menuitem', { name: 'Add to My Saved Palettes' })
-      .click();
-
-    // Now a saved palette, still showing its page
-    await expect(page.getByText(/Gallery only/)).toHaveCount(0);
-    await expect(page.getByText(/^Saved /).first()).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: 'Share Sunset' }).locator('..'),
-    ).toContainText('Published');
-    const [{ projectId }] = localD1(
-      `select "projectId" from "galleryPost" where "postId" = ${postId}`,
-    );
-    expect(projectId).not.toBe('gone-palette');
-
-    // Another account can't move it
-    expect(
-      (
-        await request.patch(`/api/account/gallery/${postId}`, {
-          data: { paletteId: 'x' },
-        })
-      ).status(),
-    ).not.toBe(200);
   });
 });
