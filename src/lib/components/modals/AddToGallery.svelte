@@ -186,14 +186,14 @@ its weather, when that isn't kept with it). -->
   } | null>(null);
 
   const view = $derived(
-    preparing
-      ? 'preparing'
-      : done
-        ? 'sent'
-        : !accountChecked
-          ? 'checking'
-          : unpublishing && page
-            ? 'unpublish'
+    done
+      ? 'sent'
+      : unpublishing && page
+        ? 'unpublish'
+        : preparing
+          ? 'preparing'
+          : !accountChecked
+            ? 'checking'
             : blocked
               ? 'blocked'
               : 'form',
@@ -734,6 +734,17 @@ its weather, when that isn't kept with it). -->
 <StickyPart position="bottom">
   {#if view === 'preparing'}
     <div class={FOOTER}>
+      {#if preparing === 'error' && page}
+        <!-- Unpublishing needs only the page -->
+        <button
+          type="button"
+          class="btn hover:preset-tonal-surface me-auto"
+          bind:this={unpublishButton}
+          onclick={askUnpublish}
+        >
+          <EyeOffIcon aria-hidden="true" />Unpublish…
+        </button>
+      {/if}
       <button
         class="btn hover:preset-tonal-surface"
         onclick={() => dialog.close()}

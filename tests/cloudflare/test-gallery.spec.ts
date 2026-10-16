@@ -412,20 +412,24 @@ test.describe('Gallery pages from accounts', () => {
     const status = dialog.locator('#share-gallery-status');
     await expect(status).toContainText('Published');
     await expect(status).toContainText('Anonymous');
-    await expect(status).toContainText('changed since');
     await expect(
       dialog.getByRole('link', { name: /^View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
-    // (Publishing is off here: nothing to publish or update with)
-    await expect(
-      dialog.getByRole('button', { name: /^Update Gallery Page/ }),
-    ).toHaveCount(0);
+    // One way in to everything else, saying it changed since
+    const edit = dialog.getByRole('button', { name: /^Edit Gallery Page/ });
+    await expect(edit).toBeVisible();
+    await expect(edit).toHaveAccessibleDescription(
+      'Changed since its page was last updated.',
+    );
     await expect(
       dialog.getByRole('button', { name: /^Publish to Gallery/ }),
     ).toHaveCount(0);
+    await expect(
+      dialog.getByRole('button', { name: /^Unpublish/ }),
+    ).toHaveCount(0);
 
-    // The name on the page: not changed here (it's in Publish/Update, and on
-    // the page's own menu), but shown
+    // The name on the page: not changed here (it's in Edit Gallery Page), but
+    // shown
     await expect(
       dialog.getByRole('checkbox', { name: /Anonymous/ }),
     ).toHaveCount(0);
@@ -446,7 +450,9 @@ test.describe('Gallery pages from accounts', () => {
     await page.reload();
     await share.click();
     await expect(status).toContainText('By Ada Lovelace');
-    await page.keyboard.press('Escape');
+    // (Close, not Escape: right after a reload, the thumbnail drawing can take
+    // a key press)
+    await dialog.getByRole('button', { name: 'Close' }).click();
     await expect(dialog).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'By Ada Lovelace',
@@ -461,29 +467,37 @@ test.describe('Gallery pages from accounts', () => {
       removed.push(new URL(route.request().url()).pathname.split('/').pop()!);
       return route.fulfill({ status: 204 });
     });
+    // In Edit Gallery Page, even when the project can't be got ready to
+    // update (its edited weather isn't saved with it)
     await share.click();
-    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
-    await expect(dialog).toContainText(`Unpublish “${title}”?`);
+    await edit.click();
+    const editor = page.getByRole('dialog', { name: 'Edit Gallery Page' });
+    await expect(editor).toContainText('edited weather data');
+    await editor.getByRole('button', { name: /^Unpublish…/ }).click();
+    await expect(editor).toContainText(`Unpublish “${title}”?`);
     await expect(
-      dialog.getByRole('button', { name: 'Unpublish', exact: true }),
+      editor.getByRole('button', { name: 'Unpublish', exact: true }),
     ).toBeFocused();
-    await dialog.getByRole('button', { name: 'Keep Published' }).click();
+    await editor.getByRole('button', { name: 'Keep Published' }).click();
     expect(removed).toEqual([]);
     await expect(
-      dialog.getByRole('button', { name: /^Unpublish…/ }),
+      editor.getByRole('button', { name: /^Unpublish…/ }),
     ).toBeFocused();
-    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
-    await dialog
+    await editor.getByRole('button', { name: /^Unpublish…/ }).click();
+    await editor
       .getByRole('button', { name: 'Unpublish', exact: true })
       .click();
-    await expect(status).toContainText('Not published');
+    await expect(
+      editor.getByRole('heading', { name: 'Unpublished' }),
+    ).toBeFocused();
     expect(removed).toEqual([String(postId)]);
-    await page.keyboard.press('Escape');
+    await editor.getByRole('button', { name: 'Done' }).click();
+    await expect(editor).toHaveCount(0);
     await expect(share.locator('..')).not.toContainText('Published');
     // (Publishing is off here, so with no page there's nothing left to change)
   });
 
-  test('on its own gallery page, the owner can show their name, find where to update it, or unpublish it', async ({
+  test('on its own gallery page, the owner edits it in the same dialog: their name, or unpublish', async ({
     page,
     request,
     browser,
@@ -502,24 +516,20 @@ test.describe('Gallery pages from accounts', () => {
     );
 
     await page.goto(`/gallery/${postId}`);
-    const options = page.getByRole('button', { name: /^Gallery: Published/ });
-    await options.click();
-    // No versions to move between; updating is from the project's card
-    await expect(
-      page.getByRole('menuitem', { name: 'Newer Version' }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole('menuitem', { name: /^Update from My Library/ }),
-    ).toHaveAttribute('href', '/my-projects');
+    const edit = page.getByRole('button', { name: /^Edit Gallery Page/ });
+    // (The project isn't saved in this browser: only what needs just the page)
+    await edit.click();
+    const editor = page.getByRole('dialog', { name: 'Edit Gallery Page' });
+    await expect(editor).toContainText('isn’t on this device yet');
 
     // Anonymous off: the name on this page
-    const anonymous = page.getByRole('menuitemcheckbox', {
-      name: /Anonymous/,
-    });
+    const anonymous = editor.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
-    await anonymous.click();
-    await expect(anonymous).not.toBeChecked();
-    await page.keyboard.press('Escape');
+    await anonymous.uncheck();
+    await editor.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(editor.getByRole('heading', { name: 'Saved' })).toBeFocused();
+    await editor.getByRole('button', { name: 'Done' }).click();
+    await expect(editor).toHaveCount(0);
     // ("By" shows under the project's title, which needs WordPress)
     await expect
       .poll(
@@ -538,27 +548,29 @@ test.describe('Gallery pages from accounts', () => {
       removed.push(new URL(route.request().url()).pathname.split('/').pop()!);
       return route.fulfill({ status: 204 });
     });
-    await options.click();
-    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await expect(page.getByText('Unpublish this page?')).toBeVisible();
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await edit.click();
+    await editor.getByRole('button', { name: /^Unpublish…/ }).click();
+    await expect(editor).toContainText('Unpublish “Lima”?');
+    await editor.getByRole('button', { name: 'Keep Published' }).click();
     expect(removed).toEqual([]);
-    await options.click();
-    await page.getByRole('menuitem', { name: /Unpublish/ }).click();
-    await page.getByRole('button', { name: 'Unpublish', exact: true }).click();
-    await expect(page.getByTestId('gallery-owner-menu')).toContainText(
+    await editor.getByRole('button', { name: /^Unpublish…/ }).click();
+    await editor
+      .getByRole('button', { name: 'Unpublish', exact: true })
+      .click();
+    await expect(editor).toHaveCount(0);
+    await expect(page.getByTestId('gallery-page-edit')).toContainText(
       'Unpublished',
     );
     expect(removed).toEqual([String(postId)]);
 
-    // Anyone else sees no menu
+    // Anyone else sees no button
     const visitor = await browser.newContext({ baseURL });
     const other = await visitor.newPage();
     await other.goto(`/gallery/${postId}`);
     await expect(
       other.getByRole('link', { name: 'Project Gallery' }),
     ).toBeVisible();
-    await expect(other.getByTestId('gallery-owner-menu')).toHaveCount(0);
+    await expect(other.getByTestId('gallery-page-edit')).toHaveCount(0);
     await visitor.close();
   });
 
@@ -656,7 +668,7 @@ test.describe('Gallery pages from accounts', () => {
       name: 'Publish to Gallery',
     });
     const updateDialog = page.getByRole('dialog', {
-      name: 'Update Gallery Page',
+      name: 'Edit Gallery Page',
     });
     await expect(card('First test')).not.toContainText('Published');
 
@@ -728,8 +740,8 @@ test.describe('Gallery pages from accounts', () => {
     // Changed since it was published (as if edited on another device): only
     // then is there something to update
     gallery.posts.find((p) => p.postId === postId)!.link = 'changed';
-    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
-    await send(updateDialog, 'Update', 'Updated');
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await send(updateDialog, 'Save', 'Saved');
     // The same page: its link is the same, and nothing new was published
     await expect(
       updateDialog.getByRole('link', { name: /^View Gallery Page/ }),
@@ -749,17 +761,17 @@ test.describe('Gallery pages from accounts', () => {
     await expect(card('Second test')).toContainText('Published');
     await expect(card('Second test')).not.toContainText('changed since');
 
-    // Anonymous, from Update Gallery Page (not the Share dialog): the name on
+    // Anonymous, from Edit Gallery Page (not the Share dialog): the name on
     // the page, changed on its own when the project is up to date
     await page.getByRole('button', { name: 'Share Second test' }).click();
     await expect(
       dialog.getByRole('checkbox', { name: /Anonymous/ }),
     ).toHaveCount(0);
-    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
-    const owner = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    const owner = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     const anonymous = owner.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
-    const apply = owner.getByRole('button', { name: 'Update', exact: true });
+    const apply = owner.getByRole('button', { name: 'Save', exact: true });
     await expect(apply).toBeDisabled();
     await anonymous.uncheck();
     await expect(owner.getByText('By Ada Lovelace')).toBeVisible();
@@ -776,14 +788,18 @@ test.describe('Gallery pages from accounts', () => {
       'By Ada Lovelace',
     );
 
-    // Unpublish, from the Share dialog: asks first, then it can be published again
-    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
-    await dialog.getByRole('button', { name: 'Keep Published' }).click();
+    // Unpublish, from Edit Gallery Page: asks first, then Back to Share, where
+    // it can be published again
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await owner.getByRole('button', { name: /^Unpublish…/ }).click();
+    await owner.getByRole('button', { name: 'Keep Published' }).click();
     expect(gallery.posts).toHaveLength(2);
-    await dialog.getByRole('button', { name: /^Unpublish…/ }).click();
-    await dialog
-      .getByRole('button', { name: 'Unpublish', exact: true })
-      .click();
+    await owner.getByRole('button', { name: /^Unpublish…/ }).click();
+    await owner.getByRole('button', { name: 'Unpublish', exact: true }).click();
+    await expect(
+      owner.getByRole('heading', { name: 'Unpublished' }),
+    ).toBeFocused();
+    await owner.getByRole('button', { name: /^Back/ }).click();
     await expect(
       dialog.getByRole('button', { name: /^Publish to Gallery…/ }),
     ).toBeVisible();
@@ -835,14 +851,22 @@ test.describe('Gallery pages from accounts', () => {
     await expect(share.locator('..')).toContainText('Published');
     await share.click();
     const dialog = page.getByRole('dialog', { name: 'Share “Sunset”' });
-    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
 
-    // Updates its name and colors in place
-    const update = page.getByRole('dialog', { name: 'Update Gallery Page' });
-    await expect(update.getByLabel('Name')).toHaveValue('Sunset');
-    await update.getByLabel('Name').fill('Sunset, Updated');
-    await update.getByRole('button', { name: 'Update', exact: true }).click();
-    await expect(update.getByText('Updated', { exact: true })).toBeVisible();
+    // Nothing to save until something differs; then its name and colors are
+    // updated in place
+    const update = page.getByRole('dialog', { name: 'Edit Gallery Page' });
+    await expect(update.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Sunset',
+    );
+    const save = update.getByRole('button', { name: 'Save', exact: true });
+    await expect(save).toBeDisabled();
+    await expect(
+      update.getByRole('button', { name: /^Unpublish…/ }),
+    ).toBeVisible();
+    await update.getByRole('textbox', { name: 'Name' }).fill('Sunset, Updated');
+    await save.click();
+    await expect(update.getByRole('heading', { name: 'Saved' })).toBeFocused();
     await expect(
       update.getByRole('link', { name: 'View Gallery Page' }),
     ).toHaveAttribute('href', '/gallery/palette/777');

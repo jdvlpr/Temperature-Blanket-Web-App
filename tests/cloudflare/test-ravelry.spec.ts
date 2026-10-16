@@ -527,8 +527,8 @@ test.describe('Ravelry', () => {
     // no longer uses
     ravelry.addOldPacks();
     await share.click();
-    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
-    const update = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    const update = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(
       update.getByText('Its gallery page is up to date'),
     ).toBeVisible();
@@ -539,7 +539,7 @@ test.describe('Ravelry', () => {
     await expect(
       update.getByText('Its picture on Ravelry is up to date'),
     ).toBeVisible();
-    const save = update.getByRole('button', { name: 'Update', exact: true });
+    const save = update.getByRole('button', { name: 'Save', exact: true });
 
     // Yarns: one this app added and no longer uses is offered for removal;
     // one added on Ravelry never is
@@ -573,7 +573,7 @@ test.describe('Ravelry', () => {
       .setInputFiles(photoFile('second.png'));
     await save.click();
     await expect(
-      update.getByRole('heading', { name: 'Updated' }),
+      update.getByRole('heading', { name: 'Saved' }),
     ).toBeVisible();
 
     // The gallery page wasn't sent again. Only what changed went to Ravelry:
@@ -605,13 +605,20 @@ test.describe('Ravelry', () => {
 
     // Remove a photo: marked first, undoable, and only gone on Update
     await share.click();
-    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
-    const again = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    const again = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(
       again.getByText('Its picture on Ravelry is up to date'),
     ).toBeVisible();
-    const update2 = again.getByRole('button', { name: 'Update', exact: true });
+    const update2 = again.getByRole('button', { name: 'Save', exact: true });
     await expect(update2).toBeDisabled();
+    // Unpublish says it unlinks Ravelry too (kept published here)
+    await again.getByRole('button', { name: /^Unpublish…/ }).click();
+    await expect(again).toContainText('unlinked from Ravelry too');
+    await again.getByRole('button', { name: 'Keep Published' }).click();
+    await expect(
+      again.getByRole('button', { name: /^Unpublish…/ }),
+    ).toBeFocused();
     const mark = again.getByRole('button', {
       name: 'Remove photo 1 from Ravelry',
     });
@@ -642,8 +649,8 @@ test.describe('Ravelry', () => {
     // be posted again
     ravelry.deleteOnRavelry();
     await share.click();
-    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
-    const gone = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    const gone = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(gone.getByText(/deleted on Ravelry/)).toBeVisible();
     await expect(gone.getByLabel('Also post to Ravelry')).not.toBeChecked();
     await page.keyboard.press('Escape');
