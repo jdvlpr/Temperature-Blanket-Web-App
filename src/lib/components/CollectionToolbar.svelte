@@ -17,18 +17,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Search, filters, sort and view for a list of projects or palettes: the
   Gallery's, and My Library's. It only holds the values; the page finds what
   matches (the Gallery asks the server on `onchange`, My Library filters what's
-  saved here). With `showFilters` off, only View and the page's actions
-  show, for short lists.
+  saved here). Search always shows; Yarn, Pattern Type and `filters` sit behind
+  the Filters button, open while any are on, and show as removable chips while
+  closed. With `showFilters` off, only View and the page's actions show, for
+  short lists.
 -->
 <script lang="ts" generics="T extends string">
   import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import { menuTriggerClass } from '#lib/components/menu-styles.js';
+  import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import type { PageLayout } from '#lib/types/page-types.js';
-  import { EarthIcon, Grid3x3, SearchIcon, XIcon } from '@lucide/svelte';
-  import type { Snippet } from 'svelte';
+  import {
+    ChevronDownIcon,
+    EarthIcon,
+    Grid3x3,
+    ListFilterIcon,
+    SearchIcon,
+    XIcon,
+  } from '@lucide/svelte';
+  import { untrack, type Snippet } from 'svelte';
 
   let {
     kind,
@@ -88,90 +99,76 @@ If not, see <https://www.gnu.org/licenses/>. -->
     actions?: Snippet;
   } = $props();
 
-  const searchId = $props.id();
+  const id = $props.id();
+  const searchId = `${id}-search`;
+  const panelId = `${id}-filters`;
   const hasPattern = $derived(patternType !== undefined);
-  // Search on its own row when it's the only filter
-  const searchOnly = $derived(!yarn && !hasPattern);
+  // Anything to put behind the Filters button
+  const hasHidden = $derived(yarn || hasPattern || !!filters);
+
+  const hasYarn = $derived(yarn && !!(brandId || yarnId));
+  const activeCount = $derived(
+    (hasYarn ? 1 : 0) + (hasPattern && patternType ? 1 : 0),
+  );
+
+  // Open while a filter is on, e.g. arriving from a yarn link
+  let open = $state(untrack(() => activeCount > 0));
+  let filtersButton = $state<HTMLButtonElement>();
+
+  const yarnLabel = $derived.by(() => {
+    if (!hasYarn) return '';
+    const brand = getBrands().find((brand) => brand.id === brandId);
+    const yarnName = brand?.yarns.find((y) => y.id === yarnId)?.name;
+    const name = [brand?.name, yarnName].filter(Boolean).join(' ') || 'Yarn';
+    return onlyThisYarn ? `Only ${name}` : name;
+  });
+  const patternLabel = $derived(
+    previews.all.find((preview) => preview.wpTagSlug === patternType)?.name ??
+      'Pattern',
+  );
+
+  /** A chip's ✕: the chip goes, so focus moves to the Filters button */
+  function removeFilter(clear: () => void) {
+    clear();
+    onchange?.();
+    filtersButton?.focus();
+  }
 </script>
 
 <div class="flex w-full flex-col gap-2">
   {#if showFilters}
-    <div class="grid w-full grid-cols-12 items-start gap-4 text-left">
-      {#if yarn}
-        <div class="col-span-12 w-full md:col-span-7">
-          <SelectYarn
-            preselectDefaultYarn={false}
-            {disabled}
-            bind:selectedBrandId={brandId}
-            bind:selectedYarnId={yarnId}
-            onselectautocomplete={() => onchange?.()}
-            bind:only={onlyThisYarn}
-            ononlychange={() => onchange?.()}
-            onlyKind={kind}
-          />
-        </div>
-      {/if}
+    <div class="label w-full text-left">
+      <label class="label-text" for={searchId}>{searchLabel}</label>
+      <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
+        <span class="label label-text" aria-hidden="true"
+          >{#if searchIcon === 'earth'}<EarthIcon />{:else}<SearchIcon
+            />{/if}</span
+        >
+        <input
+          id={searchId}
+          type="text"
+          class="input w-full truncate"
+          autocomplete="off"
+          placeholder={searchPlaceholder}
+          bind:value={search}
+          oninput={() => onchange?.()}
+        />
 
-      <div
-        class={[
-          'label col-span-12',
-          searchOnly ? 'md:col-span-8 md:col-start-3' : 'md:col-span-5',
-        ]}
-      >
-        <label class="label-text" for={searchId}>{searchLabel}</label>
-        <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
-          <span class="label label-text" aria-hidden="true"
-            >{#if searchIcon === 'earth'}<EarthIcon />{:else}<SearchIcon
-              />{/if}</span
+        {#if search}
+          <button
+            type="button"
+            class="btn hover:preset-tonal-surface"
+            title="Clear Search"
+            aria-label="Clear Search"
+            onclick={() => {
+              search = '';
+              onchange?.();
+            }}
           >
-          <input
-            id={searchId}
-            type="text"
-            class="input w-full truncate"
-            autocomplete="off"
-            placeholder={searchPlaceholder}
-            bind:value={search}
-            oninput={() => onchange?.()}
-          />
-
-          {#if search}
-            <button
-              type="button"
-              class="btn hover:preset-tonal-surface"
-              title="Clear Search"
-              aria-label="Clear Search"
-              onclick={() => {
-                search = '';
-                onchange?.();
-              }}
-            >
-              <XIcon />
-            </button>
-          {/if}
-        </div>
+            <XIcon />
+          </button>
+        {/if}
       </div>
-
-      {#if hasPattern}
-        <label class="label col-span-12 w-full md:col-span-7">
-          <span class="label-text">Pattern Type</span>
-          <div class="relative flex items-center">
-            <Grid3x3 class={FIELD_ICON} />
-            <select
-              {disabled}
-              class="select truncate pl-11"
-              bind:value={patternType}
-              onchange={() => onchange?.()}
-            >
-              <option value="">Any Pattern</option>
-              {#each previews.all as { name, wpTagSlug } (wpTagSlug)}
-                <option value={wpTagSlug}>{name}</option>
-              {/each}
-            </select>
-          </div>
-        </label>
-      {/if}
-
-      {@render filters?.()}
     </div>
   {/if}
 
@@ -194,6 +191,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {canReverse}
         />
         {@render menus?.()}
+        {#if hasHidden}
+          <button
+            bind:this={filtersButton}
+            type="button"
+            class={menuTriggerClass}
+            aria-expanded={open}
+            aria-controls={panelId}
+            onclick={() => (open = !open)}
+          >
+            <ListFilterIcon aria-hidden="true" />
+            <span
+              >Filters{#if activeCount}<span aria-hidden="true">
+                  · {activeCount}</span
+                ><span class="sr-only">, {activeCount} on</span>{/if}</span
+            >
+            <ChevronDownIcon
+              class={['icon-sm transition-transform', open && 'rotate-180']}
+              aria-hidden="true"
+            />
+          </button>
+        {/if}
       {/if}
       <ViewMenu bind:value={layout} />
     </div>
@@ -203,4 +221,87 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
+
+  {#if showFilters && hasHidden}
+    <div
+      id={panelId}
+      hidden={!open}
+      class="grid w-full grid-cols-12 items-start gap-4 text-left"
+    >
+      {#if yarn}
+        <div class="col-span-12 w-full md:col-span-7">
+          <SelectYarn
+            preselectDefaultYarn={false}
+            {disabled}
+            bind:selectedBrandId={brandId}
+            bind:selectedYarnId={yarnId}
+            onselectautocomplete={() => onchange?.()}
+            bind:only={onlyThisYarn}
+            ononlychange={() => onchange?.()}
+            onlyKind={kind}
+          />
+        </div>
+      {/if}
+
+      {#if hasPattern}
+        <label class="label col-span-12 w-full md:col-span-5">
+          <span class="label-text">Pattern Type</span>
+          <div class="relative flex items-center">
+            <Grid3x3 class={FIELD_ICON} />
+            <select
+              {disabled}
+              class="select truncate pl-11"
+              bind:value={patternType}
+              onchange={() => onchange?.()}
+            >
+              <option value="">Any Pattern</option>
+              {#each previews.all as { name, wpTagSlug } (wpTagSlug)}
+                <option value={wpTagSlug}>{name}</option>
+              {/each}
+            </select>
+          </div>
+        </label>
+      {/if}
+
+      {@render filters?.()}
+    </div>
+
+    {#if !open && activeCount}
+      <ul class="flex flex-wrap justify-center gap-2" aria-label="Filters on">
+        {#if hasYarn}
+          <li>
+            <button
+              type="button"
+              class="btn btn-sm preset-tonal rounded-full"
+              aria-label="Remove filter: {yarnLabel}"
+              {disabled}
+              onclick={() =>
+                removeFilter(() => {
+                  brandId = '';
+                  yarnId = '';
+                  onlyThisYarn = false;
+                })}
+            >
+              <span>{yarnLabel}</span>
+              <XIcon aria-hidden="true" />
+            </button>
+          </li>
+        {/if}
+        {#if hasPattern && patternType}
+          <li>
+            <button
+              type="button"
+              class="btn btn-sm preset-tonal rounded-full"
+              aria-label="Remove filter: {patternLabel}"
+              {disabled}
+              onclick={() => removeFilter(() => (patternType = ''))}
+            >
+              <span>{patternLabel}</span>
+              <XIcon aria-hidden="true" />
+            </button>
+          </li>
+        {/if}
+      </ul>
+    {/if}
+  {/if}
 </div>
