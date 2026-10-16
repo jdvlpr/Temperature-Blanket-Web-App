@@ -20,6 +20,7 @@ import type { BetterAuthOptions } from 'better-auth';
 import { APIError } from 'better-auth/api';
 import { emailOTP } from 'better-auth/plugins/email-otp';
 import { genericOAuth } from 'better-auth/plugins/generic-oauth';
+import { randomCraftName } from '../../accounts/craft-names';
 import { cleanName } from '../../utils/clean-name';
 
 export type SignInCodePurpose =
@@ -155,12 +156,9 @@ export function buildAuthOptions(config: AuthConfig) {
                 code: SIGN_UPS_PAUSED,
                 message: 'New sign-ups are paused',
               });
-            return {
-              data: {
-                ...user,
-                name: cleanName(user.name, MAX_DISPLAY_NAME_LENGTH),
-              },
-            };
+            // A made-up name to start, not the one from Google: nobody's
+            // real name shows on a gallery page unless they put it there
+            return { data: { ...user, name: randomCraftName() } };
           },
         },
         update: {

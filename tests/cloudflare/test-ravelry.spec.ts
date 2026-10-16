@@ -21,7 +21,13 @@
 // WordPress app is needed. The server side is covered by unit tests.
 
 import { expect, test, type Page } from '@playwright/test';
-import { idbSet, signIn, uniqueEmail, useTestIp } from './helpers';
+import {
+  addFromBrowser,
+  idbSet,
+  signIn,
+  uniqueEmail,
+  useTestIp,
+} from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
   await useTestIp(page);
@@ -419,10 +425,8 @@ test.describe('Ravelry', () => {
       projects_index: [saved.item],
     });
     await signIn(page, request, email);
-    await page
-      .getByRole('heading', { name: 'Add your projects to your account?' })
-      .waitFor();
-    await page.getByRole('button', { name: 'Add it' }).click();
+    await addFromBrowser(page).waitFor();
+    await page.getByRole('button', { name: /^Add 1 project/ }).click();
     await expect
       .poll(
         async () =>

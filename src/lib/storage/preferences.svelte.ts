@@ -51,6 +51,22 @@ type LocalStatePreferencesType = {
   myProjectsLayout?: PageLayout;
 };
 
+/**
+ * Whether this browser had preferences before this page load (they're written
+ * on every visit, since 5.0.0): someone who's been here before. Read before
+ * `preferences` below can write its defaults.
+ */
+export const hadPreferences = (() => {
+  try {
+    return (
+      typeof localStorage !== 'undefined' &&
+      localStorage.getItem('preferences') !== null
+    );
+  } catch {
+    return false;
+  }
+})();
+
 export const preferences = persistedState<LocalStatePreferencesType>(
   'preferences',
   {

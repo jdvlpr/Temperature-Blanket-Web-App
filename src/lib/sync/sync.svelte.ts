@@ -33,6 +33,7 @@
 
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
+import { signInHref } from '#lib/accounts/redirect.js';
 import { clearSignedInHint, getSession } from '#lib/accounts/client.js';
 import {
   account,
@@ -219,7 +220,6 @@ async function sessionEnded(userId: string): Promise<boolean> {
   }
   // After leaving, as signing out does, so lists refresh without its items
   forgetAccountSummary();
-  const redirect = encodeURIComponent(location.pathname + location.search);
   toast.trigger({
     message: kept
       ? 'You’ve been signed out. Changes that hadn’t synced are still saved in this browser. Sign in to sync them.'
@@ -228,7 +228,8 @@ async function sessionEnded(userId: string): Promise<boolean> {
     autohide: false,
     action: {
       label: 'Sign in',
-      response: () => goto(`${resolve('/auth/sign-in')}?redirect=${redirect}`),
+      // Back to this page as it is then
+      response: () => goto(signInHref(location)),
     },
   });
   return true;

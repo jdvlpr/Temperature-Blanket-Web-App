@@ -129,7 +129,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     errorMessage = '';
     busy = true;
     try {
-      await signInWithProvider(provider, redirectTo, window.location.pathname);
+      // A failure comes back here with ?redirect= kept
+      await signInWithProvider(
+        provider,
+        redirectTo,
+        window.location.pathname + window.location.search,
+      );
     } catch (e) {
       errorMessage = accountErrorMessage(e);
       busy = false;

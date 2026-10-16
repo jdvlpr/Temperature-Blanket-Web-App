@@ -13,33 +13,27 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Introducing accounts (in beta) to people who aren't signed in, each way
-// once: a "New" dot on the account button until it's used, and a notice after
-// the first thing they save
+// Introducing accounts (in beta) to people who aren't signed in: a "New" dot
+// on the account button until it's used
 
-import { goto } from '$app/navigation';
-import { resolve } from '$app/paths';
 import { account } from '#lib/accounts/summary.svelte.js';
-import { toast } from '#lib/state/page-state.svelte.js';
 
 const KEY = 'accounts_intro';
 
 export type AccountsIntroState = {
   /** The account button (with its "New" dot) has been used */
   buttonSeen: boolean;
-  /** The notice after a first save has been shown */
-  saveNoticeShown: boolean;
 };
 
 function readState(): AccountsIntroState {
   try {
     const state = JSON.parse(localStorage.getItem(KEY) ?? 'null');
     if (state && typeof state === 'object')
-      return { buttonSeen: false, saveNoticeShown: false, ...state };
+      return { buttonSeen: false, ...state };
   } catch {
     // Start over
   }
-  return { buttonSeen: false, saveNoticeShown: false };
+  return { buttonSeen: false };
 }
 
 class AccountsIntro {
@@ -75,23 +69,6 @@ class AccountsIntro {
     this.#refresh();
     this.state.buttonSeen = true;
     this.#write();
-  }
-
-  /** Call after a project or palette is saved for the first time */
-  offerAfterSave() {
-    this.#refresh();
-    if (!this.#signedOut || this.state.saveNoticeShown) return;
-    this.state.saveNoticeShown = true;
-    this.#write();
-    toast.trigger({
-      // One element, as the toast lays out its parts side by side
-      message:
-        '<span><b>Accounts (Beta).</b> Sign in to keep your projects and yarn palettes on all your devices.</span>',
-      category: 'info',
-      // Stays until dismissed, so there's time to read it and choose
-      autohide: false,
-      action: { label: 'Sign In', response: () => goto(resolve('account')) },
-    });
   }
 }
 

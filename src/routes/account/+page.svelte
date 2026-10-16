@@ -55,6 +55,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let status: 'loading' | 'signed-in' | 'signed-out' | 'deleted' | 'error' =
     $state('loading');
   let user = $state<AccountUser | null>(null);
+
+  // A name changed elsewhere (in the welcome, over this page) shows here too
+  $effect(() => {
+    const name = account.summary?.name;
+    if (user && name !== undefined && account.summary?.id === user.id)
+      user.name = name;
+  });
   let busy = $state(false);
   let errorMessage = $state('');
   // For the delete-account question

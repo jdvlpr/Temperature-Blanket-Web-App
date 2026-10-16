@@ -23,7 +23,6 @@ import {
   saveNow,
   saveOpenProject,
 } from '#lib/storage/autosave.svelte.js';
-import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
 
 /** Saves the open project; returns whether it saved. */
 export async function saveProject(): Promise<boolean> {
@@ -45,7 +44,6 @@ export async function saveProject(): Promise<boolean> {
     return autosave.state === 'saved';
   }
 
-  const firstSave = !autosave.stored;
   const item = await saveOpenProject();
   if (!item) {
     toast.trigger({
@@ -63,6 +61,5 @@ export async function saveProject(): Promise<boolean> {
         : 'Saved in this browser. Changes now save automatically.',
     category: 'success',
   });
-  if (firstSave) accountsIntro.offerAfterSave();
   return true;
 }

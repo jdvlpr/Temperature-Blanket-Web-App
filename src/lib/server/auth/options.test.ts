@@ -29,9 +29,12 @@ const newUser = {
 };
 
 describe('creating a user', () => {
-  it('cleans the name while sign-ups are open', async () => {
+  it('gives a made-up name, not the given one, while sign-ups are open', async () => {
     const before = config(async () => true).databaseHooks.user.create.before;
-    expect(await before(newUser)).toMatchObject({ data: { name: 'Sam' } });
+    const { data } = await before(newUser);
+    expect(data.name).not.toContain('Sam');
+    expect(data.name).toMatch(/^[A-Z][a-z]+ [A-Z][a-z]+ [1-9]\d$/);
+    expect(data.email).toBe(newUser.email);
   });
 
   it('refuses with SIGN_UPS_PAUSED when they are closed or full', async () => {

@@ -18,14 +18,11 @@ Shows nothing while syncing works, which is the usual case. -->
 
 <script lang="ts">
   import { page } from '$app/state';
+  import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import { CloudAlertIcon, CloudOffIcon } from '@lucide/svelte';
 
   let { class: className = '' }: { class?: string } = $props();
-
-  const signInHref = $derived(
-    `/auth/sign-in?redirect=${encodeURIComponent(page.url.pathname + page.url.search)}`,
-  );
 
   async function syncNow() {
     const { syncNow } = await import('#lib/sync/sync.svelte.js');
@@ -49,7 +46,9 @@ Shows nothing while syncing works, which is the usual case. -->
       <CloudAlertIcon class="icon-sm text-warning-700-300 shrink-0" />
       <span>Your session ended.</span>
       <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-      <a class="anchor" href={signInHref}>Sign in to sync</a>
+      <a class="anchor" href={signInHref(page.url)} onclick={backHereOnClick}
+        >Sign in to sync</a
+      >
     {:else if sync.state === 'error'}
       <CloudAlertIcon class="icon-sm text-error-700-300 shrink-0" />
       <span>Couldn’t sync.</span>

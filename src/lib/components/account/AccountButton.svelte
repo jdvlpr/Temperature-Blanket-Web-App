@@ -27,6 +27,7 @@ link to Preferences. -->
   import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
+  import { signInHref } from '#lib/accounts/redirect.js';
   import { account, loadAccountSummary } from '#lib/accounts/summary.svelte.js';
   import AccountAvatar from '#lib/components/account/AccountAvatar.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
@@ -58,12 +59,15 @@ link to Preferences. -->
   // The button shows as current on either page it leads to
   let current = $derived(onAccountPage || onPreferencesPage);
 
+  // Signing in comes back to this page, as it is when the menu opens
+  let signInTarget = $state('/auth/sign-in');
+
   // Signed out, the menu's links
   let signedOutItems = $derived([
     {
       value: 'sign-in',
       label: 'Sign In',
-      href: resolve('account'),
+      href: signInTarget,
       icon: LogInIcon,
       here: onAccountPage,
     },
@@ -237,7 +241,9 @@ link to Preferences. -->
     <Menu
       positioning={menuPositioning('bottom-end')}
       onOpenChange={(e) => {
-        if (e.open) accountsIntro.markButtonSeen();
+        if (!e.open) return;
+        accountsIntro.markButtonSeen();
+        signInTarget = signInHref(window.location);
       }}
     >
       <Menu.Trigger

@@ -29,6 +29,8 @@ button to it. -->
   } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
+  import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
@@ -256,7 +258,8 @@ the same color) says it's waiting here -->
           Sign in to open your saved projects and yarn palettes from any device.
         </p>
         <a
-          href={resolve('account')}
+          href={signInHref(page.url)}
+          onclick={backHereOnClick}
           class="btn preset-tonal-primary self-start"
           data-testid="menu-sign-in"
         >

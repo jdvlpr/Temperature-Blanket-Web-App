@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { cubicOut } from 'svelte/easing';
   import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
+  import WhatsNewBanner from './WhatsNewBanner.svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
   interface Props {
@@ -167,7 +168,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="min-w-0 flex-1">
-      <div class="lg:m-2 xl:mx-0">{@render main?.()}</div>
+      <div class="lg:m-2 xl:mx-0">
+        <WhatsNewBanner />
+        {@render main?.()}
+      </div>
       {@render footer?.()}
     </div>
   </div>

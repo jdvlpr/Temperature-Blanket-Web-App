@@ -17,7 +17,12 @@
 // navigation can show them without asking the server on every page. The server
 // session stays the source of truth: this is cleared whenever it ends.
 
-import { hasSignedInHint, type AccountUser } from './client';
+import {
+  clearSignedInHint,
+  getSession,
+  hasSignedInHint,
+  type AccountUser,
+} from './client';
 
 export type AccountSummary = Pick<AccountUser, 'name' | 'email' | 'image'> & {
   /** Which saved projects are this account's. Missing from summaries saved before sync. */
@@ -41,6 +46,19 @@ export function loadAccountSummary() {
     account.summary = saved ? JSON.parse(saved) : null;
   } catch {
     account.summary = null;
+  }
+  // Just back from signing in with Google, on any page: ask who it is
+  if (!account.summary) void fetchAccountSummary();
+}
+
+async function fetchAccountSummary() {
+  try {
+    const session = await getSession();
+    if (session?.user) rememberAccountSummary(session.user);
+    // The session is over: stop asking on every page
+    else clearSignedInHint();
+  } catch {
+    // Offline: try again on the next page load
   }
 }
 

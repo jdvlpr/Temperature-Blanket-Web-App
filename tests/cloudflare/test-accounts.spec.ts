@@ -24,6 +24,7 @@ import {
 } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import {
+  finishWelcome,
   latestCode,
   openEmailSignIn,
   TEST_TURNSTILE_HEADERS,
@@ -58,6 +59,8 @@ test.describe('Accounts: sign in with an emailed code', () => {
 
     await expect(page).toHaveURL(/\/account$/);
     await expect(page.getByTestId('account-email')).toHaveText(email);
+    // A new account is welcomed, with a made-up name to keep or change
+    await finishWelcome(page);
 
     // The session survives a reload
     await page.reload();
@@ -126,6 +129,31 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await expect(page).toHaveURL(/\/preferences$/);
   });
 
+  test('Sign In in the top bar comes back to the page, hash and all', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('top-bar');
+    // Loaded, so the account button's menu works
+    await page.goto('/privacy#top', { waitUntil: 'networkidle' });
+    await page.getByTestId('account-button').click();
+    await page.getByRole('menuitem', { name: 'Sign In' }).click();
+    await expect(page).toHaveURL(/\/auth\/sign-in\?redirect=%2Fprivacy%23top$/);
+    await openEmailSignIn(page);
+    await page.getByLabel('Email').fill(email);
+    await page.getByRole('button', { name: 'Email me a code' }).click();
+    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await expect(page).toHaveURL(/\/privacy#top$/);
+
+    // Welcomed there, with a made-up name to change
+    const welcome = page.getByRole('dialog', { name: 'Welcome!' });
+    await welcome.getByLabel('Your display name').fill('Blanket Maker');
+    await welcome.getByRole('button', { name: 'Done' }).click();
+    await expect(welcome).toHaveCount(0);
+    await page.goto('/account');
+    await expect(page.getByLabel('Display name')).toHaveValue('Blanket Maker');
+  });
+
   test('a wrong code is rejected', async ({ page, request }) => {
     const email = uniqueEmail('wrong-code');
 
@@ -157,6 +185,8 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const code = await latestCode(request, email);
     await page.getByLabel('Code').fill(`${code.slice(0, 3)} ${code.slice(3)}`);
     await expect(page).toHaveURL(/\/faq$/);
+    // Welcomed wherever it lands
+    await finishWelcome(page);
 
     // A redirect to another site is ignored
     await page.goto('/account');
@@ -191,6 +221,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await page.getByLabel('Code').fill(await latestCode(request, email));
     await expect(page.getByTestId('account-email')).toHaveText(email);
     await expect(page).toHaveURL(/\/account$/);
+    await finishWelcome(page);
   });
 
   test('requests from another site are refused', async ({ request }) => {
@@ -450,7 +481,8 @@ test.describe('Accounts: managing the account', () => {
     ).toBe(false);
 
     await signIn(page, request, email);
-    await expect(page.getByLabel('Display name')).toHaveValue('');
+    // A new account, with a new made-up name
+    await expect(page.getByLabel('Display name')).not.toHaveValue('Soon Gone');
   });
 
   test('delete with an old session asks for a new code first', async ({

@@ -15,6 +15,7 @@
 
 import { PUBLIC_GITHUB_LINK } from '$app/env/public';
 import { ICONS } from '#lib/constants/icon-constants.js';
+import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
 import type { ChangelogItemGroup } from '#lib/types/page-types.js';
 import {
   CloudCogIcon,
@@ -44,29 +45,28 @@ export const entries: ChangelogItemGroup[] = [
       {
         month: 'October',
         items: [
-          // The accounts beta opens after this release, when accounts are
-          // switched on, so the note only appears then
-          ...(__ACCOUNTS_ENABLED__
-            ? [
-                {
-                  notes: [
-                    {
-                      IconComponent: UserRoundIcon,
-                      text: `You can now sign in, with an emailed code or with Google, to keep your projects, yarn palettes and preferences in an account and open them on any device. Projects and palettes you share in the gallery can show your name and appear on your own public gallery page, if you choose, and you can share yarn palettes on their own. Accounts are optional. Read all about it in the <a href="/blog/2026-09-28-accounts-beta" class="link">Accounts (Beta) blog post</a>.`,
-                      title: 'Accounts (Beta)',
-                    },
-                  ],
-                },
-              ]
-            : []),
-
           {
             notes: [
+              // Accounts open with this release when they're switched on
+              ...(__ACCOUNTS_ENABLED__
+                ? [
+                    {
+                      IconComponent: UserRoundIcon,
+                      text: `Sign in with Google to keep your projects, yarn palettes and preferences in an account and open them on any device. They sync by themselves, and the first time you sign in you can choose which projects and palettes already in your browser to add. Your account starts with a made-up display name, so your real name is never shown unless you choose it. Accounts are optional. Read all about it in the <a href="${VERSION_7_POST_HREF}" class="link">Version 7 blog post</a>.`,
+                      title: 'Accounts (Beta)',
+                    },
+                    {
+                      IconComponent: GlobeIcon,
+                      text: `Publish a project or yarn palette to the gallery from its Share button. Each one has a single gallery page that updates when you change it, shows your display name or stays anonymous, and follows it into the Trash and back. Pages that show your name are collected on Your Gallery. You can also link your Ravelry account and post a project to Ravelry, photos and yarns included.`,
+                      title: 'Gallery Pages & Ravelry',
+                    },
+                  ]
+                : []),
               {
                 IconComponent: FolderHeartIcon,
                 instructions: 'Find it at the top of the site menu',
-                text: `The new <a href="/my-projects" class="link">My Projects</a> page lists your saved projects and yarn palettes. You can name your projects, and deleted projects and palettes go to a Trash for 30 days, so they can be put back. Once a project is saved, your changes save by themselves; <span class="italic">Save</span> is now in the top bar, and the Project menu has everything else.`,
-                title: 'My Projects, Saved Palettes & Auto-Save',
+                text: `The new <a href="/my-projects" class="link">My Library</a> lists your saved projects and yarn palettes, as cards or a list, with filters. You can name your projects, and deleted projects and palettes go to a Trash for 30 days, so they can be put back. Once a project is saved, your changes save by themselves; <span class="italic">Save</span> is now in the top bar, and the Project menu has everything else.`,
+                title: 'My Library, Saved Palettes & Auto-Save',
               },
               {
                 IconComponent: PaletteIcon,
@@ -75,7 +75,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: CogIcon,
-                text: `Preferences have been redesigned with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn off motion touches with Reduce Motion.`,
+                text: `Preferences have their own page, opened from the person icon in the top bar, with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn off motion touches with Reduce Motion.`,
                 title: 'Preferences',
               },
               {
@@ -95,7 +95,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: ImageIcon,
-                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. The gallery now opens sorted by Popular, the most viewed in the past month (or day, week or year), and Popular works together with search and the yarn and pattern filters. Visits to project pages now count toward Popular.`,
+                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. The gallery now opens sorted by Popular, the most viewed in the past month (or day, week or year), and Popular works together with search and the yarn and pattern filters. Visits to project pages now count toward Popular, and each card shows how many times it's been viewed.`,
                 title: 'Project Gallery',
               },
               {
@@ -104,7 +104,7 @@ export const entries: ChangelogItemGroup[] = [
                 title: 'Privacy',
               },
             ],
-            version: '6.4.0',
+            version: '7.0.0',
           },
         ],
       },

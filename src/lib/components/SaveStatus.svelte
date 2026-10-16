@@ -18,7 +18,8 @@ this browser (a screen), with a way to sync that one. At the top of the
 Project menu. -->
 
 <script lang="ts">
-  import { resolve } from '$app/paths';
+  import { page } from '$app/state';
+  import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import {
@@ -99,8 +100,10 @@ Project menu. -->
         Add to Account
       </button>
     {:else}
-      <a href={resolve('account')} class="btn preset-tonal-primary self-start"
-        ><LogInIcon />Sign In</a
+      <a
+        href={signInHref(page.url)}
+        onclick={backHereOnClick}
+        class="btn preset-tonal-primary self-start"><LogInIcon />Sign In</a
       >
     {/if}
   {/if}

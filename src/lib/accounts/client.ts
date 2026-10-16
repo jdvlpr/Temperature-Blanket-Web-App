@@ -124,7 +124,9 @@ export const signInWithCode = (email: string, otp: string) =>
   call<{ user: AccountUser }>('/sign-in/email-otp', { email, otp });
 
 export const getSession = () =>
-  call<{ user: AccountUser } | null>('/get-session');
+  call<{ user: AccountUser; session: { createdAt: string } } | null>(
+    '/get-session',
+  );
 
 export const signOut = () => call<{ success: boolean }>('/sign-out', {});
 

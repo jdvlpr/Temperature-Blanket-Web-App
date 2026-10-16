@@ -192,7 +192,8 @@ test.describe('Gallery pages from accounts', () => {
         publicId: null,
       },
       publishing: false,
-      name: '',
+      // New accounts start with a made-up name
+      name: expect.stringMatching(/^[A-Z][a-z]+ [A-Z][a-z]+ [1-9]\d$/),
     });
 
     const published = await api.post('/api/account/gallery', {
@@ -247,6 +248,8 @@ test.describe('Gallery pages from accounts', () => {
     const email = uniqueEmail('gallery-list');
     await signIn(page, request, email);
     const userId = userIdFor(email);
+    // No display name yet (new accounts start with a made-up one)
+    localD1(`update "user" set "name" = '' where "id" = '${userId}'`);
     const postId = 900_000_000 + Math.floor(Math.random() * 1e8);
 
     // A saved project with a page
@@ -654,7 +657,7 @@ test.describe('Gallery pages from accounts', () => {
 
     await page.reload();
     // In the account: a project's page follows the account's copy into the Trash
-    await page.getByRole('button', { name: /^Add all/ }).click();
+    await page.getByRole('button', { name: /^Add 2 projects/ }).click();
     const card = (name: string) =>
       page.getByRole('button', { name: `Share ${name}` }).locator('..');
     const shareDialog = (name: string) =>

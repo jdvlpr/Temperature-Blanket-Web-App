@@ -86,12 +86,19 @@ export async function openEmailSignIn(page: Page) {
   await page.getByRole('button', { name: 'Use email instead' }).click();
 }
 
-/** Signs in through the sign-in page and waits for the account page. */
+/**
+ * Signs in through the sign-in page and waits for the account page. A new
+ * account is welcomed: its first step (the display name) is closed, and any
+ * second step (adding what's in the browser, see `addFromBrowser`) is left to
+ * the test.
+ */
 export async function signIn(
   page: Page,
   request: APIRequestContext,
   email: string,
 ) {
+  const isNew =
+    localD1(`select "id" from "user" where "email" = '${email}'`).length === 0;
   await page.goto('/auth/sign-in');
   await openEmailSignIn(page);
   await page.getByLabel('Email').fill(email);
@@ -100,7 +107,24 @@ export async function signIn(
   // The code field submits itself on the sixth digit
   await page.getByLabel('Code').fill(await latestCode(request, email));
   await expect(page.getByTestId('account-email')).toHaveText(email);
+  if (isNew) await finishWelcome(page);
 }
+
+/** The welcome's first step: keeps the made-up display name. */
+export async function finishWelcome(page: Page) {
+  const welcome = page.getByRole('dialog', { name: 'Welcome!' });
+  const name = welcome.getByLabel('Your display name');
+  await expect(name).toHaveValue(/^[A-Z][a-z]+ [A-Z][a-z]+ [1-9]\d$/);
+  // Enter submits it (Done or Continue), whatever toasts cover its buttons
+  await name.press('Enter');
+  await expect(welcome).toHaveCount(0);
+}
+
+/** The offer to add this browser's projects and palettes to the account */
+export const addFromBrowser = (page: Page) =>
+  page.getByRole('heading', {
+    name: 'Add what’s in this browser to your account?',
+  });
 
 /**
  * Runs SQL against the local D1 database that wrangler pages dev uses. Retried:

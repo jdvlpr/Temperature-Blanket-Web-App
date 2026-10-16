@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-// The beta post exists only in builds with accounts (PUBLIC_ACCOUNTS_ENABLED)
+// The version 7 post is about accounts: only in builds with them (PUBLIC_ACCOUNTS_ENABLED)
 export const prerender = __ACCOUNTS_ENABLED__;
 
 export function load() {

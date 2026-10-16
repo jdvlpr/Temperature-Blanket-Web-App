@@ -32,6 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
+  import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
@@ -165,8 +167,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Sign in to keep your projects and yarn palettes on all your devices.
       </p>
 
-      <a href={resolve('account')} class="btn preset-filled-primary-500"
-        ><LogInIcon />Sign In</a
+      <a
+        href={signInHref(page.url)}
+        onclick={backHereOnClick}
+        class="btn preset-filled-primary-500"><LogInIcon />Sign In</a
       >
     </div>
   {/if}

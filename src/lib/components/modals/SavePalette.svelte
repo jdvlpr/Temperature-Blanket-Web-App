@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
-  import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
   import {
     MAX_SAVED_PALETTE_NAME_LENGTH,
     PaletteStorage,
@@ -58,7 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category: added ? 'success' : 'info',
       });
       dialog.close();
-      if (added) accountsIntro.offerAfterSave();
     } catch {
       toast.trigger({
         message: 'Unable to save the palette in this browser',

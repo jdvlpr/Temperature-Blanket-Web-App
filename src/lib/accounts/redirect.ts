@@ -32,3 +32,27 @@ export function safeRedirect(value: string | null | undefined): string {
     return fallback;
   }
 }
+
+/**
+ * The sign-in page, coming back to `here` afterwards: its path, query and hash
+ * (where the Project Planner keeps a project's settings). From the account or
+ * sign-in pages, just the sign-in page, which returns to the account page.
+ */
+export function signInHref(here: {
+  pathname: string;
+  search: string;
+  hash: string;
+}): string {
+  const { pathname, search, hash } = here;
+  if (pathname === '/account' || pathname.startsWith('/auth/'))
+    return '/auth/sign-in';
+  return `/auth/sign-in?redirect=${encodeURIComponent(pathname + search + hash)}`;
+}
+
+/**
+ * A Sign In link's onclick: points it back at this page as it is now, since
+ * the Project Planner's hash changes as a project is edited.
+ */
+export function backHereOnClick(event: MouseEvent) {
+  (event.currentTarget as HTMLAnchorElement).href = signInHref(window.location);
+}

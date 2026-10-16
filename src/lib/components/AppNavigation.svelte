@@ -35,6 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
+  import { whatsNew } from '#lib/storage/whats-new.svelte.js';
+  import { onMount } from 'svelte';
 
   const pathname = $derived(page.url.pathname);
   const library = $derived(['/my-projects', '/my-palettes'].includes(pathname));
@@ -48,6 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const HEADING =
     'text-surface-700-300 mt-4 px-3 text-xs font-semibold tracking-wide uppercase';
   const SMALL_CURRENT = 'text-secondary-700-300 opacity-100!';
+
+  // After loading, so the server's page (which can't know) doesn't differ
+  let mounted = $state(false);
+  onMount(() => (mounted = true));
 </script>
 
 <!-- Icons line up by what's drawn, with the site logo's edge -->
@@ -174,7 +180,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={['py-1', SMALL_LINK, pathname === '/changelog' && SMALL_CURRENT]}
       aria-current={pathname === '/changelog' ? 'page' : undefined}
     >
-      What's New <span class="text-xs">v{version}</span>
+      What's New
+      <!-- Filled while there's news to see -->
+      <span
+        class={[
+          'badge px-2 py-0.5 text-xs',
+          mounted && whatsNew.show
+            ? 'preset-filled-primary-500'
+            : 'bg-surface-200-800',
+        ]}
+        >v{version}{#if mounted && whatsNew.show}<span class="sr-only"
+            >, new</span
+          >{/if}</span
+      >
     </a>
     <a
       href="/contact"

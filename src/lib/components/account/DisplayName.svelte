@@ -33,6 +33,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let changed = $derived(name.trim() !== lastSaved);
 
+  // Changed elsewhere (in the welcome): follow it, unless it's being edited
+  $effect(() => {
+    const next = savedName;
+    untrack(() => {
+      if (next !== lastSaved && name.trim() === lastSaved)
+        name = lastSaved = next;
+    });
+  });
+
   async function save(event: Event) {
     event.preventDefault();
     busy = true;

@@ -25,7 +25,14 @@ import {
   type BrowserContext,
   type Page,
 } from '@playwright/test';
-import { idbSet, localD1, signIn, uniqueEmail, useTestIp } from './helpers';
+import {
+  addFromBrowser,
+  idbSet,
+  localD1,
+  signIn,
+  uniqueEmail,
+  useTestIp,
+} from './helpers';
 
 // A sync pass is several requests, slower while the other specs run alongside
 const expect = baseExpect.configure({ timeout: 15_000 });
@@ -189,21 +196,13 @@ test.describe('Sync in the browser', () => {
     const id = await saveProject(phone, 'Reykjavík 2026');
 
     await signIn(phone, phone.request, email);
-    await expect(
-      phone.getByRole('heading', {
-        name: 'Add your projects to your account?',
-      }),
-    ).toBeVisible();
-    await phone.getByRole('button', { name: 'Add it' }).click();
+    await expect(addFromBrowser(phone)).toBeVisible();
+    await phone.getByRole('button', { name: /^Add 1 project/ }).click();
     await expect.poll(() => serverProjectIds(phone)).toEqual([id]);
 
     await signIn(laptop, laptop.request, email);
     // Nothing to add from a new browser
-    await expect(
-      laptop.getByRole('heading', {
-        name: 'Add your projects to your account?',
-      }),
-    ).toHaveCount(0);
+    await expect(addFromBrowser(laptop)).toHaveCount(0);
     await openSavedProjects(laptop);
     const link = laptop.getByRole('link', { name: 'Reykjavík 2026' });
     await expect(link).toBeVisible();
@@ -214,6 +213,33 @@ test.describe('Sync in the browser', () => {
     await expect(laptop.getByTestId('sync-label')).toHaveText('Synced');
     // Working sync shows no notice
     await expect(laptop.getByTestId('sync-status')).toHaveCount(0);
+  });
+
+  test('a new account is welcomed, then adds only the projects left checked', async ({
+    browser,
+    baseURL,
+  }) => {
+    const { phone } = await twoDevices(browser, baseURL!);
+    await phone.goto('/privacy');
+    const kept = await saveProject(phone, 'Oslo 2026');
+    await saveProject(phone, 'Lima 2026');
+
+    // signIn keeps the welcome's made-up name and continues
+    await signIn(phone, phone.request, uniqueEmail('sync-choose'));
+    await expect(addFromBrowser(phone)).toBeVisible();
+    await expect(phone.getByText('Step 2 of 2')).toBeVisible();
+    const lima = phone.getByRole('checkbox', { name: 'Add Lima 2026' });
+    await expect(lima).toBeChecked();
+    await lima.uncheck();
+    await phone.getByRole('button', { name: /^Add 1 project/ }).click();
+    await expect.poll(() => serverProjectIds(phone)).toEqual([kept]);
+
+    // Asked once
+    await phone.reload();
+    await expect(phone.getByRole('dialog', { name: 'Welcome!' })).toHaveCount(
+      0,
+    );
+    await expect(addFromBrowser(phone)).toHaveCount(0);
   });
 
   test('a project removed on one device is removed on the other', async ({

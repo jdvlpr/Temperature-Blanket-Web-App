@@ -13,58 +13,94 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- "Add the projects on this device to your account?" Shown once per account
-and device, after signing in, and again whenever someone asks to add projects
-(`later`). Saved palettes go along unless someone chooses otherwise. -->
+<!-- "Add what's in this browser to your account?" Each project and palette has
+its own checkbox, all checked to start. Shown once per account and device after
+signing in (as the welcome's second step for a new account), and whenever
+someone asks to add them from My Library (`later`). -->
 
 <script lang="ts">
   import { ROW_FOCUS } from '#lib/constants/class-constants.js';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import ProjectDetails from '#lib/components/ProjectDetails.svelte';
+  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import { PaletteStorage } from '#lib/storage/palettes.svelte.js';
   import {
     ProjectStorage,
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import { addToAccount, markImportAsked } from '#lib/sync/sync.svelte.js';
+  import type { Color } from '#lib/types/yarn-types.js';
   import {
-    ChevronRightIcon,
-    ClockIcon,
-    CloudUploadIcon,
-    ListChecksIcon,
-    XIcon,
-  } from '@lucide/svelte';
-  import { onMount, untrack } from 'svelte';
+    getColorsFromInput,
+    getPaletteFallbackName,
+  } from '#lib/utils/color-utils.js';
+  import { ClockIcon, CloudUploadIcon, XIcon } from '@lucide/svelte';
+  import { onMount, tick, untrack } from 'svelte';
 
   let {
     userId,
     ids,
     paletteIds = [],
     later = false,
+    step,
   }: {
     userId: string;
     ids: string[];
     paletteIds?: string[];
     later?: boolean;
+    /** "Step 2 of 2", when it follows the welcome; the title takes focus */
+    step?: string;
   } = $props();
 
+  type PaletteRow = { id: string; label: string; colors: Color[] };
+
   let projects = $state<StoredProjectIndexItem[]>([]);
+  let palettes = $state<PaletteRow[]>([]);
   // Everything is chosen to start with
-  let chosen = $state<string[]>(untrack(() => [...ids]));
-  let addPalettes = $state(true);
-  let choosing = $state(false);
+  let chosenProjects = $state<string[]>(untrack(() => [...ids]));
+  let chosenPalettes = $state<string[]>(untrack(() => [...paletteIds]));
   let busy = $state(false);
+  let title = $state<HTMLElement>();
+
+  let total = $derived(ids.length + paletteIds.length);
+  let chosenCount = $derived(chosenProjects.length + chosenPalettes.length);
 
   onMount(async () => {
+    if (step) {
+      await tick();
+      title?.focus();
+    }
     const index = await ProjectStorage.getIndex();
     projects = index.filter((item) => ids.includes(item.id)).reverse();
+    if (!paletteIds.length) return;
+    // Yarn names in a palette's code need the yarn data
+    await ensureYarnData();
+    const saved = await PaletteStorage.getAll();
+    palettes = saved
+      .filter((palette) => paletteIds.includes(palette.id))
+      .map((palette) => {
+        const colors = getColorsFromInput({ string: palette.code }) || [];
+        return {
+          id: palette.id,
+          colors,
+          label: palette.name || getPaletteFallbackName(colors),
+        };
+      });
   });
+
+  function chooseAll(all: boolean) {
+    chosenProjects = all ? [...ids] : [];
+    chosenPalettes = all ? [...paletteIds] : [];
+  }
 
   // The first and last rows round their own outer corners, so the first row's
   // fill fits inside the list's border
   const ROW = `flex w-full items-start gap-3 px-4 py-3 text-left transition-colors first:rounded-t-container last:rounded-b-container disabled:opacity-50 ${ROW_FOCUS}`;
   const ICON = 'mt-0.5 shrink-0';
   const DETAIL = 'block text-sm opacity-75';
+  const CHOICE = 'flex cursor-pointer items-center gap-3';
 
   const plural = (n: number) => (n === 1 ? 'project' : 'projects');
   const palettesLabel = (n: number) =>
@@ -108,52 +144,70 @@ and device, after signing in, and again whenever someone asks to add projects
   <div class="flex items-start gap-3">
     <CloudUploadIcon class="text-primary-500 mt-1 shrink-0" />
     <div class="flex flex-col gap-1">
-      <h2 id="sync-import-title" class="h4">
+      {#if step}<p class="text-sm opacity-70">{step}</p>{/if}
+      <h2
+        id="sync-import-title"
+        class="h4 focus:outline-none"
+        tabindex="-1"
+        bind:this={title}
+      >
         {later
-          ? `Add ${ids.length ? 'projects' : 'palettes'} to your account`
-          : `Add your ${ids.length ? 'projects' : 'palettes'} to your account?`}
+          ? 'Add to your account'
+          : `Add what’s in this browser to your account?`}
       </h2>
       <p class="text-sm opacity-80">
         This browser has {describe(ids.length, paletteIds.length)} that
-        {ids.length + paletteIds.length === 1 ? 'isn’t' : 'aren’t'} in your account
-        yet.
+        {total === 1 ? 'isn’t' : 'aren’t'} in your account yet. Choose which to add.
       </p>
     </div>
   </div>
 
-  {#if choosing}
-    <!-- The same cards as in Saved Projects, so projects are easy to tell apart -->
-    <fieldset>
-      <legend class="sr-only">Projects to add</legend>
-      <!-- A fieldset can't reliably be a flex box, so the list is a div -->
-      <div class="flex flex-col gap-3">
-        {#each projects as project (project.id)}
-          <label class="flex cursor-pointer items-center gap-3">
-            <input
-              type="checkbox"
-              class="checkbox shrink-0"
-              value={project.id}
-              aria-label="Add {project.meta.title || 'Untitled project'}"
-              bind:group={chosen}
-            />
-            <span class="block min-w-0 flex-1">
-              <ProjectDetails project={project.meta} canRemove={false} />
-            </span>
-          </label>
-        {/each}
-        {#if paletteIds.length}
-          <label class="flex cursor-pointer items-center gap-3">
-            <input
-              type="checkbox"
-              class="checkbox shrink-0"
-              bind:checked={addPalettes}
-            />
-            <span>Also add {palettesLabel(paletteIds.length)}</span>
-          </label>
-        {/if}
-      </div>
-    </fieldset>
-  {/if}
+  <fieldset class="flex flex-col gap-3">
+    <legend class="sr-only">Projects and palettes to add</legend>
+    {#if total > 1}
+      <label class="{CHOICE} border-surface-200-800 border-b pb-3">
+        <input
+          type="checkbox"
+          class="checkbox shrink-0"
+          checked={chosenCount === total}
+          indeterminate={chosenCount > 0 && chosenCount < total}
+          onchange={(e) => chooseAll(e.currentTarget.checked)}
+        />
+        <span class="font-bold">Select all</span>
+      </label>
+    {/if}
+    <!-- The same cards as in My Library, so projects are easy to tell apart -->
+    {#each projects as project (project.id)}
+      <label class={CHOICE}>
+        <input
+          type="checkbox"
+          class="checkbox shrink-0"
+          value={project.id}
+          aria-label="Add {project.meta.name ||
+            project.meta.title ||
+            'Untitled project'}"
+          bind:group={chosenProjects}
+        />
+        <span class="block min-w-0 flex-1">
+          <ProjectDetails project={project.meta} canRemove={false} />
+        </span>
+      </label>
+    {/each}
+    {#each palettes as palette (palette.id)}
+      <label class={CHOICE}>
+        <input
+          type="checkbox"
+          class="checkbox shrink-0"
+          value={palette.id}
+          bind:group={chosenPalettes}
+        />
+        <span class="flex min-w-0 flex-1 flex-col gap-1">
+          <span class="truncate font-semibold">{palette.label}</span>
+          <PaletteStrip colors={palette.colors} height="24px" insideControl />
+        </span>
+      </label>
+    {/each}
+  </fieldset>
 
   <!-- Each choice is one row: what it does, and what that means. Pinned to the
   bottom of the dialog, so they stay in reach while scrolling a long list. -->
@@ -166,46 +220,19 @@ and device, after signing in, and again whenever someone asks to add projects
       <button
         type="button"
         class="bg-primary-50-950 hover:bg-primary-100-900 {ROW}"
-        disabled={busy ||
-          (choosing && !chosen.length && !(addPalettes && paletteIds.length))}
-        onclick={() =>
-          choosing
-            ? answer(chosen, addPalettes ? paletteIds : [])
-            : answer(ids, paletteIds)}
+        disabled={busy || !chosenCount}
+        onclick={() => answer(chosenProjects, chosenPalettes)}
       >
         <CloudUploadIcon class="text-primary-600-400 {ICON}" />
         <span class="flex-1">
           <span class="block font-bold">
-            {#if choosing}
-              Add {describe(
-                chosen.length,
-                addPalettes ? paletteIds.length : 0,
-              ) || 'nothing'}
-            {:else if ids.length + paletteIds.length === 1}
-              Add it
-            {:else}
-              Add all {ids.length + paletteIds.length}
-            {/if}
+            {chosenCount
+              ? `Add ${describe(chosenProjects.length, chosenPalettes.length)}`
+              : 'Choose something to add'}
           </span>
           <span class={DETAIL}> Synced to every device you sign in on. </span>
         </span>
       </button>
-
-      {#if !choosing}
-        <button
-          type="button"
-          class="hover:bg-surface-100-900 {ROW}"
-          disabled={busy}
-          onclick={() => (choosing = true)}
-        >
-          <ListChecksIcon class={ICON} />
-          <span class="flex-1">
-            <span class="block font-bold">Choose…</span>
-            <span class={DETAIL}>Pick what to add.</span>
-          </span>
-          <ChevronRightIcon class="icon-sm mt-0.5 shrink-0 opacity-50" />
-        </button>
-      {/if}
 
       <button
         type="button"

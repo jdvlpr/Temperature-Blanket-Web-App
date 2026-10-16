@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { describe, expect, it } from 'vitest';
-import { safeRedirect } from './redirect';
+import { safeRedirect, signInHref } from './redirect';
 
 describe('safeRedirect', () => {
   it('keeps paths on this site', () => {
@@ -37,5 +37,30 @@ describe('safeRedirect', () => {
       'evil.example',
     ])
       expect(safeRedirect(value)).toBe('/account');
+  });
+});
+
+describe('signInHref', () => {
+  const here = (pathname: string, search = '', hash = '') => ({
+    pathname,
+    search,
+    hash,
+  });
+
+  it('comes back to the same page, hash and all', () => {
+    const href = signInHref(here('/', '?project=1', '#l=abc&d=1'));
+    const redirect = new URL(
+      href,
+      'https://temperature-blanket.com',
+    ).searchParams.get('redirect');
+    expect(redirect).toBe('/?project=1#l=abc&d=1');
+    expect(safeRedirect(redirect)).toBe('/?project=1#l=abc&d=1');
+  });
+
+  it('goes to the account page from the account and sign-in pages', () => {
+    expect(signInHref(here('/account'))).toBe('/auth/sign-in');
+    expect(signInHref(here('/auth/sign-in', '?redirect=%2F'))).toBe(
+      '/auth/sign-in',
+    );
   });
 });

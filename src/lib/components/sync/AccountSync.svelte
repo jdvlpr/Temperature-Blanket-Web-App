@@ -17,7 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 layout, when accounts are on. The sync code loads only after someone signs in. -->
 
 <script lang="ts">
+  import { page } from '$app/state';
   import { getSession } from '#lib/accounts/client.js';
+  import { isNewAccount } from '#lib/accounts/welcome.js';
   import {
     account,
     forgetAccountSummary,
@@ -59,24 +61,63 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
     void (async () => {
       syncModule ??= await import('#lib/sync/sync.svelte.js');
       syncModule.startSync();
+    })();
+  });
 
-      // First sign-in on this device: offer to add its projects to the account
-      const state = await ProjectStorage.accountSyncState(userId);
-      if (state.importAsked) return;
-      const ids = await syncModule.guestProjectIds();
-      const paletteIds = await syncModule.guestPaletteIds();
-      if (!ids.length && !paletteIds.length) return;
-      if (dialog.opened) return;
-      const { default: SyncImportDialog } =
-        await import('./SyncImportDialog.svelte');
+  // Once per account and page load, and not on the sign-in page, which is
+  // about to move on (and close any dialog as it does)
+  let offeredTo: string | undefined;
+  $effect(() => {
+    if (frame) return;
+    const userId = account.summary?.id;
+    if (!userId) return void (offeredTo = undefined);
+    if (offeredTo === userId) return;
+    if (page.url.pathname.startsWith('/auth/')) return;
+    offeredTo = userId;
+    void offer(userId);
+  });
+
+  async function offer(userId: string) {
+    syncModule ??= await import('#lib/sync/sync.svelte.js');
+    // First sign-in on this device: offer to add its projects to the
+    // account. A brand-new account is welcomed first, in the same dialog.
+    const state = await ProjectStorage.accountSyncState(userId);
+    const [ids, paletteIds] = state.importAsked
+      ? [[], []]
+      : [
+          await syncModule.guestProjectIds(),
+          await syncModule.guestPaletteIds(),
+        ];
+    const welcome = await isNewAccount(userId);
+    if (!welcome && !ids.length && !paletteIds.length) return;
+    if (dialog.opened || account.summary?.id !== userId) return;
+    if (welcome) {
+      const { default: WelcomeDialog } =
+        await import('#lib/components/account/WelcomeDialog.svelte');
       dialog.trigger({
         type: 'component',
         component: {
-          ref: SyncImportDialog,
-          props: { userId, ids, paletteIds },
+          ref: WelcomeDialog,
+          props: {
+            userId,
+            name: account.summary?.name ?? '',
+            ids,
+            paletteIds,
+          },
         },
         options: { showCloseButton: false },
       });
-    })();
-  });
+      return;
+    }
+    const { default: SyncImportDialog } =
+      await import('./SyncImportDialog.svelte');
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: SyncImportDialog,
+        props: { userId, ids, paletteIds },
+      },
+      options: { showCloseButton: false },
+    });
+  }
 </script>

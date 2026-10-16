@@ -18,6 +18,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import {
+    VERSION_7_POST,
+    VERSION_7_POST_HREF,
+  } from '#lib/constants/version-7-post.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
   import { stringToDate } from '#lib/utils/date-utils.js';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
@@ -36,12 +40,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ...(__ACCOUNTS_ENABLED__
       ? [
           {
-            date: '2026-09-28',
-            href: '/blog/2026-09-28-accounts-beta',
-            imgSrc:
-              '/images/blog-images/2026-09-28-accounts-beta/featured-image.svg',
-            imgAlt: 'Accounts (Beta): Your Projects on Every Device',
-            title: 'Accounts (Beta): Your Projects on Every Device',
+            date: VERSION_7_POST.date,
+            href: VERSION_7_POST_HREF,
+            imgSrc: `/images/blog-images/${VERSION_7_POST.slug}/featured-image.svg`,
+            imgAlt: VERSION_7_POST.title,
+            title: VERSION_7_POST.title,
             tags: ['News'],
           } satisfies BlogPostType,
         ]
