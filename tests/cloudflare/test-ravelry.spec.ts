@@ -481,7 +481,8 @@ test.describe('Ravelry', () => {
     await expect(post).toHaveCount(0);
     await expect(share.locator('..')).toContainText('On Ravelry · 2 photos');
 
-    // Update: opens with what's on Ravelry; nothing changed, so nothing to save
+    // Update: opens with what's on Ravelry. The only change offered is a yarn
+    // this app added that the project no longer uses
     ravelry.addOldPacks();
     await share.click();
     await dialog.getByRole('button', { name: /^Update on Ravelry…/ }).click();
@@ -493,13 +494,18 @@ test.describe('Ravelry', () => {
     await expect(update.getByText('Its picture is up to date')).toBeVisible();
     await expect(update.locator('svg#preview-svg-image')).toHaveCount(0);
     const save = update.getByRole('button', { name: 'Save on Ravelry' });
-    await expect(save).toBeDisabled();
 
     // Yarns: one this app added and no longer uses is offered for removal;
     // one added on Ravelry never is
-    await expect(update.getByLabel('Remove Old Yarn – Gone')).toBeChecked();
+    const removeOld = update.getByLabel('Remove Old Yarn – Gone');
+    await expect(removeOld).toBeChecked();
     await expect(update.getByLabel(/Mine/)).toHaveCount(0);
     await expect(update.getByLabel(/^Add .* – /)).toHaveCount(0);
+    await expect(save).toBeEnabled();
+    // Without it, nothing changed, so nothing to save
+    await removeOld.uncheck();
+    await expect(save).toBeDisabled();
+    await removeOld.check();
 
     // Edit the name, move the photo earlier, add another
     await update
@@ -590,7 +596,8 @@ test.describe('Ravelry', () => {
     await dialog.getByRole('button', { name: /^Update on Ravelry…/ }).click();
     const gone = page.getByRole('dialog', { name: 'Update on Ravelry' });
     await expect(gone.getByRole('alert')).toContainText('deleted on Ravelry');
-    await gone.getByRole('button', { name: 'Close' }).click();
+    // The message's own Close, not the dialog's ✕
+    await gone.getByText('Close', { exact: true }).click();
     await expect(gone).toHaveCount(0);
     await expect(share.locator('..')).not.toContainText('On Ravelry');
   });
