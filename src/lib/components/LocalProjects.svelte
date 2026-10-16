@@ -222,7 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         (!patternId || patternIdOf(link, previewIds) === patternId) &&
         matchesStatus(filters.status, {
           published: galleryPages.grouped.byProject.has(project.id),
-          galleryOnly: false,
+          ravelry: ravelryLinks.links.has(project.id),
         })
       );
     });

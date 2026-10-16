@@ -18,26 +18,25 @@
 
 import type { Color } from '#lib/types/yarn-types.js';
 
-/** Who can see it: on the gallery, not, or only there (not saved here) */
-export type LibraryStatus =
-  'all' | 'published' | 'unpublished' | 'gallery-only';
+/** Where it is: on the gallery, not, or posted to Ravelry (projects only) */
+export type LibraryStatus = 'all' | 'published' | 'unpublished' | 'ravelry';
 
 export const LIBRARY_STATUSES = [
   { value: 'all', label: 'All' },
   {
     value: 'published',
     label: 'Published',
-    details: 'Saved here and on the gallery',
+    details: 'On the gallery',
   },
   {
     value: 'unpublished',
     label: 'Unpublished',
-    details: 'Only saved here',
+    details: 'Not on the gallery',
   },
   {
-    value: 'gallery-only',
-    label: 'Gallery Only',
-    details: 'On the gallery, not saved here',
+    value: 'ravelry',
+    label: 'On Ravelry',
+    details: 'Posted to Ravelry',
   },
 ] as const satisfies readonly {
   value: LibraryStatus;
@@ -108,20 +107,20 @@ export function matchesYarn(
   return only ? colors.length > 0 && colors.every(isThis) : colors.some(isThis);
 }
 
-/** Whether something with this gallery state shows for the status chosen */
+/** Whether something with this gallery and Ravelry state shows for the status chosen */
 export function matchesStatus(
   status: LibraryStatus,
-  { published, galleryOnly }: { published: boolean; galleryOnly: boolean },
+  { published, ravelry }: { published: boolean; ravelry: boolean },
 ): boolean {
   switch (status) {
     case 'all':
       return true;
-    case 'gallery-only':
-      return galleryOnly;
     case 'published':
-      return published && !galleryOnly;
+      return published;
     case 'unpublished':
-      return !published && !galleryOnly;
+      return !published;
+    case 'ravelry':
+      return ravelry;
   }
 }
 

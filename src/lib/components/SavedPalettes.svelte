@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         matchesYarn(card.colors, yarn) &&
         matchesStatus(filters.status, {
           published: galleryPages.grouped.byPalette.has(card.palette.id),
-          galleryOnly: false,
+          ravelry: false,
         }),
     );
     return sortLibrary(kept, filters.sort, filters.reversed, {

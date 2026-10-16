@@ -23,6 +23,7 @@ in the gallery), with search, filters and sort once there are a few. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
@@ -107,7 +108,12 @@ in the gallery), with search, filters and sort once there are a few. -->
           {showFilters}
         >
           {#snippet menus()}
-            {#if signedIn && galleryPages.shown}<LibraryStatusMenu />{/if}
+            {#if signedIn && (galleryPages.shown || ravelryLinks.connected)}
+              <LibraryStatusMenu
+                gallery={galleryPages.shown}
+                ravelry={ravelryLinks.connected}
+              />
+            {/if}
           {/snippet}
           {#snippet actions()}
             <!-- A full load: the project open before stays loaded otherwise -->

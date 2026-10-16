@@ -136,7 +136,7 @@ only in the gallery), with search, filters and sort once there are a few. -->
           {showFilters}
         >
           {#snippet menus()}
-            {#if showGallery}<LibraryStatusMenu />{/if}
+            {#if showGallery}<LibraryStatusMenu gallery />{/if}
           {/snippet}
           {#snippet actions()}
             <a href={resolve('yarn')} class="btn hover:preset-tonal-surface"

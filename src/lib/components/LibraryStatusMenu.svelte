@@ -15,19 +15,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   My Library's Show menu: everything, or only what's published, not published,
-  or only in the gallery. For signed-in accounts with gallery pages.
+  or (projects) posted to Ravelry. For signed-in accounts with gallery pages
+  (`gallery`) or Ravelry connected (`ravelry`).
 -->
 <script lang="ts">
   import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
   import { LIBRARY_STATUSES } from '#lib/utils/collection-filter.js';
   import { EyeIcon } from '@lucide/svelte';
+
+  let {
+    gallery = false,
+    ravelry = false,
+  }: {
+    /** Offers Published and Unpublished */
+    gallery?: boolean;
+    /** Offers On Ravelry (not for palettes, which can't be posted there) */
+    ravelry?: boolean;
+  } = $props();
+
+  const options = $derived(
+    LIBRARY_STATUSES.filter(
+      ({ value }) =>
+        value === 'all' || (value === 'ravelry' ? ravelry : gallery),
+    ),
+  );
+
+  // The filters are shared by the Projects and Palettes pages: a choice this
+  // menu doesn't have (On Ravelry on Palettes) starts over
+  $effect(() => {
+    if (!options.some(({ value }) => value === libraryFilters.status))
+      libraryFilters.status = 'all';
+  });
 </script>
 
 <ChoiceMenu
   label="Show"
   icon={EyeIcon}
-  options={LIBRARY_STATUSES}
+  {options}
   value={libraryFilters.status}
   onchange={(status) => (libraryFilters.status = status)}
 />

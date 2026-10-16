@@ -71,15 +71,17 @@ describe('matchesYarn', () => {
 });
 
 describe('matchesStatus', () => {
-  it('sorts things into published, not published and gallery only', () => {
-    const published = { published: true, galleryOnly: false };
-    const unpublished = { published: false, galleryOnly: false };
-    const galleryOnly = { published: true, galleryOnly: true };
+  it('sorts things into published, not published and on Ravelry', () => {
+    const published = { published: true, ravelry: false };
+    const unpublished = { published: false, ravelry: false };
+    const onRavelry = { published: false, ravelry: true };
     expect(matchesStatus('published', published)).toBe(true);
-    expect(matchesStatus('published', galleryOnly)).toBe(false);
+    expect(matchesStatus('published', onRavelry)).toBe(false);
     expect(matchesStatus('unpublished', unpublished)).toBe(true);
     expect(matchesStatus('unpublished', published)).toBe(false);
-    expect(matchesStatus('gallery-only', galleryOnly)).toBe(true);
+    expect(matchesStatus('unpublished', onRavelry)).toBe(true);
+    expect(matchesStatus('ravelry', onRavelry)).toBe(true);
+    expect(matchesStatus('ravelry', published)).toBe(false);
     expect(matchesStatus('all', unpublished)).toBe(true);
   });
 });
