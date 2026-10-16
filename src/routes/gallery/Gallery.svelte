@@ -30,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { GlobeIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryOwners } from './gallery-owners.svelte';
-  import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, galleryState } from './state.svelte';
 
   let first = 40;
@@ -222,25 +221,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:yarnId={galleryState.filteredYarnId}
         bind:onlyThisYarn={galleryState.palettesContainOnlyFilteredYarn}
         bind:patternType={galleryState.filteredPatternType}
-        {...gallerySortMenu(galleryState.orderBy, (order) => {
-          galleryState.orderBy = order;
-          search();
-        })}
+        {...gallerySortMenu(
+          galleryState.orderBy,
+          (order) => {
+            galleryState.orderBy = order;
+            search();
+          },
+          {
+            days: galleryState.popularDays,
+            set: (days) => {
+              galleryState.popularDays = days;
+              if (galleryState.orderBy === 'POPULAR') search();
+            },
+          },
+        )}
         bind:layout={galleryState.layout}
         onchange={debouncedSearch}
-      >
-        {#snippet menus()}
-          {#if galleryState.orderBy === 'POPULAR'}
-            <PopularPeriodMenu
-              days={galleryState.popularDays}
-              onchange={(days) => {
-                galleryState.popularDays = days;
-                search();
-              }}
-            />
-          {/if}
-        {/snippet}
-      </CollectionToolbar>
+      ></CollectionToolbar>
     </div>
 
     <div

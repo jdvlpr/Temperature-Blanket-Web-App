@@ -247,6 +247,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </p>
   <div class="flex flex-wrap items-center gap-2">
+    <FiltersButton
+      bind:this={filtersButton}
+      bind:open={filtersOpen}
+      count={chips.length}
+      controls={filtersId}
+    />
     {#if results.length}
       <SortSelectMenu
         options={colorwaySortOptions(!!matchHex)}
@@ -255,17 +261,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {reversed}
         onsort={(chosen) => (chosenSort = chosen)}
         onreverse={(value) => (reversed = value)}
+        compact
       />
     {/if}
     {#if results.length}
-      <ViewMenu bind:value={layout} fillOption />
+      <ViewMenu bind:value={layout} fillOption compact />
     {/if}
-    <FiltersButton
-      bind:this={filtersButton}
-      bind:open={filtersOpen}
-      count={chips.length}
-      controls={filtersId}
-    />
   </div>
 </div>
 

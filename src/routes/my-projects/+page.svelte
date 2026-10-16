@@ -29,10 +29,13 @@ in the gallery), with search, filters and sort once there are a few. -->
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import LocalProjects from '#lib/components/LocalProjects.svelte';
   import MyLibrary from '#lib/components/MyLibrary.svelte';
-  import LibraryStatusMenu from '#lib/components/LibraryStatusMenu.svelte';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
-  import { FILTERS_FROM, LIBRARY_SORTS } from '#lib/utils/collection-filter.js';
+  import {
+    FILTERS_FROM,
+    LIBRARY_SORTS,
+    libraryStatuses,
+  } from '#lib/utils/collection-filter.js';
   import { loadedInPlace } from '#lib/utils/open-saved-project.js';
   import { PlusIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
@@ -96,6 +99,13 @@ in the gallery), with search, filters and sort once there are a few. -->
           bind:yarnId={libraryFilters.yarnId}
           bind:onlyThisYarn={libraryFilters.onlyThisYarn}
           bind:patternType={libraryFilters.patternType}
+          bind:status={libraryFilters.status}
+          statuses={signedIn
+            ? libraryStatuses({
+                gallery: galleryPages.shown,
+                ravelry: ravelryLinks.connected,
+              })
+            : undefined}
           sortOptions={LIBRARY_SORTS}
           sort={libraryFilters.sort}
           onsort={(sort) => (libraryFilters.sort = sort)}
@@ -107,14 +117,6 @@ in the gallery), with search, filters and sort once there are a few. -->
           }
           {showFilters}
         >
-          {#snippet menus()}
-            {#if signedIn && (galleryPages.shown || ravelryLinks.connected)}
-              <LibraryStatusMenu
-                gallery={galleryPages.shown}
-                ravelry={ravelryLinks.connected}
-              />
-            {/if}
-          {/snippet}
           {#snippet actions()}
             <!-- A full load: the project open before stays loaded otherwise -->
             <a

@@ -597,15 +597,33 @@ export const GALLERY_SORTS = [
   { value: 'DESC', label: 'Newest' },
 ] as const;
 
+/** Popular's periods, in days, as the gallery's popular route takes them */
+export const POPULAR_PERIODS = [
+  { value: '1', label: 'Past Day' },
+  { value: '7', label: 'Past Week' },
+  { value: '30', label: 'Past Month' },
+  { value: '365', label: 'Past Year' },
+] as const;
+
 /**
  * A sort menu's props for a gallery sort: Oldest shows as Newest reversed.
  * Popular can't be reversed (least viewed first isn't worth browsing).
+ * Popular's period is a submenu on its row; `period.set` runs before the
+ * sort changes to Popular, so a page searching on both should search on the
+ * period only while Popular is the sort.
  */
 export function gallerySortMenu(
   sort: GallerySort,
   set: (sort: GallerySort) => void,
+  period?: { days: number; set: (days: number) => void },
 ) {
   return {
+    submenu: period && {
+      option: 'POPULAR' as const,
+      current: String(period.days),
+      choices: POPULAR_PERIODS,
+      onchoose: (days: string) => period.set(Number(days)),
+    },
     sortOptions: GALLERY_SORTS,
     sort: sort === 'ASC' ? ('DESC' as const) : sort,
     reversed: sort === 'ASC',

@@ -195,6 +195,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div class="my-2 flex flex-wrap items-center justify-center gap-2">
+    <FiltersButton
+      bind:this={filtersButton}
+      bind:open={filtersOpen}
+      count={yarnChip ? 1 : 0}
+      controls={panelId}
+    />
     <SortSelectMenu
       options={[{ value: 'DESC', label: 'Newest' }]}
       current="DESC"
@@ -205,12 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         galleryPalettesState.orderBy = reversed ? 'ASC' : 'DESC';
         debouncedSearch();
       }}
-    />
-    <FiltersButton
-      bind:this={filtersButton}
-      bind:open={filtersOpen}
-      count={yarnChip ? 1 : 0}
-      controls={panelId}
+      compact
     />
   </div>
 

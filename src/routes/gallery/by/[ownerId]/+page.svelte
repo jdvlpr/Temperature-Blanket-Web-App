@@ -37,7 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { streamed } from '#lib/utils/streamed.svelte.js';
   import { XIcon } from '@lucide/svelte';
-  import PopularPeriodMenu from '../../PopularPeriodMenu.svelte';
   import {
     lastSeen,
     ownerFilters,
@@ -178,19 +177,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {...gallerySortMenu(
         ownerFilters.sort,
         (sort) => (ownerFilters.sort = sort),
+        {
+          days: ownerFilters.popularDays,
+          set: (days) => (ownerFilters.popularDays = days),
+        },
       )}
       bind:layout={ownerFilters.layout}
       {showFilters}
-    >
-      {#snippet menus()}
-        {#if ownerFilters.sort === 'POPULAR'}
-          <PopularPeriodMenu
-            days={ownerFilters.popularDays}
-            onchange={(days) => (ownerFilters.popularDays = days)}
-          />
-        {/if}
-      {/snippet}
-    </CollectionToolbar>
+    ></CollectionToolbar>
   </div>
   <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
     {#if filtering}

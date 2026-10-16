@@ -17,12 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Search, filters, sort and view for a list of projects or palettes: the
   Gallery's, and My Library's. It only holds the values; the page finds what
   matches (the Gallery asks the server on `onchange`, My Library filters what's
-  saved here). Search always shows; Yarn, Pattern Type and `filters` sit behind
-  the Filters button, open while any are on, and show as removable chips while
-  closed. With `showFilters` off, only View and the page's actions show, for
+  saved here). Search always shows; Show (`statuses`), Yarn, Pattern Type and
+  `filters` sit behind the Filters button, open while any are on, and show as
+  removable chips while closed. Filters, Sort and View share one line, Sort
+  and View as icons on phones, so the panel always opens right below the
+  button. With `showFilters` off, only View and the page's actions show, for
   short lists.
 -->
-<script lang="ts" generics="T extends string">
+<script lang="ts" generics="T extends string, S extends string = string">
   import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
@@ -33,8 +35,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import FiltersButton from '#lib/components/buttons/FiltersButton.svelte';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import type { PageLayout } from '#lib/types/page-types.js';
-  import { EarthIcon, Grid3x3, SearchIcon, XIcon } from '@lucide/svelte';
-  import { untrack, type Snippet } from 'svelte';
+  import {
+    EarthIcon,
+    EyeIcon,
+    Grid3x3,
+    SearchIcon,
+    XIcon,
+  } from '@lucide/svelte';
+  import { untrack, type ComponentProps, type Snippet } from 'svelte';
 
   let {
     kind,
@@ -47,18 +55,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnId = $bindable(''),
     onlyThisYarn = $bindable(false),
     patternType = $bindable<string | undefined>(),
+    status = $bindable<S | undefined>(),
+    statuses,
     sortOptions,
     sort,
     onsort,
     reversed,
     onreverse,
     canReverse,
+    submenu,
     layout = $bindable('grid'),
     showFilters = true,
     disabled = false,
     onchange,
     filters,
-    menus,
     actions,
   }: {
     /** What's listed, for the "Only" filter's description */
@@ -74,12 +84,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onlyThisYarn?: boolean;
     /** Offers the pattern filter when bound (projects) */
     patternType?: string;
+    /** Offers the Show filter with these choices; the first shows all */
+    status?: S;
+    statuses?: readonly { value: S; label: string }[];
     sortOptions: readonly { value: T; label: string; details?: string }[];
     sort: T;
     onsort: (sort: T) => void;
     reversed?: boolean;
     onreverse?: (reversed: boolean) => void;
     canReverse?: (sort: T) => boolean;
+    /** One sort's own choices, e.g. Popular's period (see SortSelectMenu) */
+    submenu?: ComponentProps<typeof SortSelectMenu<T>>['submenu'];
     layout?: PageLayout;
     /** Off for short lists: just View and the actions */
     showFilters?: boolean;
@@ -88,8 +103,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onchange?: () => void;
     /** More filters, after the built-in ones */
     filters?: Snippet;
-    /** More menus, after Sort (only with the filters) */
-    menus?: Snippet;
     /** The page's buttons, at the end of the row, e.g. New Project */
     actions?: Snippet;
   } = $props();
@@ -99,18 +112,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const panelId = `${id}-filters`;
   const hasPattern = $derived(patternType !== undefined);
   // Anything to put behind the Filters button
-  const hasHidden = $derived(yarn || hasPattern || !!filters);
+  const hasStatus = $derived(!!statuses && statuses.length > 1);
+  const hasHidden = $derived(hasStatus || yarn || hasPattern || !!filters);
 
+  const allStatus = $derived(statuses?.[0]?.value);
+  const statusOn = $derived(hasStatus && status !== allStatus);
   const hasYarn = $derived(yarn && !!(brandId || yarnId));
   const activeCount = $derived(
-    (hasYarn ? 1 : 0) + (hasPattern && patternType ? 1 : 0),
+    (statusOn ? 1 : 0) +
+      (hasYarn ? 1 : 0) +
+      (hasPattern && patternType ? 1 : 0),
   );
+
+  // A choice no longer offered (e.g. On Ravelry on Palettes) starts over
+  $effect(() => {
+    if (statuses && !statuses.some(({ value }) => value === status))
+      status = allStatus;
+  });
 
   // Open while a filter is on, e.g. arriving from a yarn link
   let open = $state(untrack(() => activeCount > 0));
   let filtersButton = $state<FiltersButton>();
 
   const chips = $derived([
+    ...(statusOn
+      ? [
+          {
+            label: statuses?.find(({ value }) => value === status)?.label ?? '',
+            remove: () => (status = allStatus),
+          },
+        ]
+      : []),
     ...(hasYarn
       ? [
           {
@@ -174,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <!-- The page's actions at the end, as beside a heading (first on phones,
-    so a wrapped row never parts Filters from its panel below) -->
+    so they never come between Filters and its panel below) -->
   <div
     class={[
       'my-2 flex w-full flex-wrap items-center gap-2',
@@ -182,6 +214,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ]}
   >
     <div class="flex flex-wrap items-center gap-2">
+      {#if showFilters && hasHidden}
+        <FiltersButton
+          bind:this={filtersButton}
+          bind:open
+          count={activeCount}
+          controls={panelId}
+        />
+      {/if}
       {#if showFilters}
         <SortSelectMenu
           options={sortOptions}
@@ -191,19 +231,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {reversed}
           {onreverse}
           {canReverse}
-        />
-        {@render menus?.()}
-      {/if}
-      <ViewMenu bind:value={layout} />
-      <!-- Last, so its panel opens right below it when the row wraps -->
-      {#if showFilters && hasHidden}
-        <FiltersButton
-          bind:this={filtersButton}
-          bind:open
-          count={activeCount}
-          controls={panelId}
+          {submenu}
+          compact
         />
       {/if}
+      <ViewMenu bind:value={layout} compact={showFilters} />
     </div>
     {#if actions}
       <div class="flex flex-wrap items-center gap-2 max-md:order-first">
@@ -247,6 +279,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <option value="">Any Pattern</option>
               {#each previews.all as { name, wpTagSlug } (wpTagSlug)}
                 <option value={wpTagSlug}>{name}</option>
+              {/each}
+            </select>
+          </div>
+        </label>
+      {/if}
+
+      {#if hasStatus}
+        <label class="label col-span-12 w-full md:col-span-5">
+          <span class="label-text">Show</span>
+          <div class="relative flex items-center">
+            <EyeIcon class={FIELD_ICON} />
+            <select
+              {disabled}
+              class="select truncate pl-11"
+              bind:value={status}
+              onchange={() => onchange?.()}
+            >
+              {#each statuses ?? [] as { value, label } (value)}
+                <option {value}>{label}</option>
               {/each}
             </select>
           </div>

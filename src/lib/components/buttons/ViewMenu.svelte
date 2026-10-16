@@ -42,11 +42,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     value = $bindable('grid'),
     fillOption = false,
+    compact = false,
     children,
   }: {
     value: PageLayout;
     /** Offer Fill with color (one setting, shared by every list that offers it) */
     fillOption?: boolean;
+    /** Just the icon on phones (the name is still read out) */
+    compact?: boolean;
     children?: Snippet;
   } = $props();
 
@@ -63,8 +66,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={menuTriggerClass}>
     <current.icon size={18} aria-hidden="true" />
-    <span>View: {current.label}</span>
-    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+    <span class={{ 'max-sm:sr-only': compact }}>View: {current.label}</span>
+    <ChevronDownIcon
+      class={['icon-sm', compact && 'max-sm:hidden']}
+      aria-hidden="true"
+    />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>

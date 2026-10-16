@@ -31,7 +31,6 @@ only in the gallery), with search, filters and sort once there are a few. -->
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
-  import LibraryStatusMenu from '#lib/components/LibraryStatusMenu.svelte';
   import MyLibrary from '#lib/components/MyLibrary.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
@@ -45,7 +44,11 @@ only in the gallery), with search, filters and sort once there are a few. -->
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
-  import { FILTERS_FROM, LIBRARY_SORTS } from '#lib/utils/collection-filter.js';
+  import {
+    FILTERS_FROM,
+    LIBRARY_SORTS,
+    libraryStatuses,
+  } from '#lib/utils/collection-filter.js';
   import { PlusIcon } from '@lucide/svelte';
 
   let total = $state<number | null>(null);
@@ -124,6 +127,10 @@ only in the gallery), with search, filters and sort once there are a few. -->
           bind:brandId={libraryFilters.brandId}
           bind:yarnId={libraryFilters.yarnId}
           bind:onlyThisYarn={libraryFilters.onlyThisYarn}
+          bind:status={libraryFilters.status}
+          statuses={showGallery
+            ? libraryStatuses({ gallery: true })
+            : undefined}
           sortOptions={LIBRARY_SORTS}
           sort={libraryFilters.sort}
           onsort={(sort) => (libraryFilters.sort = sort)}
@@ -135,9 +142,6 @@ only in the gallery), with search, filters and sort once there are a few. -->
           }
           {showFilters}
         >
-          {#snippet menus()}
-            {#if showGallery}<LibraryStatusMenu gallery />{/if}
-          {/snippet}
           {#snippet actions()}
             <a href={resolve('yarn')} class="btn preset-tonal-primary"
               ><PlusIcon />New Palette</a

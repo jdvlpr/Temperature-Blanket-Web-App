@@ -19,6 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   out). The button names the sort; its icon flips upside down when reversed.
   Options can have a few words under them, as in the app's other menus.
   For a sort that stays chosen, unlike SortMenu, which reorders a palette once.
+  `submenu` gives one sort its own choices (e.g. Popular's period), in a
+  submenu on its row. `compact` shows just the icon on phones.
 -->
 <script lang="ts" generics="T extends string">
   import {
@@ -34,6 +36,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
+  import MenuSubmenu from '#lib/components/buttons/MenuSubmenu.svelte';
+  import {
+    drillPositionerClass,
+    provideMenuDrill,
+  } from '#lib/components/menu-drill.svelte.js';
 
   interface Props {
     /** Each sort, with a few words under it on what it does, if any */
@@ -48,6 +55,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     disabled?: boolean;
     /** Names the menu on its button, e.g. "Sort: Newest" */
     label?: string;
+    /** One sort's own choices, in a submenu on its row; choosing one also
+     * chooses that sort */
+    submenu?: {
+      option: T;
+      current: string;
+      choices: readonly { value: string; label: string }[];
+      onchoose: (value: string) => void;
+    };
+    /** Just the icon on phones (the name is still read out) */
+    compact?: boolean;
   }
 
   let {
@@ -59,11 +76,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canReverse = () => true,
     disabled = false,
     label = 'Sort',
+    submenu,
+    compact = false,
   }: Props = $props();
 
+  const drill = provideMenuDrill();
+
   let isReversed = $derived(!!onreverse && reversed && canReverse(current));
+  let submenuLabel = $derived(
+    submenu?.choices.find((choice) => choice.value === submenu.current)
+      ?.label ?? '',
+  );
+  // e.g. "Popular, past week"
   let currentLabel = $derived(
-    options.find((option) => option.value === current)?.label ?? '',
+    (options.find((option) => option.value === current)?.label ?? '') +
+      (submenu?.option === current && submenuLabel
+        ? `, ${submenuLabel.toLowerCase()}`
+        : ''),
   );
 </script>
 
@@ -76,7 +105,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 {/snippet}
 
-<Menu positioning={menuPositioning('bottom-start')}>
+<Menu
+  positioning={menuPositioning('bottom-start')}
+  onOpenChange={({ open }) => {
+    if (!open) drill.reset();
+  }}
+>
   <Menu.Trigger class={menuTriggerClass} {disabled}>
     <!-- Flipped upside down when reversed; screen readers hear "reversed" -->
     <ArrowDownWideNarrowIcon
@@ -85,32 +119,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? '-scale-y-100'
         : ''}"
     />
-    <span
+    <span class={{ 'max-sm:sr-only': compact }}
       >{label}: {currentLabel}{#if isReversed}<span class="sr-only"
           >, reversed</span
         >{/if}</span
     >
-    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+    <ChevronDownIcon
+      class={['icon-sm', compact && 'max-sm:hidden']}
+      aria-hidden="true"
+    />
   </Menu.Trigger>
   <Portal>
-    <Menu.Positioner>
-      <Menu.Content class={menuContentClass}>
+    <Menu.Positioner class={drillPositionerClass}>
+      <Menu.Content class="{menuContentClass} pointer-events-auto">
         {#each options as option (option.value)}
-          <Menu.OptionItem
-            type="radio"
-            value={option.value}
-            checked={option.value === current}
-            onCheckedChange={() => onsort(option.value)}
-            class={menuItemClass}
-          >
-            {@render item(option.label, option.details)}
-            <CheckIcon
-              class="shrink-0 {option.value === current ? '' : 'invisible'}"
-              aria-hidden="true"
-            />
-          </Menu.OptionItem>
+          {#if submenu?.option === option.value}
+            <MenuSubmenu label={option.label} current={submenuLabel}>
+              {#each submenu.choices as choice (choice.value)}
+                {@const checked =
+                  current === option.value && choice.value === submenu.current}
+                <Menu.OptionItem
+                  type="radio"
+                  value="{option.value}-{choice.value}"
+                  {checked}
+                  onCheckedChange={() => {
+                    // The choice first, so the sort is found with it
+                    submenu.onchoose(choice.value);
+                    if (current !== option.value) onsort(option.value);
+                  }}
+                  class={menuItemClass}
+                >
+                  {@render item(choice.label)}
+                  <CheckIcon
+                    class="shrink-0 {checked ? '' : 'invisible'}"
+                    aria-hidden="true"
+                  />
+                </Menu.OptionItem>
+              {/each}
+            </MenuSubmenu>
+          {:else if drill.showsMenu}
+            <Menu.OptionItem
+              type="radio"
+              value={option.value}
+              checked={option.value === current}
+              onCheckedChange={() => onsort(option.value)}
+              class={menuItemClass}
+            >
+              {@render item(option.label, option.details)}
+              <CheckIcon
+                class="shrink-0 {option.value === current ? '' : 'invisible'}"
+                aria-hidden="true"
+              />
+            </Menu.OptionItem>
+          {/if}
         {/each}
-        {#if onreverse}
+        {#if onreverse && drill.showsMenu}
           <Menu.Separator />
           <!-- Stays open, so the check shows it took -->
           <Menu.OptionItem

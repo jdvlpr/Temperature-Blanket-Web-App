@@ -44,6 +44,24 @@ export const LIBRARY_STATUSES = [
   details?: string;
 }[];
 
+/**
+ * My Library's Show choices: what's published or not (`gallery`, accounts
+ * with gallery pages) and posted to Ravelry (`ravelry`, projects only); none
+ * when neither applies
+ */
+export function libraryStatuses({
+  gallery = false,
+  ravelry = false,
+}: {
+  gallery?: boolean;
+  ravelry?: boolean;
+}) {
+  if (!gallery && !ravelry) return undefined;
+  return LIBRARY_STATUSES.filter(
+    ({ value }) => value === 'all' || (value === 'ravelry' ? ravelry : gallery),
+  );
+}
+
 export type LibrarySort = 'recent' | 'name';
 
 export const LIBRARY_SORTS = [

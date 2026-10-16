@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryOwners } from './gallery-owners.svelte';
-  import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, yarnPaletteGalleryState } from './state.svelte';
 
   let first = 40;
@@ -177,25 +176,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:onlyThisYarn={
           yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
         }
-        {...gallerySortMenu(yarnPaletteGalleryState.orderBy, (order) => {
-          yarnPaletteGalleryState.orderBy = order;
-          search();
-        })}
+        {...gallerySortMenu(
+          yarnPaletteGalleryState.orderBy,
+          (order) => {
+            yarnPaletteGalleryState.orderBy = order;
+            search();
+          },
+          {
+            days: yarnPaletteGalleryState.popularDays,
+            set: (days) => {
+              yarnPaletteGalleryState.popularDays = days;
+              if (yarnPaletteGalleryState.orderBy === 'POPULAR') search();
+            },
+          },
+        )}
         bind:layout={yarnPaletteGalleryState.layout}
         onchange={debouncedSearch}
-      >
-        {#snippet menus()}
-          {#if yarnPaletteGalleryState.orderBy === 'POPULAR'}
-            <PopularPeriodMenu
-              days={yarnPaletteGalleryState.popularDays}
-              onchange={(days) => {
-                yarnPaletteGalleryState.popularDays = days;
-                search();
-              }}
-            />
-          {/if}
-        {/snippet}
-      </CollectionToolbar>
+      ></CollectionToolbar>
     </div>
     <div class={grid ? gridClass : listClass}>
       {#each yarnPaletteGalleryState.palettes as palette, i (i)}
