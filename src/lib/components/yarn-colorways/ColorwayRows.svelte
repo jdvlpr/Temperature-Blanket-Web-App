@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   circle that's checked when it's selected.
 -->
 <script lang="ts">
+  import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { CircleCheckIcon, CircleIcon } from '@lucide/svelte';
   import ColorwayMoreMenu from './ColorwayMoreMenu.svelte';
@@ -88,8 +89,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if match !== undefined}{@render matchPill(match, 'hidden @md:inline')}{/if}
 {/snippet}
 
+<!-- The end rows round like the list, and so do their toggle buttons on the
+side they meet it, so a focused row's ring follows the list's corners -->
 <ul
-  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 @container w-full divide-y overflow-hidden border"
+  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 [&>li:first-child]:rounded-t-container [&>li:first-child>button]:rounded-tl-container [&>li:last-child]:rounded-b-container [&>li:last-child>button]:rounded-bl-container @container w-full divide-y overflow-hidden border"
 >
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}
@@ -112,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="button"
           class="{filled
             ? 'hover-on-color'
-            : 'hover:bg-surface-200-800/50'} flex min-w-0 flex-1 cursor-pointer items-center gap-3 p-2 text-left"
+            : 'hover:bg-surface-200-800/50'} flex min-w-0 flex-1 cursor-pointer items-center gap-3 p-2 text-left {ROW_FOCUS}"
           aria-pressed={selected}
           onclick={() => selection.ontoggle(colorway)}
         >
