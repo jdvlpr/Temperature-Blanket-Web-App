@@ -28,15 +28,11 @@ import { withProjectName } from '#lib/utils/project-name-link.js';
 /**
  * Opens it. `name` is the project's name and `item` the project as saved here,
  * read before (a clipboard write right after waiting on storage can be refused
- * in Safari); with `item`, it has its Ravelry part too. `returnable` gives the
- * dialog Back to where it was opened from.
+ * in Safari); with `item`, it can tell whether the project is in the account.
  */
 export function openProjectShare(
   name: string,
-  {
-    returnable = false,
-    item,
-  }: { returnable?: boolean; item?: StoredProjectIndexItem } = {},
+  { item }: { item?: StoredProjectIndexItem } = {},
 ) {
   const label = name || locations.projectTitle || 'Project';
   const publish = (title: string) =>
@@ -62,13 +58,7 @@ export function openProjectShare(
         ravelryItem: item,
       },
     },
-    // Medium, for Gallery Page and Ravelry side by side, unless it takes the
-    // place of the Project menu's side panel; always returnable, so the
-    // dialogs it opens have Back to it
-    options: {
-      title: `Share “${label}”`,
-      returnable: true,
-      ...(!returnable && { size: 'medium' as const }),
-    },
+    // Always returnable, so the publish dialog has Back to it
+    options: { title: `Share “${label}”`, returnable: true },
   });
 }

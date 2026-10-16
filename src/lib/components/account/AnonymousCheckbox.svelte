@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- "Anonymous", when publishing to the gallery from an account (bound the
-other way round, as `checked` = show the name): the same quiet row as on a
-published page's Share dialog. -->
+other way round, as `checked` = show the name): a quiet checkbox, with what it
+means under it unless the dialog says so by the name (`detail` false). -->
 
 <script lang="ts">
   import { anonymousDetail } from '#lib/accounts/anonymous.js';
@@ -24,11 +24,17 @@ published page's Share dialog. -->
     checked = $bindable(false),
     name,
     disabled = false,
+    detail = true,
+    describedby,
   }: {
     checked?: boolean;
     /** The account's display name, as it is now */
     name: string;
     disabled?: boolean;
+    /** Show what it means under it */
+    detail?: boolean;
+    /** What says what it means instead, by the name */
+    describedby?: string;
   } = $props();
 </script>
 
@@ -38,11 +44,14 @@ published page's Share dialog. -->
     class="checkbox mt-0.5 shrink-0"
     bind:checked={() => !checked, (anonymous) => (checked = !anonymous)}
     {disabled}
+    aria-describedby={describedby}
   />
   <span class="flex flex-1 flex-col">
-    <span>Anonymous</span>
-    <span class="text-xs opacity-70"
-      >{anonymousDetail(!checked, name.trim())}</span
-    >
+    <span class={detail ? '' : 'text-sm'}>Anonymous</span>
+    {#if detail}
+      <span class="text-xs opacity-70"
+        >{anonymousDetail(!checked, name.trim())}</span
+      >
+    {/if}
   </span>
 </label>

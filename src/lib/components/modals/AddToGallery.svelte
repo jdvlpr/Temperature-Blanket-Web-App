@@ -13,27 +13,37 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Publishes the open project to the Project Gallery, or updates its gallery
-page in place (same link, views and settings) when it has one: each project has
-one page. It shows the project as its gallery card will (preview, name, and "By"
-with the account's name), then publishes it and links to the page. Publishing
-needs an account; signed out, it says so with a way to sign in. From My
-Library, the saved project loads behind the dialog first (with its weather,
-when that isn't kept with it). -->
+<!-- Publish to Gallery / Update Gallery Page: one dialog for everything a
+project shares. Its gallery page (published, or updated in place when the
+project changed: same link, views and settings), Anonymous, by the name, and,
+for a project in the account with Ravelry connected, its Ravelry project: Also
+post to Ravelry, or once posted its details, yarns and photos, saved with the
+same Update. Publishing needs an account; signed out, it says so with a way to
+sign in. From My Library, the saved project loads behind the dialog first (with
+its weather, when that isn't kept with it). -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
+  import RavelryFields, {
+    type RavelryApplied,
+  } from '#lib/components/account/RavelryFields.svelte';
+  import { ravelryErrorMessage } from '#lib/accounts/ravelry.js';
+  import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
-  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import {
+    ProjectStorage,
+    type StoredProjectIndexItem,
+  } from '#lib/storage/projects.svelte.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
+  import { inAccount } from '#lib/utils/open-ravelry.js';
   import { loadInPlace } from '#lib/utils/open-saved-project.js';
   import { svgToPNG } from '#lib/utils/preview-utils.svelte.js';
   import {
@@ -45,6 +55,7 @@ when that isn't kept with it). -->
     CheckIcon,
     ExternalLinkIcon,
     LoaderCircleIcon,
+    RefreshCwIcon,
     SendIcon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
@@ -139,23 +150,34 @@ when that isn't kept with it). -->
   // Why it can't be published from here, once the account is checked
   let blocked = $state<'signed-out' | 'paused' | null>(null);
   let accountChecked = $state(false);
-  // Include a new page on the account's public gallery, starting from the last
-  // choice (an update keeps the page's own)
+  // Its name on the page, starting from the last choice for a new page and
+  // the page's own for an update
   let showOwner = $state(false);
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
   // The project's gallery page, updated in place, if it has one
-  let page = $state<{ postId: number; showOwner?: boolean } | null>(null);
+  type Page = {
+    postId: number;
+    showOwner: boolean;
+    link: string | null;
+    title: string;
+  };
+  let page = $state<Page | null>(null);
+  // The project as saved here, which Ravelry needs (in the account)
+  let item = $state<StoredProjectIndexItem | null>(null);
 
-  // Sent: its page
-  let sent = $state<Extract<GallerySendResult, { status: 'sent' }> | null>(
-    null,
-  );
+  // Done: what was published and saved
+  let done = $state<{
+    gallery: Extract<GallerySendResult, { status: 'sent' }> | null;
+    galleryLink: string;
+    lines: string[];
+    ravelry: RavelryApplied | null;
+  } | null>(null);
 
   const view = $derived(
     preparing
       ? 'preparing'
-      : sent
+      : done
         ? 'sent'
         : !accountChecked
           ? 'checking'
@@ -206,16 +228,90 @@ when that isn't kept with it). -->
             : post.projectId === project.id),
       )
       .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId)[0];
-    if (own) page = { postId: own.postId, showOwner: own.showOwner };
+    if (own) {
+      page = {
+        postId: own.postId,
+        showOwner: !!own.showOwner,
+        link: own.link ?? null,
+        title: own.title,
+      };
+      showOwner = page.showOwner;
+    }
     if (typeof gallery.name === 'string') serverName = gallery.name;
+    item =
+      (await ProjectStorage.getIndex()).find((i) => i.id === project.id) ??
+      null;
+    if (!ravelryLinks.status) void ravelryLinks.load();
   }
 
   // Every footer: secondary actions, then the one filled primary
   const FOOTER =
     'bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-3 sm:px-4';
 
+  // ---- The gallery page
+  // Its name as shown: the saved one, which Rename here changes too
+  let name = $state('');
+  $effect(() => {
+    // Read again after a rename (the link's name changes with it)
+    void project.linkName;
+    void ProjectStorage.getById(project.id).then(
+      (stored) => (name = stored ? (stored.name ?? '') : project.linkName),
+    );
+  });
+  /** The parts of a project link that make the project */
+  const linkKey = (link: string) => {
+    try {
+      const url = new URL(link, window.location.origin);
+      url.searchParams.delete('m');
+      return url.search + url.hash;
+    } catch {
+      return link;
+    }
+  };
+  // Published or updated already, and the gallery page shows this project
+  let galleryDone = $state(false);
+  const galleryUpToDate = $derived(
+    galleryDone ||
+      Boolean(
+        page &&
+        page.link &&
+        linkKey(page.link) === linkKey(project.url.href) &&
+        (!name || name === page.title),
+      ),
+  );
+  // Its name shown or not, changed here, for a page there is
+  const ownerChanged = $derived(!!page && showOwner !== page.showOwner);
+
+  // ---- Ravelry: for a project in the account, with Ravelry connected
+  const linked = $derived(ravelryLinks.links.has(project.id));
+  const ravelryReady = $derived(
+    !!item && inAccount(item) && ravelryLinks.connected,
+  );
+  let alsoPost = $state(false);
+  let ravelryFields = $state<RavelryFields>();
+  let ravelryChanged = $state(false);
+  let ravelryCanSave = $state(false);
+  let ravelryPictureNeeded = $state(false);
+  // Said once, when it turns out it was deleted on Ravelry
+  let ravelryNotice = $state('');
+  // The Ravelry part shows: posted (unless Anonymous is ticked, which unlinks
+  // it), or Also post to Ravelry is ticked
+  const ravelryOn = $derived(
+    ravelryReady && showOwner && (linked || alsoPost) && !preparing,
+  );
+  // Unlinked by saving as Anonymous
+  const unlinksRavelry = $derived(linked && !showOwner);
+
+  const nothingChanged = $derived(
+    !!page &&
+      galleryUpToDate &&
+      !ownerChanged &&
+      !(ravelryOn && ravelryChanged),
+  );
+
   let busy = $state(false);
   let step = $state<'image' | GallerySendStep | null>(null);
+  let ravelryStep = $state('');
   const STEP_TEXT = {
     image: 'Drawing the preview image…',
     sending: 'Publishing… This can take a minute.',
@@ -223,15 +319,54 @@ when that isn't kept with it). -->
   let problem = $state<Exclude<GallerySendResult, { status: 'sent' }> | null>(
     null,
   );
-  // The page's own link, for after it's sent
+  let ravelryError = $state('');
+  let ownerError = $state('');
+  // The result's heading, for after it's sent
   let sentHeading = $state<HTMLElement>();
-  const stepText = $derived(step ? STEP_TEXT[step] : '');
+  const stepText = $derived(ravelryStep || (step ? STEP_TEXT[step] : '') || '');
+
+  const canSubmit = $derived(
+    view === 'form' &&
+      !busy &&
+      !!previews.active?.svg &&
+      !nothingChanged &&
+      (!ravelryOn || ravelryCanSave),
+  );
+
+  const submitText = $derived(
+    !page && !galleryDone
+      ? ravelryOn
+        ? 'Publish and Post to Ravelry'
+        : 'Publish'
+      : !page
+        ? 'Post to Ravelry'
+        : 'Update',
+  );
+
+  async function drawPNG() {
+    const active = previews.active;
+    if (!active?.svg || !active.width || !active.height)
+      throw new Error('The picture isn’t ready');
+    const img = await svgToPNG({
+      svgNode: active.svg,
+      width: active.width,
+      height: active.height,
+      download: false,
+    });
+    document.getElementById('temporary-canvas')?.remove();
+    return img;
+  }
+
+  // What's done so far, kept across a retry
+  let sentSoFar: Extract<GallerySendResult, { status: 'sent' }> | null = null;
+  let lines: string[] = [];
 
   async function submit() {
-    const active = previews.active;
-    if (!active?.svg || !active?.width || !active?.height || busy) return;
+    if (!canSubmit) return;
     busy = true;
     problem = null;
+    ravelryError = ownerError = '';
+    const withRavelry = ravelryOn;
     try {
       if (!href) {
         // Published from the account, it's kept there too, next to its gallery page
@@ -241,35 +376,105 @@ when that isn't kept with it). -->
       }
       // The name it has now, which may have just been changed here
       const stored = await ProjectStorage.getById(project.id);
-      const name = stored ? (stored.name ?? '') : project.linkName;
-      step = 'image';
-      const img = await svgToPNG({
-        svgNode: active.svg,
-        width: active.width,
-        height: active.height,
-        download: false,
-      });
-      document.getElementById('temporary-canvas')?.remove();
-      const result = await sendToProjectGallery(img, {
-        showOwner,
-        name,
-        postId: page?.postId,
-        onStep: (next) => (step = next),
-      });
-      if (result.status === 'sent') {
-        sent = result;
-        await tick();
-        sentHeading?.focus();
-      } else {
-        problem = result;
-        // Unpublished elsewhere: sending again publishes a new page
-        if (result.status === 'gone') page = null;
+      const savedName = stored ? (stored.name ?? '') : project.linkName;
+
+      // Anonymous or not: first, so Ravelry can link to the page under the name
+      if (page && ownerChanged) {
+        const { galleryPages } =
+          await import('#lib/accounts/gallery-pages.svelte.js');
+        try {
+          await galleryPages.setShowOwner(page.postId, showOwner, {
+            unlinkRavelry: unlinksRavelry,
+          });
+        } catch {
+          ownerError =
+            'Its name on the page couldn’t be changed. Try again later.';
+          return;
+        }
+        if (unlinksRavelry) {
+          ravelryLinks.remove(project.id);
+          lines.push('Unlinked it from Ravelry (the Ravelry project stays)');
+        }
+        lines.push(
+          showOwner ? 'Shows your name on its page' : 'Made its page anonymous',
+        );
+        page.showOwner = showOwner;
       }
+
+      const needPicture =
+        !galleryUpToDate || (withRavelry && ravelryPictureNeeded);
+      let img: string | null = null;
+      if (needPicture) {
+        step = 'image';
+        img = await drawPNG();
+      }
+
+      if (!galleryUpToDate && img) {
+        const result = await sendToProjectGallery(img, {
+          showOwner,
+          name: savedName,
+          postId: page?.postId,
+          onStep: (next) => (step = next),
+        });
+        step = null;
+        if (result.status === 'sent') {
+          sentSoFar = result;
+          galleryDone = true;
+          lines.push(
+            result.updated
+              ? 'Updated its gallery page. Its link stays the same.'
+              : 'Published its gallery page',
+          );
+        } else if (result.status === 'duplicate') {
+          // Already just like this
+          galleryDone = true;
+        } else {
+          problem = result;
+          // Unpublished elsewhere: sending again publishes a new page
+          if (result.status === 'gone') page = null;
+          return;
+        }
+      }
+
+      let ravelry: RavelryApplied | null = null;
+      if (withRavelry && ravelryFields) {
+        const picture =
+          img && ravelryPictureNeeded ? await (await fetch(img)).blob() : null;
+        try {
+          ravelry = await ravelryFields.apply({
+            picture,
+            onStep: (text) => (ravelryStep = text),
+          });
+        } catch (e) {
+          ravelryError =
+            (galleryDone && !page
+              ? 'Its gallery page is published, but it isn’t on Ravelry yet. '
+              : (e as { partly?: boolean }).partly
+                ? 'Part of this is saved on Ravelry; the rest wasn’t. '
+                : '') + ravelryErrorMessage(e);
+          return;
+        }
+      }
+
+      done = {
+        gallery: sentSoFar,
+        galleryLink:
+          sentSoFar?.link ??
+          (page ? resolve('/gallery/[id]', { id: String(page.postId) }) : ''),
+        lines: [
+          ...lines,
+          ...(ravelry?.summary ?? []).map((line) => `Ravelry: ${line}`),
+        ],
+        ravelry,
+      };
+      await tick();
+      sentHeading?.focus();
     } catch {
       problem = { status: 'error', message: '' };
     } finally {
       busy = false;
       step = null;
+      ravelryStep = '';
     }
   }
 
@@ -323,16 +528,22 @@ when that isn't kept with it). -->
         <p>Publishing to the gallery is paused right now. Try again later.</p>
       {/if}
     </div>
-  {:else if view === 'sent' && sent}
+  {:else if view === 'sent' && done}
     <div class="flex flex-col items-center gap-2 py-6 text-center">
-      <CheckIcon class="text-success-700-300 size-8" />
+      <CheckIcon class="text-success-700-300 size-8" aria-hidden="true" />
       <h2 class="h4" tabindex="-1" bind:this={sentHeading}>
-        {sent.updated ? 'Updated' : 'Published'}
+        {done.gallery && !done.gallery.updated ? 'Published' : 'Updated'}
       </h2>
-      {#if sent.updated}
+      {#if done.lines.length}
+        <ul class="flex flex-col gap-1 text-sm">
+          {#each done.lines as line (line)}
+            <li>{line}</li>
+          {/each}
+        </ul>
+      {/if}
+      {#if done.ravelry?.processing}
         <p class="text-sm opacity-80">
-          Its gallery page shows the project as it is now. Its link stays the
-          same.
+          Ravelry is still adding a photo. It shows up there in a moment.
         </p>
       {/if}
     </div>
@@ -347,44 +558,112 @@ when that isn't kept with it). -->
           <previews.active.previewComponent />
         {/if}
       </div>
-      <div class="flex min-w-0 flex-1 flex-col gap-1">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
         <RenameProject saveToName={view === 'form'} />
-        {#if view === 'form' && (page ? page.showOwner : showOwner) && ownerName}
-          <p class="text-sm">By {ownerName}</p>
+        {#if view === 'form'}
+          <!-- Its name on the page, and the choice to leave it off, together -->
+          <p class="text-sm" id="gallery-owner-line">
+            {#if !showOwner}
+              No name, not on your public gallery page
+            {:else if ownerName}
+              By {ownerName}
+            {:else}
+              <span class="text-warning-700-300"
+                >Add a display name to be credited</span
+              >
+            {/if}
+          </p>
+          <AnonymousCheckbox
+            bind:checked={showOwner}
+            name={ownerName}
+            disabled={busy}
+            detail={false}
+            describedby="gallery-owner-line"
+          />
         {/if}
       </div>
     </div>
 
     {#if view === 'form'}
       <p class="text-sm opacity-80">
-        {page
-          ? 'Updates its gallery page to the project as it is now. Its link stays the same.'
-          : 'Publishes this project, as it is now, to the public Project Gallery. You can update or unpublish it later.'}
+        {#if !page}
+          Publishes this project, as it is now, to the public Project Gallery.
+          You can update or unpublish it later.
+        {:else if galleryUpToDate}
+          Its gallery page is up to date.
+        {:else}
+          Updates its gallery page to the project as it is now. Its link stays
+          the same.
+        {/if}
       </p>
-      {#if !page}
-        <AnonymousCheckbox
-          bind:checked={showOwner}
-          name={ownerName}
-          disabled={busy}
-        />
+      {#if ownerError}
+        <p class="text-error-700-300 text-sm" role="alert">{ownerError}</p>
       {/if}
       {#if problem}
-        <div class="text-error-700-300 flex flex-col gap-1" role="alert">
-          <p>{problemText}</p>
-          {#if problem.status === 'duplicate' && problem.link}
-            <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
-            <a
-              href={problem.link}
-              target="_blank"
-              rel="noreferrer"
-              class="link w-fit"
-            >
-              {problem.title || 'View its gallery page'}
-              <ExternalLinkIcon class="icon-sm inline" />
-            </a>
-            <!-- eslint-enable svelte/no-navigation-without-resolve -->
+        <p class="text-error-700-300 text-sm" role="alert">{problemText}</p>
+      {/if}
+
+      {#if ravelryReady}
+        <section
+          class="border-surface-200-800 flex flex-col gap-4 border-t pt-4"
+          aria-label="Ravelry"
+        >
+          {#if ravelryNotice}
+            <p class="text-sm" role="status">{ravelryNotice}</p>
           {/if}
-        </div>
+          {#if linked && !showOwner}
+            <p class="text-sm">
+              It’s on Ravelry, which links to this page under your name. Saving
+              it as Anonymous unlinks it; the Ravelry project stays.
+            </p>
+          {:else if !linked}
+            <label class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                class="checkbox mt-0.5 shrink-0"
+                bind:checked={alsoPost}
+                disabled={busy || !showOwner}
+                aria-describedby="also-post-detail"
+              />
+              <span class="flex flex-1 flex-col">
+                <span>Also post to Ravelry</span>
+                <span class="text-xs opacity-70" id="also-post-detail"
+                  >{showOwner
+                    ? 'A Ravelry project with its picture, yarns and photos, linking to this page.'
+                    : 'Needs your name shown. Ravelry links to this page under your name.'}</span
+                >
+              </span>
+            </label>
+          {/if}
+          {#if ravelryOn}
+            <RavelryFields
+              bind:this={ravelryFields}
+              onstate={(state) => {
+                ravelryChanged = state.changed;
+                ravelryCanSave = state.canSave;
+                ravelryPictureNeeded = state.pictureNeeded;
+              }}
+              projectId={project.id}
+              href={project.url.href}
+              name={name || item?.meta.title || 'Untitled Project'}
+              disabled={busy}
+              ongone={(message) => {
+                ravelryNotice = message;
+                alsoPost = false;
+              }}
+            />
+          {/if}
+          {#if ravelryError}
+            <p class="text-error-700-300 text-sm" role="alert">
+              {ravelryError}
+            </p>
+          {/if}
+        </section>
+      {:else if item && inAccount(item) && ravelryLinks.status?.available && !ravelryLinks.connected}
+        <p class="text-xs opacity-70">
+          <a class="anchor" href={resolve('/account')}>Connect Ravelry</a> in your
+          Account to post there too.
+        </p>
       {/if}
     {/if}
   {/if}
@@ -409,18 +688,39 @@ when that isn't kept with it). -->
         >
       {/if}
     </div>
-  {:else if view === 'sent' && sent?.link}
+  {:else if view === 'sent' && done}
     <div class={FOOTER}>
-      <!-- eslint-disable svelte/no-navigation-without-resolve -- the gallery page's own address -->
-      <a
-        href={sent.link}
-        target="_blank"
-        rel="noreferrer"
-        class="btn preset-filled-primary-500"
-      >
-        View Gallery Page
-        <ExternalLinkIcon class="icon-sm" />
-      </a>
+      <!-- eslint-disable svelte/no-navigation-without-resolve -- the pages' own addresses -->
+      {#if done.ravelry?.url}
+        <a
+          href={done.ravelry.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn preset-tonal-surface"
+        >
+          View on Ravelry
+          <ExternalLinkIcon class="icon-sm" aria-hidden="true" /><span
+            class="sr-only"
+          >
+            (opens in a new tab)</span
+          >
+        </a>
+      {/if}
+      {#if done.galleryLink}
+        <a
+          href={done.galleryLink}
+          target="_blank"
+          rel="noreferrer"
+          class="btn preset-filled-primary-500"
+        >
+          View Gallery Page
+          <ExternalLinkIcon class="icon-sm" aria-hidden="true" /><span
+            class="sr-only"
+          >
+            (opens in a new tab)</span
+          >
+        </a>
+      {/if}
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
     </div>
   {:else if view === 'blocked'}
@@ -442,20 +742,28 @@ when that isn't kept with it). -->
     </div>
   {:else if view === 'form' || view === 'checking'}
     <div class={FOOTER}>
-      {#if busy && step}
+      {#if busy && stepText}
         <p class="w-full text-center text-sm" aria-hidden="true">
           {stepText}
+        </p>
+      {:else if view === 'form' && nothingChanged}
+        <p class="w-full text-center text-sm opacity-80" id="up-to-date">
+          Everything is up to date.
         </p>
       {/if}
       <button
         type="button"
         class="btn preset-filled-primary-500"
-        disabled={!previews.active?.svg || view === 'checking' || busy}
+        disabled={!canSubmit}
+        aria-describedby={nothingChanged ? 'up-to-date' : undefined}
         onclick={submit}
       >
-        {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon
+        {#if busy}<LoaderCircleIcon
+            class="animate-spin"
+          />{:else if page}<RefreshCwIcon aria-hidden="true" />{:else}<SendIcon
+            aria-hidden="true"
           />{/if}
-        {page ? 'Update' : 'Publish'}
+        {submitText}
       </button>
     </div>
   {/if}

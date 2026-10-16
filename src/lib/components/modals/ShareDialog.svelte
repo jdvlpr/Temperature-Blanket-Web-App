@@ -15,23 +15,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Share a project or palette, in one place: its Link (a copy anyone can open;
-  yours never changes), its Gallery Page (one public page, published from
-  the account, updated in place, or unpublished) and, for a project, Ravelry,
-  which needs its gallery page. Publishing needs an account; signed out, Copy
-  Link still works. Opened from a card's Share button and the planner's
-  Project menu. Where there's room, Gallery Page and Ravelry sit side by side,
-  each with its view link beside its heading.
+  yours never changes) and its Gallery Page (one public page, published from
+  the account, updated in place, or unpublished). Publishing and updating,
+  with Anonymous and a project's Ravelry project, happen in the publish
+  dialog. Publishing needs an account; signed out, Copy Link still works.
+  Opened from a card's Share button and the planner's Project menu.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import { anonymousDetail } from '#lib/accounts/anonymous.js';
-  import { DISPLAY_NAME_HREF } from '#lib/accounts/display-name-link.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { publishedOn } from '#lib/accounts/gallery-version.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
-  import RavelryShareSection from '#lib/components/account/RavelryShareSection.svelte';
   import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
@@ -77,18 +73,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onupdate?: (page: GalleryPage) => void;
     /** Where Sign In goes, to come back here */
     signInHref?: string;
-    /** A saved project: its Ravelry section, when signed in */
+    /** A saved project, to tell whether it's in the account */
     ravelryItem?: StoredProjectIndexItem;
     /** More places it's shared, after the gallery */
     children?: Snippet;
   } = $props();
 
   const signedIn = $derived(__ACCOUNTS_ENABLED__ && !!account.summary);
-  const showRavelry = $derived(
-    Boolean(
-      ravelryItem && signedIn && ravelryLinks.status?.available !== false,
-    ),
-  );
 
   onMount(() => {
     // Fresh each time: it may have been published from elsewhere since
@@ -128,33 +119,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let errorMessage = $state('');
   let confirming = $state(false);
 
-  // Its Ravelry project links to the page under the owner's Ravelry name, so
-  // Anonymous unlinks it, after asking
+  // On Ravelry too: Unpublish unlinks it
   const onRavelry = $derived(kind === 'project' && ravelryLinks.links.has(id));
-  let confirmingAnonymous = $state(false);
-
-  async function setAnonymous(
-    anonymous: boolean,
-    { unlinkRavelry = false } = {},
-  ) {
-    if (!page) return;
-    if (anonymous && onRavelry && !unlinkRavelry) {
-      confirmingAnonymous = true;
-      return;
-    }
-    errorMessage = '';
-    busy = true;
-    try {
-      await galleryPages.setShowOwner(page.postId, !anonymous, {
-        unlinkRavelry,
-      });
-      confirmingAnonymous = false;
-    } catch {
-      errorMessage = 'That change couldn’t be saved. Try again later.';
-    } finally {
-      busy = false;
-    }
-  }
 
   let root = $state<HTMLElement>();
   /** The confirm's first button takes the focus, as the row that asked is gone */
@@ -195,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="@container flex flex-col gap-6 p-4 text-left" bind:this={root}>
+<div class="flex flex-col gap-6 p-4 text-left" bind:this={root}>
   {#if link}
     <!-- The link first: what most people share -->
     <ul class={PANEL_LIST} aria-label="Link">
@@ -217,209 +183,141 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </ul>
   {/if}
 
-  <div
-    class="grid gap-6 {showRavelry
-      ? '@xl:divide-surface-200-800 @xl:grid-cols-2 @xl:divide-x @xl:[&>*:first-child]:pr-6'
-      : ''}"
-  >
-    <section class="flex flex-col gap-3" aria-labelledby="share-gallery">
-      <ShareSectionHeader
-        id="share-gallery"
-        title="Gallery Page"
-        href={page ? pageHref(page) : undefined}
-        linkText="View Gallery Page"
-      >
-        {#if signedIn && !galleryPages.loaded}
-          <LoaderCircleIcon
-            class="icon-sm inline animate-spin"
-            aria-hidden="true"
-          />
-          Checking…
-        {:else}
-          {status}{#if page}
-            · {page.showOwner && ownerName
-              ? `By ${ownerName}`
-              : 'Anonymous'}{/if}{#if isChanged}
-            · <span class="font-bold">changed since</span>{/if}
-        {/if}
-      </ShareSectionHeader>
+  <section class="flex flex-col gap-3" aria-labelledby="share-gallery">
+    <ShareSectionHeader
+      id="share-gallery"
+      title="Gallery Page"
+      href={page ? pageHref(page) : undefined}
+      linkText="View Gallery Page"
+    >
+      {#if signedIn && !galleryPages.loaded}
+        <LoaderCircleIcon
+          class="icon-sm inline animate-spin"
+          aria-hidden="true"
+        />
+        Checking…
+      {:else}
+        {status}{#if page}
+          · {page.showOwner && ownerName
+            ? `By ${ownerName}`
+            : 'Anonymous'}{/if}{#if isChanged}
+          · <span class="font-bold">changed since</span>{/if}
+      {/if}
+    </ShareSectionHeader>
 
-      {#if !signedIn}
+    {#if !signedIn}
+      <div class="flex flex-col items-start gap-1">
+        <!-- eslint-disable svelte/no-navigation-without-resolve -- resolved by the opener -->
+        <a
+          class="btn preset-filled-primary-500"
+          href={signInHref ?? resolve('/auth/sign-in')}
+          data-sveltekit-reload
+        >
+          <LogInIcon aria-hidden="true" />Sign In to Publish
+        </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
+        <p class="text-xs opacity-70">
+          A free account lets you publish a public page, then update or
+          unpublish it any time.
+        </p>
+      </div>
+    {:else if galleryPages.loaded && !page}
+      {#if kind === 'project' && ravelryItem && !inAccount(ravelryItem)}
+        <!-- Its page follows the account's copy into and out of the Trash -->
+        <p class="text-sm">
+          Add this project to your account first (Add to your account, at the
+          top of My Projects), then publish it.
+        </p>
+      {:else if galleryPages.publishing && onpublish}
         <div class="flex flex-col items-start gap-1">
-          <!-- eslint-disable svelte/no-navigation-without-resolve -- resolved by the opener -->
-          <a
+          <button
+            type="button"
             class="btn preset-filled-primary-500"
-            href={signInHref ?? resolve('/auth/sign-in')}
-            data-sveltekit-reload
+            data-row="publish"
+            onclick={onpublish}
           >
-            <LogInIcon aria-hidden="true" />Sign In to Publish
-          </a>
-          <!-- eslint-enable svelte/no-navigation-without-resolve -->
+            <SendIcon aria-hidden="true" />Publish to Gallery…
+          </button>
           <p class="text-xs opacity-70">
-            A free account lets you publish a public page, then update or
-            unpublish it any time.
+            A public page anyone can find. You can update or unpublish it any
+            time.
           </p>
         </div>
-      {:else if galleryPages.loaded && !page}
-        {#if kind === 'project' && ravelryItem && !inAccount(ravelryItem)}
-          <!-- Its page follows the account's copy into and out of the Trash -->
+      {:else if !galleryPages.publishing}
+        <p class="text-sm">Publishing to the gallery is paused right now.</p>
+      {/if}
+    {:else if page}
+      {#if confirming}
+        <div class="flex flex-col gap-2" role="group" aria-label="Unpublish">
           <p class="text-sm">
-            Add this project to your account first (Add to your account, at the
-            top of My Projects), then publish it.
+            Unpublish “{page.title}”? Its gallery page link stops working{kind ===
+            'project'
+              ? ', and it comes off the globe'
+              : ''}{onRavelry
+              ? '. It’s unlinked from Ravelry too (the Ravelry project stays)'
+              : ''}. Your {kind} stays saved, and links you’ve shared to it still
+            work.
           </p>
-        {:else if galleryPages.publishing && onpublish}
-          <div class="flex flex-col items-start gap-1">
-            <button
-              type="button"
-              class="btn preset-filled-primary-500"
-              data-row="publish"
-              onclick={onpublish}
-            >
-              <SendIcon aria-hidden="true" />Publish to Gallery…
-            </button>
-            <p class="text-xs opacity-70">
-              A public page anyone can find. You can update or unpublish it any
-              time.
-            </p>
-          </div>
-        {:else if !galleryPages.publishing}
-          <p class="text-sm">Publishing to the gallery is paused right now.</p>
-        {/if}
-      {:else if page}
-        {#if confirming}
-          <div class="flex flex-col gap-2" role="group" aria-label="Unpublish">
-            <p class="text-sm">
-              Unpublish “{page.title}”? Its gallery page link stops working{kind ===
-              'project'
-                ? ', and it comes off the globe'
-                : ''}{onRavelry
-                ? '. It’s unlinked from Ravelry too (the Ravelry project stays)'
-                : ''}. Your {kind} stays saved, and links you’ve shared to it still
-              work.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                class="btn preset-filled-error-500"
-                onclick={unpublish}
-                disabled={busy}
-                {@attach takeFocus}
-                >{#if busy}<LoaderCircleIcon
-                    class="animate-spin"
-                  />{/if}Unpublish</button
-              >
-              <button
-                type="button"
-                class="btn preset-tonal-surface"
-                onclick={() => {
-                  confirming = false;
-                  void focusRow('unpublish');
-                }}
-                disabled={busy}>Keep Published</button
-              >
-            </div>
-          </div>
-        {:else}
           <div class="flex flex-wrap gap-2">
-            {#if onupdate && galleryPages.publishing}
-              <button
-                type="button"
-                class="btn {isChanged
-                  ? 'preset-filled-primary-500'
-                  : 'preset-tonal-surface'}"
-                onclick={() => page && onupdate(page)}
-              >
-                <RefreshCwIcon aria-hidden="true" />Update Gallery Page…
-              </button>
-            {/if}
             <button
               type="button"
-              class="btn hover:preset-tonal-surface"
-              data-row="unpublish"
-              onclick={() => (confirming = true)}
+              class="btn preset-filled-error-500"
+              onclick={unpublish}
               disabled={busy}
+              {@attach takeFocus}
+              >{#if busy}<LoaderCircleIcon
+                  class="animate-spin"
+                />{/if}Unpublish</button
             >
-              <EyeOffIcon aria-hidden="true" />Unpublish…
-            </button>
-          </div>
-          {#if onupdate && galleryPages.publishing}
-            <p class="-mt-1 text-xs opacity-70">
-              Update: {kind === 'palette'
-                ? `to “${label}”, with its colors now.`
-                : 'to the project as it is now.'} Its link stays the same.
-            </p>
-          {/if}
-        {/if}
-        {#if confirmingAnonymous}
-          <div
-            class="flex flex-col gap-2"
-            role="group"
-            aria-label="Make anonymous"
-          >
-            <p class="text-sm">
-              This project is on Ravelry, which links to this page under your
-              Ravelry name. Making the page anonymous unlinks it from Ravelry
-              here; the Ravelry project stays.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                class="btn preset-filled-primary-500"
-                onclick={() => setAnonymous(true, { unlinkRavelry: true })}
-                disabled={busy}
-                {@attach takeFocus}>Unlink and Make Anonymous</button
-              >
-              <button
-                type="button"
-                class="btn preset-tonal-surface"
-                onclick={() => {
-                  confirmingAnonymous = false;
-                  void focusRow('anonymous');
-                }}
-                disabled={busy}>Keep My Name</button
-              >
-            </div>
-          </div>
-        {:else}
-          <label class="flex items-start gap-3">
-            <input
-              type="checkbox"
-              class="checkbox mt-0.5 shrink-0"
-              data-row="anonymous"
-              checked={!page.showOwner}
-              disabled={busy}
-              onchange={(e) => {
-                const anonymous = e.currentTarget.checked;
-                // Asked first: the box stays as it was until then
-                if (anonymous && onRavelry) e.currentTarget.checked = false;
-                void setAnonymous(anonymous);
+            <button
+              type="button"
+              class="btn preset-tonal-surface"
+              onclick={() => {
+                confirming = false;
+                void focusRow('unpublish');
               }}
-            />
-            <span class="flex flex-1 flex-col">
-              <span>Anonymous</span>
-              <span class="text-xs opacity-70"
-                >{anonymousDetail(!page.showOwner, ownerName)}</span
-              >
-            </span>
-          </label>
-        {/if}
-        {#if page.showOwner && !ownerName}
-          <p class="text-warning-700-300 text-sm">
-            Add a display name in your
-            <a href={DISPLAY_NAME_HREF} class="link">Profile settings</a>
-            to be credited.
+              disabled={busy}>Keep Published</button
+            >
+          </div>
+        </div>
+      {:else}
+        <div class="flex flex-wrap gap-2">
+          {#if onupdate && galleryPages.publishing}
+            <button
+              type="button"
+              class="btn {isChanged
+                ? 'preset-filled-primary-500'
+                : 'preset-tonal-surface'}"
+              onclick={() => page && onupdate(page)}
+            >
+              <RefreshCwIcon aria-hidden="true" />Update Gallery Page…
+            </button>
+          {/if}
+          <button
+            type="button"
+            class="btn hover:preset-tonal-surface"
+            data-row="unpublish"
+            onclick={() => (confirming = true)}
+            disabled={busy}
+          >
+            <EyeOffIcon aria-hidden="true" />Unpublish…
+          </button>
+        </div>
+        {#if onupdate && galleryPages.publishing}
+          <p class="-mt-1 text-xs opacity-70">
+            Update: {kind === 'palette'
+              ? `to “${label}”, with its colors now.`
+              : onRavelry
+                ? 'the page and its Ravelry project, as the project is now.'
+                : 'to the project as it is now.'} Its link stays the same.
           </p>
         {/if}
       {/if}
-      {#if errorMessage}
-        <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
-      {/if}
-    </section>
-
-    {#if showRavelry && ravelryItem}
-      <RavelryShareSection item={ravelryItem} {page} />
     {/if}
-  </div>
+    {#if errorMessage}
+      <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
+    {/if}
+  </section>
 
   {@render children?.()}
 </div>

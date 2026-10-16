@@ -82,9 +82,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ravelryItem,
         },
       },
-      // Medium: room for Gallery Page and Ravelry side by side; returnable,
-      // so their dialogs have Back to it
-      options: { title: `Share “${label}”`, size: 'medium', returnable: true },
+      // Returnable, so the publish dialog has Back to it
+      options: { title: `Share “${label}”`, returnable: true },
     });
   }
 </script>

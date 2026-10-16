@@ -126,8 +126,7 @@ button to it. -->
   });
 
   // Copy Link and its gallery page, in the panel with Back to this menu
-  const share = () =>
-    openProjectShare(shareName, { returnable: true, item: shareItem });
+  const share = () => openProjectShare(shareName, { item: shareItem });
 
   async function copyProject() {
     try {
