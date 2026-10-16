@@ -13,8 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- On the Account page: connect Ravelry (to post projects there, add photos,
-and match yarns), or disconnect it. Hidden where Ravelry isn't set up. -->
+<!-- On the Account page: connect Ravelry (to post projects there and add photos), or disconnect it. Hidden where Ravelry isn't set up. -->
 
 <script lang="ts">
   import {
@@ -96,7 +95,7 @@ and match yarns), or disconnect it. Hidden where Ravelry isn't set up. -->
               {:else if status.connected}
                 Connected{status.username ? ` as ${status.username}` : ''}
               {:else}
-                Post projects to Ravelry, add photos, and match yarns
+                Post projects to Ravelry and add photos
               {/if}
             </p>
           </div>
