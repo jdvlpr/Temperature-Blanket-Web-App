@@ -166,55 +166,6 @@ describe('project-utils', () => {
       });
     });
 
-    it('shares chosen palettes with each gauge’s own link, and reports them', async () => {
-      const { gauges } = await import('#lib/state/gauges-state.svelte.js');
-      const { buildGalleryRequestBody } =
-        await import('#lib/utils/gallery-upload-utils.js');
-      (gauges.allCreated as unknown[]).push({ colors: [], label: 'Temp' });
-      try {
-        answer({
-          code: 200,
-          link: 'https://example.test/gallery/4',
-          shared_palettes: {
-            created: [{ id: 5, title: 'Warm &amp; bright' }],
-            skipped: [{ title: 'Other', reason: 'duplicate', id: 6 }],
-          },
-        });
-        const result = await projectUtils.sendToProjectGallery('img', {
-          sharePalettes: [
-            { gaugeIndex: 0, title: 'Warm & bright', paletteId: 'pal1' },
-            // no such gauge: left out
-            { gaugeIndex: 3, title: 'Missing' },
-          ],
-        });
-        const data = vi.mocked(buildGalleryRequestBody).mock.calls.at(-1)?.[0];
-        expect(data?.share_palettes).toEqual([
-          {
-            title: 'Warm & bright',
-            yarn_url: 'https://app.test/yarn?s=code&f=details',
-            palette_id: 'pal1',
-          },
-        ]);
-        expect(result).toMatchObject({
-          status: 'sent',
-          palettes: {
-            created: [{ id: 5, title: 'Warm & bright' }],
-            skipped: [{ title: 'Other', reason: 'duplicate', id: 6 }],
-          },
-        });
-
-        // An older plugin doesn't say: null, so the dialog can tell
-        answer({ code: 200, link: 'https://example.test/gallery/7' });
-        expect(
-          await projectUtils.sendToProjectGallery('img', {
-            sharePalettes: [{ gaugeIndex: 0, title: 'Warm' }],
-          }),
-        ).toMatchObject({ status: 'sent', palettes: null });
-      } finally {
-        (gauges.allCreated as unknown[]).length = 0;
-      }
-    });
-
     it('says when it is too large', async () => {
       const { buildGalleryRequestBody } =
         await import('#lib/utils/gallery-upload-utils.js');

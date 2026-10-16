@@ -133,25 +133,6 @@ export const downloadWeatherCSV = () => {
   document.body.removeChild(link);
 };
 
-/** What the gallery did with the palettes shared with a project (plugin 1.7.0) */
-export type SharedPaletteResults = {
-  created: { id: number; title: string }[];
-  /**
-   * reason: 'title', 'link', 'duplicate' (with the existing palette's `id`),
-   * 'error', or 'limit' (the account's daily limit)
-   */
-  skipped: { title: string; reason: string; id?: number }[];
-};
-
-/** A gauge's palette to share with the project, named */
-export type SharePaletteChoice = {
-  /** Its place in gauges.allCreated */
-  gaugeIndex: number;
-  title: string;
-  /** The saved palette with these colors, if any (from an account, its row shows the page) */
-  paletteId?: string;
-};
-
 /** What happened when the project was sent to the gallery, for the dialog to show. */
 export type GallerySendResult =
   | {
@@ -160,11 +141,6 @@ export type GallerySendResult =
       link: string;
       /** An existing page was updated in place (same link) */
       updated: boolean;
-      /**
-       * Its palettes, when some were shared with it: null when the gallery
-       * didn't say (a plugin before 1.7.0 doesn't share them)
-       */
-      palettes?: SharedPaletteResults | null;
     }
   /** The same project is in the gallery already: that page */
   | { status: 'duplicate'; link: string; title: string }
@@ -193,7 +169,6 @@ export const sendToProjectGallery = async (
     showOwner = false,
     name = '',
     postId,
-    sharePalettes = [],
     onStep,
   }: {
     /** A new page: include it on the owner's public gallery, with their name (an update keeps the page's choice) */
@@ -202,8 +177,6 @@ export const sendToProjectGallery = async (
     name?: string;
     /** The project's gallery page, updated in place */
     postId?: number;
-    /** Gauges' palettes to share to the palette gallery with it */
-    sharePalettes?: SharePaletteChoice[];
     onStep?: (step: GallerySendStep) => void;
   } = {},
 ): Promise<GallerySendResult> => {
@@ -269,17 +242,6 @@ export const sendToProjectGallery = async (
     // Only when named: older gallery plugins ignore it, and the title stays the
     // location title so gallery search by place still works
     ...(name && { project_name: name }),
-    // Only when chosen (plugin 1.7.0; older ones ignore it). Not `palettes`,
-    // which is the project's own color codes.
-    ...(sharePalettes.length && {
-      share_palettes: sharePalettes
-        .filter((choice) => yarnUrls[choice.gaugeIndex])
-        .map((choice) => ({
-          title: choice.title,
-          yarn_url: yarnUrls[choice.gaugeIndex],
-          ...(choice.paletteId && { palette_id: choice.paletteId }),
-        })),
-    }),
   };
   // WordPress's messages are text, never HTML
   const text = (value: unknown) =>
@@ -305,7 +267,6 @@ export const sendToProjectGallery = async (
       title?: unknown;
       message?: unknown;
       data?: unknown;
-      shared_palettes?: unknown;
     };
 
     if (Number(response.code) === 200) {
@@ -318,9 +279,6 @@ export const sendToProjectGallery = async (
         status: 'sent',
         link,
         updated: postId !== undefined,
-        ...(sharePalettes.length && {
-          palettes: sharedPalettesFrom(response.shared_palettes),
-        }),
       };
     }
     if (Number(response.code) === 409) {
@@ -356,37 +314,6 @@ function galleryPageHref(permalink: unknown, id?: unknown): string {
   return postId
     ? resolve('/gallery/[id]', { id: postId })
     : String(permalink ?? '');
-}
-
-/** The gallery's answer about shared palettes, as text, or null when it gave none. */
-function sharedPalettesFrom(value: unknown): SharedPaletteResults | null {
-  const shared = value as {
-    created?: { id?: unknown; title?: unknown }[];
-    /** On an update: its palette pages changed in place (shown as shared) */
-    updated?: { id?: unknown; title?: unknown }[];
-    skipped?: { title?: unknown; reason?: unknown; id?: unknown }[];
-  } | null;
-  if (!shared || !Array.isArray(shared.created)) return null;
-  const text = (value: unknown) =>
-    decodeHtmlEntities(String(value ?? '')).trim();
-  return {
-    created: [
-      ...shared.created,
-      ...(Array.isArray(shared.updated) ? shared.updated : []),
-    ]
-      .filter((palette) => typeof palette?.id === 'number')
-      .map((palette) => ({
-        id: palette.id as number,
-        title: text(palette.title),
-      })),
-    skipped: (Array.isArray(shared.skipped) ? shared.skipped : []).map(
-      (palette) => ({
-        title: text(palette?.title),
-        reason: String(palette?.reason ?? 'error'),
-        ...(typeof palette?.id === 'number' && { id: palette.id }),
-      }),
-    ),
-  };
 }
 
 // In the backend db, each project has a locations meta key

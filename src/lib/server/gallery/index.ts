@@ -129,35 +129,6 @@ async function recordPublished(
   if (post.showOwner) await ensurePublicId(gallery.db, gallery.userId);
 }
 
-/** A palette shared with a project, as the browser asks (gallery plugin 1.7.0) */
-type SharePaletteRequest = {
-  title?: unknown;
-  yarn_url?: unknown;
-  /** The matching saved palette, so My Projects shows the page on its row */
-  palette_id?: unknown;
-};
-
-/** What WordPress says about the palettes shared with a project (plugin 1.7.0) */
-export type SharedPalettes = {
-  created: { id: number; title: string; yarn_url: string }[];
-  /** On an update (plugin 1.9.0): this project's palette pages changed in place */
-  updated?: { id: number; title: string; yarn_url: string }[];
-  /** reason: 'title' | 'link' | 'duplicate' (with the existing `id`) | 'error', or 'limit' (this server's daily limit) */
-  skipped: { title: string; yarn_url: string; reason: string; id?: number }[];
-};
-
-/** The part of a palette link that names its colors: from /yarn? on, without v= */
-function paletteLinkKey(link: unknown) {
-  if (typeof link !== 'string') return '';
-  const start = link.indexOf('/yarn?');
-  if (start === -1) return '';
-  const [path, query] = link.slice(start).split('?');
-  return `${path}?${query
-    .split('&')
-    .filter((p) => p !== 'v' && !p.startsWith('v='))
-    .join('&')}`;
-}
-
 /**
  * Publishes the browser's gallery payload as this user, or with `postId`
  * updates that page of theirs in place (same link, views and settings).
@@ -177,7 +148,6 @@ export async function publishFromAccount(
     project_url?: unknown;
     title?: unknown;
     project_name?: unknown;
-    share_palettes?: unknown;
   };
   try {
     payload = JSON.parse(payloadText);
@@ -200,29 +170,14 @@ export async function publishFromAccount(
     showOwner = existing.showOwner ?? false;
   }
 
-  // Palettes shared with it count towards the daily limit: past it, they're
-  // left out (and said so), never the project
-  const requested = Array.isArray(payload?.share_palettes)
-    ? (payload.share_palettes as SharePaletteRequest[])
-    : [];
-  let overLimit: SharePaletteRequest[] = [];
+  // Sharing palettes along with a project is no longer offered: never forward it
+  // Otherwise forwarded as sent, so a large payload is parsed once and never re-encoded
   let forwarded = payloadText;
-  if (requested.length) {
-    const allowance = Math.max(
-      0,
-      PALETTES_PER_DAY -
-        (await countPalettesSince(gallery.db, gallery.userId, now - DAY)),
-    );
-    if (requested.length > allowance) {
-      overLimit = requested.slice(allowance);
-      forwarded = JSON.stringify({
-        ...payload,
-        share_palettes: requested.slice(0, allowance),
-      });
-    }
+  if (payload && typeof payload === 'object' && 'share_palettes' in payload) {
+    delete (payload as { share_palettes?: unknown }).share_palettes;
+    forwarded = JSON.stringify(payload);
   }
 
-  // Otherwise forwarded as sent, so a large payload is parsed once and never re-encoded
   let response: PublishResponse;
   if (postId !== undefined) {
     let result;
@@ -287,51 +242,6 @@ export async function publishFromAccount(
         showOwner,
       });
 
-    // Its palettes, each recorded as the account's own palette page (on its
-    // saved palette's row when there is one), with the project's name choice.
-    // Absent when the plugin is older: they weren't shared.
-    const shared = (response as { shared_palettes?: SharedPalettes })
-      .shared_palettes;
-    if (shared && Array.isArray(shared.created)) {
-      for (const palette of shared.created) {
-        if (typeof palette?.id !== 'number') continue;
-        const asked = requested.find(
-          (r) =>
-            paletteLinkKey(r.yarn_url) === paletteLinkKey(palette.yarn_url),
-        );
-        const paletteId =
-          typeof asked?.palette_id === 'string' &&
-          SAVED_PALETTE_ID.test(asked.palette_id)
-            ? asked.palette_id
-            : '';
-        await recordPost(gallery.db, gallery.userId, {
-          postId: palette.id,
-          projectId: paletteId,
-          title: cleanName(palette.title, MAX_PALETTE_TITLE_LENGTH),
-          publishedAt: now,
-          kind: 'palette',
-          link: typeof palette.yarn_url === 'string' ? palette.yarn_url : null,
-          showOwner,
-        });
-      }
-      // An update changes the project's palette pages that were already there
-      for (const palette of Array.isArray(shared.updated) ? shared.updated : [])
-        if (typeof palette?.id === 'number')
-          await updatePost(gallery.db, gallery.userId, palette.id, {
-            title: cleanName(palette.title, MAX_PALETTE_TITLE_LENGTH),
-            link:
-              typeof palette.yarn_url === 'string' ? palette.yarn_url : null,
-            updatedAt: now,
-          });
-      shared.skipped = [
-        ...(Array.isArray(shared.skipped) ? shared.skipped : []),
-        ...overLimit.map((r) => ({
-          title: cleanName(r.title, MAX_PALETTE_TITLE_LENGTH),
-          yarn_url: typeof r.yarn_url === 'string' ? r.yarn_url : '',
-          reason: 'limit',
-        })),
-      ];
-    }
     return json({ ...response, linked: true });
   }
   return json(response);

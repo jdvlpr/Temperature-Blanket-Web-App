@@ -19,28 +19,20 @@ one page. It shows the project as its gallery card will (preview, name, and "By"
 with the account's name), then publishes it and links to the page. Publishing
 needs an account; signed out, it says so with a way to sign in. From My
 Library, the saved project loads behind the dialog first (with its weather,
-when that isn't kept with it). Each gauge's yarn palette can be shared to the
-palette gallery with it, by choice. -->
+when that isn't kept with it). -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
   import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
   import { account } from '#lib/accounts/summary.svelte.js';
-  import { locations } from '#lib/state/location-state.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
-  import { PaletteStorage } from '#lib/storage/palettes.svelte.js';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
-  import { gauges } from '#lib/state/gauges-state.svelte.js';
-  import type { Color } from '#lib/types/yarn-types.js';
-  import { colorsToPaletteCode } from '#lib/utils/color-utils.js';
-  import { cleanName } from '#lib/utils/string-utils.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
   import { loadInPlace } from '#lib/utils/open-saved-project.js';
   import { svgToPNG } from '#lib/utils/preview-utils.svelte.js';
@@ -48,7 +40,6 @@ palette gallery with it, by choice. -->
     sendToProjectGallery,
     type GallerySendResult,
     type GallerySendStep,
-    type SharePaletteChoice,
   } from '#lib/utils/project-utils.svelte.js';
   import {
     CheckIcon,
@@ -219,66 +210,6 @@ palette gallery with it, by choice. -->
     if (typeof gallery.name === 'string') serverName = gallery.name;
   }
 
-  // Palettes to share with it: each gauge with yarn colors (the palette
-  // gallery shows only those), by its place in gauges.allCreated
-  const MAX_PALETTE_NAME_LENGTH = 80;
-  let shareable = $derived(
-    gauges.allCreated
-      .map((gauge, index) => ({
-        index,
-        colors: (gauge.colors ?? []) as Color[],
-        gaugeName: String(gauge.label ?? 'Gauge'),
-      }))
-      .filter(({ colors }) =>
-        colors.some((color) => color?.brandName && color?.yarnName),
-      ),
-  );
-  let shareChecked = $state<Record<number, boolean>>({});
-  // Names typed; until then, the project's name and the gauge's
-  let shareNames = $state<Record<number, string>>({});
-  const projectLabel = $derived(
-    (project.linkName || locations.projectTitle || 'Project').trim(),
-  );
-  const defaultPaletteName = (gaugeName: string) =>
-    cleanName(`${projectLabel} – ${gaugeName}`, MAX_PALETTE_NAME_LENGTH);
-  const paletteName = (option: { index: number; gaugeName: string }) =>
-    shareNames[option.index] ?? defaultPaletteName(option.gaugeName);
-  let shareChoices = $derived(
-    shareable.filter((option) => shareChecked[option.index]),
-  );
-  let shareNamesMissing = $derived(
-    shareChoices.some(
-      (option) => !cleanName(paletteName(option), MAX_PALETTE_NAME_LENGTH),
-    ),
-  );
-
-  // The chosen palettes, named; from the account, each with its saved palette
-  // when there is one, so My Projects shows its page on that row
-  async function sharePaletteChoices(): Promise<SharePaletteChoice[]> {
-    if (!shareChoices.length) return [];
-    const saved = await PaletteStorage.list().catch(() => []);
-    return shareChoices.map((option) => {
-      const code = colorsToPaletteCode(option.colors);
-      return {
-        gaugeIndex: option.index,
-        title: cleanName(paletteName(option), MAX_PALETTE_NAME_LENGTH),
-        paletteId: saved.find((palette) => palette.code === code)?.id,
-      };
-    });
-  }
-
-  // Why a palette wasn't shared, as people would say it
-  const skippedText = (reason: string) =>
-    reason === 'duplicate'
-      ? 'You’ve published it already.'
-      : reason === 'title'
-        ? 'Its name can’t be used.'
-        : reason === 'link'
-          ? 'It couldn’t be matched to the project.'
-          : reason === 'limit'
-            ? 'You’ve shared as many palettes as you can today.'
-            : 'It couldn’t be shared. You can try again from Save & Export.';
-
   // Every footer: secondary actions, then the one filled primary
   const FOOTER =
     'bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-3 sm:px-4';
@@ -319,9 +250,7 @@ palette gallery with it, by choice. -->
         download: false,
       });
       document.getElementById('temporary-canvas')?.remove();
-      const sharePalettes = await sharePaletteChoices();
       const result = await sendToProjectGallery(img, {
-        sharePalettes,
         showOwner,
         name,
         postId: page?.postId,
@@ -406,41 +335,6 @@ palette gallery with it, by choice. -->
           same.
         </p>
       {/if}
-      {#if sent.palettes === null}
-        <p class="text-sm opacity-80">
-          Its palettes weren’t shared: the gallery can’t do that yet.
-        </p>
-      {:else if sent.palettes}
-        <ul class="flex flex-col gap-1 text-left text-sm" aria-label="Palettes">
-          {#each sent.palettes.created as palette (palette.id)}
-            <li>
-              Shared
-              <a
-                href={resolve('/gallery/palette/[id]', {
-                  id: String(palette.id),
-                })}
-                target="_blank"
-                class="link">“{palette.title}”</a
-              >
-              to the palette gallery.
-            </li>
-          {/each}
-          {#each sent.palettes.skipped as palette, i (i)}
-            <li>
-              “{palette.title}” wasn’t shared. {skippedText(palette.reason)}
-              {#if palette.id}
-                <a
-                  href={resolve('/gallery/palette/[id]', {
-                    id: String(palette.id),
-                  })}
-                  target="_blank"
-                  class="link">View it</a
-                >
-              {/if}
-            </li>
-          {/each}
-        </ul>
-      {/if}
     </div>
   {:else}
     <!-- The project as its gallery card will show it -->
@@ -473,53 +367,6 @@ palette gallery with it, by choice. -->
           name={ownerName}
           disabled={busy}
         />
-      {/if}
-      {#if shareable.length}
-        <fieldset class="flex flex-col gap-3" disabled={busy}>
-          <legend class="mb-2 font-bold">
-            Also share {shareable.length === 1 ? 'its palette' : 'its palettes'}
-            to the
-            <a href={resolve('/gallery/palettes')} target="_blank" class="link"
-              >Yarn Palette Gallery</a
-            >
-          </legend>
-          {#each shareable as option (option.index)}
-            <div class="flex flex-col gap-1">
-              <label class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox"
-                  checked={Boolean(shareChecked[option.index])}
-                  onchange={(event) =>
-                    (shareChecked[option.index] = event.currentTarget.checked)}
-                />
-                <span>{option.gaugeName}</span>
-              </label>
-              <div class="pl-7" aria-hidden="true">
-                <PaletteStrip colors={option.colors} height="12px" />
-              </div>
-              {#if shareChecked[option.index]}
-                <label class="label pl-7">
-                  <span class="label-text"
-                    >Palette name<span class="sr-only">
-                      for {option.gaugeName}</span
-                    ></span
-                  >
-                  <input
-                    type="text"
-                    class="input"
-                    autocomplete="off"
-                    maxlength={MAX_PALETTE_NAME_LENGTH}
-                    required
-                    value={paletteName(option)}
-                    oninput={(event) =>
-                      (shareNames[option.index] = event.currentTarget.value)}
-                  />
-                </label>
-              {/if}
-            </div>
-          {/each}
-        </fieldset>
       {/if}
       {#if problem}
         <div class="text-error-700-300 flex flex-col gap-1" role="alert">
@@ -603,10 +450,7 @@ palette gallery with it, by choice. -->
       <button
         type="button"
         class="btn preset-filled-primary-500"
-        disabled={!previews.active?.svg ||
-          view === 'checking' ||
-          busy ||
-          shareNamesMissing}
+        disabled={!previews.active?.svg || view === 'checking' || busy}
         onclick={submit}
       >
         {#if busy}<LoaderCircleIcon class="animate-spin" />{:else}<SendIcon

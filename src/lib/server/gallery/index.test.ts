@@ -125,13 +125,6 @@ describe('publishFromAccount', () => {
         code: 200,
         id: 77,
         link: 'l',
-        shared_palettes: {
-          created: [],
-          updated: [
-            { id: 90, title: 'Warm', yarn_url: 'https://t.com/yarn?s=2' },
-          ],
-          skipped: [],
-        },
       } as PublishResponse),
     );
     await recordPost(d1, 'u1', {
@@ -140,14 +133,6 @@ describe('publishFromAccount', () => {
       title: 'Old',
       publishedAt: 10,
       showOwner: true,
-    });
-    await recordPost(d1, 'u1', {
-      postId: 90,
-      projectId: '',
-      title: 'Cold',
-      publishedAt: 10,
-      kind: 'palette',
-      link: 'https://t.com/yarn?s=1',
     });
     const body = payload('https://t.com/?project=p1#new', 'New name');
     const response = await publishFromAccount(
@@ -170,12 +155,7 @@ describe('publishFromAccount', () => {
       // The page's own choice, not the one sent
       showOwner: true,
     });
-    expect(posts.find((p) => p.postId === 90)).toMatchObject({
-      title: 'Warm',
-      link: 'https://t.com/yarn?s=2',
-      updatedAt: 2000,
-    });
-    expect(posts).toHaveLength(2);
+    expect(posts).toHaveLength(1);
   });
 
   it('refuses to update a page that isn’t this user’s, without asking WordPress', async () => {
@@ -548,95 +528,25 @@ describe('renaming a palette page', () => {
   });
 });
 
-describe('palettes shared with a project', () => {
-  const link = (code: string) =>
-    `https://temperature-blanket.com/yarn?s=${code}&f=x`;
-  const body = (palettes: unknown[]) =>
-    JSON.stringify({
-      project_url: 'https://temperature-blanket.com/?project=p1#x',
-      title: 'Somewhere',
-      share_palettes: palettes,
-    });
-
-  it('records each created palette as the account’s, on its saved palette', async () => {
+describe('palettes sent with a project', () => {
+  it('are never forwarded to WordPress, and nothing is recorded for them', async () => {
     const { gallery, d1, calls } = await setup(() =>
-      answered({
-        code: 200,
-        id: 50,
-        shared_palettes: {
-          created: [{ id: 51, title: 'Warm', yarn_url: link('aa') }],
-          skipped: [
-            { title: 'Cool', yarn_url: link('bb'), reason: 'duplicate', id: 9 },
-          ],
-        },
-      } as PublishResponse),
+      answered({ code: 200, id: 50 }),
     );
-    const payloadText = body([
-      // the app's own origin and version: matched by the colors part
-      {
-        title: 'Warm',
-        yarn_url: 'https://localhost:5173/yarn?s=aa&v=7&f=x',
-        palette_id: 'pal1',
-      },
-      { title: 'Cool', yarn_url: link('bb') },
-    ]);
-    const response = await publishFromAccount(gallery, payloadText, {
-      showOwner: true,
-    });
-    const answer = await response.json();
-    // Under the limit, forwarded exactly as sent
-    expect(calls[0].body).toBe(payloadText);
-    expect(answer.shared_palettes.skipped).toHaveLength(1);
-    const posts = await listPosts(d1, 'u1');
-    expect(posts.find((p) => p.postId === 51)).toMatchObject({
-      kind: 'palette',
-      projectId: 'pal1',
-      title: 'Warm',
-      link: link('aa'),
-      showOwner: true,
-    });
-    expect(posts.map((p) => p.postId).sort()).toEqual([50, 51]);
-  });
-
-  it('leaves out palettes past the daily limit, never the project', async () => {
-    const { gallery, d1, calls } = await setup(() =>
-      answered({
-        code: 200,
-        id: 60,
-        shared_palettes: { created: [], skipped: [] },
-      } as PublishResponse),
-    );
-    for (let i = 0; i < PALETTES_PER_DAY - 1; i++)
-      await recordPost(d1, 'u1', {
-        postId: 100 + i,
-        projectId: '',
-        title: 'Earlier',
-        publishedAt: Date.now(),
-        kind: 'palette',
-      });
-    const response = await publishFromAccount(
-      gallery,
-      body([
-        { title: 'One', yarn_url: link('aa') },
-        { title: 'Two', yarn_url: link('bb') },
-      ]),
-    );
-    expect(JSON.parse(calls[0].body).share_palettes).toEqual([
-      { title: 'One', yarn_url: link('aa') },
-    ]);
-    const answer = await response.json();
-    expect(answer.code).toBe(200);
-    expect(answer.shared_palettes.skipped).toEqual([
-      { title: 'Two', yarn_url: link('bb'), reason: 'limit' },
-    ]);
-  });
-
-  it('records no palettes when an older plugin doesn’t answer about them', async () => {
-    const { gallery, d1 } = await setup(() => answered({ code: 200, id: 70 }));
     await publishFromAccount(
       gallery,
-      body([{ title: 'One', yarn_url: link('aa') }]),
+      JSON.stringify({
+        project_url: 'https://temperature-blanket.com/?project=p1#x',
+        title: 'Somewhere',
+        share_palettes: [
+          {
+            title: 'Warm',
+            yarn_url: 'https://temperature-blanket.com/yarn?s=aa',
+          },
+        ],
+      }),
     );
-    expect((await listPosts(d1, 'u1')).map((p) => p.postId)).toEqual([70]);
+    expect(JSON.parse(calls[0].body)).not.toHaveProperty('share_palettes');
+    expect((await listPosts(d1, 'u1')).map((p) => p.postId)).toEqual([50]);
   });
 });
