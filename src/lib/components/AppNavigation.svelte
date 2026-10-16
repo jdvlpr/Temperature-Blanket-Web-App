@@ -14,24 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { version } from '$app/env';
-  import { resolve } from '$app/paths';
-  import { page } from '$app/state';
-  import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import PreferencesDialog from '#lib/components/modals/PreferencesDialog.svelte';
   import { SMALL_LINK, SMALL_LINKS } from '#lib/constants/class-constants.js';
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
+  import { version } from '$app/env';
+  import { PUBLIC_GITHUB_LINK } from '$app/env/public';
+  import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import { yarnBall } from '@lucide/lab';
   import {
     CloudyIcon,
     ExternalLinkIcon,
-    LibraryBigIcon,
-    GlobeIcon,
     HeartIcon,
     Icon,
     LandmarkIcon,
+    LibraryBigIcon,
     NotebookPenIcon,
     SlidersHorizontalIcon,
     SwatchBookIcon,
@@ -122,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-current={pathname === '/' ? 'page' : undefined}
   >
     <NotebookPenIcon />
-    Project
+    Project Planner
   </a>
 
   <a
@@ -146,21 +145,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </a>
 
   <a
-    href="/globe"
-    class={[LINK, pathname === '/globe' && CURRENT]}
-    aria-current={pathname === '/globe' ? 'page' : undefined}
-  >
-    <GlobeIcon />
-    Globe
-  </a>
-
-  <a
     href="/yarn-colorway-finder"
     class={[LINK, pathname === '/yarn-colorway-finder' && CURRENT]}
     aria-current={pathname === '/yarn-colorway-finder' ? 'page' : undefined}
   >
     <Icon iconNode={yarnBall} />
-    Yarn Colorway Finder
+    Yarn Colorways
   </a>
 
   <a

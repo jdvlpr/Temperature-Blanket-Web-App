@@ -139,7 +139,7 @@ only in the gallery), with search, filters and sort once there are a few. -->
             {#if showGallery}<LibraryStatusMenu gallery />{/if}
           {/snippet}
           {#snippet actions()}
-            <a href={resolve('yarn')} class="btn hover:preset-tonal-surface"
+            <a href={resolve('yarn')} class="btn preset-tonal-primary"
               ><PlusIcon />New Palette</a
             >
           {/snippet}

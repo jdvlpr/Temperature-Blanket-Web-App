@@ -3,31 +3,31 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
+  import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
     fetchProjects,
     GALLERY_SORTS,
     type FetchProjectsResult,
   } from '#lib/utils/gallery-utils.js';
-  import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
-  import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import { resolve } from '$app/paths';
-  import { XIcon, PlusIcon } from '@lucide/svelte';
+  import { GlobeIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, galleryState } from './state.svelte';
@@ -188,15 +188,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
-      <div class="mb-2 flex w-full justify-center">
+      <div class="mb-2 flex w-full items-center justify-center gap-2">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
         {:else if totalProjects !== undefined}
           <p class="text-xs">
             {totalProjects} total
           </p>
+          <a
+            href="/globe"
+            class="btn btn-sm hover:preset-tonal-surface items-center gap-1"
+          >
+            <GlobeIcon />
+            View Globe
+          </a>
         {/if}
       </div>
+
       <CollectionToolbar
         kind="project"
         searchLabel="Search Projects"
@@ -228,6 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/snippet}
       </CollectionToolbar>
     </div>
+
     <div
       class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}

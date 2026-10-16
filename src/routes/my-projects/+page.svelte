@@ -119,7 +119,7 @@ in the gallery), with search, filters and sort once there are a few. -->
             <!-- A full load: the project open before stays loaded otherwise -->
             <a
               href={resolve('/')}
-              class="btn hover:preset-tonal-surface"
+              class="btn preset-tonal-primary"
               data-sveltekit-reload
             >
               <PlusIcon />
