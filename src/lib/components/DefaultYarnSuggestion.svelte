@@ -1,11 +1,13 @@
 <!-- Suggests making a yarn the default once it's been used a few times, in
-place of an always-there toggle. The default is otherwise set in Preferences. -->
+place of an always-there toggle. The default is otherwise set in Preferences
+(/preferences, linked in a new tab so the dialog it's shown in stays open). -->
 
 <script lang="ts">
   import { defaultYarn } from '#lib/state/page-state.svelte.js';
   import { yarnKey, yarnUses } from '#lib/storage/yarn-uses.svelte.js';
   import { stringToBrandAndYarnDetails } from '#lib/utils/yarn-utils.js';
-  import { CheckIcon, XIcon } from '@lucide/svelte';
+  import { resolve } from '$app/paths';
+  import { CheckIcon, ExternalLinkIcon, XIcon } from '@lucide/svelte';
 
   let {
     selectedBrandId,
@@ -91,7 +93,17 @@ empty, so it leaves no gap -->
     >
       <CheckIcon class="shrink-0" aria-hidden="true" />
       <span
-        ><strong>{name(key)}</strong> is your default yarn. Change it anytime in Preferences.</span
+        ><strong>{name(key)}</strong> is your default yarn. Change it anytime in
+        <a
+          href={resolve('preferences')}
+          class="link inline-flex items-center gap-1"
+          target="_blank"
+          rel="noopener"
+          >Preferences<ExternalLinkIcon
+            class="icon-sm"
+            aria-hidden="true"
+          /><span class="sr-only">(opens in a new tab)</span></a
+        >.</span
       >
     </p>
   {/if}

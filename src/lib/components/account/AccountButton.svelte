@@ -13,11 +13,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The account button in the top bar. Signed in, it opens a menu with the
-account's details, sync and sign out; otherwise it's a way to sign in. Nothing
-when accounts are off. -->
+<!-- The account button in the top bar, and the way to Preferences. Signed in,
+it opens a panel with the account's details, sync, Preferences and sign out;
+signed out, a menu to sign in or open Preferences. With accounts off, it's a
+link to Preferences. -->
 
 <script lang="ts">
+  import {
+    menuContentClass,
+    menuItemClass,
+    menuPositioning,
+  } from '#lib/components/menu-styles.js';
   import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
@@ -31,10 +37,13 @@ when accounts are off. -->
   import { sync } from '#lib/sync/status.svelte.js';
   import {
     CircleUserRoundIcon,
+    LogInIcon,
     LogOutIcon,
+    SlidersHorizontalIcon,
     UserRoundCogIcon,
   } from '@lucide/svelte';
-  import { Popover } from '@skeletonlabs/skeleton-svelte';
+  import { Menu, Popover, Portal } from '@skeletonlabs/skeleton-svelte';
+  import type { HTMLAnchorAttributes } from 'svelte/elements';
   import { onMount } from 'svelte';
 
   const BUTTON = 'btn-icon hover:preset-tonal-surface shrink-0';
@@ -45,6 +54,27 @@ when accounts are off. -->
   let errorMessage = $state('');
 
   let onAccountPage = $derived(page.url.pathname === '/account');
+  let onPreferencesPage = $derived(page.url.pathname === '/preferences');
+  // The button shows as current on either page it leads to
+  let current = $derived(onAccountPage || onPreferencesPage);
+
+  // Signed out, the menu's links
+  let signedOutItems = $derived([
+    {
+      value: 'sign-in',
+      label: 'Sign In',
+      href: resolve('account'),
+      icon: LogInIcon,
+      here: onAccountPage,
+    },
+    {
+      value: 'preferences',
+      label: 'Preferences',
+      href: resolve('preferences'),
+      icon: SlidersHorizontalIcon,
+      here: onPreferencesPage,
+    },
+  ]);
 
   // After loading, so the server's page (which can't know) doesn't differ
   let mounted = $state(false);
@@ -78,11 +108,22 @@ when accounts are off. -->
   }
 </script>
 
-{#if __ACCOUNTS_ENABLED__}
+{#if !__ACCOUNTS_ENABLED__}
+  <a
+    href={resolve('preferences')}
+    class={[BUTTON, onPreferencesPage && 'preset-tonal-secondary']}
+    aria-label="Preferences"
+    aria-current={onPreferencesPage ? 'page' : undefined}
+    title="Preferences"
+  >
+    <SlidersHorizontalIcon aria-hidden="true" />
+  </a>
+{:else}
   {#if account.summary}
     {@const summary = account.summary}
     <Popover
       {open}
+      positioning={menuPositioning('bottom-end')}
       onOpenChange={(e) => {
         open = e.open;
 
@@ -93,7 +134,7 @@ when accounts are off. -->
       }}
     >
       <Popover.Trigger
-        class={[BUTTON, (open || onAccountPage) && 'preset-tonal-secondary']}
+        class={[BUTTON, (open || current) && 'preset-tonal-secondary']}
         aria-label="Account"
         title="Account: {summary.name || summary.email}"
         data-testid="account-button"
@@ -147,6 +188,16 @@ when accounts are off. -->
                         <span class="font-bold">Account settings</span>
                       </a>
                     {/if}
+                    {#if !onPreferencesPage}
+                      <a
+                        href={resolve('preferences')}
+                        class={ROW}
+                        onclick={() => (open = false)}
+                      >
+                        <SlidersHorizontalIcon class="shrink-0 opacity-70" />
+                        <span class="font-bold">Preferences</span>
+                      </a>
+                    {/if}
                     <button
                       type="button"
                       class={ROW}
@@ -178,23 +229,56 @@ when accounts are off. -->
       </Popover.Positioner>
     </Popover>
   {:else}
-    <!-- A "New" dot, until it's used, to introduce accounts -->
+    <!-- A "New" dot, until it's opened, to introduce accounts -->
     {@const isNew = mounted && accountsIntro.showDot}
-    <a
-      href={resolve('account')}
-      class={[BUTTON, 'relative', onAccountPage && 'preset-tonal-secondary']}
-      aria-label={isNew ? 'Sign in. Accounts (Beta)' : 'Sign in'}
-      title={isNew ? 'Sign in. Accounts (Beta)' : 'Sign in'}
-      data-testid="account-button"
-      onclick={() => accountsIntro.markButtonSeen()}
+    {@const label = isNew
+      ? 'Sign in and Preferences. Accounts (Beta)'
+      : 'Sign in and Preferences'}
+    <Menu
+      positioning={menuPositioning('bottom-end')}
+      onOpenChange={(e) => {
+        if (e.open) accountsIntro.markButtonSeen();
+      }}
     >
-      <CircleUserRoundIcon />
-      {#if isNew}
-        <span
-          class="bg-primary-500 absolute top-1.5 right-1.5 size-2.5 rounded-full"
-          aria-hidden="true"
-        ></span>
-      {/if}
-    </a>
+      <Menu.Trigger
+        class={[
+          BUTTON,
+          'data-[state=open]:preset-tonal-secondary relative',
+          current && 'preset-tonal-secondary',
+        ]}
+        aria-label={label}
+        title={label}
+        data-testid="account-button"
+      >
+        <CircleUserRoundIcon aria-hidden="true" />
+        {#if isNew}
+          <span
+            class="bg-primary-500 absolute top-1.5 right-1.5 size-2.5 rounded-full"
+            aria-hidden="true"
+          ></span>
+        {/if}
+      </Menu.Trigger>
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content class={menuContentClass}>
+            {#each signedOutItems as item (item.value)}
+              <Menu.Item value={item.value} class={menuItemClass}>
+                {#snippet element(attributes)}
+                  <!-- The item's menu behavior, typed for its default div -->
+                  <a
+                    {...attributes as HTMLAnchorAttributes}
+                    href={item.href}
+                    aria-current={item.here ? 'page' : undefined}
+                  >
+                    <item.icon aria-hidden="true" />
+                    <span>{item.label}</span>
+                  </a>
+                {/snippet}
+              </Menu.Item>
+            {/each}
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu>
   {/if}
 {/if}

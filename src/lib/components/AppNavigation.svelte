@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import PreferencesDialog from '#lib/components/modals/PreferencesDialog.svelte';
   import { SMALL_LINK, SMALL_LINKS } from '#lib/constants/class-constants.js';
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -32,7 +31,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LandmarkIcon,
     LibraryBigIcon,
     NotebookPenIcon,
-    SlidersHorizontalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
@@ -88,21 +86,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <LibraryBigIcon />
     My Library
   </a>
-
-  <button
-    class="btn hover:preset-tonal-surface"
-    onclick={() =>
-      dialog.trigger({
-        component: {
-          ref: PreferencesDialog,
-        },
-        type: 'component',
-        options: { title: 'Preferences' },
-      })}
-  >
-    <SlidersHorizontalIcon />
-    My Preferences
-  </button>
 
   <a
     href="/supporters"
