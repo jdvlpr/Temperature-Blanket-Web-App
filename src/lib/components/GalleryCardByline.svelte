@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   "By <name> · 1.2K views" on a gallery card, under when it was published, as
   on its gallery page. One line when they fit, else two, with no dot starting
-  a line (each dot sits in the space the row's negative margin hides). Nothing
+  a line (each dot sits in the space the row's negative margin hides, and
+  screen readers skip them). Nothing
   without a name or views.
 -->
 <script lang="ts">
@@ -33,11 +34,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if author || views}
   <span class="text-surface-700-300 block overflow-hidden text-xs">
-    <span
-      class="-ml-3 flex flex-wrap [&>*]:before:inline-block [&>*]:before:w-3 [&>*]:before:text-center [&>*]:before:content-['·']"
-    >
-      {#if author}<span class="max-w-full truncate">By {author}</span>{/if}
-      <ViewCount {views} class="whitespace-nowrap" />
+    <span class="-ml-3 flex flex-wrap">
+      {#if author}
+        <span class="max-w-full truncate">{@render dot()}By {author}</span>
+      {/if}
+      {#if views}
+        <span class="whitespace-nowrap"
+          >{@render dot()}<ViewCount {views} /></span
+        >
+      {/if}
     </span>
   </span>
 {/if}
+
+{#snippet dot()}<span aria-hidden="true" class="inline-block w-3 text-center"
+    >·</span
+  >{/snippet}
