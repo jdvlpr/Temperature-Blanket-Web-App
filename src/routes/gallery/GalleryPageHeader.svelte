@@ -15,12 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   The top of a gallery page, the same for projects and palettes: its name, a
-  line under it, "By <name> · Published <date>" (the only place either shows),
+  line under it, then "Published <date>" and under that "By <name> · 1.2K
+  views" (the order gallery cards use too),
   then Open a Copy and, for its owner, Edit Gallery Page (the dialog its
   Share dialog in My Library opens).
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import ViewCount from '#lib/components/ViewCount.svelte';
   import GalleryPageEdit from '#lib/components/account/GalleryPageEdit.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
   import type { Component, Snippet } from 'svelte';
@@ -34,6 +36,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     date?: string | null;
     /** When it was last changed (updated in place), as the gallery gives it */
     modified?: string | null;
+    /** Its views, all time, as the gallery gives them (none shows nothing) */
+    views?: number | null;
     /** The page's name (h1) */
     heading: Snippet;
     /** A line under the name */
@@ -55,11 +59,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     owner = $bindable(),
     date,
     modified,
+    views,
     heading,
     subtitle,
     details,
     open,
   }: Props = $props();
+
+  // Items on a line, a dot between
+  const META_LINE =
+    "text-surface-600-400 flex flex-wrap justify-center gap-x-1.5 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']";
 
   const dayOf = (value?: string | null) =>
     value
@@ -81,25 +90,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if subtitle}
     <p>{@render subtitle()}</p>
   {/if}
-  {#if owner || sharedOn || details}
-    <p
-      class="text-surface-600-400 flex flex-wrap justify-center gap-x-1.5 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']"
-    >
-      {#if owner}
-        <span data-testid="gallery-owner"
-          >By <a
-            class="link"
-            href={resolve('/gallery/by/[ownerId]', {
-              ownerId: owner.publicId,
-            })}>{owner.name}</a
-          ></span
-        >
-      {/if}
-      {#if sharedOn}<span>Published {sharedOn}</span>{/if}
-      {#if updatedOn}<span>Updated {updatedOn}</span>{/if}
-      {@render details?.()}
-    </p>
-  {/if}
+  <div class="flex flex-col gap-0.5 empty:hidden">
+    {#if sharedOn || details}
+      <p class={META_LINE}>
+        {#if sharedOn}<span>Published {sharedOn}</span>{/if}
+        {#if updatedOn}<span>Updated {updatedOn}</span>{/if}
+        {@render details?.()}
+      </p>
+    {/if}
+    {#if owner || views}
+      <p class={META_LINE}>
+        {#if owner}
+          <span data-testid="gallery-owner"
+            >By <a
+              class="link"
+              href={resolve('/gallery/by/[ownerId]', {
+                ownerId: owner.publicId,
+              })}>{owner.name}</a
+            ></span
+          >
+        {/if}
+        <ViewCount {views} />
+      </p>
+    {/if}
+  </div>
 
   <div
     class="mt-2 flex flex-wrap items-center justify-center gap-2 empty:hidden"

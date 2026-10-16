@@ -207,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       aria-label="Projects by {data.name}"
     >
-      {#each shown as { databaseId, featuredImage, locations, projectName, date } (databaseId)}
+      {#each shown as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
         <li>
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
@@ -218,6 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : getTitleTextFromLocationsMeta(locations)}
             {date}
             title={getTitleTextFromLocationsMeta(locations)}
+            {views}
             layout={ownerFilters.layout}
           />
         </li>

@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import { GlobeIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { galleryOwners } from './gallery-owners.svelte';
   import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, galleryState } from './state.svelte';
 
@@ -180,6 +181,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     galleryState.filteredPatternType = '';
     search();
   }
+
+  // "By <name>" on the cards shown
+  $effect(() => {
+    galleryOwners.load(
+      galleryState.displayedProjects.map((project) => project.databaseId),
+    );
+  });
 </script>
 
 <div class="flex flex-col justify-center gap-8">
@@ -244,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'grid grid-cols-1 items-start md:grid-cols-2'}"
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, date } (databaseId)}
+        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
             image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
@@ -254,6 +262,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : getTitleTextFromLocationsMeta(locations)}
             {date}
             title={getTitleTextFromLocationsMeta(locations)}
+            author={galleryOwners.nameOf(databaseId)}
+            {views}
             layout={galleryState.layout}
           />
         {/each}

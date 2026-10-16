@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import { PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { galleryOwners } from './gallery-owners.svelte';
   import PopularPeriodMenu from './PopularPeriodMenu.svelte';
   import { galleryFilters, yarnPaletteGalleryState } from './state.svelte';
 
@@ -138,6 +139,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const gridClass =
     'grid w-full grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
   const listClass = 'flex w-full flex-col items-start gap-6';
+
+  // "By <name>" on the cards shown
+  $effect(() => {
+    galleryOwners.load(
+      yarnPaletteGalleryState.palettes.map((palette) => palette.page.id),
+    );
+  });
 </script>
 
 {#snippet placeholders(count: number)}
@@ -191,7 +199,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <div class={grid ? gridClass : listClass}>
       {#each yarnPaletteGalleryState.palettes as palette, i (i)}
-        <GalleryPaletteCard {palette} />
+        <GalleryPaletteCard
+          {palette}
+          author={galleryOwners.nameOf(palette.page.id)}
+        />
       {/each}
       {#if loading}
         {@render placeholders(grid ? 12 : 8)}

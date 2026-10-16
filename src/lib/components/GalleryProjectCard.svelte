@@ -30,13 +30,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A project as a card: its preview image (or a `cover` in its place), its name
-  (or its places and dates) and when it was published, all one link, as on
+  (or its places and dates), when it was published, then who by and its
+  views (as on its gallery page), all one link, as on
   My Library. In a grid or row it stands up, the picture over the name; in a
   list it lies down, the picture beside the name.
   The gallery's cards are only that; My Projects gives its own `nameRow` (with
   its ⋮ menu, outside the link), `details` and a `footer` with its sharing.
 -->
 <script lang="ts">
+  import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -47,6 +49,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label?: string;
     /** When it was published (the gallery post's date) */
     date?: string | null;
+    /** Who published it, when their name shows on its gallery page */
+    author?: string | null;
+    /** Its gallery page's views, all time (none shows nothing) */
+    views?: number | null;
     layout?: 'grid' | 'list' | 'row';
     /** In place of the image, when there's none (sized with `coverClasses`) */
     cover?: Snippet;
@@ -66,6 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     image,
     label = '',
     date,
+    author,
+    views,
     layout = 'grid',
     cover,
     nameRow,
@@ -122,6 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >{dateLine}</span
           >
         {/if}
+        <GalleryCardByline {author} {views} />
       </span>
     {/if}
   </a>

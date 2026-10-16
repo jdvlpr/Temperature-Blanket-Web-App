@@ -25,10 +25,13 @@ export type GalleryPageInfo = {
   endCursor: string | null;
 };
 
+/** Fields an older gallery plugin doesn't have: `projectName` (1.6.0), `views` (1.11.0) */
+const NEWER_FIELDS = ['projectName', 'views'];
+
 /**
- * Sends a query to the gallery's GraphQL. A gallery plugin before 1.6.0 has no
- * `projectName`, and rejects any query asking for it: the query is then sent
- * again without it, so the gallery works whichever plugin is live.
+ * Sends a query to the gallery's GraphQL. An older gallery plugin rejects any
+ * query asking for a field it doesn't have (`NEWER_FIELDS`): the query is then
+ * sent again without those, so the gallery works whichever plugin is live.
  */
 export async function queryGallery(
   query: string,
@@ -43,10 +46,18 @@ export async function queryGallery(
     return { response, result: await response.json().catch(() => null) };
   };
   const first = await send(query);
-  const missingName = first.result?.errors?.some((e: { message?: string }) =>
-    e.message?.includes('projectName'),
+  const missing = NEWER_FIELDS.filter((field) =>
+    first.result?.errors?.some((e: { message?: string }) =>
+      e.message?.includes(`Cannot query field "${field}"`),
+    ),
   );
-  return missingName ? send(query.replace(/\bprojectName\b/g, '')) : first;
+  if (!missing.length) return first;
+  return send(
+    missing.reduce(
+      (text, field) => text.replace(new RegExp(`\\b${field}\\b`, 'g'), ''),
+      query,
+    ),
+  );
 }
 
 export type GalleryProjectNode = {
@@ -54,6 +65,8 @@ export type GalleryProjectNode = {
   /** The name the project was given, if any (gallery plugin 1.6.0) */
   projectName?: string | null;
   databaseId: number;
+  /** How many times its gallery page was viewed, all time (gallery plugin 1.11.0) */
+  views?: number | null;
   projectUrl: string;
   yarnUrls: string;
   locations: string;
@@ -80,6 +93,8 @@ export type GallerySharedPaletteNode = {
   __typename: 'Palette';
   title: string;
   databaseId: number;
+  /** As for projects */
+  views?: number | null;
   /** A JSON array holding the palette's Yarn Palette Creator link */
   yarnUrls: string;
   date: string;
@@ -129,7 +144,7 @@ export const fetchPaletteGallery = async ({
     if (popular) {
       const nodes = await fetchNodesByIds<PaletteGalleryNode>(
         `contentNodes(first: $first, where: { contentTypes: [TEMPBLANKET_PALETTE], in: $ids }) {
-          nodes { __typename ... on Palette { title databaseId yarnUrls date } }
+          nodes { __typename ... on Palette { title databaseId yarnUrls date views } }
         }`,
         'contentNodes',
         popular.ids,
@@ -159,7 +174,7 @@ export const fetchPaletteGallery = async ({
         edges {
           node {
             __typename
-            ... on Palette { title databaseId yarnUrls date }
+            ... on Palette { title databaseId yarnUrls date views }
           }
         }
       }
@@ -209,6 +224,7 @@ const PROJECT_NODE_FIELDS = `
   title
   projectName
   databaseId
+  views
   projectUrl
   yarnUrls
   locations
@@ -485,7 +501,7 @@ export async function fetchProjectsWithLink(
         projects(first: $first, after: $after, where: { yarnUrls: $search, orderby: { field: DATE, order: ASC } }) {
           pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
           nodes {
-            title projectName databaseId projectUrl yarnUrls locations date
+            title projectName databaseId projectUrl yarnUrls locations date views
             featuredImage { node { mediaItemUrl mediaDetails { sizes(include: MEDIUM) { sourceUrl } } } }
           }
         }

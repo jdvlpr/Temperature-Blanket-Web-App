@@ -402,6 +402,34 @@ export async function ownerForPost(
   return row ? { name: row.name.trim(), publicId: row.publicId } : null;
 }
 
+/** As `ownerForPost`, for a page of gallery cards (at most 100): only those with an owner to show. */
+export async function ownersForPosts(
+  db: D1Database,
+  postIds: number[],
+): Promise<Record<number, GalleryOwner>> {
+  const ids = [...new Set(postIds)].slice(0, 100);
+  if (!ids.length) return {};
+  const { results } = await db
+    .prepare(
+      `select "galleryPost"."postId" as "postId", "user"."name" as "name",
+         "galleryOwner"."publicId" as "publicId"
+       from "galleryPost"
+       join "galleryOwner" on "galleryOwner"."userId" = "galleryPost"."userId"
+       join "user" on "user"."id" = "galleryPost"."userId"
+       where "galleryPost"."postId" in (${ids.map(() => '?').join(', ')})
+         and "galleryPost"."showOwner" = 1
+         and "galleryPost"."hiddenAt" is null and ${NAMED_OWNER}`,
+    )
+    .bind(...ids)
+    .all<GalleryOwner & { postId: number }>();
+  return Object.fromEntries(
+    results.map((row) => [
+      row.postId,
+      { name: row.name.trim(), publicId: row.publicId },
+    ]),
+  );
+}
+
 /**
  * An owner's page: their name and the gallery pages (projects and palettes)
  * included on it, newest first, or null when there are none to show.

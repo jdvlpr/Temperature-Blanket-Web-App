@@ -34,7 +34,7 @@ export const prerender = false;
 
 export type GalleryPalettePage = Pick<
   GallerySharedPaletteNode,
-  'databaseId' | 'title' | 'yarnUrls' | 'date'
+  'databaseId' | 'title' | 'yarnUrls' | 'date' | 'views'
 > & {
   /** The project it came from (gallery plugin 1.7.0), which may be gone since */
   sourceProjectId?: number | null;
@@ -94,7 +94,7 @@ async function getPalette(
     const query = (fields: string) =>
       queryGallery(
         `query GALLERY_PALETTE($id: ID!) {
-          palette(id: $id, idType: DATABASE_ID) { databaseId title yarnUrls date ${fields} }
+          palette(id: $id, idType: DATABASE_ID) { databaseId title yarnUrls date views ${fields} }
         }`,
         { id },
       );

@@ -331,6 +331,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:owner
               date={project?.date}
               modified={project?.modified}
+              views={project?.views}
               open={projectURL && openHref
                 ? {
                     href: openHref,

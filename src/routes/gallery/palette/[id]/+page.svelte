@@ -55,6 +55,7 @@ with them. -->
   import type { PageData } from './$types';
   import GalleryPageHeader from '../../GalleryPageHeader.svelte';
   import GalleryYarnLines from '../../GalleryYarnLines.svelte';
+  import { galleryOwners } from '../../gallery-owners.svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -157,6 +158,10 @@ with them. -->
         )
       : [],
   );
+  // "By <name>" on its projects' cards
+  $effect(() => {
+    galleryOwners.load(projects.map((project) => project.databaseId));
+  });
   let samePalettes = $derived(
     palette
       ? postsWithColors(palette.colors, samePalettesFound).filter(
@@ -203,6 +208,7 @@ with them. -->
             kind="palette"
             bind:owner
             date={galleryPalette?.date}
+            views={galleryPalette?.views}
             open={palette
               ? {
                   href: palette.href,
@@ -284,7 +290,7 @@ with them. -->
             Projects with this palette
           </h2>
           <div class="flex flex-wrap items-start justify-center gap-2">
-            {#each projects as { databaseId, featuredImage, locations, projectName, date } (databaseId)}
+            {#each projects as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
               <div class="w-40 sm:w-56">
                 <GalleryProjectCard
                   href={resolve('/gallery/[id]', { id: String(databaseId) })}
@@ -295,6 +301,8 @@ with them. -->
                     : getTitleTextFromLocationsMeta(locations)}
                   {date}
                   title={getTitleTextFromLocationsMeta(locations)}
+                  author={galleryOwners.nameOf(databaseId)}
+                  {views}
                 >
                   {#snippet details()}
                     {#if databaseId === sourceProjectId}

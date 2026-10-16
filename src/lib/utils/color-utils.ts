@@ -925,6 +925,7 @@ type GallerySharedPaletteSummary = {
   title: string;
   yarnUrls: string;
   databaseId: string | number;
+  views?: number | null;
 };
 
 type GalleryProjectSummary = {
@@ -935,6 +936,7 @@ type GalleryProjectSummary = {
   yarnUrls: string;
   locations: string;
   databaseId: string | number;
+  views?: number | null;
 };
 
 export type GalleryPalette = {
@@ -953,6 +955,8 @@ type GalleryPalettePage = {
   id: number;
   title: string;
   kind: 'palette' | 'project';
+  /** How many times the page was viewed, all time; unknown with an older gallery plugin */
+  views?: number | null;
 };
 
 export const getPalettesFromProjects = ({
@@ -1043,6 +1047,7 @@ export const getPalettesFromProjects = ({
             id,
             title: decodeHtmlEntities(sharedPalette.title ?? '').trim(),
             kind: 'palette',
+            views: project.views,
           };
         else {
           const { projectName, locations } = project as GalleryProjectSummary;
@@ -1053,6 +1058,7 @@ export const getPalettesFromProjects = ({
             id,
             title: i > 0 ? `${title} - ${i + 1}` : title,
             kind: 'project',
+            views: project.views,
           };
         }
 

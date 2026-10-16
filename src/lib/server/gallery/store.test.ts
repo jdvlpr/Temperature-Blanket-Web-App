@@ -8,6 +8,7 @@ import {
   newPublicId,
   ownerForPost,
   ownerPage,
+  ownersForPosts,
   PUBLIC_ID_PATTERN,
   ownsPost,
   postKind,
@@ -99,6 +100,20 @@ describe('gallery store', () => {
     await ensurePublicId(d1, 'u2');
     expect(await ownerForPost(d1, 12)).toBeNull();
     expect(await ownerForPost(d1, 99)).toBeNull();
+  });
+
+  it('finds the owners of a page of cards at once, like one page', async () => {
+    const { d1 } = setup();
+    await recordPost(d1, 'u1', { ...post(10), showOwner: true });
+    await recordPost(d1, 'u1', post(11));
+    await recordPost(d1, 'u2', { ...post(12), showOwner: true });
+    expect(await ownersForPosts(d1, [10, 11, 12])).toEqual({});
+    const publicId = await ensurePublicId(d1, 'u1');
+    await ensurePublicId(d1, 'u2');
+    expect(await ownersForPosts(d1, [10, 11, 12, 99, 10])).toEqual({
+      10: { name: 'Ada Lovelace', publicId },
+    });
+    expect(await ownersForPosts(d1, [])).toEqual({});
   });
 
   it('includes and takes off one page at a time, for its owner only', async () => {

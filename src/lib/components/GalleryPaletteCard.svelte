@@ -17,22 +17,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A palette from the gallery, as a card. In the gallery (`mode="page"`)
   tapping it opens its gallery page. In the Yarn Palette Creator's Browse Palettes (`mode="use"`) tapping it uses
   it (`onclick`), and the button opens its page in a new tab, so the palette
-  being made stays open.
+  being made stays open. In the gallery it also says who published it (when
+  their name shows on its page) and its page's views.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import PaletteCard from '#lib/components/PaletteCard.svelte';
+  import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
   import { SwatchBookIcon } from '@lucide/svelte';
 
   interface Props {
     palette: GalleryPalette;
+    /** Who published its page, when their name shows there (`mode="page"`) */
+    author?: string | null;
     mode?: 'page' | 'use';
     /** Uses the palette (`mode="use"`) */
     onclick?: () => void;
   }
 
-  let { palette, mode = 'page', onclick }: Props = $props();
+  let { palette, author, mode = 'page', onclick }: Props = $props();
 
   // Its own page, or (from a gallery before palette pages) its project's
   let pageHref = $derived(
@@ -52,6 +56,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onclick={mode === 'use' ? onclick : undefined}
   title={mode === 'page' ? `Open ${pageLabel}` : 'Use This Palette'}
 >
+  {#snippet details()}
+    {#if mode === 'page'}
+      <GalleryCardByline {author} views={palette.page.views} />
+    {/if}
+  {/snippet}
   {#snippet action()}
     {#if mode === 'use'}
       <a

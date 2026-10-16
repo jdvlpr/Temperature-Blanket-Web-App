@@ -37,11 +37,12 @@ export type OwnerProject = Pick<
   | 'projectUrl'
   | 'yarnUrls'
   | 'date'
+  | 'views'
 >;
 
 export type OwnerPalette = Pick<
   GallerySharedPaletteNode,
-  'databaseId' | 'title' | 'yarnUrls' | 'date'
+  'databaseId' | 'title' | 'yarnUrls' | 'date' | 'views'
 >;
 
 /** The gallery's published projects among these IDs, newest first; null if it can't be reached. */
@@ -59,6 +60,7 @@ export async function fetchProjects(
               yarnUrls
               locations
               date
+              views
               featuredImage {
                 node {
                   mediaItemUrl
@@ -87,7 +89,7 @@ export async function fetchPalettes(
     const { response, result } = await queryGallery(
       `query OWNER_PALETTES($ids: [ID]) {
           palettes(first: ${MAX_PAGES}, where: { in: $ids, orderby: { field: DATE, order: DESC } }) {
-            nodes { databaseId title yarnUrls date }
+            nodes { databaseId title yarnUrls date views }
           }
         }`,
       { ids },
