@@ -13,7 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Every gallery page and palette one person published from their account,
+<!-- Someone's gallery ("Ada’s Gallery"; their own is Your Gallery): every
+gallery page and palette they published from their account with their name,
 linked from "By <name>" on their gallery pages: their projects and their yarn
 palettes, each on a page of its own. -->
 
@@ -54,7 +55,7 @@ palettes, each on a page of its own. -->
         Gallery</a
       >
       <h1 class="h2 text-gradient px-2 text-center">
-        {current === 'palettes' ? 'Yarn palettes' : 'Projects'} by {data.name}
+        {data.name}’s Gallery
       </h1>
       <CollectionNav
         label="Gallery pages by {data.name}"

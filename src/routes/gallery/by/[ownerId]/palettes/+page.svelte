@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Gallery: {heading}</title>
+  <title>{data.name}’s Gallery: Yarn Palettes</title>
   <meta name="description" content="Temperature blanket {heading}" />
   <meta property="og:title" content="Gallery: {heading}" />
   <meta

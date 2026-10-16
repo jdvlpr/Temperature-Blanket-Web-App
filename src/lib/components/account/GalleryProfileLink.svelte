@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- On the Account page, next to the display name: the link to the owner's
-public gallery page, once they've included a project or palette on it (that's
+gallery (Your Gallery, /gallery/by/<id>), once they've included a project or palette on it (that's
 chosen for each one, when adding it and in My Projects). Hidden otherwise. -->
 
 <script lang="ts">
@@ -49,13 +49,13 @@ chosen for each one, when adding it and in My Projects). Hidden otherwise. -->
       data-testid="gallery-owner-page"
     >
       <UserRoundIcon class="shrink-0 opacity-70" />
-      <span class="flex-1">Your public gallery page</span>
+      <span class="flex-1">Your Gallery</span>
       <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
     </a>
   {:else}
     <p class="text-warning-700-300 px-4 py-3 text-sm">
-      Add a display name above to show it on your public gallery page and on the
-      projects and palettes you included there.
+      Add a display name above to show it in your gallery and on the projects
+      and palettes you included there.
     </p>
   {/if}
 {/if}

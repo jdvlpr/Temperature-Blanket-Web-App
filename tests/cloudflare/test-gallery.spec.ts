@@ -293,7 +293,7 @@ test.describe('Gallery pages from accounts', () => {
       name: 'Share “Ottawa from 2025 to 2026”',
     });
     await expect(
-      dialog.getByRole('heading', { name: 'Gallery Page' }),
+      dialog.getByRole('button', { name: /^Edit Gallery Page/ }),
     ).toBeVisible();
     await expect(
       dialog.getByRole('checkbox', { name: /Anonymous/ }),
@@ -403,8 +403,8 @@ test.describe('Gallery pages from accounts', () => {
 
     await share.click();
     const dialog = page.getByRole('dialog', { name: `Share “${title}”` });
-    // Link: a copy anyone can open, first
-    await expect(dialog.getByRole('list', { name: 'Link' })).toBeVisible();
+    // One list: the link first (a copy anyone can open), then its page
+    await expect(dialog.getByRole('list', { name: 'Share' })).toBeVisible();
     await expect(
       dialog.getByRole('button', { name: /^Copy Link/ }),
     ).toBeVisible();
@@ -419,7 +419,7 @@ test.describe('Gallery pages from accounts', () => {
     const edit = dialog.getByRole('button', { name: /^Edit Gallery Page/ });
     await expect(edit).toBeVisible();
     await expect(edit).toHaveAccessibleDescription(
-      'Changed since its page was last updated.',
+      /Changed since its page was last updated/,
     );
     await expect(
       dialog.getByRole('button', { name: /^Publish to Gallery/ }),
@@ -673,7 +673,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(card('First test')).not.toContainText('Published');
 
     // The first opens over My Projects; closing it leaves everything as it was
-    await openFromShare('First test', /^Publish to Gallery…/);
+    await openFromShare('First test', /^Publish to Gallery/);
     await expect(publishDialog.locator('svg#preview-svg-image')).toBeVisible();
     await expect(page).toHaveURL(/\/my-projects$/);
     await page.keyboard.press('Escape');
@@ -693,7 +693,7 @@ test.describe('Gallery pages from accounts', () => {
       await dialog.getByRole('button', { name: button, exact: true }).click();
       await expect(dialog.getByRole('heading', { name: done })).toBeVisible();
     };
-    await openFromShare('Second test', /^Publish to Gallery…/);
+    await openFromShare('Second test', /^Publish to Gallery/);
     await send(publishDialog, 'Publish', 'Published');
     await page.keyboard.press('Escape');
     await expect(publishDialog).toHaveCount(0);
@@ -715,7 +715,7 @@ test.describe('Gallery pages from accounts', () => {
     const postId = gallery.posts[0].postId;
 
     // And the first, all of it
-    await openFromShare('First test', /^Publish to Gallery…/);
+    await openFromShare('First test', /^Publish to Gallery/);
     await send(publishDialog, 'Publish', 'Published');
     await page.keyboard.press('Escape');
     expect(sent()).toHaveLength(2);
@@ -732,7 +732,7 @@ test.describe('Gallery pages from accounts', () => {
     await page.getByRole('button', { name: 'Share Second test' }).click();
     const dialog = shareDialog('Second test');
     await expect(
-      dialog.getByRole('button', { name: /^Publish to Gallery…/ }),
+      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
     ).toHaveCount(0);
     await expect(
       dialog.getByRole('link', { name: /^View Gallery Page/ }),
@@ -740,7 +740,7 @@ test.describe('Gallery pages from accounts', () => {
     // Changed since it was published (as if edited on another device): only
     // then is there something to update
     gallery.posts.find((p) => p.postId === postId)!.link = 'changed';
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
     await send(updateDialog, 'Save', 'Saved');
     // The same page: its link is the same, and nothing new was published
     await expect(
@@ -767,7 +767,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       dialog.getByRole('checkbox', { name: /Anonymous/ }),
     ).toHaveCount(0);
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
     const owner = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     const anonymous = owner.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
@@ -790,7 +790,7 @@ test.describe('Gallery pages from accounts', () => {
 
     // Unpublish, from Edit Gallery Page: asks first, then Back to Share, where
     // it can be published again
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
     await owner.getByRole('button', { name: /^Unpublish…/ }).click();
     await owner.getByRole('button', { name: 'Keep Published' }).click();
     expect(gallery.posts).toHaveLength(2);
@@ -801,7 +801,7 @@ test.describe('Gallery pages from accounts', () => {
     ).toBeFocused();
     await owner.getByRole('button', { name: /^Back/ }).click();
     await expect(
-      dialog.getByRole('button', { name: /^Publish to Gallery…/ }),
+      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
     ).toBeVisible();
     expect(gallery.calls.filter((call) => call.method === 'DELETE')).toEqual([
       { method: 'DELETE', postId, body: undefined },
@@ -851,7 +851,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(share.locator('..')).toContainText('Published');
     await share.click();
     const dialog = page.getByRole('dialog', { name: 'Share “Sunset”' });
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
 
     // Nothing to save until something differs; then its name and colors are
     // updated in place
@@ -922,7 +922,6 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       dialog.getByRole('button', { name: /^Copy Link/ }),
     ).toBeVisible();
-    await expect(dialog.getByText('Not published')).toBeVisible();
     const signIn = dialog.getByRole('link', { name: /^Sign In to Publish/ });
     await expect(signIn).toHaveAttribute('href', /^\/auth\/sign-in/);
     await expect(
@@ -958,7 +957,7 @@ test.describe('Gallery pages from accounts', () => {
 
     await page.goto(`/gallery/by/${publicId}`);
     await expect(
-      page.getByRole('heading', { name: 'Projects by Grace Hopper' }),
+      page.getByRole('heading', { name: 'Grace Hopper’s Gallery' }),
     ).toBeVisible();
 
     // Linked from My Projects

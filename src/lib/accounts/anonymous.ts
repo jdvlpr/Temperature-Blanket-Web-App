@@ -16,10 +16,10 @@
 // The "Anonymous" option on a published gallery page (stored the other way
 // round, as `showOwner`): under it in a menu, what it means for that page.
 
-/** One short line: whether the page names the owner and is on their public gallery page */
+/** One short line: whether the page names the owner and is in their gallery (/gallery/by/<id>) */
 export const anonymousDetail = (anonymous: boolean, ownerName: string) =>
   anonymous
-    ? 'No name; not on your public gallery page'
+    ? 'No name; not in your gallery'
     : ownerName
-      ? `“By ${ownerName}”, on your public gallery page`
+      ? `“By ${ownerName}”, in your gallery`
       : 'Add a display name to be credited';

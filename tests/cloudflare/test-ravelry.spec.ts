@@ -444,7 +444,7 @@ test.describe('Ravelry', () => {
     await share.click();
     const dialog = page.getByRole('dialog', { name: `Share “${name}”` });
     await expect(dialog.getByText('Ravelry')).toHaveCount(0);
-    await dialog.getByRole('button', { name: /^Publish to Gallery…/ }).click();
+    await dialog.getByRole('button', { name: /^Publish to Gallery/ }).click();
 
     // The project loads behind the dialog; Also post to Ravelry shows its part
     const post = page.getByRole('dialog', { name: 'Publish to Gallery' });
@@ -452,9 +452,9 @@ test.describe('Ravelry', () => {
     await expect(page).toHaveURL(/\/my-projects$/);
     await expect(post.getByText('By Ada')).toBeVisible();
     const alsoPost = post.getByLabel('Also post to Ravelry');
-    // Anonymous needs the name, so it can't go to Ravelry
+    // Anonymous needs the name, so Ravelry isn't offered then
     await post.getByLabel('Anonymous').check();
-    await expect(alsoPost).toBeDisabled();
+    await expect(alsoPost).toHaveCount(0);
     await post.getByLabel('Anonymous').uncheck();
     await alsoPost.check();
     // One name: the project's, on its gallery page and on Ravelry
@@ -532,7 +532,7 @@ test.describe('Ravelry', () => {
     await share.click();
     // Renamed on Ravelry meanwhile: it follows the project's name again
     ravelry.details()!.name = 'Renamed on Ravelry';
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
     const update = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(
       update.getByText('Its gallery page is up to date'),
@@ -541,12 +541,8 @@ test.describe('Ravelry', () => {
       update.getByRole('spinbutton', { name: 'Progress (percent)' }),
     ).toHaveValue('10');
     // Its picture on Ravelry is up to date: shown, not replaced
-    await expect(
-      update.getByText(/Picture from Temperature Blanket$/),
-    ).toBeVisible();
-    await expect(update.getByText('Replaced by the new picture')).toHaveCount(
-      0,
-    );
+    await expect(update.getByText(/This picture$/)).toBeVisible();
+    await expect(update.getByText('To be replaced')).toHaveCount(0);
     const save = update.getByRole('button', { name: 'Save', exact: true });
 
     // Yarns: one this app added and no longer uses is offered for removal;
@@ -562,11 +558,9 @@ test.describe('Ravelry', () => {
     await removeOld.check();
 
     // Move the photo earlier, add another
-    await expect(
-      update.getByText('Main photo · Picture from Temperature Blanket'),
-    ).toBeVisible();
+    await expect(update.getByText('Main · This picture')).toBeVisible();
     await update.getByRole('button', { name: 'Move photo 2 earlier' }).click();
-    await expect(update.getByText('Main photo · Photo 1')).toBeVisible();
+    await expect(update.getByText('Main · Photo 1')).toBeVisible();
     // The moved photo's button keeps the focus; at the start, the other one gets it
     await expect(
       update.getByRole('button', { name: 'Move photo 1 later' }),
@@ -606,13 +600,11 @@ test.describe('Ravelry', () => {
 
     // Remove a photo: marked first, undoable, and only gone on Update
     await share.click();
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
     const again = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     // Its picture on Ravelry is up to date: shown, not replaced
-    await expect(
-      again.getByText(/Picture from Temperature Blanket$/),
-    ).toBeVisible();
-    await expect(again.getByText('Replaced by the new picture')).toHaveCount(0);
+    await expect(again.getByText(/This picture$/)).toBeVisible();
+    await expect(again.getByText('To be replaced')).toHaveCount(0);
     const update2 = again.getByRole('button', { name: 'Save', exact: true });
     await expect(update2).toBeDisabled();
     // Unpublish says it unlinks Ravelry too (kept published here)
@@ -652,7 +644,7 @@ test.describe('Ravelry', () => {
     // be posted again
     ravelry.deleteOnRavelry();
     await share.click();
-    await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
+    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
     const gone = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(gone.getByText(/deleted on Ravelry/)).toBeVisible();
     await expect(gone.getByLabel('Also post to Ravelry')).not.toBeChecked();

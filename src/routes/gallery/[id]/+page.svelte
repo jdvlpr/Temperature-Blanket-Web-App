@@ -62,6 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/string-utils.js';
   import {
     ArrowLeftIcon,
+    ExternalLinkIcon,
     GlobeIcon,
     NotebookPenIcon,
     SwatchBookIcon,
@@ -91,6 +92,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // The project's photos on Ravelry, when its owner linked it there (streamed)
   type RavelryPhotos = Awaited<NonNullable<PageData['ravelry']>>;
   let ravelry = $state<RavelryPhotos>(null);
+  // Its photos besides its picture, which is the one shown already
+  const ravelryPhotos = $derived(
+    ravelry?.photos.filter((photo) => !photo.isPicture) ?? [],
+  );
   $effect(() => {
     let current = true;
     ravelry = null;
@@ -357,6 +362,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {@html projectTitle}
                 {/if}
               {/snippet}
+              {#snippet details()}
+                <!-- Where its weather came from, its neighbours, and Ravelry,
+                beside who made it and when -->
+                {#if weatherSources?.length}
+                  <span
+                    >Weather from {#each weatherSources as { name, url }, i (url)}{#if i}<span
+                          class="mr-1">,</span
+                        >{/if}<a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="link">{name}</a
+                      >{/each}</span
+                  >
+                {/if}
+                {#if globeLink}
+                  <span
+                    ><a
+                      class="link inline-flex items-center gap-1"
+                      href={globeLink}
+                      aria-label={globeLinkLabel}
+                      title={globeLinkLabel}
+                      ><GlobeIcon class="icon-sm" aria-hidden="true" />Nearby
+                      projects</a
+                    ></span
+                  >
+                {/if}
+                {#if ravelry}
+                  <span
+                    ><a
+                      class="link inline-flex items-center gap-1"
+                      href={ravelry.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >On Ravelry<ExternalLinkIcon
+                        class="icon-sm"
+                        aria-hidden="true"
+                      /><span class="sr-only"> (opens in a new tab)</span></a
+                    ></span
+                  >
+                {/if}
+              {/snippet}
             </GalleryPageHeader>
           {/snippet}
           {#snippet content()}
@@ -368,96 +415,69 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     alt="Project Preview"
                     class="m-auto max-h-[60vh]"
                   />
-                  {#if ravelry}
-                    <!-- Photos of the made project, kept on Ravelry -->
-                    <section
-                      class="mx-auto mt-4 flex max-w-3xl flex-col gap-2 px-2"
-                      aria-labelledby="ravelry-photos"
+                  {#if ravelryPhotos.length}
+                    <!-- Photos of the made project, from Ravelry, under its
+                    picture (Ravelry's copy of the picture is left out) -->
+                    <ul
+                      class="mx-auto mt-2 flex max-w-3xl flex-wrap justify-center gap-2 px-2"
+                      aria-label="Photos on Ravelry"
                     >
-                      <h2 id="ravelry-photos" class="text-sm font-bold">
-                        {ravelry.photos.length
-                          ? 'Photos on Ravelry'
-                          : 'On Ravelry'}
-                      </h2>
-                      {#if ravelry.photos.length}
-                        <ul class="flex flex-wrap justify-center gap-2">
-                          {#each ravelry.photos as photo, i (photo.photoId)}
-                            <li>
-                              <a
-                                href={ravelry.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="block"
-                                ><img
-                                  src={photo.mediumUrl ??
-                                    photo.smallUrl ??
-                                    photo.squareUrl ??
-                                    ''}
-                                  alt={photo.isPicture
-                                    ? `${projectName || 'The project'}: its picture from Temperature Blanket (opens Ravelry in a new tab)`
-                                    : `${projectName || 'The project'}: photo ${i + 1} on Ravelry (opens in a new tab)`}
-                                  class="bg-surface-100-900 h-32 w-auto max-w-full sm:h-48"
-                                  loading="lazy"
-                                /></a
+                      {#each ravelryPhotos as photo, i (photo.photoId)}
+                        <li>
+                          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- Ravelry's site -->
+                          <a
+                            href={ravelry?.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="block"
+                            ><img
+                              src={photo.mediumUrl ??
+                                photo.smallUrl ??
+                                photo.squareUrl ??
+                                ''}
+                              alt={`${projectName || 'The project'}: photo ${i + 1} on Ravelry (opens in a new tab)`}
+                              class="bg-surface-100-900 h-24 w-auto max-w-full sm:h-32"
+                              loading="lazy"
+                            /></a
+                          >
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                  {#if ravelry?.notes}
+                    <!-- The maker's notes from Ravelry, as plain text with a few marks -->
+                    <section
+                      class="mx-auto mt-4 flex max-w-prose flex-col gap-2 px-2 text-left"
+                      aria-label="Notes"
+                    >
+                      {#each parseNotes(ravelry.notes) as paragraph, p (p)}
+                        <p>
+                          {#each paragraph as segment, i (i)}
+                            {#if segment.type === 'break'}<br />
+                            {:else if segment.type === 'bold'}<strong
+                                >{segment.text}</strong
                               >
-                            </li>
+                            {:else if segment.type === 'italic'}<em
+                                >{segment.text}</em
+                              >
+                            {:else if segment.type === 'link'}<a
+                                class="link"
+                                href={segment.href}
+                                target="_blank"
+                                rel="nofollow ugc noopener noreferrer"
+                                >{segment.text}</a
+                              >
+                            {:else}{segment.text}{/if}
                           {/each}
-                        </ul>
-                      {/if}
-                      {#if ravelry.notes}
-                        <!-- The maker's notes from Ravelry, as plain text with a few marks -->
-                        <div class="flex flex-col gap-2 text-left text-sm">
-                          {#each parseNotes(ravelry.notes) as paragraph, p (p)}
-                            <p>
-                              {#each paragraph as segment, i (i)}
-                                {#if segment.type === 'break'}<br />
-                                {:else if segment.type === 'bold'}<strong
-                                    >{segment.text}</strong
-                                  >
-                                {:else if segment.type === 'italic'}<em
-                                    >{segment.text}</em
-                                  >
-                                {:else if segment.type === 'link'}<a
-                                    class="link"
-                                    href={segment.href}
-                                    target="_blank"
-                                    rel="nofollow ugc noopener noreferrer"
-                                    >{segment.text}</a
-                                  >
-                                {:else}{segment.text}{/if}
-                              {/each}
-                            </p>
-                          {/each}
-                        </div>
-                      {/if}
-                      <a
-                        class="link self-center text-sm"
-                        href={ravelry.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        >See the project on Ravelry<span class="sr-only">
-                          (opens in a new tab)</span
-                        ></a
-                      >
+                        </p>
+                      {/each}
                     </section>
                   {/if}
                   <!-- Only what the title, gauges and preview don't say -->
                   <p
-                    class="text-surface-600-400 mt-2 flex flex-wrap justify-center gap-x-1.5 px-2 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']"
+                    class="text-surface-600-400 mt-2 flex flex-wrap justify-center gap-x-1.5 px-2 text-sm empty:hidden [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']"
                   >
                     {#if pattern?.name}<span>{pattern.name}</span>{/if}
-                    {#if weatherSources?.length}
-                      <span
-                        >Weather from {#each weatherSources as { name, url }, i (url)}{#if i}<span
-                              class="mr-1">,</span
-                            >{/if}<a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="link">{name}</a
-                          >{/each}</span
-                      >
-                    {/if}
                     {#if project.missingDays}
                       <span
                         >{project.missingDays}
@@ -468,20 +488,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <span
                         >In progress when published · a copy gets the weather
                         since</span
-                      >
-                    {/if}
-                    {#if globeLink}
-                      <span
-                        ><a
-                          class="link inline-flex items-center gap-1"
-                          href={globeLink}
-                          aria-label={globeLinkLabel}
-                          title={globeLinkLabel}
-                          ><GlobeIcon
-                            class="icon-sm"
-                            aria-hidden="true"
-                          />Nearby projects</a
-                        ></span
                       >
                     {/if}
                   </p>

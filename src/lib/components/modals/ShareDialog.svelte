@@ -14,12 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Share a project or palette, in one place: its Link (a copy anyone can open;
-  yours never changes) and its Gallery Page (one public page, published from
-  the account, updated in place, or unpublished). Publishing and updating,
-  with Anonymous and a project's Ravelry project, happen in the publish
-  dialog. Publishing needs an account; signed out, Copy Link still works.
-  Opened from a card's Share button and the planner's Project menu.
+  Share a project or palette, as one list of rows like the Project menu's:
+  Copy Link (a copy anyone can open; yours never changes), then its gallery
+  page: Publish to Gallery, or once published Edit Gallery Page (its status
+  under it) with View beside it. Edit opens the dialog that updates the page,
+  changes Anonymous and a project's Ravelry project, and unpublishes it.
+  Publishing needs an account; signed out, Copy Link still works. Opened from
+  a card's Share button and the planner's Project menu.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -30,11 +31,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CopyIcon from '#lib/components/CopyIcon.svelte';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
-  import ShareSectionHeader from '#lib/components/account/ShareSectionHeader.svelte';
   import { inAccount } from '#lib/utils/open-ravelry.js';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import {
+    ChevronRightIcon,
+    ExternalLinkIcon,
     LinkIcon,
     LoaderCircleIcon,
     LogInIcon,
@@ -111,6 +113,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       linkCopied.trigger();
   }
 
+  // A row that only says something, as tall as the others
+  const NOTE_ROW = 'flex min-h-12 items-center gap-3 px-4 py-2 text-sm';
+
   const status = $derived(
     !page
       ? 'Not published'
@@ -124,9 +129,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-6 p-4 text-left">
-  {#if link}
-    <!-- The link first: what most people share -->
-    <ul class={PANEL_LIST} aria-label="Link">
+  <!-- One list, as the Project menu's: the link first (what most people
+  share), then its gallery page -->
+  <ul class={PANEL_LIST} aria-label="Share">
+    {#if link}
       <li>
         <button type="button" class={PANEL_ROW} onclick={copyLink}>
           <CopyIcon
@@ -142,91 +148,120 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
         </button>
       </li>
-    </ul>
-  {/if}
-
-  <section class="flex flex-col gap-3" aria-labelledby="share-gallery">
-    <ShareSectionHeader
-      id="share-gallery"
-      title="Gallery Page"
-      href={page ? pageHref(page) : undefined}
-      linkText="View Gallery Page"
-    >
-      {#if signedIn && !galleryPages.loaded}
-        <LoaderCircleIcon
-          class="icon-sm inline animate-spin"
-          aria-hidden="true"
-        />
-        Checking…
-      {:else}
-        {status}{page
-          ? ` · ${page.showOwner && ownerName ? `By ${ownerName}` : 'Anonymous'}`
-          : ''}
-      {/if}
-    </ShareSectionHeader>
+    {/if}
 
     {#if !signedIn}
-      <div class="flex flex-col items-start gap-1">
+      <li>
         <!-- eslint-disable svelte/no-navigation-without-resolve -- resolved by the opener -->
         <a
-          class="btn preset-filled-primary-500"
+          class={PANEL_ROW}
           href={signInHref ?? resolve('/auth/sign-in')}
           data-sveltekit-reload
         >
-          <LogInIcon aria-hidden="true" />Sign In to Publish
+          <LogInIcon class="shrink-0 opacity-70" aria-hidden="true" />
+          <span class="flex flex-1 flex-col">
+            <span>Sign In to Publish</span>
+            <span class="text-xs opacity-70"
+              >A free account lets you publish a public gallery page, then
+              update or unpublish it any time.</span
+            >
+          </span>
         </a>
         <!-- eslint-enable svelte/no-navigation-without-resolve -->
-        <p class="text-xs opacity-70">
-          A free account lets you publish a public page, then update or
-          unpublish it any time.
-        </p>
-      </div>
-    {:else if galleryPages.loaded && !page}
+      </li>
+    {:else if !galleryPages.loaded}
+      <li class={NOTE_ROW}>
+        <LoaderCircleIcon
+          class="shrink-0 animate-spin opacity-70"
+          aria-hidden="true"
+        />
+        Checking the gallery…
+      </li>
+    {:else if !page}
       {#if kind === 'project' && ravelryItem && !inAccount(ravelryItem)}
         <!-- Its page follows the account's copy into and out of the Trash -->
-        <p class="text-sm">
-          Add this project to your account first (Add to your account, at the
-          top of My Projects), then publish it.
-        </p>
+        <li class={NOTE_ROW}>
+          <SendIcon class="shrink-0 opacity-40" aria-hidden="true" />
+          Add this project to your account first (Add to your account, at the top
+          of My Projects), then publish it to the gallery.
+        </li>
       {:else if galleryPages.publishing && onpublish}
-        <div class="flex flex-col items-start gap-1">
+        <li>
           <button
             type="button"
-            class="btn preset-filled-primary-500"
+            class={PANEL_ROW}
             data-row="publish"
             onclick={onpublish}
           >
-            <SendIcon aria-hidden="true" />Publish to Gallery…
+            <SendIcon class="shrink-0 opacity-70" aria-hidden="true" />
+            <span class="flex flex-1 flex-col">
+              <span>Publish to Gallery</span>
+              <span class="text-xs opacity-70"
+                >A public page anyone can find. You can update or unpublish it
+                any time.</span
+              >
+            </span>
+            <ChevronRightIcon
+              class="icon-sm shrink-0 opacity-50"
+              aria-hidden="true"
+            />
           </button>
-          <p class="text-xs opacity-70">
-            A public page anyone can find. You can update or unpublish it any
-            time.
-          </p>
-        </div>
-      {:else if !galleryPages.publishing}
-        <p class="text-sm">Publishing to the gallery is paused right now.</p>
+        </li>
+      {:else}
+        <li class={NOTE_ROW}>
+          <SendIcon class="shrink-0 opacity-40" aria-hidden="true" />
+          Publishing to the gallery is paused right now.
+        </li>
       {/if}
-    {:else if page}
-      <div class="flex flex-col items-start gap-1">
+    {:else}
+      <!-- Edit, with its page beside it: two parts of one row -->
+      <li class="divide-surface-200-800 flex divide-x">
         <button
           type="button"
-          class="btn {isChanged
-            ? 'preset-filled-primary-500'
-            : 'preset-tonal-surface'}"
+          class={[PANEL_ROW, 'flex-1']}
           onclick={() => page && onedit?.(page)}
           disabled={!onedit}
-          aria-describedby={isChanged ? 'share-gallery-changed' : undefined}
+          aria-describedby={isChanged
+            ? 'share-gallery-status share-gallery-changed'
+            : 'share-gallery-status'}
         >
-          <PencilIcon aria-hidden="true" />Edit Gallery Page…
+          <PencilIcon class="shrink-0 opacity-70" aria-hidden="true" />
+          <span class="flex flex-1 flex-col">
+            <span>Edit Gallery Page</span>
+            <span class="text-xs opacity-70" id="share-gallery-status"
+              >{status} · {page.showOwner && ownerName
+                ? `By ${ownerName}`
+                : 'Anonymous'}</span
+            >
+            {#if isChanged}
+              <span
+                class="text-primary-800-200 text-xs font-bold"
+                id="share-gallery-changed"
+                >Changed since its page was last updated</span
+              >
+            {/if}
+          </span>
+          <ChevronRightIcon
+            class="icon-sm shrink-0 opacity-50"
+            aria-hidden="true"
+          />
         </button>
-        {#if isChanged}
-          <p class="text-xs opacity-70" id="share-gallery-changed">
-            Changed since its page was last updated.
-          </p>
-        {/if}
-      </div>
+        <a
+          href={pageHref(page)}
+          target="_blank"
+          class={[
+            PANEL_ROW,
+            'w-auto shrink-0 flex-col justify-center gap-0.5 px-3 text-xs',
+          ]}
+          title="View Gallery Page"
+          ><ExternalLinkIcon class="icon-sm opacity-70" aria-hidden="true" />
+          <span class="opacity-80">View</span><span class="sr-only">
+            Gallery Page (opens in a new tab)</span
+          ></a
+        >
+      </li>
     {/if}
-  </section>
+  </ul>
 
   {@render children?.()}
 </div>

@@ -208,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <GlobeIcon class="shrink-0 opacity-70" />
                 <span class="flex flex-1 flex-col">
-                  <span>Your Gallery Page</span>
+                  <span>Your Gallery</span>
                   <span class="text-xs opacity-70"
                     >Everything you've published with your name, for anyone to
                     see</span

@@ -38,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     heading: Snippet;
     /** A line under the name */
     subtitle?: Snippet;
+    /** More on the "By · Published" line, each its own element (a dot goes between) */
+    details?: Snippet;
     /** Open a Copy: where, its icon, and its tooltip */
     open?: {
       href: string;
@@ -55,6 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modified,
     heading,
     subtitle,
+    details,
     open,
   }: Props = $props();
 
@@ -78,9 +81,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if subtitle}
     <p>{@render subtitle()}</p>
   {/if}
-  {#if owner || sharedOn}
+  {#if owner || sharedOn || details}
     <p
-      class="text-surface-600-400 flex flex-wrap justify-center gap-x-1.5 text-sm"
+      class="text-surface-600-400 flex flex-wrap justify-center gap-x-1.5 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']"
     >
       {#if owner}
         <span data-testid="gallery-owner"
@@ -90,12 +93,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ownerId: owner.publicId,
             })}>{owner.name}</a
           ></span
-        >{/if}{#if owner && sharedOn}<span aria-hidden="true">
-          ·
-        </span>{/if}{#if sharedOn}<span>Published {sharedOn}</span
-        >{/if}{#if updatedOn}<span aria-hidden="true"> · </span><span
-          >Updated {updatedOn}</span
-        >{/if}
+        >
+      {/if}
+      {#if sharedOn}<span>Published {sharedOn}</span>{/if}
+      {#if updatedOn}<span>Updated {updatedOn}</span>{/if}
+      {@render details?.()}
     </p>
   {/if}
 

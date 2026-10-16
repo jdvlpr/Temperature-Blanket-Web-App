@@ -15,13 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   The Ravelry part of Publish to Gallery / Edit Gallery Page: the project's
-  Ravelry project, edited almost 1:1. Posting creates it (name, craft, status,
-  dates, progress, notes, one yarn per color linked to Ravelry's yarn when
-  confirmed, the picture and photos). Once posted, it shows what's on Ravelry
-  now (with View on Ravelry and Unlink) and changes only what was edited here:
-  fields, yarns (added ones, and removed ones this app added), photos
-  (removed, added, in a new order) and the picture, sent again only when the
-  project changed. The dialog draws the picture and calls `apply` after its
+  Ravelry project, edited almost 1:1. Its name is the project's. Posting
+  creates it (craft, status, dates, progress, notes, its yarns, each linked to
+  Ravelry's yarn or by name only, the picture and photos). Once posted, it
+  shows what's on Ravelry now and changes only what was edited here: fields,
+  yarns (added ones, and removed ones this app added), photos (removed, added,
+  in a new order) and the picture, sent again only when the project changed.
+  Photos come first, under the dialog's picture; the dialog itself has View on
+  Ravelry and Unlink. It draws the picture and calls `apply` after its
   gallery page is published, which the Ravelry project links to.
 -->
 <script lang="ts" module>
@@ -50,7 +51,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     RavelryRequestError,
     reorderRavelryPhotos,
     searchRavelryYarns,
-    unlinkRavelryProject,
     type RavelryOption,
     type RavelryPack,
     type RavelryPhoto,
@@ -72,7 +72,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CalendarClockIcon,
     CalendarPlusIcon,
     ArrowRightIcon,
-    ExternalLinkIcon,
     ImageIcon,
     ImagePlusIcon,
     LoaderCircleIcon,
@@ -81,7 +80,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
-  import type { Attachment } from 'svelte/attachments';
 
   let {
     projectId,
@@ -118,10 +116,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let root: HTMLElement | null = $state(null);
   let destroyed = false;
 
-  /** Takes the focus when it appears, as the button that asked is gone */
-  const takeFocus: Attachment<HTMLElement> = (node) => {
-    node.focus({ preventScroll: true });
-  };
 
   onDestroy(() => {
     destroyed = true;
@@ -506,8 +500,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const captionOf = (photo: RavelryPhoto, i: number) =>
     [
-      i === mainIndex && 'Main photo',
-      photo.isPicture ? 'Picture from Temperature Blanket' : `Photo ${i + 1}`,
+      i === mainIndex && 'Main',
+      photo.isPicture ? 'This picture' : `Photo ${i + 1}`,
     ]
       .filter(Boolean)
       .join(' · ');
@@ -750,24 +744,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  // ---- Unlink (once posted)
-  let confirmingUnlink = $state(false);
-  let unlinking = $state(false);
-  let unlinkError = $state('');
-  async function unlink() {
-    unlinking = true;
-    unlinkError = '';
-    try {
-      await unlinkRavelryProject(projectId);
-      // This part goes away, and the dialog offers to post it again
-      ravelryLinks.remove(projectId);
-    } catch {
-      unlinkError = 'It couldn’t be unlinked. Try again later.';
-      unlinking = false;
-    }
-  }
-
-  const photoCount = $derived(project?.photos.length ?? 0);
   // The picture to add, shown as a photo: when posting (first, the main
   // photo), or when its old one is gone from Ravelry (at the end)
   const newPicture = $derived(pictureNeeded && !picturePhoto);
@@ -822,74 +798,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <div class="flex min-w-0 flex-col gap-4" bind:this={root}>
-  {#if updating && project}
-    <!-- Where it is, before what can change -->
-    <div class="flex flex-col gap-1">
-      <div class="flex flex-wrap items-baseline justify-between gap-x-4">
-        <h3 class="font-bold" id="ravelry-heading">On Ravelry</h3>
-        <!-- eslint-disable svelte/no-navigation-without-resolve -- Ravelry's site -->
-        <a
-          class="anchor text-sm"
-          href={project.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          >View on Ravelry<ExternalLinkIcon
-            class="icon-sm ml-0.5 inline"
-            aria-hidden="true"
-          /><span class="sr-only"> (opens in a new tab)</span></a
-        >
-        <!-- eslint-enable svelte/no-navigation-without-resolve -->
-      </div>
-      {#if confirmingUnlink}
-        <div class="flex flex-col gap-2" role="group" aria-label="Unlink">
-          <p class="text-sm">
-            Unlink from Ravelry? The project stays on Ravelry, but it’s no
-            longer updated from here, and its photos leave its gallery page.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="btn preset-filled-error-500"
-              onclick={unlink}
-              disabled={unlinking || disabled}
-              {@attach takeFocus}
-              >{#if unlinking}<LoaderCircleIcon
-                  class="animate-spin"
-                />{/if}Unlink</button
-            >
-            <button
-              type="button"
-              class="btn preset-tonal-surface"
-              data-row="keep-linked"
-              onclick={async () => {
-                confirmingUnlink = false;
-                await tick();
-                root
-                  ?.querySelector<HTMLElement>('[data-row="unlink"]')
-                  ?.focus({ preventScroll: true });
-              }}
-              disabled={unlinking}>Keep Linked</button
-            >
-          </div>
-        </div>
-      {:else}
-        <p class="text-sm opacity-80">
-          Posted{photoCount ? ` · ${plural(photoCount, 'photo')}` : ''} ·
-          <button
-            type="button"
-            class="anchor"
-            data-row="unlink"
-            {disabled}
-            onclick={() => (confirmingUnlink = true)}>Unlink…</button
-          >
-        </p>
-      {/if}
-      {#if unlinkError}
-        <p class="text-error-700-300 text-sm" role="alert">{unlinkError}</p>
-      {/if}
-    </div>
-  {/if}
-
   {#if detailsState === 'loading'}
     <p class="flex items-center gap-2 text-sm">
       <LoaderCircleIcon class="icon-sm animate-spin" aria-hidden="true" />
@@ -906,6 +814,146 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {:else}
     <fieldset class="flex min-w-0 flex-col gap-6" {disabled}>
+      <!-- Under its picture, in the dialog's top part: photos on Ravelry (the
+      picture is the first when posting), and Add Photos at the end -->
+      <fieldset class="flex min-w-0 flex-col gap-2">
+        <legend class="label-text mb-1">Photos on Ravelry</legend>
+        <ul
+          class="grid grid-cols-3 items-start gap-2 sm:grid-cols-5"
+          aria-label="Photos on Ravelry"
+          aria-describedby="ravelry-photos-hint"
+        >
+          {#each photos as photo, i (photo.photoId)}
+            {@const isRemoved = removed.has(photo.photoId)}
+            {@const replaced = photo.isPicture && pictureState === 'changed'}
+            <li class="flex min-w-0 flex-col gap-1">
+              <div class="relative">
+                <img
+                  src={photo.squareUrl ??
+                    photo.smallUrl ??
+                    photo.mediumUrl ??
+                    ''}
+                  alt={photo.isPicture
+                    ? `${name}: its picture from Temperature Blanket`
+                    : `${name}: photo ${i + 1} of ${photos.length}`}
+                  class={[
+                    'bg-surface-100-900 aspect-square w-full object-cover',
+                    (isRemoved || replaced) && 'opacity-40',
+                  ]}
+                  loading="lazy"
+                />
+                {#if !replaced}
+                  <button
+                    type="button"
+                    class={[
+                      'btn-icon btn-icon-sm absolute top-1 right-1 shadow',
+                      isRemoved
+                        ? 'preset-filled-error-500'
+                        : 'preset-filled-surface-50-950',
+                    ]}
+                    aria-label={`Remove photo ${i + 1} from Ravelry`}
+                    aria-pressed={isRemoved}
+                    onclick={() => toggleRemoved(photo.photoId)}
+                    ><Trash2Icon class="icon-sm" aria-hidden="true" /></button
+                  >
+                {/if}
+              </div>
+              <p class="truncate text-xs">
+                {#if isRemoved}
+                  <strong>Will be removed</strong>
+                {:else if replaced}
+                  To be replaced
+                {:else}
+                  {captionOf(photo, i)}
+                {/if}
+              </p>
+              <div class="flex gap-1">
+                <button
+                  type="button"
+                  class="btn-icon btn-icon-sm preset-tonal-surface"
+                  aria-label={`Move photo ${i + 1} earlier`}
+                  data-move="{photo.photoId}-earlier"
+                  disabled={i === 0}
+                  onclick={() => move(i, -1)}
+                  ><ArrowLeftIcon class="icon-sm" aria-hidden="true" /></button
+                >
+                <button
+                  type="button"
+                  class="btn-icon btn-icon-sm preset-tonal-surface"
+                  aria-label={`Move photo ${i + 1} later`}
+                  data-move="{photo.photoId}-later"
+                  disabled={i === photos.length - 1}
+                  onclick={() => move(i, 1)}
+                  ><ArrowRightIcon class="icon-sm" aria-hidden="true" /></button
+                >
+              </div>
+            </li>
+          {/each}
+          {#if newPicture && updating && previews.active}
+            <!-- Its old picture is gone from Ravelry: the new one goes at the end -->
+            <li class="flex min-w-0 flex-col gap-1">
+              <div
+                class="bg-surface-100-900 pointer-events-none flex aspect-square w-full items-center justify-center overflow-hidden"
+                aria-hidden="true"
+              >
+                <previews.active.previewComponent />
+              </div>
+              <p class="truncate text-xs">New · This picture</p>
+            </li>
+          {/if}
+          {#each added as item (item.id)}
+            <li class="flex min-w-0 flex-col gap-1">
+              <div class="relative">
+                {#if item.url}
+                  <img
+                    src={item.url}
+                    alt={`New photo: ${item.file.name}`}
+                    class="bg-surface-100-900 aspect-square w-full object-cover"
+                  />
+                {:else}
+                  <div
+                    class="bg-surface-100-900 flex aspect-square w-full items-center justify-center"
+                  >
+                    <ImageIcon class="size-8" aria-hidden="true" />
+                  </div>
+                {/if}
+                <button
+                  type="button"
+                  class="btn-icon btn-icon-sm preset-filled-surface-50-950 absolute top-1 right-1 shadow"
+                  aria-label={`Don’t add ${item.file.name}`}
+                  onclick={() => unadd(item)}
+                  ><XIcon class="icon-sm" aria-hidden="true" /></button
+                >
+              </div>
+              <p class="truncate text-xs" title={item.file.name}>
+                New · {item.file.name}
+              </p>
+            </li>
+          {/each}
+          <li class="min-w-0">
+            <label
+              class="border-surface-300-700 hover:bg-surface-100-900 has-[:focus-visible]:outline-primary-500 flex aspect-square w-full cursor-pointer flex-col items-center justify-center gap-1 border-2 border-dashed p-1 text-center text-xs transition-colors has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50 has-[:focus-visible]:outline-2"
+            >
+              <ImagePlusIcon aria-hidden="true" />Add Photos
+              <input
+                bind:this={fileInput}
+                class="sr-only"
+                type="file"
+                accept="image/png,image/jpeg,image/heic,image/heif"
+                multiple
+                onchange={(e) => addFiles(e.currentTarget.files)}
+              />
+            </label>
+          </li>
+        </ul>
+        <p id="ravelry-photos-hint" class="text-xs opacity-70">
+          {updating
+            ? 'The first is the main photo.'
+            : 'The picture above is the main photo; these go after it.'} They show
+          on its gallery page too.
+        </p>
+      </fieldset>
+
       <!-- What it is and where it's at -->
       <div class="flex flex-col gap-4">
         {#if optionsError}
@@ -1053,158 +1101,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </fieldset>
       {/if}
-
-      <fieldset class="flex flex-col gap-3">
-        <legend class="label-text mb-1">Photos</legend>
-        <p class="text-xs opacity-70">
-          They show on its gallery page too. The first is the main photo.
-        </p>
-        {#if photos.length || added.length || newPicture}
-          <ul
-            class="grid grid-cols-2 items-start gap-3 sm:grid-cols-4"
-            aria-label="Photos"
-          >
-            {#if newPicture && !updating && previews.active}
-              <li class="flex flex-col gap-1">
-                <div
-                  class="bg-surface-100-900 pointer-events-none w-full overflow-hidden"
-                  aria-hidden="true"
-                >
-                  <previews.active.previewComponent />
-                </div>
-                <p class="text-sm">
-                  Main photo · Picture from Temperature Blanket
-                </p>
-              </li>
-            {/if}
-            {#each photos as photo, i (photo.photoId)}
-              {@const isRemoved = removed.has(photo.photoId)}
-              {@const replaced = photo.isPicture && pictureState === 'changed'}
-              <li class="flex flex-col gap-1">
-                <div class="relative">
-                  <img
-                    src={photo.mediumUrl ??
-                      photo.smallUrl ??
-                      photo.squareUrl ??
-                      ''}
-                    alt={photo.isPicture
-                      ? `${name}: its picture from Temperature Blanket`
-                      : `${name}: photo ${i + 1} of ${photos.length}`}
-                    class={[
-                      'bg-surface-100-900 h-auto w-full',
-                      (isRemoved || replaced) && 'opacity-40',
-                    ]}
-                    loading="lazy"
-                  />
-                  {#if !replaced}
-                    <button
-                      type="button"
-                      class={[
-                        'btn-icon btn-icon-sm absolute top-2 right-2 shadow',
-                        isRemoved
-                          ? 'preset-filled-error-500'
-                          : 'preset-filled-surface-50-950',
-                      ]}
-                      aria-label={`Remove photo ${i + 1} from Ravelry`}
-                      aria-pressed={isRemoved}
-                      onclick={() => toggleRemoved(photo.photoId)}
-                      ><Trash2Icon class="icon-sm" aria-hidden="true" /></button
-                    >
-                  {/if}
-                </div>
-                <p class="text-sm">
-                  {#if isRemoved}
-                    <strong>Will be removed</strong>
-                  {:else if replaced}
-                    Replaced by the new picture
-                  {:else}
-                    {captionOf(photo, i)}
-                  {/if}
-                </p>
-                <div class="flex gap-2">
-                  <button
-                    type="button"
-                    class="btn-icon btn-icon-sm preset-tonal-surface"
-                    aria-label={`Move photo ${i + 1} earlier`}
-                    data-move="{photo.photoId}-earlier"
-                    disabled={i === 0}
-                    onclick={() => move(i, -1)}
-                    ><ArrowLeftIcon
-                      class="icon-sm"
-                      aria-hidden="true"
-                    /></button
-                  >
-                  <button
-                    type="button"
-                    class="btn-icon btn-icon-sm preset-tonal-surface"
-                    aria-label={`Move photo ${i + 1} later`}
-                    data-move="{photo.photoId}-later"
-                    disabled={i === photos.length - 1}
-                    onclick={() => move(i, 1)}
-                    ><ArrowRightIcon
-                      class="icon-sm"
-                      aria-hidden="true"
-                    /></button
-                  >
-                </div>
-              </li>
-            {/each}
-            {#if newPicture && updating && previews.active}
-              <li class="flex flex-col gap-1">
-                <div
-                  class="bg-surface-100-900 pointer-events-none w-full overflow-hidden"
-                  aria-hidden="true"
-                >
-                  <previews.active.previewComponent />
-                </div>
-                <p class="text-sm">New · Picture from Temperature Blanket</p>
-              </li>
-            {/if}
-            {#each added as item (item.id)}
-              <li class="flex flex-col gap-1">
-                <div class="relative">
-                  {#if item.url}
-                    <img
-                      src={item.url}
-                      alt={`New photo: ${item.file.name}`}
-                      class="bg-surface-100-900 h-auto w-full"
-                    />
-                  {:else}
-                    <div
-                      class="bg-surface-100-900 rounded-base flex aspect-square w-full items-center justify-center"
-                    >
-                      <ImageIcon class="size-8" aria-hidden="true" />
-                    </div>
-                  {/if}
-                  <button
-                    type="button"
-                    class="btn-icon btn-icon-sm preset-filled-surface-50-950 absolute top-2 right-2 shadow"
-                    aria-label={`Don’t add ${item.file.name}`}
-                    onclick={() => unadd(item)}
-                    ><XIcon class="icon-sm" aria-hidden="true" /></button
-                  >
-                </div>
-                <p class="text-sm break-all">New · {item.file.name}</p>
-              </li>
-            {/each}
-          </ul>
-        {/if}
-        <div class="flex">
-          <label
-            class="btn preset-tonal-surface cursor-pointer has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50"
-          >
-            <ImagePlusIcon aria-hidden="true" />Add Photos
-            <input
-              bind:this={fileInput}
-              class="sr-only"
-              type="file"
-              accept="image/png,image/jpeg,image/heic,image/heif"
-              multiple
-              onchange={(e) => addFiles(e.currentTarget.files)}
-            />
-          </label>
-        </div>
-      </fieldset>
 
       {#if updating}
         <p class="text-xs opacity-70">
