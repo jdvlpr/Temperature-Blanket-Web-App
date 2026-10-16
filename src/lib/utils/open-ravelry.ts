@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Opens a saved project's Ravelry dialogs from My Projects (its card's
-// Ravelry button and its ⋮ menu).
+// Opens a saved project's Ravelry dialog, from the Ravelry section of its
+// Share dialog.
 
 import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
 import { account } from '#lib/accounts/summary.svelte.js';
@@ -29,7 +29,7 @@ const nameOf = (item: StoredProjectIndexItem) =>
 export const inAccount = (item: StoredProjectIndexItem) =>
   !!item.sync && item.sync.ownerUserId === account.summary?.id;
 
-/** Post to Ravelry, or Update on Ravelry once it's posted. */
+/** Post to Ravelry, or Update on Ravelry (details, yarns and photos) once it's posted. */
 export async function openRavelryPost(item: StoredProjectIndexItem) {
   if (!inAccount(item)) {
     toast.trigger({
@@ -50,19 +50,5 @@ export async function openRavelryPost(item: StoredProjectIndexItem) {
       size: 'medium',
       title: updating ? 'Update on Ravelry' : 'Post to Ravelry',
     },
-  });
-}
-
-/** The project's Ravelry photos: add, delete, unlink. */
-export async function openRavelryPhotos(item: StoredProjectIndexItem) {
-  const { default: RavelryPhotos } =
-    await import('#lib/components/modals/RavelryPhotos.svelte');
-  dialog.trigger({
-    type: 'component',
-    component: {
-      ref: RavelryPhotos,
-      props: { projectId: item.id, name: nameOf(item) },
-    },
-    options: { size: 'medium', title: 'Photos on Ravelry' },
   });
 }

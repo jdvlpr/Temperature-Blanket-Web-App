@@ -92,6 +92,30 @@ export type RavelryProjectLink = {
   postedAt: number;
   updatedAt: number;
   photos: RavelryPhoto[];
+  /** What the app's picture was drawn from (see ravelryPictureKey), if it's been added */
+  pictureKey: string | null;
+};
+
+/** A yarn on the Ravelry project; `ours` when this app added it. */
+export type RavelryPack = {
+  packId: number;
+  name: string;
+  colorway: string;
+  yarnId: number | null;
+  ours: boolean;
+};
+
+/** What's on the Ravelry project now (the notes without the link line). */
+export type RavelryProjectDetails = {
+  name: string;
+  craftId: number | null;
+  statusId: number | null;
+  started: string | null;
+  finishBy: string | null;
+  completed: string | null;
+  progress: number | null;
+  notes: string;
+  packs: RavelryPack[];
 };
 
 /** A failed call: `code` RAVELRY_RECONNECT means connect Ravelry again. */
@@ -140,6 +164,10 @@ export function ravelryErrorMessage(error: unknown): string {
     return 'Ravelry stopped accepting the connection. Connect it again on your Account page.';
   if (error.code === 'RAVELRY_ERROR')
     return 'Ravelry didn’t answer as expected. Try again in a moment.';
+  if (error.code === 'NEEDS_GALLERY_PAGE')
+    return 'Publish it to the gallery first, then post it to Ravelry.';
+  if (error.code === 'NEEDS_NAME_SHOWN')
+    return 'Show your name on its gallery page first, then post it to Ravelry.';
   return error.message;
 }
 
@@ -148,25 +176,36 @@ export const listRavelryProjects = () =>
     (r) => r.projects,
   );
 
-/** The link, with its photos refreshed from Ravelry. */
+/** The link, with its photos, and what's on the Ravelry project now. */
 export const getRavelryProject = (projectId: string) =>
-  request<{ project: RavelryProjectLink }>(
+  request<{ project: RavelryProjectLink; details: RavelryProjectDetails }>(
     `/projects/${encodeURIComponent(projectId)}`,
-  ).then((r) => r.project);
+  );
 
+type RavelryYarn = { ravelryYarnId?: number; name: string; colorway: string };
+
+/**
+ * Posting needs a name and sends everything. Updating sends only the fields
+ * that changed (null clears a date) and the yarns to add or remove.
+ */
 export type RavelryProjectRequest = {
-  name: string;
-  craftId: number | null;
-  statusId: number | null;
-  started: string | null;
-  finishBy: string | null;
-  link: string;
-  notes: string;
-  yarns: { ravelryYarnId?: number; name: string; colorway: string }[];
-  update?: { name: boolean; dates: boolean; status: boolean; notes: boolean };
+  name?: string;
+  craftId?: number | null;
+  statusId?: number | null;
+  started?: string | null;
+  finishBy?: string | null;
+  completed?: string | null;
+  /** 0 to 100 */
+  progress?: number | null;
+  /** Without the link line, which the server keeps at the end */
+  notes?: string;
+  /** Posting: one per color */
+  yarns?: RavelryYarn[];
+  /** Updating: only packs this app added can be removed */
+  packs?: { add: RavelryYarn[]; remove: number[] };
 };
 
-/** Posts the project to Ravelry, or updates the Ravelry project it's linked to. */
+/** Posts the project to Ravelry, or changes the Ravelry project it's linked to. */
 export const postRavelryProject = (
   projectId: string,
   body: RavelryProjectRequest,
@@ -182,18 +221,21 @@ export const unlinkRavelryProject = (projectId: string) =>
     method: 'DELETE',
   });
 
-/** Adds a photo to the linked Ravelry project; as `picture`, it replaces the app's last one. */
 type PhotoResult = { photos: RavelryPhoto[]; processing: boolean };
 
 /**
- * Adds a photo to the linked project. It goes straight from the browser to
+ * Adds a photo to the linked project; as the `picture`, it replaces the app's
+ * last one, and `pictureKey` is kept with it. It goes straight from the browser to
  * Ravelry (with a one-use token, so big photos skip this server), or through
  * this server if that upload doesn't reach Ravelry.
  */
 export async function addRavelryPhoto(
   projectId: string,
   file: Blob,
-  { picture = false } = {},
+  {
+    picture = false,
+    pictureKey,
+  }: { picture?: boolean; pictureKey?: string | null } = {},
 ): Promise<PhotoResult> {
   const path = `/projects/${encodeURIComponent(projectId)}/photos`;
   try {
@@ -212,7 +254,7 @@ export async function addRavelryPhoto(
     }).catch(() => {});
     return await request<PhotoResult>(
       path,
-      jsonInit('POST', { uploadToken, picture }),
+      jsonInit('POST', { uploadToken, picture, pictureKey }),
     );
   } catch (e) {
     // Only an upload that didn't arrive falls back; other errors are real
@@ -222,6 +264,7 @@ export async function addRavelryPhoto(
   const form = new FormData();
   form.set('file', file, 'photo');
   if (picture) form.set('picture', '1');
+  if (pictureKey) form.set('pictureKey', pictureKey);
   return request<PhotoResult>(path, { method: 'POST', body: form });
 }
 
@@ -238,6 +281,31 @@ export const deleteRavelryPhoto = (projectId: string, photoId: number) =>
     `/projects/${encodeURIComponent(projectId)}/photos/${photoId}`,
     { method: 'DELETE' },
   ).then((r) => r.photos);
+
+/** Puts the photos in this order on Ravelry; the first is the main photo. */
+export const reorderRavelryPhotos = (projectId: string, photoIds: number[]) =>
+  request<{ photos: RavelryPhoto[] }>(
+    `/projects/${encodeURIComponent(projectId)}/photos/order`,
+    jsonInit('POST', { photoIds }),
+  ).then((r) => r.photos);
+
+/**
+ * What the app's picture was drawn from, as a short code: the project's link
+ * plus anything else it's drawn from. The same code later means the picture on
+ * Ravelry is still current. Null where the browser can't hash.
+ */
+export async function ravelryPictureKey(href: string, extra: string) {
+  try {
+    const bytes = new TextEncoder().encode(`${href}\n${extra}`);
+    const hash = await crypto.subtle.digest('SHA-256', bytes);
+    return [...new Uint8Array(hash)]
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+      .slice(0, 16);
+  } catch {
+    return null;
+  }
+}
 
 export type RavelryOption = { id: number; name: string };
 
