@@ -29,7 +29,7 @@ update it. -->
     updatePalettePage,
   } from '#lib/accounts/gallery.js';
   import { account } from '#lib/accounts/summary.svelte.js';
-  import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
+  import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
   import { onMount, untrack } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import { getYarnPageURL } from '#lib/utils/color-utils.js';
@@ -228,7 +228,7 @@ update it. -->
         {/if}
       </p>
       {#if !target}
-        <ShowOwnerToggle
+        <AnonymousCheckbox
           bind:checked={showOwner}
           name={ownerName}
           disabled={busy}

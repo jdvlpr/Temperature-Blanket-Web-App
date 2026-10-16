@@ -25,7 +25,7 @@ when that isn't kept with it). -->
   import { resolve } from '$app/paths';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
-  import ShowOwnerToggle from '#lib/components/account/ShowOwnerToggle.svelte';
+  import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
@@ -362,7 +362,7 @@ when that isn't kept with it). -->
           : 'Publishes this project, as it is now, to the public Project Gallery. You can update or unpublish it later.'}
       </p>
       {#if !page}
-        <ShowOwnerToggle
+        <AnonymousCheckbox
           bind:checked={showOwner}
           name={ownerName}
           disabled={busy}
