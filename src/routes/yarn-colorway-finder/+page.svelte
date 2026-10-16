@@ -39,6 +39,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
+  import FilterChips from '#lib/components/FilterChips.svelte';
+  import FiltersButton from '#lib/components/buttons/FiltersButton.svelte';
   import ColorSearchField from '#lib/components/ColorSearchField.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import ColorwayCards from '#lib/components/yarn-colorways/ColorwayCards.svelte';
@@ -91,6 +93,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let accordionState: string[] = $state([]);
 
+  // Yarn Weight and Colorway Name sit behind the Filters button
+  let filtersOpen = $state(false);
+  let filtersButton = $state<FiltersButton>();
+  // Yarn Weight only shows until a yarn is chosen
+  const weightShown = $derived(
+    !(
+      yarnColorwayFinderState.selectedBrandId &&
+      yarnColorwayFinderState.selectedYarnId
+    ),
+  );
+  const chips = $derived([
+    ...(weightShown && yarnColorwayFinderState.selectedYarnWeightId
+      ? [
+          {
+            label: `${ALL_YARN_WEIGHTS.find((weight) => weight.id === yarnColorwayFinderState.selectedYarnWeightId)?.name} weight`,
+            remove: () => (yarnColorwayFinderState.selectedYarnWeightId = ''),
+          },
+        ]
+      : []),
+    ...(yarnColorwayFinderState.search
+      ? [
+          {
+            label: `Name: ${yarnColorwayFinderState.search}`,
+            remove: () => (yarnColorwayFinderState.search = ''),
+          },
+        ]
+      : []),
+  ]);
+
   onMount(() => {
     initPage();
   });
@@ -137,6 +168,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       { threshold: 1 },
     );
     if (filtersContainer) scrollObserver.observe(filtersContainer);
+    // Open when a link brought filters
+    filtersOpen = chips.length > 0;
     isLoaded = true;
   }
 
@@ -320,11 +353,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               {#key isLoaded}
-                <div
-                  class="col-span-12 w-full md:col-span-9"
-                  class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
-                    !!yarnColorwayFinderState.selectedYarnId}
-                >
+                <div class="col-span-12 w-full">
                   <SelectYarn
                     preselectDefaultYarn={false}
                     bind:selectedBrandId={
@@ -335,52 +364,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </div>
               {/key}
-
-              {#if isLoaded}
-                {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
-                  <div
-                    class="col-span-12 w-full md:col-span-3"
-                    class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
-                      !!yarnColorwayFinderState.selectedYarnId}
-                  >
-                    <SelectYarnWeight
-                      selectedBrandId={yarnColorwayFinderState.selectedBrandId}
-                      bind:selectedYarnWeightId={
-                        yarnColorwayFinderState.selectedYarnWeightId
-                      }
-                    />
-                  </div>
-                {/key}
-              {/if}
-
-              <div class="col-span-12 flex w-full flex-col justify-start gap-1">
-                <div class="label">
-                  <span class="label-text"> Colorway Name </span>
-                  <div
-                    class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto]']}
-                  >
-                    <span class="label label-text"><SearchIcon /></span>
-                    <input
-                      id="yarn-select-search-input"
-                      autocomplete="off"
-                      placeholder="e.g., Wisteria, Cream"
-                      type="text"
-                      class="input truncate"
-                      bind:value={yarnColorwayFinderState.search}
-                    />
-                    {#if yarnColorwayFinderState.search}
-                      <button
-                        aria-label="Clear Search"
-                        class="btn hover:preset-tonal-surface"
-                        onclick={() => {
-                          yarnColorwayFinderState.search = '';
-                        }}
-                        ><XIcon />
-                      </button>
-                    {/if}
-                  </div>
-                </div>
-              </div>
             </div>
 
             {#if results.length}
@@ -394,7 +377,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ? pluralize('close match', sorted.length, 'es')
                   : pluralize('Colorway', sorted.length)}
               </p>
-              <div class="flex flex-wrap items-center justify-center gap-2">
+            {/if}
+            <div class="flex flex-wrap items-center justify-center gap-2">
+              {#if results.length}
                 <SortSelectMenu
                   options={colorwaySortOptions(!!yarnColorwayFinderState.hex)}
                   current={sort}
@@ -404,7 +389,77 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onreverse={(reversed) =>
                     (yarnColorwayFinderState.reversed = reversed)}
                 />
+              {/if}
+              <FiltersButton
+                bind:this={filtersButton}
+                bind:open={filtersOpen}
+                count={chips.length}
+                controls="finder-filters"
+              />
+              {#if results.length}
                 <ViewMenu bind:value={layout} fillOption />
+              {/if}
+            </div>
+
+            <div
+              id="finder-filters"
+              hidden={!filtersOpen}
+              class="my-2 grid w-full grid-cols-12 items-end gap-4"
+            >
+              {#if isLoaded}
+                {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
+                  <div
+                    class="col-span-12 w-full md:col-span-4"
+                    class:hidden={!weightShown}
+                  >
+                    <SelectYarnWeight
+                      selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                      bind:selectedYarnWeightId={
+                        yarnColorwayFinderState.selectedYarnWeightId
+                      }
+                    />
+                  </div>
+                {/key}
+              {/if}
+
+              <div
+                class={[
+                  'label col-span-12 w-full',
+                  weightShown && 'md:col-span-8',
+                ]}
+              >
+                <label class="label-text" for="yarn-select-search-input">
+                  Colorway Name
+                </label>
+                <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto]']}>
+                  <span class="label label-text" aria-hidden="true"
+                    ><SearchIcon /></span
+                  >
+                  <input
+                    id="yarn-select-search-input"
+                    autocomplete="off"
+                    placeholder="e.g., Wisteria, Cream"
+                    type="text"
+                    class="input truncate"
+                    bind:value={yarnColorwayFinderState.search}
+                  />
+                  {#if yarnColorwayFinderState.search}
+                    <button
+                      aria-label="Clear Search"
+                      class="btn hover:preset-tonal-surface"
+                      onclick={() => {
+                        yarnColorwayFinderState.search = '';
+                      }}
+                      ><XIcon />
+                    </button>
+                  {/if}
+                </div>
+              </div>
+            </div>
+
+            {#if !filtersOpen}
+              <div class="my-2">
+                <FilterChips {chips} onremove={() => filtersButton?.focus()} />
               </div>
             {/if}
 

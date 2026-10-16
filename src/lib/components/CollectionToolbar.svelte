@@ -27,18 +27,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
-  import { menuTriggerClass } from '#lib/components/menu-styles.js';
-  import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
+  import FilterChips, {
+    yarnChipLabel,
+  } from '#lib/components/FilterChips.svelte';
+  import FiltersButton from '#lib/components/buttons/FiltersButton.svelte';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import type { PageLayout } from '#lib/types/page-types.js';
-  import {
-    ChevronDownIcon,
-    EarthIcon,
-    Grid3x3,
-    ListFilterIcon,
-    SearchIcon,
-    XIcon,
-  } from '@lucide/svelte';
+  import { EarthIcon, Grid3x3, SearchIcon, XIcon } from '@lucide/svelte';
   import { untrack, type Snippet } from 'svelte';
 
   let {
@@ -113,26 +108,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Open while a filter is on, e.g. arriving from a yarn link
   let open = $state(untrack(() => activeCount > 0));
-  let filtersButton = $state<HTMLButtonElement>();
+  let filtersButton = $state<FiltersButton>();
 
-  const yarnLabel = $derived.by(() => {
-    if (!hasYarn) return '';
-    const brand = getBrands().find((brand) => brand.id === brandId);
-    const yarnName = brand?.yarns.find((y) => y.id === yarnId)?.name;
-    const name = [brand?.name, yarnName].filter(Boolean).join(' ') || 'Yarn';
-    return onlyThisYarn ? `Only ${name}` : name;
-  });
-  const patternLabel = $derived(
-    previews.all.find((preview) => preview.wpTagSlug === patternType)?.name ??
-      'Pattern',
-  );
-
-  /** A chip's ✕: the chip goes, so focus moves to the Filters button */
-  function removeFilter(clear: () => void) {
-    clear();
-    onchange?.();
-    filtersButton?.focus();
-  }
+  const chips = $derived([
+    ...(hasYarn
+      ? [
+          {
+            label: yarnChipLabel(brandId, yarnId, onlyThisYarn),
+            remove: () => {
+              brandId = '';
+              yarnId = '';
+              onlyThisYarn = false;
+            },
+          },
+        ]
+      : []),
+    ...(hasPattern && patternType
+      ? [
+          {
+            label:
+              previews.all.find((preview) => preview.wpTagSlug === patternType)
+                ?.name ?? 'Pattern',
+            remove: () => (patternType = ''),
+          },
+        ]
+      : []),
+  ]);
 </script>
 
 <div class="flex w-full flex-col gap-2">
@@ -192,25 +193,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
         {@render menus?.()}
         {#if hasHidden}
-          <button
+          <FiltersButton
             bind:this={filtersButton}
-            type="button"
-            class={menuTriggerClass}
-            aria-expanded={open}
-            aria-controls={panelId}
-            onclick={() => (open = !open)}
-          >
-            <ListFilterIcon aria-hidden="true" />
-            <span
-              >Filters{#if activeCount}<span aria-hidden="true">
-                  · {activeCount}</span
-                ><span class="sr-only">, {activeCount} on</span>{/if}</span
-            >
-            <ChevronDownIcon
-              class={['icon-sm transition-transform', open && 'rotate-180']}
-              aria-hidden="true"
-            />
-          </button>
+            bind:open
+            count={activeCount}
+            controls={panelId}
+          />
         {/if}
       {/if}
       <ViewMenu bind:value={layout} />
@@ -266,42 +254,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {@render filters?.()}
     </div>
 
-    {#if !open && activeCount}
-      <ul class="flex flex-wrap justify-center gap-2" aria-label="Filters on">
-        {#if hasYarn}
-          <li>
-            <button
-              type="button"
-              class="btn btn-sm preset-tonal rounded-full"
-              aria-label="Remove filter: {yarnLabel}"
-              {disabled}
-              onclick={() =>
-                removeFilter(() => {
-                  brandId = '';
-                  yarnId = '';
-                  onlyThisYarn = false;
-                })}
-            >
-              <span>{yarnLabel}</span>
-              <XIcon aria-hidden="true" />
-            </button>
-          </li>
-        {/if}
-        {#if hasPattern && patternType}
-          <li>
-            <button
-              type="button"
-              class="btn btn-sm preset-tonal rounded-full"
-              aria-label="Remove filter: {patternLabel}"
-              {disabled}
-              onclick={() => removeFilter(() => (patternType = ''))}
-            >
-              <span>{patternLabel}</span>
-              <XIcon aria-hidden="true" />
-            </button>
-          </li>
-        {/if}
-      </ul>
+    {#if !open}
+      <FilterChips
+        {chips}
+        {disabled}
+        onremove={() => {
+          onchange?.();
+          filtersButton?.focus();
+        }}
+      />
     {/if}
   {/if}
 </div>

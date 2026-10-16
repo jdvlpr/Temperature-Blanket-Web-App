@@ -22,6 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import DefaultYarnSuggestion from '#lib/components/DefaultYarnSuggestion.svelte';
+  import FilterChips from '#lib/components/FilterChips.svelte';
+  import FiltersButton from '#lib/components/buttons/FiltersButton.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
@@ -38,13 +40,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     withDeltas,
     type ColorwaySort,
   } from '#lib/components/yarn-colorways/colorway-utils.js';
-  import { YARN_COLORWAYS_PER_PAGE } from '#lib/constants/color-constants.js';
+  import {
+    ALL_YARN_WEIGHTS,
+    YARN_COLORWAYS_PER_PAGE,
+  } from '#lib/constants/color-constants.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
   import { getColorways } from '#lib/utils/yarn-utils.js';
   import { PlusIcon, SearchIcon, XIcon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -81,6 +86,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** Reverse the sort (any but Best match); stays on across sorts */
   let reversed = $state(false);
   let yarnDataReady = $state(false);
+
+  // Yarn Weight and Colorway Name sit behind the Filters button
+  // Yarn Weight only shows until a yarn is chosen
+  const weightShown = $derived(!(selectedBrandId && selectedYarnId));
+  const chips = $derived([
+    ...(weightShown && selectedYarnWeightId
+      ? [
+          {
+            label: `${ALL_YARN_WEIGHTS.find((weight) => weight.id === selectedYarnWeightId)?.name} weight`,
+            remove: () => (selectedYarnWeightId = ''),
+          },
+        ]
+      : []),
+    ...(search
+      ? [
+          {
+            label: `Name: ${search}`,
+            remove: () => (search = ''),
+          },
+        ]
+      : []),
+  ]);
+  let filtersOpen = $state(untrack(() => !!search));
+  let filtersButton = $state<FiltersButton>();
+  const filtersId = $props.id();
 
   /** Tells colorways apart for choosing, as the palette stores them */
   const selectionId = ({ hex, name, brandId, yarnId }: Color) =>
@@ -191,10 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="my-2 grid w-full grid-cols-12 items-end gap-2"
   bind:this={filtersContainer}
 >
-  <div
-    class="order-1 col-span-full w-full md:col-span-9"
-    class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
-  >
+  <div class="col-span-full w-full">
     <SelectYarn
       bind:selectedBrandId
       bind:selectedYarnId
@@ -205,26 +232,65 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <DefaultYarnSuggestion
     {selectedBrandId}
     {selectedYarnId}
-    class="order-2 col-span-full md:order-3"
+    class="col-span-full"
   />
+</div>
 
+<div class="my-2 flex flex-wrap items-center justify-between gap-2">
+  <p class="text-sm">
+    {#if results.length}
+      {#if sorted.length > results.length}
+        Showing {results.length.toLocaleString()} of
+      {/if}
+      {sorted.length.toLocaleString()}
+      {pluralize('Colorway', sorted.length)}
+    {/if}
+  </p>
+  <div class="flex flex-wrap items-center gap-2">
+    {#if results.length}
+      <SortSelectMenu
+        options={colorwaySortOptions(!!matchHex)}
+        current={sort}
+        {canReverse}
+        {reversed}
+        onsort={(chosen) => (chosenSort = chosen)}
+        onreverse={(value) => (reversed = value)}
+      />
+    {/if}
+    <FiltersButton
+      bind:this={filtersButton}
+      bind:open={filtersOpen}
+      count={chips.length}
+      controls={filtersId}
+    />
+    {#if results.length}
+      <ViewMenu bind:value={layout} fillOption />
+    {/if}
+  </div>
+</div>
+
+<div
+  id={filtersId}
+  hidden={!filtersOpen}
+  class="my-2 grid w-full grid-cols-12 items-end gap-2"
+>
   {#if yarnDataReady}
     {#key selectedBrandId}
       <div
-        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
-        class:hidden={!!selectedBrandId && !!selectedYarnId}
+        class="col-span-full w-full md:col-span-4"
+        class:hidden={!weightShown}
       >
         <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
       </div>
     {/key}
   {/if}
 
-  <div class="label order-4 col-span-full w-full">
+  <div class={['label col-span-full w-full', weightShown && 'md:col-span-8']}>
     <label class="label-text" for="yarn-select-search-input"
       >Colorway Name</label
     >
     <div class={[FIELD_GROUP, 'w-full grid-cols-[auto_1fr_auto]']}>
-      <span class="label label-text"><SearchIcon /></span>
+      <span class="label label-text" aria-hidden="true"><SearchIcon /></span>
       <input
         id="yarn-select-search-input"
         autocomplete="off"
@@ -245,27 +311,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-{#if results.length}
-  <div class="my-2 flex flex-wrap items-center justify-between gap-2">
-    <p class="text-sm">
-      {#if sorted.length > results.length}
-        Showing {results.length.toLocaleString()} of
-      {/if}
-      {sorted.length.toLocaleString()}
-      {pluralize('Colorway', sorted.length)}
-    </p>
-    <div class="flex flex-wrap items-center gap-2">
-      <SortSelectMenu
-        options={colorwaySortOptions(!!matchHex)}
-        current={sort}
-        {canReverse}
-        {reversed}
-        onsort={(chosen) => (chosenSort = chosen)}
-        onreverse={(value) => (reversed = value)}
-      />
-      <ViewMenu bind:value={layout} fillOption />
-    </div>
+{#if !filtersOpen}
+  <div class="my-2">
+    <FilterChips {chips} onremove={() => filtersButton?.focus()} />
   </div>
+{/if}
+
+{#if results.length}
   <div class="my-2 w-full">
     {#if layout === 'grid'}
       <ColorwayCards

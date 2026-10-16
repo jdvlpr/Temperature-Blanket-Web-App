@@ -50,12 +50,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
-  import Expand from '#lib/components/Expand.svelte';
+  import FilterChips, {
+    yarnChipLabel,
+  } from '#lib/components/FilterChips.svelte';
+  import FiltersButton from '#lib/components/buttons/FiltersButton.svelte';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
-  import { ICONS } from '#lib/constants/icon-constants.js';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { isDesktop } from '#lib/state/page-state.svelte.js';
   import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
   import {
@@ -64,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/gallery-utils.js';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
   import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   interface Props {
     updateGauge?: any;
@@ -72,7 +73,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { updateGauge = null }: Props = $props();
 
-  let filtersExpanded = $state(true);
+  const id = $props.id();
+  const searchId = `${id}-search`;
+  const panelId = `${id}-filters`;
+
+  const yarnChip = $derived(
+    yarnChipLabel(
+      galleryPalettesState.filteredBrandId,
+      galleryPalettesState.filteredYarnId,
+      galleryPalettesState.palettesContainOnlyFilteredYarn,
+    ),
+  );
+  // Open while a filter is on, e.g. coming back to this tab
+  let filtersOpen = $state(untrack(() => !!yarnChip));
+  let filtersButton = $state<FiltersButton>();
 
   let first = 40;
   let loading = $state(true);
@@ -146,61 +160,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let endCursor = $derived(galleryPalettesState.gallery?.pageInfo?.endCursor);
 </script>
 
-<div class=" flex flex-wrap items-end justify-center gap-2 pb-2 text-center">
-  <Expand bind:isExpanded={filtersExpanded} label="{ICONS.filter} Filters"
-  ></Expand>
+<div class="flex flex-col gap-2 px-2 pb-2">
+  <div class="label w-full text-left">
+    <label class="label-text" for={searchId}>Search</label>
+    <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
+      <span class="label label-text" aria-hidden="true">
+        <EarthIcon />
+      </span>
+      <input
+        id={searchId}
+        type="text"
+        class="input w-full truncate"
+        autocomplete="off"
+        placeholder="e.g., Kansas, 2003"
+        bind:value={galleryPalettesState.search}
+        oninput={debouncedSearch}
+      />
 
-  {#if filtersExpanded}
-    <div
-      class="grid w-full grid-cols-12 items-start justify-center gap-4 px-2"
-      transition:safeSlide
-    >
-      <div class="col-span-12 w-full md:col-span-7">
-        <SelectYarn
-          preselectDefaultYarn={false}
-          disabled={loading}
-          bind:selectedBrandId={galleryPalettesState.filteredBrandId}
-          bind:selectedYarnId={galleryPalettesState.filteredYarnId}
-          onselectautocomplete={debouncedSearch}
-          bind:only={galleryPalettesState.palettesContainOnlyFilteredYarn}
-          ononlychange={debouncedSearch}
-        />
-      </div>
-
-      <div class="col-span-12 flex w-full flex-col justify-start md:col-span-5">
-        <span class="label-text text-left"> Search </span>
-        <div class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}>
-          <span class="label label-text">
-            <EarthIcon />
-          </span>
-          <input
-            type="text"
-            class="input w-full truncate"
-            autocomplete="off"
-            placeholder="e.g., Kansas, 2003"
-            bind:value={galleryPalettesState.search}
-            oninput={debouncedSearch}
-          />
-
-          {#if showSearchReset}
-            <button
-              class="btn hover:preset-tonal-surface"
-              title="Reset Search"
-              onclick={() => {
-                galleryPalettesState.search = '';
-                debouncedSearch();
-              }}
-            >
-              <XIcon />
-            </button>
-          {/if}
-        </div>
-      </div>
+      {#if showSearchReset}
+        <button
+          type="button"
+          class="btn hover:preset-tonal-surface"
+          title="Clear Search"
+          aria-label="Clear Search"
+          onclick={() => {
+            galleryPalettesState.search = '';
+            debouncedSearch();
+          }}
+        >
+          <XIcon />
+        </button>
+      {/if}
     </div>
-  {/if}
-</div>
-<div class="flex flex-col items-center px-2" bind:this={projectsList}>
-  <div class="mb-2 flex justify-center">
+  </div>
+
+  <div class="my-2 flex flex-wrap items-center justify-center gap-2">
     <SortSelectMenu
       options={[{ value: 'DESC', label: 'Newest' }]}
       current="DESC"
@@ -212,7 +206,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
         debouncedSearch();
       }}
     />
+    <FiltersButton
+      bind:this={filtersButton}
+      bind:open={filtersOpen}
+      count={yarnChip ? 1 : 0}
+      controls={panelId}
+    />
   </div>
+
+  <div id={panelId} hidden={!filtersOpen} class="w-full text-left">
+    <SelectYarn
+      preselectDefaultYarn={false}
+      disabled={loading}
+      bind:selectedBrandId={galleryPalettesState.filteredBrandId}
+      bind:selectedYarnId={galleryPalettesState.filteredYarnId}
+      onselectautocomplete={debouncedSearch}
+      bind:only={galleryPalettesState.palettesContainOnlyFilteredYarn}
+      ononlychange={debouncedSearch}
+    />
+  </div>
+
+  {#if !filtersOpen}
+    <FilterChips
+      chips={yarnChip
+        ? [
+            {
+              label: yarnChip,
+              remove: () => {
+                galleryPalettesState.filteredBrandId = '';
+                galleryPalettesState.filteredYarnId = '';
+                galleryPalettesState.palettesContainOnlyFilteredYarn = false;
+              },
+            },
+          ]
+        : []}
+      disabled={loading}
+      onremove={() => {
+        debouncedSearch();
+        filtersButton?.focus();
+      }}
+    />
+  {/if}
+</div>
+<div class="flex flex-col items-center px-2" bind:this={projectsList}>
   {#if loading && !galleryPalettesState.palettes.length}
     <div class="my-1"></div>
     <PlaceholderPalettes items={20} maxWFull={true} />
