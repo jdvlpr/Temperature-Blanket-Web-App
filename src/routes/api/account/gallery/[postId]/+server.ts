@@ -99,6 +99,24 @@ export const PATCH: RequestHandler = async (event) => {
   }
   if (!postId || typeof body?.showOwner !== 'boolean')
     return galleryError(400, 'INVALID_REQUEST', 'Nothing to change');
+  // A project on Ravelry links to this page from its notes, under the owner's
+  // Ravelry name: it can't be anonymous unless it's unlinked first
+  if (!body.showOwner) {
+    const { ravelryProjectForPost, forgetProjectLink } =
+      await import('#lib/server/ravelry/store.js');
+    const linked = await ravelryProjectForPost(
+      gallery.db,
+      gallery.userId,
+      postId,
+    ).catch(() => null);
+    if (linked && body.unlinkRavelry !== true)
+      return galleryError(
+        409,
+        'RAVELRY_LINKED',
+        'Unlink it from Ravelry to make its page anonymous',
+      );
+    if (linked) await forgetProjectLink(gallery.db, gallery.userId, linked);
+  }
   // Only in the app: WordPress never has the owner's name, so there's nothing to tell it
   if (
     !(await setPostShowOwner(
@@ -142,6 +160,15 @@ export const DELETE: RequestHandler = async (event) => {
       'The gallery couldn’t be reached. Try again later.',
     );
   }
+  // Its Ravelry project would link to a page that's gone: unlinked too (it stays on Ravelry)
+  const { ravelryProjectForPost, forgetProjectLink } =
+    await import('#lib/server/ravelry/store.js');
+  const linked = await ravelryProjectForPost(
+    gallery.db,
+    gallery.userId,
+    postId,
+  ).catch(() => null);
+  if (linked) await forgetProjectLink(gallery.db, gallery.userId, linked);
   await forgetPost(gallery.db, gallery.userId, postId);
   return new Response(null, { status: 204 });
 };

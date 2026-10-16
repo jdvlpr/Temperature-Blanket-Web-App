@@ -29,6 +29,37 @@ export type RavelryProjectLink = {
   updatedAt: number;
   /** When its photos were last read from Ravelry, or null (migration 0013) */
   photosRefreshedAt?: number | null;
+  /**
+   * What the app last read of it (migration 0014): Ravelry's updated_at, photo
+   * count and first photo, so it's read again only when one changed
+   */
+  ravelryUpdatedAt?: string | null;
+  /** Its public notes, without the link line */
+  notes?: string | null;
+  /** Its yarns, as JSON StoredPack[] */
+  packs?: string | null;
+  /** When it was last read from Ravelry */
+  checkedAt?: number | null;
+  /** What its picture from this app was drawn from, hashed */
+  pictureKey?: string | null;
+};
+
+/** A yarn on the Ravelry project. `ours`: added by this app, so Update may remove it. */
+export type StoredPack = {
+  packId: number;
+  name: string;
+  colorway: string;
+  yarnId: number | null;
+  ours: boolean;
+};
+
+export const readPacks = (json: string | null | undefined): StoredPack[] => {
+  try {
+    const packs = JSON.parse(json ?? '[]');
+    return Array.isArray(packs) ? packs : [];
+  } catch {
+    return [];
+  }
 };
 
 export type StoredRavelryPhoto = {
@@ -85,7 +116,8 @@ export async function getProjectLink(
   return db
     .prepare(
       `select "projectId", "ravelryProjectId", "ravelryUsername", "permalink",
-              "picturePhotoId", "postedAt", "updatedAt"
+              "picturePhotoId", "postedAt", "updatedAt", "photosRefreshedAt",
+              "ravelryUpdatedAt", "notes", "packs", "checkedAt", "pictureKey"
        from "ravelryProject" where "userId" = ? and "projectId" = ?`,
     )
     .bind(userId, projectId)
@@ -100,12 +132,58 @@ export async function listProjectLinks(
   const { results } = await db
     .prepare(
       `select "projectId", "ravelryProjectId", "ravelryUsername", "permalink",
-              "picturePhotoId", "postedAt", "updatedAt", "photosRefreshedAt"
+              "picturePhotoId", "postedAt", "updatedAt", "photosRefreshedAt",
+              "ravelryUpdatedAt", "notes", "packs", "checkedAt", "pictureKey"
        from "ravelryProject" where "userId" = ? order by "postedAt" desc`,
     )
     .bind(userId)
     .all<RavelryProjectLink>();
   return results;
+}
+
+/** What was read from Ravelry, or a new picture's key: only the fields given change. */
+export async function updateLinkState(
+  db: D1Database,
+  userId: string,
+  projectId: string,
+  state: Partial<
+    Pick<
+      RavelryProjectLink,
+      | 'permalink'
+      | 'ravelryUpdatedAt'
+      | 'notes'
+      | 'packs'
+      | 'checkedAt'
+      | 'pictureKey'
+    >
+  >,
+) {
+  const entries = Object.entries(state).filter(([, v]) => v !== undefined);
+  if (!entries.length) return;
+  await db
+    .prepare(
+      `update "ravelryProject" set ${entries.map(([k]) => `"${k}" = ?`).join(', ')}
+       where "userId" = ? and "projectId" = ?`,
+    )
+    .bind(...entries.map(([, v]) => v), userId, projectId)
+    .run();
+}
+
+/** When the user's Ravelry project list was last read, and marks it read now. */
+export async function claimListCheck(
+  db: D1Database,
+  userId: string,
+  notBefore: number,
+  now = Date.now(),
+): Promise<boolean> {
+  const { meta } = await db
+    .prepare(
+      `update "ravelryUser" set "listCheckedAt" = ?
+       where "userId" = ? and coalesce("listCheckedAt", 0) <= ?`,
+    )
+    .bind(now, userId, notBefore)
+    .run();
+  return meta.changes > 0;
 }
 
 export async function saveProjectLink(
@@ -191,9 +269,9 @@ export async function replacePhotos(
   await db.batch([
     db
       .prepare(
-        'update "ravelryProject" set "photosRefreshedAt" = ? where "userId" = ? and "projectId" = ?',
+        'update "ravelryProject" set "photosRefreshedAt" = ?, "checkedAt" = ? where "userId" = ? and "projectId" = ?',
       )
-      .bind(now, userId, projectId),
+      .bind(now, now, userId, projectId),
     db
       .prepare(
         'delete from "ravelryPhoto" where "userId" = ? and "projectId" = ?',
@@ -224,17 +302,21 @@ export async function replacePhotos(
   ]);
 }
 
-/** The photos of the project behind a gallery page, when its owner linked it to Ravelry. */
+/** The photos and notes of the project behind a gallery page, when its owner linked it to Ravelry. */
 export async function photosForGalleryPost(
   db: D1Database,
   postId: number,
-): Promise<{ url: string; photos: StoredRavelryPhoto[] } | null> {
+): Promise<{
+  url: string;
+  photos: StoredRavelryPhoto[];
+  notes: string | null;
+} | null> {
   const link = await db
     .prepare(
-      `select r."userId", r."projectId", r."ravelryUsername", r."permalink"
+      `select r."userId", r."projectId", r."ravelryUsername", r."permalink", r."notes"
        from "galleryPost" g
        join "ravelryProject" r on r."userId" = g."userId" and r."projectId" = g."projectId"
-       where g."postId" = ?`,
+       where g."postId" = ? and coalesce(g."kind", 'project') = 'project' and g."hiddenAt" is null`,
     )
     .bind(postId)
     .first<{
@@ -242,10 +324,27 @@ export async function photosForGalleryPost(
       projectId: string;
       ravelryUsername: string;
       permalink: string;
+      notes: string | null;
     }>();
   if (!link) return null;
   const photos = await listPhotos(db, link.userId, link.projectId);
-  return { url: ravelryProjectUrl(link), photos };
+  return { url: ravelryProjectUrl(link), photos, notes: link.notes || null };
+}
+
+/** The saved project behind this user's gallery page, when it's linked to Ravelry. */
+export async function ravelryProjectForPost(
+  db: D1Database,
+  userId: string,
+  postId: number,
+): Promise<string | null> {
+  return db
+    .prepare(
+      `select r."projectId" from "galleryPost" g
+       join "ravelryProject" r on r."userId" = g."userId" and r."projectId" = g."projectId"
+       where g."postId" = ? and g."userId" = ? and coalesce(g."kind", 'project') = 'project'`,
+    )
+    .bind(postId, userId)
+    .first<string>('projectId');
 }
 
 /** Everything linked to Ravelry, as the account forgets the link. */
@@ -265,4 +364,5 @@ export const linkForClient = (
   postedAt: link.postedAt,
   updatedAt: link.updatedAt,
   photos,
+  pictureKey: link.pictureKey ?? null,
 });

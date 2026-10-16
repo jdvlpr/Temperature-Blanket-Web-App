@@ -227,6 +227,24 @@ export async function forgetPost(
     .run();
 }
 
+/** A saved project's live gallery page, newest first, if it has one. */
+export async function projectPage(
+  db: D1Database,
+  userId: string,
+  projectId: string,
+): Promise<{ postId: number; showOwner: boolean } | null> {
+  const row = await db
+    .prepare(
+      `select "postId", "showOwner" from "galleryPost"
+       where "userId" = ? and "projectId" = ? and coalesce("kind", 'project') = 'project'
+         and ${LIVE}
+       order by "publishedAt" desc limit 1`,
+    )
+    .bind(userId, projectId)
+    .first<{ postId: number; showOwner: number }>();
+  return row ? { postId: row.postId, showOwner: row.showOwner === 1 } : null;
+}
+
 /** A project's or palette's pages, live or hidden, for hiding or restoring them with it. */
 export async function postsForItem(
   db: D1Database,

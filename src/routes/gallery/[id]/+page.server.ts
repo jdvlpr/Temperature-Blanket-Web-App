@@ -57,7 +57,7 @@ async function getRavelryPhotos(event: Parameters<PageServerLoad>[0]) {
     const { photosForGalleryPost } =
       await import('#lib/server/ravelry/store.js');
     const found = await photosForGalleryPost(env.DB, id);
-    return found?.photos.length ? found : null;
+    return found?.photos.length || found?.notes ? found : null;
   } catch (e) {
     // Before migration 0011: the page shows without them
     console.error('Could not look up Ravelry photos', e);

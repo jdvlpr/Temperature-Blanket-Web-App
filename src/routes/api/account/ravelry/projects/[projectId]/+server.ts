@@ -34,10 +34,14 @@ async function projectIdOf(event: RequestEvent<{ projectId: string }>) {
   return PROJECT_ID_PATTERN.test(id) ? id : null;
 }
 
-/** The link, with its photos refreshed from Ravelry. */
+/**
+ * The link, read from Ravelry again: its photos, and what's on Ravelry now
+ * (name, dates, status, notes without the link line, yarns) for Update.
+ */
 export const GET: RequestHandler = async (event) => {
   const m = await load();
-  const { refreshPhotos } = await import('#lib/server/ravelry/photos.js');
+  const { readLinkedProject } = await import('#lib/server/ravelry/sync.js');
+  const { withoutLinkLine } = await import('#lib/server/ravelry/project.js');
   const projectId = await projectIdOf(event);
   if (!projectId)
     return m.ravelryError(400, 'INVALID_REQUEST', 'Bad project ID');
@@ -45,19 +49,50 @@ export const GET: RequestHandler = async (event) => {
     const link = await m.getProjectLink(session.db, session.userId, projectId);
     if (!link)
       return m.ravelryError(404, 'NOT_LINKED', 'Not posted to Ravelry');
-    const photos = await refreshPhotos(session, link);
+    const read = await readLinkedProject(session, link);
+    if (!read) return gone(m);
+    const { project } = read;
     return Response.json(
-      { project: m.linkForClient(link, photos) },
+      {
+        project: m.linkForClient(read.link, read.photos),
+        details: {
+          name: project.name,
+          craftId: project.craft_id ?? null,
+          statusId: project.project_status_id ?? null,
+          started: project.started ?? null,
+          finishBy: project.finish_by ?? null,
+          completed: project.completed ?? null,
+          progress: project.progress ?? null,
+          notes: withoutLinkLine(project.notes),
+          packs: read.packs,
+        },
+      },
       { headers: m.NO_STORE },
     );
   });
 };
 
-/** Posts the project to Ravelry, or updates the Ravelry project it was posted as. */
+/** Deleted on Ravelry, so unlinked here */
+const gone = (m: Awaited<ReturnType<typeof load>>) =>
+  m.ravelryError(
+    404,
+    'RAVELRY_GONE',
+    'That project was deleted on Ravelry, so it’s unlinked here',
+  );
+
+/**
+ * Posts the project to Ravelry, or changes the Ravelry project it was posted
+ * as: only the fields sent that differ, and yarns added or (only ones this app
+ * added) removed. Its notes link to the project's gallery page, which has to
+ * show its owner's name: the Ravelry project names them anyway.
+ */
 export const POST: RequestHandler = async (event) => {
   const m = await load();
-  const { readProjectPost, createData, updateData } =
+  const { readProjectPost, createData, updateData, packFor } =
     await import('#lib/server/ravelry/project.js');
+  const { keepProject } = await import('#lib/server/ravelry/sync.js');
+  const { projectPage } = await import('#lib/server/gallery/store.js');
+  const { RavelryApiError } = await import('#lib/server/ravelry/api.js');
   const projectId = await projectIdOf(event);
   if (!projectId)
     return m.ravelryError(400, 'INVALID_REQUEST', 'Bad project ID');
@@ -71,46 +106,108 @@ export const POST: RequestHandler = async (event) => {
         'NOT_IN_ACCOUNT',
         'Add this project to your account first',
       );
+    const page = await projectPage(session.db, session.userId, projectId);
+    if (!page)
+      return m.ravelryError(
+        409,
+        'NEEDS_GALLERY_PAGE',
+        'Publish it to the gallery first',
+      );
+    if (!page.showOwner)
+      return m.ravelryError(
+        409,
+        'NEEDS_NAME_SHOWN',
+        'Show your name on its gallery page first',
+      );
+    const pageUrl = `${event.url.origin}/gallery/${page.postId}`;
 
-    const post = readProjectPost(
-      await event.request.json().catch(() => null),
-      event.url.origin,
-      projectId,
-    );
+    let link = await m.getProjectLink(session.db, session.userId, projectId);
+    const post = readProjectPost(await event.request.json().catch(() => null), {
+      create: !link,
+    });
     if (typeof post === 'string')
       return m.ravelryError(400, 'INVALID_REQUEST', post);
 
-    let link = await m.getProjectLink(session.db, session.userId, projectId);
     if (!link) {
       const project = await session.api.createProject(
         session.username,
-        createData(post),
+        createData(post, pageUrl),
       );
+      const now = Date.now();
       link = {
         projectId,
         ravelryProjectId: project.id,
         ravelryUsername: session.username,
         permalink: project.permalink,
         picturePhotoId: null,
-        postedAt: Date.now(),
-        updatedAt: Date.now(),
+        postedAt: now,
+        updatedAt: now,
       };
-    } else {
-      const current = await session.api.showProject(
-        link.ravelryUsername,
-        link.ravelryProjectId,
+      await m.saveProjectLink(session.db, session.userId, link);
+      const kept = await keepProject(session, link, project, {
+        ours: (project.packs ?? []).map((p) => p.id),
+      });
+      return Response.json(
+        { project: m.linkForClient(kept.link, kept.photos) },
+        { headers: m.NO_STORE },
       );
-      const project = await session.api.updateProject(
-        link.ravelryUsername,
-        link.ravelryProjectId,
-        updateData(post, current.notes),
-      );
-      link = { ...link, permalink: project.permalink, updatedAt: Date.now() };
     }
-    await m.saveProjectLink(session.db, session.userId, link);
-    const photos = await m.listPhotos(session.db, session.userId, projectId);
+
+    let current;
+    try {
+      current = await session.api.showProject(
+        link.ravelryUsername,
+        link.ravelryProjectId,
+      );
+    } catch (e) {
+      if (e instanceof RavelryApiError && e.status === 404) {
+        await m.forgetProjectLink(session.db, session.userId, projectId);
+        return gone(m);
+      }
+      throw e;
+    }
+    const data = updateData(post, pageUrl, current);
+    if (Object.keys(data).length)
+      await session.api.updateProject(
+        link.ravelryUsername,
+        link.ravelryProjectId,
+        data,
+      );
+
+    // Yarns: only ones this app added can be removed
+    const ours = new Set(
+      m
+        .readPacks(link.packs)
+        .filter((p) => p.ours)
+        .map((p) => p.packId),
+    );
+    const added: number[] = [];
+    for (const packId of post.packs?.remove ?? [])
+      if (ours.has(packId))
+        await session.api.deletePack(packId).catch((e) => {
+          if (!(e instanceof RavelryApiError && e.status === 404)) throw e;
+        });
+    for (const yarn of post.packs?.add ?? [])
+      added.push(
+        (await session.api.createPack(link.ravelryProjectId, packFor(yarn))).id,
+      );
+
+    const changed =
+      Object.keys(data).length || added.length || post.packs?.remove.length;
+    if (changed) {
+      link = { ...link, updatedAt: Date.now() };
+      await m.saveProjectLink(session.db, session.userId, link);
+    }
+    // What Ravelry has now, kept here
+    const project = changed
+      ? await session.api.showProject(
+          link.ravelryUsername,
+          link.ravelryProjectId,
+        )
+      : current;
+    const kept = await keepProject(session, link, project, { ours: added });
     return Response.json(
-      { project: m.linkForClient(link, photos) },
+      { project: m.linkForClient(kept.link, kept.photos) },
       { headers: m.NO_STORE },
     );
   });

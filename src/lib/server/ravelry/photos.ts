@@ -19,11 +19,11 @@
 import { RavelryApiError } from './api';
 import type { RavelrySession } from './index';
 import {
-  listPhotos,
-  replacePhotos,
   saveProjectLink,
+  updateLinkState,
   type RavelryProjectLink,
 } from './store';
+import { readLinkedProject } from './sync';
 
 /** Ravelry takes PNG, JPEG and HEIC, up to 50 MB a request. */
 export const PHOTO_TYPES = new Set([
@@ -38,33 +38,18 @@ const STATUS_CHECKS = 10;
 const STATUS_WAIT_MS = 1000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Ravelry's photos of the project, kept here, in Ravelry's order. */
+/**
+ * Ravelry's photos of the project, kept here, in Ravelry's order (with its notes
+ * and yarns: see readLinkedProject). A project deleted on Ravelry is unlinked,
+ * and answers 404.
+ */
 export async function refreshPhotos(
   session: RavelrySession,
   link: RavelryProjectLink,
 ) {
-  const project = await session.api.showProject(
-    link.ravelryUsername,
-    link.ravelryProjectId,
-  );
-  // The app's picture may have been deleted on Ravelry
-  const photos = project.photos ?? [];
-  const picturePhotoId = photos.some((p) => p.id === link.picturePhotoId)
-    ? link.picturePhotoId
-    : null;
-  await replacePhotos(
-    session.db,
-    session.userId,
-    link.projectId,
-    photos,
-    picturePhotoId,
-  );
-  if (picturePhotoId !== link.picturePhotoId)
-    await saveProjectLink(session.db, session.userId, {
-      ...link,
-      picturePhotoId,
-    });
-  return listPhotos(session.db, session.userId, link.projectId);
+  const read = await readLinkedProject(session, link);
+  if (!read) throw new RavelryApiError(404, 'Deleted on Ravelry');
+  return read.photos;
 }
 
 /** Where the browser uploads a photo itself, with a one-use token. */
@@ -79,7 +64,7 @@ export async function addPhoto(
   session: RavelrySession,
   link: RavelryProjectLink,
   file: Blob,
-  { picture = false } = {},
+  { picture = false, pictureKey = null as string | null } = {},
 ) {
   const { api } = session;
   const token = await api.uploadToken();
@@ -90,7 +75,7 @@ export async function addPhoto(
         ? 'heic'
         : 'jpg';
   const imageId = await api.uploadImage(token, file, `photo.${extension}`);
-  return attachImage(session, link, imageId, { picture });
+  return attachImage(session, link, imageId, { picture, pictureKey });
 }
 
 /**
@@ -101,7 +86,7 @@ export async function attachImage(
   session: RavelrySession,
   link: RavelryProjectLink,
   imageId: number,
-  { picture = false } = {},
+  { picture = false, pictureKey = null as string | null } = {},
 ) {
   const { api } = session;
   const statusToken = await api.createProjectPhoto(
@@ -127,6 +112,11 @@ export async function attachImage(
       });
     link = { ...link, picturePhotoId: photoId };
     await saveProjectLink(session.db, session.userId, link);
+    // So Update sends a picture again only when the project changed
+    if (pictureKey)
+      await updateLinkState(session.db, session.userId, link.projectId, {
+        pictureKey,
+      });
   }
 
   // Still being processed after the wait: it shows up on the next refresh

@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { withProjectName } from '#lib/utils/project-name-link.js';
+  import { parseNotes } from '#lib/utils/ravelry-notes.js';
   import { fromGalleryLink } from '#lib/utils/gallery-request.js';
   import { resolve } from '$app/paths';
   import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
@@ -374,31 +375,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       aria-labelledby="ravelry-photos"
                     >
                       <h2 id="ravelry-photos" class="text-sm font-bold">
-                        Photos on Ravelry
+                        {ravelry.photos.length
+                          ? 'Photos on Ravelry'
+                          : 'On Ravelry'}
                       </h2>
-                      <ul class="flex flex-wrap justify-center gap-2">
-                        {#each ravelry.photos as photo, i (photo.photoId)}
-                          <li>
-                            <a
-                              href={ravelry.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="block"
-                              ><img
-                                src={photo.mediumUrl ??
-                                  photo.smallUrl ??
-                                  photo.squareUrl ??
-                                  ''}
-                                alt={photo.isPicture
-                                  ? `${projectName || 'The project'}: its picture from Temperature Blanket (opens Ravelry in a new tab)`
-                                  : `${projectName || 'The project'}: photo ${i + 1} on Ravelry (opens in a new tab)`}
-                                class="bg-surface-100-900 h-32 w-auto max-w-full sm:h-48"
-                                loading="lazy"
-                              /></a
-                            >
-                          </li>
-                        {/each}
-                      </ul>
+                      {#if ravelry.photos.length}
+                        <ul class="flex flex-wrap justify-center gap-2">
+                          {#each ravelry.photos as photo, i (photo.photoId)}
+                            <li>
+                              <a
+                                href={ravelry.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="block"
+                                ><img
+                                  src={photo.mediumUrl ??
+                                    photo.smallUrl ??
+                                    photo.squareUrl ??
+                                    ''}
+                                  alt={photo.isPicture
+                                    ? `${projectName || 'The project'}: its picture from Temperature Blanket (opens Ravelry in a new tab)`
+                                    : `${projectName || 'The project'}: photo ${i + 1} on Ravelry (opens in a new tab)`}
+                                  class="bg-surface-100-900 h-32 w-auto max-w-full sm:h-48"
+                                  loading="lazy"
+                                /></a
+                              >
+                            </li>
+                          {/each}
+                        </ul>
+                      {/if}
+                      {#if ravelry.notes}
+                        <!-- The maker's notes from Ravelry, as plain text with a few marks -->
+                        <div class="flex flex-col gap-2 text-left text-sm">
+                          {#each parseNotes(ravelry.notes) as paragraph, p (p)}
+                            <p>
+                              {#each paragraph as segment, i (i)}
+                                {#if segment.type === 'break'}<br />
+                                {:else if segment.type === 'bold'}<strong
+                                    >{segment.text}</strong
+                                  >
+                                {:else if segment.type === 'italic'}<em
+                                    >{segment.text}</em
+                                  >
+                                {:else if segment.type === 'link'}<a
+                                    class="link"
+                                    href={segment.href}
+                                    target="_blank"
+                                    rel="nofollow ugc noopener noreferrer"
+                                    >{segment.text}</a
+                                  >
+                                {:else}{segment.text}{/if}
+                              {/each}
+                            </p>
+                          {/each}
+                        </div>
+                      {/if}
                       <a
                         class="link self-center text-sm"
                         href={ravelry.url}

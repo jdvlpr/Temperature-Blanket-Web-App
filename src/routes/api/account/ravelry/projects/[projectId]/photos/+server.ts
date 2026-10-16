@@ -23,6 +23,10 @@ export const prerender = false;
  * "file" through here. With picture=1 it's the project's picture from the
  * app, replacing the last one.
  */
+/** What a picture was drawn from, hashed by the browser (see ravelryPictureKey) */
+const keyOf = (value: unknown) =>
+  typeof value === 'string' && /^[0-9a-f]{8,64}$/.test(value) ? value : null;
+
 export const POST: RequestHandler = async (event) => {
   const { withRavelry, ravelryError, NO_STORE } =
     await import('#lib/server/ravelry/index.js');
@@ -43,6 +47,7 @@ export const POST: RequestHandler = async (event) => {
       const body = (await event.request.json().catch(() => null)) as {
         uploadToken?: unknown;
         picture?: unknown;
+        pictureKey?: unknown;
       } | null;
       if (typeof body?.uploadToken !== 'string' || !body.uploadToken)
         return ravelryError(400, 'INVALID_REQUEST', 'Missing upload token');
@@ -57,6 +62,7 @@ export const POST: RequestHandler = async (event) => {
         );
       const result = await attachImage(session, link, imageId, {
         picture: body.picture === true,
+        pictureKey: keyOf(body.pictureKey),
       });
       return Response.json(result, { headers: NO_STORE });
     }
@@ -74,6 +80,7 @@ export const POST: RequestHandler = async (event) => {
 
     const result = await addPhoto(session, link, file, {
       picture: form?.get('picture') === '1',
+      pictureKey: keyOf(form?.get('pictureKey')),
     });
     return Response.json(result, { headers: NO_STORE });
   });

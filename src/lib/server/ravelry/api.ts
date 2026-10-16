@@ -72,6 +72,16 @@ export type RavelryProjectPost = {
   packs?: RavelryPackPost[];
 };
 
+export type RavelryPack = {
+  id: number;
+  yarn_id?: number | null;
+  /** The database yarn's name, when linked to one */
+  yarn_name?: string | null;
+  yarn?: { name?: string | null; yarn_company_name?: string | null } | null;
+  personal_name?: string | null;
+  colorway?: string | null;
+};
+
 export type RavelryProject = {
   id: number;
   name: string;
@@ -79,13 +89,24 @@ export type RavelryProject = {
   notes?: string | null;
   progress?: number | null;
   started?: string | null;
+  finish_by?: string | null;
   completed?: string | null;
   status_name?: string | null;
   project_status_id?: number | null;
   craft_id?: number | null;
+  updated_at?: string | null;
   photos?: RavelryPhoto[];
-  packs?: { id: number; yarn_id?: number | null; colorway?: string | null }[];
+  packs?: RavelryPack[];
   user?: { username: string };
+};
+
+/** A project as projects/list gives it: enough to tell whether it changed. */
+export type RavelryProjectSmall = {
+  id: number;
+  permalink: string;
+  updated_at?: string | null;
+  photos_count?: number | null;
+  first_photo?: { id: number } | null;
 };
 
 export type RavelryYarn = {
@@ -185,6 +206,35 @@ export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
           `/projects/${user(username)}/${id}.json`,
         )
       ).project,
+
+    /** One page of the user's projects, oldest pages first. */
+    listProjects: (username: string, page = 1, pageSize = 100) =>
+      call<{
+        projects: RavelryProjectSmall[];
+        paginator?: { page: number; page_count: number };
+      }>(
+        `/projects/${user(username)}/list.json?sort=created&page=${page}&page_size=${pageSize}`,
+      ),
+
+    /** Adds a yarn to an existing project. */
+    createPack: async (projectId: number, data: RavelryPackPost) =>
+      (
+        await call<{ pack: RavelryPack }>('/packs/create.json', {
+          params: { data: JSON.stringify({ ...data, project_id: projectId }) },
+        })
+      ).pack,
+
+    deletePack: (packId: number) =>
+      call<{ pack: RavelryPack }>(`/packs/${packId}.json`, {
+        method: 'DELETE',
+      }),
+
+    /** Puts the project's photos in this order; the first is its main photo. */
+    reorderPhotos: (username: string, projectId: number, photoIds: number[]) =>
+      call<unknown>(
+        `/projects/${user(username)}/${projectId}/reorder_photos.json`,
+        { params: { sort_order: photoIds.join(' ') } },
+      ),
 
     /** A one-use token for upload/image, which needs no other credentials. */
     uploadToken: async () =>
