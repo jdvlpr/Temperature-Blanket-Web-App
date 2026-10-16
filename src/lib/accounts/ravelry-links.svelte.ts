@@ -46,8 +46,12 @@ class RavelryLinksState {
       this.status = await getRavelryStatus();
       if (!this.connected) return;
       try {
-        for (const link of await listRavelryProjects())
-          this.links.set(link.projectId, link);
+        const links = await listRavelryProjects();
+        // Ones unlinked meanwhile (deleted on Ravelry, say) go
+        const ids = new Set(links.map((l) => l.projectId));
+        for (const id of [...this.links.keys()])
+          if (!ids.has(id)) this.links.delete(id);
+        for (const link of links) this.links.set(link.projectId, link);
       } catch {
         // Cards show it as not posted; posting again finds the link
       }

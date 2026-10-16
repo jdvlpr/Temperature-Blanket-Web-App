@@ -51,6 +51,15 @@ type DialogView = {
   scrollTop: number;
 };
 
+/** How wide each dialog size is, in order */
+const SIZE_RANK: Record<NonNullable<DialogOptions['size']>, number> = {
+  small: 0,
+  medium: 1,
+  large: 2,
+  xlarge: 3,
+  full: 4,
+};
+
 class DialogClass {
   #defaultOptions: DialogOptions = {
     showCloseButton: true,
@@ -122,14 +131,18 @@ class DialogClass {
     component?: any;
     options?: DialogOptions;
   }) => {
-    // Opened from a returnable dialog (like the Project menu): opens in its
-    // place, which Back returns to. Not a wide one, which needs the room.
+    // Opened from a returnable dialog (like the Project menu or Share): opens
+    // in its place, which Back returns to. Not one wider than it, which needs
+    // the room; the side panel keeps its width, so it takes up to medium.
+    const size = SIZE_RANK[options?.size ?? 'small'];
     const fromReturnable =
       type === 'component' &&
       this.opened &&
       this.type === 'component' &&
       Boolean(this.options.returnable) &&
-      (options?.size ?? 'small') === 'small';
+      (this.options.placement === 'side'
+        ? size <= SIZE_RANK.medium
+        : size <= SIZE_RANK[this.options.size ?? 'small']);
     if (fromReturnable) {
       this.stack.push({
         component: this.contentComponent,

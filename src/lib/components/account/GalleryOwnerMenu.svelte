@@ -26,7 +26,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { anonymousDetail } from '#lib/accounts/anonymous.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
-  import type { GalleryPage } from '#lib/accounts/gallery.js';
+  import {
+    RavelryLinkedError,
+    type GalleryPage,
+  } from '#lib/accounts/gallery.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
   import {
     menuContentClass,
@@ -105,7 +109,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     busy = true;
     errorMessage = '';
     try {
-      await galleryPages.setShowOwner(postId, next);
+      try {
+        await galleryPages.setShowOwner(postId, next);
+      } catch (e) {
+        if (!(e instanceof RavelryLinkedError)) throw e;
+        // Its Ravelry project links here under the owner's Ravelry name
+        const unlink = await new Promise<boolean>((resolve) =>
+          dialog.trigger({
+            type: 'confirm',
+            title: 'Unlink from Ravelry?',
+            body: 'This project is on Ravelry, which links to this page under your Ravelry name. Making it anonymous unlinks it here; the project stays on Ravelry.',
+            confirmText: 'Unlink and Make Anonymous',
+            response: resolve,
+          }),
+        );
+        if (!unlink) return;
+        await galleryPages.setShowOwner(postId, next, { unlinkRavelry: true });
+      }
       onowner?.(
         next && ownerName && galleryPages.publicId
           ? { name: ownerName, publicId: galleryPages.publicId }

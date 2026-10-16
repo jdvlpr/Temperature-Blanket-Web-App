@@ -82,15 +82,28 @@ export async function updateGallerySettings(
  * Includes one of the account's pages on its public gallery or takes it off.
  * Answers the owner page's ID, which exists once a page has been included.
  */
+/** Anonymous was refused: the page's project is on Ravelry, which links to it. */
+export class RavelryLinkedError extends Error {}
+
+/**
+ * Shows or hides the owner's name. `unlinkRavelry` unlinks the page's project
+ * from Ravelry too, which Anonymous needs (otherwise RavelryLinkedError).
+ */
 export async function setGalleryPageShowOwner(
   postId: number,
   showOwner: boolean,
+  { unlinkRavelry = false } = {},
 ): Promise<{ publicId: string | null }> {
   const response = await fetch(`${PATH}/${postId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ showOwner }),
+    body: JSON.stringify({
+      showOwner,
+      ...(unlinkRavelry && { unlinkRavelry }),
+    }),
   });
+  if (response.status === 409)
+    throw new RavelryLinkedError('Unlink it from Ravelry first');
   if (!response.ok)
     throw new Error(`Changing the gallery page failed: ${response.status}`);
   return response.json();

@@ -62,6 +62,13 @@ export function openProjectShare(
         ravelryItem: item,
       },
     },
-    options: { title: `Share “${label}”`, returnable },
+    // Medium, for Gallery Page and Ravelry side by side, unless it takes the
+    // place of the Project menu's side panel; always returnable, so the
+    // dialogs it opens have Back to it
+    options: {
+      title: `Share “${label}”`,
+      returnable: true,
+      ...(!returnable && { size: 'medium' as const }),
+    },
   });
 }

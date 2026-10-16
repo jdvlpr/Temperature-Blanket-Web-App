@@ -84,7 +84,15 @@ class GalleryPagesState {
   }
 
   /** Includes a page on the public gallery with the name, or takes it off. Throws when it fails. */
-  async setShowOwner(postId: number, showOwner: boolean) {
+  /**
+   * Shows or hides the owner's name. Anonymous for a project on Ravelry needs
+   * `unlinkRavelry`, which unlinks it (otherwise RavelryLinkedError).
+   */
+  async setShowOwner(
+    postId: number,
+    showOwner: boolean,
+    { unlinkRavelry = false } = {},
+  ) {
     const page = this.pages.find((p) => p.postId === postId);
     const before = page?.showOwner ?? false;
     if (page) page.showOwner = showOwner;
@@ -92,7 +100,12 @@ class GalleryPagesState {
       ({ publicId: this.publicId } = await setGalleryPageShowOwner(
         postId,
         showOwner,
+        { unlinkRavelry },
       ));
+      if (unlinkRavelry && page) {
+        const { ravelryLinks } = await import('./ravelry-links.svelte');
+        ravelryLinks.remove(page.projectId);
+      }
     } catch (error) {
       if (page) page.showOwner = before;
       throw error;
@@ -111,8 +124,14 @@ class GalleryPagesState {
 
   /** Takes a page off the gallery. Throws when it fails. */
   async remove(postId: number) {
+    const page = this.pages.find((p) => p.postId === postId);
     await removeGalleryPage(postId);
     this.pages = this.pages.filter((p) => p.postId !== postId);
+    // A project's Ravelry link goes with its page (it linked there)
+    if (page && (page.kind ?? 'project') === 'project') {
+      const { ravelryLinks } = await import('./ravelry-links.svelte');
+      ravelryLinks.remove(page.projectId);
+    }
   }
 }
 

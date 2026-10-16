@@ -15,10 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Share a project or palette, in one place: its Link (a copy anyone can open;
-  yours never changes) and its Gallery Page (one public page, published from
-  the account, updated in place, or unpublished). Publishing needs an account;
-  signed out, Copy Link still works. Opened from a card's Share button and the
-  planner's Project menu.
+  yours never changes), its Gallery Page (one public page, published from
+  the account, updated in place, or unpublished) and, for a project, Ravelry,
+  which needs its gallery page. Publishing needs an account; signed out, Copy
+  Link still works. Opened from a card's Share button and the planner's
+  Project menu. Where there's room, Gallery Page and Ravelry sit side by side,
+  each with its view link beside its heading.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -33,10 +35,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
+  import ShareSectionHeader from '#lib/components/account/ShareSectionHeader.svelte';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import {
-    ExternalLinkIcon,
     EyeOffIcon,
     LinkIcon,
     LoaderCircleIcon,
@@ -81,6 +83,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } = $props();
 
   const signedIn = $derived(__ACCOUNTS_ENABLED__ && !!account.summary);
+  const showRavelry = $derived(
+    Boolean(
+      ravelryItem && signedIn && ravelryLinks.status?.available !== false,
+    ),
+  );
 
   onMount(() => {
     // Fresh each time: it may have been published from elsewhere since
@@ -120,12 +127,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let errorMessage = $state('');
   let confirming = $state(false);
 
-  async function setAnonymous(anonymous: boolean) {
+  // Its Ravelry project links to the page under the owner's Ravelry name, so
+  // Anonymous unlinks it, after asking
+  const onRavelry = $derived(kind === 'project' && ravelryLinks.links.has(id));
+  let confirmingAnonymous = $state(false);
+
+  async function setAnonymous(
+    anonymous: boolean,
+    { unlinkRavelry = false } = {},
+  ) {
     if (!page) return;
+    if (anonymous && onRavelry && !unlinkRavelry) {
+      confirmingAnonymous = true;
+      return;
+    }
     errorMessage = '';
     busy = true;
     try {
-      await galleryPages.setShowOwner(page.postId, !anonymous);
+      await galleryPages.setShowOwner(page.postId, !anonymous, {
+        unlinkRavelry,
+      });
+      confirmingAnonymous = false;
     } catch {
       errorMessage = 'That change couldn’t be saved. Try again later.';
     } finally {
@@ -172,34 +194,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex flex-col gap-6 p-4 text-left" bind:this={root}>
+<div class="@container flex flex-col gap-6 p-4 text-left" bind:this={root}>
   {#if link}
-    <section class="flex flex-col gap-2" aria-labelledby="share-link">
-      <h3 id="share-link" class="font-bold">Link</h3>
-      <ul class={PANEL_LIST}>
-        <li>
-          <button type="button" class={PANEL_ROW} onclick={copyLink}>
-            <CopyIcon
-              copied={linkCopied.is()}
-              icon={LinkIcon}
-              class="shrink-0 opacity-70"
-            />
-            <span class="flex flex-1 flex-col">
-              <span>Copy Link</span>
-              <span class="text-xs opacity-70"
-                >Anyone with the link gets their own copy. Yours stays as it is.</span
-              >
-            </span>
-          </button>
-        </li>
-      </ul>
-    </section>
+    <!-- The link first: what most people share -->
+    <ul class={PANEL_LIST} aria-label="Link">
+      <li>
+        <button type="button" class={PANEL_ROW} onclick={copyLink}>
+          <CopyIcon
+            copied={linkCopied.is()}
+            icon={LinkIcon}
+            class="shrink-0 opacity-70"
+          />
+          <span class="flex flex-1 flex-col">
+            <span>Copy Link</span>
+            <span class="text-xs opacity-70"
+              >Anyone with the link gets their own copy. Yours stays as it is.</span
+            >
+          </span>
+        </button>
+      </li>
+    </ul>
   {/if}
 
-  <section class="flex flex-col gap-2" aria-labelledby="share-gallery">
-    <div class="flex flex-col">
-      <h3 id="share-gallery" class="font-bold">Gallery Page</h3>
-      <p class="text-sm opacity-80">
+  <div
+    class="grid gap-6 {showRavelry
+      ? '@xl:divide-surface-200-800 @xl:grid-cols-2 @xl:divide-x @xl:[&>*:first-child]:pr-6'
+      : ''}"
+  >
+    <section class="flex flex-col gap-3" aria-labelledby="share-gallery">
+      <ShareSectionHeader
+        id="share-gallery"
+        title="Gallery Page"
+        href={page ? pageHref(page) : undefined}
+        linkText="View Gallery Page"
+      >
         {#if signedIn && !galleryPages.loaded}
           <LoaderCircleIcon
             class="icon-sm inline animate-spin"
@@ -213,174 +241,178 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : 'Anonymous'}{/if}{#if isChanged}
             · <span class="font-bold">changed since</span>{/if}
         {/if}
-      </p>
-    </div>
+      </ShareSectionHeader>
 
-    {#if !signedIn}
-      <ul class={PANEL_LIST}>
-        <li>
+      {#if !signedIn}
+        <div class="flex flex-col items-start gap-1">
           <!-- eslint-disable svelte/no-navigation-without-resolve -- resolved by the opener -->
           <a
-            class={PANEL_ROW}
+            class="btn preset-filled-primary-500"
             href={signInHref ?? resolve('/auth/sign-in')}
             data-sveltekit-reload
           >
-            <LogInIcon class="shrink-0 opacity-70" aria-hidden="true" />
-            <span class="flex flex-1 flex-col">
-              <span>Sign In to Publish</span>
-              <span class="text-xs opacity-70"
-                >A free account lets you publish a public page, then update or
-                unpublish it any time</span
-              >
-            </span>
+            <LogInIcon aria-hidden="true" />Sign In to Publish
           </a>
           <!-- eslint-enable svelte/no-navigation-without-resolve -->
-        </li>
-      </ul>
-    {:else if galleryPages.loaded && !page}
-      {#if galleryPages.publishing && onpublish}
-        <ul class={PANEL_LIST}>
-          <li>
+          <p class="text-xs opacity-70">
+            A free account lets you publish a public page, then update or
+            unpublish it any time.
+          </p>
+        </div>
+      {:else if galleryPages.loaded && !page}
+        {#if galleryPages.publishing && onpublish}
+          <div class="flex flex-col items-start gap-1">
             <button
               type="button"
-              class={PANEL_ROW}
+              class="btn preset-filled-primary-500"
               data-row="publish"
               onclick={onpublish}
             >
-              <SendIcon class="shrink-0 opacity-70" aria-hidden="true" />
-              <span class="flex flex-1 flex-col">
-                <span>Publish to Gallery…</span>
-                <span class="text-xs opacity-70"
-                  >A public page anyone can find. You can update or unpublish it
-                  any time.</span
-                >
-              </span>
+              <SendIcon aria-hidden="true" />Publish to Gallery…
             </button>
-          </li>
-        </ul>
-      {:else if !galleryPages.publishing}
-        <p class="text-sm">Publishing to the gallery is paused right now.</p>
-      {/if}
-    {:else if page}
-      <ul class={PANEL_LIST}>
-        <li>
-          <a
-            class={PANEL_ROW}
-            href={pageHref(page)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ExternalLinkIcon class="shrink-0 opacity-70" aria-hidden="true" />
-            <span class="flex flex-1 flex-col"
-              ><span
-                >View Gallery Page<span class="sr-only">
-                  (opens in a new tab)</span
-                ></span
-              ><span class="text-xs opacity-70">“{page.title}”</span></span
-            >
-          </a>
-        </li>
-        {#if onupdate && galleryPages.publishing}
-          <li>
-            <button
-              type="button"
-              class={PANEL_ROW}
-              onclick={() => page && onupdate(page)}
-            >
-              <RefreshCwIcon class="shrink-0 opacity-70" aria-hidden="true" />
-              <span class="flex flex-1 flex-col">
-                <span>Update Gallery Page…</span>
-                <span class="text-xs opacity-70"
-                  >{kind === 'palette'
-                    ? `To “${label}”, with its colors now.`
-                    : 'To the project as it is now.'} Its link stays the same.</span
-                >
-              </span>
-            </button>
-          </li>
+            <p class="text-xs opacity-70">
+              A public page anyone can find. You can update or unpublish it any
+              time.
+            </p>
+          </div>
+        {:else if !galleryPages.publishing}
+          <p class="text-sm">Publishing to the gallery is paused right now.</p>
         {/if}
-        <li>
-          <label class={PANEL_ROW}>
-            <input
-              type="checkbox"
-              class="checkbox shrink-0"
-              checked={!page.showOwner}
-              disabled={busy}
-              onchange={(e) => void setAnonymous(e.currentTarget.checked)}
-            />
-            <span class="flex flex-1 flex-col">
-              <span>Anonymous</span>
-              <span class="text-xs opacity-70"
-                >{anonymousDetail(!page.showOwner, ownerName)}{ravelryItem &&
-                ravelryLinks.links.has(ravelryItem.id)
-                  ? '. Anonymous also hides your Ravelry photos and link.'
-                  : ''}</span
+      {:else if page}
+        {#if confirming}
+          <div class="flex flex-col gap-2" role="group" aria-label="Unpublish">
+            <p class="text-sm">
+              Unpublish “{page.title}”? Its gallery page link stops working{kind ===
+              'project'
+                ? ', and it comes off the globe'
+                : ''}{onRavelry
+                ? '. It’s unlinked from Ravelry too (the Ravelry project stays)'
+                : ''}. Your {kind} stays saved, and links you’ve shared to it still
+              work.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="btn preset-filled-error-500"
+                onclick={unpublish}
+                disabled={busy}
+                {@attach takeFocus}
+                >{#if busy}<LoaderCircleIcon
+                    class="animate-spin"
+                  />{/if}Unpublish</button
               >
-            </span>
-          </label>
-        </li>
-        <li>
-          {#if confirming}
-            <div class="flex flex-col gap-2 px-4 py-3">
-              <p class="text-sm">
-                Unpublish “{page.title}”? Its gallery page link stops working{kind ===
-                'project'
-                  ? ', and it comes off the globe'
-                  : ''}. Your {kind} stays saved, and links you’ve shared to it still
-                work.
-              </p>
-              <div class="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  class="btn btn-sm preset-filled-error-500"
-                  onclick={unpublish}
-                  disabled={busy}
-                  {@attach takeFocus}
-                  >{#if busy}<LoaderCircleIcon
-                      class="animate-spin"
-                    />{/if}Unpublish</button
-                >
-                <button
-                  type="button"
-                  class="btn btn-sm preset-tonal-surface"
-                  onclick={() => {
-                    confirming = false;
-                    void focusRow('unpublish');
-                  }}
-                  disabled={busy}>Keep Published</button
-                >
-              </div>
+              <button
+                type="button"
+                class="btn preset-tonal-surface"
+                onclick={() => {
+                  confirming = false;
+                  void focusRow('unpublish');
+                }}
+                disabled={busy}>Keep Published</button
+              >
             </div>
-          {:else}
+          </div>
+        {:else}
+          <div class="flex flex-wrap gap-2">
+            {#if onupdate && galleryPages.publishing}
+              <button
+                type="button"
+                class="btn {isChanged
+                  ? 'preset-filled-primary-500'
+                  : 'preset-tonal-surface'}"
+                onclick={() => page && onupdate(page)}
+              >
+                <RefreshCwIcon aria-hidden="true" />Update Gallery Page…
+              </button>
+            {/if}
             <button
               type="button"
-              class={PANEL_ROW}
+              class="btn hover:preset-tonal-surface"
               data-row="unpublish"
               onclick={() => (confirming = true)}
               disabled={busy}
             >
-              <EyeOffIcon class="shrink-0 opacity-70" aria-hidden="true" />
-              <span class="flex-1">Unpublish…</span>
+              <EyeOffIcon aria-hidden="true" />Unpublish…
             </button>
+          </div>
+          {#if onupdate && galleryPages.publishing}
+            <p class="-mt-1 text-xs opacity-70">
+              Update: {kind === 'palette'
+                ? `to “${label}”, with its colors now.`
+                : 'to the project as it is now.'} Its link stays the same.
+            </p>
           {/if}
-        </li>
-      </ul>
-      {#if page.showOwner && !ownerName}
-        <p class="text-warning-700-300 text-sm">
-          Add a display name in your
-          <a href={DISPLAY_NAME_HREF} class="link">Profile settings</a>
-          to be credited.
-        </p>
+        {/if}
+        {#if confirmingAnonymous}
+          <div
+            class="flex flex-col gap-2"
+            role="group"
+            aria-label="Make anonymous"
+          >
+            <p class="text-sm">
+              This project is on Ravelry, which links to this page under your
+              Ravelry name. Making the page anonymous unlinks it from Ravelry
+              here; the Ravelry project stays.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="btn preset-filled-primary-500"
+                onclick={() => setAnonymous(true, { unlinkRavelry: true })}
+                disabled={busy}
+                {@attach takeFocus}>Unlink and Make Anonymous</button
+              >
+              <button
+                type="button"
+                class="btn preset-tonal-surface"
+                onclick={() => {
+                  confirmingAnonymous = false;
+                  void focusRow('anonymous');
+                }}
+                disabled={busy}>Keep My Name</button
+              >
+            </div>
+          </div>
+        {:else}
+          <label class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              class="checkbox mt-0.5 shrink-0"
+              data-row="anonymous"
+              checked={!page.showOwner}
+              disabled={busy}
+              onchange={(e) => {
+                const anonymous = e.currentTarget.checked;
+                // Asked first: the box stays as it was until then
+                if (anonymous && onRavelry) e.currentTarget.checked = false;
+                void setAnonymous(anonymous);
+              }}
+            />
+            <span class="flex flex-1 flex-col">
+              <span>Anonymous</span>
+              <span class="text-xs opacity-70"
+                >{anonymousDetail(!page.showOwner, ownerName)}</span
+              >
+            </span>
+          </label>
+        {/if}
+        {#if page.showOwner && !ownerName}
+          <p class="text-warning-700-300 text-sm">
+            Add a display name in your
+            <a href={DISPLAY_NAME_HREF} class="link">Profile settings</a>
+            to be credited.
+          </p>
+        {/if}
       {/if}
-    {/if}
-    {#if errorMessage}
-      <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
-    {/if}
-  </section>
+      {#if errorMessage}
+        <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
+      {/if}
+    </section>
 
-  {#if ravelryItem && signedIn}
-    <RavelryShareSection item={ravelryItem} />
-  {/if}
+    {#if showRavelry && ravelryItem}
+      <RavelryShareSection item={ravelryItem} {page} />
+    {/if}
+  </div>
 
   {@render children?.()}
 </div>
