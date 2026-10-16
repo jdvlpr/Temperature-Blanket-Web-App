@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Share a project or palette, as one list of rows like the Project menu's:
   Copy Link (a copy anyone can open; yours never changes), then its gallery
   page: Publish to Gallery, or once published Edit Gallery Page (its status
-  under it) with View beside it. Edit opens the dialog that updates the page,
+  under it) and View Gallery Page. Edit opens the dialog that updates the page,
   changes Anonymous and a project's Ravelry project, and unpublishes it.
   Publishing needs an account; signed out, Copy Link still works. Opened from
   a card's Share button and the planner's Project menu.
@@ -214,11 +214,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </li>
       {/if}
     {:else}
-      <!-- Edit, with its page beside it: two parts of one row -->
-      <li class="divide-surface-200-800 flex divide-x">
+      <li>
         <button
           type="button"
-          class={[PANEL_ROW, 'flex-1']}
+          class={PANEL_ROW}
           onclick={() => page && onedit?.(page)}
           disabled={!onedit}
           aria-describedby={isChanged
@@ -246,17 +245,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             aria-hidden="true"
           />
         </button>
-        <a
-          href={pageHref(page)}
-          target="_blank"
-          class={[
-            PANEL_ROW,
-            'w-auto shrink-0 flex-col justify-center gap-0.5 px-3 text-xs',
-          ]}
-          title="View Gallery Page"
-          ><ExternalLinkIcon class="icon-sm opacity-70" aria-hidden="true" />
-          <span class="opacity-80">View</span><span class="sr-only">
-            Gallery Page (opens in a new tab)</span
+      </li>
+      <li>
+        <a href={pageHref(page)} target="_blank" class={PANEL_ROW}
+          ><ExternalLinkIcon class="shrink-0 opacity-70" aria-hidden="true" />
+          <span class="flex-1">View Gallery Page</span><span class="sr-only">
+            (opens in a new tab)</span
           ></a
         >
       </li>

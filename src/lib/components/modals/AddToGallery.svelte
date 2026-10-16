@@ -616,8 +616,14 @@ its weather, when that isn't kept with it). -->
   {/if}
 {/snippet}
 
-<!-- Medium on wide screens, so the Ravelry part has room (less a scroll bar) -->
-<div class="flex w-full flex-col gap-4 p-4 text-left lg:w-[46.5rem]">
+<!-- Medium on wide screens, so the Ravelry part has room (less a scroll bar);
+in the Project menu's side panel, its width, so nothing scrolls sideways -->
+<div
+  class={[
+    'flex w-full flex-col gap-4 p-4 text-left',
+    dialog.options.placement !== 'side' && 'lg:w-[46.5rem]',
+  ]}
+>
   <!-- Always here, so screen readers announce what changes in it -->
   <p class="sr-only" role="status">
     {view === 'preparing' ? preparingText : busy ? stepText : ''}
