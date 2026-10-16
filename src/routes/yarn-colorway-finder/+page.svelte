@@ -390,15 +390,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     (yarnColorwayFinderState.reversed = reversed)}
                 />
               {/if}
+              {#if results.length}
+                <ViewMenu bind:value={layout} fillOption />
+              {/if}
               <FiltersButton
                 bind:this={filtersButton}
                 bind:open={filtersOpen}
                 count={chips.length}
                 controls="finder-filters"
               />
-              {#if results.length}
-                <ViewMenu bind:value={layout} fillOption />
-              {/if}
             </div>
 
             <div

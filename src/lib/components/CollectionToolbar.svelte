@@ -173,7 +173,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <!-- The page's actions at the end, as beside a heading -->
+  <!-- The page's actions at the end, as beside a heading (first on phones,
+    so a wrapped row never parts Filters from its panel below) -->
   <div
     class={[
       'my-2 flex w-full flex-wrap items-center gap-2',
@@ -192,19 +193,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {canReverse}
         />
         {@render menus?.()}
-        {#if hasHidden}
-          <FiltersButton
-            bind:this={filtersButton}
-            bind:open
-            count={activeCount}
-            controls={panelId}
-          />
-        {/if}
       {/if}
       <ViewMenu bind:value={layout} />
+      <!-- Last, so its panel opens right below it when the row wraps -->
+      {#if showFilters && hasHidden}
+        <FiltersButton
+          bind:this={filtersButton}
+          bind:open
+          count={activeCount}
+          controls={panelId}
+        />
+      {/if}
     </div>
     {#if actions}
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2 max-md:order-first">
         {@render actions()}
       </div>
     {/if}

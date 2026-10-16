@@ -257,15 +257,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onreverse={(value) => (reversed = value)}
       />
     {/if}
+    {#if results.length}
+      <ViewMenu bind:value={layout} fillOption />
+    {/if}
     <FiltersButton
       bind:this={filtersButton}
       bind:open={filtersOpen}
       count={chips.length}
       controls={filtersId}
     />
-    {#if results.length}
-      <ViewMenu bind:value={layout} fillOption />
-    {/if}
   </div>
 </div>
 
