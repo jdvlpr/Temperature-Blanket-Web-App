@@ -84,12 +84,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   let list = $derived(layout === 'list');
-
-  let dateLine = $derived(
-    date && !isNaN(new Date(date).getTime())
-      ? `Published ${new Date(date).toLocaleDateString(undefined, { dateStyle: 'medium' })}`
-      : '',
-  );
 </script>
 
 <div
@@ -125,12 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span class="line-clamp-2 text-sm font-semibold break-words"
           >{label || 'Untitled Project'}</span
         >
-        {#if dateLine}
-          <span class="text-surface-700-300 line-clamp-1 text-xs"
-            >{dateLine}</span
-          >
-        {/if}
-        <GalleryCardByline {author} {views} />
+        <GalleryCardByline {date} {author} {views} />
       </span>
     {/if}
   </a>

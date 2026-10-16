@@ -17,8 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A palette from the gallery, as a card. In the gallery (`mode="page"`)
   tapping it opens its gallery page. In the Yarn Palette Creator's Browse Palettes (`mode="use"`) tapping it uses
   it (`onclick`), and the button opens its page in a new tab, so the palette
-  being made stays open. In the gallery it also says who published it (when
-  their name shows on its page) and its page's views.
+  being made stays open. In the gallery it also says when it was published,
+  who by (when their name shows on its page) and its page's views.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -58,7 +58,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#snippet details()}
     {#if mode === 'page'}
-      <GalleryCardByline {author} views={palette.page.views} />
+      <GalleryCardByline
+        date={palette.page.date}
+        {author}
+        views={palette.page.views}
+      />
     {/if}
   {/snippet}
   {#snippet action()}

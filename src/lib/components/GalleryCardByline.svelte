@@ -14,24 +14,35 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  "By <name> · 1.2K views" on a gallery card, under when it was published, as
-  on its gallery page. One line when they fit, else two, with no dot starting
-  a line (each dot sits in the space the row's negative margin hides, and
-  screen readers skip them). Nothing
-  without a name or views.
+  Under a gallery card's name, as on its gallery page: "Published <date>",
+  then "By <name> · 1.2K views". That line is one line when they fit, else
+  two, with no dot starting a line (each dot sits in the space the row's
+  negative margin hides, and screen readers skip them). Each part only when
+  known: a name only for pages showing their owner, views only once viewed.
 -->
 <script lang="ts">
   import ViewCount from '#lib/components/ViewCount.svelte';
 
   interface Props {
+    /** When it was published (the gallery post's date) */
+    date?: string | null;
     /** Who published it, when their name shows on its gallery page */
     author?: string | null;
     views?: number | null;
   }
 
-  let { author, views }: Props = $props();
+  let { date, author, views }: Props = $props();
+
+  let dateLine = $derived(
+    date && !isNaN(new Date(date).getTime())
+      ? `Published ${new Date(date).toLocaleDateString(undefined, { dateStyle: 'medium' })}`
+      : '',
+  );
 </script>
 
+{#if dateLine}
+  <span class="text-surface-700-300 line-clamp-1 text-xs">{dateLine}</span>
+{/if}
 {#if author || views}
   <span class="text-surface-700-300 block overflow-hidden text-xs">
     <span class="-ml-3 flex flex-wrap">

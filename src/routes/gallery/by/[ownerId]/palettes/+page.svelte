@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Each palette as a card, newest first, with its date to sort by
   let cards = $derived(
     yarnDataReady
-      ? all.flatMap(({ databaseId, title, yarnUrls, date }) => {
+      ? all.flatMap(({ databaseId, title, yarnUrls, date, views }) => {
           const palette = sharedPaletteFrom(yarnUrls);
           if (!palette) return [];
           const card: GalleryPalette = {
@@ -82,6 +82,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               id: databaseId,
               title: galleryTitleText(title),
               kind: 'palette',
+              views,
+              date,
             },
             others: [],
           };
