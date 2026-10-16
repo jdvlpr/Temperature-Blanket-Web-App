@@ -132,8 +132,9 @@ async function recordPublished(
 /**
  * Publishes the browser's gallery payload as this user, or with `postId`
  * updates that page of theirs in place (same link, views and settings).
- * Ownership comes from the session, so the project needn't be saved to the
- * account; its ID (?project=) is kept to tie the page to it. WordPress's own
+ * The project has to be in the account (409 NOT_IN_ACCOUNT): its page follows
+ * it into and out of the Trash, which only the account's copy tells the
+ * server about. Its ID (?project=) ties the page to it. WordPress's own
  * answers (400, 409 duplicate, 500) come back unchanged with status 200, adding
  * `linked: true` when the page was recorded to the account. Updating answers 404
  * for a page that isn't theirs and 501 UPDATE_UNSUPPORTED with an older plugin.
@@ -155,8 +156,18 @@ export async function publishFromAccount(
     return galleryError(400, 'INVALID_REQUEST', 'Invalid gallery payload');
   }
 
-  // Every planner link has one; '' just leaves the page unconnected to a project
+  // Every planner link has one
   const projectId = projectIdFromLink(payload?.project_url) ?? '';
+  const { getProjectMeta } = await import('#lib/server/sync/store.js');
+  const meta = projectId
+    ? await getProjectMeta(gallery.db, gallery.userId, projectId)
+    : null;
+  if (!meta || meta.deleted)
+    return galleryError(
+      409,
+      'NOT_IN_ACCOUNT',
+      'Add this project to your account first',
+    );
 
   // An update keeps the page's own choice of showing its owner
   let existing: GalleryPost | undefined;

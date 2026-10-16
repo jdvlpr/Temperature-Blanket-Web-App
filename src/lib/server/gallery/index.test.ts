@@ -229,17 +229,19 @@ describe('publishFromAccount', () => {
     ['not saved to the account', 'https://t.com/?project=other#h', 'other'],
     ['deleted from the account', 'https://t.com/?project=p2#h', 'p2'],
     ['without a project ID', 'https://t.com/#h', ''],
-  ])('publishes a project %s too', async (_, url, projectId) => {
-    const { d1, gallery, calls } = await setup(() =>
-      answered({ code: 200, id: 5 }),
-    );
-    const response = await publishFromAccount(gallery, payload(url), {}, 9);
-    expect(await response.json()).toMatchObject({ linked: true });
-    expect(calls).toHaveLength(1);
-    expect(await listPosts(d1, 'u1')).toEqual([
-      expect.objectContaining({ postId: 5, projectId }),
-    ]);
-  });
+  ])(
+    'doesn’t publish a project %s: its page follows the account’s copy into the Trash',
+    async (_, url) => {
+      const { d1, gallery, calls } = await setup(() =>
+        answered({ code: 200, id: 5 }),
+      );
+      const response = await publishFromAccount(gallery, payload(url), {}, 9);
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({ code: 'NOT_IN_ACCOUNT' });
+      expect(calls).toHaveLength(0);
+      expect(await listPosts(d1, 'u1')).toEqual([]);
+    },
+  );
 
   it('passes WordPress refusals through without recording', async () => {
     const duplicate = {
@@ -339,6 +341,23 @@ describe('galleryApi.trash', () => {
     expect(await api.trash(1, 'u1')).toBe('ok');
     expect(await api.trash(1, 'u1')).toBe('gone');
     await expect(api.trash(1, 'u1')).rejects.toThrow();
+  });
+});
+
+describe('galleryApi.restore', () => {
+  it('forgets only a page WordPress says is gone, never one an older plugin can’t restore', async () => {
+    const answers = [
+      new Response('{"code":200}', { status: 200 }),
+      new Response('{"code":404}', { status: 404 }),
+      new Response('{"code":"rest_no_route"}', { status: 404 }),
+    ];
+    const { api, calls } = fakeWordPress(() => answers.shift()!);
+    expect(await api.restore(1, 'u1')).toBe('ok');
+    expect(calls[0].url).toBe(
+      'https://wp.example/wp-json/tbgalleryapi/v1/project/1/restore',
+    );
+    expect(await api.restore(1, 'u1')).toBe('gone');
+    await expect(api.restore(1, 'u1')).rejects.toThrow();
   });
 });
 

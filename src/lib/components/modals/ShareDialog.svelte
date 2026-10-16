@@ -36,6 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
   import ShareSectionHeader from '#lib/components/account/ShareSectionHeader.svelte';
+  import { inAccount } from '#lib/utils/open-ravelry.js';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import {
@@ -260,7 +261,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         </div>
       {:else if galleryPages.loaded && !page}
-        {#if galleryPages.publishing && onpublish}
+        {#if kind === 'project' && ravelryItem && !inAccount(ravelryItem)}
+          <!-- Its page follows the account's copy into and out of the Trash -->
+          <p class="text-sm">
+            Add this project to your account first (Add to your account, at the
+            top of My Projects), then publish it.
+          </p>
+        {:else if galleryPages.publishing && onpublish}
           <div class="flex flex-col items-start gap-1">
             <button
               type="button"

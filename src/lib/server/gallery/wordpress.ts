@@ -155,13 +155,19 @@ export function galleryApi({ baseUrl, key, fetch }: GalleryApiConfig) {
 
     /**
      * Brings back a page trashed above, with the same ID and link (gallery plugin
-     * 1.10.0). 'gone' when WordPress no longer has it for this owner: emptied from
-     * its trash, or an older plugin without the route.
+     * 1.10.0). 'gone' when WordPress no longer has it for this owner (emptied
+     * from its trash); throws with an older plugin without the route.
      */
     async restore(postId: number, ownerId: string): Promise<'ok' | 'gone'> {
       const response = await post(`/project/${postId}/restore`, '{}', ownerId);
       if (response.ok) return 'ok';
-      if (response.status === 404) return 'gone';
+      const body = (await response.json().catch(() => null)) as {
+        code?: number | string;
+      } | null;
+      // An older plugin without the route answers rest_no_route: the page is
+      // still in WordPress's trash, so it stays hidden and a later sync tries again
+      if (response.status === 404 && body?.code !== 'rest_no_route')
+        return 'gone';
       throw new Error(`Gallery restore failed: ${response.status}`);
     },
 
