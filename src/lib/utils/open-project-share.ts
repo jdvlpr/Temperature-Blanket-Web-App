@@ -54,7 +54,7 @@ export function openProjectShare(
         link: withProjectName(project.url.href, name, locations.projectTitle),
         signInHref: `${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(here)}`,
         onpublish: () => publish('Publish to Gallery'),
-        onupdate: () => publish('Update Gallery Page'),
+        onedit: () => publish('Edit Gallery Page'),
         ravelryItem: item,
       },
     },

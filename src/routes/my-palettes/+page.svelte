@@ -77,7 +77,7 @@ only in the gallery), with search, filters and sort once there are a few. -->
         },
       },
       options: {
-        title: update ? 'Update Gallery Page' : 'Publish to Gallery',
+        title: update ? 'Edit Gallery Page' : 'Publish to Gallery',
       },
     });
   }
@@ -174,7 +174,7 @@ only in the gallery), with search, filters and sort once there are a few. -->
               )}
               changed={(p) => paletteChanged(colors, label, p)}
               onadd={() => sharePalette(palette, colors, label)}
-              onupdate={(old) => sharePalette(palette, colors, label, old)}
+              onedit={(old) => sharePalette(palette, colors, label, old)}
             />
           {/snippet}
         </SavedPalettes>

@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         options: {
           title:
             request.action === 'replace'
-              ? 'Update Gallery Page'
+              ? 'Edit Gallery Page'
               : 'Publish to Gallery',
         },
       });

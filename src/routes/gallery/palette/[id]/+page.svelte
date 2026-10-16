@@ -64,7 +64,7 @@ with them. -->
   let found = $derived(streamedPage.current);
   let galleryPalette = $derived(typeof found === 'object' ? found : undefined);
 
-  // "By" and the name, which the owner bar changes in place
+  // "By" and the name (loaded again after Edit Gallery Page saves)
   let owner = $derived(data.owner);
   let name = $derived(
     galleryPalette

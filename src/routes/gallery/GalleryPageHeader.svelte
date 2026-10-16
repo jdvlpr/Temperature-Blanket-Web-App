@@ -16,19 +16,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   The top of a gallery page, the same for projects and palettes: its name, a
   line under it, "By <name> · Published <date>" (the only place either shows),
-  then Open a Copy and, for its owner, Published ▾ (as on its My Library
-  card).
+  then Open a Copy and, for its owner, Edit Gallery Page (the dialog its
+  Share dialog in My Library opens).
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
-  import GalleryOwnerMenu from '#lib/components/account/GalleryOwnerMenu.svelte';
+  import GalleryPageEdit from '#lib/components/account/GalleryPageEdit.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
   import type { Component, Snippet } from 'svelte';
 
   interface Props {
     postId: number;
     kind: 'project' | 'palette';
-    /** "By" and the name, which the owner bar changes in place */
+    /** "By" and the name (loaded again after Edit Gallery Page saves) */
     owner: GalleryOwner | null;
     /** When it was published, as the gallery gives it */
     date?: string | null;
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
     <!-- Even when the page can't be found, so its owner can unpublish it -->
     {#if __ACCOUNTS_ENABLED__}
-      <GalleryOwnerMenu {postId} {kind} onowner={(next) => (owner = next)} />
+      <GalleryPageEdit {postId} {kind} />
     {/if}
   </div>
 </div>

@@ -328,7 +328,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {changed}
     ravelryItem={signedIn ? project : undefined}
     onadd={() => openForGallery(project, { action: 'add' })}
-    onupdate={(old) =>
+    onedit={(old) =>
       openForGallery(project, {
         action: 'replace',
         postId: old.postId,

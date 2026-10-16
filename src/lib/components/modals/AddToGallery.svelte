@@ -13,12 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Publish to Gallery / Update Gallery Page: one dialog for everything a
+<!-- Publish to Gallery / Edit Gallery Page: one dialog for everything a
 project shares. Its gallery page (published, or updated in place when the
 project changed: same link, views and settings), Anonymous, by the name, and,
 for a project in the account with Ravelry connected, its Ravelry project: Also
-post to Ravelry, or once posted its details, yarns and photos, saved with the
-same Update. Publishing needs an account; signed out, it says so with a way to
+post to Ravelry, or once posted its details, yarns and photos, all saved with
+one Save. Once published, Unpublish is here too. Opened from the Share dialog
+and from the gallery page itself (`onsaved`). Publishing needs an account; signed out, it says so with a way to
 sign in. From My Library, the saved project loads behind the dialog first (with
 its weather, when that isn't kept with it). -->
 
@@ -27,6 +28,7 @@ its weather, when that isn't kept with it). -->
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
+  import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
   import RavelryFields, {
     type RavelryApplied,
   } from '#lib/components/account/RavelryFields.svelte';
@@ -53,9 +55,9 @@ its weather, when that isn't kept with it). -->
   } from '#lib/utils/project-utils.svelte.js';
   import {
     CheckIcon,
+    EyeOffIcon,
     ExternalLinkIcon,
     LoaderCircleIcon,
-    RefreshCwIcon,
     SendIcon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
@@ -64,12 +66,17 @@ its weather, when that isn't kept with it). -->
   let {
     request,
     href,
+    onsaved,
+    onunpublished,
   }: {
-    // From My Library: add with a choice already made, or update that page
-    // to the project as it is now
+    // From My Library: add with a choice already made, or edit that page
     request?: GalleryRequest;
     // From My Projects: the saved project's link, loaded behind the dialog
     href?: string;
+    // From its own gallery page, which shows what changed: Done closes, and
+    // after Unpublish the dialog closes
+    onsaved?: () => void;
+    onunpublished?: () => void;
   } = $props();
 
   // Getting the project ready to draw: loading it (from My Projects), then
@@ -166,8 +173,12 @@ its weather, when that isn't kept with it). -->
   // The project as saved here, which Ravelry needs (in the account)
   let item = $state<StoredProjectIndexItem | null>(null);
 
+  // Unpublish is being asked, in place of the form
+  let unpublishing = $state(false);
+
   // Done: what was published and saved
   let done = $state<{
+    heading: string;
     gallery: Extract<GallerySendResult, { status: 'sent' }> | null;
     galleryLink: string;
     lines: string[];
@@ -181,9 +192,11 @@ its weather, when that isn't kept with it). -->
         ? 'sent'
         : !accountChecked
           ? 'checking'
-          : blocked
-            ? 'blocked'
-            : 'form',
+          : unpublishing && page
+            ? 'unpublish'
+            : blocked
+              ? 'blocked'
+              : 'form',
   );
 
   onMount(async () => {
@@ -211,10 +224,6 @@ its weather, when that isn't kept with it). -->
       blocked = 'signed-out';
       return;
     }
-    if (!gallery.publishing) {
-      blocked = 'paused';
-      return;
-    }
     showOwner = gallery.settings.showOwnerDefault;
     if (request?.action === 'add' && request.showOwner !== undefined)
       showOwner = request.showOwner;
@@ -238,6 +247,11 @@ its weather, when that isn't kept with it). -->
       showOwner = page.showOwner;
     }
     if (typeof gallery.name === 'string') serverName = gallery.name;
+    // Paused: a page can still be unpublished
+    if (!gallery.publishing) {
+      blocked = 'paused';
+      return;
+    }
     item =
       (await ProjectStorage.getIndex()).find((i) => i.id === project.id) ??
       null;
@@ -340,7 +354,7 @@ its weather, when that isn't kept with it). -->
         : 'Publish'
       : !page
         ? 'Post to Ravelry'
-        : 'Update',
+        : 'Save',
   );
 
   async function drawPNG() {
@@ -457,6 +471,7 @@ its weather, when that isn't kept with it). -->
       }
 
       done = {
+        heading: sentSoFar && !sentSoFar.updated ? 'Published' : 'Saved',
         gallery: sentSoFar,
         galleryLink:
           sentSoFar?.link ??
@@ -467,6 +482,7 @@ its weather, when that isn't kept with it). -->
         ],
         ravelry,
       };
+      if (page) onsaved?.();
       await tick();
       sentHeading?.focus();
     } catch {
@@ -476,6 +492,43 @@ its weather, when that isn't kept with it). -->
       step = null;
       ravelryStep = '';
     }
+  }
+
+  // ---- Unpublish, asked first in place of the form
+  let unpublishButton = $state<HTMLButtonElement>();
+  // On Ravelry when asked (unpublishing unlinks it)
+  let unpublishLinked = false;
+  function askUnpublish() {
+    unpublishLinked = linked;
+    unpublishing = true;
+  }
+  async function unpublished() {
+    unpublishing = false;
+    if (onunpublished) {
+      dialog.close();
+      onunpublished();
+      return;
+    }
+    done = {
+      heading: 'Unpublished',
+      gallery: null,
+      galleryLink: '',
+      lines: [
+        'Its gallery page link no longer works',
+        ...(unpublishLinked
+          ? ['Unlinked it from Ravelry (the Ravelry project stays)']
+          : []),
+      ],
+      ravelry: null,
+    };
+    page = null;
+    await tick();
+    sentHeading?.focus();
+  }
+  async function keepPublished() {
+    unpublishing = false;
+    await tick();
+    unpublishButton?.focus();
   }
 
   const problemText = $derived.by(() => {
@@ -514,6 +567,15 @@ its weather, when that isn't kept with it). -->
       {/if}
       <p>{preparingText}</p>
     </div>
+  {:else if view === 'unpublish' && page}
+    <UnpublishConfirm
+      kind="project"
+      postId={page.postId}
+      title={page.title}
+      onRavelry={linked}
+      ondone={unpublished}
+      oncancel={keepPublished}
+    />
   {:else if view === 'blocked'}
     <div class="flex flex-col items-center gap-2 py-6 text-center">
       {#if blocked === 'signed-out'}
@@ -532,7 +594,7 @@ its weather, when that isn't kept with it). -->
     <div class="flex flex-col items-center gap-2 py-6 text-center">
       <CheckIcon class="text-success-700-300 size-8" aria-hidden="true" />
       <h2 class="h4" tabindex="-1" bind:this={sentHeading}>
-        {done.gallery && !done.gallery.updated ? 'Published' : 'Updated'}
+        {done.heading}
       </h2>
       {#if done.lines.length}
         <ul class="flex flex-col gap-1 text-sm">
@@ -706,7 +768,7 @@ its weather, when that isn't kept with it). -->
           >
         </a>
       {/if}
-      {#if done.galleryLink}
+      {#if done.galleryLink && !onsaved}
         <a
           href={done.galleryLink}
           target="_blank"
@@ -720,11 +782,28 @@ its weather, when that isn't kept with it). -->
             (opens in a new tab)</span
           >
         </a>
+      {:else}
+        <!-- Unpublished, or already on its page -->
+        <button
+          type="button"
+          class="btn preset-filled-primary-500"
+          onclick={() => dialog.close()}>Done</button
+        >
       {/if}
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
     </div>
   {:else if view === 'blocked'}
     <div class={FOOTER}>
+      {#if blocked === 'paused' && page}
+        <button
+          type="button"
+          class="btn hover:preset-tonal-surface me-auto"
+          bind:this={unpublishButton}
+          onclick={askUnpublish}
+        >
+          <EyeOffIcon aria-hidden="true" />Unpublish…
+        </button>
+      {/if}
       <button
         class="btn hover:preset-tonal-surface"
         onclick={() => dialog.close()}>Close</button
@@ -751,6 +830,16 @@ its weather, when that isn't kept with it). -->
           Everything is up to date.
         </p>
       {/if}
+      {#if page && view === 'form' && !busy}
+        <button
+          type="button"
+          class="btn hover:preset-tonal-surface me-auto"
+          bind:this={unpublishButton}
+          onclick={askUnpublish}
+        >
+          <EyeOffIcon aria-hidden="true" />Unpublish…
+        </button>
+      {/if}
       <button
         type="button"
         class="btn preset-filled-primary-500"
@@ -760,9 +849,7 @@ its weather, when that isn't kept with it). -->
       >
         {#if busy}<LoaderCircleIcon
             class="animate-spin"
-          />{:else if page}<RefreshCwIcon aria-hidden="true" />{:else}<SendIcon
-            aria-hidden="true"
-          />{/if}
+          />{:else if !page}<SendIcon aria-hidden="true" />{/if}
         {submitText}
       </button>
     </div>

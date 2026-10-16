@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  The Ravelry part of Publish to Gallery / Update Gallery Page: the project's
+  The Ravelry part of Publish to Gallery / Edit Gallery Page: the project's
   Ravelry project, edited almost 1:1. Posting creates it (name, craft, status,
   dates, progress, notes, one yarn per color linked to Ravelry's yarn when
   confirmed, the picture and photos). Once posted, it shows what's on Ravelry

@@ -14,10 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Publishes a saved palette to the Yarn Palette Gallery while signed in,
-linked to the account, or with `update` updates its gallery page in place (its
-name and colors; its link stays the same). Each palette has one page. When the
-gallery says these colors are published already, it shows that page, and can
-update it. -->
+linked to the account, or with `update` edits its gallery page (Edit Gallery
+Page): its name and colors, updated in place (its link stays the same),
+Anonymous, and Unpublish. Each palette has one page. When the gallery says
+these colors are published already, it shows that page, and can update it.
+From the gallery page itself (`onsaved`), Done closes it. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -25,18 +26,27 @@ update it. -->
   import {
     GALLERY_PAGES_CHANGED,
     getGalleryPages,
+    paletteNameDiffers,
     sharePalette,
     updatePalettePage,
   } from '#lib/accounts/gallery.js';
+  import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
-  import { onMount, untrack } from 'svelte';
+  import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { onMount, tick, untrack } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
-  import { getYarnPageURL } from '#lib/utils/color-utils.js';
+  import {
+    colorsToPaletteCode,
+    getColorsFromInput,
+    getYarnPageURL,
+  } from '#lib/utils/color-utils.js';
   import { cleanName } from '#lib/utils/string-utils.js';
   import {
     CheckIcon,
     ExternalLinkIcon,
+    EyeOffIcon,
     LoaderCircleIcon,
     RefreshCwIcon,
     SendIcon,
@@ -51,14 +61,25 @@ update it. -->
     name: savedName,
     showOwner: chosenShowOwner,
     update,
+    onsaved,
+    onunpublished,
   }: {
     paletteId: string;
     colors: Color[];
     name: string;
     /** Chosen already: with or without the account's name */
     showOwner?: boolean;
-    /** Updating this published page in place */
-    update?: { postId: number; title: string };
+    /** Editing this published page */
+    update?: {
+      postId: number;
+      title: string;
+      showOwner?: boolean;
+      link?: string | null;
+    };
+    /** From its own gallery page, which shows what changed: Done closes */
+    onsaved?: () => void;
+    /** From its own gallery page: unpublished, and the dialog closes */
+    onunpublished?: () => void;
   } = $props();
 
   // The page to update: the one given, or the one the gallery says has these
@@ -70,21 +91,41 @@ update it. -->
   // svelte-ignore state_referenced_locally
   let name = $state(cleanName(savedName, MAX_NAME_LENGTH));
   let busy = $state(false);
-  let done = $state<'published' | 'updated' | null>(null);
+  let done = $state<'published' | 'saved' | 'unpublished' | null>(null);
   // The palette's gallery page, once shared
   let postId = $state<number | null>(null);
   let errorMessage = $state('');
   // Include a new page on the account's public gallery, starting from the last choice
-  let showOwner = $state(false);
+  let showOwner = $state(untrack(() => update?.showOwner ?? false));
   let serverName = $state<string | null>(null);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
+  let doneHeading = $state<HTMLElement>();
 
   onMount(async () => {
     const gallery = await getGalleryPages();
     if (!gallery) return;
-    showOwner = chosenShowOwner ?? gallery.settings.showOwnerDefault;
+    showOwner =
+      update?.showOwner ?? chosenShowOwner ?? gallery.settings.showOwnerDefault;
     if (typeof gallery.name === 'string') serverName = gallery.name;
   });
+
+  // Editing: what differs from its page now
+  // Its page's choice, once saved here
+  let pageShowOwner = $state(untrack(() => update?.showOwner));
+  const ownerChanged = $derived(
+    pageShowOwner !== undefined && showOwner !== pageShowOwner,
+  );
+  const pageChanged = $derived(
+    !update ||
+      paletteNameDiffers(name, update) ||
+      Boolean(
+        update.link &&
+        colorsToPaletteCode(
+          getColorsFromInput({ string: update.link }) || [],
+        ) !== colorsToPaletteCode(colors),
+      ),
+  );
+  const nothingChanged = $derived(!!update && !pageChanged && !ownerChanged);
 
   // Without the app version, so the same palette is the same link and the
   // gallery can tell it's already there
@@ -99,10 +140,9 @@ update it. -->
     if (result.status === 'answered') {
       const code = Number(result.response.code);
       if (code === 200) {
-        done = 'updated';
         postId = page.postId;
         window.dispatchEvent(new Event(GALLERY_PAGES_CHANGED));
-        return;
+        return true;
       }
       errorMessage =
         code === 409
@@ -120,16 +160,38 @@ update it. -->
               : result.status === 'signed-out'
                 ? 'Sign in again, then try again.'
                 : 'Its gallery page is gone. Refresh My Library to see it.';
+    return false;
+  }
+
+  async function finish(next: typeof done) {
+    done = next;
+    if (next === 'saved') onsaved?.();
+    await tick();
+    doneHeading?.focus();
   }
 
   async function share(event?: Event) {
     event?.preventDefault();
     const title = cleanName(name, MAX_NAME_LENGTH);
-    if (!title || busy) return;
+    if (!title || busy || nothingChanged) return;
     busy = true;
     errorMessage = '';
     try {
-      if (target) return await updatePage(target, title);
+      if (target) {
+        if (update && ownerChanged) {
+          try {
+            await galleryPages.setShowOwner(update.postId, showOwner);
+          } catch {
+            errorMessage =
+              'Its name on the page couldn’t be changed. Try again later.';
+            return;
+          }
+          pageShowOwner = showOwner;
+        }
+        if (pageChanged && !(await updatePage(target, title))) return;
+        postId = target.postId;
+        return await finish('saved');
+      }
       const result = await sharePalette({
         paletteId,
         title,
@@ -137,8 +199,8 @@ update it. -->
         showOwner,
       });
       if (result.status === 'shared') {
-        done = 'published';
         postId = result.postId;
+        await finish('published');
       } else if (result.status === 'published-already')
         existing = { postId: result.postId, title: result.title };
       else errorMessage = result.message;
@@ -146,26 +208,54 @@ update it. -->
       busy = false;
     }
   }
+
+  // ---- Unpublish, asked first in place of the form
+  let unpublishing = $state(false);
+  let unpublishButton = $state<HTMLButtonElement>();
+  async function unpublished() {
+    unpublishing = false;
+    if (onunpublished) {
+      dialog.close();
+      onunpublished();
+      return;
+    }
+    postId = null;
+    await finish('unpublished');
+  }
+  async function keepPublished() {
+    unpublishing = false;
+    await tick();
+    unpublishButton?.focus();
+  }
 </script>
 
 <div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
   <PaletteStrip {colors} />
 
   {#if done}
-    <div class="flex flex-col items-center gap-2 text-center" role="status">
-      <CheckIcon class="text-success-700-300 size-8" />
-      <p class="font-bold">{done === 'updated' ? 'Updated' : 'Published'}</p>
-      {#if done === 'updated'}
-        <p class="text-sm">
-          Its gallery page has this name and these colors. Its link stays the
-          same.
-        </p>
+    <div class="flex flex-col items-center gap-2 text-center">
+      <CheckIcon class="text-success-700-300 size-8" aria-hidden="true" />
+      <h2 class="h4" tabindex="-1" bind:this={doneHeading}>
+        {done === 'saved'
+          ? 'Saved'
+          : done === 'unpublished'
+            ? 'Unpublished'
+            : 'Published'}
+      </h2>
+      {#if done === 'unpublished'}
+        <p class="text-sm">Its gallery page link no longer works.</p>
       {/if}
-      {#if postId}
+      {#if postId && !onsaved}
         <a
           href={resolve('/gallery/palette/[id]', { id: String(postId) })}
           target="_blank"
           class="link">View Gallery Page</a
+        >
+      {:else}
+        <button
+          type="button"
+          class="btn preset-filled-primary-500"
+          onclick={() => dialog.close()}>Done</button
         >
       {/if}
     </div>
@@ -202,6 +292,14 @@ update it. -->
         }}><RefreshCwIcon />Update Gallery Page</button
       >
     </div>
+  {:else if unpublishing && update}
+    <UnpublishConfirm
+      kind="palette"
+      postId={update.postId}
+      title={update.title}
+      ondone={unpublished}
+      oncancel={keepPublished}
+    />
   {:else}
     <form class="flex flex-col gap-4" onsubmit={share}>
       <label class="label">
@@ -217,7 +315,9 @@ update it. -->
         />
       </label>
       <p>
-        {#if target}
+        {#if update && !pageChanged}
+          Its gallery page has this name and these colors.
+        {:else if target}
           Updates its gallery page to this name and these colors. Its link stays
           the same.
         {:else}
@@ -227,7 +327,7 @@ update it. -->
           >. You can update or unpublish it later.
         {/if}
       </p>
-      {#if !target}
+      {#if !target || update}
         <AnonymousCheckbox
           bind:checked={showOwner}
           name={ownerName}
@@ -237,16 +337,36 @@ update it. -->
       {#if errorMessage}
         <p class="text-error-700-300" role="alert">{errorMessage}</p>
       {/if}
-      <button
-        type="submit"
-        class="btn preset-filled-primary-500 w-full sm:w-fit"
-        disabled={busy || !cleanName(name, MAX_NAME_LENGTH)}
-      >
-        {#if busy}<LoaderCircleIcon
-            class="animate-spin"
-          />{:else if target}<RefreshCwIcon />{:else}<SendIcon />{/if}
-        {target ? 'Update' : 'Publish'}
-      </button>
+      {#if nothingChanged}
+        <p class="text-sm opacity-80" id="palette-up-to-date">
+          Everything is up to date.
+        </p>
+      {/if}
+      <div class="flex flex-wrap items-center gap-2">
+        {#if update && !busy}
+          <button
+            type="button"
+            class="btn hover:preset-tonal-surface me-auto"
+            bind:this={unpublishButton}
+            onclick={() => (unpublishing = true)}
+          >
+            <EyeOffIcon aria-hidden="true" />Unpublish…
+          </button>
+        {/if}
+        <button
+          type="submit"
+          class="btn preset-filled-primary-500 max-sm:w-full"
+          disabled={busy || nothingChanged || !cleanName(name, MAX_NAME_LENGTH)}
+          aria-describedby={nothingChanged ? 'palette-up-to-date' : undefined}
+        >
+          {#if busy}<LoaderCircleIcon
+              class="animate-spin"
+            />{:else if !target}<SendIcon
+              aria-hidden="true"
+            />{:else if !update}<RefreshCwIcon aria-hidden="true" />{/if}
+          {update ? 'Save' : target ? 'Update' : 'Publish'}
+        </button>
+      </div>
     </form>
   {/if}
 </div>

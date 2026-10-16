@@ -28,7 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { publishedOn } from '#lib/accounts/gallery-version.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
-  import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
   import ShareSectionHeader from '#lib/components/account/ShareSectionHeader.svelte';
@@ -36,24 +35,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import {
-    EyeOffIcon,
     LinkIcon,
     LoaderCircleIcon,
     LogInIcon,
-    RefreshCwIcon,
+    PencilIcon,
     SendIcon,
   } from '@lucide/svelte';
-  import { onMount, tick, type Snippet } from 'svelte';
-  import type { Attachment } from 'svelte/attachments';
+  import { onMount, type Snippet } from 'svelte';
 
   let {
     kind,
     id,
-    label,
     link,
     changed,
     onpublish,
-    onupdate,
+    onedit,
     signInHref,
     ravelryItem,
     children,
@@ -69,8 +65,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changed?: (page: GalleryPage) => boolean;
     /** Publishes it (opens the publish dialog) */
     onpublish?: () => void;
-    /** Updates its page in place (opens the publish dialog) */
-    onupdate?: (page: GalleryPage) => void;
+    /** Edits its page: update, Anonymous, Ravelry, Unpublish (opens the publish dialog) */
+    onedit?: (page: GalleryPage) => void;
     /** Where Sign In goes, to come back here */
     signInHref?: string;
     /** A saved project, to tell whether it's in the account */
@@ -115,40 +111,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       linkCopied.trigger();
   }
 
-  let busy = $state(false);
-  let errorMessage = $state('');
-  let confirming = $state(false);
-
-  // On Ravelry too: Unpublish unlinks it
-  const onRavelry = $derived(kind === 'project' && ravelryLinks.links.has(id));
-
-  let root = $state<HTMLElement>();
-  /** The confirm's first button takes the focus, as the row that asked is gone */
-  const takeFocus: Attachment<HTMLButtonElement> = (button) => {
-    button.focus({ preventScroll: true });
-  };
-  async function focusRow(name: string) {
-    await tick();
-    root
-      ?.querySelector<HTMLElement>(`[data-row="${name}"]`)
-      ?.focus({ preventScroll: true });
-  }
-
-  async function unpublish() {
-    if (!page) return;
-    busy = true;
-    errorMessage = '';
-    try {
-      await galleryPages.remove(page.postId);
-      confirming = false;
-      await focusRow('publish');
-    } catch {
-      errorMessage = 'It couldn’t be unpublished. Try again later.';
-    } finally {
-      busy = false;
-    }
-  }
-
   const status = $derived(
     !page
       ? 'Not published'
@@ -161,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex flex-col gap-6 p-4 text-left" bind:this={root}>
+<div class="flex flex-col gap-6 p-4 text-left">
   {#if link}
     <!-- The link first: what most people share -->
     <ul class={PANEL_LIST} aria-label="Link">
@@ -198,10 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Checking…
       {:else}
         {status}{#if page}
-          · {page.showOwner && ownerName
-            ? `By ${ownerName}`
-            : 'Anonymous'}{/if}{#if isChanged}
-          · <span class="font-bold">changed since</span>{/if}
+          · {page.showOwner && ownerName ? `By ${ownerName}` : 'Anonymous'}{/if}
       {/if}
     </ShareSectionHeader>
 
@@ -247,75 +206,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-sm">Publishing to the gallery is paused right now.</p>
       {/if}
     {:else if page}
-      {#if confirming}
-        <div class="flex flex-col gap-2" role="group" aria-label="Unpublish">
-          <p class="text-sm">
-            Unpublish “{page.title}”? Its gallery page link stops working{kind ===
-            'project'
-              ? ', and it comes off the globe'
-              : ''}{onRavelry
-              ? '. It’s unlinked from Ravelry too (the Ravelry project stays)'
-              : ''}. Your {kind} stays saved, and links you’ve shared to it still
-            work.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="btn preset-filled-error-500"
-              onclick={unpublish}
-              disabled={busy}
-              {@attach takeFocus}
-              >{#if busy}<LoaderCircleIcon
-                  class="animate-spin"
-                />{/if}Unpublish</button
-            >
-            <button
-              type="button"
-              class="btn preset-tonal-surface"
-              onclick={() => {
-                confirming = false;
-                void focusRow('unpublish');
-              }}
-              disabled={busy}>Keep Published</button
-            >
-          </div>
-        </div>
-      {:else}
-        <div class="flex flex-wrap gap-2">
-          {#if onupdate && galleryPages.publishing}
-            <button
-              type="button"
-              class="btn {isChanged
-                ? 'preset-filled-primary-500'
-                : 'preset-tonal-surface'}"
-              onclick={() => page && onupdate(page)}
-            >
-              <RefreshCwIcon aria-hidden="true" />Update Gallery Page…
-            </button>
-          {/if}
-          <button
-            type="button"
-            class="btn hover:preset-tonal-surface"
-            data-row="unpublish"
-            onclick={() => (confirming = true)}
-            disabled={busy}
-          >
-            <EyeOffIcon aria-hidden="true" />Unpublish…
-          </button>
-        </div>
-        {#if onupdate && galleryPages.publishing}
-          <p class="-mt-1 text-xs opacity-70">
-            Update: {kind === 'palette'
-              ? `to “${label}”, with its colors now.`
-              : onRavelry
-                ? 'the page and its Ravelry project, as the project is now.'
-                : 'to the project as it is now.'} Its link stays the same.
+      <div class="flex flex-col items-start gap-1">
+        <button
+          type="button"
+          class="btn {isChanged
+            ? 'preset-filled-primary-500'
+            : 'preset-tonal-surface'}"
+          onclick={() => page && onedit?.(page)}
+          disabled={!onedit}
+          aria-describedby={isChanged ? 'share-gallery-changed' : undefined}
+        >
+          <PencilIcon aria-hidden="true" />Edit Gallery Page…
+        </button>
+        {#if isChanged}
+          <p class="text-xs opacity-70" id="share-gallery-changed">
+            Changed since its page was last updated.
           </p>
         {/if}
-      {/if}
-    {/if}
-    {#if errorMessage}
-      <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
+      </div>
     {/if}
   </section>
 

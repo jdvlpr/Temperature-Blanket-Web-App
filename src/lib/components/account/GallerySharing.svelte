@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A saved project's or palette's sharing, on its card in My Library: one Share
   button, with what's shared beside it (Published, and whether it changed
   since; On Ravelry, with its photos). It opens the Share dialog: Copy Link, and its one gallery page
-  (Publish, or View, Update, Anonymous and Unpublish).
+  (Publish, or its status, View and Edit Gallery Page).
 -->
 <script lang="ts">
   import type { GalleryPage } from '#lib/accounts/gallery.js';
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changedSince = false,
     changed,
     onadd,
-    onupdate,
+    onedit,
     ravelryItem,
   }: {
     kind: 'project' | 'palette';
@@ -54,8 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changed?: (page: GalleryPage) => boolean;
     /** Publishes it */
     onadd?: () => void;
-    /** Updates its page in place */
-    onupdate?: (page: GalleryPage) => void;
+    /** Edits its page (Edit Gallery Page) */
+    onedit?: (page: GalleryPage) => void;
     /** A saved project, signed in: its Ravelry part too */
     ravelryItem?: StoredProjectIndexItem;
   } = $props();
@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           link,
           changed,
           onpublish: onadd,
-          onupdate,
+          onedit,
           ravelryItem,
         },
       },

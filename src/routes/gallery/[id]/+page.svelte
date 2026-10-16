@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // there's no such project
   const streamedProject = streamed(() => data.project);
   let project = $derived(streamedProject.current);
-  // "By" and the name, which the owner bar changes in place
+  // "By" and the name (loaded again after Edit Gallery Page saves)
   let owner = $derived(data.owner);
 
   // The project's photos on Ravelry, when its owner linked it there (streamed)
