@@ -33,7 +33,7 @@ button to it. -->
   import RenameProject from '#lib/components/RenameProject.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
   import { locations } from '#lib/state/location-state.svelte.js';
-  import { dialog, isDesktop, toast } from '#lib/state/page-state.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import {
@@ -83,9 +83,6 @@ button to it. -->
 
   const hasWeather = $derived(weather.data.length > 0);
   const hasProject = $derived(hasWeather && locations.allValid);
-  // Wider screens show its name in the top bar, so the card here just says
-  // where it's saved
-  const inTopBar = $derived(isDesktop.current && hasWeather);
   const problem = $derived(
     autosave.on &&
       (autosave.state === 'conflict' || autosave.state === 'error'),
@@ -195,6 +192,25 @@ button to it. -->
   });
 </script>
 
+<!-- Save, until the project saves by itself; the Project button's dot (in
+the same color) says it's waiting here -->
+{#snippet saveButton()}
+  <button
+    type="button"
+    class="btn preset-tonal-primary self-start"
+    disabled={saving}
+    onclick={save}
+    data-testid="menu-save"
+  >
+    {#if saving}
+      <LoaderCircleIcon class="animate-spin" />
+    {:else}
+      <BookmarkIcon />
+    {/if}
+    Save Project
+  </button>
+{/snippet}
+
 <!-- Its title, Project, is in the dialog's header -->
 <div class="flex w-full flex-col gap-6 p-4 pt-2 text-left">
   <!-- This project -->
@@ -202,9 +218,7 @@ button to it. -->
     class="bg-surface-100 dark:bg-surface-900 rounded-container card-border flex flex-col gap-2 p-4"
     aria-label="This project"
   >
-    {#if !inTopBar}
-      <RenameProject />
-    {/if}
+    <RenameProject />
 
     <!-- Where it's saved -->
     {#if problem}
@@ -229,21 +243,9 @@ button to it. -->
           Saved in this browser{#if !project.status.saved}, with unsaved changes{/if}.
         </span>
       </p>
+      {#if !project.status.saved}{@render saveButton()}{/if}
     {:else if hasProject}
-      <button
-        type="button"
-        class="btn preset-tonal-primary self-start"
-        disabled={saving}
-        onclick={save}
-        data-testid="menu-save"
-      >
-        {#if saving}
-          <LoaderCircleIcon class="animate-spin" />
-        {:else}
-          <BookmarkIcon />
-        {/if}
-        Save Project
-      </button>
+      {@render saveButton()}
     {:else if !hasWeather}
       <p class="text-sm opacity-70">
         Choose a location and get its weather data to start a project.

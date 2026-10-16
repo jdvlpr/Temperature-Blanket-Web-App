@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  The yarns in some colors, inline: "Himalaya Everyday · Aran", the weight
-  linking to the yarn weights chart, several yarns separated by commas.
+  The yarns in some colors, inline: "Himalaya Everyday · Aran", several
+  yarns separated by commas.
 -->
 <script lang="ts">
   import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
@@ -40,9 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#each yarns as { name, weight }, i (name)}{#if i}<span class="mr-1">,</span
     >{/if}<span
-    >{name}{#if weight}<span class="mx-1" aria-hidden="true">·</span><a
-        href="/blog/yarn-weights?highlight={weight}"
-        class="link"
-        title="See the yarn weights chart">{weight}</a
-      >{/if}</span
+    >{name}{#if weight}<span class="mx-1" aria-hidden="true">·</span
+      >{weight}{/if}</span
   >{/each}

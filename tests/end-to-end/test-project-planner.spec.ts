@@ -150,7 +150,8 @@ test.describe('Project Planner', () => {
 
     // 2. Save -- this is the app's own mechanism for writing the current project
     // state into a shareable URL (saving calls replaceState).
-    await page.getByTestId('save-button').click();
+    await page.getByRole('button', { name: /^Project Options/ }).click();
+    await page.getByTestId('menu-save').click();
     await expect(
       page.getByText(/Saved in this browser|problem saving your project/),
     ).toBeVisible();

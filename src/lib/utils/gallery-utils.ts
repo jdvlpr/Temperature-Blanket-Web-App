@@ -565,15 +565,13 @@ export const popularToGalleryNodes = (popular: PopularProject[]) =>
         },
   );
 
-/** The orders a gallery can show in, newest first by default */
-export const GALLERY_ORDERS = [
-  { value: 'DESC', label: 'Newest' },
-  { value: 'ASC', label: 'Oldest' },
-] as const;
+/** The orders a gallery can show in: newest first, or oldest (Newest reversed) */
+export type GalleryOrder = 'DESC' | 'ASC';
 
-export type GalleryOrder = (typeof GALLERY_ORDERS)[number]['value'];
+/** A gallery's sorts: Popular (most viewed first) or by date */
+export type GallerySort = 'POPULAR' | GalleryOrder;
 
-/** The gallery pages' sorts: most viewed first by default */
+/** The sorts the menu offers; oldest first is Newest with Reverse on */
 export const GALLERY_SORTS = [
   {
     value: 'POPULAR',
@@ -581,7 +579,24 @@ export const GALLERY_SORTS = [
     details: 'Most viewed first, then newest',
   },
   { value: 'DESC', label: 'Newest' },
-  { value: 'ASC', label: 'Oldest' },
 ] as const;
 
-export type GallerySort = (typeof GALLERY_SORTS)[number]['value'];
+/**
+ * A sort menu's props for a gallery sort: Oldest shows as Newest reversed.
+ * Popular can't be reversed (least viewed first isn't worth browsing).
+ */
+export function gallerySortMenu(
+  sort: GallerySort,
+  set: (sort: GallerySort) => void,
+) {
+  return {
+    sortOptions: GALLERY_SORTS,
+    sort: sort === 'ASC' ? ('DESC' as const) : sort,
+    reversed: sort === 'ASC',
+    canReverse: (option: GallerySort) => option !== 'POPULAR',
+    // Newest again keeps Reverse on; Popular turns it off
+    onsort: (option: GallerySort) =>
+      set(option === 'DESC' && sort === 'ASC' ? 'ASC' : option),
+    onreverse: (reversed: boolean) => set(reversed ? 'ASC' : 'DESC'),
+  };
+}

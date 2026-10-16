@@ -105,14 +105,17 @@ export class PaletteStorage {
 
   /**
    * Save a palette. If the same code is already saved, nothing is added and
-   * the existing palette is returned with `added: false`.
+   * the existing palette is returned with `added: false`, unless `copy`
+   * (My Library's Create a Copy) asks for a second one anyway.
    */
   static async add({
     code,
     name,
+    copy = false,
   }: {
     code: string;
     name?: string;
+    copy?: boolean;
   }): Promise<{ palette: SavedPalette; added: boolean }> {
     if (!this.isAvailable()) throw new Error('IndexedDB is not available');
     if (!code) throw new Error('Missing palette code');
@@ -120,9 +123,11 @@ export class PaletteStorage {
     const owner = this.syncOwner();
     let result: { palette: SavedPalette; added: boolean } | undefined;
     await update<SavedPalette[]>(SAVED_PALETTES_KEY, (all = []) => {
-      const existing = all.find(
-        (p) => p.code === code && !p.deletedAt && this.shown(p, owner),
-      );
+      const existing =
+        !copy &&
+        all.find(
+          (p) => p.code === code && !p.deletedAt && this.shown(p, owner),
+        );
       if (existing) {
         result = { palette: existing, added: false };
         return all;

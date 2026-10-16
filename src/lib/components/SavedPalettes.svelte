@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     matchesYarn,
     sortLibrary,
   } from '#lib/utils/collection-filter.js';
-  import { PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
+  import { CopyIcon, PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
@@ -172,6 +172,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       () => PaletteStorage.rename(id, editingName),
       'Unable to rename the palette',
     );
+  }
+
+  async function copy(palette: SavedPalette, label: string) {
+    await run(async () => {
+      await PaletteStorage.add({
+        code: palette.code,
+        name: `${label} (copy)`.slice(0, MAX_SAVED_PALETTE_NAME_LENGTH),
+        copy: true,
+      });
+      toast.trigger({
+        message: `Created a copy of ${label}`,
+        category: 'success',
+      });
+    }, 'Unable to copy the palette');
   }
 
   async function remove(palette: SavedPalette, label: string) {
@@ -308,6 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {:else}
             <PaletteCard
               {colors}
+              {layout}
               name={label}
               summary={updateGauge ? !!palette.name : false}
               href={updateGauge ? undefined : linkFor(colors, palette.name)}
@@ -356,6 +371,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       icon: PencilIcon,
                       onselect: () => startRename(palette),
                     },
+                    ...(updateGauge
+                      ? []
+                      : [
+                          {
+                            value: 'copy',
+                            label: 'Create a Copy',
+                            icon: CopyIcon,
+                            onselect: () => copy(palette, label),
+                          },
+                        ]),
                     {
                       value: 'trash',
                       label: 'Move to Trash',

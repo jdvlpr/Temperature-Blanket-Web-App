@@ -46,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onsort,
     reversed,
     onreverse,
+    canReverse,
     layout = $bindable('grid'),
     showFilters = true,
     disabled = false,
@@ -72,6 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onsort: (sort: T) => void;
     reversed?: boolean;
     onreverse?: (reversed: boolean) => void;
+    canReverse?: (sort: T) => boolean;
     layout?: PageLayout;
     /** Off for short lists: just View and the actions */
     showFilters?: boolean;
@@ -189,6 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {onsort}
           {reversed}
           {onreverse}
+          {canReverse}
         />
         {@render menus?.()}
       {/if}

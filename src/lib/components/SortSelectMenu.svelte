@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@render item(
               'Reverse',
               options.some((option) => option.details)
-                ? 'The other way round'
+                ? 'Same sort, last to first'
                 : undefined,
             )}
             <MenuCheckbox checked={isReversed} />

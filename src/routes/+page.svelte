@@ -30,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
   import LegacyNotification from '#lib/components/modals/LegacyNotification.svelte';
   import ProjectMenuButton from '#lib/components/buttons/ProjectMenuButton.svelte';
-  import SaveButton from '#lib/components/buttons/SaveButton.svelte';
   import ProjectTitle from '#lib/components/ProjectTitle.svelte';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import {
@@ -299,10 +298,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <RedoIcon />
             <span class="inline-block max-md:hidden">Redo</span>
           </button>
-
-          {#if !isDesktop.current}
-            <SaveButton />
-          {/if}
         </div>
       {/if}
     </div>

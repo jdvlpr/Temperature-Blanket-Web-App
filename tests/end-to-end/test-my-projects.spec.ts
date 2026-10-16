@@ -151,7 +151,7 @@ test.describe('My Projects', () => {
     // Nothing in the Trash: no button
     await expect(page.getByRole('button', { name: /^Trash/ })).toHaveCount(0);
 
-    // Palettes go to the same Trash
+    // Palettes have their own Trash, on My Palettes
     await page.goto('/my-palettes');
     await moveToTrash(page, 'Test Meadow');
     await page.getByRole('button', { name: 'Trash (1)' }).click();
@@ -183,15 +183,15 @@ test.describe('My Projects', () => {
     await expect(
       menu.getByRole('button', { name: /Rename|Name this/ }),
     ).toHaveCount(0);
-    await page.keyboard.press('Escape');
-
-    // Save is in the top bar: it saves right away
-    await page.getByTestId('save-button').click();
+    // Not saved yet: a dot on the Project button, and Save Project in its menu
+    await expect(page.getByTestId('unsaved-dot')).toBeVisible();
+    await menu.getByTestId('menu-save').click();
     await expect(
       page.getByText('Saved in this browser. Changes now save automatically.'),
     ).toBeVisible();
-    // Saving by itself now, Save gives way to the Project button's icon
-    await expect(page.getByTestId('save-button')).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    // Saving by itself now, the dot gives way to the Project button's icon
+    await expect(page.getByTestId('unsaved-dot')).toHaveCount(0);
     await expect(page.getByTestId('project-button')).toHaveAttribute(
       'data-save-status',
       'Saved in this browser',
@@ -227,8 +227,7 @@ test.describe('My Projects', () => {
     await title.press('Enter');
     await expect(title).toHaveValue('Austin Gift');
 
-    // The Project menu says where; with the name in the top bar, it doesn't
-    // repeat it
+    // The Project menu says where, and can rename it on wider screens too
     await page.getByTestId('project-button').click();
     await expect(menu.getByTestId('autosave-status')).toHaveText(
       'Saved in this browser',
@@ -236,7 +235,9 @@ test.describe('My Projects', () => {
     await expect(
       menu.getByText('Changes save automatically, on this device only.'),
     ).toBeVisible();
-    await expect(menu.getByTestId('project-name')).toHaveCount(0);
+    await expect(
+      menu.getByRole('button', { name: 'Rename Austin Gift' }),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
 
     // On a phone, it renames it from the menu's project card

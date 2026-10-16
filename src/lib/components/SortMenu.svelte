@@ -141,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Menu.Separator />
         <Menu.Item value="reverse" class={menuItemClass}>
           <ArrowLeftRightIcon class="shrink-0" aria-hidden="true" />
-          {@render item('Reverse', 'The other way round')}
+          {@render item('Reverse', 'Same sort, last to first')}
         </Menu.Item>
         <Menu.Item value="shuffle" class={menuItemClass}>
           <ShuffleIcon class="shrink-0" aria-hidden="true" />

@@ -16,7 +16,10 @@ import {
   stringToDate,
 } from '#lib/utils/date-utils.js';
 import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
-import { projectCreatedAtTime } from '#lib/utils/project-id-utils.js';
+import {
+  newProjectId,
+  projectCreatedAtTime,
+} from '#lib/utils/project-id-utils.js';
 import { cleanName } from '#lib/utils/string-utils.js';
 import type {
   AccountSyncState,
@@ -406,6 +409,31 @@ export class ProjectStorage {
       setAccountState: (userId, state) =>
         this.setAccountSyncState(userId, state),
     };
+  }
+
+  /**
+   * Save a copy of a saved project as a new one, named "… (copy)" (unnamed
+   * too, from its title) so the two don't look the same, as the planner's
+   * Save a Copy does. Signed in, the copy is the account's.
+   */
+  static async duplicate(id: string): Promise<StoredProjectIndexItem | null> {
+    const stored = await this.getById(id);
+    if (!stored) return null;
+    const copyId = newProjectId();
+    const href = new URL(stored.href);
+    href.searchParams.set('project', copyId);
+    const base = stored.name || stored.title;
+    return this.save({
+      id: copyId,
+      localProject: {
+        ...stored,
+        href: href.href,
+        createdAt: new Date().toISOString(),
+        name: base
+          ? `${base} (copy)`.slice(0, MAX_SAVED_PROJECT_NAME_LENGTH)
+          : undefined,
+      },
+    });
   }
 
   /**

@@ -128,6 +128,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     galleryPages.refreshSoon();
   }
 
+  async function copy(item: StoredProjectIndexItem) {
+    await run(async () => {
+      if (!(await ProjectStorage.duplicate(item.id))) throw new Error();
+      toast.trigger({
+        message: `Created a copy of ${labelFor(item)}`,
+        category: 'success',
+      });
+    }, 'Unable to copy the project');
+    await loadProjects();
+  }
+
   async function rename(id: string, name: string) {
     await run(
       () => ProjectStorage.rename(id, name),
@@ -376,6 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : undefined}
                 onrename={(name) => rename(project.id, name)}
                 onremove={() => remove(project)}
+                oncopy={() => copy(project)}
               >
                 {#snippet sharing()}
                   {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}

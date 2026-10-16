@@ -17,10 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 itself (and Save is gone), its icon is the save state, like Google Docs' cloud:
 a cloud for the account or a screen for this browser only, in the text color,
 since saved is the usual state; a slow, dimmed spinner while a change waits
-to save, with a little pop when it lands; red only for a problem, which the menu explains. -->
+to save, with a little pop when it lands; red only for a problem, which the menu explains.
+Until then, a dot in the menu's Save Project color says there's something to save. -->
 
 <script lang="ts">
   import { openProjectMenu } from '#lib/state/page-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import { autosave } from '#lib/storage/autosave.svelte.js';
   import {
     CloudAlertIcon,
@@ -49,15 +53,28 @@ to save, with a little pop when it lands; red only for a problem, which the menu
           : 'Saving…',
   );
 
+  // The menu has Save Project: a project not saved yet, or changes to one
+  // saved in this browser (another account's, here signed out)
+  const unsaved = $derived(
+    !autosave.on &&
+      weather.data.length > 0 &&
+      locations.allValid &&
+      (!autosave.stored || !project.status.saved),
+  );
+
   const label = $derived(
-    status ? `Project Options (${status})` : 'Project Options',
+    status
+      ? `Project Options (${status})`
+      : unsaved
+        ? 'Project Options (Not saved)'
+        : 'Project Options',
   );
 </script>
 
 <button
   aria-label={label}
   title={label}
-  class="btn hover:preset-tonal-surface gap-1"
+  class="btn hover:preset-tonal-surface relative gap-1"
   onclick={() => openProjectMenu()}
   data-testid="project-button"
   data-save-status={status}
@@ -84,6 +101,13 @@ to save, with a little pop when it lands; red only for a problem, which the menu
     <LoaderCircleIcon class="saving-spin opacity-60" />
   {/if}
   <span>Project</span>
+  {#if unsaved}
+    <span
+      class="bg-primary-500 absolute top-1 right-1 size-2 rounded-full"
+      aria-hidden="true"
+      data-testid="unsaved-dot"
+    ></span>
+  {/if}
 </button>
 
 <style>

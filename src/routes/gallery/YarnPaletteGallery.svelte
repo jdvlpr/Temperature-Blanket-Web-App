@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
-  import { GALLERY_SORTS } from '#lib/utils/gallery-utils.js';
+  import { gallerySortMenu } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
@@ -169,12 +169,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:onlyThisYarn={
           yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
         }
-        sortOptions={GALLERY_SORTS}
-        sort={yarnPaletteGalleryState.orderBy}
-        onsort={(order) => {
+        {...gallerySortMenu(yarnPaletteGalleryState.orderBy, (order) => {
           yarnPaletteGalleryState.orderBy = order;
           search();
-        }}
+        })}
         bind:layout={yarnPaletteGalleryState.layout}
         onchange={debouncedSearch}
       >

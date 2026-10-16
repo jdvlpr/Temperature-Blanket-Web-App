@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     matchesYarn,
     sortGalleryPages,
   } from '#lib/utils/collection-filter.js';
-  import { GALLERY_SORTS } from '#lib/utils/gallery-utils.js';
+  import { gallerySortMenu } from '#lib/utils/gallery-utils.js';
   import {
     galleryTitleText,
     sharedPaletteFrom,
@@ -148,9 +148,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:brandId={ownerFilters.brandId}
       bind:yarnId={ownerFilters.yarnId}
       bind:onlyThisYarn={ownerFilters.onlyThisYarn}
-      sortOptions={GALLERY_SORTS}
-      sort={ownerFilters.sort}
-      onsort={(sort) => (ownerFilters.sort = sort)}
+      {...gallerySortMenu(
+        ownerFilters.sort,
+        (sort) => (ownerFilters.sort = sort),
+      )}
       bind:layout={ownerFilters.layout}
       {showFilters}
     >

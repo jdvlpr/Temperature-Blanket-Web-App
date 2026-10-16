@@ -63,7 +63,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     recordPageView,
   } from '#lib/utils/gallery-utils.js';
   import SortSelectMenu from '#lib/components/SortSelectMenu.svelte';
-  import { GALLERY_ORDERS } from '#lib/utils/gallery-utils.js';
   import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -203,11 +202,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col items-center px-2" bind:this={projectsList}>
   <div class="mb-2 flex justify-center">
     <SortSelectMenu
-      options={GALLERY_ORDERS}
-      current={galleryPalettesState.orderBy}
+      options={[{ value: 'DESC', label: 'Newest' }]}
+      current="DESC"
       disabled={loading}
-      onsort={(order) => {
-        galleryPalettesState.orderBy = order;
+      onsort={() => {}}
+      reversed={galleryPalettesState.orderBy === 'ASC'}
+      onreverse={(reversed) => {
+        galleryPalettesState.orderBy = reversed ? 'ASC' : 'DESC';
         debouncedSearch();
       }}
     />

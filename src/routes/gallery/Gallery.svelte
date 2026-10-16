@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
     fetchProjects,
-    GALLERY_SORTS,
+    gallerySortMenu,
     type FetchProjectsResult,
   } from '#lib/utils/gallery-utils.js';
   import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
@@ -214,12 +214,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:yarnId={galleryState.filteredYarnId}
         bind:onlyThisYarn={galleryState.palettesContainOnlyFilteredYarn}
         bind:patternType={galleryState.filteredPatternType}
-        sortOptions={GALLERY_SORTS}
-        sort={galleryState.orderBy}
-        onsort={(order) => {
+        {...gallerySortMenu(galleryState.orderBy, (order) => {
           galleryState.orderBy = order;
           search();
-        }}
+        })}
         bind:layout={galleryState.layout}
         onchange={debouncedSearch}
       >

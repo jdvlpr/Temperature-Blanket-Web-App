@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
-  import { PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { CopyIcon, PencilIcon, Trash2Icon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
 
   type Props = {
@@ -52,6 +52,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Called with the new name ('' clears it) */
     onrename: (name: string) => void;
     onremove: () => void;
+    /** Create a Copy: saves it again as a new project */
+    oncopy: () => void;
     /** Its Share button */
     sharing?: Snippet;
   };
@@ -64,6 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     syncLabel,
     onrename,
     onremove,
+    oncopy,
     sharing,
   }: Props = $props();
 
@@ -88,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let linkTitle = $derived(`Open in the Project Planner (${dateLine})`);
 
-  // It can be renamed or moved to the Trash
+  // It can be renamed, copied or moved to the Trash
   let menu = $derived<MoreMenuItem[]>([
     {
       value: 'rename',
@@ -98,6 +101,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         editingName = item.meta.name ?? '';
         editing = true;
       },
+    },
+    {
+      value: 'copy',
+      label: 'Create a Copy',
+      icon: CopyIcon,
+      onselect: oncopy,
     },
     {
       value: 'trash',

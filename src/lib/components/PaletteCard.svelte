@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   one link (`href`) or button (`onclick`), "8 colors · Brand Yarn" under the
   name, and one `action` button beside it. My Projects gives its own
   `nameRow` (with a rename pencil, outside the link) and a `footer`.
+  In a list it lies down, as a project's card does: the colors beside the name.
 -->
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
@@ -44,6 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** After "8 colors · yarns", e.g. "Saved Oct 13" */
     details?: Snippet;
     footer?: Snippet;
+    layout?: 'grid' | 'list';
   }
 
   let {
@@ -58,7 +60,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     nameRow,
     details,
     footer,
+    layout = 'grid',
   }: Props = $props();
+
+  let list = $derived(layout === 'list');
 
   let yarns = $derived([
     ...new Set(
@@ -67,11 +72,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .map((color) => `${color.brandName} ${color.yarnName}`),
     ),
   ]);
-  const controlClass =
-    'flex w-full min-w-0 cursor-pointer flex-col gap-y-1 text-left';
+  let controlClass = $derived([
+    'flex min-w-0 cursor-pointer flex-col gap-y-1 text-left',
+    list ? 'w-28 shrink-0 sm:w-48' : 'w-full',
+  ]);
 </script>
 
-<div class="flex w-full min-w-0 flex-col gap-1 text-left">
+<div
+  class={[
+    'flex w-full min-w-0 gap-1 text-left',
+    list ? 'flex-row items-center gap-3' : 'flex-col',
+  ]}
+>
   {#snippet strip()}
     <PaletteStrip {colors} insideControl />
   {/snippet}
@@ -106,23 +118,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !nameRow}{@render text()}{/if}
     </button>
   {/if}
-  <div class="flex items-start gap-1">
-    <div class="flex min-w-0 grow flex-col gap-0.5">
-      {@render nameRow?.()}
-      <span
-        class={[
-          'text-surface-700-300 line-clamp-1 text-xs',
-          !summary && 'hidden',
-        ]}
-      >
-        {colors.length}
-        {pluralize('color', colors.length)}{#if yarns.length}{' · '}{yarns.join(
-            ', ',
-          )}{/if}
-      </span>
-      {@render details?.()}
+  <div class={list ? 'flex min-w-0 grow flex-col gap-1' : 'contents'}>
+    <div class="flex items-start gap-1">
+      <div class="flex min-w-0 grow flex-col gap-0.5">
+        {@render nameRow?.()}
+        <span
+          class={[
+            'text-surface-700-300 line-clamp-1 text-xs',
+            !summary && 'hidden',
+          ]}
+        >
+          {colors.length}
+          {pluralize(
+            'color',
+            colors.length,
+          )}{#if yarns.length}{' · '}{yarns.join(', ')}{/if}
+        </span>
+        {@render details?.()}
+      </div>
+      {@render action?.()}
     </div>
-    {@render action?.()}
+    {@render footer?.()}
   </div>
-  {@render footer?.()}
 </div>

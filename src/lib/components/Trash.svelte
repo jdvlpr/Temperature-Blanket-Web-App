@@ -13,8 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Deleted projects and palettes, in a dialog from the My Projects page:
-restore them, or delete them forever. Each is deleted forever after
+<!-- Deleted projects or palettes (whichever My Library page it's opened
+from), in a dialog: restore them, or delete them forever. Each is deleted forever after
 TRASH_DAYS anyway. Signed in, it's the account's Trash: what was deleted on any
 device, restored everywhere (see $lib/storage/account-trash). -->
 
@@ -49,6 +49,8 @@ device, restored everywhere (see $lib/storage/account-trash). -->
   import { ArchiveRestoreIcon, Trash2Icon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
+  let { kind }: { kind: 'project' | 'palette' } = $props();
+
   type Entry = {
     kind: 'project' | 'palette';
     id: string;
@@ -69,29 +71,34 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 
   let entries = $derived.by((): Entry[] => {
     if (!yarnDataReady) return [];
-    const projects = trashedProjects.map((project) => {
-      const href = project.local?.item.meta.href ?? downloadedHrefs[project.id];
-      return {
-        kind: 'project' as const,
-        id: project.id,
-        label: project.label,
-        href,
-        colors: (href && getColorsFromInput({ string: href })) || [],
-        deletedAt: project.deletedAt,
-        project,
-      };
-    });
-    const palettes = savedPalettes.deleted.map((palette) => {
-      const colors = getColorsFromInput({ string: palette.code }) || [];
-      return {
-        kind: 'palette' as const,
-        id: palette.id,
-        label: palette.name || getPaletteFallbackName(colors),
-        colors,
-        deletedAt: palette.deletedAt ?? 0,
-      };
-    });
-    return [...projects, ...palettes].sort((a, b) => b.deletedAt - a.deletedAt);
+    if (kind === 'palette')
+      return savedPalettes.deleted
+        .map((palette) => {
+          const colors = getColorsFromInput({ string: palette.code }) || [];
+          return {
+            kind: 'palette' as const,
+            id: palette.id,
+            label: palette.name || getPaletteFallbackName(colors),
+            colors,
+            deletedAt: palette.deletedAt ?? 0,
+          };
+        })
+        .sort((a, b) => b.deletedAt - a.deletedAt);
+    return trashedProjects
+      .map((project) => {
+        const href =
+          project.local?.item.meta.href ?? downloadedHrefs[project.id];
+        return {
+          kind: 'project' as const,
+          id: project.id,
+          label: project.label,
+          href,
+          colors: (href && getColorsFromInput({ string: href })) || [],
+          deletedAt: project.deletedAt,
+          project,
+        };
+      })
+      .sort((a, b) => b.deletedAt - a.deletedAt);
   });
 
   onMount(async () => {
@@ -157,16 +164,19 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     );
 
   const emptyTrash = () =>
-    run(async () => {
-      await emptyProjectTrash(trashedProjects);
-      await PaletteStorage.emptyTrash();
-    }, 'Unable to empty the Trash');
+    run(
+      () =>
+        kind === 'project'
+          ? emptyProjectTrash(trashedProjects)
+          : PaletteStorage.emptyTrash(),
+      'Unable to empty the Trash',
+    );
 </script>
 
 <div class="flex w-full flex-col gap-2 px-4 pb-4 md:min-w-[40rem]">
   <p class="text-surface-700-300 text-center text-sm">
-    Deleted projects and palettes stay here for {TRASH_DAYS} days before they're permanently
-    removed.
+    Deleted {kind === 'project' ? 'projects' : 'palettes'} stay here for {TRASH_DAYS}
+    days before they're permanently removed.
   </p>
 
   {#if !entries.length}
@@ -208,8 +218,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
                 >{entry.label}</span
               >
               <span class="text-surface-700-300 line-clamp-1 text-xs"
-                >{entry.kind === 'project' ? 'Project' : 'Yarn Palette'} · Deleted
-                {formatDateTime(entry.deletedAt)}</span
+                >Deleted {formatDateTime(entry.deletedAt)}</span
               >
             </div>
             {#if confirming === key}

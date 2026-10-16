@@ -13,15 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The open project's name in the top bar, on wider screens (phones rename in
-the Project menu). It's a text field styled as the title, as in Google Docs:
+<!-- The open project's name in the top bar, on wider screens (it can be
+renamed in the Project menu too). It's a text field styled as the title, as in Google Docs:
 click to rename in place; Enter or clicking away keeps the name, Escape puts
 it back. Not saved yet, clicking it saves the project first, since naming it
-means keeping it. Save is beside it until the project saves by itself; then
-the Project button shows the save state. -->
+means keeping it. Until the project saves by itself, a dot on the Project
+button says it isn't saved; then the button shows the save state. -->
 
 <script lang="ts">
-  import SaveButton from '#lib/components/buttons/SaveButton.svelte';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
@@ -125,4 +124,3 @@ wide as the title, focused or not -->
     data-testid="top-bar-project-name"
   />
 </div>
-<SaveButton beside="title" />

@@ -14,7 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$app/env/public';
+  import { ArrowLeftIcon } from '@lucide/svelte';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Globe from './Globe.svelte';
@@ -39,7 +41,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Globe">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="flex items-center gap-2">
+      <div class="hidden lg:inline-flex"><AppLogo /></div>
+      <a
+        href={resolve('/gallery')}
+        class="btn hover:preset-tonal-surface flex w-fit items-center"
+      >
+        <ArrowLeftIcon />
+        Gallery</a
+      >
+    </div>
   {/snippet}
   {#snippet main()}
     <div class="mx-auto w-full">

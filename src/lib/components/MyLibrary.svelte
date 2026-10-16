@@ -73,7 +73,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } = $props();
 
   let trashedProjectCount = $state(0);
-  let trashCount = $derived(trashedProjectCount + savedPalettes.deleted.length);
+  // Each page's Trash has only its own kind
+  let trashCount = $derived(
+    current === 'projects' ? trashedProjectCount : savedPalettes.deleted.length,
+  );
 
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
@@ -252,7 +255,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() =>
               dialog.trigger({
                 type: 'component',
-                component: { ref: Trash },
+                component: {
+                  ref: Trash,
+                  props: {
+                    kind: current === 'projects' ? 'project' : 'palette',
+                  },
+                },
                 options: { size: 'large', title: 'Trash' },
               })}
           >

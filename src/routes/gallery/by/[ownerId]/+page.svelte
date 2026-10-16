@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     patternIdOf,
     sortGalleryPages,
   } from '#lib/utils/collection-filter.js';
-  import { GALLERY_SORTS } from '#lib/utils/gallery-utils.js';
+  import { gallerySortMenu } from '#lib/utils/gallery-utils.js';
   import {
     getLocationsFromMeta,
     getTitleTextFromLocationsMeta,
@@ -175,9 +175,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:yarnId={ownerFilters.yarnId}
       bind:onlyThisYarn={ownerFilters.onlyThisYarn}
       bind:patternType={ownerFilters.patternType}
-      sortOptions={GALLERY_SORTS}
-      sort={ownerFilters.sort}
-      onsort={(sort) => (ownerFilters.sort = sort)}
+      {...gallerySortMenu(
+        ownerFilters.sort,
+        (sort) => (ownerFilters.sort = sort),
+      )}
       bind:layout={ownerFilters.layout}
       {showFilters}
     >

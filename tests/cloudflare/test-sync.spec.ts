@@ -555,10 +555,12 @@ async function openMenu(page: Page) {
   }).toPass();
 }
 
-/** Saves from the top bar, as someone does the first time. */
+/** Saves from the Project menu, as someone does the first time. */
 async function saveFromMenu(page: Page) {
-  await page.getByTestId('save-button').click();
+  await openMenu(page);
+  await page.getByTestId('menu-save').click();
   await expect(page.getByText('Saved to your account.')).toBeVisible();
+  await page.keyboard.press('Escape');
 }
 
 /** The auto-save state the Project button's icon shows */
@@ -732,11 +734,11 @@ test.describe('Auto-save', () => {
 
     expect(await savedIndex(laptop)).toEqual([]);
     await openMenu(laptop);
-    // Wider screens: the top bar says it isn't saved, not the menu
+    // The Project button says it isn't saved (its dot), not the menu's status
     await expect(laptop.getByTestId('autosave-status')).toHaveCount(0);
     await laptop.keyboard.press('Escape');
-    await expect(laptop.getByTestId('save-button')).toHaveAccessibleName(
-      'Save',
+    await expect(laptop.getByTestId('project-button')).toHaveAccessibleName(
+      'Project Options (Not saved)',
     );
   });
 });
