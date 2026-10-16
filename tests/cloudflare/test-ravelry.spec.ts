@@ -298,32 +298,55 @@ async function fakeRavelry(page: Page) {
 }
 
 /** The account's gallery pages: this project has one, showing the owner's name. */
+/**
+ * The account's gallery pages: none until the project is published here, then
+ * its page (published from the link that was sent). Records what was sent.
+ */
 async function fakeGalleryPage(page: Page, projectId: string, title: string) {
-  await page.context().route(/\/api\/account\/gallery(?:\?.*)?$/, (route) =>
-    route.request().method() === 'GET'
-      ? route.fulfill({
-          json: {
-            posts: [
-              {
-                postId: 77,
-                projectId,
-                title,
-                publishedAt: Date.now() - 30_000,
-                kind: 'project',
-                showOwner: true,
-              },
-            ],
-            settings: {
-              showOwnerDefault: true,
-              removeOnDelete: false,
-              publicId: 'ada-1',
-            },
-            publishing: true,
-            name: 'Ada',
+  let post: Record<string, unknown> | null = null;
+  const sends: { method: string; url: string }[] = [];
+  await page.context().route(/\/api\/account\/gallery(?:[/?].*)?$/, (route) => {
+    const request = route.request();
+    const method = request.method();
+    const url = new URL(request.url());
+    if (method === 'GET' && url.pathname === '/api/account/gallery')
+      return route.fulfill({
+        json: {
+          posts: post ? [post] : [],
+          settings: {
+            showOwnerDefault: true,
+            removeOnDelete: false,
+            publicId: 'ada-1',
           },
-        })
-      : route.fallback(),
-  );
+          publishing: true,
+          name: 'Ada',
+        },
+      });
+    if (method === 'POST' || method === 'PUT') {
+      sends.push({ method, url: url.pathname + url.search });
+      const body = request.postDataJSON() as { project_url: string };
+      post = {
+        postId: 77,
+        projectId,
+        title,
+        publishedAt: Date.now() - 1000,
+        kind: 'project',
+        showOwner: true,
+        link: body.project_url,
+      };
+      return route.fulfill({
+        json: {
+          code: 200,
+          id: 77,
+          link: '/gallery/77',
+          title,
+          linked: true,
+        },
+      });
+    }
+    return route.fallback();
+  });
+  return { sends };
 }
 
 const day = (date: string, t: number) => ({
@@ -377,7 +400,7 @@ function savedProject(origin: string, id: string, name: string) {
 }
 
 test.describe('Ravelry', () => {
-  test('a saved project is posted to Ravelry, then edited there with its photos, from one dialog', async ({
+  test('a saved project is published with Ravelry, then both are updated from one dialog', async ({
     page,
     request,
     baseURL,
@@ -411,24 +434,29 @@ test.describe('Ravelry', () => {
       .toEqual([id]);
 
     const ravelry = await fakeRavelry(page);
-    await fakeGalleryPage(page, id, name);
+    const gallery = await fakeGalleryPage(page, id, name);
     await page.goto('/my-projects');
     const share = page.getByRole('button', { name: `Share ${name}` });
     await expect(share).toBeVisible();
     await expect(share.locator('..')).not.toContainText('On Ravelry');
 
-    // Share has a Ravelry section: not posted yet
+    // Share has no Ravelry of its own: it's part of publishing
     await share.click();
     const dialog = page.getByRole('dialog', { name: `Share “${name}”` });
-    await expect(
-      dialog.getByRole('heading', { name: 'Ravelry', exact: true }),
-    ).toBeVisible();
-    await dialog.getByRole('button', { name: /^Post to Ravelry…/ }).click();
+    await expect(dialog.getByText('Ravelry')).toHaveCount(0);
+    await dialog.getByRole('button', { name: /^Publish to Gallery…/ }).click();
 
-    // The project loads behind the dialog and its picture is drawn
-    const post = page.getByRole('dialog', { name: 'Post to Ravelry' });
+    // The project loads behind the dialog; Also post to Ravelry shows its part
+    const post = page.getByRole('dialog', { name: 'Publish to Gallery' });
     await expect(post.locator('svg#preview-svg-image')).toBeVisible();
     await expect(page).toHaveURL(/\/my-projects$/);
+    await expect(post.getByText('By Ada')).toBeVisible();
+    const alsoPost = post.getByLabel('Also post to Ravelry');
+    // Anonymous needs the name, so it can't go to Ravelry
+    await post.getByLabel('Anonymous').check();
+    await expect(alsoPost).toBeDisabled();
+    await post.getByLabel('Anonymous').uncheck();
+    await alsoPost.check();
     await expect(post.getByLabel('Project name on Ravelry')).toHaveValue(name);
     await expect(post.getByLabel('Craft')).toHaveValue('1');
     await expect(post.getByLabel('Status')).toHaveValue('1');
@@ -440,14 +468,27 @@ test.describe('Ravelry', () => {
       .locator('input[type=file]')
       .setInputFiles(photoFile('blanket.png'));
     await expect(post.getByText('New · blanket.png')).toBeVisible();
-    await post.getByRole('button', { name: 'Post to Ravelry' }).click();
-    await expect(post.getByText('Posted to Ravelry')).toBeVisible();
+    await post
+      .getByRole('button', { name: 'Publish and Post to Ravelry' })
+      .click();
+    await expect(
+      post.getByRole('heading', { name: 'Published' }),
+    ).toBeVisible();
+    await expect(post.getByText('Published its gallery page')).toBeVisible();
+    await expect(post.getByText('Ravelry: Posted the project')).toBeVisible();
     await expect(
       post.getByRole('link', { name: /^View on Ravelry/ }),
     ).toHaveAttribute('href', 'https://www.ravelry.com/projects/ada/x');
+    await expect(
+      post.getByRole('link', { name: /^View Gallery Page/ }),
+    ).toBeVisible();
+    // The gallery page first (Ravelry links to it), with the name shown
+    expect(gallery.sends).toEqual([
+      { method: 'POST', url: '/api/account/gallery?showOwner=true' },
+    ]);
 
-    // What was sent: the project (the server builds the link line), then the
-    // picture with its key, then the photo
+    // What was sent to Ravelry: the project (the server builds the link
+    // line), then the picture with its key, then the photo
     const posted = ravelry.calls.find(
       (call) => call.method === 'POST' && call.path === `/projects/${id}`,
     )!.body as Record<string, unknown>;
@@ -477,23 +518,28 @@ test.describe('Ravelry', () => {
     ]);
     const pictureKey = ravelry.link()?.pictureKey;
 
-    await post.getByRole('button', { name: 'Done' }).click();
+    await page.keyboard.press('Escape');
     await expect(post).toHaveCount(0);
     await expect(share.locator('..')).toContainText('On Ravelry · 2 photos');
 
-    // Update: opens with what's on Ravelry. The only change offered is a yarn
-    // this app added that the project no longer uses
+    // Update: one dialog, with what's on Ravelry. The gallery page is up to
+    // date; the only change offered is a yarn this app added that the project
+    // no longer uses
     ravelry.addOldPacks();
     await share.click();
-    await dialog.getByRole('button', { name: /^Update on Ravelry…/ }).click();
-    const update = page.getByRole('dialog', { name: 'Update on Ravelry' });
+    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+    const update = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await expect(
+      update.getByText('Its gallery page is up to date'),
+    ).toBeVisible();
     await expect(update.getByLabel('Project name on Ravelry')).toHaveValue(
       name,
     );
     await expect(update.getByLabel('Progress (%)')).toHaveValue('10');
-    await expect(update.getByText('Its picture is up to date')).toBeVisible();
-    await expect(update.locator('svg#preview-svg-image')).toHaveCount(0);
-    const save = update.getByRole('button', { name: 'Save on Ravelry' });
+    await expect(
+      update.getByText('Its picture on Ravelry is up to date'),
+    ).toBeVisible();
+    const save = update.getByRole('button', { name: 'Update', exact: true });
 
     // Yarns: one this app added and no longer uses is offered for removal;
     // one added on Ravelry never is
@@ -505,6 +551,7 @@ test.describe('Ravelry', () => {
     // Without it, nothing changed, so nothing to save
     await removeOld.uncheck();
     await expect(save).toBeDisabled();
+    await expect(update.getByText('Everything is up to date')).toBeVisible();
     await removeOld.check();
 
     // Edit the name, move the photo earlier, add another
@@ -525,11 +572,14 @@ test.describe('Ravelry', () => {
       .locator('input[type=file]')
       .setInputFiles(photoFile('second.png'));
     await save.click();
-    await expect(update.getByText('Saved on Ravelry')).toBeVisible();
+    await expect(
+      update.getByRole('heading', { name: 'Updated' }),
+    ).toBeVisible();
 
-    // Only what changed was sent: the name, the unused yarn removed; the
-    // picture wasn't drawn or sent again; the new photo went to the end and
-    // the order was set
+    // The gallery page wasn't sent again. Only what changed went to Ravelry:
+    // the name, the unused yarn removed; the picture wasn't sent again; the
+    // new photo went to the end and the order was set
+    expect(gallery.sends).toHaveLength(1);
     const posts = ravelry.calls.filter(
       (call) => call.method === 'POST' && call.path === `/projects/${id}`,
     );
@@ -550,17 +600,18 @@ test.describe('Ravelry', () => {
     expect(ravelry.link()?.photos.map((p) => p.photoId)).toEqual([2, 1, 3]);
     expect(ravelry.link()?.pictureKey).toBe(pictureKey);
     expect(ravelry.details()?.name).toBe('Alpine blanket II');
-    await update.getByRole('button', { name: 'Done' }).click();
+    await page.keyboard.press('Escape');
     await expect(share.locator('..')).toContainText('On Ravelry · 3 photos');
 
-    // Remove a photo: marked first, undoable, and only gone on Save
+    // Remove a photo: marked first, undoable, and only gone on Update
     await share.click();
-    await dialog.getByRole('button', { name: /^Update on Ravelry…/ }).click();
-    const again = page.getByRole('dialog', { name: 'Update on Ravelry' });
-    await expect(again.getByText('Its picture is up to date')).toBeVisible();
+    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+    const again = page.getByRole('dialog', { name: 'Update Gallery Page' });
     await expect(
-      again.getByRole('button', { name: 'Save on Ravelry' }),
-    ).toBeDisabled();
+      again.getByText('Its picture on Ravelry is up to date'),
+    ).toBeVisible();
+    const update2 = again.getByRole('button', { name: 'Update', exact: true });
+    await expect(update2).toBeDisabled();
     const mark = again.getByRole('button', {
       name: 'Remove photo 1 from Ravelry',
     });
@@ -571,13 +622,10 @@ test.describe('Ravelry', () => {
     ).toBeVisible();
     await mark.click();
     await expect(mark).toHaveAttribute('aria-pressed', 'false');
-    await expect(
-      again.getByRole('button', { name: 'Save on Ravelry' }),
-    ).toBeDisabled();
+    await expect(update2).toBeDisabled();
     await mark.click();
-    await again.getByRole('button', { name: 'Save on Ravelry' }).click();
-    await expect(again.getByText('Saved on Ravelry')).toBeVisible();
-    await expect(again.getByText('Removed 1 photo')).toBeVisible();
+    await update2.click();
+    await expect(again.getByText('Ravelry: Removed 1 photo')).toBeVisible();
     expect(ravelry.calls.filter((call) => call.method === 'DELETE')).toEqual([
       { method: 'DELETE', path: `/projects/${id}/photos/2`, body: undefined },
     ]);
@@ -588,16 +636,17 @@ test.describe('Ravelry', () => {
       ),
     ).toHaveLength(2);
     expect(ravelry.link()?.photos.map((p) => p.photoId)).toEqual([1, 3]);
-    await again.getByRole('button', { name: 'Done' }).click();
+    await page.keyboard.press('Escape');
 
-    // Deleted on Ravelry meanwhile: said so, and it's unlinked here
+    // Deleted on Ravelry meanwhile: said so, it's unlinked here, and it can
+    // be posted again
     ravelry.deleteOnRavelry();
     await share.click();
-    await dialog.getByRole('button', { name: /^Update on Ravelry…/ }).click();
-    const gone = page.getByRole('dialog', { name: 'Update on Ravelry' });
-    await expect(gone.getByRole('alert')).toContainText('deleted on Ravelry');
-    // The message's own Close, not the dialog's ✕
-    await gone.getByText('Close', { exact: true }).click();
+    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+    const gone = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    await expect(gone.getByText(/deleted on Ravelry/)).toBeVisible();
+    await expect(gone.getByLabel('Also post to Ravelry')).not.toBeChecked();
+    await page.keyboard.press('Escape');
     await expect(gone).toHaveCount(0);
     await expect(share.locator('..')).not.toContainText('On Ravelry');
   });

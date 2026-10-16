@@ -112,6 +112,8 @@ async function fakeGallery(page: Page, initial: FakePost[] = []) {
         updatedAt: null,
         kind: 'project',
         showOwner: url.searchParams.get('showOwner') === 'true',
+        // The link it was published from, as the server records it
+        link: String(body.project_url),
       };
       posts.push(created);
       return route.fulfill({ json: answer(created) });
@@ -126,7 +128,10 @@ async function fakeGallery(page: Page, initial: FakePost[] = []) {
       if (post.kind === 'palette') {
         post.title = body.title;
         post.link = body.yarnUrl;
-      } else post.title = String(body.project_name || body.title);
+      } else {
+        post.title = String(body.project_name || body.title);
+        post.link = String(body.project_url);
+      }
       post.updatedAt = Date.now();
       return route.fulfill({ json: answer(post) });
     }
@@ -235,7 +240,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(page.getByTestId('gallery-name-status')).toHaveCount(0);
   });
 
-  test('a saved project’s page is included on the public gallery from its Share dialog, and deleting the account asks about it', async ({
+  test('a saved project’s page is included on the public gallery, and deleting the account asks about it', async ({
     page,
     request,
   }) => {
@@ -278,8 +283,9 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('button', { name: `Share ${title}` }),
     ).toBeVisible();
 
-    // Each page is included on the public gallery on its own, from its Share
-    // dialog; the display name itself is in the Account page's Profile settings
+    // Each page's Anonymous is set when publishing or updating it, not in its
+    // Share dialog; the display name itself is in the Account page's Profile
+    // settings
     await page
       .getByRole('button', { name: 'Share Ottawa from 2025 to 2026' })
       .click();
@@ -289,18 +295,22 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       dialog.getByRole('heading', { name: 'Gallery Page' }),
     ).toBeVisible();
-    const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
-    await expect(anonymous).toBeChecked();
+    await expect(
+      dialog.getByRole('checkbox', { name: /Anonymous/ }),
+    ).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'Add a Name for Gallery Pages',
     );
-    await anonymous.uncheck();
-    await expect(anonymous).not.toBeChecked();
-    await expect(
-      dialog.getByRole('link', { name: 'Profile settings' }),
-    ).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
+    // Its name shown (as Update Gallery Page does), with no display name yet
+    expect(
+      (
+        await page.request.patch(`/api/account/gallery/${postId}`, {
+          data: { showOwner: true },
+        })
+      ).ok(),
+    ).toBe(true);
     await page
       .getByTestId('gallery-name-status')
       .getByRole('link', { name: 'Add a Name for Gallery Pages' })
@@ -414,20 +424,28 @@ test.describe('Gallery pages from accounts', () => {
       dialog.getByRole('button', { name: /^Publish to Gallery/ }),
     ).toHaveCount(0);
 
-    // The name on the page
-    const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
-    await expect(anonymous).toBeChecked();
-    await anonymous.uncheck();
-    await expect(anonymous).not.toBeChecked();
+    // The name on the page: not changed here (it's in Publish/Update, and on
+    // the page's own menu), but shown
+    await expect(
+      dialog.getByRole('checkbox', { name: /Anonymous/ }),
+    ).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    expect(
+      (
+        await page.request.patch(`/api/account/gallery/${postId}`, {
+          data: { showOwner: true },
+        })
+      ).ok(),
+    ).toBe(true);
+    expect(
+      localD1(
+        `select "showOwner" from "galleryPost" where "postId" = ${postId}`,
+      )[0].showOwner,
+    ).toBe(1);
+    await page.reload();
+    await share.click();
     await expect(status).toContainText('By Ada Lovelace');
-    await expect
-      .poll(
-        () =>
-          localD1(
-            `select "showOwner" from "galleryPost" where "postId" = ${postId}`,
-          )[0].showOwner,
-      )
-      .toBe(1);
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
@@ -707,6 +725,9 @@ test.describe('Gallery pages from accounts', () => {
     await expect(
       dialog.getByRole('link', { name: /^View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
+    // Changed since it was published (as if edited on another device): only
+    // then is there something to update
+    gallery.posts.find((p) => p.postId === postId)!.link = 'changed';
     await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
     await send(updateDialog, 'Update', 'Updated');
     // The same page: its link is the same, and nothing new was published
@@ -728,23 +749,31 @@ test.describe('Gallery pages from accounts', () => {
     await expect(card('Second test')).toContainText('Published');
     await expect(card('Second test')).not.toContainText('changed since');
 
-    // Anonymous, from the Share dialog: the name on the page
+    // Anonymous, from Update Gallery Page (not the Share dialog): the name on
+    // the page, changed on its own when the project is up to date
     await page.getByRole('button', { name: 'Share Second test' }).click();
-    const anonymous = dialog.getByRole('checkbox', { name: /Anonymous/ });
+    await expect(
+      dialog.getByRole('checkbox', { name: /Anonymous/ }),
+    ).toHaveCount(0);
+    await dialog.getByRole('button', { name: /^Update Gallery Page…/ }).click();
+    const owner = page.getByRole('dialog', { name: 'Update Gallery Page' });
+    const anonymous = owner.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
+    const apply = owner.getByRole('button', { name: 'Update', exact: true });
+    await expect(apply).toBeDisabled();
     await anonymous.uncheck();
-    await expect(dialog.locator('#share-gallery-status')).toContainText(
-      'By Ada Lovelace',
-    );
+    await expect(owner.getByText('By Ada Lovelace')).toBeVisible();
+    await apply.click();
+    await expect(owner.getByText('Shows your name on its page')).toBeVisible();
     expect(gallery.posts.find((p) => p.postId === postId)?.showOwner).toBe(
       true,
     );
-    await anonymous.check();
+    expect(sent()).toHaveLength(2);
+    await page.keyboard.press('Escape');
+    await expect(owner).toHaveCount(0);
+    await page.getByRole('button', { name: 'Share Second test' }).click();
     await expect(dialog.locator('#share-gallery-status')).toContainText(
-      'Anonymous',
-    );
-    expect(gallery.posts.find((p) => p.postId === postId)?.showOwner).toBe(
-      false,
+      'By Ada Lovelace',
     );
 
     // Unpublish, from the Share dialog: asks first, then it can be published again
