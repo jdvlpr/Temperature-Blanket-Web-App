@@ -44,10 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '#lib/types/yarn-types.js';
   import type { GaugeSettingsType } from '#lib/types/gauge-types.js';
   import { createGaugeColors } from '#lib/state/gauges-state.svelte.js';
-  import { ravelryConnectedHint } from '#lib/accounts/ravelry.js';
-  import { account } from '#lib/accounts/summary.svelte.js';
   import {
-    ArchiveIcon,
     BookmarkPlusIcon,
     SendIcon,
     ChevronDownIcon,
@@ -151,17 +148,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       details: 'Pick by brand and yarn',
       icon: CircleCheckIcon,
     },
-    // Signed in with Ravelry connected (as this browser last saw it)
-    ...(__ACCOUNTS_ENABLED__ && account.summary?.id && ravelryConnectedHint()
-      ? [
-          {
-            value: 'ravelry-stash',
-            label: 'From My Ravelry Stash',
-            details: 'Plan with yarn you have',
-            icon: ArchiveIcon,
-          },
-        ]
-      : []),
     {
       value: 'image',
       label: 'From an Image',
@@ -204,16 +190,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: { ref: ChooseColorways, props: { updateGauge } },
           options: { size: 'full', title: 'Choose Colorways' },
         });
-        break;
-      case 'ravelry-stash':
-        void import('#lib/components/modals/RavelryStash.svelte').then(
-          ({ default: RavelryStash }) =>
-            dialog.trigger({
-              type: 'component',
-              component: { ref: RavelryStash, props: { updateGauge } },
-              options: { size: 'full', title: 'From My Ravelry Stash' },
-            }),
-        );
         break;
       case 'image':
         dialog.trigger({

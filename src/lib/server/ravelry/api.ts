@@ -53,7 +53,6 @@ export type RavelryNamed = { id: number; name: string; permalink?: string };
 
 export type RavelryPackPost = {
   yarn_id?: number | null;
-  stash_id?: number | null;
   personal_name?: string | null;
   colorway?: string | null;
   skeins?: string | null;
@@ -97,22 +96,6 @@ export type RavelryYarn = {
   discontinued?: boolean;
   yarn_weight?: { id: number; name: string } | null;
   first_photo?: RavelryPhoto | null;
-};
-
-export type RavelryStash = {
-  id: number;
-  name?: string | null;
-  colorway_name?: string | null;
-  color_family_name?: string | null;
-  permalink: string;
-  first_photo?: RavelryPhoto | null;
-  yarn?: {
-    id: number;
-    name: string;
-    yarn_company_name?: string | null;
-    yarn_weight?: { name: string } | null;
-  } | null;
-  personal_yarn_weight?: { name: string } | null;
 };
 
 export type PhotoStatus = {
@@ -268,14 +251,6 @@ export function ravelryApi(accessToken: string, fetchFn: Fetch = fetch) {
       call<{ photo: RavelryPhoto }>(`/photos/${photoId}.json`, {
         method: 'DELETE',
       }),
-
-    stash: async (username: string, page = 1) =>
-      call<{
-        stash: RavelryStash[];
-        paginator?: { page: number; page_count: number };
-      }>(
-        `/people/${user(username)}/stash/list.json?page=${page}&page_size=100&sort=alpha`,
-      ),
 
     yarnSearch: async (query: string, pageSize = 5) =>
       (

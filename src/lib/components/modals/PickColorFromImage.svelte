@@ -51,12 +51,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Shown inside another dialog rather than as its own: back to that one,
      * by Back, Cancel, or once a color is used */
     onBack?: () => void;
-    /** Opens on this photo (on this site, e.g. a Ravelry stash photo through
-     * its proxy) instead of asking for one */
-    src?: string;
   }
 
-  let { onPick, onBack, src }: Props = $props();
+  let { onPick, onBack }: Props = $props();
 
   /** Leave: back to the dialog this is shown in, or else close */
   const leave = () => (onBack ? onBack() : dialog.close());
@@ -242,10 +239,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     await openImage(url, check.failMessage);
     URL.revokeObjectURL(url);
   }
-
-  onMount(() => {
-    if (src) void openImage(src, 'Couldn’t open that photo. Try again.');
-  });
 
   async function openImage(url: string, failMessage: string) {
     const id = ++loadId;

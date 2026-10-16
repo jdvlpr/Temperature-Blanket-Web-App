@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- On the Account page: connect Ravelry (to post projects there, add photos,
-and plan from your stash), or disconnect it. Hidden where Ravelry isn't set up. -->
+and match yarns), or disconnect it. Hidden where Ravelry isn't set up. -->
 
 <script lang="ts">
   import {
@@ -96,7 +96,7 @@ and plan from your stash), or disconnect it. Hidden where Ravelry isn't set up. 
               {:else if status.connected}
                 Connected{status.username ? ` as ${status.username}` : ''}
               {:else}
-                Post projects to Ravelry, add photos, and plan from your stash
+                Post projects to Ravelry, add photos, and match yarns
               {/if}
             </p>
           </div>
