@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onunpublished,
         },
       },
-      options: { title: TITLE },
+      options: { title: TITLE, size: 'medium' },
     });
   }
 

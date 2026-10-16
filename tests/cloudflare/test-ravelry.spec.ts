@@ -457,12 +457,15 @@ test.describe('Ravelry', () => {
     await expect(alsoPost).toBeDisabled();
     await post.getByLabel('Anonymous').uncheck();
     await alsoPost.check();
-    await expect(post.getByLabel('Project name on Ravelry')).toHaveValue(name);
+    // One name: the project's, on its gallery page and on Ravelry
+    await expect(post.getByLabel('Project name on Ravelry')).toHaveCount(0);
     await expect(post.getByLabel('Craft')).toHaveValue('1');
     await expect(post.getByLabel('Status')).toHaveValue('1');
     await expect(post.getByLabel('Started')).toHaveValue('2025-01-01');
     await expect(post.getByLabel('Finish by')).toHaveValue('2025-01-03');
-    await post.getByLabel('Progress (%)').fill('10');
+    await post
+      .getByRole('spinbutton', { name: 'Progress (percent)' })
+      .fill('10');
     // A photo of its own goes up with it
     await post
       .locator('input[type=file]')
@@ -527,18 +530,23 @@ test.describe('Ravelry', () => {
     // no longer uses
     ravelry.addOldPacks();
     await share.click();
+    // Renamed on Ravelry meanwhile: it follows the project's name again
+    ravelry.details()!.name = 'Renamed on Ravelry';
     await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
     const update = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(
       update.getByText('Its gallery page is up to date'),
     ).toBeVisible();
-    await expect(update.getByLabel('Project name on Ravelry')).toHaveValue(
-      name,
-    );
-    await expect(update.getByLabel('Progress (%)')).toHaveValue('10');
     await expect(
-      update.getByText('Its picture on Ravelry is up to date'),
+      update.getByRole('spinbutton', { name: 'Progress (percent)' }),
+    ).toHaveValue('10');
+    // Its picture on Ravelry is up to date: shown, not replaced
+    await expect(
+      update.getByText(/Picture from Temperature Blanket$/),
     ).toBeVisible();
+    await expect(update.getByText('Replaced by the new picture')).toHaveCount(
+      0,
+    );
     const save = update.getByRole('button', { name: 'Save', exact: true });
 
     // Yarns: one this app added and no longer uses is offered for removal;
@@ -548,17 +556,12 @@ test.describe('Ravelry', () => {
     await expect(update.getByLabel(/Mine/)).toHaveCount(0);
     await expect(update.getByLabel(/^Add .* – /)).toHaveCount(0);
     await expect(save).toBeEnabled();
-    // Without it, nothing changed, so nothing to save
+    // Without it, there's still its name to bring back
     await removeOld.uncheck();
-    await expect(save).toBeDisabled();
-    await expect(update.getByText('Everything is up to date')).toBeVisible();
+    await expect(save).toBeEnabled();
     await removeOld.check();
 
-    // Edit the name, move the photo earlier, add another
-    await update
-      .getByLabel('Project name on Ravelry')
-      .fill('Alpine blanket II');
-    await expect(save).toBeEnabled();
+    // Move the photo earlier, add another
     await expect(
       update.getByText('Main photo · Picture from Temperature Blanket'),
     ).toBeVisible();
@@ -572,9 +575,7 @@ test.describe('Ravelry', () => {
       .locator('input[type=file]')
       .setInputFiles(photoFile('second.png'));
     await save.click();
-    await expect(
-      update.getByRole('heading', { name: 'Saved' }),
-    ).toBeVisible();
+    await expect(update.getByRole('heading', { name: 'Saved' })).toBeVisible();
 
     // The gallery page wasn't sent again. Only what changed went to Ravelry:
     // the name, the unused yarn removed; the picture wasn't sent again; the
@@ -585,7 +586,7 @@ test.describe('Ravelry', () => {
     );
     expect(posts).toHaveLength(2);
     expect(posts[1].body).toEqual({
-      name: 'Alpine blanket II',
+      name,
       packs: { add: [], remove: [900] },
     });
     const photoCalls = ravelry.calls.filter(
@@ -599,7 +600,7 @@ test.describe('Ravelry', () => {
     ).toEqual({ photoIds: [2, 1, 3] });
     expect(ravelry.link()?.photos.map((p) => p.photoId)).toEqual([2, 1, 3]);
     expect(ravelry.link()?.pictureKey).toBe(pictureKey);
-    expect(ravelry.details()?.name).toBe('Alpine blanket II');
+    expect(ravelry.details()?.name).toBe(name);
     await page.keyboard.press('Escape');
     await expect(share.locator('..')).toContainText('On Ravelry · 3 photos');
 
@@ -607,9 +608,11 @@ test.describe('Ravelry', () => {
     await share.click();
     await dialog.getByRole('button', { name: /^Edit Gallery Page…/ }).click();
     const again = page.getByRole('dialog', { name: 'Edit Gallery Page' });
+    // Its picture on Ravelry is up to date: shown, not replaced
     await expect(
-      again.getByText('Its picture on Ravelry is up to date'),
+      again.getByText(/Picture from Temperature Blanket$/),
     ).toBeVisible();
+    await expect(again.getByText('Replaced by the new picture')).toHaveCount(0);
     const update2 = again.getByRole('button', { name: 'Save', exact: true });
     await expect(update2).toBeDisabled();
     // Unpublish says it unlinks Ravelry too (kept published here)

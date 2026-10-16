@@ -209,6 +209,7 @@ export async function openGalleryDialog(href: string, request: GalleryRequest) {
         request.action === 'replace'
           ? 'Edit Gallery Page'
           : 'Publish to Gallery',
+      size: 'medium',
     },
   });
 }

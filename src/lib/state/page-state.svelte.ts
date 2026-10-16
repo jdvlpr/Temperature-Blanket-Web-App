@@ -132,17 +132,16 @@ class DialogClass {
     options?: DialogOptions;
   }) => {
     // Opened from a returnable dialog (like the Project menu or Share): opens
-    // in its place, which Back returns to. Not one wider than it, which needs
-    // the room; the side panel keeps its width, so it takes up to medium.
+    // in its place, which Back returns to. Up to medium (as the side panel
+    // takes); wider ones need the room.
     const size = SIZE_RANK[options?.size ?? 'small'];
     const fromReturnable =
       type === 'component' &&
       this.opened &&
       this.type === 'component' &&
       Boolean(this.options.returnable) &&
-      (this.options.placement === 'side'
-        ? size <= SIZE_RANK.medium
-        : size <= SIZE_RANK[this.options.size ?? 'small']);
+      size <=
+        Math.max(SIZE_RANK.medium, SIZE_RANK[this.options.size ?? 'small']);
     if (fromReturnable) {
       this.stack.push({
         component: this.contentComponent,

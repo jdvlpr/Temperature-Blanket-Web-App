@@ -354,7 +354,24 @@ its weather, when that isn't kept with it). -->
         : 'Publish'
       : !page
         ? 'Post to Ravelry'
-        : 'Save',
+        : ravelryOn && !linked
+          ? 'Save and Post to Ravelry'
+          : 'Save',
+  );
+
+  // What Save does, said beside it
+  const saveSummary = $derived(
+    nothingChanged
+      ? 'Everything is up to date.'
+      : !page && !galleryDone
+        ? ravelryOn
+          ? 'Publishes it to the public Project Gallery, then posts it to Ravelry.'
+          : 'Publishes it, as it is now, to the public Project Gallery. You can update or unpublish it later.'
+        : !page
+          ? ''
+          : galleryUpToDate
+            ? 'Its gallery page is up to date.'
+            : 'Updates its gallery page to the project as it is now. Its link stays the same.',
   );
 
   async function drawPNG() {
@@ -551,7 +568,8 @@ its weather, when that isn't kept with it). -->
   });
 </script>
 
-<div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
+<!-- Medium on wide screens, so the Ravelry part has room (less a scroll bar) -->
+<div class="flex w-full flex-col gap-4 p-4 text-left lg:w-[46.5rem]">
   <!-- Always here, so screen readers announce what changes in it -->
   <p class="sr-only" role="status">
     {view === 'preparing' ? preparingText : busy ? stepText : ''}
@@ -615,7 +633,7 @@ its weather, when that isn't kept with it). -->
       class="bg-surface-50 dark:bg-surface-950 rounded-container flex gap-4 p-4"
       inert={busy}
     >
-      <div class="pointer-events-none w-24 shrink-0 sm:w-32" aria-hidden="true">
+      <div class="pointer-events-none w-24 shrink-0 sm:w-40" aria-hidden="true">
         {#if previews.active}
           <previews.active.previewComponent />
         {/if}
@@ -647,17 +665,6 @@ its weather, when that isn't kept with it). -->
     </div>
 
     {#if view === 'form'}
-      <p class="text-sm opacity-80">
-        {#if !page}
-          Publishes this project, as it is now, to the public Project Gallery.
-          You can update or unpublish it later.
-        {:else if galleryUpToDate}
-          Its gallery page is up to date.
-        {:else}
-          Updates its gallery page to the project as it is now. Its link stays
-          the same.
-        {/if}
-      </p>
       {#if ownerError}
         <p class="text-error-700-300 text-sm" role="alert">{ownerError}</p>
       {/if}
@@ -836,9 +843,13 @@ its weather, when that isn't kept with it). -->
         <p class="w-full text-center text-sm" aria-hidden="true">
           {stepText}
         </p>
-      {:else if view === 'form' && nothingChanged}
-        <p class="w-full text-center text-sm opacity-80" id="up-to-date">
-          Everything is up to date.
+      {:else if view === 'form' && saveSummary}
+        <!-- What Save does, beside it -->
+        <p
+          class="w-full text-center text-sm opacity-80 sm:text-right"
+          id="save-summary"
+        >
+          {saveSummary}
         </p>
       {/if}
       {#if page && view === 'form' && !busy}
@@ -855,7 +866,7 @@ its weather, when that isn't kept with it). -->
         type="button"
         class="btn preset-filled-primary-500"
         disabled={!canSubmit}
-        aria-describedby={nothingChanged ? 'up-to-date' : undefined}
+        aria-describedby={saveSummary && !busy ? 'save-summary' : undefined}
         onclick={submit}
       >
         {#if busy}<LoaderCircleIcon

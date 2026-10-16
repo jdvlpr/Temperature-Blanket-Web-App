@@ -139,6 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             request.action === 'replace'
               ? 'Edit Gallery Page'
               : 'Publish to Gallery',
+          size: 'medium',
         },
       });
     });

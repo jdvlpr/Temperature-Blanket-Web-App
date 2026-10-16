@@ -65,8 +65,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '#lib/types/yarn-types.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
+  import { FIELD_GROUP, FIELD_ICON } from '#lib/constants/class-constants.js';
   import {
     ArrowLeftIcon,
+    CalendarCheckIcon,
+    CalendarClockIcon,
+    CalendarPlusIcon,
     ArrowRightIcon,
     ExternalLinkIcon,
     ImageIcon,
@@ -82,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     projectId,
     href,
-    name: initialName,
+    name,
     disabled = false,
     onstate,
     ongone,
@@ -90,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectId: string;
     /** The open project's link, once it's ready to draw */
     href: string;
-    /** Its name */
+    /** Its name: the project's, as on its gallery page (kept the same on Ravelry) */
     name: string;
     /** While the dialog saves */
     disabled?: boolean;
@@ -124,8 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     for (const item of added) if (item.url) URL.revokeObjectURL(item.url);
   });
 
-  // ---- The form
-  let name = $state(untrack(() => initialName));
+  // ---- The form (its name is the project's)
   let crafts = $state<RavelryOption[]>([]);
   let statuses = $state<RavelryOption[]>([]);
   let craftId = $state<number | null>(null);
@@ -147,6 +150,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     notes: string;
   };
 
+  // Finished projects have a completed date; the rest, a finish-by date and progress
+  const finished = $derived(
+    /finish/i.test(statuses.find((s) => s.id === statusId)?.name ?? ''),
+  );
+  const today = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  function statusChanged() {
+    if (finished && !completed) completed = today();
+  }
+
   const progressOf = (value: number | null | undefined) =>
     value == null || Number.isNaN(value)
       ? null
@@ -166,6 +181,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   /** What's on Ravelry, as the form last held it */
   let original = $state<Fields | null>(null);
+  // Its name on Ravelry, which follows the project's
+  let ravelryName = $state('');
 
   const CRAFT_KEY = 'tb-ravelry-craft';
   const rememberedCraft = () => {
@@ -254,6 +271,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }>({ add: [], remove: [] });
   // The yarns are sent with the project; a retry doesn't send them again
   let yarnsSent = $state(false);
+  // Posting: whether its yarns go to Ravelry at all
+  let addYarnsOnPost = $state(true);
 
   // Suggested only when Ravelry's yarn has this name, from the same brand
   function suggestion(name: string, matches: RavelryYarnMatch[]) {
@@ -311,7 +330,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const { details } = result;
       project = result.project;
       photos = [...result.project.photos];
-      name = details.name;
+      ravelryName = details.name;
       craftId = details.craftId;
       statusId = details.statusId;
       started = toDay(details.started);
@@ -319,7 +338,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       completed = toDay(details.completed);
       progress = details.progress;
       notes = details.notes;
-      original = fields();
+      original = { ...fields(), name: ravelryName.trim() };
       yarnPlan = {
         add: appYarns
           .filter((y) => !details.packs.some((p) => samePack(p, y)))
@@ -346,6 +365,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
+  // Posting: the project's dates, once its locations are there (they can
+  // still be loading when this shows), unless changed here first
+  $effect(() => {
+    if (updating) return;
+    const from = toDay(days('from')[0]);
+    const to = toDay(days('to').at(-1));
+    untrack(() => {
+      if (!started && from) started = from;
+      if (!finishBy && to) finishBy = to;
+    });
+  });
+
   let optionsError = $state('');
   onMount(async () => {
     // What the picture is drawn from, to tell later whether it changed
@@ -361,8 +392,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else {
       setYarnChoices(appYarns);
       craftId = rememberedCraft();
-      started = toDay(days('from')[0]);
-      finishBy = toDay(days('to').at(-1));
     }
     try {
       const options = await getRavelryOptions();
@@ -540,6 +569,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const plural = (n: number, word: string) =>
     `${n} ${word}${n === 1 ? '' : 's'}`;
+  const yarnsDetail = $derived(
+    `${plural(appYarns.length, 'colorway')} of ${plural(yarnChoices.length, 'yarn')}. Link ${yarnChoices.length === 1 ? 'it' : 'each yarn'} to its page on Ravelry, or add just the name.`,
+  );
 
   /**
    * Saves what changed on Ravelry: the project (posting it the first time),
@@ -593,7 +625,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ...(now.completed ? { completed: now.completed } : {}),
                 ...(now.progress !== null ? { progress: now.progress } : {}),
                 notes: now.notes,
-                yarns: appYarns.map((yarn) => ({
+                yarns: (addYarnsOnPost ? appYarns : []).map((yarn) => ({
                   ...yarn,
                   ...(chosenFor(yarn)
                     ? { ravelryYarnId: chosenFor(yarn) }
@@ -736,19 +768,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   const photoCount = $derived(project?.photos.length ?? 0);
-  const pictureText = $derived(
-    pictureState === 'checking'
-      ? ''
-      : pictureState === 'current'
-        ? 'Its picture on Ravelry is up to date.'
-        : pictureState === 'changed' && picturePhoto
-          ? 'The project changed, so its picture on Ravelry is replaced.'
-          : 'The picture above goes to Ravelry too.',
-  );
+  // The picture to add, shown as a photo: when posting (first, the main
+  // photo), or when its old one is gone from Ravelry (at the end)
+  const newPicture = $derived(pictureNeeded && !picturePhoto);
 </script>
 
+{#snippet dateField(
+  label: string,
+  Icon: typeof CalendarPlusIcon,
+  value: string,
+  set: (value: string) => void,
+)}
+  <label class="label min-w-0">
+    <span class="label-text">{label}</span>
+    <span class="relative flex min-w-0 items-center">
+      <Icon class={[FIELD_ICON, 'z-10']} aria-hidden="true" />
+      <!-- The icon here is the one shown: the browser's own picker button is
+      unseen but covers the field, so a click anywhere opens the picker.
+      Safari on iPhone gives date fields a width of their own (wider than a
+      half-width cell) and centers the date unless told not to -->
+      <input
+        class="input relative block w-full min-w-0 appearance-none pl-11 text-left [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:size-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:text-left"
+        type="date"
+        {value}
+        oninput={(e) => set(e.currentTarget.value)}
+      />
+    </span>
+  </label>
+{/snippet}
+
 {#snippet yarnSelect(choice: YarnChoice)}
-  <label class="label">
+  <label class="label min-w-0">
     <span class="label-text">{choice.name}</span>
     {#if choice.searching}
       <span class="flex items-center gap-2 text-sm"
@@ -756,8 +806,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Looking for it on Ravelry…</span
       >
     {:else}
-      <select class="select" bind:value={choice.chosen}>
-        <option value={0}>Don’t link (name only)</option>
+      <select class="select min-w-0" bind:value={choice.chosen}>
+        <option value={0}>Name only (not linked)</option>
         {#each choice.matches as match (match.id)}
           <option value={match.id}
             >{match.company}
@@ -855,103 +905,129 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
     </div>
   {:else}
-    <fieldset class="flex min-w-0 flex-col gap-4" {disabled}>
-      {#if pictureText}
-        <p class="flex items-center gap-2 text-sm">
-          <ImageIcon class="icon-sm shrink-0 opacity-70" aria-hidden="true" />
-          {pictureText}
-        </p>
-      {/if}
+    <fieldset class="flex min-w-0 flex-col gap-6" {disabled}>
+      <!-- What it is and where it's at -->
+      <div class="flex flex-col gap-4">
+        {#if optionsError}
+          <p class="text-error-700-300 text-sm" role="alert">{optionsError}</p>
+        {:else if crafts.length || statuses.length}
+          <div class="grid grid-cols-2 gap-4">
+            <label class="label min-w-0">
+              <span class="label-text">Status</span>
+              <select
+                class="select min-w-0"
+                bind:value={statusId}
+                onchange={statusChanged}
+              >
+                {#if statusId === null}
+                  <option value={null}>Not set</option>
+                {/if}
+                {#each statuses as status (status.id)}
+                  <option value={status.id}>{status.name}</option>
+                {/each}
+              </select>
+            </label>
+            <label class="label min-w-0">
+              <span class="label-text">Craft</span>
+              <select class="select min-w-0" bind:value={craftId}>
+                {#if craftId === null}
+                  <option value={null}>Not set</option>
+                {/if}
+                {#each crafts as craft (craft.id)}
+                  <option value={craft.id}>{craft.name}</option>
+                {/each}
+              </select>
+            </label>
+          </div>
+        {/if}
 
-      <label class="label">
-        <span class="label-text">Project name on Ravelry</span>
-        <input class="input" bind:value={name} maxlength="100" required />
-      </label>
-
-      {#if optionsError}
-        <p class="text-error-700-300 text-sm" role="alert">{optionsError}</p>
-      {:else if crafts.length || statuses.length}
-        <div class="grid gap-4 sm:grid-cols-2">
-          <label class="label">
-            <span class="label-text">Craft</span>
-            <select class="select" bind:value={craftId}>
-              {#if craftId === null}
-                <option value={null}>Not set</option>
-              {/if}
-              {#each crafts as craft (craft.id)}
-                <option value={craft.id}>{craft.name}</option>
-              {/each}
-            </select>
-          </label>
-          <label class="label">
-            <span class="label-text">Status</span>
-            <select class="select" bind:value={statusId}>
-              {#if statusId === null}
-                <option value={null}>Not set</option>
-              {/if}
-              {#each statuses as status (status.id)}
-                <option value={status.id}>{status.name}</option>
-              {/each}
-            </select>
-          </label>
+        <div class="grid gap-4 min-[26rem]:grid-cols-2 sm:grid-cols-3">
+          {@render dateField(
+            'Started',
+            CalendarPlusIcon,
+            started,
+            (v) => (started = v),
+          )}
+          {#if finished}
+            {@render dateField(
+              'Completed',
+              CalendarCheckIcon,
+              completed,
+              (v) => (completed = v),
+            )}
+          {:else}
+            {@render dateField(
+              'Finish by',
+              CalendarClockIcon,
+              finishBy,
+              (v) => (finishBy = v),
+            )}
+            <label class="label min-w-0">
+              <span class="label-text"
+                >Progress<span class="sr-only"> (percent)</span></span
+              >
+              <div class={[FIELD_GROUP, 'grid-cols-[1fr_auto]']}>
+                <input
+                  class="input"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="0"
+                  bind:value={progress}
+                  onblur={() => (progress = progressOf(progress))}
+                />
+                <span class="label label-text" aria-hidden="true">%</span>
+              </div>
+            </label>
+          {/if}
         </div>
-      {/if}
-
-      <div class="grid gap-4 sm:grid-cols-2">
-        <label class="label">
-          <span class="label-text">Started</span>
-          <input class="input" type="date" bind:value={started} />
-        </label>
-        <label class="label">
-          <span class="label-text">Finish by</span>
-          <input class="input" type="date" bind:value={finishBy} />
-        </label>
-        <label class="label">
-          <span class="label-text">Completed</span>
-          <input class="input" type="date" bind:value={completed} />
-        </label>
-        <label class="label">
-          <span class="label-text">Progress (%)</span>
-          <input
-            class="input"
-            type="number"
-            min="0"
-            max="100"
-            step="1"
-            inputmode="numeric"
-            bind:value={progress}
-          />
-        </label>
       </div>
 
-      <label class="label">
+      <label class="label min-w-0">
         <span class="label-text">Notes{updating ? '' : ' (optional)'}</span>
         <textarea
           class="textarea"
-          rows="4"
+          rows="3"
           bind:value={notes}
           maxlength="5000"
           aria-describedby="ravelry-notes-hint"></textarea>
+        <span id="ravelry-notes-hint" class="text-xs leading-normal opacity-70">
+          Followed by “Planned with Temperature Blanket” and a link to its
+          gallery page.
+        </span>
       </label>
-      <p id="ravelry-notes-hint" class="-mt-2 text-xs opacity-70">
-        Followed by “Planned with Temperature Blanket” and a link to its gallery
-        page.
-      </p>
 
       {#if !updating && !yarnsSent && yarnChoices.length}
         <fieldset class="flex flex-col gap-3">
-          <legend class="label-text mb-1">Yarns on Ravelry</legend>
-          <p class="text-xs opacity-70">
-            Each color is added as a yarn. Link it to Ravelry’s page for the
-            yarn, or keep just its name.
-          </p>
-          {#each visibleChoices as choice (choice.name)}
-            {@render yarnSelect(choice)}
-          {/each}
+          <legend class="sr-only">Yarns</legend>
+          <label class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              class="checkbox mt-0.5 shrink-0"
+              bind:checked={addYarnsOnPost}
+              aria-describedby="ravelry-yarns-detail"
+            />
+            <span class="flex flex-1 flex-col">
+              <span>Add its yarns</span>
+              <span class="text-xs opacity-70" id="ravelry-yarns-detail"
+                >{yarnsDetail}</span
+              >
+            </span>
+          </label>
+          {#if addYarnsOnPost}
+            <!-- Under its checkbox's text, as part of it -->
+            <div class="grid gap-4 pl-8 sm:grid-cols-2">
+              {#each visibleChoices as choice (choice.name)}
+                {@render yarnSelect(choice)}
+              {/each}
+            </div>
+          {/if}
         </fieldset>
       {:else if updating && (yarnPlan.add.length || yarnPlan.remove.length) && !yarnsSent}
         <fieldset class="flex flex-col gap-3">
-          <legend class="label-text mb-1">Yarns on Ravelry</legend>
+          <legend class="label-text mb-1">Yarns</legend>
           <p class="text-xs opacity-70">
             The yarns in this project differ from those on Ravelry. Yarns you
             added there yourself stay.
@@ -968,23 +1044,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Remove {yarnLabel(item.pack)}
             </label>
           {/each}
-          {#each visibleChoices as choice (choice.name)}
-            {@render yarnSelect(choice)}
-          {/each}
+          {#if visibleChoices.length}
+            <div class="grid gap-4 sm:grid-cols-2">
+              {#each visibleChoices as choice (choice.name)}
+                {@render yarnSelect(choice)}
+              {/each}
+            </div>
+          {/if}
         </fieldset>
       {/if}
 
       <fieldset class="flex flex-col gap-3">
-        <legend class="label-text mb-1">Photos on Ravelry</legend>
+        <legend class="label-text mb-1">Photos</legend>
         <p class="text-xs opacity-70">
-          They show on its card here and on its gallery page too. The first is
-          the main photo.
+          They show on its gallery page too. The first is the main photo.
         </p>
-        {#if photos.length || added.length}
+        {#if photos.length || added.length || newPicture}
           <ul
-            class="grid grid-cols-2 items-start gap-3 sm:grid-cols-3"
+            class="grid grid-cols-2 items-start gap-3 sm:grid-cols-4"
             aria-label="Photos"
           >
+            {#if newPicture && !updating && previews.active}
+              <li class="flex flex-col gap-1">
+                <div
+                  class="bg-surface-100-900 pointer-events-none w-full overflow-hidden"
+                  aria-hidden="true"
+                >
+                  <previews.active.previewComponent />
+                </div>
+                <p class="text-sm">
+                  Main photo · Picture from Temperature Blanket
+                </p>
+              </li>
+            {/if}
             {#each photos as photo, i (photo.photoId)}
               {@const isRemoved = removed.has(photo.photoId)}
               {@const replaced = photo.isPicture && pictureState === 'changed'}
@@ -996,10 +1088,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       photo.squareUrl ??
                       ''}
                     alt={photo.isPicture
-                      ? `${initialName}: its picture from Temperature Blanket`
-                      : `${initialName}: photo ${i + 1} of ${photos.length}`}
+                      ? `${name}: its picture from Temperature Blanket`
+                      : `${name}: photo ${i + 1} of ${photos.length}`}
                     class={[
-                      'bg-surface-100-900 rounded-base h-auto w-full',
+                      'bg-surface-100-900 h-auto w-full',
                       (isRemoved || replaced) && 'opacity-40',
                     ]}
                     loading="lazy"
@@ -1057,6 +1149,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </li>
             {/each}
+            {#if newPicture && updating && previews.active}
+              <li class="flex flex-col gap-1">
+                <div
+                  class="bg-surface-100-900 pointer-events-none w-full overflow-hidden"
+                  aria-hidden="true"
+                >
+                  <previews.active.previewComponent />
+                </div>
+                <p class="text-sm">New · Picture from Temperature Blanket</p>
+              </li>
+            {/if}
             {#each added as item (item.id)}
               <li class="flex flex-col gap-1">
                 <div class="relative">
@@ -1064,7 +1167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <img
                       src={item.url}
                       alt={`New photo: ${item.file.name}`}
-                      class="bg-surface-100-900 rounded-base h-auto w-full"
+                      class="bg-surface-100-900 h-auto w-full"
                     />
                   {:else}
                     <div

@@ -39,7 +39,7 @@ export function openProjectShare(
     dialog.trigger({
       type: 'component',
       component: { ref: AddToGallery },
-      options: { title, returnable: true },
+      options: { title, size: 'medium', returnable: true },
     });
   const here = project.url.href.replace(window.location.origin, '');
   dialog.trigger({

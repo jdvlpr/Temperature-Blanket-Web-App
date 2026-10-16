@@ -159,8 +159,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
         Checking…
       {:else}
-        {status}{#if page}
-          · {page.showOwner && ownerName ? `By ${ownerName}` : 'Anonymous'}{/if}
+        {status}{page
+          ? ` · ${page.showOwner && ownerName ? `By ${ownerName}` : 'Anonymous'}`
+          : ''}
       {/if}
     </ShareSectionHeader>
 

@@ -35,6 +35,10 @@ From the gallery page itself (`onsaved`), Done closes it. -->
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
   import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
+  import {
+    PaletteStorage,
+    savedPalettes,
+  } from '#lib/storage/palettes.svelte.js';
   import { onMount, tick, untrack } from 'svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import {
@@ -170,6 +174,18 @@ From the gallery page itself (`onsaved`), Done closes it. -->
     doneHeading?.focus();
   }
 
+  // One name: the palette's, which its gallery page shows too. Renamed
+  // here, the saved palette is renamed with its page
+  async function renameSaved(title: string) {
+    if (title === cleanName(savedName, MAX_NAME_LENGTH)) return;
+    try {
+      await PaletteStorage.rename(paletteId, title);
+      await savedPalettes.refresh();
+    } catch {
+      // Its page has the name; the saved palette keeps its old one
+    }
+  }
+
   async function share(event?: Event) {
     event?.preventDefault();
     const title = cleanName(name, MAX_NAME_LENGTH);
@@ -177,6 +193,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
     busy = true;
     errorMessage = '';
     try {
+      await renameSaved(title);
       if (target) {
         if (update && ownerChanged) {
           try {
