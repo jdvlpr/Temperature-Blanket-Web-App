@@ -13,48 +13,53 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Which side of My Library was open last on this device, so the sidebar's
-// My Library link goes back to it. Projects the first time.
+// Which side of a two-sided area was open last on this device, so the
+// sidebar's link goes back to it: My Library (Projects or Palettes) and
+// Create (the planner or the Yarn page). The first side the first time.
 
 export type LibrarySection = 'projects' | 'palettes';
+export type CreateSection = 'planner' | 'yarn';
 
-const KEY = 'my_library_section';
+class Section<T extends string> {
+  #value = $state<T>() as T;
+  readonly #key: string;
+  readonly #options: readonly T[];
 
-function readSection(): LibrarySection | null {
-  try {
-    const value = localStorage.getItem(KEY);
-    return value === 'projects' || value === 'palettes' ? value : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeSection(value: LibrarySection) {
-  try {
-    localStorage.setItem(KEY, value);
-  } catch {
-    // Private browsing: My Library opens on Projects next time
-  }
-}
-
-class Section {
-  #value = $state<LibrarySection>('projects');
-
-  constructor() {
-    // On the server, Projects
+  constructor(key: string, options: readonly [T, ...T[]]) {
+    this.#key = key;
+    this.#options = options;
+    this.#value = options[0];
+    // On the server, the first side
     if (typeof localStorage === 'undefined') return;
-    this.#value = readSection() ?? 'projects';
+    try {
+      const stored = localStorage.getItem(key) as T | null;
+      if (stored && options.includes(stored)) this.#value = stored;
+    } catch {
+      // Private browsing: the first side
+    }
   }
 
   get value() {
     return this.#value;
   }
 
-  set value(value: LibrarySection) {
+  set value(value: T) {
     if (value === this.#value) return;
     this.#value = value;
-    writeSection(value);
+    try {
+      localStorage.setItem(this.#key, value);
+    } catch {
+      // Private browsing: the first side opens next time
+    }
   }
 }
 
-export const librarySection = new Section();
+export const librarySection = new Section<LibrarySection>(
+  'my_library_section',
+  ['projects', 'palettes'],
+);
+
+export const createSection = new Section<CreateSection>('create_section', [
+  'planner',
+  'yarn',
+]);

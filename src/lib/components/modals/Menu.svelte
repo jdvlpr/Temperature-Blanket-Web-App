@@ -73,7 +73,6 @@ button to it. -->
     MonitorXIcon,
     PlusIcon,
     RefreshCwIcon,
-    SwatchBookIcon,
     Trash2Icon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
@@ -386,18 +385,6 @@ the same color) says it's waiting here -->
               <span>Start Another Project</span>
               <span class="text-xs opacity-70"
                 >In a new tab, leaving this one open</span
-              >
-            </span>
-            <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
-          </a>
-        </li>
-        <li>
-          <a href={resolve('/yarn')} target="_blank" class={ROW}>
-            <SwatchBookIcon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>New Palette</span>
-              <span class="text-xs opacity-70"
-                >Yarn colors only, in a new tab</span
               >
             </span>
             <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />

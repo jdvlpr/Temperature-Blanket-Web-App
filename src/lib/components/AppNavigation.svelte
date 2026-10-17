@@ -14,6 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import {
+    menuContentClass,
+    menuItemClass,
+    menuPositioning,
+  } from '#lib/components/menu-styles.js';
   import { SMALL_LINK, SMALL_LINKS } from '#lib/constants/class-constants.js';
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -21,9 +26,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { version } from '$app/env';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import { resolve } from '$app/paths';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { yarnBall } from '@lucide/lab';
   import {
+    ChevronDownIcon,
     CloudyIcon,
     ExternalLinkIcon,
     HeartIcon,
@@ -31,10 +38,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LandmarkIcon,
     LibraryBigIcon,
     NotebookPenIcon,
+    ThermometerSunIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
+  import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
-  import { librarySection } from '#lib/storage/library-section.svelte.js';
+  import {
+    createSection,
+    librarySection,
+  } from '#lib/storage/library-section.svelte.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
@@ -50,9 +62,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const CURRENT = 'preset-tonal-secondary';
   const HEADING =
     'text-surface-700-300 mt-4 px-3 text-xs font-semibold tracking-wide uppercase';
+  // Stronger than the other links' hover, so the two halves can be told apart.
+  // A translucent overlay works over the plain and the tinted (current) look
+  // alike, and the button's own brightness filter is off so the two don't stack
+  const CREATE_HOVER =
+    'hover:bg-surface-950/10 hover:filter-none! dark:hover:bg-surface-50/10';
+  // Where the link ends and the caret begins, shown while the control is
+  // hovered or focused. Inside the caret, so no gap drops the hover between
+  const DIVIDER =
+    'before:absolute before:inset-y-2 before:left-0 before:w-px before:opacity-0 group-focus-within:before:opacity-100 group-hover:before:opacity-100';
+  const CREATE_OPTIONS = [
+    {
+      href: '/',
+      label: 'Project',
+      description: 'Plan a blanket from weather data',
+      yarn: false,
+    },
+    {
+      href: '/yarn',
+      label: 'Palette',
+      description: 'Just pick yarn colors',
+      yarn: true,
+    },
+  ];
   const SMALL_CURRENT = 'text-secondary-700-300 opacity-100!';
 
   // After loading, so the server's page (which can't know) doesn't differ
+  let createGroup = $state();
   let mounted = $state(false);
   onMount(() => (mounted = true));
 </script>
@@ -107,17 +143,65 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Supporters
   </a>
 
-  <h2 class={HEADING}>Create</h2>
-
-  <!-- The planner, which links to the Yarn page for a palette alone -->
-  <a
-    href="/"
-    class={[LINK, create && CURRENT]}
-    aria-current={create ? 'page' : undefined}
+  <!-- Back to the planner or the Yarn page, whichever was open last (after
+  loading, like My Library). The caret picks either one -->
+  <div
+    bind:this={createGroup}
+    class={['group rounded-base flex items-center', create && CURRENT]}
   >
-    <NotebookPenIcon />
-    Create
-  </a>
+    <a
+      href={mounted && createSection.value === 'yarn' ? '/yarn' : '/'}
+      class={['btn rounded-r-none', CREATE_HOVER]}
+      aria-current={create ? 'page' : undefined}
+    >
+      <NotebookPenIcon />
+      Create
+    </a>
+    <!-- Opens under the whole control, not just the caret -->
+    <Menu
+      positioning={menuPositioning('bottom-start', {
+        getAnchorRect: () => createGroup?.getBoundingClientRect() ?? null,
+      })}
+      onSelect={(details) => goto(details.value)}
+    >
+      <Menu.Trigger
+        class={[
+          'btn relative rounded-l-none px-2',
+          CREATE_HOVER,
+          DIVIDER,
+          create ? 'before:bg-secondary-300-700' : 'before:bg-surface-300-700',
+        ]}
+        aria-label="Choose what to create"
+      >
+        <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+      </Menu.Trigger>
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content class={menuContentClass}>
+            {#each CREATE_OPTIONS as option (option.href)}
+              <Menu.Item value={option.href} class={menuItemClass}>
+                {#if option.yarn}
+                  <Icon
+                    iconNode={yarnBall}
+                    class="shrink-0"
+                    aria-hidden="true"
+                  />
+                {:else}
+                  <ThermometerSunIcon class="shrink-0" aria-hidden="true" />
+                {/if}
+                <div class="flex min-w-0 flex-col text-left">
+                  <span>{option.label}</span>
+                  <span class="text-surface-700-300 text-xs"
+                    >{option.description}</span
+                  >
+                </div>
+              </Menu.Item>
+            {/each}
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu>
+  </div>
 
   <h2 class={HEADING}>Explore</h2>
 
