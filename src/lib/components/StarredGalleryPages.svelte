@@ -165,6 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         : getTitleTextFromLocationsMeta(node.locations),
     }));
     if (!filters) return { all, shown: all };
+    const yarnChosen = !!(filters.brandId || filters.yarnId);
     const patternId = filters.patternType
       ? (previews.all.find((p) => p.wpTagSlug === filters.patternType)?.id ??
         null)
@@ -175,10 +176,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           label,
           getTitleTextFromLocationsMeta(node.locations),
         ]) &&
-        matchesYarn(
-          getColorsFromInput({ string: node.projectUrl }) || [],
-          yarnOf(filters),
-        ) &&
+        // Its colors read from its link only when a yarn is chosen
+        (!yarnChosen ||
+          matchesYarn(
+            getColorsFromInput({ string: node.projectUrl }) || [],
+            yarnOf(filters),
+          )) &&
         (!patternId || patternIdOf(node.projectUrl, previewIds) === patternId),
     );
     return {

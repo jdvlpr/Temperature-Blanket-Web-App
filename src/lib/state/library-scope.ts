@@ -25,7 +25,8 @@ const STARRED = 'starred';
 /** Whether this My Library address shows Starred */
 export const showsStarred = (url: {
   searchParams: { get(name: string): string | null };
-}) => browser && url.searchParams.get(PARAM) === STARRED;
+}) =>
+  __ACCOUNTS_ENABLED__ && browser && url.searchParams.get(PARAM) === STARRED;
 
 /** A My Library page's address showing Mine, or Starred */
 export const withScope = (path: string, starred: boolean) =>

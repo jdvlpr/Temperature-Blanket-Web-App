@@ -60,11 +60,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </a>
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
     {:else}
+      <!-- aria-disabled, not disabled, so it stays in the Tab order and
+      screen readers say why -->
       <button
         type="button"
-        class={[PANEL_ROW, 'disabled:opacity-60']}
-        disabled={row.disabled}
-        onclick={() => row.onselect?.()}
+        class={[
+          PANEL_ROW,
+          'aria-disabled:cursor-default aria-disabled:opacity-60',
+        ]}
+        aria-disabled={row.disabled ? 'true' : undefined}
+        onclick={() => !row.disabled && row.onselect?.()}
       >
         <row.icon class="shrink-0 opacity-70" aria-hidden="true" />
         {@render text(row)}

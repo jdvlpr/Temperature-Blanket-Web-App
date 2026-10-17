@@ -187,15 +187,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >{label}</a
               >
             </span>
-            <span aria-live="polite">
-              <LibraryInfoLine
-                saved={savedOn}
-                {published}
-                {views}
-                {changed}
-                {ravelryPhotos}
-              />
-            </span>
+            <LibraryInfoLine
+              saved={savedOn}
+              {published}
+              {views}
+              {changed}
+              {ravelryPhotos}
+            />
             {#if syncLabel?.tone === 'error'}
               <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
             {/if}

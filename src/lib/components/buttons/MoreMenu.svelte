@@ -38,7 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     separate?: boolean;
     /** A second line under the label */
     detail?: string;
-    /** Shown, but can't be chosen (its `detail` says why) */
+    /** Shown, but does nothing (its `detail` says why). Still reached with
+    the arrow keys, so screen readers say why */
     disabled?: boolean;
   };
 </script>
@@ -120,10 +121,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#each items as item (item.value)}
           {#if item.separate}<Menu.Separator />{/if}
+          <!-- Not Zag's `disabled`, which arrow keys skip: aria-disabled,
+          and choosing it leaves the menu open -->
           <Menu.Item
             value={item.value}
             class={menuItemClass}
-            disabled={item.disabled}
+            closeOnSelect={!item.disabled}
           >
             {#snippet element(attributes)}
               {#if item.href && !item.disabled}
@@ -145,7 +148,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </a>
                 <!-- eslint-enable svelte/no-navigation-without-resolve -->
               {:else}
-                <div {...attributes}>
+                <div
+                  {...attributes}
+                  aria-disabled={item.disabled ? 'true' : undefined}
+                >
                   <item.icon class="shrink-0" aria-hidden="true" />
                   {@render text(item)}
                 </div>
