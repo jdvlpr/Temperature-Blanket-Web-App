@@ -129,7 +129,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if !pickingFromPhoto}
   <StickyPart position="bottom">
-    <div class="p-2" bind:clientHeight={footerHeight}>
+    <div
+      class="bg-surface-50 dark:bg-surface-950 p-2"
+      bind:clientHeight={footerHeight}
+    >
       {#if cleared && !selectedColors.length}
         <div
           class="card preset-tonal-surface mb-2 flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"

@@ -236,7 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <StickyPart position="bottom">
-  <div class="p-2 sm:p-4">
+  <div class="bg-surface-50 dark:bg-surface-950 p-2 sm:p-4">
     <!-- The palette in its tray, as on the main page -->
     <div
       class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
