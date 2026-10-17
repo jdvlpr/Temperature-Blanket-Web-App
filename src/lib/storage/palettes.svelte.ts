@@ -149,6 +149,24 @@ export class PaletteStorage {
     return result!;
   }
 
+  /** A palette that's shown and not in the Trash, by its id */
+  static async getById(id: string): Promise<SavedPalette | undefined> {
+    return (await this.list()).find((p) => p.id === id);
+  }
+
+  /**
+   * Changes a saved palette's colors (the Yarn page saving edits to the open
+   * palette). False when it's no longer there to change: in the Trash, deleted
+   * for good, or another account's.
+   */
+  static async updateCode(id: string, code: string): Promise<boolean> {
+    if (!code) throw new Error('Missing palette code');
+    const palette = await this.getById(id);
+    if (!palette) return false;
+    if (palette.code !== code) await this.change(id, (p) => ({ ...p, code }));
+    return true;
+  }
+
   static async rename(id: string, name: string): Promise<void> {
     await this.change(id, (p) => ({ ...p, name: cleanPaletteName(name) }));
   }

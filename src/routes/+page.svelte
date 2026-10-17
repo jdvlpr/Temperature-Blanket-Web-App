@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SectionNavigationButtons from '#lib/components/buttons/SectionNavigationButtons.svelte';
   import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
   import LegacyNotification from '#lib/components/modals/LegacyNotification.svelte';
+  import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
   import ProjectMenuButton from '#lib/components/buttons/ProjectMenuButton.svelte';
   import ProjectTitle from '#lib/components/ProjectTitle.svelte';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
@@ -63,7 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/gallery-request.js';
   import AddToGallery from '#lib/components/modals/AddToGallery.svelte';
   import { setUnitsFromNavigator } from '#lib/utils/unit-utils.svelte.js';
-  import { RedoIcon, UndoIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
 
   let debounceTimer: number;
@@ -261,44 +261,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ProjectTitle />
           </div>
         {/if}
-        <!-- One row: icon buttons on smaller screens, never wrapping -->
-        <div class="mx-auto flex shrink-0 gap-2 sm:mx-0">
-          <button
-            aria-label="Undo"
-            class="max-md:btn-icon md:btn hover:preset-tonal-surface"
-            title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
-            id="undo"
-            disabled={!weather.data.length ||
-              project.history.isFirst ||
-              project.history.isUpdating}
-            onclick={() => {
-              loadFromHistory({
-                action: 'Undo',
-              });
-            }}
-          >
-            <UndoIcon />
-            <span class="inline-block max-md:hidden">Undo</span>
-          </button>
-
-          <button
-            aria-label="Redo"
-            class="max-md:btn-icon md:btn hover:preset-tonal-surface"
-            id="redo"
-            title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
-            disabled={!weather.data.length ||
-              project.history.isLast ||
-              project.history.isUpdating}
-            onclick={() => {
-              loadFromHistory({
-                action: 'Redo',
-              });
-            }}
-          >
-            <RedoIcon />
-            <span class="inline-block max-md:hidden">Redo</span>
-          </button>
-        </div>
+        <UndoRedoButtons
+          canUndo={!project.history.isFirst && !project.history.isUpdating}
+          canRedo={!project.history.isLast && !project.history.isUpdating}
+          onUndo={() => loadFromHistory({ action: 'Undo' })}
+          onRedo={() => loadFromHistory({ action: 'Redo' })}
+        />
       {/if}
     </div>
 

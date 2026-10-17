@@ -13,19 +13,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Where the open project saves by itself: the account (a cloud), or only
-this browser (a screen), with a way to sync that one. At the top of the
-Project menu. -->
+<!-- Where the open project or palette saves by itself: the account (a cloud),
+or only this browser (a screen), with a way to sync that one. At the top of the
+Project menu, and in the Yarn page's Palette popover. -->
 
 <script lang="ts">
   import { page } from '$app/state';
   import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
-  import {
-    addOpenProjectToAccount,
-    autosave,
-  } from '#lib/storage/autosave.svelte.js';
+  import type { autosave } from '#lib/storage/autosave.svelte.js';
 
   import {
     CloudCheckIcon,
@@ -38,20 +35,32 @@ Project menu. -->
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
   );
-  const saving = $derived(autosave.state !== 'saved');
+  let {
+    saveState,
+    account: toAccount,
+    addToAccount,
+  }: {
+    saveState: (typeof autosave)['state'];
+    /** Whether it saves to the account; otherwise to this browser */
+    account: boolean;
+    /** Adds it, saved only in this browser, to the signed-in account */
+    addToAccount: () => Promise<void>;
+  } = $props();
+
+  const saving = $derived(saveState !== 'saved');
 
   let adding = $state(false);
 
   async function add() {
     adding = true;
     try {
-      await addOpenProjectToAccount();
+      await addToAccount();
       toast.trigger({
         message: 'Added to your account. It’ll show up on your other devices.',
         category: 'success',
       });
     } catch (e) {
-      console.warn("Can't add the project to the account", { e });
+      console.warn("Can't add it to the account", { e });
       toast.trigger({
         message: 'Unable to add it to your account. Try again.',
         category: 'error',
@@ -67,7 +76,7 @@ Project menu. -->
     {#if saving}
       <LoaderCircleIcon class="icon-sm shrink-0 animate-spin opacity-70" />
       Saving…
-    {:else if autosave.account}
+    {:else if toAccount}
       <CloudCheckIcon class="icon-sm shrink-0" />
       Saved to your account
     {:else}
@@ -76,7 +85,7 @@ Project menu. -->
     {/if}
   </p>
   <p class="opacity-70">
-    {#if autosave.account}
+    {#if toAccount}
       Changes save automatically and sync to your devices.
     {:else if __ACCOUNTS_ENABLED__ && !signedIn}
       Changes save automatically, on this device only. Sign in to sync them.
@@ -84,7 +93,7 @@ Project menu. -->
       Changes save automatically, on this device only.
     {/if}
   </p>
-  {#if !autosave.account && __ACCOUNTS_ENABLED__}
+  {#if !toAccount && __ACCOUNTS_ENABLED__}
     {#if signedIn}
       <button
         type="button"

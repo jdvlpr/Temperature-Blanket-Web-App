@@ -39,6 +39,7 @@ button to it. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import {
+    addOpenProjectToAccount,
     autosave,
     changedElsewhereMessage,
     saveCopy,
@@ -229,7 +230,11 @@ the same color) says it's waiting here -->
         Not saved
       </p>
     {:else if autosave.on}
-      <SaveStatus />
+      <SaveStatus
+        saveState={autosave.state}
+        account={autosave.account}
+        addToAccount={addOpenProjectToAccount}
+      />
     {:else if autosave.stored}
       <!-- Another account's project, here signed out -->
       <p class="flex items-start gap-1 text-sm">

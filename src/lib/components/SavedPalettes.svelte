@@ -62,7 +62,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     filters,
     oncount,
   }: {
-    updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
+    updateGauge?: (update: {
+      _colors: Color[];
+      _schemeId?: string;
+      _paletteId?: string;
+    }) => void;
     sharing?: Snippet<
       [{ palette: SavedPalette; colors: Color[]; label: string }]
     >;
@@ -236,8 +240,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   const layout = $derived(grid ? 'grid' : 'list');
 
-  function use(colors: Color[]) {
-    updateGauge?.({ _colors: colors, _schemeId: 'Custom' });
+  function use(colors: Color[], paletteId: string) {
+    updateGauge?.({
+      _colors: colors,
+      _schemeId: 'Custom',
+      _paletteId: paletteId,
+    });
   }
 </script>
 
@@ -325,7 +333,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               name={label}
               summary={!!palette.name}
               title="Use This Palette"
-              onclick={() => use(colors)}
+              onclick={() => use(colors, palette.id)}
             >
               {#snippet details()}
                 <span class="text-surface-700-300 line-clamp-1 text-xs"

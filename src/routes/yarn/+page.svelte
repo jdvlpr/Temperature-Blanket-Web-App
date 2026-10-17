@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PUBLIC_BASE_URL } from '$app/env/public';
+  import { beforeNavigate } from '$app/navigation';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
@@ -22,61 +23,141 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Gauge from '#lib/components/Gauge.svelte';
   import GaugeCustomizer from '#lib/components/GaugeCustomizer.svelte';
   import YarnSources from '#lib/components/YarnSources.svelte';
+  import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
+  import SavePalette from '#lib/components/modals/SavePalette.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
+  import {
+    dialog,
+    ignoresShortcuts,
+    isDesktop,
+    isRedo,
+    isUndo,
+  } from '#lib/state/page-state.svelte.js';
   import { MAX_SAVED_PALETTE_NAME_LENGTH } from '#lib/storage/palettes.svelte.js';
   import { cleanName } from '#lib/utils/clean-name.js';
   import {
+    colorsToPaletteCode,
     stringToColors,
     yarnDetailsToColors,
   } from '#lib/utils/color-utils.js';
   import { onMount } from 'svelte';
+  import PaletteStatusButton from './PaletteStatusButton.svelte';
+  import PaletteTitle from './PaletteTitle.svelte';
+  import {
+    closePalette,
+    openMatchingPalette,
+    openPalette,
+    paletteAutosave,
+    savePaletteNow,
+    watchColors,
+  } from './autosave.svelte';
   import { yarnPageState } from './state.svelte';
 
-  let urlParams;
+  watchColors(() => yarnPageState.gauge.colors);
 
   onMount(() => {
     initPage();
   });
 
   async function initPage() {
-    urlParams = new URLSearchParams(window.location.search);
+    yarnPageState.loading = true;
+    const urlParams = new URLSearchParams(window.location.search);
+    const before = colorsToPaletteCode(yarnPageState.gauge.colors);
+    let colors = $state.snapshot(yarnPageState.gauge.colors);
+
     // Load URL
-    if (urlParams?.has('s')) {
-      const s = urlParams.get('s');
-      if (s) {
-        yarnPageState.gauge.colors =
-          stringToColors({
-            string: s,
-          }) || yarnPageState.gauge.colors;
-      }
-    }
+    const s = urlParams.get('s');
+    if (s) colors = stringToColors({ string: s }) || colors;
 
-    if (urlParams?.has('f')) {
+    const yarnString = urlParams.get('f');
+    if (yarnString) {
       await ensureYarnData();
-
-      let _yarnString = urlParams.get('f');
-
-      if (_yarnString) {
-        yarnPageState.gauge.colors =
-          yarnDetailsToColors({
-            string: _yarnString,
-            colors: $state.snapshot(yarnPageState.gauge.colors),
-          }) || yarnPageState.gauge.colors;
-      }
+      colors = yarnDetailsToColors({ string: yarnString, colors }) || colors;
     }
 
-    // A name that came with the palette (Open a Copy in the gallery)
-    const name = cleanName(
-      urlParams.get('name'),
-      MAX_SAVED_PALETTE_NAME_LENGTH,
-    );
-    if (name)
-      yarnPageState.suggestion = {
-        name,
-        colors: $state.snapshot(yarnPageState.gauge.colors),
-      };
+    // Back on the page with the same colors (or none in the link): carry on
+    // with them, their history and the open palette
+    const carryOn =
+      yarnPageState.history.length > 0 &&
+      (!s || colorsToPaletteCode(colors) === before);
+
+    if (!carryOn) {
+      yarnPageState.gauge.colors = colors;
+
+      // A name that came with the palette (Open a Copy in the gallery)
+      const name = cleanName(
+        urlParams.get('name'),
+        MAX_SAVED_PALETTE_NAME_LENGTH,
+      );
+      yarnPageState.suggestion = name
+        ? { name, colors: $state.snapshot(yarnPageState.gauge.colors) }
+        : null;
+
+      closePalette();
+      yarnPageState.startHistory();
+      // Opened from My Library (or the link is one of the saved palettes)
+      if (s) await openMatchingPalette();
+    } else yarnPageState.showInAddressBar();
+
+    yarnPageState.loading = false;
   }
+
+  let debounceTimer: number;
+  $effect(() => {
+    // Every change to the colors, deeply
+    void JSON.stringify(yarnPageState.gauge.colors);
+    if (yarnPageState.loading) return;
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(() => yarnPageState.updateHistory(), 300);
+  });
+
+  const canUndo = $derived(!yarnPageState.history.isFirst);
+  const canRedo = $derived(!yarnPageState.history.isLast);
+
+  /** Save Palette; the palette it saves is then open here */
+  function openSavePalette() {
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: SavePalette,
+        props: {
+          colors: $state.snapshot(yarnPageState.gauge.colors),
+          suggestedName: yarnPageState.suggestedNameFor(
+            yarnPageState.gauge.colors,
+          ),
+          onsaved: (palette: { id: string }) => openPalette(palette.id),
+        },
+      },
+      options: { size: 'medium', title: 'Save Palette' },
+    });
+  }
+
+  // Leaving for another page of the site: a change waiting to save saves now
+  beforeNavigate(() => void savePaletteNow());
 </script>
+
+<svelte:window
+  onkeydown={(ev) => {
+    if (ignoresShortcuts(ev) || yarnPageState.loading) return;
+    if (isUndo(ev)) {
+      ev.preventDefault();
+      if (canUndo) yarnPageState.loadFromHistory({ action: 'Undo' });
+    } else if (isRedo(ev)) {
+      ev.preventDefault();
+      if (canRedo) yarnPageState.loadFromHistory({ action: 'Redo' });
+    } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
+      ev.preventDefault();
+      if (paletteAutosave.id) void savePaletteNow();
+      else openSavePalette();
+    }
+  }}
+  onbeforeunload={(event) => {
+    if (!paletteAutosave.id || paletteAutosave.state === 'saved') return;
+    void savePaletteNow();
+    event.preventDefault();
+    event.returnValue = 'Unsaved Palette';
+  }}
+/>
 
 <svelte:head>
   <title>Yarn Palette Creator</title>
@@ -102,7 +183,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Palette Creator">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden shrink-0 lg:inline-flex"><AppLogo /></div>
+    <div class="flex min-w-0 flex-1 justify-between gap-2 sm:justify-end">
+      <!-- The palette's name, in the space wider screens have spare -->
+      {#if isDesktop.current}
+        <div class="flex min-w-0 flex-1 items-center gap-0.5 lg:ml-2">
+          <PaletteTitle />
+        </div>
+      {/if}
+      <UndoRedoButtons
+        {canUndo}
+        {canRedo}
+        onUndo={() => yarnPageState.loadFromHistory({ action: 'Undo' })}
+        onRedo={() => yarnPageState.loadFromHistory({ action: 'Redo' })}
+      />
+    </div>
+    <PaletteStatusButton onsave={openSavePalette} />
   {/snippet}
   {#snippet main()}
     <div>
@@ -132,6 +228,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 suggestedName={yarnPageState.suggestedNameFor(
                   yarnPageState.gauge.colors,
                 )}
+                onopenpalette={(id: string, how: 'saved' | 'chosen') => {
+                  // Another of My Palettes: its own history from here
+                  if (how === 'chosen') yarnPageState.startHistory();
+                  void openPalette(id);
+                }}
               />
 
               <GaugeCustomizer bind:gauge={yarnPageState.gauge} />

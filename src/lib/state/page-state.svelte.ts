@@ -571,25 +571,29 @@ const checkUndoRedo = (
   return false;
 };
 
-const isUndo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
+export const isUndo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
   return checkUndoRedo(ev, style, !ev.shiftKey);
 };
 
-const isRedo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
+export const isRedo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
   return checkUndoRedo(ev, style, ev.shiftKey);
 };
 
-export const handleKeyDown = (ev: KeyboardEvent) => {
+/** Whether a key press is for a dialog or a field, not a page shortcut */
+export const ignoresShortcuts = (ev: KeyboardEvent) => {
   const target = ev.target as HTMLElement | null;
-  if (
+  return (
     dialog.opened ||
     target?.tagName === 'INPUT' ||
     target?.tagName === 'TEXTAREA' ||
     target?.tagName === 'TD' ||
     target?.tagName === 'SELECT' ||
     target?.tagName === 'BUTTON'
-  )
-    return;
+  );
+};
+
+export const handleKeyDown = (ev: KeyboardEvent) => {
+  if (ignoresShortcuts(ev)) return;
 
   const routeId = page.route.id;
 

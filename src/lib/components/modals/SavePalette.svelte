@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     MAX_SAVED_PALETTE_NAME_LENGTH,
     PaletteStorage,
+    type SavedPalette,
   } from '#lib/storage/palettes.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import {
@@ -32,10 +33,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     colors,
     suggestedName = '',
+    onsaved,
   }: {
     colors: Color[];
     /** The name to start with (a gallery palette's), still editable */
     suggestedName?: string;
+    /** The Yarn page: the saved palette (or the one already saved) is now
+    open there, and saves by itself */
+    onsaved?: (palette: SavedPalette) => void;
   } = $props();
 
   // The dialog is opened for one palette, so its suggestion never changes
@@ -46,14 +51,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   async function save() {
     saving = true;
     try {
-      const { added } = await PaletteStorage.add({
+      const { palette, added } = await PaletteStorage.add({
         code: colorsToPaletteCode(colors),
         name,
       });
+      onsaved?.(palette);
+      const after = onsaved ? ' Changes now save automatically.' : '';
       toast.trigger({
         message: added
-          ? 'Palette saved. Find it in My Library, or press Get Colors, then Browse Palettes.'
-          : 'This palette is already saved',
+          ? `Palette saved. Find it in My Library, or press Get Colors, then Browse Palettes.${after}`
+          : `This palette is already saved.${after}`,
         category: added ? 'success' : 'info',
       });
       dialog.close();

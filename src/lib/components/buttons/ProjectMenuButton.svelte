@@ -27,12 +27,7 @@ Until then, a dot in the menu's Save Project color says there's something to sav
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { autosave } from '#lib/storage/autosave.svelte.js';
-  import {
-    CloudAlertIcon,
-    EllipsisVerticalIcon,
-    LoaderCircleIcon,
-    MonitorXIcon,
-  } from '@lucide/svelte';
+  import SaveStateIcon from '#lib/components/SaveStateIcon.svelte';
 
   const problem = $derived(
     autosave.state === 'error' || autosave.state === 'conflict',
@@ -78,17 +73,11 @@ Until then, a dot in the menu's Save Project color says there's something to sav
   data-testid="project-button"
   data-save-status={status}
 >
-  {#if !autosave.on || saved}
-    <EllipsisVerticalIcon />
-  {:else if problem}
-    {#if autosave.account}
-      <CloudAlertIcon class="text-error-700-300" />
-    {:else}
-      <MonitorXIcon class="text-error-700-300" />
-    {/if}
-  {:else}
-    <LoaderCircleIcon class="saving-spin opacity-60" />
-  {/if}
+  <SaveStateIcon
+    on={autosave.on}
+    saveState={autosave.state}
+    account={autosave.account}
+  />
   <span>Project</span>
   {#if unsaved}
     <span
@@ -98,23 +87,3 @@ Until then, a dot in the menu's Save Project color says there's something to sav
     ></span>
   {/if}
 </button>
-
-<style>
-  /* Saving: a slow turn, calmer than a busy spinner, since it shows after every change */
-  :global(.saving-spin) {
-    animation: saving-spin 1.6s linear infinite;
-  }
-  @keyframes saving-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    :global(.saving-spin) {
-      animation: none;
-    }
-  }
-  :global([data-motion='reduce'] .saving-spin) {
-    animation: none;
-  }
-</style>

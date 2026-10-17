@@ -71,6 +71,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     inProject = false,
     /** Save Palette's name to start with (the Yarn page's, from the gallery) */
     suggestedName = '',
+    /** The Yarn page: a palette was saved, or one of My Palettes chosen in
+    Browse Palettes; it's now the open palette there */
+    onopenpalette = undefined as
+      ((paletteId: string, how: 'saved' | 'chosen') => void) | undefined,
   } = $props();
 
   // Pointing at or focusing a color highlights the days in that yarn on the preview
@@ -93,9 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let flashIndices = $derived(
-    inProject && historyChange.gaugeId === gauge.id
-      ? historyChange.indices
-      : [],
+    historyChange.gaugeId === gauge.id ? historyChange.indices : [],
   );
 
   /** Each color's range, as the gauge shows it, like 50 → 59 °F */
@@ -118,15 +120,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function updateGauge({
     _colors,
     _schemeId = 'Custom',
+    _paletteId,
   }: {
     _colors: Color[];
     _schemeId?: GaugeSettingsType['schemeId'];
+    _paletteId?: string;
   }) {
     if (_colors) {
       gauge.updateColors({ colors: _colors });
     }
 
     gauge.schemeId = _schemeId;
+
+    if (_paletteId) onopenpalette?.(_paletteId, 'chosen');
 
     drawerState.closeAll();
 
@@ -344,7 +350,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (value === 'save') {
       dialog.trigger({
         type: 'component',
-        component: { ref: SavePalette, props: { colors, suggestedName } },
+        component: {
+          ref: SavePalette,
+          props: {
+            colors,
+            suggestedName,
+            onsaved:
+              onopenpalette &&
+              ((p: { id: string }) => onopenpalette(p.id, 'saved')),
+          },
+        },
         options: { size: 'medium', title: output.title },
       });
       return;

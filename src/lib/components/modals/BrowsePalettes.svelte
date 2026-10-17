@@ -58,7 +58,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   interface Props {
     numberOfColors: number;
-    updateGauge: (update: { _colors: Color[]; _schemeId?: string }) => void;
+    /** `_paletteId`: one of My Palettes was chosen */
+    updateGauge: (update: {
+      _colors: Color[];
+      _schemeId?: string;
+      _paletteId?: string;
+    }) => void;
   }
 
   let { numberOfColors = $bindable(), updateGauge }: Props = $props();

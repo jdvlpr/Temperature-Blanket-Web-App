@@ -198,13 +198,16 @@ export const loadFromHistory = async ({
     preview: previewChanged,
   });
 
-  if (message) {
-    toast.trigger({
-      message: `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${escapeHtml(message)}</span></span>`,
-      background: 'preset-filled-success-100-900',
-    });
-  }
+  if (message) historyToast(action, message);
 };
+
+/** Says what an undo or redo did, e.g. "Undo: Temperature: color 3 changed to Ruby Red" */
+export function historyToast(action: 'Undo' | 'Redo', message: string) {
+  toast.trigger({
+    message: `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${escapeHtml(message)}</span></span>`,
+    background: 'preset-filled-success-100-900',
+  });
+}
 export type GaugeChangeState = {
   colors: Color[];
   ranges?: GaugeRange[];

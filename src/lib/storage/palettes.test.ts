@@ -92,6 +92,24 @@ describe('PaletteStorage', () => {
     });
   });
 
+  it('changes a palette’s colors in place, but not in the Trash', async () => {
+    const { palette } = await PaletteStorage.add({ code: RED, name: 'Warm' });
+    vi.setSystemTime(5_000);
+    expect(await PaletteStorage.updateCode(palette.id, BLUE)).toBe(true);
+    expect(await PaletteStorage.getById(palette.id)).toMatchObject({
+      id: palette.id,
+      name: 'Warm',
+      code: BLUE,
+      updatedAt: 5_000,
+    });
+
+    await PaletteStorage.remove(palette.id);
+    expect(await PaletteStorage.getById(palette.id)).toBeUndefined();
+    expect(await PaletteStorage.updateCode(palette.id, RED)).toBe(false);
+    const [deleted] = await PaletteStorage.listDeleted();
+    expect(deleted.code).toBe(BLUE);
+  });
+
   it('soft deletes, hides deleted palettes, and restores them', async () => {
     const { palette } = await PaletteStorage.add({ code: RED });
     vi.setSystemTime(3_000);
