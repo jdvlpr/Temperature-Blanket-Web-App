@@ -15,8 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Search, filters, sort and view for saved palettes, and "3 of 12 palettes"
-  while filtering: My Library's, and Get Colors' My Palettes, which share
-  them. Search and filters show once there are a few (or one is on).
+  while filtering: My Library's (Mine or Starred, whose sorts differ and
+  which has no Show filter), and Get Colors' My Palettes, which share them.
+  Search and filters show once there are a few (or one is on).
 -->
 <script lang="ts">
   import { account } from '#lib/accounts/summary.svelte.js';
@@ -26,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import {
     FILTERS_FROM,
-    LIBRARY_SORTS,
+    librarySortMenu,
     libraryStatuses,
   } from '#lib/utils/collection-filter.js';
   import type { Snippet } from 'svelte';
@@ -34,10 +35,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     total,
     matching,
+    starred = false,
     actions,
   }: {
-    /** How many are saved, once known */
+    /** How many are saved (or starred), once known */
     total: number | null;
+    /** For My Library's Starred palettes */
+    starred?: boolean;
     /** How many match the filters */
     matching: number;
     /** The page's buttons, e.g. New Palette */
@@ -51,9 +55,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const showFilters = $derived(
     (total ?? 0) > FILTERS_FROM ||
-      libraryFilters.activeFor('palettes') ||
-      libraryFilters.sort !== 'recent' ||
-      libraryFilters.reversed,
+      libraryFilters.activeFor('palettes', { starred }) ||
+      (starred
+        ? libraryFilters.starredSort !== 'starred' ||
+          libraryFilters.starredReversed
+        : libraryFilters.sort !== 'recent' || libraryFilters.reversed),
   );
 </script>
 
@@ -67,12 +73,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:yarnId={libraryFilters.yarnId}
   bind:onlyThisYarn={libraryFilters.onlyThisYarn}
   bind:status={libraryFilters.status}
-  statuses={showGallery ? libraryStatuses({ gallery: true }) : undefined}
-  sortOptions={LIBRARY_SORTS}
-  sort={libraryFilters.sort}
-  onsort={(sort) => (libraryFilters.sort = sort)}
-  reversed={libraryFilters.reversed}
-  onreverse={(reversed) => (libraryFilters.reversed = reversed)}
+  statuses={showGallery && !starred
+    ? libraryStatuses({ gallery: true })
+    : undefined}
+  {...librarySortMenu(libraryFilters, starred)}
   bind:layout={
     () => preferences.value.myProjectsLayout ?? 'grid',
     (layout) => (preferences.value.myProjectsLayout = layout)
@@ -81,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {actions}
 ></CollectionToolbar>
 <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
-  {#if libraryFilters.activeFor('palettes') && total}
-    {matching} of {total} palettes
+  {#if libraryFilters.activeFor('palettes', { starred }) && total}
+    {matching} of {total} {starred ? 'starred palettes' : 'palettes'}
   {/if}
 </p>

@@ -13,13 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- My Library's Projects page: every saved project (and signed in, ones only
-in the gallery), with search, filters and sort once there are a few. -->
+<!-- My Library's Projects page: every saved project, or (Starred,
+`?show=starred`) gallery projects starred to find again, with search, filters
+and sort once there are a few. -->
 
 <script lang="ts">
   import { browser } from '$app/env';
   import { beforeNavigate, goto } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
@@ -29,11 +31,13 @@ in the gallery), with search, filters and sort once there are a few. -->
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import LocalProjects from '#lib/components/LocalProjects.svelte';
   import MyLibrary from '#lib/components/MyLibrary.svelte';
+  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
+  import { showsStarred } from '#lib/state/library-scope.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import {
     FILTERS_FROM,
-    LIBRARY_SORTS,
+    librarySortMenu,
     libraryStatuses,
   } from '#lib/utils/collection-filter.js';
   import { loadedInPlace } from '#lib/utils/open-saved-project.js';
@@ -42,10 +46,16 @@ in the gallery), with search, filters and sort once there are a few. -->
 
   let total = $state<number | null>(null);
   let matching = $state(0);
+  // Starred's, apart from Mine's (Mine's total is also Mine's count)
+  let starredTotal = $state<number | null>(null);
+  let starredMatching = $state(0);
 
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
   );
+  const starred = $derived(showsStarred(page.url));
+  const shownTotal = $derived(starred ? starredTotal : total);
+  const shownMatching = $derived(starred ? starredMatching : matching);
 
   // Links from before palettes had their own page
   onMount(() => {
@@ -85,60 +95,75 @@ in the gallery), with search, filters and sort once there are a few. -->
     <MyLibrary current="projects" currentTotal={total}>
       {#if browser}
         {@const showFilters =
-          (total ?? 0) > FILTERS_FROM ||
-          libraryFilters.activeFor('projects') ||
-          libraryFilters.sort !== 'recent' ||
-          libraryFilters.reversed}
-        <CollectionToolbar
-          kind="project"
-          searchIcon="search"
-          searchLabel="Search Projects"
-          searchPlaceholder="Name or place"
-          bind:search={libraryFilters.search}
-          bind:brandId={libraryFilters.brandId}
-          bind:yarnId={libraryFilters.yarnId}
-          bind:onlyThisYarn={libraryFilters.onlyThisYarn}
-          bind:patternType={libraryFilters.patternType}
-          bind:status={libraryFilters.status}
-          statuses={signedIn
-            ? libraryStatuses({
-                gallery: galleryPages.shown,
-                ravelry: ravelryLinks.connected,
-              })
-            : undefined}
-          sortOptions={LIBRARY_SORTS}
-          sort={libraryFilters.sort}
-          onsort={(sort) => (libraryFilters.sort = sort)}
-          reversed={libraryFilters.reversed}
-          onreverse={(reversed) => (libraryFilters.reversed = reversed)}
-          bind:layout={
-            () => preferences.value.myProjectsLayout ?? 'grid',
-            (layout) => (preferences.value.myProjectsLayout = layout)
-          }
-          {showFilters}
-        >
-          {#snippet actions()}
-            <!-- A full load: the project open before stays loaded otherwise -->
-            <a
-              href={resolve('/')}
-              class="btn preset-tonal-primary"
-              data-sveltekit-reload
-            >
-              <PlusIcon />
-              New Project
-            </a>
-          {/snippet}
-        </CollectionToolbar>
-        <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
-          {#if libraryFilters.activeFor('projects') && total}
-            {matching} of {total} projects
-          {/if}
-        </p>
-        <LocalProjects
-          onMyProjectsPage
-          filters={libraryFilters}
-          oncount={(count) => ({ total, matching } = count)}
-        />
+          (shownTotal ?? 0) > FILTERS_FROM ||
+          libraryFilters.activeFor('projects', { starred }) ||
+          (starred
+            ? libraryFilters.starredSort !== 'starred' ||
+              libraryFilters.starredReversed
+            : libraryFilters.sort !== 'recent' || libraryFilters.reversed)}
+        <!-- Signed out, Starred is only a prompt to sign in -->
+        {#if !starred || signedIn}
+          <CollectionToolbar
+            kind="project"
+            searchIcon="search"
+            searchLabel="Search Projects"
+            searchPlaceholder="Name or place"
+            bind:search={libraryFilters.search}
+            bind:brandId={libraryFilters.brandId}
+            bind:yarnId={libraryFilters.yarnId}
+            bind:onlyThisYarn={libraryFilters.onlyThisYarn}
+            bind:patternType={libraryFilters.patternType}
+            bind:status={libraryFilters.status}
+            statuses={signedIn && !starred
+              ? libraryStatuses({
+                  gallery: galleryPages.shown,
+                  ravelry: ravelryLinks.connected,
+                })
+              : undefined}
+            {...librarySortMenu(libraryFilters, starred)}
+            bind:layout={
+              () => preferences.value.myProjectsLayout ?? 'grid',
+              (layout) => (preferences.value.myProjectsLayout = layout)
+            }
+            {showFilters}
+          >
+            {#snippet actions()}
+              <!-- A full load: the project open before stays loaded otherwise -->
+              <a
+                href={resolve('/')}
+                class="btn preset-tonal-primary"
+                data-sveltekit-reload
+              >
+                <PlusIcon />
+                New Project
+              </a>
+            {/snippet}
+          </CollectionToolbar>
+          <p
+            class="text-surface-700-300 text-center text-sm"
+            aria-live="polite"
+          >
+            {#if libraryFilters.activeFor( 'projects', { starred } ) && shownTotal}
+              {shownMatching} of {shownTotal}
+              {starred ? 'starred projects' : 'projects'}
+            {/if}
+          </p>
+        {/if}
+        {#if starred}
+          <StarredGalleryPages
+            kind="project"
+            layout={preferences.value.myProjectsLayout ?? 'grid'}
+            filters={libraryFilters}
+            oncount={(count) =>
+              ({ total: starredTotal, matching: starredMatching } = count)}
+          />
+        {:else}
+          <LocalProjects
+            onMyProjectsPage
+            filters={libraryFilters}
+            oncount={(count) => ({ total, matching } = count)}
+          />
+        {/if}
       {/if}
     </MyLibrary>
   {/snippet}

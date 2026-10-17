@@ -21,6 +21,7 @@
 import type {
   LibrarySort,
   LibraryStatus,
+  StarredSort,
 } from '#lib/utils/collection-filter.js';
 
 export class LibraryFilters {
@@ -33,12 +34,18 @@ export class LibraryFilters {
   status = $state<LibraryStatus>('all');
   sort = $state<LibrarySort>('recent');
   reversed = $state(false);
+  /** Starred's own sort: its choices differ from the saved things' */
+  starredSort = $state<StarredSort>('starred');
+  starredReversed = $state(false);
 
-  /** Whether anything on this page is left out (sort only reorders) */
-  activeFor(kind: 'projects' | 'palettes') {
+  /**
+   * Whether anything on this page is left out (sort only reorders). Starred
+   * has no Show filter, so `status` doesn't count there.
+   */
+  activeFor(kind: 'projects' | 'palettes', { starred = false } = {}) {
     const shared =
       !!this.search.trim() ||
-      this.status !== 'all' ||
+      (!starred && this.status !== 'all') ||
       !!this.brandId ||
       !!this.yarnId;
     return kind === 'projects' ? shared || !!this.patternType : shared;

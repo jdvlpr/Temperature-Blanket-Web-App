@@ -77,6 +77,83 @@ export const LIBRARY_SORTS = [
   details?: string;
 }[];
 
+/** My Library's Starred sorts: starred gallery pages, not saved things */
+export type StarredSort = 'starred' | 'newest' | 'views';
+
+export const STARRED_SORTS = [
+  {
+    value: 'starred',
+    label: 'Recently starred',
+    details: 'Last starred first',
+  },
+  { value: 'newest', label: 'Newest published' },
+  { value: 'views', label: 'Most viewed' },
+] as const satisfies readonly {
+  value: StarredSort;
+  label: string;
+  details?: string;
+}[];
+
+/** A toolbar's sort menu, for either set of sorts (see CollectionToolbar) */
+export type SortMenu = {
+  sortOptions: readonly { value: string; label: string; details?: string }[];
+  sort: string;
+  onsort: (sort: string) => void;
+  reversed: boolean;
+  onreverse: (reversed: boolean) => void;
+};
+
+/** My Library's sort menu: Mine's sorts, or Starred's */
+export function librarySortMenu(
+  filters: {
+    sort: LibrarySort;
+    reversed: boolean;
+    starredSort: StarredSort;
+    starredReversed: boolean;
+  },
+  starred: boolean,
+): SortMenu {
+  return starred
+    ? {
+        sortOptions: STARRED_SORTS,
+        sort: filters.starredSort,
+        onsort: (sort) => (filters.starredSort = sort as StarredSort),
+        reversed: filters.starredReversed,
+        onreverse: (reversed) => (filters.starredReversed = reversed),
+      }
+    : {
+        sortOptions: LIBRARY_SORTS,
+        sort: filters.sort,
+        onsort: (sort) => (filters.sort = sort as LibrarySort),
+        reversed: filters.reversed,
+        onreverse: (reversed) => (filters.reversed = reversed),
+      };
+}
+
+/**
+ * Starred pages sorted as chosen: by when each was starred, published, or
+ * by views, the most first; reversed flips any. Equal ones keep their order.
+ */
+export function sortStarred<T>(
+  items: readonly T[],
+  sort: StarredSort,
+  reversed: boolean,
+  {
+    starredAt,
+    publishedAt,
+    views,
+  }: {
+    starredAt: (item: T) => number;
+    publishedAt: (item: T) => number;
+    views: (item: T) => number;
+  },
+): T[] {
+  const key =
+    sort === 'starred' ? starredAt : sort === 'newest' ? publishedAt : views;
+  const direction = reversed ? -1 : 1;
+  return [...items].sort((a, b) => direction * (key(b) - key(a)));
+}
+
 /** Lists longer than this get search, filters and sort: any of two or more */
 export const FILTERS_FROM = 1;
 

@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   My Library's frame, around its Projects page or its Yarn Palettes page: where
   things are kept, whose name gallery pages show, Sign In, Projects | Yarn
-  Palettes with how many of each, and the Trash. Signed in, projects, palettes
+  Palettes with how many of each, Mine | Starred (the page's own list, or
+  gallery pages starred to find again; `?show=starred`), and the Trash. Signed in, projects, palettes
   and the Trash sync to the account, and each project and palette can be
   published to the gallery as a snapshot, with the account's name or without.
 -->
@@ -38,10 +39,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
+  import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
-  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
+  import LibraryScope from '#lib/components/LibraryScope.svelte';
   import Trash from '#lib/components/Trash.svelte';
-  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { showsStarred, withScope } from '#lib/state/library-scope.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { savedPalettes } from '#lib/storage/palettes.svelte.js';
@@ -72,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     children,
   }: {
     current: 'projects' | 'palettes';
-    /** How many the list on this page has, once it knows */
+    /** How many the list on this page has (Mine), once it knows */
     currentTotal?: number | null;
     children: Snippet;
   } = $props();
@@ -90,6 +92,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
+  const starred = $derived(showsStarred(page.url));
+  const kind = $derived(current === 'projects' ? 'project' : 'palette');
+
+  // Signed in: the stars, for Starred's count (and its list)
+  $effect(() => {
+    if (signedIn) return galleryStars.start();
+  });
+  const starredCount = $derived(
+    signedIn && galleryStars.loaded ? galleryStars.list(kind).length : null,
   );
   // Signed in with sync on: projects are kept in the account
   const synced = $derived(signedIn && sync.active);
@@ -167,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <!-- Signed out: an account keeps them safe, and on every device -->
-  {#if browser && __ACCOUNTS_ENABLED__ && !signedIn}
+  {#if browser && __ACCOUNTS_ENABLED__ && !signedIn && !starred}
     <div
       class="bg-surface-100-900 rounded-container mx-auto flex w-full max-w-3xl flex-col items-center gap-3 p-4 text-center"
     >
@@ -186,8 +198,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <CollectionNav
     label="My Library"
     {current}
-    projectsHref={resolve('my-projects')}
-    palettesHref={resolve('my-palettes')}
+    projectsHref={withScope(resolve('my-projects'), starred)}
+    palettesHref={withScope(resolve('my-palettes'), starred)}
     projectsCount={current === 'projects'
       ? (currentTotal ?? projectsCount)
       : projectsCount}
@@ -196,20 +208,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : palettesCount}
   />
 
+  {#if __ACCOUNTS_ENABLED__}
+    <LibraryScope
+      {starred}
+      label={current === 'projects' ? 'Projects to show' : 'Palettes to show'}
+      mineHref={page.url.pathname}
+      starredHref={withScope(page.url.pathname, true)}
+      mineCount={current === 'projects'
+        ? (currentTotal ?? projectsCount)
+        : (currentTotal ?? palettesCount)}
+      {starredCount}
+    />
+  {/if}
+
   <section class="flex flex-col gap-2" aria-labelledby="library-list">
     <h2 id="library-list" class="sr-only">
-      {current === 'projects' ? 'Projects' : 'Yarn Palettes'}
+      {starred ? 'Starred ' : ''}{current === 'projects'
+        ? 'Projects'
+        : 'Yarn Palettes'}
     </h2>
     {@render children()}
   </section>
-
-  <!-- Gallery pages starred to find again: links, not copies -->
-  {#if browser && signedIn}
-    <StarredGalleryPages
-      kind={current === 'projects' ? 'project' : 'palette'}
-      layout={preferences.value.myProjectsLayout ?? 'grid'}
-    />
-  {/if}
 
   <!-- Out of the way, below the list, as rows like the Project menu's: whose
   name gallery pages show (it's changed in Profile settings), where those pages

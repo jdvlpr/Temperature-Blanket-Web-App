@@ -78,6 +78,11 @@ test('a gallery project is starred from its card, found under Starred in My Libr
   await expect(
     page.getByRole('link', { name: `Sign in to star ${NAME}` }),
   ).toHaveAttribute('href', /\/auth\/sign-in\?redirect=%2Fgallery/);
+  // And My Library's Starred asks to sign in
+  await page.goto('/my-projects?show=starred');
+  await expect(
+    page.getByText('Sign in to star gallery pages and find them here'),
+  ).toBeVisible();
 
   const email = uniqueEmail('gallery-stars');
   await signIn(page, request, email);
@@ -95,8 +100,14 @@ test('a gallery project is starred from its card, found under Starred in My Libr
     .poll(() => starsOf(userId))
     .toEqual([{ postId, kind: 'project' }]);
 
-  // In My Library, as the gallery's card, still starred
+  // In My Library's Starred, as the gallery's card, still starred
   await page.goto('/my-projects');
+  const scope = page.getByRole('navigation', { name: 'Projects to show' });
+  await expect(scope.getByRole('link', { name: /^Starred/ })).toContainText(
+    '1',
+  );
+  await scope.getByRole('link', { name: /^Starred/ }).click();
+  await expect(page).toHaveURL(/\/my-projects\?show=starred$/);
   const starred = page.getByRole('list', { name: 'Starred projects' });
   await expect(starred.getByRole('link', { name: NAME })).toBeVisible();
   const again = starred.getByRole('button', { name: `Star ${NAME}` });
@@ -107,6 +118,15 @@ test('a gallery project is starred from its card, found under Starred in My Libr
   await expect(again).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(() => starsOf(userId)).toEqual([]);
   await expect(starred.getByRole('link', { name: NAME })).toBeVisible();
+  // Its menu opens a copy, or copies the page's link
+  await starred.getByRole('button', { name: `More for ${NAME}` }).click();
+  await expect(
+    page.getByRole('menuitem', { name: 'Open a Copy' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('menuitem', { name: /^Copy Link/ }),
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
 
   // One's own page has no star
   localD1(

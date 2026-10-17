@@ -13,8 +13,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- My Library's Yarn Palettes page: every saved palette (and signed in, ones
-only in the gallery), with search, filters and sort once there are a few. -->
+<!-- My Library's Yarn Palettes page: every saved palette, or (Starred,
+`?show=starred`) gallery palettes starred to find again, with search, filters
+and sort once there are a few. -->
 
 <script lang="ts">
   import { browser } from '$app/env';
@@ -36,6 +37,9 @@ only in the gallery), with search, filters and sort once there are a few. -->
   import MyLibrary from '#lib/components/MyLibrary.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
   import SavedPalettesToolbar from '#lib/components/SavedPalettesToolbar.svelte';
+  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
+  import { showsStarred } from '#lib/state/library-scope.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -51,6 +55,10 @@ only in the gallery), with search, filters and sort once there are a few. -->
 
   let total = $state<number | null>(null);
   let matching = $state(0);
+  // Starred's, apart from Mine's (Mine's total is also Mine's count)
+  let starredTotal = $state<number | null>(null);
+  let starredMatching = $state(0);
+  const starred = $derived(showsStarred(appPage.url));
 
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
@@ -154,7 +162,23 @@ only in the gallery), with search, filters and sort once there are a few. -->
   {/snippet}
   {#snippet main()}
     <MyLibrary current="palettes" currentTotal={total}>
-      {#if browser}
+      {#if browser && starred}
+        <!-- Signed out, Starred is only a prompt to sign in -->
+        {#if signedIn}
+          <SavedPalettesToolbar
+            starred
+            total={starredTotal}
+            matching={starredMatching}
+          />
+        {/if}
+        <StarredGalleryPages
+          kind="palette"
+          layout={preferences.value.myProjectsLayout ?? 'grid'}
+          filters={libraryFilters}
+          oncount={(count) =>
+            ({ total: starredTotal, matching: starredMatching } = count)}
+        />
+      {:else if browser}
         <SavedPalettesToolbar {total} {matching}>
           {#snippet actions()}
             <a href={resolve('yarn')} class="btn preset-tonal-primary"
