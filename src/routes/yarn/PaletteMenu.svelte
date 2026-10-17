@@ -226,8 +226,8 @@ the panel, with a Back button to it. -->
     }
   }
 
-  function newPalette() {
-    void savePaletteNow();
+  async function newPalette() {
+    await savePaletteNow();
     yarnPageState.startNew();
     dialog.close();
   }

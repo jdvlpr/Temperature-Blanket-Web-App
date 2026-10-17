@@ -95,6 +95,17 @@ test.describe('Saved palettes', () => {
       'data-save-status',
       'Not saved',
     );
+
+    // Not saved, New Palette is a step Undo takes back
+    await page.getByRole('button', { name: 'Sort', exact: true }).click();
+    await page.getByRole('menuitem', { name: /^Reverse/ }).click();
+    await expect(page.locator('#undo')).toBeEnabled();
+    const reversed = page.url();
+    await paletteButton.click();
+    await menu.getByRole('button', { name: /^New Palette/ }).click();
+    await expect(page).not.toHaveURL(reversed);
+    await page.locator('#undo').click();
+    await expect(page).toHaveURL(reversed);
   });
 
   test('a name in the link is offered by Save Palette, for those colors', async ({

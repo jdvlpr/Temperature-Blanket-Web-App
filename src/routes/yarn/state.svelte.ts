@@ -57,12 +57,22 @@ class YarnState {
     this.showInAddressBar();
   }
 
-  /** A new palette, as on a fresh visit (the Palette menu's New Palette) */
+  /**
+   * A new palette, as on a fresh visit (the Palette menu's New Palette, and
+   * after Move to Trash). After a saved palette, history starts over; after
+   * one that isn't saved, it's one more step, so Undo brings it back.
+   */
   startNew() {
+    const wasSaved = Boolean(paletteAutosave.id);
     this.gauge = new TemperatureGauge();
     this.suggestion = null;
     closePalette();
-    this.startHistory();
+    if (wasSaved) this.startHistory();
+    else {
+      const entry = this.#entry();
+      if (entry !== this.history.current) this.history.push(entry);
+      this.showInAddressBar();
+    }
   }
 
   /** One of My Palettes, open here in place of this one, with its own history */
