@@ -305,6 +305,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 What's a Temperature Blanket?</a
               >
             </p>
+            <p>
+              Only need yarn colors? <a href="/yarn" class="link"
+                >Make a palette<span aria-hidden="true"> →</span></a
+              >
+            </p>
           </div>
         </div>
 

@@ -31,7 +31,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LandmarkIcon,
     LibraryBigIcon,
     NotebookPenIcon,
-    SwatchBookIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
@@ -45,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ['/gallery', '/gallery/palettes'].includes(pathname),
   );
   const blog = $derived(pathname.includes('/blog'));
+  const create = $derived(['/', '/yarn'].includes(pathname));
 
   const LINK = 'btn hover:preset-tonal-surface w-fit';
   const CURRENT = 'preset-tonal-secondary';
@@ -109,22 +109,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <h2 class={HEADING}>Create</h2>
 
+  <!-- The planner, which links to the Yarn page for a palette alone -->
   <a
     href="/"
-    class={[LINK, pathname === '/' && CURRENT]}
-    aria-current={pathname === '/' ? 'page' : undefined}
+    class={[LINK, create && CURRENT]}
+    aria-current={create ? 'page' : undefined}
   >
     <NotebookPenIcon />
-    Project Planner
-  </a>
-
-  <a
-    href="/yarn"
-    class={[LINK, pathname === '/yarn' && CURRENT]}
-    aria-current={pathname === '/yarn' ? 'page' : undefined}
-  >
-    <SwatchBookIcon />
-    Yarn Palette
+    Create
   </a>
 
   <h2 class={HEADING}>Explore</h2>
