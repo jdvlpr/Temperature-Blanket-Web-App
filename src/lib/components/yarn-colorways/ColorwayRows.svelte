@@ -20,7 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   list is narrow.
 
   With View › Fill with color, the whole row takes the colorway's color, as
-  the cards do (see ColorwayCards).
+  the cards do (see ColorwayCards), and the swatch's room closes as the color
+  grows out of it, so the text moves over to the row's start.
 
   With `selection`, each row (but its ⋮ menu) is one toggle button, led by a
   circle that's checked when it's selected.
@@ -65,11 +66,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet row(colorway: Color & { delta?: number })}
   {@const match = matchPercent(colorway)}
+  <!-- Filled, the swatch's room closes (and its gap with it), so the text
+  takes its place. The swatch inside keeps its size, so the fill grows from
+  and shrinks into the same spot, open or closed. -->
   <span
-    class="{swatchClass} {filled ? 'opacity-0' : ''}"
-    style="background:{colorway.hex}"
-    data-fill-origin
-  ></span>
+    class="flex shrink-0 overflow-hidden {filled ? '-mr-3 w-0' : 'w-12'}"
+    data-fill-collapse
+  >
+    <span
+      class="{swatchClass} {filled ? 'opacity-0' : ''}"
+      style="background:{colorway.hex}"
+      data-fill-origin
+    ></span>
+  </span>
   <span class="flex min-w-0 flex-1 flex-col gap-0.5">
     <span class="leading-tight font-semibold text-pretty">{colorway.name}</span>
     <span class="{mutedText(filled)} text-xs text-pretty">
@@ -90,9 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <!-- The end rows round like the list, and so do their toggle buttons on the
-side they meet it, so a focused row's ring follows the list's corners -->
+side they meet it, so a focused row's ring follows the list's corners (not
+the ⋮ button, also right in the row) -->
 <ul
-  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 [&>li:first-child]:rounded-t-container [&>li:first-child>button]:rounded-tl-container [&>li:last-child]:rounded-b-container [&>li:last-child>button]:rounded-bl-container @container w-full divide-y overflow-hidden border"
+  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 [&>li:first-child]:rounded-t-container [&>li:first-child>[data-row-toggle]]:rounded-tl-container [&>li:last-child]:rounded-b-container [&>li:last-child>[data-row-toggle]]:rounded-bl-container @container w-full divide-y overflow-hidden border"
 >
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}
@@ -118,6 +128,7 @@ side they meet it, so a focused row's ring follows the list's corners -->
             : 'hover:bg-surface-200-800/50'} flex min-w-0 flex-1 cursor-pointer items-center gap-3 p-2 text-left {ROW_FOCUS}"
           aria-pressed={selected}
           onclick={() => selection.ontoggle(colorway)}
+          data-row-toggle
         >
           {#if selected}
             <CircleCheckIcon

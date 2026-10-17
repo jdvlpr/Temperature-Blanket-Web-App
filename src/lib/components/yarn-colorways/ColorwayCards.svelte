@@ -17,7 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Yarn colorways as cards, like the palette's color cards: a round swatch on
   the card's top line with a "more" menu (⋮) at its end, then the name, yarn
   and match below it on the card. The ⋮ menu holds the link to buy or view
-  it and the copy options.
+  it and the copy options. The cards share their grid row's tracks (subgrid),
+  so across a row the names, yarns and matches line up.
 
   With View › Fill with color, the whole card takes the colorway's color,
   grown out of the swatch (which fades into it), with black or white text,
@@ -47,6 +48,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { colorways, selection }: Props = $props();
 
   let filled = $derived(fillWithColor.on);
+
+  // A track for the match and "No longer available" only when some card
+  // has one, so there's no empty track (and its gap) on every card
+  let hasExtras = $derived(
+    colorways.some(
+      (colorway) =>
+        matchPercent(colorway) !== undefined || colorway.unavailable,
+    ),
+  );
+  // Literal, so Tailwind finds them. The card's own gap, not the grid's.
+  let rows = $derived(
+    `grid grid-rows-subgrid gap-y-1 ${hasExtras ? 'row-span-4' : 'row-span-3'}`,
+  );
 </script>
 
 <!-- Spans, since in a selectable card they're inside its button -->
@@ -63,26 +77,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ></span>
 {/snippet}
 
+<!-- One per track: name, yarn, then match and "No longer available" -->
 {#snippet details(colorway: Color & { delta?: number })}
   {@const match = matchPercent(colorway)}
-  <span class="flex min-w-0 flex-col gap-0.5">
-    <span class="leading-tight font-semibold text-pretty">
-      {colorway.name}
-    </span>
-    <span class="{mutedText(filled)} text-xs text-pretty">
-      {colorway.brandName} · {colorway.yarnName}
-    </span>
+  <span class="leading-tight font-semibold text-pretty">
+    {colorway.name}
   </span>
-  {#if match !== undefined}
-    <span
-      class="bg-surface-200-800 text-surface-950-50 w-fit rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums"
-    >
-      {match}% match
-    </span>
-  {/if}
-  {#if colorway.unavailable}
-    <span class="{mutedText(filled)} mt-auto text-xs leading-tight">
-      No longer available
+  <span class="{mutedText(filled)} text-xs text-pretty">
+    {colorway.brandName} · {colorway.yarnName}
+  </span>
+  <!-- Its track stays when this card has neither, if another has one -->
+  {#if match !== undefined || colorway.unavailable}
+    <span class="flex flex-col items-start gap-1 pt-1">
+      {#if match !== undefined}
+        <span
+          class="bg-surface-200-800 text-surface-950-50 w-fit rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums"
+        >
+          {match}% match
+        </span>
+      {/if}
+      {#if colorway.unavailable}
+        <span class="{mutedText(filled)} text-xs leading-tight">
+          No longer available
+        </span>
+      {/if}
     </span>
   {/if}
 {/snippet}
@@ -96,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <!-- Selected on a color: the ring stands off the card, so it shows
       even on a yarn close to the ring's own color -->
       <li
-        class="card bg-surface-50-950 relative isolate flex min-w-0 flex-col overflow-hidden border {selected
+        class="card bg-surface-50-950 relative isolate min-w-0 overflow-hidden border {rows} {selected
           ? 'border-primary-500 ring-primary-500 ring-2'
           : 'border-surface-200-800'} {selected && filled
           ? 'ring-offset-surface-50-950 ring-offset-2'
@@ -109,14 +127,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {@render fillLayer(colorway)}
         <button
           type="button"
-          class="flex flex-1 cursor-pointer flex-col text-left {filled
+          class="cursor-pointer p-2 text-left {rows} {filled
             ? 'hover-on-color'
             : 'hover:bg-surface-200-800/50'}"
           aria-pressed={selected}
           onclick={() => selection.ontoggle(colorway)}
         >
           <!-- Room at the end for the ⋮ menu, which isn't part of the toggle -->
-          <span class="flex h-14 items-center gap-1 px-2 pt-2 pr-14">
+          <span class="mb-1 flex h-12 items-center gap-1 pr-12">
             <span class="flex size-8 shrink-0 items-center justify-center">
               {#if selected}
                 <CircleCheckIcon
@@ -129,9 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </span>
             {@render swatch(colorway)}
           </span>
-          <span class="flex flex-1 flex-col gap-2 p-2">
-            {@render details(colorway)}
-          </span>
+          {@render details(colorway)}
         </button>
         <!-- Over the swatch's line, a box the same height and as far down,
         so the button centers on that line whatever its own size -->
@@ -141,14 +157,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </li>
     {:else}
       <li
-        class="card bg-surface-50-950 border-surface-200-800 relative isolate flex min-w-0 flex-col overflow-hidden border"
+        class="card bg-surface-50-950 border-surface-200-800 relative isolate min-w-0 overflow-hidden border p-2 {rows}"
         style:color={filled ? iconColorOn(colorway.hex) : undefined}
         data-fillable
         data-filled={filled || undefined}
         use:fillFromSwatch={filled}
       >
         {@render fillLayer(colorway)}
-        <div class="flex h-14 items-center gap-1 px-2 pt-2">
+        <div class="mb-1 flex h-12 items-center gap-1">
           {@render swatch(colorway)}
           <span class="ml-auto flex items-center"
             ><ColorwayMoreMenu
@@ -157,9 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             /></span
           >
         </div>
-        <div class="flex flex-1 flex-col gap-2 p-2">
-          {@render details(colorway)}
-        </div>
+        {@render details(colorway)}
       </li>
     {/if}
   {/each}
