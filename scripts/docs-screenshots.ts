@@ -15,7 +15,7 @@
 
 // The screenshots in Guides & Help, light and dark. Run it again after the UI
 // changes to refresh every shot:
-//   pnpm build && pnpm preview          # in another terminal
+//   PUBLIC_ACCOUNTS_ENABLED=true pnpm build && pnpm preview   # in another terminal (as launched)
 //   node scripts/docs-screenshots.ts [--base https://localhost:4173] [--only <name>]
 // Each shot is static/images/docs/<name>-light.png and -dark.png (DocsShot's
 // `src` is <name>), and its size goes into src/lib/docs/docs-shots.json, which
@@ -45,6 +45,8 @@ type Shot = {
   open: (page: Page) => Promise<Locator>;
   /** For a panel as tall as the window: end the shot below its content */
   trim?: boolean;
+  /** A taller window, so bars and toasts at the bottom stay below the shot */
+  height?: number;
 };
 
 /** The planner with the project's weather loaded, at one of its sections */
@@ -89,6 +91,30 @@ const menu = (page: Page) => page.getByRole('menu').last();
 const dialog = (page: Page) => page.getByRole('dialog').last();
 
 const SHOTS: Shot[] = [
+  {
+    name: 'preview/rows',
+    open: async (page) => {
+      const section = await planner(page, 'preview');
+      return section.locator('#preview-svg-image');
+    },
+    height: 2200,
+  },
+  {
+    name: 'library-and-account/card-menu',
+    open: async (page) => {
+      await planner(page, 'weather-data');
+      await page.keyboard.press('.');
+      await page.getByTestId('menu-save').click();
+      await page.getByTestId('autosave-status').waitFor();
+      await page.goto(new URL('/my-projects', base).href);
+      await page
+        .getByRole('button', { name: /^More for/ })
+        .first()
+        .click();
+      await settle(page);
+      return menu(page);
+    },
+  },
   {
     name: 'location-and-dates/location',
     open: async (page) => {
@@ -163,7 +189,7 @@ async function main() {
       const context = await browser.newContext({
         baseURL: base,
         ignoreHTTPSErrors: true,
-        viewport: { width: 1280, height: 1400 },
+        viewport: { width: 1280, height: shot.height ?? 1400 },
         colorScheme: theme,
         reducedMotion: 'reduce',
         // Sharp on high-density screens; the sizes kept are CSS pixels

@@ -21,6 +21,14 @@
   },
   "library-and-account/project-menu": {
     "width": 448,
-    "height": 866
+    "height": 915
+  },
+  "preview/rows": {
+    "width": 968,
+    "height": 1178
+  },
+  "library-and-account/card-menu": {
+    "width": 241,
+    "height": 247
   }
 }

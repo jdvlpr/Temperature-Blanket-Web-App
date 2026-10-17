@@ -19,6 +19,7 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
 
 <script lang="ts">
   import Seasons from '#lib/components/docs/help/Seasons.svelte';
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 
   const patterns = [
@@ -117,6 +118,11 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     Press <span class="font-bold">Information</span> above a preview for more about
     its pattern and what's in this one.
   </p>
+  <DocsShot
+    src="preview/rows"
+    alt="A Rows preview of a year of London's weather: one thin stripe per day from top to bottom, purples and blues in winter, warming through yellows and oranges to deep reds in summer, and back to blues and purples in December."
+    caption="The Rows pattern, a year of London."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

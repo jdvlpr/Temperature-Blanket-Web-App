@@ -110,7 +110,7 @@ show only in builds with accounts. -->
   </p>
   <DocsShot
     src="library-and-account/project-menu"
-    alt="The Project menu: the project's name with Save Project; Download; Share with Copy Link; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
+    alt="The Project menu: the project's name with Save Project; Download; Share with Copy Link and Sign In to Publish; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
     caption="The Project menu, before the project is saved."
   />
 </section>
@@ -165,6 +165,11 @@ show only in builds with accounts. -->
       >.
     </p>
   {/if}
+  <DocsShot
+    src="library-and-account/card-menu"
+    alt="A project card's ⋮ menu in My Library: Edit in Project Planner, Duplicate Project, Sign In to Publish under Gallery Page, and Move to Trash."
+    caption="A project card's ⋮ menu, signed out."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

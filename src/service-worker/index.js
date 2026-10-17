@@ -23,7 +23,9 @@ const CACHE = `cache-${version}`;
 // Manifest paths are relative to the base path; the fetch handler compares pathnames
 const ASSETS = [
   ...immutable, // the app itself
-  ...assets, // everything in `static`
+  // everything in `static`, but Guides & Help's screenshots: only a reader
+  // needs them, one theme of each, and they load (and are cached) as read
+  ...assets.filter(({ path }) => !path.includes('images/docs/')),
 ].map(({ path }) => new URL(path, self.registration.scope).pathname);
 
 self.addEventListener('install', (event) => {
