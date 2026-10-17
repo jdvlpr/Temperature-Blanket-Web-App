@@ -237,7 +237,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
-    <div class="">
+    <!-- The palette in its tray, as on the main page -->
+    <div
+      class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
+    >
       {#if !yarnDataReady}
         <div class="mx-auto my-6">
           <Spinner />
@@ -246,6 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <PaletteStripEditor
           bind:colors={randomPalette}
           lockable
+          roundedBottom={false}
           onchange={(colors) => (numberOfColors = colors.length)}
         />
       {/if}

@@ -361,11 +361,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="mt-2 flex w-full flex-col items-center gap-2">
+<div
+  class={[
+    'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col items-center justify-center gap-2 shadow-inner',
+    gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
+  ]}
+>
   <div class="w-full">
     <!-- The overview: pressing a color goes to it in the list below, where it's edited -->
     <PaletteStrip
       colors={gauge.colors}
+      roundedBottom={false}
       {flashIndices}
       onhover={(index) => (highlightIndex = index)}
       onselect={(index) => focusGaugeColor(gauge.id, index)}
@@ -374,7 +380,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     class={[
-      'flex w-full flex-wrap items-center justify-center gap-2',
+      'flex flex-wrap items-center justify-center gap-2 px-2',
       gauge.unit.type === 'category' && 'hidden',
     ]}
   >

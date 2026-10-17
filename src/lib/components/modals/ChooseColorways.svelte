@@ -151,11 +151,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
       {#if selectedColors.length}
-        <div class="">
+        <div
+          class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
+        >
           <!-- Sort and Clear, or the bar for a color pressed in the strip -->
-          <PaletteStripEditor bind:colors={selectedColors}>
+          <PaletteStripEditor
+            bind:colors={selectedColors}
+            roundedBottom={false}
+          >
             {#snippet toolbar()}
-              <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center justify-between gap-2 px-2">
                 <p class="text-xs">{paletteTitleText}</p>
                 <div class="flex items-center gap-1">
                   <SortMenu

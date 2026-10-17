@@ -44,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Text, or markup, under the colors */
     label?: string | Snippet;
     height?: string;
+    roundedBottom?: boolean;
     /** Slightly rounded corners, for small strips in lists and cards */
     smallCorners?: boolean;
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
@@ -68,6 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors,
     label,
     height = '70px',
+    roundedBottom = true,
     smallCorners = false,
     insideControl = false,
     onselect,
@@ -185,9 +187,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // The end colors round their outer corners like the strip, so their
         // outline (hover, selected, focus) follows the curve instead of
         // being clipped by it
-        index === 0 && (smallCorners ? 'rounded-l-sm' : 'rounded-l-container'),
+        index === 0 &&
+          (smallCorners ? 'rounded-tl-sm' : 'rounded-tl-container'),
+        index === 0 &&
+          roundedBottom &&
+          (smallCorners ? 'rounded-bl-sm' : 'rounded-bl-container'),
         index === colors.length - 1 &&
-          (smallCorners ? 'rounded-r-sm' : 'rounded-r-container'),
+          (smallCorners ? 'rounded-tr-sm' : 'rounded-tr-container'),
+        index === colors.length - 1 &&
+          roundedBottom &&
+          (smallCorners ? 'rounded-br-sm' : 'rounded-br-container'),
       ],
       style: `background:${hex};color:${getTextColor(hex)};${
         highlightIndex === index
@@ -244,7 +253,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span
       class={[
         'flex w-full overflow-hidden',
-        smallCorners ? 'rounded-sm' : 'rounded-container',
+        smallCorners ? 'rounded-t-sm' : 'rounded-t-container',
+        roundedBottom &&
+          (smallCorners ? 'rounded-b-sm' : 'rounded-b-container'),
       ]}
       style:height
       role={insideControl ? undefined : 'group'}

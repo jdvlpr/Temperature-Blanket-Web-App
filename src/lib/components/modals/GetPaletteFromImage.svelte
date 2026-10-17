@@ -479,12 +479,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="bg-surface-50 dark:bg-surface-950 flex flex-col gap-1 px-2 pt-2 sm:px-4"
         >
           <!-- The palette and its tools, as on the main page -->
-          <div class="flex w-full flex-col items-center gap-2">
+          <div
+            class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
+          >
             <!-- Count, Yarn, Auto Palette, Sort and Clear; the bar for a color
             pressed in the strip takes their place while it's open -->
             {#snippet tools()}
               <div
-                class="flex w-full flex-wrap items-center justify-center gap-2"
+                class="flex flex-wrap items-center justify-center gap-2 px-2"
               >
                 {#key palette.points.length}
                   <SelectNumberOfColors
@@ -706,6 +708,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 preview={previewYarn}
                 staggerIn
                 lockable
+                roundedBottom={false}
                 colors={paletteColors}
                 {highlightIndex}
                 onhover={(index: number | null) =>
@@ -721,7 +724,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             {:else}
               <div
-                class="border-surface-300-700 text-surface-700-300 rounded-container flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
+                class="rounded-t-container border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
               >
                 Tap the photo to add colors, or use Auto<span
                   class="max-sm:hidden">&nbsp;Palette</span
