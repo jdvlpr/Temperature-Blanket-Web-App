@@ -43,7 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onchange?: (colors: Color[]) => void;
     /** Whether colors can be locked, to keep them when the rest change */
     lockable?: boolean;
-    roundedBottom?: boolean;
     /** A color to outline, as when its marker is pointed at on an image */
     highlightIndex?: number | null;
     /** Called with a color's index when it's pointed at or focused from the keyboard, and null after */
@@ -69,7 +68,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors = $bindable([]),
     onchange,
     lockable = false,
-    roundedBottom = true,
     highlightIndex = null,
     onhover,
     staggerIn = false,
@@ -167,7 +165,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <PaletteStrip
     bind:this={strip}
     {colors}
-    {roundedBottom}
     {staggerIn}
     {onhover}
     highlightIndex={selected ?? highlightIndex}
@@ -184,9 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={[
         // Tinted, like the pop-ups' other notices, so it reads as its own
         // panel for this one color
-        'card preset-tonal-surface flex flex-wrap items-center gap-x-2 gap-y-1 p-2 text-left',
-        // A strip with a square bottom sits flush in a card, whose tools are inset
-        roundedBottom ? 'w-full' : 'mx-2 w-[calc(100%-1rem)]',
+        'card preset-tonal-surface flex w-full flex-wrap items-center gap-x-2 gap-y-1 p-2 text-left',
       ]}
       role="group"
       aria-label="Color {selected + 1}"

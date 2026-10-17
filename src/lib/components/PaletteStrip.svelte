@@ -44,7 +44,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Text, or markup, under the colors */
     label?: string | Snippet;
     height?: string;
-    roundedBottom?: boolean;
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
     insideControl?: boolean;
     /** Called with a color's index when it's pressed; each color is then a button */
@@ -67,7 +66,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors,
     label,
     height = '70px',
-    roundedBottom = true,
     insideControl = false,
     onselect,
     selectedIndex,
@@ -184,10 +182,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // The end colors round their outer corners like the strip, so their
         // outline (hover, selected, focus) follows the curve instead of
         // being clipped by it
-        index === 0 && 'rounded-tl-sm',
-        index === 0 && roundedBottom && 'rounded-bl-sm',
-        index === colors.length - 1 && 'rounded-tr-sm',
-        index === colors.length - 1 && roundedBottom && 'rounded-br-sm',
+        index === 0 && 'rounded-l-sm',
+        index === colors.length - 1 && 'rounded-r-sm',
       ],
       style: `background:${hex};color:${getTextColor(hex)};${
         highlightIndex === index
@@ -242,10 +238,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-hidden={insideControl || undefined}
   >
     <span
-      class={[
-        'flex w-full overflow-hidden rounded-t-sm',
-        roundedBottom && 'rounded-b-sm',
-      ]}
+      class="flex w-full overflow-hidden rounded-sm"
       style:height
       role={insideControl ? undefined : 'group'}
       aria-label={insideControl
