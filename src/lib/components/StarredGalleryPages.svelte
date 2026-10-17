@@ -119,14 +119,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <h2 id="starred-heading" class="flex items-center gap-2 text-lg font-bold">
     <StarIcon aria-hidden="true" />Starred
   </h2>
-  {#if failed}
+  {#if failed || (galleryStars.failed && !galleryStars.loaded)}
     <p role="alert">
       Your starred {noun} couldn’t be loaded.
       <button
         type="button"
         class="link"
-        onclick={() => load(galleryStars.list(kind).map((star) => star.postId))}
-        >Try again</button
+        onclick={() =>
+          galleryStars.loaded
+            ? load(galleryStars.list(kind).map((star) => star.postId))
+            : galleryStars.load()}>Try again</button
       >
     </p>
   {:else if !shown}

@@ -32,11 +32,15 @@ class GalleryStarsState {
   /** Whose stars these are */
   #userId = $state<string | null>(null);
   #stars = new SvelteMap<number, GalleryStar>();
+  /** The account's own gallery pages, which can't be starred */
+  #own = new SvelteSet<number>();
   /** Stars being saved, so a second tap waits for the first */
   #saving = new SvelteSet<number>();
   #loading: Promise<void> | null = null;
   #lastLoad = 0;
   #shown = 0;
+  /** Whether the last load failed (stars can't be shown or changed then) */
+  failed = $state(false);
 
   /** Whether this account's stars have loaded */
   get loaded() {
@@ -46,6 +50,11 @@ class GalleryStarsState {
   /** Whether the account signed in now starred this page */
   has(postId: number) {
     return this.loaded && this.#stars.has(postId);
+  }
+
+  /** Whether this is one of the account's own pages: no star on it */
+  isOwn(postId: number) {
+    return this.loaded && this.#own.has(postId);
   }
 
   saving(postId: number) {
@@ -68,15 +77,22 @@ class GalleryStarsState {
         this.#lastLoad = Date.now();
         const response = await fetch(ENDPOINT);
         if (!response.ok) throw new Error(`${response.status}`);
-        const { stars } = (await response.json()) as { stars: GalleryStar[] };
+        const { stars, own } = (await response.json()) as {
+          stars: GalleryStar[];
+          own: number[];
+        };
         // Signed out or into another account meanwhile
         if (account.summary?.id !== userId) return;
         this.#stars.clear();
         for (const star of stars) this.#stars.set(star.postId, star);
+        this.#own.clear();
+        for (const postId of own) this.#own.add(postId);
         this.#userId = userId;
+        this.failed = false;
       } catch (e) {
-        // Stars show unpressed; asked again on the next focus
+        // Asked again on the next focus, or when a star is tapped
         console.error('Could not load gallery stars', e);
+        if (account.summary?.id === userId) this.failed = true;
       } finally {
         this.#loading = null;
       }
@@ -97,7 +113,9 @@ class GalleryStarsState {
     if (!this.loaded) {
       // Another account's stars never show, even for a moment
       this.#stars.clear();
+      this.#own.clear();
       this.#userId = null;
+      this.failed = false;
       void this.load();
     }
     if (this.#shown++ === 0) {
@@ -111,9 +129,24 @@ class GalleryStarsState {
     };
   }
 
-  /** Stars or unstars a page at once, putting it back with a toast when that fails */
-  async toggle(postId: number, kind: GalleryPostKind) {
-    if (!this.loaded || this.#saving.has(postId)) return;
+  /**
+   * Stars or unstars a page at once, putting it back with a toast when that
+   * fails. Returns whether it's starred now, or null when nothing changed.
+   */
+  async toggle(postId: number, kind: GalleryPostKind): Promise<boolean | null> {
+    if (this.#saving.has(postId)) return null;
+    if (!this.loaded) {
+      // The stars couldn't load: try again first
+      await this.load();
+      if (!this.loaded) {
+        toast.trigger({
+          message: 'Could not load your stars. Try again.',
+          category: 'error',
+        });
+        return null;
+      }
+      if (this.#own.has(postId)) return null;
+    }
     const before = this.#stars.get(postId);
     if (before) this.#stars.delete(postId);
     else this.#stars.set(postId, { postId, kind, createdAt: Date.now() });
@@ -132,6 +165,7 @@ class GalleryStarsState {
           status: response.status,
         });
       }
+      return !before;
     } catch (e) {
       if (before) this.#stars.set(postId, before);
       else this.#stars.delete(postId);
@@ -145,6 +179,7 @@ class GalleryStarsState {
               : 'Could not star this page. Try again.',
         category: 'error',
       });
+      return null;
     } finally {
       this.#saving.delete(postId);
     }

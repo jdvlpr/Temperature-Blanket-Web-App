@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import { page } from '$app/state';
-  import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
   import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account } from '#lib/accounts/summary.svelte.js';
@@ -40,16 +39,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { postId, kind, name = '', labelled = false }: Props = $props();
 
   let userId = $derived(__ACCOUNTS_ENABLED__ ? account.summary?.id : undefined);
-  // Only known where the account's pages have loaded (the page itself); the
-  // server refuses a star on one's own page anyway
-  let own = $derived(
-    !!userId &&
-      galleryPages.pages.some(
-        (p) => p.postId === postId && (p.kind ?? 'project') === kind,
-      ),
-  );
+  // Loaded with the stars (the server refuses a star on one's own page anyway)
+  let own = $derived(!!userId && galleryStars.isOwn(postId));
   let starred = $derived(galleryStars.has(postId));
-  let ready = $derived(galleryStars.loaded && !galleryStars.saving(postId));
+  // While the stars load, or this one saves; after a failed load a tap tries again
+  let busy = $derived(
+    (!galleryStars.loaded && !galleryStars.failed) ||
+      galleryStars.saving(postId),
+  );
+  /** Said after a change, where the label changing alone may not be */
+  let announcement = $state('');
+
+  async function toggle() {
+    if (busy) return;
+    const now = await galleryStars.toggle(postId, kind);
+    if (labelled && now !== null) announcement = now ? 'Starred' : 'Unstarred';
+  }
 
   $effect(() => {
     if (userId) return galleryStars.start();
@@ -70,9 +75,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 {/snippet}
 
-<!-- On the page itself, the owner's Edit Gallery Page loads their pages: wait
-for those rather than show a star that then goes -->
-{#if __ACCOUNTS_ENABLED__ && !own && !(labelled && userId && !galleryPages.loaded)}
+<!-- On the page itself, wait for the stars rather than show the owner a star
+that then goes -->
+{#if __ACCOUNTS_ENABLED__ && !own && !(labelled && userId && busy && !galleryStars.loaded)}
   {#if userId}
     <!-- With a label that changes, the label says the state; an icon alone says
     it with aria-pressed and keeps one name -->
@@ -81,18 +86,19 @@ for those rather than show a star that then goes -->
       class={buttonClass}
       aria-pressed={labelled ? undefined : starred}
       aria-label={labelled ? undefined : `Star ${name}`}
-      aria-disabled={!ready || undefined}
+      aria-disabled={busy || undefined}
       title={starred
         ? 'Starred: tap to unstar'
         : 'Star to find it in My Library'}
       data-testid="gallery-star"
-      onclick={() => {
-        if (ready) void galleryStars.toggle(postId, kind);
-      }}
+      onclick={toggle}
     >
       {@render icon(starred)}
       {#if labelled}{starred ? 'Starred' : 'Star'}{/if}
     </button>
+    {#if labelled}
+      <p class="sr-only" aria-live="polite">{announcement}</p>
+    {/if}
   {:else}
     <a
       href={signInHref(page.url)}

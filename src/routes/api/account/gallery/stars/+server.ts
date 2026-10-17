@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // The signed-in user's stars: gallery pages they starred to find again. List
-// them (GET), star one (PUT { postId, kind }) or unstar it (DELETE { postId }).
+// them with the user's own pages, which can't be starred (GET), star one (PUT { postId, kind }) or unstar it (DELETE { postId }).
 // Private, and one D1 request each: never WordPress, never a view.
 
 import type { RequestHandler } from './$types';
@@ -32,12 +32,12 @@ function postIdFrom(value: unknown) {
 
 export const GET: RequestHandler = async (event) => {
   const { requireGallery } = await import('#lib/server/gallery/index.js');
-  const { listStars } = await import('#lib/server/gallery/stars.js');
+  const { listStarsAndOwn } = await import('#lib/server/gallery/stars.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 
-  const stars = await listStars(gallery.db, gallery.userId);
-  return Response.json({ stars }, { headers: PRIVATE });
+  const { stars, own } = await listStarsAndOwn(gallery.db, gallery.userId);
+  return Response.json({ stars, own }, { headers: PRIVATE });
 };
 
 export const PUT: RequestHandler = async (event) => {

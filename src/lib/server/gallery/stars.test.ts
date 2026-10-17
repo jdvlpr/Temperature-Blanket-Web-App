@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   addStar,
   listStars,
+  listStarsAndOwn,
   removeStar,
   removeStars,
   STAR_LIMIT,
@@ -56,6 +57,10 @@ describe('gallery stars', () => {
     });
     expect(await addStar(d1, 'u1', 10, 'project')).toBe('own-page');
     expect(await addStar(d1, 'u2', 10, 'project')).toBe('added');
+    expect(await listStarsAndOwn(d1, 'u1')).toEqual({ stars: [], own: [10] });
+    expect(
+      (await listStarsAndOwn(d1, 'u2')).stars.map((s) => s.postId),
+    ).toEqual([10]);
   });
 
   it('stops at the limit', async () => {

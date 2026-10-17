@@ -31,6 +31,10 @@ export type GalleryStar = {
 export type AddStarResult =
   'added' | 'starred-already' | 'star-limit' | 'own-page';
 
+const LIST_STARS = `select "postId", "kind", "createdAt" from "galleryStar"
+  where "userId" = ?1 and (?2 is null or "kind" = ?2)
+  order by "createdAt" desc, "postId" desc`;
+
 /** The user's stars, newest first, of one kind or both */
 export async function listStars(
   db: D1Database,
@@ -38,14 +42,25 @@ export async function listStars(
   kind?: GalleryPostKind,
 ): Promise<GalleryStar[]> {
   const { results } = await db
-    .prepare(
-      `select "postId", "kind", "createdAt" from "galleryStar"
-       where "userId" = ?1 and (?2 is null or "kind" = ?2)
-       order by "createdAt" desc, "postId" desc`,
-    )
+    .prepare(LIST_STARS)
     .bind(userId, kind ?? null)
     .all<GalleryStar>();
   return results;
+}
+
+/**
+ * The user's stars, and their own gallery pages (which can't be starred, so
+ * their cards show no star), for one request from the browser.
+ */
+export async function listStarsAndOwn(db: D1Database, userId: string) {
+  const [stars, own] = await Promise.all([
+    listStars(db, userId),
+    db
+      .prepare(`select "postId" from "galleryPost" where "userId" = ?`)
+      .bind(userId)
+      .all<{ postId: number }>(),
+  ]);
+  return { stars, own: own.results.map((row) => row.postId) };
 }
 
 /**

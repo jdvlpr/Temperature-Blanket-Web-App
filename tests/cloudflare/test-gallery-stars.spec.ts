@@ -107,4 +107,13 @@ test('a gallery project is starred from its card, found under Starred in My Libr
   await expect(again).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(() => starsOf(userId)).toEqual([]);
   await expect(starred.getByRole('link', { name: NAME })).toBeVisible();
+
+  // One's own page has no star
+  localD1(
+    `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
+     values (${postId}, '${userId}', 'p-star', '${NAME}', ${Date.now()})`,
+  );
+  await page.goto('/gallery');
+  await expect(page.getByRole('link', { name: NAME })).toBeVisible();
+  await expect(page.getByTestId('gallery-star')).toHaveCount(0);
 });
