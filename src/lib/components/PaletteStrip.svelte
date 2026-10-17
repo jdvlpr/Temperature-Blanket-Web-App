@@ -44,6 +44,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** Text, or markup, under the colors */
     label?: string | Snippet;
     height?: string;
+    /** Slightly rounded corners, for small strips in lists and cards */
+    smallCorners?: boolean;
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
     insideControl?: boolean;
     /** Called with a color's index when it's pressed; each color is then a button */
@@ -66,6 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors,
     label,
     height = '70px',
+    smallCorners = false,
     insideControl = false,
     onselect,
     selectedIndex,
@@ -182,8 +185,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // The end colors round their outer corners like the strip, so their
         // outline (hover, selected, focus) follows the curve instead of
         // being clipped by it
-        index === 0 && 'rounded-l-sm',
-        index === colors.length - 1 && 'rounded-r-sm',
+        index === 0 && (smallCorners ? 'rounded-l-sm' : 'rounded-l-container'),
+        index === colors.length - 1 &&
+          (smallCorners ? 'rounded-r-sm' : 'rounded-r-container'),
       ],
       style: `background:${hex};color:${getTextColor(hex)};${
         highlightIndex === index
@@ -238,7 +242,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-hidden={insideControl || undefined}
   >
     <span
-      class="flex w-full overflow-hidden rounded-sm"
+      class={[
+        'flex w-full overflow-hidden',
+        smallCorners ? 'rounded-sm' : 'rounded-container',
+      ]}
       style:height
       role={insideControl ? undefined : 'group'}
       aria-label={insideControl

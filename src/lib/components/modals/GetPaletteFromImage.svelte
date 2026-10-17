@@ -721,7 +721,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             {:else}
               <div
-                class="border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center rounded-sm border-2 border-dashed text-sm"
+                class="border-surface-300-700 text-surface-700-300 rounded-container flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
               >
                 Tap the photo to add colors, or use Auto<span
                   class="max-sm:hidden">&nbsp;Palette</span

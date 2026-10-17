@@ -309,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <li class="flex w-full min-w-0" {@attach slots.track(card.key)}>
           {#if editingId === palette.id}
             <div class="flex w-full flex-col gap-2">
-              <PaletteStrip {colors} />
+              <PaletteStrip {colors} smallCorners />
               <NameField
                 bind:value={editingName}
                 label="Palette name"
