@@ -64,8 +64,9 @@
   }: Props = $props();
 
   // Base Classes
+  // Above a bar pinned to the bottom of the screen (CollectionNav), if any
   const cWrapper =
-    'flex fixed top-0 left-0 right-0 bottom-0 pointer-events-none ';
+    'flex fixed top-0 left-0 right-0 bottom-0 pointer-events-none pb-(--bottom-bar-height)';
   const cSnackbar = 'flex flex-col gap-y-2';
   // On narrow screens the buttons go below the message, rather than
   // squeezing it

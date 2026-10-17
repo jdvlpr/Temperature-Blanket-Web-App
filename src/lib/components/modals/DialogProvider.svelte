@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { BOTTOM_BAR } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
@@ -615,7 +616,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if dialog.headerControl && phone.current}
                     <div
                       data-sticky-footer
-                      class="bg-surface-50/90 dark:bg-surface-950/90 border-surface-200-800 sticky bottom-0 z-20 mt-0! border-t px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur"
+                      class={[BOTTOM_BAR, 'sticky bottom-0 z-20 mt-0!']}
                     >
                       {@render dialog.headerControl()}
                     </div>

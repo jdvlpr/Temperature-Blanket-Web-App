@@ -11,14 +11,23 @@ type Placement =
 /**
  * The room a menu has: the screen below the sticky bar on top of it (the open
  * dialog's, or else the app's header, each marked `data-sticky-bar`), so a
- * menu never runs under that bar
+ * menu never runs under that bar. On the page itself, it also stops above a
+ * bar pinned to the bottom (CollectionNav's, marked `data-bottom-bar`).
  */
 function belowStickyBar() {
   const bars = document.querySelectorAll<HTMLElement>('[data-sticky-bar]');
-  const bar = [...bars].find((el) => el.closest('[role="dialog"]')) ?? bars[0];
+  const dialogBar = [...bars].find((el) => el.closest('[role="dialog"]'));
+  const bar = dialogBar ?? bars[0];
   const top = Math.max(0, bar?.getBoundingClientRect().bottom ?? 0);
   const { clientWidth, clientHeight } = document.documentElement;
-  return { x: 0, y: top, width: clientWidth, height: clientHeight - top };
+  let bottom = clientHeight;
+  if (!dialogBar) {
+    const pinned = document
+      .querySelector<HTMLElement>('[data-bottom-bar]')
+      ?.getBoundingClientRect();
+    if (pinned?.height) bottom = Math.min(bottom, pinned.top);
+  }
+  return { x: 0, y: top, width: clientWidth, height: bottom - top };
 }
 
 /**

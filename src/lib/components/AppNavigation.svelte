@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
+  import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
@@ -84,8 +85,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
   {/if}
 
+  <!-- Back to the side that was open last (after loading: a link's address
+  isn't updated from the server's) -->
   <a
-    href={resolve('my-projects')}
+    href={mounted && librarySection.value === 'palettes'
+      ? resolve('my-palettes')
+      : resolve('my-projects')}
     class={[LINK, library && CURRENT]}
     aria-current={library ? 'page' : undefined}
   >

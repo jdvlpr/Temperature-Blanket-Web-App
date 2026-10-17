@@ -44,6 +44,12 @@
     border-color: var(--color-gray-200, currentColor);
   }
 
+  /* Keyboard focus and scrolling into view stop above a bar pinned to the
+  bottom of the screen (CollectionNav sets the height while it shows) */
+  html {
+    scroll-padding-bottom: var(--bottom-bar-height, 0px);
+  }
+
   ::selection {
     color: var(--typo-base--color-dark);
   }

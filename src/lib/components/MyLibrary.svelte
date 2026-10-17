@@ -41,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CollectionNav from '#lib/components/CollectionNav.svelte';
   import Trash from '#lib/components/Trash.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
+  import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { savedPalettes } from '#lib/storage/palettes.svelte.js';
   import {
     ProjectStorage,
@@ -73,6 +74,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     currentTotal?: number | null;
     children: Snippet;
   } = $props();
+
+  // The sidebar's My Library link comes back to this side next time
+  $effect(() => {
+    librarySection.value = current;
+  });
 
   let trashedProjectCount = $state(0);
   // Each page's Trash has only its own kind

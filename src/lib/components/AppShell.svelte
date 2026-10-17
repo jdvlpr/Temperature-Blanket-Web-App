@@ -69,7 +69,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div>
+<!-- Room for a bar pinned to the bottom of the screen (CollectionNav) -->
+<div class="pb-(--bottom-bar-height)">
   <div
     class={[
       'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',

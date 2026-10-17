@@ -63,6 +63,15 @@ test.describe('My Projects', () => {
       .click();
     await expect(page).toHaveURL(/\/my-palettes$/);
     await expect(page.getByText('No saved palettes yet')).toBeVisible();
+
+    // The site menu's link goes back to the side that was open last
+    await expect(
+      page.getByRole('link', { name: 'My Library' }).first(),
+    ).toHaveAttribute('href', '/my-palettes');
+    await page.goto('/');
+    await expect(
+      page.getByRole('link', { name: 'My Library' }).first(),
+    ).toHaveAttribute('href', '/my-palettes');
   });
 
   test('lists saved projects and palettes', async ({ page }) => {
