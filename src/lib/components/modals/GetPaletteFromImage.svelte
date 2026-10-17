@@ -484,7 +484,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             pressed in the strip takes their place while it's open -->
             {#snippet tools()}
               <div
-                class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-wrap items-center justify-center gap-2 p-2 shadow-inner"
+                class="flex w-full flex-wrap items-center justify-center gap-2"
               >
                 {#key palette.points.length}
                   <SelectNumberOfColors

@@ -374,7 +374,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     class={[
-      'rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-wrap items-center justify-center gap-2 p-2 shadow-inner',
+      'flex w-full flex-wrap items-center justify-center gap-2',
       gauge.unit.type === 'category' && 'hidden',
     ]}
   >
