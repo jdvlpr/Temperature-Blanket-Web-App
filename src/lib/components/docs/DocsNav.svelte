@@ -20,6 +20,7 @@ Choosing a link closes it (onNavigate). -->
 <script lang="ts">
   import { page } from '$app/state';
   import OnThisPage from '#lib/components/docs/OnThisPage.svelte';
+  import { goFromSheet } from '#lib/docs/on-this-page.svelte.js';
   import {
     DOCS_TITLE,
     GUIDES,
@@ -32,6 +33,9 @@ Choosing a link closes it (onNavigate). -->
 
   const pathname = $derived(page.url.pathname.replace(/\/$/, ''));
   const current = $derived(docsPageAt(pathname));
+
+  const go = (event: MouseEvent, href: string) =>
+    onNavigate && goFromSheet(event, href, onNavigate);
 
   const LINK =
     'block rounded-base px-3 py-1.5 hover:bg-surface-200-800 transition-colors';
@@ -49,7 +53,7 @@ Choosing a link closes it (onNavigate). -->
       href="/documentation"
       class={[LINK, pathname === '/documentation' && CURRENT]}
       aria-current={pathname === '/documentation' ? 'page' : undefined}
-      onclick={onNavigate}>All {DOCS_TITLE}</a
+      onclick={(event) => go(event, '/documentation')}>All {DOCS_TITLE}</a
     >
     {#each [{ heading: 'Guides', pages: GUIDES }, { heading: 'Reference', pages: REFERENCE }] as { heading, pages } (heading)}
       <div class="flex flex-col gap-1">
@@ -62,7 +66,7 @@ Choosing a link closes it (onNavigate). -->
                 {href}
                 class={[LINK, pathname === href && CURRENT]}
                 aria-current={pathname === href ? 'page' : undefined}
-                onclick={onNavigate}>{docsPage.title}</a
+                onclick={(event) => go(event, href)}>{docsPage.title}</a
               >
             </li>
           {/each}

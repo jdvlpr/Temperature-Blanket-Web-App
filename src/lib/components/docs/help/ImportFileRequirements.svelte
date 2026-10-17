@@ -19,8 +19,10 @@ headings are the ones ImportWeatherData reads. -->
 <div class="flex flex-col gap-2">
   <p>
     The easiest way: download your project's weather as a spreadsheet (CSV),
-    change it, and import it back. Any CSV file works, though, if its first row
-    has these headings.
+    change it, and import it back. Choose
+    <span class="font-bold">Daily</span> weather before downloading: a weekly download
+    has a Week Of column instead of Date, which can't be imported. Any CSV file works,
+    though, if its first row has these headings.
   </p>
   <p class="font-bold">Always:</p>
   <ul class="ml-6 list-disc space-y-1">
@@ -44,8 +46,9 @@ headings are the ones ImportWeatherData reads. -->
   </ul>
   <p>
     Type the headings exactly, with the spaces, brackets and symbols. Weather
-    without a column in your file stays as it is. Save the file as UTF-8 if your
-    spreadsheet app asks.
+    without a column in your file stays as it is. In the columns you include,
+    leave no cell empty: an empty cell is read as 0. Save the file as UTF-8 if
+    your spreadsheet app asks.
   </p>
   <img
     src="/images/documentation/csv-file-requirements.png"

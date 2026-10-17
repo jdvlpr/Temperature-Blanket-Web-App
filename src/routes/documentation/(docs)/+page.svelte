@@ -162,7 +162,7 @@ Back doesn't return to it. -->
       </p>
     </div>
 
-    <div id="yarn" class="space-y-1">
+    <div id="yarn-not-listed" class="space-y-1">
       <h3 class="font-bold">Why isn't the yarn I want here?</h3>
       <p>
         Probably because nobody has asked for it yet!

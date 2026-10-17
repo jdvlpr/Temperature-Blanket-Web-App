@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 beside the page on wide screens, and at the top of the Contents sheet. -->
 
 <script lang="ts">
-  import { onThisPage } from '#lib/docs/on-this-page.svelte.js';
+  import { goFromSheet, onThisPage } from '#lib/docs/on-this-page.svelte.js';
 
   let {
     heading = 'On this page',
@@ -42,7 +42,9 @@ beside the page on wide screens, and at the top of the Contents sheet. -->
                 : 'border-transparent opacity-80 hover:opacity-100',
             ]}
             aria-current={current ? 'location' : undefined}
-            onclick={onNavigate}>{section.text}</a
+            onclick={onNavigate
+              ? (event) => goFromSheet(event, `#${section.id}`, onNavigate)
+              : undefined}>{section.text}</a
           >
         </li>
       {/each}

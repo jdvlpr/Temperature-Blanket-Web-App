@@ -18,6 +18,7 @@
 // the one being read. Collected from the page's own h2 and h3 headings, so
 // pages need nothing extra: a heading's id, or else its section's.
 
+import { goto } from '$app/navigation';
 import type { Attachment } from 'svelte/attachments';
 
 export type Section = { id: string; text: string; level: 2 | 3 };
@@ -91,6 +92,36 @@ export function trackSections(): Attachment<HTMLElement> {
       onThisPage.current = null;
     };
   };
+}
+
+/**
+ * A link chosen in the Contents sheet: closes it, then goes there once the
+ * page can scroll again. While a dialog is open the page's scroll is locked,
+ * and on iOS unlocking puts the page back where it was, which would undo the
+ * jump to a section (or leave a new page scrolled down).
+ */
+export async function goFromSheet(
+  event: MouseEvent,
+  href: string,
+  close: () => void,
+) {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0)
+    return;
+  event.preventDefault();
+  close();
+  const started = performance.now();
+  await new Promise<void>((resolve) => {
+    const check = () => {
+      if (
+        !document.body.hasAttribute('data-scroll-lock') ||
+        performance.now() - started > 2000
+      )
+        resolve();
+      else requestAnimationFrame(check);
+    };
+    requestAnimationFrame(check);
+  });
+  await goto(href);
 }
 
 function sectionId(heading: HTMLElement) {
