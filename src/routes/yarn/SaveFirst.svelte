@@ -17,6 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 (to come back to it from My Palettes), go without saving, or stay -->
 
 <script lang="ts">
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { BookmarkIcon, LoaderCircleIcon } from '@lucide/svelte';
 
@@ -43,15 +48,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 p-4 pt-2 text-left">
+<div class="flex flex-col gap-4 px-4 pt-2 text-left">
   <p>
     Save this palette first? It goes on the new project’s Temperature gauge
     either way. Saved, you can come back to it from My Palettes.
   </p>
-  <div class="flex flex-wrap gap-2">
+  <DialogFooter>
     <button
       type="button"
-      class="btn preset-filled-primary-500"
+      class={BTN_SECONDARY}
+      disabled={saving}
+      onclick={() => dialog.close()}>Cancel</button
+    >
+    <button type="button" class={BTN_SECONDARY} disabled={saving} onclick={ongo}
+      >Don’t Save</button
+    >
+    <button
+      type="button"
+      class={BTN_PRIMARY}
       disabled={saving}
       onclick={saveAndGo}
     >
@@ -62,17 +76,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       Save and Start
     </button>
-    <button
-      type="button"
-      class="btn preset-tonal"
-      disabled={saving}
-      onclick={ongo}>Don’t Save</button
-    >
-    <button
-      type="button"
-      class="btn hover:preset-tonal"
-      disabled={saving}
-      onclick={() => dialog.close()}>Cancel</button
-    >
-  </div>
+  </DialogFooter>
 </div>

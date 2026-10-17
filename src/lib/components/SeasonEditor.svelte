@@ -14,8 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CloseButton from '#lib/components/modals/CloseButton.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
   import { MONTHS } from '#lib/constants/weather-constants.js';
   import { SEASON_PRESETS } from '#lib/constants/seasons-constants.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
@@ -230,12 +229,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<StickyPart position="bottom">
-  <div class="flex w-full flex-wrap items-center justify-center gap-2 p-2 py-4">
-    <CloseButton {onClose} text="Cancel" />
-    <button class="btn preset-filled-primary-500" onclick={saveChanges}>
-      <CheckIcon />
-      Save
-    </button>
-  </div>
-</StickyPart>
+<SaveAndCloseButtons onSave={saveChanges} {onClose} />

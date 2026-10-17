@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorSearchField from '#lib/components/ColorSearchField.svelte';
   import PickColorFromImage from '#lib/components/modals/PickColorFromImage.svelte';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { DIALOG_FOOTER } from '#lib/constants/class-constants.js';
   import YarnGridSelect from '#lib/components/modals/YarnGridSelect.svelte';
   import SortMenu from '#lib/components/SortMenu.svelte';
   import { menuTriggerClass } from '#lib/components/menu-styles.js';
@@ -129,94 +129,85 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 {#if !pickingFromPhoto}
-  <StickyPart position="bottom">
-    <div
-      class="bg-surface-50 dark:bg-surface-950 p-2"
-      bind:clientHeight={footerHeight}
-    >
-      {#if cleared && !selectedColors.length}
-        <div
-          class="card preset-tonal-surface mb-2 flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
-          role="status"
+  <div class={DIALOG_FOOTER} bind:clientHeight={footerHeight}>
+    {#if cleared && !selectedColors.length}
+      <div
+        class="card preset-tonal-surface flex w-full items-center justify-between gap-2 p-2 pl-4 text-left text-sm"
+        role="status"
+      >
+        <span class="line-clamp-1"
+          >Cleared {cleared.length}
+          {pluralize('colorway', cleared.length)}</span
         >
-          <span class="line-clamp-1"
-            >Cleared {cleared.length}
-            {pluralize('colorway', cleared.length)}</span
-          >
-          <button
-            type="button"
-            class="btn btn-sm hover:preset-tonal-surface"
-            onclick={undoClear}
-            {@attach takeFocus}
-          >
-            <Undo2Icon aria-hidden="true" />
-            Undo
-          </button>
-        </div>
-      {/if}
-      {#if selectedColors.length}
-        <div
-          class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
+        <button
+          type="button"
+          class="btn btn-sm hover:preset-tonal-surface"
+          onclick={undoClear}
+          {@attach takeFocus}
         >
-          <!-- Sort and Clear, or the bar for a color pressed in the strip -->
-          <PaletteStripEditor
-            bind:colors={selectedColors}
-            roundedBottom={false}
-          >
-            {#snippet toolbar()}
-              <div class="flex items-center justify-between gap-2 px-2">
-                <p class="text-xs">{paletteTitleText}</p>
-                <div class="flex items-center gap-1">
-                  <SortMenu
-                    colors={selectedColors}
-                    placement="top"
-                    triggerClass={menuTriggerClass}
-                    disabled={selectedColors.length < 2}
-                    onsort={(sort) => {
-                      const colors = $state.snapshot(selectedColors);
-                      selectedColors =
-                        sort === 'reverse'
-                          ? reverseColors(colors)
-                          : sort === 'shuffle'
-                            ? shuffleColors(colors)
-                            : getSortedPalette({
-                                palette: colors,
-                                sortColors: sort,
-                              });
-                    }}
-                  />
-                  <button
-                    type="button"
-                    class={menuTriggerClass}
-                    title="Remove all colorways"
-                    bind:this={clearButton}
-                    onclick={clear}
-                  >
-                    <Trash2Icon aria-hidden="true" />
-                    <span>Clear</span>
-                  </button>
-                </div>
-              </div>
-            {/snippet}
-          </PaletteStripEditor>
-        </div>
-      {/if}
-
-      <div class="max-sm:pb-2">
-        <SaveAndCloseButtons
-          onSave={() => {
-            yarnUses.record(selectedBrandId, selectedYarnId);
-            updateGauge({
-              _colors: selectedColors,
-            });
-            dialog.close();
-          }}
-          onClose={() => {
-            dialog.close();
-          }}
-          disabled={!selectedColors.length}
-        />
+          <Undo2Icon aria-hidden="true" />
+          Undo
+        </button>
       </div>
-    </div>
-  </StickyPart>
+    {/if}
+    {#if selectedColors.length}
+      <div
+        class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
+      >
+        <!-- Sort and Clear, or the bar for a color pressed in the strip -->
+        <PaletteStripEditor bind:colors={selectedColors} roundedBottom={false}>
+          {#snippet toolbar()}
+            <div class="flex items-center justify-between gap-2 px-2">
+              <p class="text-xs">{paletteTitleText}</p>
+              <div class="flex items-center gap-1">
+                <SortMenu
+                  colors={selectedColors}
+                  placement="top"
+                  triggerClass={menuTriggerClass}
+                  disabled={selectedColors.length < 2}
+                  onsort={(sort) => {
+                    const colors = $state.snapshot(selectedColors);
+                    selectedColors =
+                      sort === 'reverse'
+                        ? reverseColors(colors)
+                        : sort === 'shuffle'
+                          ? shuffleColors(colors)
+                          : getSortedPalette({
+                              palette: colors,
+                              sortColors: sort,
+                            });
+                  }}
+                />
+                <button
+                  type="button"
+                  class={menuTriggerClass}
+                  title="Remove all colorways"
+                  bind:this={clearButton}
+                  onclick={clear}
+                >
+                  <Trash2Icon aria-hidden="true" />
+                  <span>Clear</span>
+                </button>
+              </div>
+            </div>
+          {/snippet}
+        </PaletteStripEditor>
+      </div>
+    {/if}
+
+    <SaveAndCloseButtons
+      onSave={() => {
+        yarnUses.record(selectedBrandId, selectedYarnId);
+        updateGauge({
+          _colors: selectedColors,
+        });
+        dialog.close();
+      }}
+      onClose={() => {
+        dialog.close();
+      }}
+      disabled={!selectedColors.length}
+      sticky={false}
+    />
+  </div>
 {/if}

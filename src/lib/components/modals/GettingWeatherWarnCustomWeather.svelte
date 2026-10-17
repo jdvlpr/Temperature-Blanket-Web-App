@@ -14,7 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { ArrowRightIcon } from '@lucide/svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import { BTN_PRIMARY } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
 
@@ -30,21 +31,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col p-2 text-center">
+<div class="flex flex-col px-2 pt-2 text-center">
   <p class="text-lg font-bold">Are you sure?</p>
 
   <p class="my-4">This will overwrite your custom weather data.</p>
 
-  <div class="mb-4">
+  <DialogFooter>
     <button
-      class="btn preset-filled-primary-500"
+      class={BTN_PRIMARY}
       onclick={() => {
         setModal();
       }}
       title="Search for Weather Data"
       id="location-action-button"
     >
-      Reload Weather Data <ArrowRightIcon />
+      Reload Weather Data
     </button>
-  </div>
+  </DialogFooter>
 </div>

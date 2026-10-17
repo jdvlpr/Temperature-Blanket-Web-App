@@ -17,7 +17,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
-  import { CheckIcon, LoaderCircleIcon, XIcon } from '@lucide/svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
+  import { LoaderCircleIcon } from '@lucide/svelte';
   import { exportToGoogleSheet, prepareGoogleExport } from './client';
   import type { ExportOptions } from './types';
 
@@ -113,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 p-4 pt-2">
+<div class="flex flex-col gap-4 px-4 pt-2">
   <div class="flex flex-col gap-1">
     <h3 class="font-semibold">Weather Data</h3>
     <div class="flex flex-col gap-1">
@@ -237,17 +242,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     popups in order to authenticate with Google.
   </p>
 
-  <div class="flex justify-center gap-2">
+  <DialogFooter>
     <button
-      class="btn hover:preset-tonal-surface"
+      class={BTN_SECONDARY}
       onclick={dialog.dismiss}
       disabled={isExporting}
     >
-      <XIcon />
       Cancel
     </button>
     <button
-      class="btn preset-filled-primary-500"
+      class={BTN_PRIMARY}
       onclick={handleExport}
       disabled={isExporting}
       data-retry-export
@@ -256,9 +260,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <LoaderCircleIcon class="animate-spin" />
         Creating...
       {:else}
-        <CheckIcon />
         Create
       {/if}
     </button>
-  </div>
+  </DialogFooter>
 </div>

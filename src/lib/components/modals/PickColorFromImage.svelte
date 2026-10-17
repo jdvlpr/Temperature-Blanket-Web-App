@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { DIALOG_FOOTER } from '#lib/constants/class-constants.js';
   import Spinner from '#lib/components/Spinner.svelte';
   import {
     checkImageFile,
@@ -457,29 +457,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </div>
-    <StickyPart position="bottom">
-      <div class="flex flex-col gap-1 px-2 pt-2 sm:px-4">
-        <div
-          class="rounded-container flex h-14 w-full items-center justify-center px-4 text-lg shadow-inner"
-          style="background:{hex ?? 'none'};color:{hex
-            ? getTextColor(hex)
-            : 'inherit'}"
-        >
-          {#if hex && !loading}
-            <span aria-hidden="true">{colorName ?? hex}</span>
-          {/if}
-        </div>
-        <!-- Said once a drag ends, not for every step of it -->
-        <p class="sr-only" aria-live="polite">
-          {#if hex && !loading && !dragAt}Picked color: {colorName ?? hex}{/if}
-        </p>
-        <SaveAndCloseButtons
-          saveText="Use Color"
-          disabled={!hex || loading}
-          onSave={use}
-          onClose={leave}
-        />
+    <div class={DIALOG_FOOTER}>
+      <div
+        class="rounded-container flex h-14 w-full items-center justify-center px-4 text-lg shadow-inner"
+        style="background:{hex ?? 'none'};color:{hex
+          ? getTextColor(hex)
+          : 'inherit'}"
+      >
+        {#if hex && !loading}
+          <span aria-hidden="true">{colorName ?? hex}</span>
+        {/if}
       </div>
-    </StickyPart>
+      <!-- Said once a drag ends, not for every step of it -->
+      <p class="sr-only" aria-live="polite">
+        {#if hex && !loading && !dragAt}Picked color: {colorName ?? hex}{/if}
+      </p>
+      <SaveAndCloseButtons
+        saveText="Use Color"
+        disabled={!hex || loading}
+        onSave={use}
+        onClose={leave}
+        sticky={false}
+      />
+    </div>
   {/if}
 </div>

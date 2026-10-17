@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import { DIALOG_FOOTER } from '#lib/constants/class-constants.js';
   import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '#lib/constants/color-constants.js';
   import ImagePaletteCanvas from '#lib/features/image-palette/ImagePaletteCanvas.svelte';
   import { ImagePaletteState } from '#lib/features/image-palette/image-palette-state.svelte.js';
@@ -472,285 +472,268 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </section>
       </div>
 
-      <StickyPart position="bottom">
-        <!-- The dialog's own background, so the palette card stands out as
-        it does on the page -->
+      <div class={DIALOG_FOOTER}>
+        <!-- The palette and its tools, as on the main page -->
         <div
-          class="bg-surface-50 dark:bg-surface-950 flex flex-col gap-1 px-2 pt-2 sm:px-4"
+          class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
         >
-          <!-- The palette and its tools, as on the main page -->
-          <div
-            class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
-          >
-            <!-- Count, Yarn, Auto Palette, Sort and Clear; the bar for a color
+          <!-- Count, Yarn, Auto Palette, Sort and Clear; the bar for a color
             pressed in the strip takes their place while it's open -->
-            {#snippet tools()}
-              <div
-                class="flex flex-wrap items-center justify-center gap-2 px-2"
-              >
-                {#key palette.points.length}
-                  <SelectNumberOfColors
-                    numberOfColors={palette.points.length}
-                    max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
-                    allowZero={true}
-                    onchange={(e) =>
-                      palette.setCount(
-                        parseInt((e.target as HTMLSelectElement).value),
-                      )}
-                  />
-                {/key}
+          {#snippet tools()}
+            <div class="flex flex-wrap items-center justify-center gap-2 px-2">
+              {#key palette.points.length}
+                <SelectNumberOfColors
+                  numberOfColors={palette.points.length}
+                  max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
+                  allowZero={true}
+                  onchange={(e) =>
+                    palette.setCount(
+                      parseInt((e.target as HTMLSelectElement).value),
+                    )}
+                />
+              {/key}
 
-                <!-- A popover rather than a menu, for the yarn search field.
+              <!-- A popover rather than a menu, for the yarn search field.
                 Its content exists only while open, so the dialog doesn't hide
                 it from screen readers (as with the yarn list) -->
-                <Popover
-                  positioning={{ placement: 'top' }}
-                  open={yarnOpen}
-                  onOpenChange={(details) => (yarnOpen = details.open)}
-                >
-                  <Popover.Trigger
-                    class={toolbarButtonClass}
-                    title={palette.mode === 'yarn'
-                      ? `Yarn Colors: ${yarnDetails}`
-                      : 'Exact Colors'}
-                    disabled={palette.loading}
-                  >
-                    <Icon iconNode={yarnBall} />
-                    <span class="flex items-center gap-1"
-                      >Yarn <ChevronDownIcon class="icon-sm" /></span
-                    >
-                  </Popover.Trigger>
-                  {#if yarnOpen}
-                    <Portal>
-                      <Popover.Positioner>
-                        <Popover.Content
-                          class="card bg-surface-100-900 border-surface-200-800 z-9999 flex max-h-(--available-height) w-96 max-w-[calc(100vw-2rem)] flex-col overflow-y-auto border py-1 shadow-lg"
-                        >
-                          <Popover.Title class="sr-only">Yarn</Popover.Title>
-                          <ToggleSwitch
-                            bare
-                            label="Match to Yarn Colors"
-                            details={palette.mode === 'yarn'
-                              ? `${yarnDetails}.`
-                              : 'Off: exact colors from the photo. A yarn colorway might not exist for each one.'}
-                            detailsTextSize="text-xs"
-                            checked={palette.mode === 'yarn'}
-                            onchange={(e) =>
-                              palette.setMode(
-                                (e.currentTarget as HTMLInputElement).checked
-                                  ? 'yarn'
-                                  : 'exact',
-                              )}
-                          />
-
-                          {#if palette.yarnReady && palette.mode === 'yarn'}
-                            <div class="flex flex-col gap-2 px-4 pb-3">
-                              <SelectYarn
-                                bind:selectedBrandId={palette.selectedBrandId}
-                                bind:selectedYarnId={palette.selectedYarnId}
-                                onselectautocomplete={onYarnFilterChange}
-                                selectedYarnWeightId={palette.selectedYarnWeightId}
-                              />
-                              <DefaultYarnSuggestion
-                                selectedBrandId={palette.selectedBrandId}
-                                selectedYarnId={palette.selectedYarnId}
-                              />
-                              {#if !palette.selectedBrandId || !palette.selectedYarnId}
-                                {#key palette.selectedBrandId}
-                                  <SelectYarnWeight
-                                    selectedBrandId={palette.selectedBrandId}
-                                    bind:selectedYarnWeightId={
-                                      palette.selectedYarnWeightId
-                                    }
-                                    onchange={onYarnFilterChange}
-                                  />
-                                {/key}
-                              {/if}
-                            </div>
-                          {/if}
-                        </Popover.Content>
-                      </Popover.Positioner>
-                    </Portal>
-                  {/if}
-                </Popover>
-
-                <Menu
-                  positioning={menuPositioning('top')}
-                  onSelect={(details) =>
-                    palette.setStyle(details.value as PaletteStyle)}
-                >
-                  <Menu.Trigger
-                    class={toolbarButtonClass}
-                    aria-label="Auto Palette"
-                    title="Pick the colors that best capture the photo"
-                    disabled={palette.loading || palette.working}
-                  >
-                    <WandSparklesIcon />
-                    <!-- Shortened on small screens, to fit the toolbar -->
-                    <span class="flex items-center gap-1"
-                      >Auto<span class="max-sm:hidden">&nbsp;Palette</span>
-                      <ChevronDownIcon class="icon-sm" /></span
-                    >
-                  </Menu.Trigger>
-                  <Portal>
-                    <Menu.Positioner>
-                      <Menu.Content class={menuContentClass}>
-                        {#each PALETTE_STYLES as style (style)}
-                          <Menu.Item value={style} class={menuItemClass}>
-                            <div class="flex min-w-0 flex-1 flex-col text-left">
-                              <p>{STYLES[style].label}</p>
-                              <p class="text-surface-700-300 text-xs">
-                                {STYLES[style].details}
-                              </p>
-                            </div>
-                            {#if palette.autoStyle === style}
-                              <CheckIcon
-                                class="shrink-0"
-                                aria-label="Current"
-                              />
-                            {/if}
-                          </Menu.Item>
-                        {/each}
-                      </Menu.Content>
-                    </Menu.Positioner>
-                  </Portal>
-                </Menu>
-
-                <SortMenu
-                  colors={paletteColors}
-                  current={palette.sortOrder}
-                  placement="top"
-                  triggerClass={toolbarButtonClass}
-                  disabled={palette.points.length < 2}
-                  onsort={(sort) =>
-                    sort === 'reverse'
-                      ? palette.reverse()
-                      : sort === 'shuffle'
-                        ? palette.shuffle()
-                        : palette.sortBy(sort)}
-                />
-
-                <button
-                  class={toolbarButtonClass}
-                  title="Remove all unlocked colors"
-                  disabled={!palette.points.some((point) => !point.locked)}
-                  onclick={() => palette.clear()}
-                >
-                  <Trash2Icon />
-                  <!-- Just the icon on small screens, so the tools fit two rows -->
-                  <span class="max-sm:sr-only">Clear</span>
-                </button>
-              </div>
-            {/snippet}
-
-            {#snippet yarnChoices(index: number)}
-              {@const point = palette.points[index]}
-              {#if point?.yarn && palette.mode === 'yarn'}
-                {@const yarn = previewYarn ?? point.yarn}
-                <div
-                  class="border-surface-300-700 mt-1 flex flex-col gap-1.5 border-t pt-2"
-                >
-                  <p class="text-surface-700-300 text-xs">
-                    {percent(yarn)}{#if closeYarns.length > 1}
-                      · Other close yarns{/if}
-                  </p>
-                  {#if closeYarns.length > 1}
-                    <div class="flex flex-wrap gap-2 p-0.5">
-                      {#each closeYarns as option (colorwayKey(option))}
-                        {@const current =
-                          colorwayKey(option) === colorwayKey(point.yarn)}
-                        <button
-                          type="button"
-                          class={[
-                            'size-8 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.25)] transition-transform hover:scale-110',
-                            current &&
-                              'outline-primary-500 outline-2 outline-offset-2',
-                          ]}
-                          style="background:{option.hex}"
-                          title="{option.brandName} - {option.yarnName}: {option.name}"
-                          aria-label="Use {option.brandName} {option.yarnName} {option.name}, {percent(
-                            option,
-                          )}"
-                          aria-pressed={current}
-                          onpointerenter={() => (previewYarn = option)}
-                          onpointerleave={() => (previewYarn = null)}
-                          onfocus={() => (previewYarn = option)}
-                          onblur={() => (previewYarn = null)}
-                          onclick={() => {
-                            palette.setYarn(point.id, option);
-                            previewYarn = null;
-                            yarnAnnouncement = `Changed to ${option.brandName} ${option.yarnName} ${option.name}`;
-                          }}
-                        ></button>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              {/if}
-            {/snippet}
-
-            <p class="sr-only" aria-live="polite">{yarnAnnouncement}</p>
-
-            {#if palette.points.length}
-              <PaletteStripEditor
-                bind:selectedIndex={
-                  () => (selectedIndex === -1 ? null : selectedIndex),
-                  (index) =>
-                    (palette.selectedId =
-                      index === null
-                        ? null
-                        : (palette.points[index]?.id ?? null))
-                }
-                keepOpen
-                barId={COLOR_BAR_ID}
-                onclose={returnToDot}
-                details={yarnChoices}
-                preview={previewYarn}
-                staggerIn
-                lockable
-                roundedBottom={false}
-                colors={paletteColors}
-                {highlightIndex}
-                onhover={(index: number | null) =>
-                  (palette.hoveredId =
-                    index === null
-                      ? null
-                      : (palette.points[index]?.id ?? null))}
-                onchange={(colors) =>
-                  palette.syncFromColors(
-                    colors as Parameters<typeof palette.syncFromColors>[0],
-                  )}
-                toolbar={tools}
-              />
-            {:else}
-              <div
-                class="rounded-t-container border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
+              <Popover
+                positioning={{ placement: 'top' }}
+                open={yarnOpen}
+                onOpenChange={(details) => (yarnOpen = details.open)}
               >
-                Tap the photo to add colors, or use Auto<span
-                  class="max-sm:hidden">&nbsp;Palette</span
+                <Popover.Trigger
+                  class={toolbarButtonClass}
+                  title={palette.mode === 'yarn'
+                    ? `Yarn Colors: ${yarnDetails}`
+                    : 'Exact Colors'}
+                  disabled={palette.loading}
                 >
-              </div>
-              {@render tools()}
-            {/if}
-          </div>
+                  <Icon iconNode={yarnBall} />
+                  <span class="flex items-center gap-1"
+                    >Yarn <ChevronDownIcon class="icon-sm" /></span
+                  >
+                </Popover.Trigger>
+                {#if yarnOpen}
+                  <Portal>
+                    <Popover.Positioner>
+                      <Popover.Content
+                        class="card bg-surface-100-900 border-surface-200-800 z-9999 flex max-h-(--available-height) w-96 max-w-[calc(100vw-2rem)] flex-col overflow-y-auto border py-1 shadow-lg"
+                      >
+                        <Popover.Title class="sr-only">Yarn</Popover.Title>
+                        <ToggleSwitch
+                          bare
+                          label="Match to Yarn Colors"
+                          details={palette.mode === 'yarn'
+                            ? `${yarnDetails}.`
+                            : 'Off: exact colors from the photo. A yarn colorway might not exist for each one.'}
+                          detailsTextSize="text-xs"
+                          checked={palette.mode === 'yarn'}
+                          onchange={(e) =>
+                            palette.setMode(
+                              (e.currentTarget as HTMLInputElement).checked
+                                ? 'yarn'
+                                : 'exact',
+                            )}
+                        />
 
-          <SaveAndCloseButtons
-            disabled={!palette.hasImage ||
-              palette.loading ||
-              !palette.points.length}
-            onSave={() => {
-              if (palette.mode === 'yarn')
-                yarnUses.record(
-                  palette.selectedBrandId,
-                  palette.selectedYarnId,
-                );
-              updateGauge({ _colors: palette.toColors() });
-              dialog.close();
-            }}
-            onClose={dialog.close}
-          />
+                        {#if palette.yarnReady && palette.mode === 'yarn'}
+                          <div class="flex flex-col gap-2 px-4 pb-3">
+                            <SelectYarn
+                              bind:selectedBrandId={palette.selectedBrandId}
+                              bind:selectedYarnId={palette.selectedYarnId}
+                              onselectautocomplete={onYarnFilterChange}
+                              selectedYarnWeightId={palette.selectedYarnWeightId}
+                            />
+                            <DefaultYarnSuggestion
+                              selectedBrandId={palette.selectedBrandId}
+                              selectedYarnId={palette.selectedYarnId}
+                            />
+                            {#if !palette.selectedBrandId || !palette.selectedYarnId}
+                              {#key palette.selectedBrandId}
+                                <SelectYarnWeight
+                                  selectedBrandId={palette.selectedBrandId}
+                                  bind:selectedYarnWeightId={
+                                    palette.selectedYarnWeightId
+                                  }
+                                  onchange={onYarnFilterChange}
+                                />
+                              {/key}
+                            {/if}
+                          </div>
+                        {/if}
+                      </Popover.Content>
+                    </Popover.Positioner>
+                  </Portal>
+                {/if}
+              </Popover>
+
+              <Menu
+                positioning={menuPositioning('top')}
+                onSelect={(details) =>
+                  palette.setStyle(details.value as PaletteStyle)}
+              >
+                <Menu.Trigger
+                  class={toolbarButtonClass}
+                  aria-label="Auto Palette"
+                  title="Pick the colors that best capture the photo"
+                  disabled={palette.loading || palette.working}
+                >
+                  <WandSparklesIcon />
+                  <!-- Shortened on small screens, to fit the toolbar -->
+                  <span class="flex items-center gap-1"
+                    >Auto<span class="max-sm:hidden">&nbsp;Palette</span>
+                    <ChevronDownIcon class="icon-sm" /></span
+                  >
+                </Menu.Trigger>
+                <Portal>
+                  <Menu.Positioner>
+                    <Menu.Content class={menuContentClass}>
+                      {#each PALETTE_STYLES as style (style)}
+                        <Menu.Item value={style} class={menuItemClass}>
+                          <div class="flex min-w-0 flex-1 flex-col text-left">
+                            <p>{STYLES[style].label}</p>
+                            <p class="text-surface-700-300 text-xs">
+                              {STYLES[style].details}
+                            </p>
+                          </div>
+                          {#if palette.autoStyle === style}
+                            <CheckIcon class="shrink-0" aria-label="Current" />
+                          {/if}
+                        </Menu.Item>
+                      {/each}
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Portal>
+              </Menu>
+
+              <SortMenu
+                colors={paletteColors}
+                current={palette.sortOrder}
+                placement="top"
+                triggerClass={toolbarButtonClass}
+                disabled={palette.points.length < 2}
+                onsort={(sort) =>
+                  sort === 'reverse'
+                    ? palette.reverse()
+                    : sort === 'shuffle'
+                      ? palette.shuffle()
+                      : palette.sortBy(sort)}
+              />
+
+              <button
+                class={toolbarButtonClass}
+                title="Remove all unlocked colors"
+                disabled={!palette.points.some((point) => !point.locked)}
+                onclick={() => palette.clear()}
+              >
+                <Trash2Icon />
+                <!-- Just the icon on small screens, so the tools fit two rows -->
+                <span class="max-sm:sr-only">Clear</span>
+              </button>
+            </div>
+          {/snippet}
+
+          {#snippet yarnChoices(index: number)}
+            {@const point = palette.points[index]}
+            {#if point?.yarn && palette.mode === 'yarn'}
+              {@const yarn = previewYarn ?? point.yarn}
+              <div
+                class="border-surface-300-700 mt-1 flex flex-col gap-1.5 border-t pt-2"
+              >
+                <p class="text-surface-700-300 text-xs">
+                  {percent(yarn)}{#if closeYarns.length > 1}
+                    · Other close yarns{/if}
+                </p>
+                {#if closeYarns.length > 1}
+                  <div class="flex flex-wrap gap-2 p-0.5">
+                    {#each closeYarns as option (colorwayKey(option))}
+                      {@const current =
+                        colorwayKey(option) === colorwayKey(point.yarn)}
+                      <button
+                        type="button"
+                        class={[
+                          'size-8 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.25)] transition-transform hover:scale-110',
+                          current &&
+                            'outline-primary-500 outline-2 outline-offset-2',
+                        ]}
+                        style="background:{option.hex}"
+                        title="{option.brandName} - {option.yarnName}: {option.name}"
+                        aria-label="Use {option.brandName} {option.yarnName} {option.name}, {percent(
+                          option,
+                        )}"
+                        aria-pressed={current}
+                        onpointerenter={() => (previewYarn = option)}
+                        onpointerleave={() => (previewYarn = null)}
+                        onfocus={() => (previewYarn = option)}
+                        onblur={() => (previewYarn = null)}
+                        onclick={() => {
+                          palette.setYarn(point.id, option);
+                          previewYarn = null;
+                          yarnAnnouncement = `Changed to ${option.brandName} ${option.yarnName} ${option.name}`;
+                        }}
+                      ></button>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          {/snippet}
+
+          <p class="sr-only" aria-live="polite">{yarnAnnouncement}</p>
+
+          {#if palette.points.length}
+            <PaletteStripEditor
+              bind:selectedIndex={
+                () => (selectedIndex === -1 ? null : selectedIndex),
+                (index) =>
+                  (palette.selectedId =
+                    index === null ? null : (palette.points[index]?.id ?? null))
+              }
+              keepOpen
+              barId={COLOR_BAR_ID}
+              onclose={returnToDot}
+              details={yarnChoices}
+              preview={previewYarn}
+              staggerIn
+              lockable
+              roundedBottom={false}
+              colors={paletteColors}
+              {highlightIndex}
+              onhover={(index: number | null) =>
+                (palette.hoveredId =
+                  index === null ? null : (palette.points[index]?.id ?? null))}
+              onchange={(colors) =>
+                palette.syncFromColors(
+                  colors as Parameters<typeof palette.syncFromColors>[0],
+                )}
+              toolbar={tools}
+            />
+          {:else}
+            <div
+              class="rounded-t-container border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
+            >
+              Tap the photo to add colors, or use Auto<span
+                class="max-sm:hidden">&nbsp;Palette</span
+              >
+            </div>
+            {@render tools()}
+          {/if}
         </div>
-      </StickyPart>
+
+        <SaveAndCloseButtons
+          disabled={!palette.hasImage ||
+            palette.loading ||
+            !palette.points.length}
+          onSave={() => {
+            if (palette.mode === 'yarn')
+              yarnUses.record(palette.selectedBrandId, palette.selectedYarnId);
+            updateGauge({ _colors: palette.toColors() });
+            dialog.close();
+          }}
+          onClose={dialog.close}
+          sticky={false}
+        />
+      </div>
     </div>
   {/if}
 </div>

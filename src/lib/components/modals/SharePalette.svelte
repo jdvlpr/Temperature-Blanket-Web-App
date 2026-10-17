@@ -34,6 +34,11 @@ From the gallery page itself (`onsaved`), Done closes it. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
   import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import {
     PaletteStorage,
@@ -246,7 +251,9 @@ From the gallery page itself (`onsaved`), Done closes it. -->
   }
 </script>
 
-<div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
+<div
+  class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 px-4 pt-4 text-left"
+>
   <PaletteStrip {colors} />
 
   {#if done}
@@ -287,20 +294,20 @@ From the gallery page itself (`onsaved`), Done closes it. -->
         <p class="text-error-700-300" role="alert">{errorMessage}</p>
       {/if}
     </div>
-    <div class="flex flex-wrap gap-2">
+    <DialogFooter>
       <a
         href={resolve('/gallery/palette/[id]', {
           id: String(existing.postId),
         })}
         target="_blank"
-        class="btn hover:preset-tonal-surface"
+        class={BTN_SECONDARY}
         >View Gallery Page<ExternalLinkIcon class="icon-sm" /><span
           class="sr-only">(opens in a new tab)</span
         ></a
       >
       <button
         type="button"
-        class="btn preset-filled-primary-500"
+        class={BTN_PRIMARY}
         disabled={busy}
         onclick={() => {
           target = existing ?? undefined;
@@ -308,7 +315,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
           share();
         }}><RefreshCwIcon />Update Gallery Page</button
       >
-    </div>
+    </DialogFooter>
   {:else if unpublishing && update}
     <UnpublishConfirm
       kind="palette"
@@ -359,11 +366,11 @@ From the gallery page itself (`onsaved`), Done closes it. -->
           Everything is up to date.
         </p>
       {/if}
-      <div class="flex flex-wrap items-center gap-2">
+      <DialogFooter>
         {#if update && !busy}
           <button
             type="button"
-            class="btn hover:preset-tonal-surface me-auto"
+            class={BTN_SECONDARY}
             bind:this={unpublishButton}
             onclick={() => (unpublishing = true)}
           >
@@ -372,7 +379,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
         {/if}
         <button
           type="submit"
-          class="btn preset-filled-primary-500 max-sm:w-full"
+          class={BTN_PRIMARY}
           disabled={busy || nothingChanged || !cleanName(name, MAX_NAME_LENGTH)}
           aria-describedby={nothingChanged ? 'palette-up-to-date' : undefined}
         >
@@ -383,7 +390,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
             />{:else if !update}<RefreshCwIcon aria-hidden="true" />{/if}
           {update ? 'Save' : target ? 'Update' : 'Publish'}
         </button>
-      </div>
+      </DialogFooter>
     </form>
   {/if}
 </div>

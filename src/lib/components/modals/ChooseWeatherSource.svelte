@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
-  import StickyPart from './StickyPart.svelte';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
 
   let warnSearchAgain = $derived.by(() => {
@@ -260,23 +259,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 
-<StickyPart position="bottom">
-  <div class="pb-2 sm:pb-0">
+<SaveAndCloseButtons
+  onSave={_onOkay}
+  onClose={dialog.close}
+  saveText={warnSearchAgain && locations.allValid ? 'Save and Search' : 'Save'}
+>
+  {#snippet above()}
     {#if warnSearchAgain}
-      <p class="text-warning-800-200 mx-auto px-2 pt-2 text-center">
+      <p class="text-warning-800-200 mx-auto text-center">
         Search again for weather data to apply weather source changes.
         {#if !locations.allValid}
           First, choose a valid location and dates.
         {/if}
       </p>
     {/if}
-
-    <SaveAndCloseButtons
-      onSave={_onOkay}
-      onClose={dialog.close}
-      saveText={warnSearchAgain && locations.allValid
-        ? 'Save and Search'
-        : 'Save'}
-    />
-  </div>
-</StickyPart>
+  {/snippet}
+</SaveAndCloseButtons>

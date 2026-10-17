@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorsToPaletteCode,
     getPaletteFallbackName,
   } from '#lib/utils/color-utils.js';
+  import { BookmarkIcon } from '@lucide/svelte';
 
   let {
     colors,
@@ -75,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 px-4 pt-2 pb-4 sm:min-w-[600px]">
+<div class="flex flex-col gap-4 px-4 pt-2 sm:min-w-[600px]">
   <label class="label text-left">
     <span class="label-text">Name (optional)</span>
     <input
@@ -105,6 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onSave={save}
     onClose={() => dialog.close()}
     saveText="Save Palette"
+    icon={BookmarkIcon}
     disabled={saving || !colors.length}
   />
 </div>

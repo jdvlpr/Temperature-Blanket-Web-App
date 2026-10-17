@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '#lib/components/SelectYarn.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
@@ -235,9 +234,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<StickyPart position="bottom">
-  <div class="p-2 sm:p-4">
-    <div class="">
+<SaveAndCloseButtons
+  disabled={!yarnDataReady}
+  onSave={() => {
+    yarnUses.record(selectedBrandId, selectedYarnId);
+    updateGauge({
+      _colors: randomPalette.map((color) => {
+        delete color.locked;
+        delete color.id;
+        return color;
+      }),
+    });
+    dialog.close();
+  }}
+  onClose={dialog.close}
+>
+  {#snippet above()}
+    <div class="sm:pt-2">
       {#if !yarnDataReady}
         <div class="mx-auto my-6">
           <Spinner />
@@ -250,21 +263,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       {/if}
     </div>
-
-    <SaveAndCloseButtons
-      disabled={!yarnDataReady}
-      onSave={() => {
-        yarnUses.record(selectedBrandId, selectedYarnId);
-        updateGauge({
-          _colors: randomPalette.map((color) => {
-            delete color.locked;
-            delete color.id;
-            return color;
-          }),
-        });
-        dialog.close();
-      }}
-      onClose={dialog.close}
-    />
-  </div>
-</StickyPart>
+  {/snippet}
+</SaveAndCloseButtons>

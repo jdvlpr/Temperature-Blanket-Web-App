@@ -22,6 +22,8 @@ saved again. Publishing one is then on My Palettes or the Yarn page. -->
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import { BTN_PRIMARY } from '#lib/constants/class-constants.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import {
@@ -89,7 +91,7 @@ saved again. Publishing one is then on My Palettes or the Yarn page. -->
 </script>
 
 <form
-  class="flex w-full flex-col gap-4 p-4 pt-2 text-left"
+  class="flex w-full flex-col gap-4 px-4 pt-2 text-left"
   onsubmit={(event) => {
     event.preventDefault();
     void save();
@@ -123,16 +125,18 @@ saved again. Publishing one is then on My Palettes or the Yarn page. -->
     {/each}
   </fieldset>
 
-  <button
-    type="submit"
-    class="btn preset-filled-primary-500 self-start"
-    disabled={saving || !chosen.length}
-  >
-    {#if saving}
-      <LoaderCircleIcon class="animate-spin" />
-    {:else}
-      <BookmarkIcon />
-    {/if}
-    Save {chosen.length === 1 ? 'Palette' : 'Palettes'}
-  </button>
+  <DialogFooter>
+    <button
+      type="submit"
+      class={BTN_PRIMARY}
+      disabled={saving || !chosen.length}
+    >
+      {#if saving}
+        <LoaderCircleIcon class="animate-spin" />
+      {:else}
+        <BookmarkIcon />
+      {/if}
+      Save {chosen.length === 1 ? 'Palette' : 'Palettes'}
+    </button>
+  </DialogFooter>
 </form>

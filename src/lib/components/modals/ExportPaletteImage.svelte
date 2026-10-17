@@ -18,12 +18,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   its settings beside it (below it on phones) and its actions at the bottom.
 -->
 <script lang="ts">
-  import { FIELD_ICON } from '#lib/constants/class-constants.js';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+    FIELD_ICON,
+  } from '#lib/constants/class-constants.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
   import {
     DEFAULT_PALETTE_IMAGE_SETTINGS,
     rangeToText,
@@ -473,38 +477,22 @@ choice's icon beside it, and what it's for below -->
     </aside>
   </div>
 
-  <StickyPart position="bottom">
-    <div
-      class="bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-2 sm:px-4"
-    >
-      {#if canCopy}
-        <button
-          class="btn hover:preset-tonal-surface"
-          disabled={!blob}
-          onclick={copy}
-        >
-          <CopyIcon copied={copied.is()} />
-          Copy Image
-        </button>
-      {/if}
-      {#if canShare}
-        <button
-          class="btn hover:preset-tonal-surface"
-          disabled={!blob}
-          onclick={share}
-        >
-          <ShareIcon />
-          Share
-        </button>
-      {/if}
-      <button
-        class="btn preset-filled-primary-500"
-        disabled={!previewUrl}
-        onclick={download}
-      >
-        <DownloadIcon />
-        Download
+  <DialogFooter>
+    {#if canCopy}
+      <button class={BTN_SECONDARY} disabled={!blob} onclick={copy}>
+        <CopyIcon copied={copied.is()} />
+        Copy Image
       </button>
-    </div>
-  </StickyPart>
+    {/if}
+    {#if canShare}
+      <button class={BTN_SECONDARY} disabled={!blob} onclick={share}>
+        <ShareIcon />
+        Share
+      </button>
+    {/if}
+    <button class={BTN_PRIMARY} disabled={!previewUrl} onclick={download}>
+      <DownloadIcon />
+      Download
+    </button>
+  </DialogFooter>
 </div>

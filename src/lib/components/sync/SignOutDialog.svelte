@@ -18,6 +18,11 @@ haven't finished syncing. Signing out removes the synced ones from this
 browser; these stay, since the account doesn't have them yet. -->
 
 <script lang="ts">
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { sync, syncNow, unsyncedCount } from '#lib/sync/sync.svelte.js';
   import { LoaderCircleIcon, TriangleAlertIcon } from '@lucide/svelte';
@@ -58,7 +63,7 @@ browser; these stay, since the account doesn't have them yet. -->
 </script>
 
 <form
-  class="flex flex-col gap-4 p-4"
+  class="flex flex-col gap-4 px-4 pt-4"
   aria-labelledby="sign-out-title"
   onsubmit={(e) => {
     e.preventDefault();
@@ -109,18 +114,12 @@ browser; these stay, since the account doesn't have them yet. -->
     them back.
   </p>
 
-  <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-    <button
-      type="button"
-      class="btn hover:preset-tonal-surface max-sm:w-full"
-      onclick={() => dialog.close()}>Cancel</button
+  <DialogFooter>
+    <button type="button" class={BTN_SECONDARY} onclick={() => dialog.close()}
+      >Cancel</button
     >
-    <button
-      type="submit"
-      class="btn preset-filled-primary-500 max-sm:w-full"
-      disabled={busy}
-    >
+    <button type="submit" class={BTN_PRIMARY} disabled={busy}>
       {everywhere ? 'Sign out everywhere' : 'Sign out'}
     </button>
-  </div>
+  </DialogFooter>
 </form>

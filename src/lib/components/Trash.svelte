@@ -47,7 +47,8 @@ device, restored everywhere (see $lib/storage/account-trash). -->
     getPaletteFallbackName,
   } from '#lib/utils/color-utils.js';
   import { formatDateTime } from '#lib/utils/date-utils.js';
-  import { ArchiveRestoreIcon, Trash2Icon, XIcon } from '@lucide/svelte';
+  import { BTN_DANGER, BTN_SECONDARY } from '#lib/constants/class-constants.js';
+  import { ArchiveRestoreIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   let { kind }: { kind: 'project' | 'palette' } = $props();
@@ -247,19 +248,18 @@ device, restored everywhere (see $lib/storage/account-trash). -->
                 >
                 <button
                   type="button"
-                  class="btn preset-filled-error-500"
+                  class={BTN_SECONDARY}
+                  onclick={() => (confirming = null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class={BTN_DANGER}
                   onclick={() => deleteForever(entry)}
                 >
                   <Trash2Icon />
                   Yes, Delete Forever
-                </button>
-                <button
-                  type="button"
-                  class="btn hover:preset-tonal-surface"
-                  onclick={() => (confirming = null)}
-                >
-                  <XIcon />
-                  Cancel
                 </button>
               </div>
             {:else}
@@ -297,18 +297,14 @@ device, restored everywhere (see $lib/storage/account-trash). -->
         >
         <button
           type="button"
-          class="btn preset-filled-error-500"
-          onclick={emptyTrash}
-        >
-          <Trash2Icon />
-          Yes, Empty Trash
-        </button>
-        <button
-          type="button"
-          class="btn hover:preset-tonal-surface"
+          class={BTN_SECONDARY}
           onclick={() => (confirming = null)}
         >
           Cancel
+        </button>
+        <button type="button" class={BTN_DANGER} onclick={emptyTrash}>
+          <Trash2Icon />
+          Yes, Empty Trash
         </button>
       </div>
     {:else}

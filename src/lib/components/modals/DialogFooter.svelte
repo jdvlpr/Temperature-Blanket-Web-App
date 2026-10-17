@@ -13,21 +13,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  /**
-   * @typedef {Object} Props
-   * @property {string} [position]
-   * @property {import('svelte').Snippet} [children]
-   */
+<script lang="ts">
+  import {
+    DIALOG_BUTTONS,
+    DIALOG_FOOTER,
+  } from '#lib/constants/class-constants.js';
+  import type { Snippet } from 'svelte';
+  import type { ClassValue } from 'svelte/elements';
 
-  /** @type {Props} */
-  let { position = 'top', children } = $props();
+  interface Props {
+    /** Full-width content shown with the buttons, above them */
+    above?: Snippet;
+    /** Pinned to the dialog's bottom as its content scrolls */
+    sticky?: boolean;
+    class?: ClassValue;
+    children: Snippet;
+  }
 
-  let classPosition = $derived(position === 'top' ? 'top-0' : 'bottom-0');
+  let { above, sticky = true, class: className, children }: Props = $props();
 </script>
 
-<div
-  class="sticky {classPosition} bg-surface-100 dark:bg-surface-900 z-20 mx-0 px-0"
->
-  {@render children?.()}
+<div class={[sticky ? DIALOG_FOOTER : 'flex flex-col gap-2', className]}>
+  {@render above?.()}
+  <div class={DIALOG_BUTTONS}>
+    {@render children()}
+  </div>
 </div>

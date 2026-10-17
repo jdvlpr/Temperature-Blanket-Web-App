@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorSearchField from '#lib/components/ColorSearchField.svelte';
   import PickColorFromImage from '#lib/components/modals/PickColorFromImage.svelte';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '#lib/components/modals/YarnGridSelect.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
@@ -159,20 +158,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 {#if !pickingFromPhoto}
-  <StickyPart position="bottom">
-    <div class="p-2">
+  <SaveAndCloseButtons onSave={_onOkay} onClose={dialog.close} disabled={!hex}>
+    {#snippet above()}
       {#if !hex}
-        <p class="card bg-warning-500/20 my-2 p-4">
-          Please enter a valid color
-        </p>
+        <p class="card bg-warning-500/20 p-4">Please enter a valid color</p>
       {/if}
-      <div class="max-sm:pb-2">
-        <SaveAndCloseButtons
-          onSave={_onOkay}
-          onClose={dialog.close}
-          disabled={!hex}
-        />
-      </div>
-    </div>
-  </StickyPart>
+    {/snippet}
+  </SaveAndCloseButtons>
 {/if}

@@ -74,3 +74,16 @@ export const PALETTE_LIST =
  * phones, and Projects | Yarn Palettes (CollectionNav) below lg */
 export const BOTTOM_BAR =
   'bg-surface-50/90 dark:bg-surface-950/90 border-surface-200-800 border-t px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur';
+
+/** A dialog's action buttons, pinned to its bottom on its own background:
+ * centered, any secondary actions first and the one filled action last.
+ * Clear of the iPhone's home bar */
+export const DIALOG_FOOTER =
+  'bg-surface-50 dark:bg-surface-950 sticky bottom-0 z-20 flex flex-col gap-2 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-4';
+export const DIALOG_BUTTONS =
+  'flex flex-wrap items-center justify-center gap-2';
+// Cancel, Close and other secondary actions: no icon unless it says more
+export const BTN_SECONDARY = 'btn hover:preset-tonal-surface';
+export const BTN_PRIMARY = 'btn preset-filled-primary-500';
+// Destructive, in the primary's place
+export const BTN_DANGER = 'btn preset-filled-error-500';

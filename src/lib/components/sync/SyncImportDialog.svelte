@@ -241,7 +241,7 @@ someone asks to add them from My Library (`later`). -->
   <!-- Each choice is one row: what it does, and what that means. Pinned to the
   bottom of the dialog, so they stay in reach while scrolling a long list. -->
   <div
-    class="bg-surface-50 dark:bg-surface-950 sticky bottom-0 -mx-4 -mb-4 px-4 pt-2 pb-4"
+    class="bg-surface-50 dark:bg-surface-950 sticky bottom-0 -mx-4 -mb-4 px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]"
   >
     <div
       class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y border"

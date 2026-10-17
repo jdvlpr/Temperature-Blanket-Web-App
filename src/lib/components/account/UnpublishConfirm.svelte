@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import { BTN_DANGER, BTN_SECONDARY } from '#lib/constants/class-constants.js';
   import { LoaderCircleIcon } from '@lucide/svelte';
   import type { Attachment } from 'svelte/attachments';
 
@@ -74,17 +75,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-wrap gap-2">
     <button
       type="button"
-      class="btn preset-filled-error-500"
+      class={BTN_SECONDARY}
+      onclick={oncancel}
+      disabled={busy}>Keep Published</button
+    >
+    <button
+      type="button"
+      class={BTN_DANGER}
       onclick={unpublish}
       disabled={busy}
       {@attach takeFocus}
       >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}Unpublish</button
-    >
-    <button
-      type="button"
-      class="btn preset-tonal-surface"
-      onclick={oncancel}
-      disabled={busy}>Keep Published</button
     >
   </div>
   {#if errorMessage}

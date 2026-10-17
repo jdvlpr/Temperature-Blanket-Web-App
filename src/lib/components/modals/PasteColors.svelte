@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import Expand from '#lib/components/Expand.svelte';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -135,15 +134,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<StickyPart position="bottom">
-  <div class="p-2 max-sm:pb-4">
-    <SaveAndCloseButtons
-      onSave={save}
-      onClose={dialog.close}
-      saveText={count
-        ? `Use ${count} ${pluralize('Color', count)}`
-        : 'Use Colors'}
-      disabled={!count}
-    />
-  </div>
-</StickyPart>
+<SaveAndCloseButtons
+  onSave={save}
+  onClose={dialog.close}
+  saveText={count ? `Use ${count} ${pluralize('Color', count)}` : 'Use Colors'}
+  disabled={!count}
+/>

@@ -24,6 +24,8 @@ then the projects and palettes in this browser to add, if there are any. -->
     rememberAccountSummary,
   } from '#lib/accounts/summary.svelte.js';
   import SyncImportDialog from '#lib/components/sync/SyncImportDialog.svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import { BTN_PRIMARY } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import {
     CloudIcon,
@@ -81,11 +83,10 @@ then the projects and palettes in this browser to add, if there are any. -->
   <SyncImportDialog {userId} {ids} {paletteIds} step="Step 2 of 2" />
 {:else}
   <div role="dialog" aria-modal="true" aria-labelledby="welcome-title">
-    <form class="flex flex-col gap-4 p-4" onsubmit={next}>
-        <div class="flex flex-col gap-1">
-          {#if hasImport}<p class="text-sm opacity-70">Step 1 of 2</p>{/if}
-          <h2 id="welcome-title" class="h4">Welcome!</h2>
-
+    <form class="flex flex-col gap-4 px-4 pt-4" onsubmit={next}>
+      <div class="flex flex-col gap-1">
+        {#if hasImport}<p class="text-sm opacity-70">Step 1 of 2</p>{/if}
+        <h2 id="welcome-title" class="h4">Welcome!</h2>
       </div>
 
       <div class="flex flex-col gap-2">
@@ -105,7 +106,9 @@ then the projects and palettes in this browser to add, if there are any. -->
           disabled={busy}
         />
         <p class="opacity-80">
-          To start, set your display name, which is shown on gallery pages you choose to publish. You can change your display name anytime on your Account page.
+          To start, set your display name, which is shown on gallery pages you
+          choose to publish. You can change your display name anytime on your
+          Account page.
         </p>
         {#if errorMessage}
           <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
@@ -130,18 +133,12 @@ then the projects and palettes in this browser to add, if there are any. -->
         </li>
       </ul>
 
-      <div
-        class="bg-surface-50 dark:bg-surface-950 sticky bottom-0 -mx-4 -mb-4 flex justify-end px-4 pt-2 pb-4"
-      >
-        <button
-          type="submit"
-          class="btn preset-filled-primary-500"
-          disabled={busy}
-        >
+      <DialogFooter>
+        <button type="submit" class={BTN_PRIMARY} disabled={busy}>
           {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
           {hasImport ? 'Continue' : 'Done'}
         </button>
-      </div>
+      </DialogFooter>
     </form>
   </div>
 {/if}

@@ -43,6 +43,7 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
     FileTextIcon,
     LayoutGridIcon,
     LayoutListIcon,
+    DownloadIcon,
   } from '@lucide/svelte';
   import { onMount, type Component } from 'svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
@@ -236,7 +237,7 @@ choice's icon beside it, and what it's for below -->
   </Accordion.ItemIndicator>
 {/snippet}
 
-<div class="flex flex-col gap-4 p-4 pt-2">
+<div class="flex flex-col gap-4 px-4 pt-2">
   <!-- What the PDF will have, in a few words, so the defaults can just be downloaded -->
   <div class="flex flex-col gap-1">
     <p class="font-bold">Your PDF will have</p>
@@ -376,6 +377,7 @@ choice's icon beside it, and what it's for below -->
 
   <SaveAndCloseButtons
     saveText="Download"
+    icon={DownloadIcon}
     disabled={isEmpty}
     onSave={download}
     onClose={dialog.dismiss}

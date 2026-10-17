@@ -28,6 +28,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
   import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { CheckIcon, EyeOffIcon, LoaderCircleIcon } from '@lucide/svelte';
   import { tick, untrack } from 'svelte';
@@ -88,16 +93,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 p-4 text-left">
+<div
+  class="flex w-full max-w-(--breakpoint-sm) flex-col gap-4 px-4 pt-4 text-left"
+>
   {#if saved}
     <div class="flex flex-col items-center gap-2 py-6 text-center">
       <CheckIcon class="text-success-700-300 size-8" aria-hidden="true" />
       <h2 class="h4" tabindex="-1" bind:this={savedHeading}>Saved</h2>
       <p class="text-sm">{anonymousDetail(!showOwner, ownerName)}</p>
-      <button
-        type="button"
-        class="btn preset-filled-primary-500"
-        onclick={() => dialog.close()}>Done</button
+      <button type="button" class={BTN_PRIMARY} onclick={() => dialog.close()}
+        >Done</button
       >
     </div>
   {:else if unpublishing}
@@ -130,10 +135,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if errorMessage}
       <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
     {/if}
-    <div class="flex flex-wrap items-center gap-2">
+    <DialogFooter>
       <button
         type="button"
-        class="btn hover:preset-tonal-surface me-auto"
+        class={BTN_SECONDARY}
         bind:this={unpublishButton}
         onclick={() => (unpublishing = true)}
         disabled={busy}
@@ -142,12 +147,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
       <button
         type="button"
-        class="btn preset-filled-primary-500"
+        class={BTN_PRIMARY}
         onclick={save}
         disabled={busy || !changed}
       >
         {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}Save
       </button>
-    </div>
+    </DialogFooter>
   {/if}
 </div>

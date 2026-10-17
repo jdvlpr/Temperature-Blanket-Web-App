@@ -636,6 +636,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {/if}
                     <div>
                       <SaveAndCloseButtons
+                        sticky={false}
                         saveText={dialog.confirmText ?? 'Yes'}
                         danger={dialog.danger}
                         onSave={() => {

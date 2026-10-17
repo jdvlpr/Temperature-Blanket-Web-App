@@ -61,7 +61,12 @@ its weather, when that isn't kept with it). -->
     SendIcon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
-  import StickyPart from './StickyPart.svelte';
+  import {
+    BTN_DANGER,
+    BTN_SECONDARY,
+    DIALOG_BUTTONS,
+    DIALOG_FOOTER,
+  } from '#lib/constants/class-constants.js';
   import type { Attachment } from 'svelte/attachments';
 
   let {
@@ -261,10 +266,6 @@ its weather, when that isn't kept with it). -->
       null;
     if (!ravelryLinks.status) void ravelryLinks.load();
   }
-
-  // Every footer: secondary actions, then the one filled primary
-  const FOOTER =
-    'bg-surface-50 dark:bg-surface-950 flex flex-wrap items-center justify-center gap-2 px-2 py-3 sm:px-4';
 
   // ---- The gallery page
   // Its name as shown: the saved one, which Rename here changes too
@@ -731,19 +732,19 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
                   <div class="flex flex-wrap gap-2">
                     <button
                       type="button"
-                      class="btn preset-filled-error-500"
+                      class={BTN_SECONDARY}
+                      onclick={keepLinked}
+                      disabled={unlinking}>Keep Linked</button
+                    >
+                    <button
+                      type="button"
+                      class={BTN_DANGER}
                       onclick={unlink}
                       disabled={unlinking}
                       {@attach takeFocus}
                       >{#if unlinking}<LoaderCircleIcon
                           class="animate-spin"
                         />{/if}Unlink</button
-                    >
-                    <button
-                      type="button"
-                      class="btn preset-tonal-surface"
-                      onclick={keepLinked}
-                      disabled={unlinking}>Keep Linked</button
                     >
                   </div>
                 </div>
@@ -857,14 +858,14 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
   {/if}
 </div>
 
-<StickyPart position="bottom">
+<div class={DIALOG_FOOTER}>
   {#if view === 'preparing'}
-    <div class={FOOTER}>
+    <div class={DIALOG_BUTTONS}>
       {#if preparing === 'error' && page}
         <!-- Unpublishing needs only the page -->
         <button
           type="button"
-          class="btn hover:preset-tonal-surface me-auto"
+          class={BTN_SECONDARY}
           bind:this={unpublishButton}
           onclick={askUnpublish}
         >
@@ -888,14 +889,14 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
       {/if}
     </div>
   {:else if view === 'sent' && done}
-    <div class={FOOTER}>
+    <div class={DIALOG_BUTTONS}>
       <!-- eslint-disable svelte/no-navigation-without-resolve -- the pages' own addresses -->
       {#if done.ravelry?.url}
         <a
           href={done.ravelry.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="btn preset-tonal-surface"
+          class={BTN_SECONDARY}
         >
           View on Ravelry
           <ExternalLinkIcon class="icon-sm" aria-hidden="true" /><span
@@ -930,11 +931,11 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
     </div>
   {:else if view === 'blocked'}
-    <div class={FOOTER}>
+    <div class={DIALOG_BUTTONS}>
       {#if blocked === 'paused' && page}
         <button
           type="button"
-          class="btn hover:preset-tonal-surface me-auto"
+          class={BTN_SECONDARY}
           bind:this={unpublishButton}
           onclick={askUnpublish}
         >
@@ -957,24 +958,21 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
       {/if}
     </div>
   {:else if view === 'form' || view === 'checking'}
-    <div class={FOOTER}>
+    <div class={DIALOG_BUTTONS}>
       {#if busy && stepText}
         <p class="w-full text-center text-sm" aria-hidden="true">
           {stepText}
         </p>
       {:else if view === 'form' && saveSummary}
         <!-- What Save does, beside it -->
-        <p
-          class="w-full text-center text-sm opacity-80 sm:text-right"
-          id="save-summary"
-        >
+        <p class="w-full text-center text-sm opacity-80" id="save-summary">
           {saveSummary}
         </p>
       {/if}
       {#if page && view === 'form' && !busy}
         <button
           type="button"
-          class="btn hover:preset-tonal-surface me-auto"
+          class={BTN_SECONDARY}
           bind:this={unpublishButton}
           onclick={askUnpublish}
         >
@@ -995,4 +993,4 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
       </button>
     </div>
   {/if}
-</StickyPart>
+</div>

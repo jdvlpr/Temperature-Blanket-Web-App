@@ -14,8 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CloseButton from '#lib/components/modals/CloseButton.svelte';
-  import { CheckIcon, Trash2Icon } from '@lucide/svelte';
+  import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
+  import {
+    BTN_DANGER,
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
+  import { Trash2Icon } from '@lucide/svelte';
+  import type { Component, Snippet } from 'svelte';
+  import type { ClassValue } from 'svelte/elements';
 
   interface Props {
     onSave: any;
@@ -24,6 +31,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     disabled?: boolean;
     /** Destructive: red, with a trash can */
     danger?: boolean;
+    /** Only when it says more than the text, as a download */
+    icon?: Component;
+    /** Full-width content shown with the buttons, above them */
+    above?: Snippet;
+    sticky?: boolean;
+    class?: ClassValue;
   }
 
   let {
@@ -32,24 +45,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     saveText = 'Save',
     disabled = false,
     danger = false,
+    icon: Icon = danger ? Trash2Icon : undefined,
+    above,
+    sticky = true,
+    class: className,
   }: Props = $props();
 </script>
 
-<div
-  class="mx-auto flex w-full flex-wrap items-center justify-center gap-2 py-2"
->
-  <CloseButton {onClose} text="Cancel" />
+<DialogFooter {above} {sticky} class={className}>
+  <button class={BTN_SECONDARY} onclick={onClose}>Cancel</button>
 
-  <button
-    class={[
-      'btn',
-      danger ? 'preset-filled-error-500' : 'preset-filled-primary-500',
-    ]}
-    onclick={onSave}
-    {disabled}
-    title={saveText}
-  >
-    {#if danger}<Trash2Icon />{:else}<CheckIcon />{/if}
+  <button class={danger ? BTN_DANGER : BTN_PRIMARY} onclick={onSave} {disabled}>
+    {#if Icon}<Icon />{/if}
     {saveText}
   </button>
-</div>
+</DialogFooter>

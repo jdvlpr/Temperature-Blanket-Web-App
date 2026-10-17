@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import StickyPart from '#lib/components/modals/StickyPart.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { displayNumber } from '#lib/utils/number-utils.js';
   import {
@@ -216,8 +215,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
         of 0."
   />
 </div>
-<StickyPart position="bottom">
-  <div class="p-2">
-    <SaveAndCloseButtons onSave={_onOkay} onClose={dialog.close} />
-  </div>
-</StickyPart>
+<SaveAndCloseButtons onSave={_onOkay} onClose={dialog.close} />

@@ -120,11 +120,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class="my-4">
-    <SaveAndCloseButtons
-      onSave={_onOkay}
-      disabled={isNaN(value) || noMinMax ? false : value < min}
-      onClose={dialog.close}
-    />
-  </div>
+  <SaveAndCloseButtons
+    onSave={_onOkay}
+    disabled={isNaN(value) || noMinMax ? false : value < min}
+    onClose={dialog.close}
+    class="mt-4 self-stretch"
+  />
 </div>

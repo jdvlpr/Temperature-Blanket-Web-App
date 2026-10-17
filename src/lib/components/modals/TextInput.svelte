@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="mx-auto inline-flex w-full flex-col items-center justify-center p-4 text-center"
+  class="mx-auto inline-flex w-full flex-col items-center justify-center px-4 pt-4 text-center"
 >
   <div>
     <label for={id} class="my-2"><h3>{@html title}</h3></label>
@@ -53,12 +53,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    <div class="my-4">
-      <SaveAndCloseButtons
-        onSave={_onOkay}
-        onClose={dialog.close}
-        disabled={!value.includes(':')}
-      />
-    </div>
+    <SaveAndCloseButtons
+      onSave={_onOkay}
+      onClose={dialog.close}
+      disabled={!value.includes(':')}
+      class="mt-4"
+    />
   </div>
 </div>
