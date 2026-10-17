@@ -19,12 +19,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     grid: 'w-full max-w-[130px] sm:max-w-[210px] md:max-w-[215px] aspect-[4/5]',
     list: 'h-28 w-24 shrink-0 sm:h-32 sm:w-32',
   };
-  /** The picture itself in each layout: whole, at its own shape */
+  /** The picture itself in each layout: whole, at its own shape, square-cornered */
   export const imageClasses = {
-    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px] rounded-nested',
+    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
     // The whole picture, in a box beside the name
     list: 'h-28 w-24 shrink-0 object-contain sm:h-32 sm:w-32',
-    row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px] rounded-nested',
+    row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
   };
 </script>
 
