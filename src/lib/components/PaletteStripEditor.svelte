@@ -159,8 +159,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuTriggerClass,
     'aria-disabled:opacity-40 aria-disabled:hover:bg-transparent',
   ];
-  // Hidden on a phone, but still the button's name for screen readers
-  const phoneHidden = 'sr-only sm:not-sr-only';
 </script>
 
 <div class="flex w-full flex-col gap-2">
@@ -212,8 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </span>
       {/if}
-      <!-- Each button's name is its text; the bar is named for its color.
-      On a phone, the arrows show only their icons; Done always says so. -->
+      <!-- Each button's name is its text; the bar is named for its color. -->
       <span
         class="flex w-full flex-wrap items-center justify-end gap-1 sm:ml-auto sm:w-auto"
       >
@@ -225,7 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => move(-1)}
         >
           <ArrowLeftIcon aria-hidden="true" />
-          <span class={phoneHidden}>Move Left</span>
+          <span>Move Left</span>
         </button>
         <button
           type="button"
@@ -235,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => move(1)}
         >
           <ArrowRightIcon aria-hidden="true" />
-          <span class={phoneHidden}>Move Right</span>
+          <span>Move Right</span>
         </button>
         {#if lockable}
           <button

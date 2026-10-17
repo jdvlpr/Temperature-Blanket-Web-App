@@ -120,8 +120,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         : ''}"
     />
     <span
-      ><span class={{ 'max-sm:sr-only': compact }}>{label}: </span
-      >{currentLabel}{#if isReversed}<span class="sr-only"
+      ><span class={{ 'max-sm:sr-only': compact }}>{label}:</span
+      >{' '}{currentLabel}{#if isReversed}<span class="sr-only"
           >, reversed</span
         >{/if}</span
     >
