@@ -40,13 +40,14 @@ export const sync = $state({
 
 export type SyncLabel = {
   text: string;
-  tone: 'success' | 'warning' | 'error' | 'surface';
-  icon: 'synced' | 'waiting' | 'error' | 'local';
+  tone: 'warning' | 'error' | 'surface';
+  icon: 'waiting' | 'error' | 'local';
 };
 
 /**
- * Where a saved project is kept, for the list of saved projects. Nothing for a
- * guest's projects, so the list looks as it always has.
+ * Where a saved project is kept, for the list of saved projects, when that
+ * needs saying. Nothing once it's synced (the usual case, so it shows no mark)
+ * or for a guest's projects, so the list looks as it always has.
  */
 export function syncLabelFor(
   item: { sync?: ProjectSyncState },
@@ -70,5 +71,5 @@ export function syncLabelFor(
   if (state.error) return { text: 'Not synced', tone: 'error', icon: 'error' };
   if (state.dirty)
     return { text: 'Waiting to sync', tone: 'warning', icon: 'waiting' };
-  return { text: 'Synced', tone: 'success', icon: 'synced' };
+  return undefined;
 }

@@ -13,14 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Where a saved project is kept, as a small cloud icon beside its title. The
-words are for hover and screen readers. -->
+<!-- Where a saved project is kept, as a small cloud icon beside its title, when
+it isn't simply synced. The words are for hover and screen readers. -->
 
 <script lang="ts">
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import {
     CloudAlertIcon,
-    CloudCheckIcon,
     CloudOffIcon,
     CloudUploadIcon,
   } from '@lucide/svelte';
@@ -28,14 +27,12 @@ words are for hover and screen readers. -->
   let { label }: { label: SyncLabel } = $props();
 
   const ICONS = {
-    synced: CloudCheckIcon,
     waiting: CloudUploadIcon,
     error: CloudAlertIcon,
     local: CloudOffIcon,
   };
 
   const TONES = {
-    success: 'text-success-700-300',
     warning: 'text-warning-700-300',
     error: 'text-error-700-300',
     surface: 'opacity-60',

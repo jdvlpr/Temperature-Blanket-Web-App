@@ -83,6 +83,20 @@ async function savedIndex(page: Page): Promise<IndexItem[]> {
   });
 }
 
+/** Every saved project has synced, which shows no mark on its card. */
+async function expectSynced(page: Page) {
+  await expect
+    .poll(async () => {
+      const items = await savedIndex(page);
+      return (
+        items.length > 0 &&
+        items.every((item) => item.sync && !item.sync.dirty && !item.sync.error)
+      );
+    })
+    .toBe(true);
+  await expect(page.getByTestId('sync-label')).toHaveCount(0);
+}
+
 /** Saves a project in this browser, as the Project Planner would. */
 async function saveProject(
   page: Page,
@@ -210,7 +224,7 @@ test.describe('Sync in the browser', () => {
     expect(await link.getAttribute('href')).toBe(
       new URL(`/?project=${id}`, baseURL).href,
     );
-    await expect(laptop.getByTestId('sync-label')).toHaveText('Synced');
+    await expectSynced(laptop);
     // Working sync shows no notice
     await expect(laptop.getByTestId('sync-status')).toHaveCount(0);
   });
@@ -259,7 +273,7 @@ test.describe('Sync in the browser', () => {
       updatedAt: Date.now(),
     });
     await openSavedProjects(phone); // reloads, which syncs
-    await expect(phone.getByTestId('sync-label')).toHaveText('Synced');
+    await expectSynced(phone);
 
     await openSavedProjects(laptop);
     await expect(laptop.getByRole('link', { name: 'Doomed' })).toBeVisible();
@@ -374,7 +388,7 @@ test.describe('Sync in the browser', () => {
       updatedAt: Date.now(),
     });
     await openSavedProjects(phone);
-    await expect(phone.getByTestId('sync-label')).toHaveText('Synced');
+    await expectSynced(phone);
 
     await signIn(laptop, laptop.request, email);
     await expect
@@ -477,16 +491,16 @@ test.describe('Sync in the browser', () => {
       updatedAt: Date.now(),
     });
     await openSavedProjects(phone);
-    await expect(phone.getByTestId('sync-label')).toHaveText('Synced');
+    await expectSynced(phone);
     await openSavedProjects(laptop);
-    await expect(laptop.getByTestId('sync-label')).toHaveText('Synced');
+    await expectSynced(laptop);
 
     // Both edit before either syncs
     await editProject(phone, id, 'Phone edit');
     await editProject(laptop, id, 'Laptop edit');
 
     await openSavedProjects(phone);
-    await expect(phone.getByTestId('sync-label')).toHaveText('Synced');
+    await expectSynced(phone);
 
     await openSavedProjects(laptop);
     await expect(
