@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // Posting a saved project to Ravelry and editing it there (details, yarns,
-// photos, all in one dialog), from its Share dialog. Ravelry itself is faked
+// photos, all in one dialog), from its card's menu. Ravelry itself is faked
 // in the browser (routes under /api/account/ravelry, Ravelry's photo upload
 // address, and the account's gallery pages, since posting needs the
 // project's gallery page with the owner's name shown), so no Ravelry or
@@ -442,15 +442,18 @@ test.describe('Ravelry', () => {
     const ravelry = await fakeRavelry(page);
     const gallery = await fakeGalleryPage(page, id, name);
     await page.goto('/my-projects');
-    const share = page.getByRole('button', { name: `Share ${name}` });
-    await expect(share).toBeVisible();
-    await expect(share.locator('..')).not.toContainText('On Ravelry');
+    const more = page.getByRole('button', { name: `More for ${name}` });
+    await expect(more).toBeVisible();
+    // Its name and info line
+    const card = more.locator('..');
+    await expect(card).not.toContainText('On Ravelry');
 
-    // Share has no Ravelry of its own: it's part of publishing
-    await share.click();
-    const dialog = page.getByRole('dialog', { name: `Share “${name}”` });
-    await expect(dialog.getByText('Ravelry')).toHaveCount(0);
-    await dialog.getByRole('button', { name: /^Publish to Gallery/ }).click();
+    // The menu has no Ravelry of its own until it's posted: that's part of
+    // publishing
+    await more.click();
+    const menu = page.getByRole('menu');
+    await expect(menu.getByText('Ravelry')).toHaveCount(0);
+    await menu.getByRole('menuitem', { name: /^Publish to Gallery/ }).click();
 
     // The project loads behind the dialog; Also post to Ravelry shows its part
     const post = page.getByRole('dialog', { name: 'Publish to Gallery' });
@@ -529,16 +532,22 @@ test.describe('Ravelry', () => {
 
     await page.keyboard.press('Escape');
     await expect(post).toHaveCount(0);
-    await expect(share.locator('..')).toContainText('On Ravelry · 2 photos');
+    await expect(card).toContainText('On Ravelry, 2 photos');
+    // And its menu links to it
+    await more.click();
+    await expect(
+      menu.getByRole('menuitem', { name: /^View on Ravelry/ }),
+    ).toHaveAccessibleName(/2 photos/);
+    await page.keyboard.press('Escape');
 
     // Update: one dialog, with what's on Ravelry. The gallery page is up to
     // date; the only change offered is a yarn this app added that the project
     // no longer uses
     ravelry.addOldPacks();
-    await share.click();
+    await more.click();
     // Renamed on Ravelry meanwhile: it follows the project's name again
     ravelry.details()!.name = 'Renamed on Ravelry';
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
+    await menu.getByRole('menuitem', { name: /^Edit Gallery Page/ }).click();
     const update = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(
       update.getByText('Its gallery page is up to date'),
@@ -602,11 +611,11 @@ test.describe('Ravelry', () => {
     expect(ravelry.link()?.pictureKey).toBe(pictureKey);
     expect(ravelry.details()?.name).toBe(name);
     await page.keyboard.press('Escape');
-    await expect(share.locator('..')).toContainText('On Ravelry · 3 photos');
+    await expect(card).toContainText('On Ravelry, 3 photos');
 
     // Remove a photo: marked first, undoable, and only gone on Update
-    await share.click();
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
+    await more.click();
+    await menu.getByRole('menuitem', { name: /^Edit Gallery Page/ }).click();
     const again = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     // Its picture on Ravelry is up to date: shown, not replaced
     await expect(again.getByText(/This picture$/)).toBeVisible();
@@ -649,13 +658,13 @@ test.describe('Ravelry', () => {
     // Deleted on Ravelry meanwhile: said so, it's unlinked here, and it can
     // be posted again
     ravelry.deleteOnRavelry();
-    await share.click();
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
+    await more.click();
+    await menu.getByRole('menuitem', { name: /^Edit Gallery Page/ }).click();
     const gone = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(gone.getByText(/deleted on Ravelry/)).toBeVisible();
     await expect(gone.getByLabel('Also post to Ravelry')).not.toBeChecked();
     await page.keyboard.press('Escape');
     await expect(gone).toHaveCount(0);
-    await expect(share.locator('..')).not.toContainText('On Ravelry');
+    await expect(card).not.toContainText('On Ravelry');
   });
 });

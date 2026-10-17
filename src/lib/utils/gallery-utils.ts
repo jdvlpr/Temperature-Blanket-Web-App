@@ -369,6 +369,31 @@ export async function fetchPalettesByIds(ids: number[]) {
   return edges.map((edge) => edge.node);
 }
 
+/**
+ * These pages' views, all time, by page ID (My Library's cards of the
+ * account's own pages): only the views, in one request a hundred at a time.
+ * Pages not found, or a gallery before 1.11.0, give none.
+ */
+export async function fetchViewsByIds(
+  kind: 'project' | 'palette',
+  ids: number[],
+): Promise<Map<number, number>> {
+  const edges = await fetchNodesByIds<{ databaseId: number; views?: number }>(
+    kind === 'project'
+      ? `projects(first: $first, where: { in: $ids }) { nodes { databaseId views } }`
+      : `contentNodes(first: $first, where: { contentTypes: [TEMPBLANKET_PALETTE], in: $ids }) {
+          nodes { __typename ... on Palette { databaseId views } }
+        }`,
+    kind === 'project' ? 'projects' : 'contentNodes',
+    ids,
+  );
+  return new Map(
+    edges.flatMap(({ node }) =>
+      typeof node.views === 'number' ? [[node.databaseId, node.views]] : [],
+    ),
+  );
+}
+
 export const fetchProjects = async ({
   first = 40,
   last = null, // TODO: is this being used by anything? I don't think so.

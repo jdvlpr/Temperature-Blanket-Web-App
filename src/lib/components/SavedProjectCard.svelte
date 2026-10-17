@@ -16,11 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A saved project on My Projects, as the gallery's project card: its picture
   (taken when the planner saved it; while one is being drawn, a placeholder;
-  if it can't be, its colors), its name, when it was saved, and a ⋮ menu
-  (Rename, Move to Trash). Its gallery button (`sharing`, Published ▾ or
-  Unpublished ▾) sits under it. Tapping it opens it in the planner.
+  if it can't be, its colors), its name, one info line (see LibraryInfoLine)
+  and a flat ⋮ menu: Rename, Create a Copy, its share rows (`shareRows`: Copy
+  Link, its gallery page, Ravelry), Move to Trash. Tapping it opens it in the
+  planner.
 -->
 <script lang="ts">
+  import LibraryInfoLine from '#lib/components/LibraryInfoLine.svelte';
   import GalleryProjectCard, {
     coverClasses,
     imageClasses,
@@ -37,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/storage/projects.svelte.js';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
   import { CopyIcon, PencilIcon, Trash2Icon } from '@lucide/svelte';
-  import type { Snippet } from 'svelte';
 
   type Props = {
     item: StoredProjectIndexItem;
@@ -54,8 +55,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onremove: () => void;
     /** Create a Copy: saves it again as a new project */
     oncopy: () => void;
-    /** Its Share button */
-    sharing?: Snippet;
+    /** Copy Link, its gallery page and Ravelry rows, in its ⋮ menu */
+    shareRows?: MoreMenuItem[];
+    /** It has a gallery page */
+    published?: boolean;
+    /** Its gallery page's views */
+    views?: number | null;
+    /** It changed since its gallery page was published or updated */
+    changed?: boolean;
+    /** On Ravelry, with this many photos there */
+    ravelryPhotos?: number | null;
   };
 
   let {
@@ -67,7 +76,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onrename,
     onremove,
     oncopy,
-    sharing,
+    shareRows = [],
+    published = false,
+    views,
+    changed = false,
+    ravelryPhotos = null,
   }: Props = $props();
 
   const dateTimeOf = (time: number) =>
@@ -91,7 +104,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let linkTitle = $derived(`Open in the Project Planner (${dateLine})`);
 
-  // It can be renamed, copied or moved to the Trash
+  // Its info line's, by day
+  let savedOn = $derived.by(() => {
+    const saved = lastSavedAt(item);
+    return `Saved ${
+      saved
+        ? new Date(saved).toLocaleDateString(undefined, { dateStyle: 'medium' })
+        : item.meta.date
+    }`;
+  });
+
+  // Renamed or copied, shared, or moved to the Trash: flat, in groups
   let menu = $derived<MoreMenuItem[]>([
     {
       value: 'rename',
@@ -108,6 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       icon: CopyIcon,
       onselect: oncopy,
     },
+    ...shareRows.map((row, i) => ({ ...row, separate: i === 0 })),
     {
       value: 'trash',
       label: 'Move to Trash',
@@ -163,11 +187,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >{label}</a
               >
             </span>
-            <span
-              class="text-surface-700-300 line-clamp-1 text-xs"
-              aria-live="polite"
-            >
-              {dateLine}
+            <span aria-live="polite">
+              <LibraryInfoLine
+                saved={savedOn}
+                {published}
+                {views}
+                {changed}
+                {ravelryPhotos}
+              />
             </span>
             {#if syncLabel?.tone === 'error'}
               <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
@@ -177,11 +204,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <MoreMenu items={menu} label="More for {label}" />
           {/if}
         </div>
-      {/if}
-    {/snippet}
-    {#snippet footer()}
-      {#if !editing && sharing}
-        <div class="w-full text-left">{@render sharing()}</div>
       {/if}
     {/snippet}
   </GalleryProjectCard>

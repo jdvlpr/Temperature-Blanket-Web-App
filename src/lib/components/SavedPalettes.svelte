@@ -47,18 +47,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortLibrary,
   } from '#lib/utils/collection-filter.js';
   import { CopyIcon, PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
-  import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
-  import { onMount, type Snippet } from 'svelte';
+  import MoreMenu, {
+    type MoreMenuItem,
+  } from '#lib/components/buttons/MoreMenu.svelte';
+  import LibraryInfoLine from '#lib/components/LibraryInfoLine.svelte';
+  import { onMount } from 'svelte';
 
   // With updateGauge (Get Colors' My Palettes), choosing a palette uses it, and that's
   // all a card does; without it (My Library), each palette is a link to the
   // Yarn Palette Creator, with Rename, Copy and Trash in its menu
-  // With sharing (My Projects, signed in), each palette says who can see it
+  // With gallery (My Library), each palette's info line says whether it's
+  // published, and its menu has its share rows
   // With filters (My Library), only what matches shows, sorted as chosen;
   // oncount says how many
   let {
     updateGauge,
-    sharing,
+    gallery,
     filters,
     oncount,
   }: {
@@ -67,9 +71,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _schemeId?: string;
       _paletteId?: string;
     }) => void;
-    sharing?: Snippet<
-      [{ palette: SavedPalette; colors: Color[]; label: string }]
-    >;
+    gallery?: (card: {
+      palette: SavedPalette;
+      colors: Color[];
+      label: string;
+    }) => {
+      /** Copy Link and its gallery page, in its ⋮ menu */
+      rows: MoreMenuItem[];
+      published: boolean;
+      views?: number | null;
+      changed: boolean;
+    };
     filters?: LibraryFilters;
     /** How many there are without the filters, once known, and how many show */
     oncount?: (count: { total: number; matching: number }) => void;
@@ -342,6 +354,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/snippet}
             </PaletteCard>
           {:else}
+            {@const shared = gallery?.({ palette, colors, label })}
             <PaletteCard
               {colors}
               {layout}
@@ -365,9 +378,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
               {/snippet}
               {#snippet details()}
-                <span class="text-surface-700-300 line-clamp-1 text-xs"
-                  >Saved {dateTimeOf(palette.createdAt)}</span
-                >
+                <LibraryInfoLine
+                  saved="Saved {new Date(palette.createdAt).toLocaleDateString(
+                    undefined,
+                    { dateStyle: 'medium' },
+                  )}"
+                  published={shared?.published}
+                  views={shared?.views}
+                  changed={shared?.changed}
+                />
               {/snippet}
               {#snippet action()}
                 <MoreMenu
@@ -385,6 +404,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       icon: CopyIcon,
                       onselect: () => copy(palette, label),
                     },
+                    ...(shared?.rows ?? []).map((row, i) => ({
+                      ...row,
+                      separate: i === 0,
+                    })),
                     {
                       value: 'trash',
                       label: 'Move to Trash',
@@ -394,9 +417,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     },
                   ]}
                 />
-              {/snippet}
-              {#snippet footer()}
-                {@render sharing?.({ palette, colors, label })}
               {/snippet}
             </PaletteCard>
           {/if}

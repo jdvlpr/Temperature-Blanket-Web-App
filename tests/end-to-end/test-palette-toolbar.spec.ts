@@ -160,16 +160,12 @@ test.describe('Palette toolbar', () => {
     ).toHaveCount(0);
   });
 
-  test('Share, signed out, offers signing in that comes back to the colors', async ({
+  test('the Palette menu, signed out, offers signing in that comes back to the colors', async ({
     page,
   }) => {
     await page.getByTestId('palette-button').click();
-    await page
-      .getByRole('dialog', { name: 'Palette' })
-      .getByRole('button', { name: /^Share/ })
-      .click();
     const signIn = page
-      .getByRole('dialog')
+      .getByRole('dialog', { name: 'Palette' })
       .getByRole('link', { name: /^Sign In to Publish/ });
     // Only in builds with accounts (PUBLIC_ACCOUNTS_ENABLED)
     test.skip((await signIn.count()) === 0, 'Accounts aren’t built in');
@@ -256,10 +252,6 @@ test.describe('Palette toolbar', () => {
     await page.getByTestId('palette-button').click();
     await page
       .getByRole('dialog', { name: 'Palette' })
-      .getByRole('button', { name: /^Share/ })
-      .click();
-    await page
-      .getByRole('dialog')
       .getByRole('button', { name: /^Copy Link/ })
       .click();
     await expect(page.getByText('Link copied')).toBeVisible();

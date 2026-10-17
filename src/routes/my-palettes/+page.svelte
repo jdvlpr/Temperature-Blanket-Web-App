@@ -19,6 +19,10 @@ only in the gallery), with search, filters and sort once there are a few. -->
 <script lang="ts">
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
+  import { page as appPage } from '$app/state';
+  import { ownPageViews } from '#lib/accounts/own-page-views.svelte.js';
+  import { signInHref } from '#lib/accounts/redirect.js';
+  import { shareRows } from '#lib/accounts/share-rows.js';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
@@ -29,7 +33,6 @@ only in the gallery), with search, filters and sort once there are a few. -->
   import { sync } from '#lib/sync/status.svelte.js';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import GallerySharing from '#lib/components/account/GallerySharing.svelte';
   import MyLibrary from '#lib/components/MyLibrary.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
   import SavedPalettesToolbar from '#lib/components/SavedPalettesToolbar.svelte';
@@ -42,6 +45,7 @@ only in the gallery), with search, filters and sort once there are a few. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
+  import type { SavedPalette } from '#lib/storage/palettes.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { PlusIcon } from '@lucide/svelte';
 
@@ -77,6 +81,50 @@ only in the gallery), with search, filters and sort once there are a few. -->
         title: update ? 'Edit Gallery Page' : 'Publish to Gallery',
       },
     });
+  }
+
+  // The views of the palettes' gallery pages (one request for all of them)
+  $effect(() => {
+    if (!showGallery) return;
+    ownPageViews.load(
+      'palette',
+      galleryPages.pages
+        .filter((p) => p.kind === 'palette')
+        .map((p) => p.postId),
+    );
+  });
+
+  /** A card's info line and share rows */
+  function galleryFor({
+    palette,
+    colors,
+    label,
+  }: {
+    palette: SavedPalette;
+    colors: Color[];
+    label: string;
+  }) {
+    const page = showGallery
+      ? galleryPages.grouped.byPalette.get(palette.id)
+      : undefined;
+    const changed = (p: GalleryPage) => paletteChanged(colors, label, p);
+    return {
+      published: !!page,
+      views: page ? ownPageViews.of(page.postId) : null,
+      changed: !!page && changed(page),
+      rows: shareRows({
+        kind: 'palette',
+        id: palette.id,
+        link: getYarnPageURL({
+          colors,
+          origin: browser ? location.origin : PUBLIC_BASE_URL,
+        }),
+        changed,
+        signInHref: signInHref(appPage.url),
+        onpublish: () => sharePalette(palette, colors, label),
+        onedit: (old) => sharePalette(palette, colors, label, old),
+      }),
+    };
   }
 
   /** Its name or colors differ from its gallery page's */
@@ -120,29 +168,8 @@ only in the gallery), with search, filters and sort once there are a few. -->
         <SavedPalettes
           filters={libraryFilters}
           oncount={(count) => ({ total, matching } = count)}
-        >
-          {#snippet sharing({ palette, colors, label })}
-            {@const page = showGallery
-              ? galleryPages.grouped.byPalette.get(palette.id)
-              : undefined}
-            <GallerySharing
-              kind="palette"
-              id={palette.id}
-              {label}
-              link={getYarnPageURL({
-                colors,
-                origin: browser ? location.origin : PUBLIC_BASE_URL,
-              })}
-              {page}
-              changedSince={Boolean(
-                page && paletteChanged(colors, label, page),
-              )}
-              changed={(p) => paletteChanged(colors, label, p)}
-              onadd={() => sharePalette(palette, colors, label)}
-              onedit={(old) => sharePalette(palette, colors, label, old)}
-            />
-          {/snippet}
-        </SavedPalettes>
+          gallery={galleryFor}
+        />
       {/if}
     </MyLibrary>
   {/snippet}

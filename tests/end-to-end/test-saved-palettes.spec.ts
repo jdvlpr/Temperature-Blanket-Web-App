@@ -141,15 +141,12 @@ test.describe('Saved palettes', () => {
     // Retried: a click before the page finishes loading does nothing
     await expect(async () => {
       await page.getByTestId('palette-button').click();
+      // Right in the Palette menu, with no Share step
       await page
         .getByRole('dialog', { name: 'Palette' })
-        .getByRole('button', { name: /^Share/ })
+        .getByRole('button', { name: /^Copy Link/ })
         .click({ timeout: 1000 });
     }).toPass();
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: /^Copy Link/ })
-      .click();
     await expect(page.getByText('Link copied')).toBeVisible();
 
     const copied = await page.evaluate(() => navigator.clipboard.readText());

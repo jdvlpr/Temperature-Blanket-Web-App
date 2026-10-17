@@ -13,21 +13,25 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The preview's Share button: the open project's Share dialog (Copy Link
-and its gallery page), as in the Project menu. -->
-<script>
+<!-- The preview's Share button: a menu of the open project's share rows
+(Copy Link and its gallery page), as in the Project menu. -->
+<script lang="ts">
+  import { loadShareState } from '#lib/accounts/share-rows.js';
+  import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { storedItem } from '#lib/storage/autosave.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
-  import { savedProjects } from '#lib/storage/projects.svelte.js';
-  import { openProjectShare } from '#lib/utils/open-project-share.js';
+  import {
+    savedProjects,
+    type StoredProjectIndexItem,
+  } from '#lib/storage/projects.svelte.js';
+  import { projectShareRows } from '#lib/utils/project-share.js';
   import { Share2Icon } from '@lucide/svelte';
 
   let { isPrimary = false } = $props();
 
-  // The project's name, ready before the dialog opens (see openProjectShare)
+  // The project's name, ready before Copy Link is chosen (see projectShareRows)
   let name = $state('');
-  /** @type {import('#lib/storage/projects.svelte.js').StoredProjectIndexItem | undefined} */
-  let shareItem = $state();
+  let shareItem = $state<StoredProjectIndexItem>();
   $effect(() => {
     void project.url.href;
     void savedProjects.version;
@@ -37,18 +41,22 @@ and its gallery page), as in the Project menu. -->
       shareItem = item;
     });
   });
+
+  let rows = $derived(projectShareRows(name, shareItem));
 </script>
 
-<button
-  class={[
+<MoreMenu
+  items={rows}
+  label="Share"
+  title="Copy a link, or publish it to the gallery"
+  onopen={() => loadShareState('project')}
+  triggerClass={[
     'btn w-fit whitespace-pre-wrap',
     isPrimary
       ? 'bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border'
-      : 'hover:preset-tonal-surface',
-  ]}
-  onclick={() => openProjectShare(name, { item: shareItem })}
-  title="Copy a link, or publish it to the gallery"
+      : 'hover:preset-tonal-surface data-[state=open]:preset-tonal-surface',
+  ].join(' ')}
 >
-  <Share2Icon />
+  <Share2Icon aria-hidden="true" />
   Share
-</button>
+</MoreMenu>

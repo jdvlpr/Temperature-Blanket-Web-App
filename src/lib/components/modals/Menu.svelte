@@ -65,7 +65,6 @@ button to it. -->
     CopyPlusIcon,
     DownloadIcon,
     ExternalLinkIcon,
-    Share2Icon,
     FolderOpenIcon,
     LoaderCircleIcon,
     LogInIcon,
@@ -76,7 +75,10 @@ button to it. -->
     Trash2Icon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
-  import { openProjectShare } from '#lib/utils/open-project-share.js';
+  import { loadShareState } from '#lib/accounts/share-rows.js';
+  import ShareRows from '#lib/components/ShareRows.svelte';
+  import { projectShareRows } from '#lib/utils/project-share.js';
+  import { onMount } from 'svelte';
   import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
   import ExportOptions from './ExportOptions.svelte';
   import SaveGaugePalettes from './SaveGaugePalettes.svelte';
@@ -128,8 +130,10 @@ button to it. -->
     });
   });
 
-  // Copy Link and its gallery page, in the panel with Back to this menu
-  const share = () => openProjectShare(shareName, { item: shareItem });
+  // Copy Link and its gallery page, right in the list; what they open
+  // opens in the panel with Back to this menu
+  const shareRowsList = $derived(projectShareRows(shareName, shareItem));
+  onMount(() => loadShareState('project'));
 
   // Its gauges' palettes, to keep in My Palettes
   const savePalettes = () =>
@@ -336,18 +340,7 @@ the same color) says it's waiting here -->
             <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
           </button>
         </li>
-        <li>
-          <button type="button" class={ROW} onclick={share}>
-            <Share2Icon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Share</span>
-              <span class="text-xs opacity-70"
-                >Copy Link, or publish it to the gallery</span
-              >
-            </span>
-            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
-          </button>
-        </li>
+        <ShareRows rows={shareRowsList} />
         <li>
           <button type="button" class={ROW} onclick={savePalettes}>
             <BookmarkPlusIcon class="shrink-0 opacity-70" />

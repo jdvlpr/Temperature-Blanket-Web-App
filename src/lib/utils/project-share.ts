@@ -13,52 +13,54 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The open project's Share dialog (Copy Link and its gallery page), from the
-// Project menu and the preview's Share button.
+// The open project's share rows (Copy Link and its gallery page), in the
+// Project menu and the preview's Share menu. Call inside $derived.
 
 import { resolve } from '$app/paths';
+import { shareRows } from '#lib/accounts/share-rows.js';
 import AddToGallery from '#lib/components/modals/AddToGallery.svelte';
-import ShareDialog from '#lib/components/modals/ShareDialog.svelte';
 import { locations } from '#lib/state/location-state.svelte.js';
 import { dialog } from '#lib/state/page-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
-import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
+import {
+  lastSavedAt,
+  type StoredProjectIndexItem,
+} from '#lib/storage/projects.svelte.js';
 import { withProjectName } from '#lib/utils/project-name-link.js';
 
 /**
- * Opens it. `name` is the project's name and `item` the project as saved here,
+ * The rows. `name` is the project's name and `item` the project as saved here,
  * read before (a clipboard write right after waiting on storage can be refused
- * in Safari); with `item`, it can tell whether the project is in the account.
+ * in Safari); with `item`, they can tell whether the project is in the account
+ * and whether it changed since its page was published.
  */
-export function openProjectShare(
+export function projectShareRows(
   name: string,
-  { item }: { item?: StoredProjectIndexItem } = {},
+  item: StoredProjectIndexItem | undefined,
 ) {
-  const label = name || locations.projectTitle || 'Project';
+  // Returnable, so the publish dialog has Back to the menu it came from
   const publish = (title: string) =>
     dialog.trigger({
       type: 'component',
       component: { ref: AddToGallery },
       options: { title, size: 'medium', returnable: true },
     });
-  const here = project.url.href.replace(window.location.origin, '');
-  dialog.trigger({
-    type: 'component',
-    component: {
-      ref: ShareDialog,
-      props: {
-        kind: 'project',
-        id: project.id,
-        label,
-        // With its name, so whoever opens it sees it too
-        link: withProjectName(project.url.href, name, locations.projectTitle),
-        signInHref: `${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(here)}`,
-        onpublish: () => publish('Publish to Gallery'),
-        onedit: () => publish('Edit Gallery Page'),
-        ravelryItem: item,
-      },
-    },
-    // Always returnable, so the publish dialog has Back to it
-    options: { title: `Share “${label}”`, returnable: true },
+  const here =
+    typeof window === 'undefined'
+      ? '/'
+      : project.url.href.replace(window.location.origin, '');
+  return shareRows({
+    kind: 'project',
+    id: project.id,
+    // With its name, so whoever opens it sees it too
+    link: withProjectName(project.url.href, name, locations.projectTitle),
+    changed: item
+      ? (page) =>
+          (lastSavedAt(item) ?? 0) > (page.updatedAt ?? page.publishedAt)
+      : undefined,
+    signInHref: `${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(here)}`,
+    onpublish: () => publish('Publish to Gallery'),
+    onedit: () => publish('Edit Gallery Page'),
+    item,
   });
 }

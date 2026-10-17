@@ -18,6 +18,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
+  import { page as appPage } from '$app/state';
+  import { signInHref } from '#lib/accounts/redirect.js';
+  import { shareRows } from '#lib/accounts/share-rows.js';
+  import { ownPageViews } from '#lib/accounts/own-page-views.svelte.js';
   import SavedProjectCard from '#lib/components/SavedProjectCard.svelte';
   import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
@@ -33,7 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     savedProjects,
   } from '#lib/storage/projects.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
-  import GallerySharing from '#lib/components/account/GallerySharing.svelte';
   import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
   import { openGalleryDialog } from '#lib/utils/open-saved-project.js';
@@ -167,10 +170,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   // Signed in on My Projects: which projects are on Ravelry, for each card's
-  // Share button and dialog (one request for the whole page)
+  // info line and menu (one request for the whole page)
   $effect(() => {
     if (onMyProjectsPage && signedIn) void ravelryLinks.load();
   });
+
+  // And the views of their gallery pages (one request for all of them)
+  $effect(() => {
+    if (!showSharing) return;
+    ownPageViews.load(
+      'project',
+      galleryPages.pages
+        .filter((p) => (p.kind ?? 'project') === 'project')
+        .map((p) => p.postId),
+    );
+  });
+
+  /** Since its page was published or last updated */
+  const changedSince = (item: StoredProjectIndexItem) => (p: GalleryPage) =>
+    (lastSavedAt(item) ?? 0) > (p.updatedAt ?? p.publishedAt);
 
   // Newest first, by when each was saved
   const allCards = $derived(
@@ -292,31 +310,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/each}
 {/snippet}
 
-{#snippet gallerySharing(project: StoredProjectIndexItem)}
+{#snippet projectCard(project: StoredProjectIndexItem)}
   {@const page = showSharing
     ? galleryPages.grouped.byProject.get(project.id)
     : undefined}
-  {@const changed = (p: GalleryPage) =>
-    (lastSavedAt(project) ?? 0) > (p.updatedAt ?? p.publishedAt)}
-  <GallerySharing
-    kind="project"
-    id={project.id}
-    label={labelFor(project)}
-    link={withProjectName(
-      project.meta.href,
-      project.meta.name,
-      project.meta.title,
-    )}
-    {page}
-    changedSince={Boolean(page && changed(page))}
-    {changed}
-    ravelryItem={signedIn ? project : undefined}
-    onadd={() => openForGallery(project, { action: 'add' })}
-    onedit={(old) =>
-      openForGallery(project, {
-        action: 'replace',
-        postId: old.postId,
-      })}
+  {@const ravelry =
+    signedIn && ravelryLinks.connected
+      ? ravelryLinks.links.get(project.id)
+      : undefined}
+  <SavedProjectCard
+    item={project}
+    picturesVersion={pictures.version}
+    pictureSettled={pictures.isSettled(project.id, project.meta.href)}
+    layout={layout === 'grid' ? 'grid' : 'list'}
+    syncLabel={__ACCOUNTS_ENABLED__
+      ? syncLabelFor(project, signedIn)
+      : undefined}
+    onrename={(name) => rename(project.id, name)}
+    onremove={() => remove(project)}
+    oncopy={() => copy(project)}
+    published={!!page}
+    views={page ? ownPageViews.of(page.postId) : null}
+    changed={!!page && changedSince(project)(page)}
+    ravelryPhotos={ravelry ? ravelry.photos.length : null}
+    shareRows={shareRows({
+      kind: 'project',
+      id: project.id,
+      link: withProjectName(
+        project.meta.href,
+        project.meta.name,
+        project.meta.title,
+      ),
+      changed: changedSince(project),
+      signInHref: signInHref(appPage.url),
+      item: signedIn ? project : undefined,
+      onpublish: () => openForGallery(project, { action: 'add' }),
+      onedit: (old) =>
+        openForGallery(project, { action: 'replace', postId: old.postId }),
+    })}
   />
 {/snippet}
 
@@ -348,22 +379,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const project = card.project}
           {@render undoAt(card.key, true)}
           <div class="w-full" {@attach slots.track(card.key)}>
-            <SavedProjectCard
-              item={project}
-              picturesVersion={pictures.version}
-              pictureSettled={pictures.isSettled(project.id, project.meta.href)}
-              layout={grid ? 'grid' : 'list'}
-              syncLabel={__ACCOUNTS_ENABLED__
-                ? syncLabelFor(project, signedIn)
-                : undefined}
-              onrename={(name) => rename(project.id, name)}
-              onremove={() => remove(project)}
-              oncopy={() => copy(project)}
-            >
-              {#snippet sharing()}
-                {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}
-              {/snippet}
-            </SavedProjectCard>
+            {@render projectCard(project)}
           </div>
         {/each}
         {@render undoAt(null, true)}

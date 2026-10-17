@@ -283,29 +283,24 @@ test.describe('Gallery pages from accounts', () => {
     // The project isn't in the account: leave it in this browser
     await page.getByRole('button', { name: /^Not now/ }).click();
     await expect(
-      page.getByRole('button', { name: `Share ${title}` }),
+      page.getByRole('button', { name: `More for ${title}` }),
     ).toBeVisible();
 
     // Each page's Anonymous is set when publishing or updating it, not in its
-    // Share dialog; the display name itself is in the Account page's Profile
+    // card's menu; the display name itself is in the Account page's Profile
     // settings
     await page
-      .getByRole('button', { name: 'Share Ottawa from 2025 to 2026' })
+      .getByRole('button', { name: 'More for Ottawa from 2025 to 2026' })
       .click();
-    const dialog = page.getByRole('dialog', {
-      name: 'Share “Ottawa from 2025 to 2026”',
-    });
+    const menu = page.getByRole('menu');
     await expect(
-      dialog.getByRole('button', { name: /^Edit Gallery Page/ }),
+      menu.getByRole('menuitem', { name: /^Edit Gallery Page/ }),
     ).toBeVisible();
-    await expect(
-      dialog.getByRole('checkbox', { name: /Anonymous/ }),
-    ).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'Add a Name for Gallery Pages',
     );
     await page.keyboard.press('Escape');
-    await expect(dialog).toHaveCount(0);
+    await expect(menu).toHaveCount(0);
     // Its name shown (as Update Gallery Page does), with no display name yet
     expect(
       (
@@ -351,7 +346,7 @@ test.describe('Gallery pages from accounts', () => {
     ]);
   });
 
-  test('a saved project shows if it is published, and its Share dialog changes its one page', async ({
+  test('a saved project shows if it is published, and its menu changes its one page', async ({
     page,
     request,
   }) => {
@@ -395,49 +390,37 @@ test.describe('Gallery pages from accounts', () => {
     await page.reload();
     // The project isn't in the account: leave it in this browser
     await page.getByRole('button', { name: /^Not now/ }).click();
-    const share = page.getByRole('button', { name: `Share ${title}` });
-    await expect(share).toBeVisible();
-    // One page, one status: Published, and changed since
-    await expect(share.locator('..')).toContainText(
-      'Published · changed since',
-    );
+    const more = page.getByRole('button', { name: `More for ${title}` });
+    await expect(more).toBeVisible();
+    // One page, one info line: Published, and changed since
+    const card = more.locator('..');
+    await expect(card).toContainText('Published');
+    await expect(card.getByTitle('Changed since publishing')).toBeVisible();
     // Versions are gone
     await expect(page.getByText(/versions?\b/)).toHaveCount(0);
 
-    await share.click();
-    const dialog = page.getByRole('dialog', { name: `Share “${title}”` });
-    // One list: the link first (a copy anyone can open), then its page
-    await expect(dialog.getByRole('list', { name: 'Share' })).toBeVisible();
+    await more.click();
+    const menu = page.getByRole('menu');
+    // Flat: the link first (a copy anyone can open), then its page
     await expect(
-      dialog.getByRole('button', { name: /^Copy Link/ }),
+      menu.getByRole('menuitem', { name: /^Copy Link/ }),
     ).toBeVisible();
-    // Gallery Page: its state, then its options
-    const status = dialog.locator('#share-gallery-status');
-    await expect(status).toContainText('Published');
-    await expect(status).toContainText('Anonymous');
     await expect(
-      dialog.getByRole('link', { name: /^View Gallery Page/ }),
+      menu.getByRole('menuitem', { name: /^View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
-    // One way in to everything else, saying it changed since
-    const edit = dialog.getByRole('button', { name: /^Edit Gallery Page/ });
-    await expect(edit).toBeVisible();
-    await expect(edit).toHaveAccessibleDescription(
-      /Changed since its page was last updated/,
-    );
+    // Edit, saying it changed since
+    const edit = menu.getByRole('menuitem', { name: /^Edit Gallery Page/ });
+    await expect(edit).toHaveAccessibleName(/Changed since publishing/);
     await expect(
-      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
+      menu.getByRole('menuitem', { name: /^Publish to Gallery/ }),
     ).toHaveCount(0);
     await expect(
-      dialog.getByRole('button', { name: /^Unpublish/ }),
-    ).toHaveCount(0);
-
-    // The name on the page: not changed here (it's in Edit Gallery Page), but
-    // shown
-    await expect(
-      dialog.getByRole('checkbox', { name: /Anonymous/ }),
-    ).toHaveCount(0);
+      menu.getByRole('menuitem', { name: /^Unpublish/ }),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(dialog).toHaveCount(0);
+    await expect(menu).toHaveCount(0);
+
+    // The name on the page: changed in Edit Gallery Page, not the menu
     expect(
       (
         await page.request.patch(`/api/account/gallery/${postId}`, {
@@ -451,12 +434,6 @@ test.describe('Gallery pages from accounts', () => {
       )[0].showOwner,
     ).toBe(1);
     await page.reload();
-    await share.click();
-    await expect(status).toContainText('By Ada Lovelace');
-    // (Close, not Escape: right after a reload, the thumbnail drawing can take
-    // a key press)
-    await dialog.getByRole('button', { name: 'Close' }).click();
-    await expect(dialog).toHaveCount(0);
     await expect(page.getByTestId('gallery-name-status')).toContainText(
       'By Ada Lovelace',
     );
@@ -472,7 +449,7 @@ test.describe('Gallery pages from accounts', () => {
     });
     // In Edit Gallery Page, even when the project can't be got ready to
     // update (its edited weather isn't saved with it)
-    await share.click();
+    await more.click();
     await edit.click();
     const editor = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     await expect(editor).toContainText('edited weather data');
@@ -496,7 +473,7 @@ test.describe('Gallery pages from accounts', () => {
     expect(removed).toEqual([String(postId)]);
     await editor.getByRole('button', { name: 'Done' }).click();
     await expect(editor).toHaveCount(0);
-    await expect(share.locator('..')).not.toContainText('Published');
+    await expect(card).not.toContainText('Published');
     // (Publishing is off here, so with no page there's nothing left to change)
   });
 
@@ -577,7 +554,7 @@ test.describe('Gallery pages from accounts', () => {
     await visitor.close();
   });
 
-  test('a saved project is published, then updated in place, from Share on My Projects, without leaving it', async ({
+  test('a saved project is published, then updated in place, from its menu on My Projects, without leaving it', async ({
     page,
     request,
   }) => {
@@ -658,14 +635,15 @@ test.describe('Gallery pages from accounts', () => {
     await page.reload();
     // In the account: a project's page follows the account's copy into the Trash
     await page.getByRole('button', { name: /^Add 2 projects/ }).click();
-    const card = (name: string) =>
-      page.getByRole('button', { name: `Share ${name}` }).locator('..');
-    const shareDialog = (name: string) =>
-      page.getByRole('dialog', { name: `Share “${name}”` });
-    // From the card's Share dialog to the publish dialog
-    const openFromShare = async (name: string, row: RegExp) => {
-      await page.getByRole('button', { name: `Share ${name}` }).click();
-      await shareDialog(name).getByRole('button', { name: row }).click();
+    const more = (name: string) =>
+      page.getByRole('button', { name: `More for ${name}` });
+    // Its name and info line
+    const card = (name: string) => more(name).locator('..');
+    const menu = page.getByRole('menu');
+    // From the card's ⋮ menu to the publish dialog
+    const openFromMenu = async (name: string, row: RegExp) => {
+      await more(name).click();
+      await menu.getByRole('menuitem', { name: row }).click();
     };
     const publishDialog = page.getByRole('dialog', {
       name: 'Publish to Gallery',
@@ -676,7 +654,7 @@ test.describe('Gallery pages from accounts', () => {
     await expect(card('First test')).not.toContainText('Published');
 
     // The first opens over My Projects; closing it leaves everything as it was
-    await openFromShare('First test', /^Publish to Gallery/);
+    await openFromMenu('First test', /^Publish to Gallery/);
     await expect(publishDialog.locator('svg#preview-svg-image')).toBeVisible();
     await expect(page).toHaveURL(/\/my-projects$/);
     await page.keyboard.press('Escape');
@@ -696,7 +674,7 @@ test.describe('Gallery pages from accounts', () => {
       await dialog.getByRole('button', { name: button, exact: true }).click();
       await expect(dialog.getByRole('heading', { name: done })).toBeVisible();
     };
-    await openFromShare('Second test', /^Publish to Gallery/);
+    await openFromMenu('Second test', /^Publish to Gallery/);
     await send(publishDialog, 'Publish', 'Published');
     await page.keyboard.press('Escape');
     await expect(publishDialog).toHaveCount(0);
@@ -718,7 +696,7 @@ test.describe('Gallery pages from accounts', () => {
     const postId = gallery.posts[0].postId;
 
     // And the first, all of it
-    await openFromShare('First test', /^Publish to Gallery/);
+    await openFromMenu('First test', /^Publish to Gallery/);
     await send(publishDialog, 'Publish', 'Published');
     await page.keyboard.press('Escape');
     expect(sent()).toHaveLength(2);
@@ -731,19 +709,18 @@ test.describe('Gallery pages from accounts', () => {
     expect(sent()[1].body.total_days).toBe(2);
     await expect(card('First test')).toContainText('Published');
 
-    // Published: Share has its page, and updating it, not publishing again
-    await page.getByRole('button', { name: 'Share Second test' }).click();
-    const dialog = shareDialog('Second test');
+    // Published: its menu has its page, and updating it, not publishing again
+    await more('Second test').click();
     await expect(
-      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
+      menu.getByRole('menuitem', { name: /^Publish to Gallery/ }),
     ).toHaveCount(0);
     await expect(
-      dialog.getByRole('link', { name: /^View Gallery Page/ }),
+      menu.getByRole('menuitem', { name: /^View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
     // Changed since it was published (as if edited on another device): only
     // then is there something to update
     gallery.posts.find((p) => p.postId === postId)!.link = 'changed';
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
+    await menu.getByRole('menuitem', { name: /^Edit Gallery Page/ }).click();
     await send(updateDialog, 'Save', 'Saved');
     // The same page: its link is the same, and nothing new was published
     await expect(
@@ -762,15 +739,13 @@ test.describe('Gallery pages from accounts', () => {
     await page.keyboard.press('Escape');
     await expect(updateDialog).toHaveCount(0);
     await expect(card('Second test')).toContainText('Published');
-    await expect(card('Second test')).not.toContainText('changed since');
-
-    // Anonymous, from Edit Gallery Page (not the Share dialog): the name on
-    // the page, changed on its own when the project is up to date
-    await page.getByRole('button', { name: 'Share Second test' }).click();
     await expect(
-      dialog.getByRole('checkbox', { name: /Anonymous/ }),
+      card('Second test').getByTitle('Changed since publishing'),
     ).toHaveCount(0);
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
+
+    // Anonymous, from Edit Gallery Page (not the menu): the name on the page,
+    // changed on its own when the project is up to date
+    await openFromMenu('Second test', /^Edit Gallery Page/);
     const owner = page.getByRole('dialog', { name: 'Edit Gallery Page' });
     const anonymous = owner.getByRole('checkbox', { name: /Anonymous/ });
     await expect(anonymous).toBeChecked();
@@ -786,37 +761,34 @@ test.describe('Gallery pages from accounts', () => {
     expect(sent()).toHaveLength(2);
     await page.keyboard.press('Escape');
     await expect(owner).toHaveCount(0);
-    await page.getByRole('button', { name: 'Share Second test' }).click();
-    await expect(dialog.locator('#share-gallery-status')).toContainText(
-      'By Ada Lovelace',
-    );
 
-    // Unpublish, from Edit Gallery Page: asks first, then Back to Share, where
-    // it can be published again
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
-    await owner.getByRole('button', { name: /^Unpublish…/ }).click();
-    await owner.getByRole('button', { name: 'Keep Published' }).click();
+    // Unpublish, right from its menu: asks first, then it can be published
+    // again
+    const unpublish = page.getByRole('dialog', { name: 'Unpublish' });
+    await openFromMenu('Second test', /^Unpublish/);
+    await unpublish.getByRole('button', { name: 'Keep Published' }).click();
+    await expect(unpublish).toHaveCount(0);
     expect(gallery.posts).toHaveLength(2);
-    await owner.getByRole('button', { name: /^Unpublish…/ }).click();
-    await owner.getByRole('button', { name: 'Unpublish', exact: true }).click();
-    await expect(
-      owner.getByRole('heading', { name: 'Unpublished' }),
-    ).toBeFocused();
-    await owner.getByRole('button', { name: /^Back/ }).click();
-    await expect(
-      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
-    ).toBeVisible();
+    await openFromMenu('Second test', /^Unpublish/);
+    await unpublish
+      .getByRole('button', { name: 'Unpublish', exact: true })
+      .click();
+    await expect(unpublish).toHaveCount(0);
     expect(gallery.calls.filter((call) => call.method === 'DELETE')).toEqual([
       { method: 'DELETE', postId, body: undefined },
     ]);
     expect(gallery.posts.map((p) => p.postId)).not.toContain(postId);
-    await page.keyboard.press('Escape');
     await expect(card('Second test')).not.toContainText('Published');
     await expect(card('First test')).toContainText('Published');
+    await more('Second test').click();
+    await expect(
+      menu.getByRole('menuitem', { name: /^Publish to Gallery/ }),
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
     expect(await page.evaluate(() => '__notReloaded' in window)).toBe(true);
   });
 
-  test('a saved palette is updated in place from Share, keeping its page', async ({
+  test('a saved palette is updated in place from its menu, keeping its page', async ({
     page,
     request,
     baseURL,
@@ -850,11 +822,13 @@ test.describe('Gallery pages from accounts', () => {
     await page.reload();
     await page.getByRole('button', { name: /^Not now/ }).click();
 
-    const share = page.getByRole('button', { name: 'Share Sunset' });
-    await expect(share.locator('..')).toContainText('Published');
-    await share.click();
-    const dialog = page.getByRole('dialog', { name: 'Share “Sunset”' });
-    await dialog.getByRole('button', { name: /^Edit Gallery Page/ }).click();
+    const more = page.getByRole('button', { name: 'More for Sunset' });
+    await expect(more.locator('..')).toContainText('Published');
+    await more.click();
+    await page
+      .getByRole('menu')
+      .getByRole('menuitem', { name: /^Edit Gallery Page/ })
+      .click();
 
     // Nothing to save until something differs; then its name and colors are
     // updated in place
@@ -887,7 +861,7 @@ test.describe('Gallery pages from accounts', () => {
     expect(gallery.posts[0].title).toBe('Sunset, Updated');
   });
 
-  test('signed out, Share offers Copy Link and signing in to publish', async ({
+  test('signed out, a card’s menu offers Copy Link and signing in to publish', async ({
     page,
     request,
   }) => {
@@ -920,15 +894,15 @@ test.describe('Gallery pages from accounts', () => {
     });
     await page.reload();
 
-    await page.getByRole('button', { name: `Share ${title}` }).click();
-    const dialog = page.getByRole('dialog', { name: `Share “${title}”` });
+    await page.getByRole('button', { name: `More for ${title}` }).click();
+    const menu = page.getByRole('menu');
     await expect(
-      dialog.getByRole('button', { name: /^Copy Link/ }),
+      menu.getByRole('menuitem', { name: /^Copy Link/ }),
     ).toBeVisible();
-    const signIn = dialog.getByRole('link', { name: /^Sign In to Publish/ });
+    const signIn = menu.getByRole('menuitem', { name: /^Sign In to Publish/ });
     await expect(signIn).toHaveAttribute('href', /^\/auth\/sign-in/);
     await expect(
-      dialog.getByRole('button', { name: /^Publish to Gallery/ }),
+      menu.getByRole('menuitem', { name: /^Publish to Gallery/ }),
     ).toHaveCount(0);
   });
 

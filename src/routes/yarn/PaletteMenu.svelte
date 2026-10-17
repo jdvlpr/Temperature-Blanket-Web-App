@@ -31,7 +31,8 @@ the panel, with a Back button to it. -->
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
-  import ShareDialog from '#lib/components/modals/ShareDialog.svelte';
+  import ShareRows from '#lib/components/ShareRows.svelte';
+  import { loadShareState, shareRows } from '#lib/accounts/share-rows.js';
   import {
     PANEL_LIST,
     PANEL_ROW,
@@ -68,7 +69,6 @@ the panel, with a Back button to it. -->
     LayoutGridIcon,
     PlusIcon,
     RotateCwIcon,
-    Share2Icon,
     Trash2Icon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
@@ -112,16 +112,19 @@ the panel, with a Back button to it. -->
         colorsToPaletteCode(colors),
     );
 
-  // Copy Link and its gallery page, in the panel with Back to this menu. The
-  // link is ready before Copy Link is pressed: a clipboard write right after
-  // waiting on storage can be refused (Safari).
-  function share() {
+  // Copy Link and its gallery page, right in the list; what they open opens
+  // in the panel with Back to this menu. The link is ready before Copy Link
+  // is chosen: a clipboard write right after waiting on storage can be
+  // refused (Safari).
+  const shareRowsList = $derived.by(() => {
     const colors = colorsNow();
     const label = yarnPageState.title;
     const name = paletteAutosave.id
       ? paletteAutosave.name
       : yarnPageState.suggestedNameFor(colors);
-    const here = window.location.pathname + window.location.search;
+    const here = browser
+      ? window.location.pathname + window.location.search
+      : '';
     const publish = (paletteId: string, update?: GalleryPage) =>
       dialog.trigger({
         type: 'component',
@@ -138,39 +141,33 @@ the panel, with a Back button to it. -->
         options: {
           title: update ? 'Edit Gallery Page' : 'Publish to Gallery',
           size: 'medium',
+          returnable: true,
         },
       });
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: ShareDialog,
-        props: {
-          kind: 'palette',
-          id: paletteAutosave.id ?? '',
-          label,
-          link: linkFor(colors, name),
-          changed: changedFrom(colors, label),
-          signInHref: `${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(here)}`,
-          // A gallery page is a saved palette's, so it's saved first
-          onpublish: async () => {
-            try {
-              const id =
-                paletteAutosave.id ?? (await saveNewPalette(name)).palette.id;
-              publish(id);
-            } catch {
-              toast.trigger({
-                message: 'Unable to save the palette in this browser',
-                category: 'error',
-              });
-            }
-          },
-          onedit: (page: GalleryPage) =>
-            paletteAutosave.id && publish(paletteAutosave.id, page),
-        },
+    return shareRows({
+      kind: 'palette',
+      id: paletteAutosave.id ?? '',
+      link: browser ? linkFor(colors, name) : undefined,
+      changed: changedFrom(colors, label),
+      signInHref: `${resolve('/auth/sign-in')}?redirect=${encodeURIComponent(here)}`,
+      // A gallery page is a saved palette's, so it's saved first
+      onpublish: async () => {
+        try {
+          const id =
+            paletteAutosave.id ?? (await saveNewPalette(name)).palette.id;
+          publish(id);
+        } catch {
+          toast.trigger({
+            message: 'Unable to save the palette in this browser',
+            category: 'error',
+          });
+        }
       },
-      options: { title: `Share “${label}”`, returnable: true },
+      onedit: (page: GalleryPage) =>
+        paletteAutosave.id && publish(paletteAutosave.id, page),
     });
-  }
+  });
+  onMount(() => loadShareState('palette'));
 
   // A new project in the planner, with these colors on its Temperature gauge
   function startProject() {
@@ -387,18 +384,7 @@ the panel, with a Back button to it. -->
           <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
         </button>
       </li>
-      <li>
-        <button type="button" class={ROW} onclick={share}>
-          <Share2Icon class="shrink-0 opacity-70" />
-          <span class="flex flex-1 flex-col">
-            <span>Share</span>
-            <span class="text-xs opacity-70"
-              >Copy Link, or publish it to the gallery</span
-            >
-          </span>
-          <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
-        </button>
-      </li>
+      <ShareRows rows={shareRowsList} />
       <li>
         <button type="button" class={ROW} onclick={startProject}>
           <LayoutGridIcon class="shrink-0 opacity-70" />
