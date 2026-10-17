@@ -112,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {
             value: 'saved',
             label: 'My Palettes',
-            details: 'The ones you’ve saved',
+            details: 'Saved and starred',
             icon: BookmarkIcon,
           },
           {

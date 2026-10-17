@@ -681,9 +681,9 @@ test.describe('Auto-save', () => {
     // A copy from the Project menu leaves the original as it was
     await laptop
       .getByRole('dialog')
-      .getByRole('button', { name: 'Save a Copy' })
+      .getByRole('button', { name: 'Duplicate' })
       .click();
-    await expect(laptop.getByText('Saved a copy.')).toBeVisible();
+    await expect(laptop.getByText('Duplicated.')).toBeVisible();
     const copyId = openProjectId(laptop);
     expect(copyId).not.toBe(id);
     await expect
@@ -742,9 +742,9 @@ test.describe('Auto-save', () => {
     await laptop.waitForTimeout(4000);
     expect(await serverTitle()).toBe('Changed on the phone');
 
-    // Saved as a copy instead: a new project, which saves by itself from now on
-    await laptop.getByRole('button', { name: 'Save a copy' }).click();
-    await expect(laptop.getByText('Saved a copy.')).toBeVisible();
+    // Duplicated instead: a new project, which saves by itself from now on
+    await laptop.getByRole('button', { name: 'Duplicate' }).click();
+    await expect(laptop.getByText('Duplicated.')).toBeVisible();
     const copyId = openProjectId(laptop);
     expect(copyId).not.toBe(id);
     await expect(laptop).toHaveURL(/clnr=/);

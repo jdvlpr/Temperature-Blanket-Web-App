@@ -14,21 +14,26 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Palettes to use on a gauge from one source, chosen in Get Colors: My
-Palettes, the Palette Gallery (each with the toolbar its page has), or
-Gradients -->
+Palettes (saved, or when signed in, Starred gallery palettes), the Palette
+Gallery (each with the toolbar its page has), or Gradients -->
 
 <script module lang="ts">
   export type PaletteSourceKind = 'saved' | 'gallery' | 'gradients';
 </script>
 
 <script lang="ts">
+  import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
+  import { account } from '#lib/accounts/summary.svelte.js';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import LibraryScope from '#lib/components/LibraryScope.svelte';
   import PaletteSchemes from '#lib/components/PaletteSchemes.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
   import SavedPalettesToolbar from '#lib/components/SavedPalettesToolbar.svelte';
+  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
   import YarnPaletteGallery from '#lib/components/YarnPaletteGallery.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { recordPageView } from '#lib/utils/gallery-utils.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { onMount } from 'svelte';
@@ -50,9 +55,26 @@ Gradients -->
   let top: HTMLElement | undefined = $state();
   let showScrollToTopButton = $state(false);
 
-  // My Palettes' counts, for its toolbar
+  // My Palettes' counts, for its toolbar, and Starred's apart from them
   let total = $state<number | null>(null);
   let matching = $state(0);
+  let starredTotal = $state<number | null>(null);
+  let starredMatching = $state(0);
+
+  // Mine | Starred, for the signed in (only they have stars)
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
+  let starredChosen = $state(false);
+  const starred = $derived(signedIn && starredChosen);
+  $effect(() => {
+    if (signedIn && source === 'saved') return galleryStars.start();
+  });
+  const starredCount = $derived(
+    signedIn && galleryStars.loaded
+      ? galleryStars.list('palette').length
+      : null,
+  );
 
   onMount(() => {
     ensureYarnData();
@@ -79,14 +101,47 @@ Gradients -->
   bind:this={container}
 >
   {#if source === 'saved'}
+    {#if signedIn}
+      <div class="pb-2">
+        <LibraryScope
+          {starred}
+          label="Palettes to show"
+          onselect={(side) => (starredChosen = side)}
+          mineCount={total}
+          {starredCount}
+        />
+      </div>
+    {/if}
     <div class="flex flex-col px-2">
-      <SavedPalettesToolbar {total} {matching} />
+      {#if starred}
+        <SavedPalettesToolbar
+          starred
+          total={starredTotal}
+          matching={starredMatching}
+        />
+      {:else}
+        <SavedPalettesToolbar {total} {matching} />
+      {/if}
     </div>
-    <SavedPalettes
-      {updateGauge}
-      filters={libraryFilters}
-      oncount={(count) => ({ total, matching } = count)}
-    />
+    {#if starred}
+      <StarredGalleryPages
+        kind="palette"
+        layout={preferences.value.myProjectsLayout ?? 'grid'}
+        filters={libraryFilters}
+        oncount={(count) =>
+          ({ total: starredTotal, matching: starredMatching } = count)}
+        onuse={(palette) => {
+          recordPageView(palette.postId);
+          updateGauge({ _colors: palette.colors, _schemeId: 'Custom' });
+        }}
+      />
+    {:else}
+      <SavedPalettes
+        {updateGauge}
+        filters={libraryFilters}
+        oncount={(count) => ({ total, matching } = count)}
+      />
+    {/if}
   {:else if source === 'gallery'}
     <YarnPaletteGallery
       mode="use"

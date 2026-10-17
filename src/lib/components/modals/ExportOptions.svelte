@@ -15,12 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Project menu's Download / Export screen. A file downloads right away
 and closes the panel; PDF and Google Sheet first ask what to include, on a
-screen of their own. Then each gauge's palette: an image, its color codes, or
-its yarn names. -->
+screen of their own. Palettes drills into a gauge's palette: an image, its
+color codes, or its yarn names. -->
 
 <script lang="ts">
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import ExportToGoogleSheetModal from '#lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -30,19 +29,13 @@ its yarn names. -->
     downloadPDF,
     downloadWeatherCSV,
   } from '#lib/utils/project-utils.svelte.js';
-  import {
-    getGaugeRangeLabels,
-    hasColorwayNames,
-    openPaletteExport,
-    type PaletteExport,
-  } from '#lib/utils/palette-export.js';
+  import { openGaugePalettes } from './gauge-palette.js';
   import {
     ChevronRightIcon,
-    ClipboardCopyIcon,
-    CodeIcon,
     FilePlusIcon,
     FileTextIcon,
     ImageIcon,
+    PaletteIcon,
     TableIcon,
   } from '@lucide/svelte';
 
@@ -56,22 +49,6 @@ its yarn names. -->
     if (!active?.width || !active?.height || !active?.svg) return;
     downloadPreviewPNG(active.width, active.height, active.svg);
     dialog.close();
-  }
-
-  const paletteExports = [
-    { type: 'image', label: 'Image', icon: ImageIcon },
-    { type: 'html', label: 'Codes', icon: CodeIcon },
-    { type: 'colorway', label: 'Yarn Names', icon: ClipboardCopyIcon },
-  ] as const;
-
-  function exportPalette(
-    type: PaletteExport,
-    gauge: (typeof gauges.allCreated)[number],
-  ) {
-    openPaletteExport(type, {
-      colors: $state.snapshot(gauge.colors),
-      ranges: getGaugeRangeLabels(gauge),
-    });
   }
 </script>
 
@@ -138,52 +115,20 @@ its yarn names. -->
           <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
         </button>
       </li>
+      {#if gauges.allCreated.length}
+        <li>
+          <button type="button" class={PANEL_ROW} onclick={openGaugePalettes}>
+            <PaletteIcon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>Palettes</span>
+              <span class="text-xs opacity-70"
+                >Image, color codes or yarn names</span
+              >
+            </span>
+            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+          </button>
+        </li>
+      {/if}
     </ul>
   </section>
-
-  {#if gauges.allCreated.length}
-    <section class="flex flex-col gap-2" aria-labelledby="export-palettes">
-      <h3 id="export-palettes" class="text-sm font-bold opacity-70">
-        Palettes
-      </h3>
-      <ul class={PANEL_LIST}>
-        {#each gauges.allCreated as gauge (gauge.id)}
-          {@const named = hasColorwayNames(gauge.colors)}
-          <li
-            class="flex flex-col gap-2 px-4 py-3"
-            aria-labelledby="export-palette-{gauge.id}"
-          >
-            <div class="flex items-center gap-3">
-              <div class="w-16 shrink-0" aria-hidden="true">
-                <PaletteStrip
-                  colors={gauge.colors}
-                  height="24px"
-                  corners="small"
-                  insideControl
-                />
-              </div>
-              <span id="export-palette-{gauge.id}" class="min-w-0 flex-1"
-                >{gauge.label}</span
-              >
-            </div>
-            <div class="flex flex-wrap gap-2">
-              {#each paletteExports as item (item.type)}
-                {#if item.type !== 'colorway' || named}
-                  <button
-                    type="button"
-                    class="btn btn-sm preset-tonal"
-                    aria-label="{gauge.label} Palette {item.label}"
-                    onclick={() => exportPalette(item.type, gauge)}
-                  >
-                    <item.icon />
-                    {item.label}
-                  </button>
-                {/if}
-              {/each}
-            </div>
-          </li>
-        {/each}
-      </ul>
-    </section>
-  {/if}
 </div>

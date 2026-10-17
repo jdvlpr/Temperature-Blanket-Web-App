@@ -412,9 +412,9 @@ export class ProjectStorage {
   }
 
   /**
-   * Save a copy of a saved project as a new one, named "… (copy)" (unnamed
+   * Duplicate a saved project as a new one, named "… (copy)" (unnamed
    * too, from its title) so the two don't look the same, as the planner's
-   * Save a Copy does. Signed in, the copy is the account's.
+   * Duplicate does. Signed in, the copy is the account's.
    */
   static async duplicate(id: string): Promise<StoredProjectIndexItem | null> {
     const stored = await this.getById(id);

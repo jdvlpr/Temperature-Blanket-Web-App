@@ -214,12 +214,12 @@ the panel, with a Back button to it. -->
       await openPalette(palette.id);
       dialog.close();
       toast.trigger({
-        message: 'Saved a copy. You’re now working on the copy.',
+        message: 'Duplicated. You’re now working on the copy.',
         category: 'success',
       });
     } catch (e) {
-      console.warn("Can't save a copy", { e });
-      toast.trigger({ message: 'Unable to save a copy', category: 'error' });
+      console.warn("Can't duplicate", { e });
+      toast.trigger({ message: 'Unable to duplicate', category: 'error' });
     }
   }
 
@@ -406,7 +406,7 @@ the panel, with a Back button to it. -->
           >
             <CopyPlusIcon class="shrink-0 opacity-70" />
             <span class="flex flex-1 flex-col">
-              <span>Save a Copy</span>
+              <span>Duplicate</span>
               <span class="text-xs opacity-70">A new palette from this one</span
               >
             </span>

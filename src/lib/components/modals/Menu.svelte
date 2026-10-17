@@ -151,12 +151,12 @@ button to it. -->
       await saveCopy();
       dialog.close();
       toast.trigger({
-        message: 'Saved a copy. You’re now working on the copy.',
+        message: 'Duplicated. You’re now working on the copy.',
         category: 'success',
       });
     } catch (e) {
-      console.warn("Can't save a copy", { e });
-      toast.trigger({ message: 'Unable to save a copy', category: 'error' });
+      console.warn("Can't duplicate", { e });
+      toast.trigger({ message: 'Unable to duplicate', category: 'error' });
     }
   }
 
@@ -297,7 +297,7 @@ the same color) says it's waiting here -->
           <button
             type="button"
             class="btn btn-sm preset-filled-primary-500"
-            onclick={copyProject}><CopyPlusIcon /> Save a Copy</button
+            onclick={copyProject}><CopyPlusIcon /> Duplicate</button
           >
           <button
             type="button"
@@ -363,7 +363,7 @@ the same color) says it's waiting here -->
             >
               <CopyPlusIcon class="shrink-0 opacity-70" />
               <span class="flex flex-1 flex-col">
-                <span>Save a Copy</span>
+                <span>Duplicate</span>
                 <span class="text-xs opacity-70"
                   >A new project from this one</span
                 >

@@ -100,15 +100,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (autosave.state !== 'conflict') return;
     untrack(() =>
       toast.trigger({
-        message: `${changedElsewhereMessage()} Save them as a copy, or reload to get the latest version.`,
+        message: `${changedElsewhereMessage()} Duplicate them, or reload to get the latest version.`,
         category: 'warning',
         autohide: false,
         action: {
-          label: 'Save a copy',
+          label: 'Duplicate',
           response: async () => {
             await saveCopy();
             toast.trigger({
-              message: 'Saved a copy. You’re now working on the copy.',
+              message: 'Duplicated. You’re now working on the copy.',
               category: 'success',
             });
           },

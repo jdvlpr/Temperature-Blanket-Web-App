@@ -53,8 +53,8 @@ test.describe('My Projects', () => {
     await page.goto('/my-projects');
     await expect(page.getByText('No saved projects yet')).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'My Library' }).first(),
-    ).toHaveAttribute('href', '/my-projects');
+      page.getByRole('button', { name: 'My Library' }).first(),
+    ).toBeVisible();
 
     // Palettes have a page of their own, a link away
     await page
@@ -64,14 +64,11 @@ test.describe('My Projects', () => {
     await expect(page).toHaveURL(/\/my-palettes$/);
     await expect(page.getByText('No saved palettes yet')).toBeVisible();
 
-    // The site menu's link goes back to the side that was open last
-    await expect(
-      page.getByRole('link', { name: 'My Library' }).first(),
-    ).toHaveAttribute('href', '/my-palettes');
+    // The site menu asks which side, wherever you are
     await page.goto('/');
-    await expect(
-      page.getByRole('link', { name: 'My Library' }).first(),
-    ).toHaveAttribute('href', '/my-palettes');
+    await page.getByRole('button', { name: 'My Library' }).first().click();
+    await page.getByRole('menuitem', { name: /Projects/ }).click();
+    await expect(page).toHaveURL(/\/my-projects$/);
   });
 
   test('lists saved projects and palettes', async ({ page }) => {

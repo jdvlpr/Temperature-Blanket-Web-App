@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import {
     menuContentClass,
     menuItemClass,
@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { version } from '$app/env';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
-  import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { yarnBall } from '@lucide/lab';
@@ -43,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
-  import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
@@ -59,26 +57,107 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const CURRENT = 'preset-tonal-secondary';
   const HEADING =
     'text-surface-700-300 mt-4 px-3 text-xs font-semibold tracking-wide uppercase';
-  const CREATE_OPTIONS = [
-    {
-      href: '/',
-      label: 'Project',
-      description: 'Plan a blanket from weather data',
-      yarn: false,
+  // Each opens a menu asking Projects or Palettes
+  const MENUS = {
+    create: {
+      icon: NotebookPenIcon,
+      label: 'Create',
+      options: [
+        {
+          href: '/',
+          label: 'Project',
+          description: 'Plan a blanket from weather data',
+          yarn: false,
+        },
+        {
+          href: '/yarn',
+          label: 'Palette',
+          description: 'Just pick yarn colors',
+          yarn: true,
+        },
+      ],
     },
-    {
-      href: '/yarn',
-      label: 'Palette',
-      description: 'Just pick yarn colors',
-      yarn: true,
+    library: {
+      icon: LibraryBigIcon,
+      label: 'My Library',
+      options: [
+        {
+          href: '/my-projects',
+          label: 'Projects',
+          description: 'Projects you’ve saved and starred',
+          yarn: false,
+        },
+        {
+          href: '/my-palettes',
+          label: 'Palettes',
+          description: 'Palettes you’ve saved and starred',
+          yarn: true,
+        },
+      ],
     },
-  ];
+    gallery: {
+      icon: LandmarkIcon,
+      label: 'Gallery',
+      options: [
+        {
+          href: '/gallery',
+          label: 'Projects',
+          description: 'Blankets shared by others',
+          yarn: false,
+        },
+        {
+          href: '/gallery/palettes',
+          label: 'Palettes',
+          description: 'Yarn palettes shared by others',
+          yarn: true,
+        },
+      ],
+    },
+  };
   const SMALL_CURRENT = 'text-secondary-700-300 opacity-100!';
 
   // After loading, so the server's page (which can't know) doesn't differ
   let mounted = $state(false);
   onMount(() => (mounted = true));
 </script>
+
+<!-- Always asks which kind, rather than guessing from the last one -->
+{#snippet navMenu(menu: (typeof MENUS)[keyof typeof MENUS], current: boolean)}
+  <Menu
+    positioning={menuPositioning('bottom-start')}
+    onSelect={(details) => goto(details.value)}
+  >
+    <Menu.Trigger
+      class={[LINK, current && CURRENT]}
+      aria-current={current ? 'page' : undefined}
+    >
+      <menu.icon />
+      {menu.label}
+      <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+    </Menu.Trigger>
+    <Portal>
+      <Menu.Positioner>
+        <Menu.Content class={menuContentClass}>
+          {#each menu.options as option (option.href)}
+            <Menu.Item value={option.href} class={menuItemClass}>
+              {#if option.yarn}
+                <Icon iconNode={yarnBall} class="shrink-0" aria-hidden="true" />
+              {:else}
+                <ThermometerSunIcon class="shrink-0" aria-hidden="true" />
+              {/if}
+              <div class="flex min-w-0 flex-col text-left">
+                <span>{option.label}</span>
+                <span class="text-surface-700-300 text-xs"
+                  >{option.description}</span
+                >
+              </div>
+            </Menu.Item>
+          {/each}
+        </Menu.Content>
+      </Menu.Positioner>
+    </Portal>
+  </Menu>
+{/snippet}
 
 <!-- Icons line up by what's drawn, with the site logo's edge -->
 <nav
@@ -108,65 +187,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
   {/if}
 
-  <!-- Always asks which to make -->
-  <Menu
-    positioning={menuPositioning('bottom-start')}
-    onSelect={(details) => goto(details.value)}
-  >
-    <Menu.Trigger
-      class={[LINK, create && CURRENT]}
-      aria-current={create ? 'page' : undefined}
-    >
-      <NotebookPenIcon />
-      Create
-      <ChevronDownIcon class="icon-sm" aria-hidden="true" />
-    </Menu.Trigger>
-    <Portal>
-      <Menu.Positioner>
-        <Menu.Content class={menuContentClass}>
-          {#each CREATE_OPTIONS as option (option.href)}
-            <Menu.Item value={option.href} class={menuItemClass}>
-              {#if option.yarn}
-                <Icon iconNode={yarnBall} class="shrink-0" aria-hidden="true" />
-              {:else}
-                <ThermometerSunIcon class="shrink-0" aria-hidden="true" />
-              {/if}
-              <div class="flex min-w-0 flex-col text-left">
-                <span>{option.label}</span>
-                <span class="text-surface-700-300 text-xs"
-                  >{option.description}</span
-                >
-              </div>
-            </Menu.Item>
-          {/each}
-        </Menu.Content>
-      </Menu.Positioner>
-    </Portal>
-  </Menu>
-
-  <!-- Back to the side that was open last (after loading: a link's address
-  isn't updated from the server's) -->
-  <a
-    href={mounted && librarySection.value === 'palettes'
-      ? resolve('my-palettes')
-      : resolve('my-projects')}
-    class={[LINK, library && CURRENT]}
-    aria-current={library ? 'page' : undefined}
-  >
-    <LibraryBigIcon />
-    My Library
-  </a>
-
-  <a
-    href="/gallery"
-    class={[LINK, gallery && CURRENT]}
-    aria-current={gallery ? 'page' : undefined}
-  >
-    <LandmarkIcon />
-    Gallery
-  </a>
+  {@render navMenu(MENUS.create, create)}
+  {@render navMenu(MENUS.library, library)}
 
   <h2 class={HEADING}>Explore</h2>
+
+  {@render navMenu(MENUS.gallery, gallery)}
 
   <a
     href="/yarn-colorway-finder"

@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               If you'd like to try something different without changing the
-              original, use <span class="italic">Save a copy</span> in the
+              original, use <span class="italic">Duplicate</span> in the
               <span class="italic">Project</span> menu. You'll keep working on the
               copy, and the original stays as it was.
             </p>
@@ -145,8 +145,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="font-bold">Editing on two devices at once</p>
             <p>
               If a project is changed on another device while you have it open,
-              the app won't overwrite those changes. Instead, you can save your
-              version as a copy, or reload to get the latest version.
+              the app won't overwrite those changes. Instead, you can duplicate
+              your version, or reload to get the latest version.
             </p>
 
             <hr class="hr my-2" />

@@ -22,7 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   stays until the next visit and can be put back. Pages the gallery doesn't
   return (taken down, or hidden while in their owner's Trash) aren't shown,
   but their stars are kept in case they come back. Signed out, it asks to
-  sign in.
+  sign in. With `onuse` (Get Colors' My Palettes, palettes only), choosing a
+  palette uses it instead of opening its page.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -70,9 +71,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     filters?: LibraryFilters;
     /** How many have loaded, once known, and how many show */
     oncount?: (count: { total: number; matching: number }) => void;
+    /** Uses a palette (Get Colors) rather than opening its gallery page */
+    onuse?: (palette: GalleryPalette) => void;
   }
 
-  let { kind, layout = 'grid', filters, oncount }: Props = $props();
+  let { kind, layout = 'grid', filters, oncount, onuse }: Props = $props();
 
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
@@ -339,6 +342,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {palette}
           author={galleryOwners.nameOf(palette.postId)}
           {layout}
+          mode={onuse ? 'use' : 'page'}
+          onclick={onuse ? () => onuse(palette) : undefined}
         />
       </li>
     {/each}

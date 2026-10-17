@@ -1623,8 +1623,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               of them in the Yarn Palette Creator. There, changes to a saved palette
               save automatically. The Palette button at the top shows where it’s saved,
               and opens the Palette menu: rename it, download or export it, share
-              it or publish it to the gallery, start a project with it, save a copy,
-              start a new palette, move it to the Trash, or open one of your recent
+              it or publish it to the gallery, start a project with it, duplicate
+              it, start a new palette, move it to the Trash, or open one of your recent
               palettes.
             </p>
             <p>
