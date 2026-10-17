@@ -34,7 +34,6 @@ either. With accounts off, a menu of those two. -->
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { toast } from '#lib/state/page-state.svelte.js';
-  import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
   import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import {
@@ -112,11 +111,6 @@ either. With accounts off, a menu of those two. -->
   onMount(() => {
     if (__ACCOUNTS_ENABLED__) loadAccountSummary();
     mounted = true;
-  });
-
-  // Opened the account page some other way: it's been seen
-  $effect(() => {
-    if (onAccountPage) accountsIntro.markButtonSeen();
   });
 
   async function signOut() {
@@ -256,18 +250,13 @@ either. With accounts off, a menu of those two. -->
     </Popover.Positioner>
   </Popover>
 {:else}
-  <!-- A "New" dot, until it's opened, to introduce accounts -->
-  {@const isNew = __ACCOUNTS_ENABLED__ && mounted && accountsIntro.showDot}
-  {@const label = !__ACCOUNTS_ENABLED__
-    ? 'My Library and Preferences'
-    : isNew
-      ? 'Sign in, My Library and Preferences. Accounts (Beta)'
-      : 'Sign in, My Library and Preferences'}
+  {@const label = __ACCOUNTS_ENABLED__
+    ? 'Sign in, My Library and Preferences'
+    : 'My Library and Preferences'}
   <Menu
     positioning={menuPositioning('bottom-end')}
     onOpenChange={(e) => {
       if (!e.open) return;
-      accountsIntro.markButtonSeen();
       signInTarget = signInHref(window.location);
     }}
   >
@@ -282,12 +271,6 @@ either. With accounts off, a menu of those two. -->
       data-testid="account-button"
     >
       <CircleUserRoundIcon aria-hidden="true" />
-      {#if isNew}
-        <span
-          class="bg-primary-500 absolute top-1.5 right-1.5 size-2.5 rounded-full"
-          aria-hidden="true"
-        ></span>
-      {/if}
     </Menu.Trigger>
     <Portal>
       <Menu.Positioner>

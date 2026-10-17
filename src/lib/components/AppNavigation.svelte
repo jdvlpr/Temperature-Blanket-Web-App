@@ -58,13 +58,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     'text-surface-700-300 mt-4 px-3 text-xs font-semibold tracking-wide uppercase';
   // Stronger than the other links' hover, so the two halves can be told apart.
   // A translucent overlay works over the plain and the tinted (current) look
-  // alike, and the button's own brightness filter is off so the two don't stack
+  // alike, and the button's own brightness filter is off so the two don't stack.
+  // Touch screens never hover, so a press (and the open caret) takes the same tint
   const CREATE_HOVER =
-    'hover:bg-surface-950/10 hover:filter-none! dark:hover:bg-surface-50/10';
+    'hover:bg-surface-950/10 hover:filter-none! dark:hover:bg-surface-50/10 active:bg-surface-950/10 active:filter-none! dark:active:bg-surface-50/10 data-[state=open]:bg-surface-950/10 dark:data-[state=open]:bg-surface-50/10';
   // Where the link ends and the caret begins, shown while the control is
-  // hovered or focused. Inside the caret, so no gap drops the hover between
+  // hovered or focused, and always on touch screens, which can't hover. Inside
+  // the caret, so no gap drops the hover between
   const DIVIDER =
-    'before:absolute before:inset-y-2 before:left-0 before:w-px before:opacity-0 group-focus-within:before:opacity-100 group-hover:before:opacity-100';
+    'before:absolute before:inset-y-2 before:left-0 before:w-px before:opacity-0 group-focus-within:before:opacity-100 group-hover:before:opacity-100 pointer-coarse:before:opacity-100';
   const CREATE_OPTIONS = [
     {
       href: '/',
