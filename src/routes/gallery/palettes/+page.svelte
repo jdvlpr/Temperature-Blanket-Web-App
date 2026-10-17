@@ -20,6 +20,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
   import YarnPaletteGallery from '#lib/components/YarnPaletteGallery.svelte';
+  import { gallerySection } from '#lib/storage/library-section.svelte.js';
+  import { onMount } from 'svelte';
+
+  // The sidebar's Gallery link comes back to this side next time
+  onMount(() => (gallerySection.value = 'palettes'));
 </script>
 
 <svelte:head>

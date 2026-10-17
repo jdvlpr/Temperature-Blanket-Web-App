@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
+  import { resolve } from '$app/paths';
   import { yarnBall } from '@lucide/lab';
   import {
     ChevronDownIcon,
@@ -42,6 +43,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
+  import {
+    gallerySection,
+    librarySection,
+  } from '#lib/storage/library-section.svelte.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
@@ -57,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const CURRENT = 'preset-tonal-secondary';
   const HEADING =
     'text-surface-700-300 mt-4 px-3 text-xs font-semibold tracking-wide uppercase';
-  // Each opens a menu asking Projects or Palettes
+  // Create asks which kind to make
   const MENUS = {
     create: {
       icon: NotebookPenIcon,
@@ -77,42 +82,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         },
       ],
     },
-    library: {
-      icon: LibraryBigIcon,
-      label: 'My Library',
-      options: [
-        {
-          href: '/my-projects',
-          label: 'Projects',
-          description: 'Projects you’ve saved and starred',
-          yarn: false,
-        },
-        {
-          href: '/my-palettes',
-          label: 'Palettes',
-          description: 'Palettes you’ve saved and starred',
-          yarn: true,
-        },
-      ],
-    },
-    gallery: {
-      icon: LandmarkIcon,
-      label: 'Gallery',
-      options: [
-        {
-          href: '/gallery',
-          label: 'Projects',
-          description: 'Blankets shared by others',
-          yarn: false,
-        },
-        {
-          href: '/gallery/palettes',
-          label: 'Palettes',
-          description: 'Yarn palettes shared by others',
-          yarn: true,
-        },
-      ],
-    },
   };
   const SMALL_CURRENT = 'text-secondary-700-300 opacity-100!';
 
@@ -121,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(() => (mounted = true));
 </script>
 
-<!-- Always asks which kind, rather than guessing from the last one -->
+<!-- Asks which kind, rather than guessing from the last one -->
 {#snippet navMenu(menu: (typeof MENUS)[keyof typeof MENUS], current: boolean)}
   <Menu
     positioning={menuPositioning('bottom-start')}
@@ -188,11 +157,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {@render navMenu(MENUS.create, create)}
-  {@render navMenu(MENUS.library, library)}
+  <!-- Back to the side that was open last (after loading: a link's address
+  isn't updated from the server's) -->
+  <a
+    href={mounted && librarySection.value === 'palettes'
+      ? resolve('/my-palettes')
+      : resolve('/my-projects')}
+    class={[LINK, library && CURRENT]}
+    aria-current={library ? 'page' : undefined}
+  >
+    <LibraryBigIcon />
+    My Library
+  </a>
 
   <h2 class={HEADING}>Explore</h2>
 
-  {@render navMenu(MENUS.gallery, gallery)}
+  <a
+    href={mounted && gallerySection.value === 'palettes'
+      ? resolve('/gallery/palettes')
+      : resolve('/gallery')}
+    class={[LINK, gallery && CURRENT]}
+    aria-current={gallery ? 'page' : undefined}
+  >
+    <LandmarkIcon />
+    Gallery
+  </a>
 
   <a
     href="/yarn-colorway-finder"

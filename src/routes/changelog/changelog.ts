@@ -27,6 +27,7 @@ import {
   SmartphoneIcon,
   UserRoundIcon,
   CogIcon,
+  EarthIcon,
   GlobeIcon,
   ImageIcon,
   LandmarkIcon,
@@ -131,7 +132,7 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                IconComponent: GlobeIcon,
+                IconComponent: EarthIcon,
                 text: `The <a href="/globe" class="link">Globe</a> now shows detailed NASA satellite imagery you can zoom much closer into. Project markers lie flat on the map, grow as you zoom in, and never overlap, so they're easier to tap. A searchable list shows the places in view, and on phones it's a panel you can swipe up from the bottom of the screen.`,
                 title: 'Globe Improvements',
               },
@@ -444,7 +445,7 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                IconComponent: GlobeIcon,
+                IconComponent: EarthIcon,
                 text: `Explore a 3D map of user-created temperature blanket projects from around the world on the new <a href="/globe" class="link">Globe</a> page.`,
                 title: 'New Feature - Project Globe',
               },

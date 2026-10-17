@@ -22,12 +22,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
+  import { gallerySection } from '#lib/storage/library-section.svelte.js';
   import Gallery from './Gallery.svelte';
 
   // Links from before the gallery had a page for each kind
   onMount(() => {
     if (page.url.searchParams.get('view') === 'yarn-palettes')
       goto(resolve('/gallery/palettes'), { replaceState: true });
+    // The sidebar's Gallery link comes back to this side next time
+    else gallerySection.value = 'projects';
   });
 </script>
 

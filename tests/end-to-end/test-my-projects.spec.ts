@@ -49,12 +49,11 @@ test.describe('My Projects', () => {
     ]);
   });
 
-  test('shows empty states and is in the site menu', async ({ page }) => {
+  test('shows empty states and is in the sidebar', async ({ page }) => {
     await page.goto('/my-projects');
     await expect(page.getByText('No saved projects yet')).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: 'My Library' }).first(),
-    ).toBeVisible();
+    const sidebarLink = page.getByRole('link', { name: 'My Library' }).first();
+    await expect(sidebarLink).toHaveAttribute('href', /\/my-projects$/);
 
     // Palettes have a page of their own, a link away
     await page
@@ -64,11 +63,11 @@ test.describe('My Projects', () => {
     await expect(page).toHaveURL(/\/my-palettes$/);
     await expect(page.getByText('No saved palettes yet')).toBeVisible();
 
-    // The site menu asks which side, wherever you are
+    // The sidebar link goes back to the side open last, wherever you are
     await page.goto('/');
-    await page.getByRole('button', { name: 'My Library' }).first().click();
-    await page.getByRole('menuitem', { name: /Projects/ }).click();
-    await expect(page).toHaveURL(/\/my-projects$/);
+    await expect(sidebarLink).toHaveAttribute('href', /\/my-palettes$/);
+    await sidebarLink.click();
+    await expect(page).toHaveURL(/\/my-palettes$/);
   });
 
   test('lists saved projects and palettes', async ({ page }) => {

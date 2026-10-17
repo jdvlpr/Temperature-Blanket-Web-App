@@ -62,8 +62,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/string-utils.js';
   import {
     ArrowLeftIcon,
+    EarthIcon,
     ExternalLinkIcon,
-    GlobeIcon,
     NotebookPenIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
@@ -385,7 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       href={globeLink}
                       aria-label={globeLinkLabel}
                       title={globeLinkLabel}
-                      ><GlobeIcon class="icon-sm" aria-hidden="true" />Nearby
+                      ><EarthIcon class="icon-sm" aria-hidden="true" />Nearby
                       projects</a
                     ></span
                   >

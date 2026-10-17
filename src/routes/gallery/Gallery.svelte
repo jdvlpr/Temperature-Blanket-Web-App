@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import { resolve } from '$app/paths';
-  import { GlobeIcon, PlusIcon, XIcon } from '@lucide/svelte';
+  import { EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { masonry } from '#lib/state/attachments/masonry.js';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
@@ -211,7 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             href="/globe"
             class="btn btn-sm hover:preset-tonal-surface items-center gap-1"
           >
-            <GlobeIcon />
+            <EarthIcon />
             View Globe
           </a>
         {/if}
