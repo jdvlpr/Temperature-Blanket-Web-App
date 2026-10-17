@@ -32,6 +32,7 @@ import {
   signIn,
   uniqueEmail,
   useTestIp,
+  skipRavelryStep,
 } from './helpers';
 
 // A sync pass is several requests, slower while the other specs run alongside
@@ -212,6 +213,7 @@ test.describe('Sync in the browser', () => {
     await signIn(phone, phone.request, email);
     await expect(addFromBrowser(phone)).toBeVisible();
     await phone.getByRole('button', { name: /^Add 1 project/ }).click();
+    await skipRavelryStep(phone);
     await expect.poll(() => serverProjectIds(phone)).toEqual([id]);
 
     await signIn(laptop, laptop.request, email);
@@ -241,11 +243,12 @@ test.describe('Sync in the browser', () => {
     // signIn keeps the welcome's made-up name and continues
     await signIn(phone, phone.request, uniqueEmail('sync-choose'));
     await expect(addFromBrowser(phone)).toBeVisible();
-    await expect(phone.getByText('Step 2 of 2')).toBeVisible();
+    await expect(phone.getByText(/^Step 2 of [23]$/)).toBeVisible();
     const lima = phone.getByRole('checkbox', { name: 'Add Lima 2026' });
     await expect(lima).toBeChecked();
     await lima.uncheck();
     await phone.getByRole('button', { name: /^Add 1 project/ }).click();
+    await skipRavelryStep(phone);
     await expect.poll(() => serverProjectIds(phone)).toEqual([kept]);
 
     // Asked once

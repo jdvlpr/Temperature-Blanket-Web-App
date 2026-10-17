@@ -17,22 +17,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
 layout, when accounts are on. The sync code loads only after someone signs in. -->
 
 <script lang="ts">
+  import { browser } from '$app/env';
   import { page } from '$app/state';
   import { getSession } from '#lib/accounts/client.js';
+  import { getRavelryStatus } from '#lib/accounts/ravelry.js';
   import { isNewAccount } from '#lib/accounts/welcome.js';
   import {
     account,
     forgetAccountSummary,
     rememberAccountSummary,
   } from '#lib/accounts/summary.svelte.js';
-  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
   import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
+  import { onMount } from 'svelte';
 
   // My Projects' hidden frame only draws a project's picture: no syncing there
   const frame = isThumbnailFrame();
 
   let syncModule: typeof import('#lib/sync/sync.svelte.js') | undefined;
+
+  // Back from connecting Ravelry in the welcome (see $lib/accounts/ravelry),
+  // anywhere but the Account page, whose Ravelry row tells it. Read before
+  // the page mounts, as pages may rewrite their address then.
+  const ravelryReturn = (() => {
+    if (!browser || frame) return null;
+    const params = new URL(window.location.href).searchParams;
+    const result = params.get('ravelry');
+    if (!result || window.location.pathname === '/account') return null;
+    return { failed: result === 'failed', error: params.get('error') };
+  })();
+
+  onMount(async () => {
+    if (!ravelryReturn) return;
+    const url = new URL(window.location.href);
+    for (const key of ['ravelry', 'error', 'error_description'])
+      url.searchParams.delete(key);
+    history.replaceState(history.state, '', url);
+    if (ravelryReturn.failed) {
+      const canceled = ravelryReturn.error === 'access_denied';
+      toast.trigger({
+        message: canceled
+          ? 'Connecting Ravelry was canceled.'
+          : 'Ravelry couldn’t be connected. Try again from your Account page.',
+        category: canceled ? 'info' : 'error',
+      });
+      return;
+    }
+    const status = await getRavelryStatus();
+    toast.trigger({
+      message:
+        status?.available && status.connected && status.username
+          ? `Ravelry connected as ${status.username}`
+          : 'Ravelry connected',
+      category: 'success',
+    });
+  });
+
   let checkedSummary = false;
 
   // Summaries saved before sync have no account ID: ask the server once
@@ -92,8 +133,11 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
     if (!welcome && !ids.length && !paletteIds.length) return;
     if (dialog.opened || account.summary?.id !== userId) return;
     if (welcome) {
-      const { default: WelcomeDialog } =
-        await import('#lib/components/account/WelcomeDialog.svelte');
+      const [{ default: WelcomeDialog }, ravelry] = await Promise.all([
+        import('#lib/components/account/WelcomeDialog.svelte'),
+        getRavelryStatus(),
+      ]);
+      if (dialog.opened || account.summary?.id !== userId) return;
       dialog.trigger({
         type: 'component',
         component: {
@@ -103,6 +147,7 @@ layout, when accounts are on. The sync code loads only after someone signs in. -
             name: account.summary?.name ?? '',
             ids,
             paletteIds,
+            ravelry: ravelry?.available === true && !ravelry.connected,
           },
         },
         options: { showCloseButton: false },

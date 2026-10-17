@@ -47,6 +47,7 @@ someone asks to add them from My Library (`later`). -->
     paletteIds = [],
     later = false,
     step,
+    onanswered,
   }: {
     userId: string;
     ids: string[];
@@ -54,6 +55,8 @@ someone asks to add them from My Library (`later`). -->
     later?: boolean;
     /** "Step 2 of 2", when it follows the welcome; the title takes focus */
     step?: string;
+    /** In place of closing, when a step follows: given the adding, once answered */
+    onanswered?: (adding: Promise<void>) => void;
   } = $props();
 
   type PaletteRow = { id: string; label: string; colors: Color[] };
@@ -129,8 +132,16 @@ someone asks to add them from My Library (`later`). -->
   async function answer(add: string[], addPaletteIds: string[] = []) {
     busy = true;
     await markImportAsked(userId);
-    dialog.close();
-    if (!add.length && !addPaletteIds.length) return;
+    const adding =
+      add.length || addPaletteIds.length
+        ? addChosen(add, addPaletteIds)
+        : Promise.resolve();
+    if (onanswered) onanswered(adding);
+    else dialog.close();
+    await adding;
+  }
+
+  async function addChosen(add: string[], addPaletteIds: string[]) {
     await addToAccount(userId, add, addPaletteIds);
     const added = describe(add.length, addPaletteIds.length);
     // Problems have toasts of their own (see $lib/sync/sync.svelte)

@@ -118,6 +118,17 @@ export async function finishWelcome(page: Page) {
   // Enter submits it (Done or Continue), whatever toasts cover its buttons
   await name.press('Enter');
   await expect(welcome).toHaveCount(0);
+  // The next step shows as the first goes: an offer to add, or else Ravelry
+  if (!(await addFromBrowser(page).isVisible())) await skipRavelryStep(page);
+}
+
+/** The welcome's last step, where Ravelry is set up: Not now. */
+export async function skipRavelryStep(page: Page) {
+  const status = await (await page.request.get('/api/account/ravelry')).json();
+  if (!status.available) return;
+  const step = page.getByRole('dialog', { name: 'Connect Ravelry?' });
+  await step.getByRole('button', { name: 'Not now' }).click();
+  await expect(step).toHaveCount(0);
 }
 
 /** The offer to add this browser's projects and palettes to the account */

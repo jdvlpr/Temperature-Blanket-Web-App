@@ -44,20 +44,35 @@ export async function getRavelryStatus(): Promise<RavelryStatus | null> {
   }
 }
 
+/** `path` (which may have a #hash) with ?ravelry=`value` added. */
+function markReturn(path: string, value: 'connected' | 'failed') {
+  const url = new URL(path, window.location.origin);
+  url.searchParams.set('ravelry', value);
+  return url.pathname + url.search + url.hash;
+}
+
 /**
  * Leaves for Ravelry to approve the link, then comes back to `returnTo`, with
- * ?error= if it failed.
+ * ?ravelry=failed&error= if it failed. `markSuccess` adds ?ravelry=connected
+ * when it worked, for pages without the Account page's Ravelry row.
  */
-export async function connectRavelry(returnTo = '/account') {
+export async function connectRavelry(
+  returnTo = '/account',
+  { markSuccess = false } = {},
+) {
   // Better Auth's generic OAuth providers link like the built-in ones
   const response = await fetch('/api/auth/link-social', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       provider: 'ravelry',
-      callbackURL: returnTo,
+      // The Account page's Ravelry row shows it worked
+      callbackURL:
+        markSuccess && !returnTo.startsWith('/account')
+          ? markReturn(returnTo, 'connected')
+          : returnTo,
       // Marked, so only the Ravelry row shows the error
-      errorCallbackURL: `${returnTo}${returnTo.includes('?') ? '&' : '?'}ravelry=failed`,
+      errorCallbackURL: markReturn(returnTo, 'failed'),
     }),
   });
   if (!response.ok)

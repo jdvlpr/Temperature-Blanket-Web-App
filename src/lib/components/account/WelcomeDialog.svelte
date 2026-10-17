@@ -15,32 +15,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Once, right after an account is made: a display name to keep or change
 (a made-up one to start, see $lib/accounts/craft-names), what the account does,
-then the projects and palettes in this browser to add, if there are any. -->
+then the projects and palettes in this browser to add, if there are any, then
+connecting Ravelry, where it's set up. That goes last: it leaves the site. -->
 
 <script lang="ts">
   import { accountErrorMessage, updateName } from '#lib/accounts/client.js';
+  import { connectRavelry } from '#lib/accounts/ravelry.js';
   import {
     account,
     rememberAccountSummary,
   } from '#lib/accounts/summary.svelte.js';
   import SyncImportDialog from '#lib/components/sync/SyncImportDialog.svelte';
   import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
-  import { BTN_PRIMARY } from '#lib/constants/class-constants.js';
+  import {
+    BTN_PRIMARY,
+    BTN_SECONDARY,
+  } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import {
     CloudIcon,
     GalleryVerticalEndIcon,
     LibraryIcon,
+    LinkIcon,
     LoaderCircleIcon,
-    SparklesIcon,
   } from '@lucide/svelte';
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
 
   let {
     userId,
     name: givenName,
     ids = [],
     paletteIds = [],
+    ravelry = false,
   }: {
     userId: string;
     /** The name the account was made with */
@@ -48,14 +54,46 @@ then the projects and palettes in this browser to add, if there are any. -->
     /** Projects and palettes in this browser to offer next */
     ids?: string[];
     paletteIds?: string[];
+    /** Whether Ravelry can be connected here */
+    ravelry?: boolean;
   } = $props();
 
   let name = $state(untrack(() => givenName));
   let busy = $state(false);
   let errorMessage = $state('');
-  let step = $state<'welcome' | 'import'>('welcome');
+  let step = $state<'welcome' | 'import' | 'ravelry'>('welcome');
+  let ravelryTitle = $state<HTMLElement>();
+  // The import's adding, which Connect waits for before leaving the site
+  let adding: Promise<void> = Promise.resolve();
 
   let hasImport = $derived(ids.length + paletteIds.length > 0);
+  let steps = $derived([
+    'welcome',
+    ...(hasImport ? ['import'] : []),
+    ...(ravelry ? ['ravelry'] : []),
+  ]);
+  let isLast = $derived(steps.length === 1);
+  const stepLabel = (of: (typeof steps)[number]) =>
+    `Step ${steps.indexOf(of) + 1} of ${steps.length}`;
+
+  async function showRavelry() {
+    step = 'ravelry';
+    await tick();
+    ravelryTitle?.focus();
+  }
+
+  async function connect() {
+    busy = true;
+    errorMessage = '';
+    try {
+      await adding;
+      const { pathname, search, hash } = window.location;
+      await connectRavelry(pathname + search + hash, { markSuccess: true });
+    } catch {
+      errorMessage = 'Ravelry couldn’t be connected. Try again.';
+      busy = false;
+    }
+  }
 
   async function next(event: Event) {
     event.preventDefault();
@@ -75,17 +113,73 @@ then the projects and palettes in this browser to add, if there are any. -->
       busy = false;
     }
     if (hasImport) step = 'import';
+    else if (ravelry) await showRavelry();
     else dialog.close();
   }
 </script>
 
 {#if step === 'import'}
-  <SyncImportDialog {userId} {ids} {paletteIds} step="Step 2 of 2" />
+  <SyncImportDialog
+    {userId}
+    {ids}
+    {paletteIds}
+    step={stepLabel('import')}
+    onanswered={ravelry
+      ? (given) => {
+          adding = given;
+          void showRavelry();
+        }
+      : undefined}
+  />
+{:else if step === 'ravelry'}
+  <div role="dialog" aria-modal="true" aria-labelledby="welcome-ravelry-title">
+    <div class="flex flex-col gap-4 px-4 pt-4">
+      <div class="flex flex-col gap-1">
+        <p class="text-sm opacity-70">{stepLabel('ravelry')}</p>
+        <h2
+          id="welcome-ravelry-title"
+          class="h4"
+          tabindex="-1"
+          bind:this={ravelryTitle}
+        >
+          Connect Ravelry?
+        </h2>
+      </div>
+
+      <p class="flex items-start gap-3">
+        <LinkIcon class="icon-sm mt-0.5 shrink-0 opacity-70" />
+        Post projects to Ravelry and add photos
+      </p>
+      {#if errorMessage}
+        <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
+      {/if}
+
+      <DialogFooter>
+        <button
+          type="button"
+          class={BTN_SECONDARY}
+          disabled={busy}
+          onclick={() => dialog.close()}>Not now</button
+        >
+        <button
+          type="button"
+          class={BTN_PRIMARY}
+          disabled={busy}
+          onclick={connect}
+        >
+          {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
+          Connect Ravelry
+        </button>
+      </DialogFooter>
+    </div>
+  </div>
 {:else}
   <div role="dialog" aria-modal="true" aria-labelledby="welcome-title">
     <form class="flex flex-col gap-4 px-4 pt-4" onsubmit={next}>
       <div class="flex flex-col gap-1">
-        {#if hasImport}<p class="text-sm opacity-70">Step 1 of 2</p>{/if}
+        {#if !isLast}<p class="text-sm opacity-70">
+            {stepLabel('welcome')}
+          </p>{/if}
         <h2 id="welcome-title" class="h4">Welcome!</h2>
       </div>
 
@@ -99,7 +193,7 @@ then the projects and palettes in this browser to add, if there are any. -->
           class="input"
           maxlength="80"
           autocomplete="nickname"
-          enterkeyhint={hasImport ? 'next' : 'done'}
+          enterkeyhint={isLast ? 'done' : 'next'}
           placeholder="Add a name"
           aria-describedby="welcome-name-help"
           bind:value={name}
@@ -136,7 +230,7 @@ then the projects and palettes in this browser to add, if there are any. -->
       <DialogFooter>
         <button type="submit" class={BTN_PRIMARY} disabled={busy}>
           {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
-          {hasImport ? 'Continue' : 'Done'}
+          {isLast ? 'Done' : 'Continue'}
         </button>
       </DialogFooter>
     </form>

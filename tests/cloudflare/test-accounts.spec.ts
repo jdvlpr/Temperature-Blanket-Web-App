@@ -33,6 +33,7 @@ import {
   signIn,
   uniqueEmail,
   useTestIp,
+  skipRavelryStep,
 } from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
@@ -148,8 +149,9 @@ test.describe('Accounts: sign in with an emailed code', () => {
     // Welcomed there, with a made-up name to change
     const welcome = page.getByRole('dialog', { name: 'Welcome!' });
     await welcome.getByLabel('Your display name').fill('Blanket Maker');
-    await welcome.getByRole('button', { name: 'Done' }).click();
+    await welcome.getByRole('button', { name: /^(Done|Continue)$/ }).click();
     await expect(welcome).toHaveCount(0);
+    await skipRavelryStep(page);
     await page.goto('/account');
     await expect(page.getByLabel('Display name')).toHaveValue('Blanket Maker');
   });

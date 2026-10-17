@@ -27,6 +27,7 @@ import {
   signIn,
   uniqueEmail,
   useTestIp,
+  skipRavelryStep,
 } from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
@@ -427,6 +428,7 @@ test.describe('Ravelry', () => {
     await signIn(page, request, email);
     await addFromBrowser(page).waitFor();
     await page.getByRole('button', { name: /^Add 1 project/ }).click();
+    await skipRavelryStep(page);
     await expect
       .poll(
         async () =>
