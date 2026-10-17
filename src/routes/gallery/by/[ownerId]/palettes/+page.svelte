@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
@@ -171,14 +172,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={[
         'w-full items-start gap-x-4 gap-y-6 px-2',
         ownerFilters.layout === 'grid'
-          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-          : 'flex flex-col',
+          ? 'grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+          : PALETTE_LIST,
       ]}
       aria-label="Yarn palettes by {data.name}"
     >
       {#each palettes as palette (palette.postId)}
         <li class="w-full">
-          <GalleryPaletteCard {palette} />
+          <GalleryPaletteCard {palette} layout={ownerFilters.layout} />
         </li>
       {/each}
     </ul>

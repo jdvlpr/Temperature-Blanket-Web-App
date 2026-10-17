@@ -54,3 +54,8 @@ export const FIELD_ICON = 'pointer-events-none absolute left-3';
 // the Project menu's Help links.
 export const SMALL_LINKS = 'flex flex-wrap gap-x-4 gap-y-2 text-sm';
 export const SMALL_LINK = 'hover:underline opacity-80 hover:opacity-100';
+
+/** Palettes as rows (List view): two side by side on large screens, so the
+ * colors beside each name don't sit in a mostly empty row */
+export const PALETTE_LIST =
+  'grid grid-cols-1 items-start gap-x-6 gap-y-6 lg:grid-cols-2';

@@ -233,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function onControl(target: EventTarget | null) {
     return Boolean(
       (target as HTMLElement | null)?.closest(
-        'button, a, input, [role="button"]',
+        'button, a, input, label, [role="button"], [role="radio"]',
       ),
     );
   }
@@ -577,6 +577,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <CloseButton onClose={dialog.close} />
                         {/if}
                       </header>
+                      {#if dialog.headerControl && !phone.current}
+                        <div class="px-4 pb-2" in:fade={viewFade}>
+                          {@render dialog.headerControl()}
+                        </div>
+                      {/if}
                     {/if}
                   </div>
                 {/if}
@@ -603,6 +608,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         />
                       </div>
                     {/key}
+                  {/if}
+                  <!-- On phones the header's control sits at the bottom of the
+                  sheet instead, in thumb reach, always in view as the content
+                  scrolls behind it -->
+                  {#if dialog.headerControl && phone.current}
+                    <div
+                      data-sticky-footer
+                      class="bg-surface-50/90 dark:bg-surface-950/90 border-surface-200-800 sticky bottom-0 z-20 mt-0! border-t px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur"
+                    >
+                      {@render dialog.headerControl()}
+                    </div>
                   {/if}
                 {:else if dialog.type === 'confirm'}
                   <div

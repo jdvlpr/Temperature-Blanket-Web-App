@@ -200,26 +200,6 @@ export const fetchPaletteGallery = async ({
   };
 };
 
-export type PopularProjectMeta = {
-  project_url: string;
-  yarn_urls: string;
-  locations: string;
-  /** The name the project was given (gallery plugin 1.6.0) */
-  project_name?: string;
-};
-
-/** A project, or since gallery plugin 1.6.0 a palette shared on its own (`type`) */
-export type PopularProject = {
-  id: number;
-  type?: string;
-  /** WordPress's rendered title, HTML-encoded */
-  title: string | { rendered: string };
-  date: string;
-  featured_media: number;
-  featured_image_src: string;
-  meta: PopularProjectMeta;
-};
-
 const PROJECT_NODE_FIELDS = `
   title
   projectName
@@ -525,61 +505,6 @@ export const recordPageView = async (id: string | number) => {
     },
   );
 };
-
-/** Popular gallery posts: projects, or for the palette galleries, palette posts. */
-export const fetchPopularProjects = async ({
-  months = 3,
-  limit = 40,
-  timeUnit = 'month',
-  palettes = false,
-}: {
-  months?: number;
-  limit?: number;
-  timeUnit?: string;
-  /** Palette posts instead of projects (a gallery plugin before 1.6.0 has none) */
-  palettes?: boolean;
-}): Promise<PopularProject[]> => {
-  if (months == 0.25) {
-    // 0.25 months means 1 week
-    timeUnit = 'week';
-    months = 1;
-  } else if (months == 0.0357) {
-    // 0.0357 months means 1 day
-    timeUnit = 'day';
-    months = 1;
-  }
-  const postTypes = palettes ? 'tempblanket_palette' : 'tempblanket_project';
-  const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wordpress-popular-posts/v1/popular-posts/?post_type=${postTypes}&limit=${limit}&range=custom&time_unit=${timeUnit}&time_quantity=${months}&_fields=id,type,title,date,featured_media,featured_image_src,meta`;
-
-  const response = await fetch(url);
-  const popularProjects = await response.json();
-  // An error answer (an object) shows as none, rather than breaking the gallery
-  return Array.isArray(popularProjects) ? popularProjects : [];
-};
-
-/**
- * Popular posts in the shape the palette galleries read (see
- * getPalettesFromProjects): projects, and palettes shared on their own.
- */
-export const popularToGalleryNodes = (popular: PopularProject[]) =>
-  popular.map((post) =>
-    post.type === 'tempblanket_palette'
-      ? {
-          __typename: 'Palette' as const,
-          databaseId: post.id,
-          title:
-            typeof post.title === 'string' ? post.title : post.title.rendered,
-          yarnUrls: post.meta.yarn_urls,
-        }
-      : {
-          __typename: 'Project' as const,
-          databaseId: post.id,
-          projectUrl: post.meta.project_url,
-          projectName: post.meta.project_name,
-          yarnUrls: post.meta.yarn_urls,
-          locations: post.meta.locations,
-        },
-  );
 
 /** The orders a gallery can show in: newest first, or oldest (Newest reversed) */
 export type GalleryOrder = 'DESC' | 'ASC';

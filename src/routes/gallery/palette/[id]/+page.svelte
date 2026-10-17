@@ -55,7 +55,7 @@ with them. -->
   import type { PageData } from './$types';
   import GalleryPageHeader from '../../GalleryPageHeader.svelte';
   import GalleryYarnLines from '../../GalleryYarnLines.svelte';
-  import { galleryOwners } from '../../gallery-owners.svelte';
+  import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
 
   let { data }: { data: PageData } = $props();
 

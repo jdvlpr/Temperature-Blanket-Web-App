@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
@@ -49,8 +50,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
-  // With updateGauge (Browse Palettes), choosing a palette uses it; without it
-  // (the My Projects page), each palette is a link to the Yarn Palette Creator
+  // With updateGauge (Browse Palettes), choosing a palette uses it, and that's
+  // all a card does; without it (My Library), each palette is a link to the
+  // Yarn Palette Creator, with Rename, Copy and Trash in its menu
   // With sharing (My Projects, signed in), each palette says who can see it
   // With filters (My Library), only what matches shows, sorted as chosen;
   // oncount says how many
@@ -228,9 +230,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return name ? `${url}&name=${encodeURIComponent(name)}` : url;
   }
 
-  // My Projects lays them out as its View menu says; Browse Palettes, one per row
+  // As My Library's View menu says, here and in Browse Palettes
   let grid = $derived(
-    !updateGauge && (preferences.value.myProjectsLayout ?? 'grid') === 'grid',
+    (preferences.value.myProjectsLayout ?? 'grid') === 'grid',
   );
   const layout = $derived(grid ? 'grid' : 'list');
 
@@ -239,13 +241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<!-- The dialog sizes to its content, so keep this as wide as the other Browse Palettes tabs -->
-<div
-  class={[
-    'flex w-full flex-col items-center',
-    updateGauge && 'px-2 md:min-w-[44rem] lg:min-w-[62rem]',
-  ]}
->
+<div class={['flex w-full flex-col items-center', updateGauge && 'px-2']}>
   {#snippet undoAt(anchor: string | null, asListItems: boolean)}
     {#each undoSpots.get(anchor) ?? [] as entry (entry.id)}
       {#if asListItems}
@@ -298,8 +294,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={[
         'my-2 w-full',
         grid
-          ? 'grid grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3'
-          : 'flex flex-col items-start justify-start gap-6',
+          ? 'grid grid-cols-2 items-start gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-3'
+          : PALETTE_LIST,
       ]}
       aria-label="Saved palettes"
     >
@@ -319,47 +315,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 oncancel={() => (editingId = null)}
               />
             </div>
+          {:else if updateGauge}
+            <!-- Browse Palettes: just for choosing one -->
+            <PaletteCard
+              {colors}
+              {layout}
+              card
+              name={label}
+              summary={!!palette.name}
+              title="Use This Palette"
+              onclick={() => use(colors)}
+            >
+              {#snippet details()}
+                <span class="text-surface-700-300 line-clamp-1 text-xs"
+                  >Saved {dateTimeOf(palette.createdAt)}</span
+                >
+              {/snippet}
+            </PaletteCard>
           {:else}
             <PaletteCard
               {colors}
               {layout}
               name={label}
-              summary={updateGauge ? !!palette.name : false}
-              href={updateGauge ? undefined : linkFor(colors, palette.name)}
-              onclick={updateGauge ? () => use(colors) : undefined}
-              title={updateGauge
-                ? 'Use This Palette'
-                : 'Open in Yarn Palette Creator'}
+              summary={false}
+              href={linkFor(colors, palette.name)}
+              title="Open in Yarn Palette Creator"
             >
               {#snippet nameRow()}
                 <span class="inline-flex items-start gap-0.5">
-                  {#if updateGauge}
-                    <button
-                      type="button"
-                      class="cursor-pointer text-left font-semibold"
-                      onclick={() => use(colors)}
-                      ><span class="sr-only">Use </span>{label}</button
-                    >
-                  {:else}
-                    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
-                    <a
-                      href={linkFor(colors, palette.name)}
-                      class="font-semibold break-words"
-                      title="Open in Yarn Palette Creator"
-                    >
-                      <span class="sr-only">Open</span>
-                      {label}
-                      <span class="sr-only">in Yarn Palette Creator</span>
-                    </a>
-                  {/if}
+                  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
+                  <a
+                    href={linkFor(colors, palette.name)}
+                    class="font-semibold break-words"
+                    title="Open in Yarn Palette Creator"
+                  >
+                    <span class="sr-only">Open</span>
+                    {label}
+                    <span class="sr-only">in Yarn Palette Creator</span>
+                  </a>
                 </span>
               {/snippet}
               {#snippet details()}
-                {#if !updateGauge}
-                  <span class="text-surface-700-300 line-clamp-1 text-xs"
-                    >Saved {dateTimeOf(palette.createdAt)}</span
-                  >
-                {/if}
+                <span class="text-surface-700-300 line-clamp-1 text-xs"
+                  >Saved {dateTimeOf(palette.createdAt)}</span
+                >
               {/snippet}
               {#snippet action()}
                 <MoreMenu
@@ -371,16 +370,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       icon: PencilIcon,
                       onselect: () => startRename(palette),
                     },
-                    ...(updateGauge
-                      ? []
-                      : [
-                          {
-                            value: 'copy',
-                            label: 'Create a Copy',
-                            icon: CopyIcon,
-                            onselect: () => copy(palette, label),
-                          },
-                        ]),
+                    {
+                      value: 'copy',
+                      label: 'Create a Copy',
+                      icon: CopyIcon,
+                      onselect: () => copy(palette, label),
+                    },
                     {
                       value: 'trash',
                       label: 'Move to Trash',

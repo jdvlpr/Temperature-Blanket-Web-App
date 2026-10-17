@@ -14,11 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_ICON } from '#lib/constants/class-constants.js';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
+  import PaletteCard from '#lib/components/PaletteCard.svelte';
   import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '#lib/constants/color-constants.js';
-  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { PaletteIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
@@ -32,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .flat()
         .sort(),
     ),
-  ];
+  ].map((scheme) => ({ value: scheme, label: scheme }));
 
   function getPresetPalettes(numberOfColors: number) {
     return SCHEMES.map((scheme) => {
@@ -53,52 +55,53 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return item.categories.includes(currentScheme);
     }),
   );
+
+  // Laid out as My Library's palettes are (one View setting)
+  let layout = $derived(preferences.value.myProjectsLayout ?? 'grid');
 </script>
 
-<div
-  class="flex scroll-mt-[70px] flex-wrap items-end justify-center gap-4 px-2 pb-4 text-center"
->
-  <label class="label">
-    <span class="label-text flex items-center gap-1"> Color Scheme </span>
-    <div class="relative flex items-center">
-      <PaletteIcon class={FIELD_ICON} />
-      <select
-        class="select truncate pl-11"
-        id="select-sort-by"
-        bind:value={currentScheme}
-      >
-        {#each schemes as scheme}
-          <option value={scheme}>{scheme}</option>
-        {/each}
-      </select>
-    </div>
-  </label>
-
-  <SelectNumberOfColors bind:numberOfColors />
-</div>
-<div
-  class="flex scroll-mt-[58px] flex-col items-center px-2 lg:scroll-mt-[44px]"
->
-  <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
-    {#each palettes as { value, label, colors }}
-      <button
-        type="button"
-        class="w-full cursor-pointer"
-        onclick={() => {
-          updateGauge({
-            _colors: colors,
-            _schemeId: value,
-          });
-          dialog.close();
-        }}
-        title="Use This Palette"
-      >
-        <PaletteStrip {colors} {label} insideControl />
-      </button>
-    {/each}
+<div class="flex flex-col items-center px-2">
+  <div class="my-2 flex w-full flex-wrap items-center justify-center gap-2">
+    <ChoiceMenu
+      label="Color Scheme"
+      icon={PaletteIcon}
+      options={schemes}
+      value={currentScheme}
+      onchange={(scheme) => (currentScheme = scheme)}
+    />
+    <SelectNumberOfColors bind:numberOfColors />
+    <ViewMenu
+      bind:value={
+        () => layout, (value) => (preferences.value.myProjectsLayout = value)
+      }
+      compact
+    />
   </div>
+  <ul
+    class={[
+      'my-2 w-full',
+      layout === 'grid'
+        ? 'grid grid-cols-2 items-start gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-3'
+        : PALETTE_LIST,
+    ]}
+    aria-label="{currentScheme} color schemes"
+  >
+    {#each palettes as { value, label, colors } (value)}
+      <li class="flex w-full min-w-0">
+        <PaletteCard
+          {colors}
+          name={label}
+          summary={false}
+          {layout}
+          card
+          title="Use This Palette"
+          onclick={() => updateGauge({ _colors: colors, _schemeId: value })}
+        />
+      </li>
+    {/each}
+  </ul>
 </div>
-<p class="mt-4 w-full text-sm">
+<p class="text-surface-700-300 mt-4 w-full px-2 text-center text-xs">
   Color schemes based on <a
     href="https://colorbrewer2.org/"
     target="_blank"

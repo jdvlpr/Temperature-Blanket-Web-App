@@ -15,28 +15,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A palette from the gallery, as a card. In the gallery (`mode="page"`)
-  tapping it opens its gallery page. In the Yarn Palette Creator's Browse Palettes (`mode="use"`) tapping it uses
-  it (`onclick`), and the button opens its page in a new tab, so the palette
-  being made stays open. In the gallery it also says when it was published,
-  who by (when their name shows on its page) and its page's views.
+  tapping it opens its gallery page. In the Yarn Palette Creator's Browse
+  Palettes (`mode="use"`) tapping it uses it (`onclick`). Either way it says when it was published, who by
+  (when their name shows on its page) and its page's views. In a list
+  (`layout="list"`) it lies down, the colors beside the name.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import PaletteCard from '#lib/components/PaletteCard.svelte';
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
-  import { SwatchBookIcon } from '@lucide/svelte';
 
   interface Props {
     palette: GalleryPalette;
-    /** Who published its page, when their name shows there (`mode="page"`) */
+    /** Who published its page, when their name shows there */
     author?: string | null;
     mode?: 'page' | 'use';
     /** Uses the palette (`mode="use"`) */
     onclick?: () => void;
+    layout?: 'grid' | 'list';
   }
 
-  let { palette, author, mode = 'page', onclick }: Props = $props();
+  let {
+    palette,
+    author,
+    mode = 'page',
+    onclick,
+    layout = 'grid',
+  }: Props = $props();
 
   // Its own page, or (from a gallery before palette pages) its project's
   let pageHref = $derived(
@@ -55,28 +61,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   href={mode === 'page' ? pageHref : undefined}
   onclick={mode === 'use' ? onclick : undefined}
   title={mode === 'page' ? `Open ${pageLabel}` : 'Use This Palette'}
+  {layout}
+  card={mode === 'use'}
 >
   {#snippet details()}
-    {#if mode === 'page'}
-      <GalleryCardByline
-        date={palette.page.date}
-        {author}
-        views={palette.page.views}
-      />
-    {/if}
-  {/snippet}
-  {#snippet action()}
-    {#if mode === 'use'}
-      <a
-        href={pageHref}
-        target="_blank"
-        rel="noopener"
-        class="btn-icon hover:preset-tonal-surface shrink-0"
-        title="{pageLabel} (opens in a new tab)"
-        aria-label="{pageLabel}: {palette.page.title} (opens in a new tab)"
-      >
-        <SwatchBookIcon aria-hidden="true" />
-      </a>
-    {/if}
+    <GalleryCardByline
+      date={palette.page.date}
+      {author}
+      views={palette.page.views}
+    />
   {/snippet}
 </PaletteCard>

@@ -29,8 +29,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import { GlobeIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { galleryOwners } from './gallery-owners.svelte';
-  import { galleryFilters, galleryState } from './state.svelte';
+  import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
+  import {
+    galleryFilters,
+    galleryState,
+  } from '#lib/state/gallery-state.svelte.js';
 
   let first = 40;
   let loading = $state(true);

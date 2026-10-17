@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
-  import YarnPaletteGallery from '../YarnPaletteGallery.svelte';
+  import YarnPaletteGallery from '#lib/components/YarnPaletteGallery.svelte';
 </script>
 
 <svelte:head>

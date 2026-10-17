@@ -263,20 +263,33 @@ test.describe('Palette toolbar', () => {
     await expect(page.getByRole('dialog')).toBeVisible();
   });
 
-  test('Browse Palettes shows categories as a grid on phones', async ({
+  test('Browse Palettes chooses where palettes come from, and remembers', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 700 });
     await page.getByRole('button', { name: 'Get Colors' }).click();
     await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
 
-    const dialog = page.getByRole('dialog');
-    const categories = dialog.getByRole('radiogroup', { name: 'Category' });
-    await expect(categories.getByRole('radio')).toHaveCount(4);
-    await categories.getByText('Saved', { exact: true }).dispatchEvent('click');
-    await expect(
-      categories.getByRole('radio', { name: 'Saved' }),
-    ).toBeChecked();
+    // All three in view on phones (at the bottom of the sheet); nothing saved,
+    // so it opens on the Gallery
+    const dialog = page.getByRole('dialog', { name: 'Browse Palettes' });
+    let sources = dialog.getByRole('radiogroup', { name: 'Browse' });
+    await expect(sources.getByRole('radio')).toHaveCount(3);
+    await expect(sources.getByRole('radio', { name: 'Gallery' })).toBeChecked();
+    await sources.getByText('My Palettes', { exact: true }).click();
     await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
+
+    // Opened again, larger, it's where it was left
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.getByRole('button', { name: 'Get Colors' }).click();
+    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
+    sources = page
+      .getByRole('dialog')
+      .getByRole('radiogroup', { name: 'Browse' });
+    await expect(
+      sources.getByRole('radio', { name: 'My Palettes' }),
+    ).toBeChecked();
   });
 });

@@ -1551,21 +1551,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To browse collection of preset colors to use in your project,
-              press Get Colors, then Browse Palettes. Then select a Category and
-              change the filters to see different color combinations. Select the
-              palette to use it in your project. The categories are as follows:
+              press Get Colors, then Browse Palettes. Choose where the palettes
+              come from (at the top of the dialog, or the bottom on phones),
+              then search, filter, sort and change the view to see different
+              color combinations. Select a palette to use it in your project. It
+              opens where you left it last time. You can choose from:
             </p>
             <ul class="ml-4 flex flex-col gap-2">
               <li>
-                <span class="font-bold">Saved</span> – Palettes you saved in this
-                browser
+                <span class="font-bold">Gallery</span> – Color palettes shared in
+                the Gallery, most viewed first (sort by Newest to see the latest),
+                with the same search and filters as the Gallery
               </li>
               <li>
-                <span class="font-bold">Gallery</span> – All user-made color palettes
-              </li>
-              <li>
-                <span class="font-bold">Featured</span> – Popular user-made color
-                palettes
+                <span class="font-bold">My Palettes</span> – Palettes you saved, as
+                on the My Palettes page
               </li>
               <li>
                 <span class="font-bold">Schemes</span>
@@ -1603,8 +1603,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               To use a saved palette, press Get Colors, then Browse Palettes,
-              then choose the Saved category. Use the pencil button to rename a
-              palette, or the trash button to move it to the Trash.
+              then choose My Palettes. To rename one, make a copy, or move it to
+              the Trash, use its More button on the My Palettes page.
             </p>
             <p>
               You can also see all your saved palettes on the

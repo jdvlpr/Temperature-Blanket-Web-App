@@ -13,150 +13,196 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module lang="ts">
+  type Source = 'gallery' | 'saved' | 'schemes';
+  const SOURCE_KEY = 'browse_palettes_source';
+
+  /** The source chosen last on this device, if any */
+  function rememberedSource(): Source | null {
+    try {
+      const value = localStorage.getItem(SOURCE_KEY);
+      return value === 'gallery' || value === 'saved' || value === 'schemes'
+        ? value
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function rememberSource(value: Source) {
+    try {
+      localStorage.setItem(SOURCE_KEY, value);
+    } catch {
+      // Private browsing: opens as if for the first time next time
+    }
+  }
+</script>
+
 <script lang="ts">
-  import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
-  import GalleryPalettes from '#lib/components/GalleryPalettes.svelte';
-  import GalleryPalettesPopular from '#lib/components/GalleryPalettesPopular.svelte';
-  import PaletteSchemes from '#lib/components/PaletteSchemes.svelte';
-  import SavedPalettes from '#lib/components/SavedPalettes.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import PaletteSchemes from '#lib/components/PaletteSchemes.svelte';
+  import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
+  import SavedPalettes from '#lib/components/SavedPalettes.svelte';
+  import SavedPalettesToolbar from '#lib/components/SavedPalettesToolbar.svelte';
+  import YarnPaletteGallery from '#lib/components/YarnPaletteGallery.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
-  import {
-    BlendIcon,
-    BookmarkIcon,
-    LandmarkIcon,
-    StarIcon,
-  } from '@lucide/svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { libraryFilters } from '#lib/state/library-filters.svelte.js';
+  import { savedPalettes } from '#lib/storage/palettes.svelte.js';
+  import { recordPageView } from '#lib/utils/gallery-utils.js';
+  import type { Color } from '#lib/types/yarn-types.js';
+  import { BlendIcon, BookmarkIcon, LandmarkIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import { MediaQuery } from 'svelte/reactivity';
 
   interface Props {
-    schemeId?: string;
-    numberOfColors: any;
-    updateGauge: any;
-    context?: string;
+    numberOfColors: number;
+    updateGauge: (update: { _colors: Color[]; _schemeId?: string }) => void;
   }
 
-  let {
-    schemeId = 'Custom',
-    numberOfColors = $bindable(),
-    updateGauge,
-    context = '',
-  }: Props = $props();
+  let { numberOfColors = $bindable(), updateGauge }: Props = $props();
 
-  let category = $state(getParentCategory(schemeId));
+  // Opens where it was left; the first time, on My Palettes when there are
+  // any, otherwise the Gallery
+  let source = $state<Source | null>(rememberedSource());
   let container: HTMLElement | undefined = $state();
+  let top: HTMLElement | undefined = $state();
   let showScrollToTopButton = $state(false);
+  // On phones the choice of source is pinned to the bottom of the sheet, so
+  // To Top goes above it
+  const phone = new MediaQuery('(max-width: 639.98px)');
 
-  let filtersContainer: HTMLElement | null = null;
-  let scrollObserver = new IntersectionObserver(
-    (entries, observer) => {
-      entries.forEach((entry) => {
-        if (entry.intersectionRatio != 1) {
-          showScrollToTopButton = true;
-        } else {
-          showScrollToTopButton = false;
-        }
-      });
-    },
-    { threshold: 1 },
-  );
-  const categories = ['Saved', 'Gallery', 'Featured', 'Schemes'];
+  // My Palettes' counts, for its toolbar
+  let total = $state<number | null>(null);
+  let matching = $state(0);
 
   // Bookmark matches the Save button; Landmark matches Gallery in the sidebar
-  const categoryIcons = {
-    Saved: BookmarkIcon,
-    Gallery: LandmarkIcon,
-    Featured: StarIcon,
-    Schemes: BlendIcon,
-  };
+  const sources = [
+    {
+      value: 'gallery',
+      label: 'Gallery',
+      details: 'Shared by everyone',
+      icon: LandmarkIcon,
+    },
+    {
+      value: 'saved',
+      label: 'My Palettes',
+      details: 'The ones you’ve saved',
+      icon: BookmarkIcon,
+    },
+    {
+      value: 'schemes',
+      label: 'Schemes',
+      details: 'Color scales from ColorBrewer',
+      icon: BlendIcon,
+    },
+  ] as const;
 
-  onMount(() => {
-    ensureYarnData();
-  });
-
-  function getParentCategory(schemeId: string | undefined) {
-    if (schemeId === 'Custom') return 'Gallery';
-    else return 'Schemes';
+  function choose(value: Source) {
+    source = value;
+    rememberSource(value);
+    container?.scrollIntoView({ block: 'start' });
   }
 
-  $effect(() => {
-    if (filtersContainer) {
-      scrollObserver.observe(filtersContainer);
+  onMount(async () => {
+    ensureYarnData();
+    dialog.headerControl = sourceControl;
+    if (!source) {
+      await savedPalettes.refresh();
+      source = savedPalettes.items.length ? 'saved' : 'gallery';
     }
+  });
+
+  // Only its own: a dialog opened in its place may have set one already
+  onDestroy(() => {
+    if (dialog.headerControl === sourceControl) dialog.headerControl = null;
+  });
+
+  $effect(() => {
+    if (!top) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        showScrollToTopButton =
+          !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      },
+      { threshold: 0 },
+    );
+    observer.observe(top);
+    return () => observer.disconnect();
   });
 </script>
 
-<div class="p-2" bind:this={container}>
-  <div
-    class="flex w-full flex-wrap items-end justify-center gap-2 px-2 pb-2"
-    class:pt-4={context === 'drawer'}
-    bind:this={filtersContainer}
+<!-- Under the title (on phones, pinned to the bottom of the sheet), all three
+  always in view: on phones each name sits under its icon so they fit -->
+{#snippet sourceControl()}
+  <SegmentedControl
+    value={source}
+    onValueChange={(event) => {
+      if (event.value) choose(event.value as Source);
+    }}
   >
-    <SegmentsScroller collapse>
-      {#snippet children(iconsOnly)}
-        <SegmentedControl
-          value={category}
-          onValueChange={(e) => {
-            if (e.value) {
-              category = e.value as string;
-            }
-          }}
+    <SegmentedControl.Label class="sr-only">Browse</SegmentedControl.Label>
+    <SegmentedControl.Control
+      class="bg-surface-100 dark:bg-surface-900 w-full flex-row!"
+    >
+      <SegmentedControl.Indicator />
+      {#each sources as item (item.value)}
+        <SegmentedControl.Item
+          value={item.value}
+          title={item.details}
+          class="flex-1 max-sm:h-auto max-sm:py-1"
         >
-          <!-- Named only once just the icons show -->
-          {#if iconsOnly}
-            <SegmentedControl.Label class="label-text"
-              >Category<span aria-hidden="true">: {category}</span
-              ></SegmentedControl.Label
+          <SegmentedControl.ItemText
+            ><span
+              class="flex flex-col items-center justify-center gap-0.5 text-xs sm:flex-row sm:gap-1 sm:text-base"
             >
-          {/if}
-          <SegmentedControl.Control
-            class="bg-surface-100 dark:bg-surface-950 min-w-max"
+              <item.icon aria-hidden="true" />
+              {item.label}
+            </span></SegmentedControl.ItemText
           >
-            <SegmentedControl.Indicator />
-            {#each categories as categoryItem}
-              {@const Icon =
-                categoryIcons[categoryItem as keyof typeof categoryIcons]}
-              <SegmentedControl.Item
-                value={categoryItem}
-                title={iconsOnly ? categoryItem : undefined}
-              >
-                <SegmentedControl.ItemText
-                  ><span class="flex items-center justify-center gap-1">
-                    <Icon />
-                    <span class={{ 'sr-only': iconsOnly }}>{categoryItem}</span>
-                  </span></SegmentedControl.ItemText
-                >
-                <SegmentedControl.ItemHiddenInput />
-              </SegmentedControl.Item>
-            {/each}
-          </SegmentedControl.Control>
-        </SegmentedControl>
-      {/snippet}
-    </SegmentsScroller>
-  </div>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      {/each}
+    </SegmentedControl.Control>
+  </SegmentedControl>
+{/snippet}
 
-  {#if category === 'Saved'}
-    <SavedPalettes {updateGauge} />
-  {:else if category === 'Gallery'}
-    <GalleryPalettes {updateGauge} />
-  {:else if category === 'Featured'}
-    <GalleryPalettesPopular {updateGauge} />
-  {:else if category === 'Schemes'}
+<!-- The dialog sizes to its content, so every source keeps it this wide and
+  tall, and switching doesn't make it jump -->
+<!-- Out of the column below, so it adds no space -->
+<div bind:this={top}></div>
+<div
+  class="flex w-full max-w-full flex-col px-2 pb-4 sm:min-h-[60svh] sm:w-[36rem] md:w-[44rem] lg:w-[62rem]"
+  bind:this={container}
+>
+  {#if source === 'saved'}
+    <div class="flex flex-col px-2">
+      <SavedPalettesToolbar {total} {matching} />
+    </div>
+    <SavedPalettes
+      {updateGauge}
+      filters={libraryFilters}
+      oncount={(count) => ({ total, matching } = count)}
+    />
+  {:else if source === 'gallery'}
+    <YarnPaletteGallery
+      mode="use"
+      onuse={(palette) => {
+        recordPageView(palette.postId);
+        updateGauge({ _colors: palette.colors, _schemeId: 'Custom' });
+      }}
+    />
+  {:else if source === 'schemes'}
     <PaletteSchemes {updateGauge} bind:numberOfColors />
+  {:else}
+    <PlaceholderPalettes items={6} maxWFull={true} />
   {/if}
 
   {#if showScrollToTopButton}
     <ToTopButton
-      onClick={() => {
-        if (container) {
-          container.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
-      }}
-      bottom="1rem"
+      onClick={() => container?.scrollIntoView({ behavior: 'smooth' })}
+      bottom={phone.current ? '5.5rem' : '1rem'}
     />
   {/if}
 </div>

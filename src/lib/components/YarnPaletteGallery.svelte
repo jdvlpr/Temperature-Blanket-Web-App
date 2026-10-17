@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import { gallerySortMenu } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
@@ -21,11 +22,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import { fetchPaletteGallery } from '#lib/utils/gallery-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
-  import { getPalettesFromProjects } from '#lib/utils/color-utils.js';
+  import {
+    getPalettesFromProjects,
+    type GalleryPalette,
+  } from '#lib/utils/color-utils.js';
   import { PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { galleryOwners } from './gallery-owners.svelte';
-  import { galleryFilters, yarnPaletteGalleryState } from './state.svelte';
+  import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
+  import {
+    galleryFilters,
+    yarnPaletteGalleryState,
+  } from '#lib/state/gallery-state.svelte.js';
+
+  // On the gallery page each palette opens its page; in Browse Palettes
+  // (`mode="use"`) choosing one uses it (`onuse`), with the same search,
+  // filters, sort and view as the gallery page
+  let {
+    mode = 'page',
+    onuse,
+  }: {
+    mode?: 'page' | 'use';
+    onuse?: (palette: GalleryPalette) => void;
+  } = $props();
 
   let first = 40;
   let loading = $state(true);
@@ -136,8 +154,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let grid = $derived(yarnPaletteGalleryState.layout === 'grid');
   const gridClass =
-    'grid w-full grid-cols-1 items-start gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
-  const listClass = 'flex w-full flex-col items-start gap-6';
+    'grid w-full grid-cols-2 items-start gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-3 xl:grid-cols-4';
+  const listClass = ['w-full', PALETTE_LIST];
 
   // "By <name>" on the cards shown
   $effect(() => {
@@ -162,7 +180,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="inline-grid gap-2 text-center">
     <div
       bind:this={scrollContainer}
-      class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 pb-4 text-center"
+      class={[
+        'flex scroll-mt-[70px] flex-col items-center justify-center gap-2 text-center',
+        // Browse Palettes spaces its lists as My Palettes does
+        mode === 'page' && 'pb-4',
+      ]}
     >
       {#if totalPalettes !== undefined}
         <p class="text-xs">{totalPalettes} total</p>
@@ -199,6 +221,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <GalleryPaletteCard
           {palette}
           author={galleryOwners.nameOf(palette.page.id)}
+          layout={yarnPaletteGalleryState.layout}
+          {mode}
+          onclick={onuse ? () => onuse(palette) : undefined}
         />
       {/each}
       {#if loading}
@@ -241,7 +266,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-{#if showScrollToTopButton && yarnPaletteGalleryState.projects.length}
+<!-- Browse Palettes has its own -->
+{#if mode === 'page' && showScrollToTopButton && yarnPaletteGalleryState.projects.length}
   <ToTopButton
     onClick={() => {
       scrollContainer?.scrollIntoView({

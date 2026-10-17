@@ -29,10 +29,10 @@ only in the gallery), with search, filters and sort once there are a few. -->
   import { sync } from '#lib/sync/status.svelte.js';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GallerySharing from '#lib/components/account/GallerySharing.svelte';
   import MyLibrary from '#lib/components/MyLibrary.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
+  import SavedPalettesToolbar from '#lib/components/SavedPalettesToolbar.svelte';
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -42,13 +42,7 @@ only in the gallery), with search, filters and sort once there are a few. -->
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
-  import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
-  import {
-    FILTERS_FROM,
-    LIBRARY_SORTS,
-    libraryStatuses,
-  } from '#lib/utils/collection-filter.js';
   import { PlusIcon } from '@lucide/svelte';
 
   let total = $state<number | null>(null);
@@ -113,49 +107,16 @@ only in the gallery), with search, filters and sort once there are a few. -->
   {#snippet main()}
     <MyLibrary current="palettes" currentTotal={total}>
       {#if browser}
-        {@const showFilters =
-          (total ?? 0) > FILTERS_FROM ||
-          libraryFilters.activeFor('palettes') ||
-          libraryFilters.sort !== 'recent' ||
-          libraryFilters.reversed}
-        <CollectionToolbar
-          kind="palette"
-          searchIcon="search"
-          searchLabel="Search Palettes"
-          searchPlaceholder="Name or colorway"
-          bind:search={libraryFilters.search}
-          bind:brandId={libraryFilters.brandId}
-          bind:yarnId={libraryFilters.yarnId}
-          bind:onlyThisYarn={libraryFilters.onlyThisYarn}
-          bind:status={libraryFilters.status}
-          statuses={showGallery
-            ? libraryStatuses({ gallery: true })
-            : undefined}
-          sortOptions={LIBRARY_SORTS}
-          sort={libraryFilters.sort}
-          onsort={(sort) => (libraryFilters.sort = sort)}
-          reversed={libraryFilters.reversed}
-          onreverse={(reversed) => (libraryFilters.reversed = reversed)}
-          bind:layout={
-            () => preferences.value.myProjectsLayout ?? 'grid',
-            (layout) => (preferences.value.myProjectsLayout = layout)
-          }
-          {showFilters}
-        >
+        <SavedPalettesToolbar {total} {matching}>
           {#snippet actions()}
             <a href={resolve('yarn')} class="btn preset-tonal-primary"
               ><PlusIcon />New Palette</a
             >
           {/snippet}
-        </CollectionToolbar>
+        </SavedPalettesToolbar>
         {#if synced}
           <AddToAccountButton kind="palettes" />
         {/if}
-        <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
-          {#if libraryFilters.activeFor('palettes') && total}
-            {matching} of {total} palettes
-          {/if}
-        </p>
         <SavedPalettes
           filters={libraryFilters}
           oncount={(count) => ({ total, matching } = count)}

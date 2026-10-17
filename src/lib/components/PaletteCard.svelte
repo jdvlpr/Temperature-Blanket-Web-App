@@ -18,11 +18,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   one link (`href`) or button (`onclick`), "8 colors · Brand Yarn" under the
   name, and one `action` button beside it. My Projects gives its own
   `nameRow` (with a rename pencil, outside the link) and a `footer`.
-  In a list it lies down, as a project's card does: the colors beside the name.
+  In a list (from small screens up) it lies down, as a project's card does:
+  the colors beside the name (then the name is the link or button for the
+  keyboard); on phones a list is one card per row, the colors full width.
 -->
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import type { Color } from '#lib/types/yarn-types.js';
+  import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { pluralize } from '#lib/utils/string-utils.js';
   import type { Snippet } from 'svelte';
 
@@ -46,6 +49,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details?: Snippet;
     footer?: Snippet;
     layout?: 'grid' | 'list';
+    /** The whole thing is one button on a card, for choosing a palette (as in
+    Browse Palettes): `onclick` only, no `href`, `nameRow`, `action` or `footer` */
+    card?: boolean;
   }
 
   let {
@@ -61,6 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details,
     footer,
     layout = 'grid',
+    card = false,
   }: Props = $props();
 
   let list = $derived(layout === 'list');
@@ -72,72 +79,117 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .map((color) => `${color.brandName} ${color.yarnName}`),
     ),
   ]);
+  // The name beside the colors (a list, or the page's own `nameRow`): the
+  // colors are then the link or button for the mouse only
+  let nameApart = $derived(!!nameRow || list);
   let controlClass = $derived([
     'flex min-w-0 cursor-pointer flex-col gap-y-1 text-left',
-    list ? 'w-28 shrink-0 sm:w-48' : 'w-full',
+    list ? 'w-full sm:w-48 sm:shrink-0' : 'w-full',
   ]);
 </script>
 
-<div
-  class={[
-    'flex w-full min-w-0 gap-1 text-left',
-    list ? 'flex-row items-center gap-3' : 'flex-col',
-  ]}
->
-  {#snippet strip()}
-    <PaletteStrip {colors} insideControl smallCorners />
-  {/snippet}
-  {#snippet text()}
-    <span class="line-clamp-2 font-semibold break-words">{name}</span>
-  {/snippet}
-  {#if href}
-    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-    <a
-      {href}
-      {onclick}
-      {title}
-      data-sveltekit-preload-data="tap"
-      data-sveltekit-reload={reload ? '' : undefined}
-      class={controlClass}
-      aria-hidden={nameRow ? 'true' : undefined}
-      tabindex={nameRow ? -1 : undefined}
+{#snippet strip()}
+  <PaletteStrip {colors} insideControl smallCorners />
+{/snippet}
+{#snippet text()}
+  <span class="line-clamp-2 font-semibold break-words">{name}</span>
+{/snippet}
+{#snippet summaryLine()}
+  <span
+    class={['text-surface-700-300 line-clamp-1 text-xs', !summary && 'hidden']}
+  >
+    {colors.length}
+    {pluralize('color', colors.length)}{#if yarns.length}{' · '}{yarns.join(
+        ', ',
+      )}{/if}
+  </span>
+{/snippet}
+
+{#if card}
+  <button
+    type="button"
+    {onclick}
+    {title}
+    class={[
+      'bg-surface-100 dark:bg-surface-900 hover:bg-surface-200 dark:hover:bg-surface-800 rounded-container card-border flex w-full min-w-0 cursor-pointer gap-2 p-2 text-left transition-colors',
+      ROW_FOCUS,
+      list ? 'flex-col sm:flex-row sm:items-center sm:gap-3' : 'flex-col',
+    ]}
+  >
+    <span class={list ? 'w-full sm:w-48 sm:shrink-0' : 'w-full'}
+      >{@render strip()}</span
     >
-      {@render strip()}
-      {#if !nameRow}{@render text()}{/if}
-    </a>
-  {:else}
-    <button
-      type="button"
-      {onclick}
-      {title}
-      class={controlClass}
-      aria-hidden={nameRow ? 'true' : undefined}
-      tabindex={nameRow ? -1 : undefined}
-    >
-      {@render strip()}
-      {#if !nameRow}{@render text()}{/if}
-    </button>
-  {/if}
-  <div class={list ? 'flex min-w-0 grow flex-col gap-1' : 'contents'}>
-    <div class="flex items-start gap-1">
-      <div class="flex min-w-0 grow flex-col gap-0.5">
-        {@render nameRow?.()}
-        <span
-          class={[
-            'text-surface-700-300 line-clamp-1 text-xs',
-            !summary && 'hidden',
-          ]}
-        >
-          {colors.length}
-          {pluralize(
-            'color',
-            colors.length,
-          )}{#if yarns.length}{' · '}{yarns.join(', ')}{/if}
-        </span>
-        {@render details?.()}
+    <span class="flex min-w-0 grow flex-col gap-0.5">
+      <span class="sr-only">Use</span>
+      {@render text()}
+      {@render summaryLine()}
+      {@render details?.()}
+    </span>
+  </button>
+{:else}
+  <div
+    class={[
+      'flex w-full min-w-0 gap-1 text-left',
+      list ? 'flex-col sm:flex-row sm:items-center sm:gap-3' : 'flex-col',
+    ]}
+  >
+    {#if href}
+      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+      <a
+        {href}
+        {onclick}
+        {title}
+        data-sveltekit-preload-data="tap"
+        data-sveltekit-reload={reload ? '' : undefined}
+        class={controlClass}
+        aria-hidden={nameApart ? 'true' : undefined}
+        tabindex={nameApart ? -1 : undefined}
+      >
+        {@render strip()}
+        {#if !nameApart}{@render text()}{/if}
+      </a>
+    {:else}
+      <button
+        type="button"
+        {onclick}
+        {title}
+        class={controlClass}
+        aria-hidden={nameApart ? 'true' : undefined}
+        tabindex={nameApart ? -1 : undefined}
+      >
+        {@render strip()}
+        {#if !nameApart}{@render text()}{/if}
+      </button>
+    {/if}
+    <div class={list ? 'flex min-w-0 grow flex-col gap-1' : 'contents'}>
+      <div class="flex items-start gap-1">
+        <div class="flex min-w-0 grow flex-col gap-0.5">
+          {#if nameRow}
+            {@render nameRow()}
+          {:else if list && href}
+            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+            <a
+              {href}
+              {onclick}
+              {title}
+              data-sveltekit-preload-data="tap"
+              data-sveltekit-reload={reload ? '' : undefined}
+              class="text-left">{@render text()}</a
+            >
+          {:else if list}
+            <button
+              type="button"
+              {onclick}
+              {title}
+              class="cursor-pointer text-left">{@render text()}</button
+            >
+          {/if}
+          {@render summaryLine()}
+          {@render details?.()}
+        </div>
+        {@render action?.()}
       </div>
-      {@render action?.()}
+      {@render footer?.()}
     </div>
-    {@render footer?.()}
   </div>
-</div>
+{/if}

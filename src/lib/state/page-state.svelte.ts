@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MediaQuery } from 'svelte/reactivity';
-import type { Component } from 'svelte';
+import type { Component, Snippet } from 'svelte';
 import { page } from '$app/state';
 import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '#lib/components/modals/Menu.svelte';
@@ -98,6 +98,11 @@ class DialogClass {
    * for them. Cleared whenever another dialog opens. */
   backAction = $state<(() => void) | null>(null);
 
+  /** Set by a dialog to show a control under its header's title, kept in
+   * view with it (e.g. a choice of what the dialog shows); on phones, pinned
+   * to the bottom of the sheet instead. Cleared whenever another dialog opens. */
+  headerControl = $state<Snippet | null>(null);
+
   /** Set by a view shown inside a dialog, for Escape to leave just that view
    * rather than close the dialog. Cleared whenever another dialog opens. */
   escapeAction = $state<(() => void) | null>(null);
@@ -152,6 +157,7 @@ class DialogClass {
       this.stack = [];
     }
     this.backAction = null;
+    this.headerControl = null;
     this.escapeAction = null;
     this.finalFocus = null;
     this.direction = fromReturnable ? 'forward' : 'none';

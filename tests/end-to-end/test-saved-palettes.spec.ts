@@ -37,21 +37,10 @@ test.describe('Saved palettes', () => {
       .click();
     await expect(page.getByText('This palette is already saved')).toBeVisible();
 
-    // It survives a reload
-    await page.reload();
-    await page.getByRole('button', { name: 'Get Colors' }).click();
-    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
-    dialog = page.getByRole('dialog');
-    // The hidden phone dropdown also has a "Saved" option
-    await dialog
-      .getByText('Saved', { exact: true })
-      .filter({ visible: true })
-      .click();
-    const list = dialog.getByRole('list', { name: 'Saved palettes' });
+    // It survives a reload, and is renamed and trashed on My Palettes
+    await page.goto('/my-palettes');
+    let list = page.getByRole('list', { name: 'Saved palettes' });
     await expect(list.getByRole('listitem')).toHaveCount(1);
-    await expect(list.getByText('Test Sunset')).toBeVisible();
-
-    // Rename
     await list.getByRole('button', { name: 'More for Test Sunset' }).click();
     await page.getByRole('menuitem', { name: 'Rename' }).click();
     await list.getByLabel('Palette name').fill('Test Dusk');
@@ -61,9 +50,23 @@ test.describe('Saved palettes', () => {
     // Delete, then undo
     await list.getByRole('button', { name: 'More for Test Dusk' }).click();
     await page.getByRole('menuitem', { name: 'Move to Trash' }).click();
-    await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
-    await dialog.getByRole('button', { name: 'Undo' }).click();
+    await expect(page.getByText('No saved palettes yet')).toBeVisible();
+    await page.getByRole('button', { name: 'Undo' }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();
+
+    // Browse Palettes opens on My Palettes, where a palette is only chosen
+    await page.goto('/yarn');
+    await page.getByRole('button', { name: 'Get Colors' }).click();
+    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
+    dialog = page.getByRole('dialog');
+    await expect(
+      dialog.getByRole('radio', { name: 'My Palettes' }),
+    ).toBeChecked();
+    list = dialog.getByRole('list', { name: 'Saved palettes' });
+    await expect(list.getByText('Test Dusk')).toBeVisible();
+    await expect(
+      list.getByRole('button', { name: 'More for Test Dusk' }),
+    ).toHaveCount(0);
 
     // Use it with its button (the name in the label): the dialog closes
     await list.getByRole('button', { name: 'Use Test Dusk' }).click();

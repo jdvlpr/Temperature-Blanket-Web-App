@@ -177,7 +177,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: BrowsePalettes,
             props: {
               numberOfColors: gauge.numberOfColors,
-              schemeId: gauge.schemeId,
               updateGauge,
             },
           },
