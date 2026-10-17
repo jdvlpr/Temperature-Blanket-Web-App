@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SavedProjectCard from '#lib/components/SavedProjectCard.svelte';
   import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
+  import { masonry } from '#lib/state/attachments/masonry.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
@@ -339,8 +340,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {@const grid = layout === 'grid'}
       <div
         class={grid
-          ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4'
+          ? 'grid w-full grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4'
           : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
+        {@attach grid ? masonry : undefined}
       >
         {#each cards as card (card.key)}
           {@const project = card.project}

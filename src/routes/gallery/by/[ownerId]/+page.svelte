@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import { masonry } from '#lib/state/attachments/masonry.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
@@ -200,6 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : 'grid grid-cols-1 md:grid-cols-2',
       ]}
       aria-label="Projects by {data.name}"
+      {@attach ownerFilters.layout === 'grid' ? masonry : undefined}
     >
       {#each shown as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
         <li>

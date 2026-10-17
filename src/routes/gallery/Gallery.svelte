@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import { GlobeIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { masonry } from '#lib/state/attachments/masonry.js';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
   import {
     galleryFilters,
@@ -249,8 +250,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div
         class=" my-2 w-full gap-2 {galleryState.layout === 'grid'
-          ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
+          ? 'grid grid-cols-2 justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'grid grid-cols-1 items-start md:grid-cols-2'}"
+        {@attach galleryState.layout === 'grid' ? masonry : undefined}
       >
         {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
           <GalleryProjectCard
