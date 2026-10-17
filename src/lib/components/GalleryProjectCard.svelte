@@ -69,6 +69,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** For a link that needs a full page load (a project opened in the planner) */
     reload?: boolean;
     title?: string;
+    /** On a click of its link (the Open screens open the copy here) */
+    onclick?: (event: MouseEvent) => void;
   }
 
   let {
@@ -86,6 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     footer,
     reload = false,
     title,
+    onclick,
   }: Props = $props();
 
   let list = $derived(layout === 'list');
@@ -121,6 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {title}
     data-sveltekit-preload-data="tap"
     data-sveltekit-reload={reload ? '' : undefined}
+    {onclick}
     class={list
       ? ['flex min-w-0 items-center gap-3', nameOutside ? 'shrink-0' : 'grow']
       : 'flex w-full flex-col items-center gap-1'}
@@ -148,6 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {title}
             data-sveltekit-preload-data="tap"
             data-sveltekit-reload={reload ? '' : undefined}
+            {onclick}
             class="flex min-w-0 grow"
           >
             {@render name()}

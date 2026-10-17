@@ -297,6 +297,16 @@ test.describe('My Projects', () => {
     await expect(page.getByText('Saved to My Palettes')).toBeVisible();
     await menu.getByTestId('save-gauge-palette').click();
     await expect(page.getByText('Already in My Palettes')).toBeVisible();
+    await menu.getByRole('button', { name: 'Back' }).click();
+
+    // Open lists the saved projects, this one as open now, with a search
+    await menu.getByTestId('menu-open').click();
+    const saved = menu.getByRole('list', { name: 'Saved projects' });
+    await expect(
+      saved.getByRole('listitem').filter({ hasText: 'Austin Blanket' }),
+    ).toContainText('Open now');
+    await menu.getByLabel('Search projects').fill('nothing like it');
+    await expect(menu.getByText('No projects match')).toBeVisible();
     await page.keyboard.press('Escape');
 
     // Opened from My Projects, it loads with its saved weather

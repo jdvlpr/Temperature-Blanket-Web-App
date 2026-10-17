@@ -60,7 +60,7 @@ test.describe('Saved palettes', () => {
     await page.getByRole('button', { name: 'Undo' }).click();
     await expect(list.getByText('Test Sunset')).toBeVisible();
 
-    // Recent Palettes in the Palette menu opens it here, in place
+    // The Palette menu's Open lists it, finds it, and opens it here
     await page.goto('/yarn');
     const paletteButton = page.getByTestId('palette-button');
     await expect(paletteButton).toHaveAttribute(
@@ -69,7 +69,12 @@ test.describe('Saved palettes', () => {
     );
     await paletteButton.click();
     const menu = page.getByRole('dialog', { name: 'Palette' });
-    await menu.getByRole('button', { name: 'Test Sunset' }).click();
+    await menu.getByTestId('menu-open').click();
+    const open = page.getByRole('dialog');
+    await open.getByLabel('Search palettes').fill('nothing like it');
+    await expect(open.getByText('No palettes match')).toBeVisible();
+    await open.getByLabel('Search palettes').fill('sunset');
+    await open.getByRole('button', { name: /^Test Sunset/ }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(paletteButton).toHaveAttribute(
       'data-save-status',

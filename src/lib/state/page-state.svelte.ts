@@ -18,6 +18,7 @@ import type { Component, Snippet } from 'svelte';
 import { page } from '$app/state';
 import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '#lib/components/modals/Menu.svelte';
+import { openProjectScreen } from '#lib/components/modals/open-project.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
@@ -592,10 +593,26 @@ export const ignoresShortcuts = (ev: KeyboardEvent) => {
   );
 };
 
-export const handleKeyDown = (ev: KeyboardEvent) => {
-  if (ignoresShortcuts(ev)) return;
+/** Cmd/Ctrl+O: Open, from anywhere on the page but a dialog (it types
+ * nothing, so a focused field or button doesn't stop it) */
+export const isOpenShortcut = (ev: KeyboardEvent) =>
+  (ev.metaKey || ev.ctrlKey) &&
+  !ev.shiftKey &&
+  !ev.altKey &&
+  ev.key.toLowerCase() === 'o' &&
+  !dialog.opened;
 
+export const handleKeyDown = (ev: KeyboardEvent) => {
   const routeId = page.route.id;
+
+  // The Project menu's Open, in place of the browser's
+  if (routeId === '/' && isOpenShortcut(ev)) {
+    ev.preventDefault();
+    void openProjectScreen();
+    return;
+  }
+
+  if (ignoresShortcuts(ev)) return;
 
   if (ev.key === 't') {
     // Toggle between light, dark, and system themes on 't' key press

@@ -39,6 +39,13 @@ export const KEYBOARD_SHORTCUTS = [
         keys: ['.'],
       },
       {
+        description: 'Open a Project',
+        keys: [
+          ['Cmd ⌘', 'o'],
+          ['Ctrl', 'o'],
+        ],
+      },
+      {
         description: 'Close any open modal',
         keys: ['Escape'],
       },
@@ -122,6 +129,13 @@ export const YARN_KEYBOARD_SHORTCUTS = [
         keys: [
           ['Cmd ⌘', 's'],
           ['Ctrl', 's'],
+        ],
+      },
+      {
+        description: 'Open a Palette',
+        keys: [
+          ['Cmd ⌘', 'o'],
+          ['Ctrl', 'o'],
         ],
       },
       {

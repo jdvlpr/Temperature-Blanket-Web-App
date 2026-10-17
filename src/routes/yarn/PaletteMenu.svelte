@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Palette menu, in the same shape as the planner's Project menu: a card
 with the palette's name and where it's saved (or Save Palette); Download and
-Start a Project with It; its Share rows; the Palette itself (New, Duplicate,
-Move to Trash); a few recent palettes, opened here; a line of help links. A
+Start a Project with It; its Share rows; the Palette itself (New, Open…,
+Duplicate, Move to Trash); a line of help links. A
 side panel on large screens (see openPaletteMenu); screens opened from here
 open in the panel, with a Back button to it. -->
 
@@ -29,7 +29,6 @@ open in the panel, with a Back button to it. -->
   } from '#lib/accounts/gallery.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import PanelGroup from '#lib/components/PanelGroup.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
   import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
@@ -44,25 +43,20 @@ open in the panel, with a Back button to it. -->
     SMALL_LINKS,
   } from '#lib/constants/class-constants.js';
   import { YARN_KEYBOARD_SHORTCUTS } from '#lib/constants/page-constants.js';
-  import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { startingPaletteSearch } from '#lib/state/starting-palette.js';
   import {
     MAX_SAVED_PALETTE_NAME_LENGTH,
     PaletteStorage,
-    savedPalettes,
   } from '#lib/storage/palettes.svelte.js';
   import { TRASH_DAYS } from '#lib/storage/trash.js';
-  import { sync } from '#lib/sync/status.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { confirmTrash } from '#lib/utils/confirm-trash.js';
   import {
     colorsToPaletteCode,
     getColorsFromInput,
-    getPaletteFallbackName,
     getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
-  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     BookmarkPlusIcon,
     ChevronRightIcon,
@@ -70,7 +64,6 @@ open in the panel, with a Back button to it. -->
     DownloadIcon,
     ExternalLinkIcon,
     FolderOpenIcon,
-    LandmarkIcon,
     LayoutGridIcon,
     PlusIcon,
     RotateCwIcon,
@@ -78,6 +71,7 @@ open in the panel, with a Back button to it. -->
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import GettingStarted from './GettingStarted.svelte';
+  import { openPaletteScreen } from './open-palette';
   import PaletteExport from './PaletteExport.svelte';
   import PaletteTitle from './PaletteTitle.svelte';
   import {
@@ -96,6 +90,9 @@ open in the panel, with a Back button to it. -->
   const LINK_ICON = 'icon-sm inline opacity-60';
 
   const saved = $derived(Boolean(paletteAutosave.id));
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
   const colorsNow = () => $state.snapshot(yarnPageState.gauge.colors);
 
   /** Its Yarn Palette Creator link, with its name for whoever opens it */
@@ -281,44 +278,6 @@ open in the panel, with a Back button to it. -->
       });
     }
   }
-
-  // A few palettes edited most recently, not counting this one
-  let yarnDataReady = $state(false);
-  onMount(async () => {
-    await ensureYarnData();
-    yarnDataReady = true;
-  });
-  $effect(() => {
-    void sync.version;
-    void account.summary?.id;
-    void paletteAutosave.id;
-    if (browser) void savedPalettes.refresh();
-  });
-  const recentTotal = $derived(savedPalettes.items.length);
-  const recent = $derived(
-    yarnDataReady
-      ? savedPalettes.items
-          .filter((p) => p.id !== paletteAutosave.id)
-          .sort((a, b) => b.updatedAt - a.updatedAt)
-          .slice(0, 3)
-          .map((palette) => {
-            const colors = getColorsFromInput({ string: palette.code });
-            if (!colors || !colors.length) return null;
-            return {
-              id: palette.id,
-              colors,
-              label: palette.name || getPaletteFallbackName(colors),
-            };
-          })
-          .filter((n) => n !== null)
-      : [],
-  );
-
-  async function openRecent(id: string, colors: Color[]) {
-    await savePaletteNow();
-    await yarnPageState.openSaved(id, colors);
-    dialog.close();
-  }
 </script>
 
 <!-- Its title, Palette, is in the dialog's header -->
@@ -422,6 +381,25 @@ open in the panel, with a Back button to it. -->
         </span>
       </button>
     </li>
+    <li>
+      <button
+        type="button"
+        class={ROW}
+        onclick={() => openPaletteScreen(true)}
+        data-testid="menu-open"
+      >
+        <FolderOpenIcon class="shrink-0 opacity-70" />
+        <span class="flex flex-1 flex-col">
+          <span>Open…</span>
+          <span class="text-xs opacity-70"
+            >{signedIn
+              ? 'Your palettes, or ones you starred'
+              : 'Your saved palettes'}</span
+          >
+        </span>
+        <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+      </button>
+    </li>
     {#if saved}
       <li>
         <button
@@ -454,51 +432,6 @@ open in the panel, with a Back button to it. -->
         </button>
       </li>
     {/if}
-  </PanelGroup>
-
-  <!-- A few recent palettes, opened here; My Palettes has them all, the
-  gallery more -->
-  <PanelGroup heading={recent.length ? 'Recent Palettes' : 'Open a Palette'}>
-    {#each recent as item (item.id)}
-      <li>
-        <button
-          type="button"
-          class={ROW}
-          onclick={() => openRecent(item.id, item.colors)}
-        >
-          <span class="w-12 shrink-0" aria-hidden="true">
-            <PaletteStrip
-              colors={item.colors}
-              height="40px"
-              corners="small"
-              insideControl
-            />
-          </span>
-          <span
-            class="line-clamp-2 min-w-0 flex-1 text-sm font-semibold break-words"
-            >{item.label}</span
-          >
-        </button>
-      </li>
-    {/each}
-    {#if recentTotal}
-      <li>
-        <a href={resolve('/my-palettes')} class={ROW}>
-          <FolderOpenIcon class="shrink-0 opacity-70" />
-          <span class="flex-1"
-            >{recentTotal > recent.length + (saved ? 1 : 0)
-              ? `All ${recentTotal} ${pluralize('Palette', recentTotal)}`
-              : 'My Palettes'}</span
-          >
-        </a>
-      </li>
-    {/if}
-    <li>
-      <a href={resolve('/gallery/palettes')} class={ROW}>
-        <LandmarkIcon class="shrink-0 opacity-70" />
-        <span class="flex-1">Palette Gallery</span>
-      </a>
-    </li>
   </PanelGroup>
 
   <!-- Help, in one line: the site menu has the rest -->

@@ -1,6 +1,8 @@
 import { TemperatureGauge } from '#lib/state/gauges/temperature-gauge-state.svelte.js';
 import { HistoryStateClass } from '#lib/state/project-state.svelte.js';
+import { MAX_SAVED_PALETTE_NAME_LENGTH } from '#lib/storage/palettes.svelte.js';
 import type { Color } from '#lib/types/yarn-types.js';
+import { cleanName } from '#lib/utils/clean-name.js';
 import {
   getYarnPageURL,
   getPaletteFallbackName,
@@ -82,6 +84,22 @@ class YarnState {
     this.suggestion = null;
     this.startHistory();
     await openPalette(id);
+  }
+
+  /**
+   * A gallery palette's colors (the Palette menu's Open, Starred), open here
+   * as a new palette named after its page, with its own history: as its
+   * Open a Copy link would open it.
+   */
+  openCopy(colors: Color[], name: string) {
+    this.gauge.updateColors({ colors });
+    this.gauge.schemeId = 'Custom';
+    closePalette();
+    const cleaned = cleanName(name, MAX_SAVED_PALETTE_NAME_LENGTH);
+    this.suggestion = cleaned
+      ? { name: cleaned, colors: $state.snapshot(this.gauge.colors) }
+      : null;
+    this.startHistory();
   }
 
   /** Called a moment after the colors change: one undo step */

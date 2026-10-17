@@ -25,10 +25,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '#lib/components/YarnSources.svelte';
   import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
   import SavePalette from '#lib/components/modals/SavePalette.svelte';
+  import { openPaletteScreen } from './open-palette';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import {
     dialog,
     ignoresShortcuts,
+    isOpenShortcut,
     isDesktop,
     isRedo,
     isUndo,
@@ -138,6 +140,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onkeydown={(ev) => {
+    // The Palette menu's Open, in place of the browser's
+    if (isOpenShortcut(ev) && !yarnPageState.loading) {
+      ev.preventDefault();
+      void openPaletteScreen();
+      return;
+    }
     if (ignoresShortcuts(ev) || yarnPageState.loading) return;
     if (isUndo(ev)) {
       ev.preventDefault();

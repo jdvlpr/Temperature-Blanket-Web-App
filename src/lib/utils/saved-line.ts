@@ -18,15 +18,15 @@ import {
   type StoredProjectIndexItem,
 } from '#lib/storage/projects.svelte.js';
 
+/** "Saved Oct 17, 2026, 9:41 AM", for a time saved */
+export const savedOn = (time: number) =>
+  `Saved ${new Date(time).toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })}`;
+
 /** "Saved Oct 17, 2026, 9:41 AM" under a project's name in a list */
 export const savedLine = (item: StoredProjectIndexItem) => {
   const saved = lastSavedAt(item);
-  return `Saved ${
-    saved
-      ? new Date(saved).toLocaleString(undefined, {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        })
-      : item.meta.date
-  }`;
+  return saved ? savedOn(saved) : `Saved ${item.meta.date}`;
 };

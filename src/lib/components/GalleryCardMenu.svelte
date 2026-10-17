@@ -32,10 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
-  import { getYarnPageURL } from '#lib/utils/color-utils.js';
   import { editGalleryPageById } from '#lib/utils/edit-gallery-page.js';
-  import { fromGalleryLink } from '#lib/utils/gallery-request.js';
-  import { withProjectName } from '#lib/utils/project-name-link.js';
+  import { paletteCopyHref, projectCopyHref } from '#lib/utils/open-copy.js';
   import {
     LinkIcon,
     NotebookPenIcon,
@@ -70,25 +68,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   // Open a Copy: with its name and the weather its page kept, as on its page
-  let openHref = $derived.by(() => {
-    if (project?.url) {
-      try {
-        // On this site, wherever the gallery saved it from (as its page does)
-        const url = new URL(
-          fromGalleryLink(
-            withProjectName(project.url, project.name?.trim() ?? ''),
-            postId,
-          ),
-        );
-        return `${url.pathname}${url.search}${url.hash}`;
-      } catch {
-        return null;
-      }
-    }
-    if (colors?.length)
-      return `${getYarnPageURL({ colors, origin: '' })}&name=${encodeURIComponent(name)}`;
-    return null;
-  });
+  let openHref = $derived(
+    project?.url
+      ? projectCopyHref(project.url, project.name, postId)
+      : colors?.length
+        ? paletteCopyHref(colors, name)
+        : null,
+  );
 
   let own = $derived(
     __ACCOUNTS_ENABLED__ && !!account.summary?.id && galleryStars.isOwn(postId),

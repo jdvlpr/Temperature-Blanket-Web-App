@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Project menu, about the open project only, in the same shape as the
 Yarn page's Palette menu: a card with its name and save state; Download; its
-Share rows; its gauges' Palettes; the Project itself (New, Duplicate, Move to
-Trash); a few recent projects; a line of help links. New Project and recent
-ones open here, in its place, asking first when that would lose changes. A
+Share rows; its gauges' Palettes; the Project itself (New, Open…, Duplicate,
+Move to Trash); a line of help links. New Project and what Open chooses open
+here, in its place, asking first when that would lose changes (leaveFor). A
 side panel on large screens (see openProjectMenu); dialogs opened from here
 open in the panel, with a Back button to it. -->
 
@@ -28,7 +28,6 @@ open in the panel, with a Back button to it. -->
     SMALL_LINK,
     SMALL_LINKS,
   } from '#lib/constants/class-constants.js';
-  import { browser } from '$app/env';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
@@ -46,23 +45,15 @@ open in the panel, with a Back button to it. -->
     addOpenProjectToAccount,
     autosave,
     changedElsewhereMessage,
-    leaveOnPurpose,
     saveCopy,
-    saveNow,
     storedItem,
     trashOpenProject,
-    unsavedWork,
   } from '#lib/storage/autosave.svelte.js';
   import {
-    ProjectStorage,
     savedProjects,
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
-  import ProjectPicture from '#lib/components/ProjectPicture.svelte';
-  import { savedLine } from '#lib/utils/saved-line.js';
-  import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import { rememberJustTrashed, TRASH_DAYS } from '#lib/storage/trash.js';
-  import { sync } from '#lib/sync/status.svelte.js';
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
@@ -72,7 +63,6 @@ open in the panel, with a Back button to it. -->
     DownloadIcon,
     ExternalLinkIcon,
     FolderOpenIcon,
-    LandmarkIcon,
     LoaderCircleIcon,
     LogInIcon,
     MonitorIcon,
@@ -87,18 +77,21 @@ open in the panel, with a Back button to it. -->
   import { projectShareRows } from '#lib/utils/project-share.js';
   import { onMount } from 'svelte';
   import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
+  import { openHere } from '#lib/utils/leave-project.js';
   import ExportOptions from './ExportOptions.svelte';
+  import { openProjectScreen } from './open-project.js';
   import { openGaugePalette } from './gauge-palette.js';
-  import SaveFirst from './SaveFirst.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
-  import { pluralize } from '#lib/utils/string-utils.js';
 
   const ROW = PANEL_ROW;
   const LINK_ICON = 'icon-sm inline opacity-60';
 
   const hasWeather = $derived(weather.data.length > 0);
   const hasProject = $derived(hasWeather && locations.allValid);
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
   const problem = $derived(
     autosave.on &&
       (autosave.state === 'conflict' || autosave.state === 'error'),
@@ -143,59 +136,6 @@ open in the panel, with a Back button to it. -->
   const shareRowsList = $derived(projectShareRows(shareName, shareItem));
   onMount(() => loadShareState('project'));
 
-  // Another project, or a new one, here in this one's place: a change
-  // waiting to save saves first, and changes that would be lost ask first
-  async function leaveFor(href: string) {
-    if (autosave.on && !problem) await saveNow();
-    const go = () => {
-      leaveOnPurpose();
-      window.location.assign(href);
-    };
-    // One never saved asks too, even unchanged: its location and weather
-    // would be gone
-    if (!unsavedWork() && !(hasProject && !autosave.stored)) {
-      go();
-      return;
-    }
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: SaveFirst,
-        props: problem
-          ? {
-              message:
-                'This project’s latest changes couldn’t be saved. Leave without them?',
-              ongo: go,
-            }
-          : {
-              message:
-                'Save this project first? Saved, you can come back to it from My Projects.',
-              saveLabel: 'Save and Continue',
-              onsave: async () => {
-                if (!(await saveProject())) throw new Error('Not saved');
-              },
-              ongo: go,
-            },
-      },
-      options: { title: 'Save Project?' },
-    });
-  }
-
-  // A plain click opens it here; Cmd, Ctrl or Shift-click and the middle
-  // button still open it in a new tab
-  function openHere(event: MouseEvent, href: string) {
-    if (
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey
-    )
-      return;
-    event.preventDefault();
-    void leaveFor(href);
-  }
-
   async function copyProject() {
     try {
       await saveCopy();
@@ -233,26 +173,6 @@ open in the panel, with a Back button to it. -->
       });
     }
   }
-
-  // A few recent projects, not counting this one
-  let recent = $state<StoredProjectIndexItem[]>([]);
-  let recentTotal = $state(0);
-  $effect(() => {
-    void savedProjects.version;
-    void sync.version;
-    void account.summary?.id;
-    const openId = new URL(project.url.href).searchParams.get('project');
-    if (!browser) return;
-    ProjectStorage.getProjectsForDisplay().then((all) => {
-      recentTotal = all.length;
-      recent = all.filter((item) => item.id !== openId).slice(0, 3);
-    });
-  });
-  // Their pictures, drawn while the menu's open if they have none yet
-  const pictures = new ProjectPictures();
-  $effect(() =>
-    pictures.draw(recent.map(({ id, meta }) => ({ id, href: meta.href }))),
-  );
 </script>
 
 <!-- Save, until the project saves by itself; the Project button's dot (in
@@ -430,8 +350,11 @@ the same color) says it's waiting here -->
         {/each}
       </PanelGroup>
     {/if}
+  {/if}
 
-    <PanelGroup heading="Project">
+  <!-- The project itself, and others: Open even before there's one -->
+  <PanelGroup heading="Project">
+    {#if hasWeather}
       <li>
         <a
           href={resolve('/')}
@@ -450,97 +373,60 @@ the same color) says it's waiting here -->
           </span>
         </a>
       </li>
-      {#if hasProject}
-        <li>
-          <button
-            type="button"
-            class={ROW}
-            title="Save these settings as a new project, and leave this one as it is"
-            onclick={copyProject}
-          >
-            <CopyPlusIcon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Duplicate</span>
-              <span class="text-xs opacity-70">A new project from this one</span
-              >
-            </span>
-          </button>
-        </li>
-      {/if}
-      {#if autosave.stored}
-        <li>
-          <button
-            type="button"
-            class="{ROW} text-error-700-300"
-            onclick={trashProject}
-            data-testid="trash-project"
-          >
-            <Trash2Icon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Move to Trash</span>
-              <span class="text-xs opacity-70"
-                >Restore it from My Library for {TRASH_DAYS} days</span
-              >
-            </span>
-          </button>
-        </li>
-      {/if}
-    </PanelGroup>
-  {/if}
-
-  <!-- A few recent projects, opened here; My Projects has them all, the
-  gallery more -->
-  <PanelGroup heading={recent.length ? 'Recent Projects' : 'Open a Project'}>
-    {#each recent as item (item.id)}
-      {@const label = item.meta.name || item.meta.title || 'Untitled Project'}
-      <li>
-        <!-- eslint-disable svelte/no-navigation-without-resolve -- the saved project's address -->
-        <a
-          href={item.meta.href}
-          data-sveltekit-reload
-          class={ROW}
-          onclick={(event) => openHere(event, item.meta.href)}
-        >
-          <!-- Its picture, as on My Library -->
-          <ProjectPicture
-            id={item.id}
-            href={item.meta.href}
-            picturesVersion={pictures.version}
-            pictureSettled={pictures.isSettled(item.id, item.meta.href)}
-            imageClass="h-14 w-12 shrink-0 object-contain"
-            coverClass="h-14 w-12 shrink-0"
-            stripHeight="40px"
-          />
-          <span class="flex min-w-0 flex-1 flex-col">
-            <span class="line-clamp-2 text-sm font-semibold break-words"
-              >{label}</span
-            >
-            <span class="text-surface-700-300 line-clamp-1 text-xs"
-              >{savedLine(item)}</span
-            >
-          </span>
-        </a>
-        <!-- eslint-enable svelte/no-navigation-without-resolve -->
-      </li>
-    {/each}
-    {#if recentTotal}
-      <li>
-        <a href={resolve('/my-projects')} class={ROW}>
-          <FolderOpenIcon class="shrink-0 opacity-70" />
-          <span class="flex-1"
-            >{recentTotal > recent.length + (autosave.stored ? 1 : 0)
-              ? `All ${recentTotal} ${pluralize('Project', recentTotal)}`
-              : 'My Projects'}</span
-          >
-        </a>
-      </li>
     {/if}
     <li>
-      <a href={resolve('/gallery')} class={ROW}>
-        <LandmarkIcon class="shrink-0 opacity-70" />
-        <span class="flex-1">Project Gallery</span>
-      </a>
+      <button
+        type="button"
+        class={ROW}
+        onclick={() => openProjectScreen(true)}
+        data-testid="menu-open"
+      >
+        <FolderOpenIcon class="shrink-0 opacity-70" />
+        <span class="flex flex-1 flex-col">
+          <span>Open…</span>
+          <span class="text-xs opacity-70"
+            >{signedIn
+              ? 'Your projects, or ones you starred'
+              : 'Your saved projects'}</span
+          >
+        </span>
+        <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+      </button>
     </li>
+    {#if hasProject}
+      <li>
+        <button
+          type="button"
+          class={ROW}
+          title="Save these settings as a new project, and leave this one as it is"
+          onclick={copyProject}
+        >
+          <CopyPlusIcon class="shrink-0 opacity-70" />
+          <span class="flex flex-1 flex-col">
+            <span>Duplicate</span>
+            <span class="text-xs opacity-70">A new project from this one</span>
+          </span>
+        </button>
+      </li>
+    {/if}
+    {#if hasWeather && autosave.stored}
+      <li>
+        <button
+          type="button"
+          class="{ROW} text-error-700-300"
+          onclick={trashProject}
+          data-testid="trash-project"
+        >
+          <Trash2Icon class="shrink-0 opacity-70" />
+          <span class="flex flex-1 flex-col">
+            <span>Move to Trash</span>
+            <span class="text-xs opacity-70"
+              >Restore it from My Library for {TRASH_DAYS} days</span
+            >
+          </span>
+        </button>
+      </li>
+    {/if}
   </PanelGroup>
 
   <!-- Help, in one line: the site menu has the rest -->

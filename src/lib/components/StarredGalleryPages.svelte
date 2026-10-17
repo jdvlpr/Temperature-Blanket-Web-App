@@ -22,8 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   stays until the next visit and can be put back. Pages the gallery doesn't
   return (taken down, or hidden while in their owner's Trash) aren't shown,
   but their stars are kept in case they come back. Signed out, it asks to
-  sign in. With `onuse` (Get Colors' My Palettes, palettes only), choosing a
-  palette uses it instead of opening its page.
+  sign in. With `onuse` (Get Colors' My Palettes, the Palette menu's Open,
+  palettes), choosing a palette uses it instead of opening its page; with
+  `onopen` (the Project menu's Open, projects), a project's card links to a
+  copy of it, opened by `onopen`, and has no ⋮ menu.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -59,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     galleryTitleText,
     sharedPaletteFrom,
   } from '#lib/utils/shared-palette-utils.js';
+  import { projectCopyHref } from '#lib/utils/open-copy.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { LogInIcon, StarIcon, XIcon } from '@lucide/svelte';
@@ -73,9 +76,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     oncount?: (count: { total: number; matching: number }) => void;
     /** Uses a palette (Get Colors) rather than opening its gallery page */
     onuse?: (palette: GalleryPalette) => void;
+    /** Opens a copy of a project (its card's link) rather than its page */
+    onopen?: (event: MouseEvent, href: string) => void;
+    /** One column, whatever the window's width (in a side panel) */
+    narrow?: boolean;
   }
 
-  let { kind, layout = 'grid', filters, oncount, onuse }: Props = $props();
+  let {
+    kind,
+    layout = 'grid',
+    filters,
+    oncount,
+    onuse,
+    onopen,
+    narrow = false,
+  }: Props = $props();
 
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
@@ -287,7 +302,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       'w-full items-start gap-2',
       layout === 'grid'
         ? 'grid grid-cols-2 justify-center md:grid-cols-3 xl:grid-cols-4'
-        : 'grid grid-cols-1 md:grid-cols-2',
+        : narrow
+          ? 'grid grid-cols-1'
+          : 'grid grid-cols-1 md:grid-cols-2',
     ]}
     aria-label="Starred projects"
     {@attach layout === 'grid' ? masonry : undefined}
@@ -302,27 +319,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
         date,
         views,
       } = node}
+      {@const copyHref = onopen
+        ? projectCopyHref(projectUrl, projectName, databaseId)
+        : null}
+      {@const card = {
+        image:
+          featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
+          featuredImage?.node?.mediaItemUrl,
+        label,
+        date,
+        title: getTitleTextFromLocationsMeta(locations),
+        author: galleryOwners.nameOf(databaseId),
+        views,
+        layout,
+      }}
       <li>
-        <GalleryProjectCard
-          href={resolve('/gallery/[id]', { id: String(databaseId) })}
-          image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
-            featuredImage?.node?.mediaItemUrl}
-          {label}
-          {date}
-          title={getTitleTextFromLocationsMeta(locations)}
-          author={galleryOwners.nameOf(databaseId)}
-          {views}
-          {layout}
-        >
-          {#snippet action()}
-            <GalleryCardMenu
-              postId={databaseId}
-              kind="project"
-              name={label}
-              project={{ url: projectUrl, name: projectName }}
-            />
-          {/snippet}
-        </GalleryProjectCard>
+        {#if copyHref}
+          <!-- A copy, opened by onopen, with no menu -->
+          <GalleryProjectCard
+            {...card}
+            href={copyHref}
+            reload
+            onclick={(event) => onopen?.(event, copyHref)}
+          />
+        {:else}
+          <GalleryProjectCard
+            {...card}
+            href={resolve('/gallery/[id]', { id: String(databaseId) })}
+          >
+            {#snippet action()}
+              <GalleryCardMenu
+                postId={databaseId}
+                kind="project"
+                name={label}
+                project={{ url: projectUrl, name: projectName }}
+              />
+            {/snippet}
+          </GalleryProjectCard>
+        {/if}
       </li>
     {/each}
   </ul>
@@ -332,7 +366,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       'w-full items-start gap-x-4 gap-y-6',
       layout === 'grid'
         ? 'grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-        : PALETTE_LIST,
+        : narrow
+          ? 'flex flex-col'
+          : PALETTE_LIST,
     ]}
     aria-label="Starred palettes"
   >

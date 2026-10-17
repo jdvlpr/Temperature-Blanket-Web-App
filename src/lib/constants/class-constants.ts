@@ -41,6 +41,9 @@ export const LIST_ENDS =
 // too, which shouldn't be open in two tabs).
 export const PANEL_LIST = `bg-surface-100 dark:bg-surface-900 rounded-container card-border divide-surface-200-800 flex flex-col divide-y overflow-hidden ${LIST_ENDS}`;
 export const PANEL_ROW = `hover:bg-surface-200-800 flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;
+/** A PANEL_ROW that isn't a control (the open one, on the Open screens) */
+export const OPEN_NOW_ROW =
+  'flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left';
 
 // A Skeleton field group drawn as one field: a single border around the icon,
 // input and buttons (its children drop their own), in the theme's roundness.
