@@ -13,9 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The Contents sheet, from the top bar's Contents button: this page's
-sections first, then every page of Guides & Help, the current one marked.
-Choosing a link closes it (onNavigate). -->
+<!-- The Contents sheet, from the top bar's Contents button: a guide or
+reference page's sections first, then every page of Guides & Help, the
+current one marked. Choosing a link closes it (onNavigate). Also beside the
+index on wide screens, without onNavigate. -->
 
 <script lang="ts">
   import { page } from '$app/state';

@@ -15,12 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Guides & Help: the index and every guide and reference page. A page here
 is only its content; its title, description, breadcrumb and Previous/Next
-all come from docs-index. On this page (its h2/h3 sections, the one being
-read marked) sits beside the page on wide screens; on smaller ones a bar
-under the top bar names the section being read. Either way, the top bar's
-Contents button (and that bar) open the Contents sheet: this page's
-sections, then every page. Only the page's content (data-pagefind-body) goes
-into the search index. -->
+all come from docs-index. On a guide or reference page, On this page (its
+h2/h3 sections, the one being read marked) sits beside the page on wide
+screens; on smaller ones a bar under the top bar names the section being
+read. The index has every page beside it instead, and no bar. Either way,
+the top bar's Contents button (and that bar) open the Contents sheet: a
+page's sections, then every page. Only the page's content
+(data-pagefind-body) goes into the search index. -->
 
 <script lang="ts">
   import { page } from '$app/state';
@@ -142,7 +143,7 @@ into the search index. -->
       <main
         class="mx-auto flex w-full max-w-(--breakpoint-md) min-w-0 flex-col gap-6 pt-2"
         style:--section-scroll-margin="{topBarHeight + sectionBarHeight + 16}px"
-        {@attach trackSections()}
+        {@attach current ? trackSections() : undefined}
       >
         {#if current}
           <header class="flex flex-col gap-2" data-on-this-page-ignore>
@@ -207,7 +208,11 @@ into the search index. -->
         style:top="{topBarHeight + 8}px"
         style:max-height="calc(100dvh - {topBarHeight + 16}px)"
       >
-        <OnThisPage />
+        {#if current}
+          <OnThisPage />
+        {:else}
+          <DocsNav />
+        {/if}
       </aside>
     </div>
   {/snippet}
