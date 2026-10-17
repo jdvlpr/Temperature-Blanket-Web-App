@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import GalleryPageEdit from '#lib/components/account/GalleryPageEdit.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
+  import { GlobeIcon } from '@lucide/svelte';
   import type { Component, Snippet } from 'svelte';
 
   interface Props {
@@ -94,7 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col gap-0.5 empty:hidden">
     {#if sharedOn || details}
       <p class={META_LINE}>
-        {#if sharedOn}<span>Published {sharedOn}</span>{/if}
+        {#if sharedOn}<span class="inline-flex items-center gap-1"
+            ><GlobeIcon class="icon-sm" aria-hidden="true" />Published {sharedOn}</span
+          >{/if}
         {#if updatedOn}<span>Updated {updatedOn}</span>{/if}
         {@render details?.()}
       </p>

@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   viewed.
 -->
 <script lang="ts">
+  import { GlobeIcon } from '@lucide/svelte';
   import ViewCount from '#lib/components/ViewCount.svelte';
 
   interface Props {
@@ -43,7 +44,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if dateLine}
-  <span class="text-surface-700-300 line-clamp-1 text-xs">{dateLine}</span>
+  <span class="text-surface-700-300 flex items-center gap-1 text-xs">
+    <GlobeIcon class="icon-sm shrink-0" aria-hidden="true" />
+    <span class="truncate">{dateLine}</span>
+  </span>
 {/if}
 {#if author || views}
   <span class="text-surface-700-300 block overflow-hidden text-xs">

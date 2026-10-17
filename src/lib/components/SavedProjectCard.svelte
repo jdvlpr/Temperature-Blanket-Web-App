@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A saved project on My Projects, as the gallery's project card: its picture
   (taken when the planner saved it; while one is being drawn, a placeholder;
   if it can't be, its colors), its name, its info (see LibraryInfoLine)
-  and a flat ⋮ menu: Rename, Create a Copy, its share rows (`shareRows`: Copy
-  Link, its gallery page, Ravelry), Move to Trash. Tapping it opens it in the
-  planner.
+  and a flat ⋮ menu: Edit in Project Planner, Duplicate, its share rows
+  (`shareRows`: a Gallery Page group, Ravelry), Move to Trash. Tapping it opens
+  it in the planner. It's renamed there (or in its Edit Gallery Page dialog).
 -->
 <script lang="ts">
   import LibraryInfoLine from '#lib/components/LibraryInfoLine.svelte';
@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     coverClasses,
     imageClasses,
   } from '#lib/components/GalleryProjectCard.svelte';
-  import NameField from '#lib/components/NameField.svelte';
   import MoreMenu, {
     type MoreMenuItem,
   } from '#lib/components/buttons/MoreMenu.svelte';
@@ -38,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
-  import { CopyIcon, PencilIcon, Trash2Icon } from '@lucide/svelte';
+  import { CopyIcon, NotebookPenIcon, Trash2Icon } from '@lucide/svelte';
 
   type Props = {
     item: StoredProjectIndexItem;
@@ -50,12 +49,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     layout?: 'grid' | 'list';
     /** Where it's kept, e.g. "Synced" (see $lib/sync) */
     syncLabel?: SyncLabel;
-    /** Called with the new name ('' clears it) */
-    onrename: (name: string) => void;
     onremove: () => void;
-    /** Create a Copy: saves it again as a new project */
+    /** Duplicate: saves it again as a new project */
     oncopy: () => void;
-    /** Copy Link, its gallery page and Ravelry rows, in its ⋮ menu */
+    /** Its gallery page and Ravelry rows, in its ⋮ menu */
     shareRows?: MoreMenuItem[];
     /** When its gallery page was published; none, not published */
     publishedAt?: number | null;
@@ -73,7 +70,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pictureSettled = false,
     layout = 'grid',
     syncLabel,
-    onrename,
     onremove,
     oncopy,
     shareRows = [],
@@ -114,20 +110,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }`;
   });
 
-  // Renamed or copied, shared, or moved to the Trash: flat, in groups
+  // Edited or duplicated, shared, or moved to the Trash: flat, in groups
   let menu = $derived<MoreMenuItem[]>([
     {
-      value: 'rename',
-      label: 'Rename',
-      icon: PencilIcon,
-      onselect: () => {
-        editingName = item.meta.name ?? '';
-        editing = true;
-      },
+      value: 'edit',
+      label: 'Edit in Project Planner',
+      icon: NotebookPenIcon,
+      href,
+      reload: true,
     },
     {
       value: 'copy',
-      label: 'Create a Copy',
+      label: 'Duplicate Project',
       icon: CopyIcon,
       onselect: oncopy,
     },
@@ -140,9 +134,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       separate: true,
     },
   ]);
-
-  let editing = $state(false);
-  let editingName = $state('');
 </script>
 
 <div class="w-full">
@@ -159,50 +150,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/snippet}
     {#snippet nameRow()}
-      {#if editing}
-        <div class="w-full text-left">
-          <NameField
-            bind:value={editingName}
-            placeholder={item.meta.title}
-            onsave={() => {
-              editing = false;
-              onrename(editingName);
-            }}
-            oncancel={() => (editing = false)}
-          />
-        </div>
-      {:else}
-        <div class="flex w-full items-start gap-1 text-left">
-          <div class="flex min-w-0 grow flex-col">
-            <span class="flex items-start gap-1">
-              {#if syncLabel}
-                <span class="mt-0.5"><SyncIcon label={syncLabel} /></span>
-              {/if}
-              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved above, or a project link -->
-              <a
-                {href}
-                data-sveltekit-reload
-                title={linkTitle}
-                class="line-clamp-2 min-w-0 text-sm font-semibold break-words"
-                >{label}</a
-              >
-            </span>
-            <LibraryInfoLine
-              saved={savedOn}
-              {publishedAt}
-              {views}
-              {changed}
-              {ravelryPhotos}
-            />
-            {#if syncLabel?.tone === 'error'}
-              <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
+      <div class="flex w-full items-start gap-1 text-left">
+        <div class="flex min-w-0 grow flex-col">
+          <span class="flex items-start gap-1">
+            {#if syncLabel}
+              <span class="mt-0.5"><SyncIcon label={syncLabel} /></span>
             {/if}
-          </div>
-          {#if menu.length}
-            <MoreMenu items={menu} label="More for {label}" />
+            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved above, or a project link -->
+            <a
+              {href}
+              data-sveltekit-reload
+              title={linkTitle}
+              class="line-clamp-2 min-w-0 text-sm font-semibold break-words"
+              >{label}</a
+            >
+          </span>
+          <LibraryInfoLine
+            saved={savedOn}
+            {publishedAt}
+            {views}
+            {changed}
+            {ravelryPhotos}
+          />
+          {#if syncLabel?.tone === 'error'}
+            <span class="text-error-700-300 text-xs">{syncLabel.text}</span>
           {/if}
         </div>
-      {/if}
+        {#if menu.length}
+          <MoreMenu items={menu} label="More for {label}" />
+        {/if}
+      </div>
     {/snippet}
   </GalleryProjectCard>
 </div>

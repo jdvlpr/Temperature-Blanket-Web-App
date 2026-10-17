@@ -14,13 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { CARD_BOX, PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
-  import NameField from '#lib/components/NameField.svelte';
   import PaletteCard from '#lib/components/PaletteCard.svelte';
-  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import PlaceholderPalettes from '#lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
@@ -46,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     matchesYarn,
     sortLibrary,
   } from '#lib/utils/collection-filter.js';
-  import { CopyIcon, PencilIcon, Trash2Icon, XIcon } from '@lucide/svelte';
+  import { CopyIcon, SwatchBookIcon, Trash2Icon, XIcon } from '@lucide/svelte';
   import MoreMenu, {
     type MoreMenuItem,
   } from '#lib/components/buttons/MoreMenu.svelte';
@@ -55,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // With updateGauge (Get Colors' My Palettes), choosing a palette uses it, and that's
   // all a card does; without it (My Library), each palette is a link to the
-  // Yarn Palette Creator, with Rename, Copy and Trash in its menu
+  // Yarn Palette Creator, with Edit, Duplicate and Trash in its menu
   // With gallery (My Library), each palette's info line says whether it's
   // published, and its menu has its share rows
   // With filters (My Library), only what matches shows, sorted as chosen;
@@ -90,8 +88,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
   let yarnDataReady = $state(false);
-  let editingId = $state<string | null>(null);
-  let editingName = $state('');
   // Undos live in the list, since the dialog is modal and a toast button behind
   // it can't be clicked: each where its palette was, so it's right there
   const undos = new TrashUndos();
@@ -176,21 +172,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       toast.trigger({ message: errorMessage, category: 'error' });
     }
     await savedPalettes.refresh();
-  }
-
-  function startRename(palette: SavedPalette) {
-    editingId = palette.id;
-    editingName = palette.name;
-  }
-
-  async function saveRename() {
-    if (!editingId) return;
-    const id = editingId;
-    editingId = null;
-    await run(
-      () => PaletteStorage.rename(id, editingName),
-      'Unable to rename the palette',
-    );
   }
 
   async function copy(palette: SavedPalette, label: string) {
@@ -324,20 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {@const { palette, colors, label } = card}
         {@render undoAt(card.key, true)}
         <li class="flex w-full min-w-0" {@attach slots.track(card.key)}>
-          {#if editingId === palette.id}
-            <!-- In its card still, so the grid doesn't shift -->
-            <div class={[CARD_BOX, 'flex w-full flex-col gap-2']}>
-              <PaletteStrip {colors} corners="nested" />
-              <NameField
-                bind:value={editingName}
-                label="Palette name"
-                maxlength={MAX_SAVED_PALETTE_NAME_LENGTH}
-                placeholder={getPaletteFallbackName(colors)}
-                onsave={saveRename}
-                oncancel={() => (editingId = null)}
-              />
-            </div>
-          {:else if updateGauge}
+          {#if updateGauge}
             <!-- Get Colors' My Palettes: just for choosing one -->
             <PaletteCard
               {colors}
@@ -394,14 +362,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   label="More for {label}"
                   items={[
                     {
-                      value: 'rename',
-                      label: 'Rename',
-                      icon: PencilIcon,
-                      onselect: () => startRename(palette),
+                      value: 'edit',
+                      label: 'Edit in Yarn Palette Creator',
+                      icon: SwatchBookIcon,
+                      href: linkFor(colors, palette.name),
                     },
                     {
                       value: 'copy',
-                      label: 'Create a Copy',
+                      label: 'Duplicate Yarn Palette',
                       icon: CopyIcon,
                       onselect: () => copy(palette, label),
                     },

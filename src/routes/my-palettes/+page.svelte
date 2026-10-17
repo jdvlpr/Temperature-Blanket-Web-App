@@ -46,7 +46,6 @@ and sort once there are a few. -->
   import {
     colorsToPaletteCode,
     getColorsFromInput,
-    getYarnPageURL,
   } from '#lib/utils/color-utils.js';
   import { libraryFilters } from '#lib/state/library-filters.svelte.js';
   import type { SavedPalette } from '#lib/storage/palettes.svelte.js';
@@ -123,10 +122,6 @@ and sort once there are a few. -->
       rows: shareRows({
         kind: 'palette',
         id: palette.id,
-        link: getYarnPageURL({
-          colors,
-          origin: browser ? location.origin : PUBLIC_BASE_URL,
-        }),
         changed,
         signInHref: signInHref(appPage.url),
         onpublish: () => sharePalette(palette, colors, label),

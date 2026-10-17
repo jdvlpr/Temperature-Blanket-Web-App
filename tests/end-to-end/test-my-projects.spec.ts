@@ -31,7 +31,7 @@ async function seedProject(page: Page, title: string) {
   }, title);
 }
 
-/** A card's ⋮ menu › an item, e.g. Rename or Move to Trash */
+/** A card's ⋮ menu › an item, e.g. Duplicate or Move to Trash */
 async function cardMenu(page: Page, name: string, item: string) {
   await page.getByRole('button', { name: `More for ${name}` }).click();
   await page.getByRole('menuitem', { name: item }).click();
@@ -115,43 +115,52 @@ test.describe('My Projects', () => {
     await expect(paletteLink.getByRole('button')).toHaveCount(0);
     await page.goto('/my-projects');
 
-    // Name the project: the name shows instead of its location title
-    await cardMenu(page, 'Test Town, 2024', 'Rename');
-    await page.getByLabel('Project name').fill('Gift Blanket');
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
-    const named = page.getByRole('link', { name: 'Gift Blanket' });
-    await expect(named).toBeVisible();
-    await page.reload();
+    // Edit opens it in the planner (a full page load, like its link)
+    await page
+      .getByRole('button', { name: 'More for Test Town, 2024' })
+      .click();
+    await expect(
+      page.getByRole('menuitem', { name: 'Edit in Project Planner' }),
+    ).toHaveAttribute('data-sveltekit-reload');
+    // Renaming is in the planner, not the menu
+    await expect(page.getByRole('menuitem', { name: 'Rename' })).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await expect(
+      page.getByRole('menuitem', { name: 'Edit in Project Planner' }),
+    ).toBeHidden();
+    const named = page.getByRole('link', { name: 'Test Town, 2024' });
     await expect(named).toBeVisible();
 
     // Move to the Trash, then undo
-    await moveToTrash(page, 'Gift Blanket');
+    await moveToTrash(page, 'Test Town, 2024');
     await expect(named).toHaveCount(0);
     await expect(page.getByRole('status')).toContainText(
-      'Moved Gift Blanket to the Trash',
+      'Moved Test Town, 2024 to the Trash',
     );
     await page.getByRole('button', { name: 'Undo' }).click();
     await expect(named).toBeVisible();
 
     // Move to the Trash, then restore it from the Trash dialog
-    await moveToTrash(page, 'Gift Blanket');
+    await moveToTrash(page, 'Test Town, 2024');
     await expect(page.getByText('No saved projects yet')).toBeVisible();
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     let trash = page.getByRole('dialog');
     await expect(trash.getByRole('list', { name: 'Trash' })).toContainText(
-      'Gift Blanket',
+      'Test Town, 2024',
     );
-    await trash.getByRole('button', { name: 'Restore Gift Blanket' }).click();
+    await trash
+      .getByRole('button', { name: 'Restore Test Town, 2024' })
+      .click();
     await expect(trash.getByText('The Trash is empty')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(named).toBeVisible();
 
     // Delete it forever, after confirming
-    await moveToTrash(page, 'Gift Blanket');
+    await moveToTrash(page, 'Test Town, 2024');
     await page.getByRole('button', { name: 'Trash (1)' }).click();
     trash = page.getByRole('dialog');
     await trash
-      .getByRole('button', { name: 'Delete Gift Blanket forever' })
+      .getByRole('button', { name: 'Delete Test Town, 2024 forever' })
       .click();
     await trash.getByRole('button', { name: 'Yes, Delete Forever' }).click();
     await expect(trash.getByText('The Trash is empty')).toBeVisible();

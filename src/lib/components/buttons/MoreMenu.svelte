@@ -16,6 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A card's "more" menu (⋮), as a colorway's: items that act, or links (on this
   site, or in a new tab), with a separator before any item marked `separate`.
+  An item with a `heading` starts a labeled group (after a separator), which
+  runs to the next item with a `heading` or `separate`.
   An item can say more on a second line (`detail`) or be shown but not
   chosen (`disabled`, with its `detail` saying why). With `children`, the
   button shows those instead of ⋮ (the preview's Share button).
@@ -36,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onselect?: () => void;
     /** A line before it */
     separate?: boolean;
+    /** Starts a group with this label (e.g. "Gallery Page"), after a line */
+    heading?: string;
     /** A second line under the label */
     detail?: string;
     /** The second line warns (in the out-of-sync icon's color), e.g. "Changed since publishing" */
@@ -79,6 +83,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title = 'More',
     onopen,
   }: Props = $props();
+
+  // Runs of items: a new one at each `separate` or `heading` (not the first)
+  let groups = $derived.by(() => {
+    const groups: { heading?: string; items: MoreMenuItem[] }[] = [];
+    for (const item of items) {
+      if (!groups.length || item.separate || item.heading)
+        groups.push({ heading: item.heading, items: [] });
+      groups.at(-1)!.items.push(item);
+    }
+    return groups;
+  });
 </script>
 
 {#snippet text(item: MoreMenuItem)}
@@ -95,6 +110,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {:else}
     <span>{item.label}</span>
   {/if}
+{/snippet}
+
+{#snippet row(item: MoreMenuItem)}
+  <!-- Not Zag's `disabled`, which arrow keys skip: aria-disabled,
+          and choosing it leaves the menu open -->
+  <Menu.Item
+    value={item.value}
+    class={menuItemClass}
+    closeOnSelect={!item.disabled}
+  >
+    {#snippet element(attributes)}
+      {#if item.href && !item.disabled}
+        <!-- eslint-disable svelte/no-navigation-without-resolve -- callers resolve their links -->
+        <!-- The item's menu behavior, typed for its default div -->
+        <a
+          {...attributes as HTMLAnchorAttributes}
+          href={item.href}
+          target={item.newTab ? '_blank' : undefined}
+          rel={item.newTab ? 'noopener' : undefined}
+          data-sveltekit-reload={item.reload ? '' : undefined}
+          onclick={() => item.onselect?.()}
+        >
+          <item.icon class="shrink-0" aria-hidden="true" />
+          {@render text(item)}
+          {#if item.newTab}
+            <span class="sr-only">(opens in a new tab)</span>
+          {/if}
+        </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
+      {:else}
+        <div {...attributes} aria-disabled={item.disabled ? 'true' : undefined}>
+          <item.icon class="shrink-0" aria-hidden="true" />
+          {@render text(item)}
+        </div>
+      {/if}
+    {/snippet}
+  </Menu.Item>
 {/snippet}
 
 <Menu
@@ -126,45 +178,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Menu.Content
         class={[menuContentClass, items.some((item) => item.detail) && 'w-72']}
       >
-        {#each items as item (item.value)}
-          {#if item.separate}<Menu.Separator />{/if}
-          <!-- Not Zag's `disabled`, which arrow keys skip: aria-disabled,
-          and choosing it leaves the menu open -->
-          <Menu.Item
-            value={item.value}
-            class={menuItemClass}
-            closeOnSelect={!item.disabled}
-          >
-            {#snippet element(attributes)}
-              {#if item.href && !item.disabled}
-                <!-- eslint-disable svelte/no-navigation-without-resolve -- callers resolve their links -->
-                <!-- The item's menu behavior, typed for its default div -->
-                <a
-                  {...attributes as HTMLAnchorAttributes}
-                  href={item.href}
-                  target={item.newTab ? '_blank' : undefined}
-                  rel={item.newTab ? 'noopener' : undefined}
-                  data-sveltekit-reload={item.reload ? '' : undefined}
-                  onclick={() => item.onselect?.()}
-                >
-                  <item.icon class="shrink-0" aria-hidden="true" />
-                  {@render text(item)}
-                  {#if item.newTab}
-                    <span class="sr-only">(opens in a new tab)</span>
-                  {/if}
-                </a>
-                <!-- eslint-enable svelte/no-navigation-without-resolve -->
-              {:else}
-                <div
-                  {...attributes}
-                  aria-disabled={item.disabled ? 'true' : undefined}
-                >
-                  <item.icon class="shrink-0" aria-hidden="true" />
-                  {@render text(item)}
-                </div>
-              {/if}
-            {/snippet}
-          </Menu.Item>
+        {#each groups as group, i (group.items[0].value)}
+          {#if i > 0}<Menu.Separator />{/if}
+          {#if group.heading}
+            <Menu.ItemGroup>
+              <Menu.ItemGroupLabel
+                class="text-surface-700-300 px-2 py-1 text-xs"
+                >{group.heading}</Menu.ItemGroupLabel
+              >
+              {#each group.items as item (item.value)}
+                {@render row(item)}
+              {/each}
+            </Menu.ItemGroup>
+          {:else}
+            {#each group.items as item (item.value)}
+              {@render row(item)}
+            {/each}
+          {/if}
         {/each}
       </Menu.Content>
     </Menu.Positioner>

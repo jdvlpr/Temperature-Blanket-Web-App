@@ -93,7 +93,7 @@ test.describe('Yarn Palette Creator history and autosave', () => {
     const list = page.getByRole('list', { name: 'Saved palettes' });
     await expect(list.getByRole('listitem')).toHaveCount(1);
     await list.getByRole('button', { name: 'More for 3 colors' }).click();
-    await page.getByRole('menuitem', { name: /^Create a Copy/ }).click();
+    await page.getByRole('menuitem', { name: /^Duplicate/ }).click();
     await expect(list.getByRole('listitem')).toHaveCount(2);
     const open = (name: string) =>
       list.getByRole('link', {

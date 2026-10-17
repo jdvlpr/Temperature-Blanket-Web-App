@@ -105,7 +105,7 @@ export function closePalette() {
 
 /**
  * Opens the saved palette with these colors, if there is one. A copy (My
- * Library's Create a Copy) has the same colors under another name, so the one
+ * Library’s Duplicate) has the same colors under another name, so the one
  * with the link's name is the one opened.
  */
 export async function openMatchingPalette(name: string) {

@@ -16,7 +16,8 @@
 // A project's or palette's share rows, the same wherever they show (a My
 // Library card's ⋮, the planner's Project menu, the preview's Share menu and
 // the Yarn page's Palette menu): Copy Link, then its one gallery page by
-// state, then a project's Ravelry project. Call it inside $derived, so the
+// state (under a Gallery Page heading), then a project's Ravelry project.
+// Unpublish is in the Edit dialog. Call it inside $derived, so the
 // rows follow the account, its gallery pages and Ravelry links.
 
 import { resolve } from '$app/paths';
@@ -25,15 +26,12 @@ import type { GalleryPage } from '#lib/accounts/gallery.js';
 import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
 import { account } from '#lib/accounts/summary.svelte.js';
 import type { MoreMenuItem } from '#lib/components/buttons/MoreMenu.svelte';
-import UnpublishDialog from '#lib/components/modals/UnpublishDialog.svelte';
-import { dialog } from '#lib/state/page-state.svelte.js';
 import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
 import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
 import { inAccount } from '#lib/utils/open-ravelry.js';
 import { pluralize } from '#lib/utils/string-utils.js';
 import {
   ExternalLinkIcon,
-  EyeOffIcon,
   GlobeIcon,
   LinkIcon,
   LogInIcon,
@@ -99,6 +97,7 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
 
   const publish = (detail?: string, disabled = false): MoreMenuItem => ({
     value: 'publish',
+    heading: 'Gallery Page',
     label: disabled ? 'Publish to Gallery' : 'Publish to Gallery…',
     detail,
     icon: SendIcon,
@@ -109,6 +108,7 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
   if (!account.summary?.id) {
     rows.push({
       value: 'sign-in',
+      heading: 'Gallery Page',
       label: 'Sign In to Publish',
       icon: LogInIcon,
       href: signInHref ?? resolve('/auth/sign-in'),
@@ -140,6 +140,7 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
     rows.push(
       {
         value: 'view-page',
+        heading: 'Gallery Page',
         label: 'View Gallery Page',
         icon: GlobeIcon,
         href: galleryPageHref(page),
@@ -154,25 +155,6 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
         disabled: !onedit,
         onselect: () => onedit?.(page),
       },
-      {
-        value: 'unpublish',
-        label: 'Unpublish…',
-        icon: EyeOffIcon,
-        onselect: () =>
-          dialog.trigger({
-            type: 'component',
-            component: {
-              ref: UnpublishDialog,
-              props: {
-                kind,
-                postId: page.postId,
-                title: page.title,
-                onRavelry: !!ravelry,
-              },
-            },
-            options: { title: 'Unpublish' },
-          }),
-      },
     );
   }
 
@@ -186,6 +168,7 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
       icon: ExternalLinkIcon,
       href: ravelry.url,
       newTab: true,
+      separate: true,
     });
 
   return rows;

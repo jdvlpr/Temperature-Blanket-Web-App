@@ -40,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import type { GalleryRequest } from '#lib/utils/gallery-request.js';
   import { openGalleryDialog } from '#lib/utils/open-saved-project.js';
-  import { withProjectName } from '#lib/utils/project-name-link.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
@@ -138,13 +137,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }, 'Unable to copy the project');
     await loadProjects();
-  }
-
-  async function rename(id: string, name: string) {
-    await run(
-      () => ProjectStorage.rename(id, name),
-      'Unable to rename the project',
-    );
   }
 
   // Signed in: show where each project is kept
@@ -326,7 +318,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     syncLabel={__ACCOUNTS_ENABLED__
       ? syncLabelFor(project, signedIn)
       : undefined}
-    onrename={(name) => rename(project.id, name)}
     onremove={() => remove(project)}
     oncopy={() => copy(project)}
     publishedAt={page?.publishedAt ?? null}
@@ -336,11 +327,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     shareRows={shareRows({
       kind: 'project',
       id: project.id,
-      link: withProjectName(
-        project.meta.href,
-        project.meta.name,
-        project.meta.title,
-      ),
       changed: changedSince(project),
       signInHref: signInHref(appPage.url),
       item: signedIn ? project : undefined,

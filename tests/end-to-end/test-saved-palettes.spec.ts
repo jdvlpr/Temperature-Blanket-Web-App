@@ -14,7 +14,7 @@ test.describe('Saved palettes', () => {
     ).toBeVisible();
   });
 
-  test('save, reload, rename, delete with undo, and use a palette', async ({
+  test('save, reload, delete with undo, and use a palette', async ({
     page,
   }) => {
     // Save with a name, from the Palette menu
@@ -38,22 +38,27 @@ test.describe('Saved palettes', () => {
       .click();
     await expect(page.getByText('This palette is already saved')).toBeVisible();
 
-    // It survives a reload, and is renamed and trashed on My Palettes
+    // It survives a reload, and is edited and trashed on My Palettes
     await page.goto('/my-palettes');
     let list = page.getByRole('list', { name: 'Saved palettes' });
     await expect(list.getByRole('listitem')).toHaveCount(1);
     await list.getByRole('button', { name: 'More for Test Sunset' }).click();
-    await page.getByRole('menuitem', { name: 'Rename' }).click();
-    await list.getByLabel('Palette name').fill('Test Dusk');
-    await list.getByRole('button', { name: 'Save', exact: true }).click();
-    await expect(list.getByText('Test Dusk')).toBeVisible();
+    await expect(
+      page.getByRole('menuitem', { name: 'Edit in Yarn Palette Creator' }),
+    ).toHaveAttribute('href', /\/yarn\?s=/);
+    await expect(page.getByRole('menuitem', { name: 'Rename' })).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await expect(
+      page.getByRole('menuitem', { name: 'Edit in Yarn Palette Creator' }),
+    ).toBeHidden();
+    await expect(list.getByText('Test Sunset')).toBeVisible();
 
     // Delete, then undo
-    await list.getByRole('button', { name: 'More for Test Dusk' }).click();
+    await list.getByRole('button', { name: 'More for Test Sunset' }).click();
     await page.getByRole('menuitem', { name: 'Move to Trash' }).click();
     await expect(page.getByText('No saved palettes yet')).toBeVisible();
     await page.getByRole('button', { name: 'Undo' }).click();
-    await expect(list.getByText('Test Dusk')).toBeVisible();
+    await expect(list.getByText('Test Sunset')).toBeVisible();
 
     // Recent Palettes in the Palette menu opens it here, in place
     await page.goto('/yarn');
@@ -64,7 +69,7 @@ test.describe('Saved palettes', () => {
     );
     await paletteButton.click();
     const menu = page.getByRole('dialog', { name: 'Palette' });
-    await menu.getByRole('button', { name: 'Test Dusk' }).click();
+    await menu.getByRole('button', { name: 'Test Sunset' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(paletteButton).toHaveAttribute(
       'data-save-status',
@@ -74,7 +79,9 @@ test.describe('Saved palettes', () => {
     // Move to Trash starts a new palette; Undo brings it back here
     await paletteButton.click();
     await page.getByTestId('trash-palette').click();
-    await expect(page.getByText('Moved Test Dusk to the Trash')).toBeVisible();
+    await expect(
+      page.getByText('Moved Test Sunset to the Trash'),
+    ).toBeVisible();
     await expect(paletteButton).toHaveAttribute(
       'data-save-status',
       'Not saved',

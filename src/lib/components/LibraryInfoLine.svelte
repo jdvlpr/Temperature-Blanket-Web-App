@@ -15,17 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Under a My Library card's name, in the same order as a gallery card and
-  page: published, "Published <date>" with Ravelry's mark beside it when it's
-  on Ravelry, then a line with its views and a warning ⟳ (the out-of-sync
-  icon's color) when it changed since its page was published or updated. Not published:
-  "Saved <date>". The marks aren't buttons: each says what it means to screen
-  readers and on hover.
+  page: published, Ravelry's mark when it's on Ravelry and a warning ⟳ (the
+  out-of-sync icon's color) when it changed since its page was published or
+  updated, then a globe and "Published <date>", then a line with its views.
+  Not published: "Saved <date>". The marks aren't buttons: each says what it
+  means to screen readers and on hover.
 -->
 <script lang="ts">
   import RavelryMark from '#lib/components/RavelryMark.svelte';
   import ViewCount from '#lib/components/ViewCount.svelte';
   import { pluralize } from '#lib/utils/string-utils.js';
-  import { RefreshCwIcon } from '@lucide/svelte';
+  import { GlobeIcon, RefreshCwIcon } from '@lucide/svelte';
 
   interface Props {
     /** When it was saved, e.g. "Saved Oct 3, 2026" (shown when not published) */
@@ -63,25 +63,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <span class="text-surface-700-300 flex min-w-0 items-center text-xs">
-  <span class="truncate">{publishedOn || saved}</span>
   {#if publishedOn && ravelryLabel}
     <span class="flex shrink-0" title={ravelryLabel}>
       <RavelryMark />
       <span class="sr-only">{ravelryLabel}</span>
     </span>
   {/if}
+  {#if publishedOn && changed}
+    <span class="text-warning-700-300 mr-1 flex shrink-0" title={CHANGED}>
+      <RefreshCwIcon class="icon-sm" aria-hidden="true" />
+      <span class="sr-only">{CHANGED}</span>
+    </span>
+  {/if}
+  {#if publishedOn}
+    <GlobeIcon class="icon-sm mr-1 shrink-0" aria-hidden="true" />
+  {/if}
+  <span class="truncate">{publishedOn || saved}</span>
 </span>
-{#if publishedOn && (views || changed)}
+{#if publishedOn && views}
   <span class="text-surface-700-300 flex min-w-0 items-center text-xs">
-    {#if views}<span class="truncate"><ViewCount {views} /></span>{/if}
-    {#if changed}
-      <span
-        class={['text-warning-700-300 flex shrink-0', views && 'ml-1']}
-        title={CHANGED}
-      >
-        <RefreshCwIcon class="icon-sm" aria-hidden="true" />
-        <span class="sr-only">{CHANGED}</span>
-      </span>
-    {/if}
+    <span class="truncate"><ViewCount {views} /></span>
   </span>
 {/if}

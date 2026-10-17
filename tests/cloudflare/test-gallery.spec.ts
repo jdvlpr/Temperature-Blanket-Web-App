@@ -401,10 +401,14 @@ test.describe('Gallery pages from accounts', () => {
 
     await more.click();
     const menu = page.getByRole('menu');
-    // Flat: the link first (a copy anyone can open), then its page
+    // Flat, its page under a heading: no link to copy (the page is the way
+    // to share it), and Unpublish is in Edit Gallery Page
+    await expect(
+      menu.getByRole('group', { name: 'Gallery Page' }),
+    ).toBeVisible();
     await expect(
       menu.getByRole('menuitem', { name: /^Copy Link/ }),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await expect(
       menu.getByRole('menuitem', { name: /^View Gallery Page/ }),
     ).toHaveAttribute('href', `/gallery/${postId}`);
@@ -416,7 +420,7 @@ test.describe('Gallery pages from accounts', () => {
     ).toHaveCount(0);
     await expect(
       menu.getByRole('menuitem', { name: /^Unpublish/ }),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await page.keyboard.press('Escape');
     await expect(menu).toHaveCount(0);
 
@@ -896,9 +900,6 @@ test.describe('Gallery pages from accounts', () => {
 
     await page.getByRole('button', { name: `More for ${title}` }).click();
     const menu = page.getByRole('menu');
-    await expect(
-      menu.getByRole('menuitem', { name: /^Copy Link/ }),
-    ).toBeVisible();
     const signIn = menu.getByRole('menuitem', { name: /^Sign In to Publish/ });
     await expect(signIn).toHaveAttribute('href', /^\/auth\/sign-in/);
     await expect(
