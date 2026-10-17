@@ -151,7 +151,9 @@ open in the panel, with a Back button to it. -->
       leaveOnPurpose();
       window.location.assign(href);
     };
-    if (!unsavedWork()) {
+    // One never saved asks too, even unchanged: its location and weather
+    // would be gone
+    if (!unsavedWork() && !(hasProject && !autosave.stored)) {
       go();
       return;
     }

@@ -26,9 +26,9 @@ menu's: a short note on making a palette -->
   </p>
 
   <p class="text-center">
-    Add colors with <strong>Get Colors</strong>: from a photo, a gradient, or
-    yarn you search for. Drag to reorder; tap a color to change it or find a
-    close yarn.
+    Add colors with <strong>Get Colors</strong>: choose yarn colorways, pick
+    them from an image, start from a preset gradient or random colors, or paste
+    color codes. Drag colors to reorder them; tap one to change it.
   </p>
 
   <p class="text-center">
