@@ -14,23 +14,24 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  A My Library card's one info line, under its name, as a gallery card's is.
-  Published: "Published · 12 views", then a muted yarn mark when it's on
-  Ravelry, then a warning ⟳ when it changed since its page was published or
-  updated. Not published: "Saved <date>". The marks aren't buttons: each says
-  what it means to screen readers and on hover.
+  Under a My Library card's name, in the same order as a gallery card and
+  page: published, "Published <date>" with Ravelry's mark beside it when it's
+  on Ravelry, then a line with its views and a warning ⟳ (the out-of-sync
+  icon's color) when it changed since its page was published or updated. Not published:
+  "Saved <date>". The marks aren't buttons: each says what it means to screen
+  readers and on hover.
 -->
 <script lang="ts">
+  import RavelryMark from '#lib/components/RavelryMark.svelte';
   import ViewCount from '#lib/components/ViewCount.svelte';
   import { pluralize } from '#lib/utils/string-utils.js';
-  import { yarnBall } from '@lucide/lab';
-  import { Icon, RefreshCwIcon } from '@lucide/svelte';
+  import { RefreshCwIcon } from '@lucide/svelte';
 
   interface Props {
     /** When it was saved, e.g. "Saved Oct 3, 2026" (shown when not published) */
     saved: string;
-    /** It has a gallery page */
-    published?: boolean;
+    /** When its gallery page was published; none, not published */
+    publishedAt?: number | null;
     /** Its gallery page's views, all time */
     views?: number | null;
     /** It changed after its page was published or updated */
@@ -41,12 +42,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     saved,
-    published = false,
+    publishedAt = null,
     views,
     changed = false,
     ravelryPhotos = null,
   }: Props = $props();
 
+  // As gallery cards and pages write it
+  let publishedOn = $derived(
+    publishedAt
+      ? `Published ${new Date(publishedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}`
+      : '',
+  );
   let ravelryLabel = $derived(
     ravelryPhotos === null
       ? ''
@@ -55,25 +62,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const CHANGED = 'Changed since publishing';
 </script>
 
-<span class="text-surface-700-300 flex min-w-0 items-center gap-1 text-xs">
-  {#if published}
-    <span class="truncate"
-      >Published{#if views}<span aria-hidden="true" class="mx-1">·</span
-        ><ViewCount {views} />{/if}</span
-    >
-    {#if ravelryLabel}
-      <span class="flex shrink-0 opacity-60" title={ravelryLabel}>
-        <Icon iconNode={yarnBall} class="icon-sm" aria-hidden="true" />
-        <span class="sr-only">{ravelryLabel}</span>
-      </span>
-    {/if}
+<span class="text-surface-700-300 flex min-w-0 items-center text-xs">
+  <span class="truncate">{publishedOn || saved}</span>
+  {#if publishedOn && ravelryLabel}
+    <span class="flex shrink-0" title={ravelryLabel}>
+      <RavelryMark />
+      <span class="sr-only">{ravelryLabel}</span>
+    </span>
+  {/if}
+</span>
+{#if publishedOn && (views || changed)}
+  <span class="text-surface-700-300 flex min-w-0 items-center text-xs">
+    {#if views}<span class="truncate"><ViewCount {views} /></span>{/if}
     {#if changed}
-      <span class="text-warning-700-300 flex shrink-0" title={CHANGED}>
+      <span
+        class={['text-warning-700-300 flex shrink-0', views && 'ml-1']}
+        title={CHANGED}
+      >
         <RefreshCwIcon class="icon-sm" aria-hidden="true" />
         <span class="sr-only">{CHANGED}</span>
       </span>
     {/if}
-  {:else}
-    <span class="truncate">{saved}</span>
-  {/if}
-</span>
+  </span>
+{/if}

@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onrename={(name) => rename(project.id, name)}
     onremove={() => remove(project)}
     oncopy={() => copy(project)}
-    published={!!page}
+    publishedAt={page?.publishedAt ?? null}
     views={page ? ownPageViews.of(page.postId) : null}
     changed={!!page && changedSince(project)(page)}
     ravelryPhotos={ravelry ? ravelry.photos.length : null}

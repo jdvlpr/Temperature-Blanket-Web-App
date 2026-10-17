@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A palette from the gallery, as a card. In the gallery (`mode="page"`)
   tapping it opens its gallery page. In the Yarn Palette Creator's Browse
-  Palettes (`mode="use"`) tapping it uses it (`onclick`). Either way its
-  info line says who by (when their name shows on its page) and its page's
+  Palettes (`mode="use"`) tapping it uses it (`onclick`). Either way it
+  says when it was published, then who by (when their name shows on its page) and its page's
   views. In the gallery its star (a palette page's) and ⋮ menu sit beside the
   name (see GalleryCardMenu). In a list
   (`layout="list"`) it lies down, the colors beside the name.

@@ -14,10 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  A gallery card's one info line, under its name: "By <name> · 1.2K views",
-  each part only when known (a name only for pages showing their owner, views
-  only once viewed). With neither, "Published <date>" instead; the date is on
-  the page itself. The name gives way (truncates) before the views do.
+  Under a gallery card's name, in the same order as everywhere a published
+  page is described (its gallery page, My Library's cards): "Published
+  <date>", then "By <name> · 1.2K views". That second line is one line when it
+  fits, else two, with no dot starting a line (each dot sits in the space the
+  row's negative margin hides, and screen readers skip them). Each part only
+  when known: a name only for pages showing their owner, views only once
+  viewed.
 -->
 <script lang="ts">
   import ViewCount from '#lib/components/ViewCount.svelte';
@@ -39,18 +42,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-{#if author || views}
-  <span class="text-surface-700-300 flex min-w-0 text-xs">
-    {#if author}
-      <span class="truncate">By {author}</span>
-    {/if}
-    {#if author && views}
-      <span aria-hidden="true" class="mx-1">·</span>
-    {/if}
-    {#if views}
-      <span class="whitespace-nowrap"><ViewCount {views} /></span>
-    {/if}
-  </span>
-{:else if dateLine}
+{#if dateLine}
   <span class="text-surface-700-300 line-clamp-1 text-xs">{dateLine}</span>
 {/if}
+{#if author || views}
+  <span class="text-surface-700-300 block overflow-hidden text-xs">
+    <span class="-ml-3 flex flex-wrap">
+      {#if author}
+        <span class="max-w-full truncate">{@render dot()}By {author}</span>
+      {/if}
+      {#if views}
+        <span class="whitespace-nowrap"
+          >{@render dot()}<ViewCount {views} /></span
+        >
+      {/if}
+    </span>
+  </span>
+{/if}
+
+{#snippet dot()}<span aria-hidden="true" class="inline-block w-3 text-center"
+    >·</span
+  >{/snippet}

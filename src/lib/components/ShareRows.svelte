@@ -31,7 +31,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span class="flex flex-1 flex-col">
     <span>{row.label}</span>
     {#if row.detail}
-      <span class="text-xs opacity-70">{row.detail}</span>
+      <span
+        class={['text-xs', row.warning ? 'text-warning-700-300' : 'opacity-70']}
+        >{row.detail}</span
+      >
     {/if}
   </span>
 {/snippet}

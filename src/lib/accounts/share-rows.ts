@@ -149,6 +149,7 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
         value: 'edit-page',
         label: 'Edit Gallery Page…',
         detail: changed?.(page) ? 'Changed since publishing' : undefined,
+        warning: true,
         icon: PencilIcon,
         disabled: !onedit,
         onselect: () => onedit?.(page),

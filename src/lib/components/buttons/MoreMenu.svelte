@@ -38,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     separate?: boolean;
     /** A second line under the label */
     detail?: string;
+    /** The second line warns (in the out-of-sync icon's color), e.g. "Changed since publishing" */
+    warning?: boolean;
     /** Shown, but does nothing (its `detail` says why). Still reached with
     the arrow keys, so screen readers say why */
     disabled?: boolean;
@@ -83,7 +85,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if item.detail}
     <span class="flex min-w-0 flex-col">
       <span>{item.label}</span>
-      <span class="text-surface-700-300 text-xs">{item.detail}</span>
+      <span
+        class={[
+          'text-xs',
+          item.warning ? 'text-warning-700-300' : 'text-surface-700-300',
+        ]}>{item.detail}</span
+      >
     </span>
   {:else}
     <span>{item.label}</span>

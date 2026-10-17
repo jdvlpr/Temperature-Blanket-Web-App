@@ -117,7 +117,7 @@ and sort once there are a few. -->
       : undefined;
     const changed = (p: GalleryPage) => paletteChanged(colors, label, p);
     return {
-      published: !!page,
+      publishedAt: page?.publishedAt ?? null,
       views: page ? ownPageViews.of(page.postId) : null,
       changed: !!page && changed(page),
       rows: shareRows({

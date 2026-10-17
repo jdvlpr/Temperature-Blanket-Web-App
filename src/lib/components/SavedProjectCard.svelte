@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A saved project on My Projects, as the gallery's project card: its picture
   (taken when the planner saved it; while one is being drawn, a placeholder;
-  if it can't be, its colors), its name, one info line (see LibraryInfoLine)
+  if it can't be, its colors), its name, its info (see LibraryInfoLine)
   and a flat ⋮ menu: Rename, Create a Copy, its share rows (`shareRows`: Copy
   Link, its gallery page, Ravelry), Move to Trash. Tapping it opens it in the
   planner.
@@ -57,8 +57,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     oncopy: () => void;
     /** Copy Link, its gallery page and Ravelry rows, in its ⋮ menu */
     shareRows?: MoreMenuItem[];
-    /** It has a gallery page */
-    published?: boolean;
+    /** When its gallery page was published; none, not published */
+    publishedAt?: number | null;
     /** Its gallery page's views */
     views?: number | null;
     /** It changed since its gallery page was published or updated */
@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onremove,
     oncopy,
     shareRows = [],
-    published = false,
+    publishedAt = null,
     views,
     changed = false,
     ravelryPhotos = null,
@@ -189,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </span>
             <LibraryInfoLine
               saved={savedOn}
-              {published}
+              {publishedAt}
               {views}
               {changed}
               {ravelryPhotos}

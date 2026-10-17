@@ -30,13 +30,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A project as a card (a raised box, as a palette's): its preview image (or a `cover` in its place), its name
-  (or its places and dates) and one info line (who by and its views, see
-  GalleryCardByline), all one link, as on My Library. In a grid or row it
+  (or its places and dates), when it was published, then who by and its
+  views (see GalleryCardByline), all one link, as on My Library. In a grid or row it
   stands up, the picture over the name; in a list it lies down, the picture
   beside the name.
   The gallery's cards add an `action` beside the name (star and ⋮, see
   GalleryCardMenu), outside the link; My Projects gives its own `nameRow`
-  (with its info line and ⋮ menu, outside the link).
+  (with its info and ⋮ menu, outside the link).
 -->
 <script lang="ts">
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';

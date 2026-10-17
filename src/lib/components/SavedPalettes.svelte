@@ -78,7 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }) => {
       /** Copy Link and its gallery page, in its ⋮ menu */
       rows: MoreMenuItem[];
-      published: boolean;
+      /** When its gallery page was published; none, not published */
+      publishedAt: number | null;
       views?: number | null;
       changed: boolean;
     };
@@ -383,7 +384,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     undefined,
                     { dateStyle: 'medium' },
                   )}"
-                  published={shared?.published}
+                  publishedAt={shared?.publishedAt}
                   views={shared?.views}
                   changed={shared?.changed}
                 />
