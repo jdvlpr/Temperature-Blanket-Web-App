@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Options can have a few words under them, as in the app's other menus.
   For a sort that stays chosen, unlike SortMenu, which reorders a palette once.
   `submenu` gives one sort its own choices (e.g. Popular's period), in a
-  submenu on its row. `compact` shows just the icon on phones.
+  submenu on its row. `compact` drops the "Sort:" on phones.
 -->
 <script lang="ts" generics="T extends string">
   import {
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       choices: readonly { value: string; label: string }[];
       onchoose: (value: string) => void;
     };
-    /** Just the icon on phones (the name is still read out) */
+    /** Just the sort's name on phones ("Sort:" is still read out) */
     compact?: boolean;
   }
 
@@ -119,15 +119,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? '-scale-y-100'
         : ''}"
     />
-    <span class={{ 'max-sm:sr-only': compact }}
-      >{label}: {currentLabel}{#if isReversed}<span class="sr-only"
+    <span
+      ><span class={{ 'max-sm:sr-only': compact }}>{label}: </span
+      >{currentLabel}{#if isReversed}<span class="sr-only"
           >, reversed</span
         >{/if}</span
     >
-    <ChevronDownIcon
-      class={['icon-sm', compact && 'max-sm:hidden']}
-      aria-hidden="true"
-    />
+    <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner class={drillPositionerClass}>

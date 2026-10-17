@@ -19,9 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   matches (the Gallery asks the server on `onchange`, My Library filters what's
   saved here). Search always shows; Show (`statuses`), Yarn, Pattern Type and
   `filters` sit behind the Filters button, open while any are on, and show as
-  removable chips while closed. Filters, Sort and View share one line, Sort
-  and View as icons on phones, so the panel always opens right below the
-  button. With `showFilters` off, only View and the page's actions show, for
+  removable chips while closed. Sort, View, then Filters last, so the panel
+  always opens right below the button, even when the row wraps on phones. With `showFilters` off, only View and the page's actions show, for
   short lists.
 -->
 <script lang="ts" generics="T extends string, S extends string = string">
@@ -214,14 +213,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ]}
   >
     <div class="flex flex-wrap items-center gap-2">
-      {#if showFilters && hasHidden}
-        <FiltersButton
-          bind:this={filtersButton}
-          bind:open
-          count={activeCount}
-          controls={panelId}
-        />
-      {/if}
       {#if showFilters}
         <SortSelectMenu
           options={sortOptions}
@@ -236,6 +227,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       {/if}
       <ViewMenu bind:value={layout} compact={showFilters} />
+      {#if showFilters && hasHidden}
+        <FiltersButton
+          bind:this={filtersButton}
+          bind:open
+          count={activeCount}
+          controls={panelId}
+        />
+      {/if}
     </div>
     {#if actions}
       <div class="flex flex-wrap items-center gap-2 max-md:order-first">

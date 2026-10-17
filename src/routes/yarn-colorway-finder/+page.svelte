@@ -379,12 +379,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             {/if}
             <div class="flex flex-wrap items-center justify-center gap-2">
-              <FiltersButton
-                bind:this={filtersButton}
-                bind:open={filtersOpen}
-                count={chips.length}
-                controls="finder-filters"
-              />
               {#if results.length}
                 <SortSelectMenu
                   options={colorwaySortOptions(!!yarnColorwayFinderState.hex)}
@@ -400,6 +394,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if results.length}
                 <ViewMenu bind:value={layout} fillOption compact />
               {/if}
+              <FiltersButton
+                bind:this={filtersButton}
+                bind:open={filtersOpen}
+                count={chips.length}
+                controls="finder-filters"
+              />
             </div>
 
             <div
