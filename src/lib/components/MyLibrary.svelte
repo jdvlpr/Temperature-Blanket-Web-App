@@ -39,7 +39,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
+  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
   import Trash from '#lib/components/Trash.svelte';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { savedPalettes } from '#lib/storage/palettes.svelte.js';
@@ -200,6 +202,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </h2>
     {@render children()}
   </section>
+
+  <!-- Gallery pages starred to find again: links, not copies -->
+  {#if browser && signedIn}
+    <StarredGalleryPages
+      kind={current === 'projects' ? 'project' : 'palette'}
+      layout={preferences.value.myProjectsLayout ?? 'grid'}
+    />
+  {/if}
 
   <!-- Out of the way, below the list, as rows like the Project menu's: whose
   name gallery pages show (it's changed in Profile settings), where those pages

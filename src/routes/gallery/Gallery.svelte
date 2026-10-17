@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
     fetchProjects,
@@ -267,7 +268,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
             author={galleryOwners.nameOf(databaseId)}
             {views}
             layout={galleryState.layout}
-          />
+          >
+            {#snippet action()}
+              <GalleryStarButton
+                postId={databaseId}
+                kind="project"
+                name={projectName
+                  ? decodeHtmlEntities(projectName)
+                  : getTitleTextFromLocationsMeta(locations)}
+              />
+            {/snippet}
+          </GalleryProjectCard>
         {/each}
       </div>
       {#if !galleryState.displayedProjects.length && !loading}

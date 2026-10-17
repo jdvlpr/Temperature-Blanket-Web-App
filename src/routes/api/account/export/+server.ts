@@ -29,15 +29,23 @@ export const GET: RequestHandler = async (event) => {
   if (account instanceof Response) return account;
 
   const headers = event.request.headers;
-  const [signInMethods, sessions, gallery, palettes, preferences, ravelry] =
-    await Promise.all([
-      account.auth.api.listUserAccounts({ headers }),
-      account.auth.api.listSessions({ headers }),
-      galleryPages(getPlatform()?.env?.DB, account.user.id, event.url.origin),
-      savedPalettes(getPlatform()?.env?.DB, account.user.id),
-      savedPreferences(getPlatform()?.env?.DB, account.user.id),
-      ravelryLinks(getPlatform()?.env?.DB, account.user.id),
-    ]);
+  const [
+    signInMethods,
+    sessions,
+    gallery,
+    stars,
+    palettes,
+    preferences,
+    ravelry,
+  ] = await Promise.all([
+    account.auth.api.listUserAccounts({ headers }),
+    account.auth.api.listSessions({ headers }),
+    galleryPages(getPlatform()?.env?.DB, account.user.id, event.url.origin),
+    galleryStars(getPlatform()?.env?.DB, account.user.id, event.url.origin),
+    savedPalettes(getPlatform()?.env?.DB, account.user.id),
+    savedPreferences(getPlatform()?.env?.DB, account.user.id),
+    ravelryLinks(getPlatform()?.env?.DB, account.user.id),
+  ]);
 
   const data = {
     exportedAt: new Date().toISOString(),
@@ -55,6 +63,7 @@ export const GET: RequestHandler = async (event) => {
       userAgent: session.userAgent,
     })),
     gallery,
+    stars,
     palettes,
     preferences,
     ravelry,
@@ -149,6 +158,30 @@ async function savedPreferences(db: D1Database | undefined, userId: string) {
     );
   } catch {
     // Not set up yet (migration 0008)
+    return null;
+  }
+}
+
+/** The gallery pages the account starred, newest first. */
+async function galleryStars(
+  db: D1Database | undefined,
+  userId: string,
+  origin: string,
+) {
+  if (!db) return null;
+  const { listStars } = await import('#lib/server/gallery/stars.js');
+  try {
+    return (await listStars(db, userId)).map((star) => ({
+      kind: star.kind,
+      url:
+        star.kind === 'palette'
+          ? `${origin}/gallery/palette/${star.postId}`
+          : `${origin}/gallery/${star.postId}`,
+      starredAt: new Date(star.createdAt).toISOString(),
+    }));
+  } catch (e) {
+    // Before migration 0015
+    console.error('Could not export gallery stars', e);
     return null;
   }
 }

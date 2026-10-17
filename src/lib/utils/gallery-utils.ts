@@ -143,9 +143,7 @@ export const fetchPaletteGallery = async ({
     });
     if (popular) {
       const nodes = await fetchNodesByIds<PaletteGalleryNode>(
-        `contentNodes(first: $first, where: { contentTypes: [TEMPBLANKET_PALETTE], in: $ids }) {
-          nodes { __typename ... on Palette { title databaseId yarnUrls date views } }
-        }`,
+        PALETTES_BY_IDS,
         'contentNodes',
         popular.ids,
       );
@@ -310,24 +308,65 @@ function popularPageInfo(
 
 /**
  * These posts' fields, in the order of `ids` (GraphQL's `in` doesn't keep
- * it). `connection` takes `$first` and `$ids` and lists `nodes`.
+ * it), a hundred at a time. `connection` takes `$first` and `$ids` and lists
+ * `nodes`. Posts not found are left out; with `strict`, a failed request throws
+ * instead of finding none.
  */
 async function fetchNodesByIds<T extends { databaseId: number }>(
   connection: string,
   field: string,
   ids: number[],
+  { strict = false } = {},
 ): Promise<{ node: T }[]> {
   if (!ids.length) return [];
-  const { result } = await queryGallery(
-    `query BY_IDS($first: Int, $ids: [ID]) { ${connection} }`,
-    { first: ids.length, ids },
+  const chunks = [];
+  for (let i = 0; i < ids.length; i += 100) chunks.push(ids.slice(i, i + 100));
+  const results = await Promise.all(
+    chunks.map((chunk) =>
+      queryGallery(`query BY_IDS($first: Int, $ids: [ID]) { ${connection} }`, {
+        first: chunk.length,
+        ids: chunk,
+      }),
+    ),
   );
-  const nodes: T[] = result?.data?.[field]?.nodes ?? [];
-  const byId = new Map(nodes.map((node) => [node.databaseId, node]));
+  const byId = new Map<number, T>();
+  for (const { response, result } of results) {
+    const nodes: T[] | undefined = result?.data?.[field]?.nodes;
+    if (strict && (!response.ok || !Array.isArray(nodes)))
+      throw new Error(`Gallery request failed (${response.status})`);
+    for (const node of nodes ?? []) byId.set(node.databaseId, node);
+  }
   return ids.flatMap((id) => {
     const node = byId.get(id);
     return node ? [{ node }] : [];
   });
+}
+
+const PROJECTS_BY_IDS = `projects(first: $first, where: { in: $ids }) { nodes { ${PROJECT_NODE_FIELDS} } }`;
+const PALETTES_BY_IDS = `contentNodes(first: $first, where: { contentTypes: [TEMPBLANKET_PALETTE], in: $ids }) {
+  nodes { __typename ... on Palette { title databaseId yarnUrls date views } }
+}`;
+
+/** These project pages (e.g. starred ones), in this order; throws when the gallery can't be reached */
+export async function fetchProjectsByIds(ids: number[]) {
+  const edges = await fetchNodesByIds<GalleryProjectNode>(
+    PROJECTS_BY_IDS,
+    'projects',
+    ids,
+    { strict: true },
+  );
+  return edges.map((edge) => edge.node);
+}
+
+/** These palette pages, as for projects */
+export async function fetchPalettesByIds(ids: number[]) {
+  const edges = await fetchNodesByIds<GallerySharedPaletteNode>(
+    PALETTES_BY_IDS,
+    'contentNodes',
+    ids,
+    { strict: true },
+  );
+  return edges.map((edge) => edge.node);
 }
 
 export const fetchProjects = async ({
@@ -363,7 +402,7 @@ export const fetchProjects = async ({
     });
     if (popular) {
       const edges = await fetchNodesByIds<GalleryProjectNode>(
-        `projects(first: $first, where: { in: $ids }) { nodes { ${PROJECT_NODE_FIELDS} } }`,
+        PROJECTS_BY_IDS,
         'projects',
         popular.ids,
       );

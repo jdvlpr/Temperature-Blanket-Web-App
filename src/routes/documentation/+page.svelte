@@ -328,6 +328,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="toc-anchor opacity-60 hover:opacity-100">Share to Gallery</a
         >
       </li>
+      {#if __ACCOUNTS_ENABLED__}
+        <li class="toc-list-item ml-4 block">
+          <a
+            href="#star-gallery-pages"
+            class="toc-anchor opacity-60 hover:opacity-100"
+            >Star Gallery Pages</a
+          >
+        </li>
+      {/if}
       <li class="toc-list-item block">
         <a href="#download" class="toc-anchor opacity-60 hover:opacity-100"
           >Download</a
@@ -1967,6 +1976,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             </div>
           </section>
+          {#if __ACCOUNTS_ENABLED__}
+            <section
+              id="star-gallery-pages"
+              class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+            >
+              <h3 class="text-xl font-bold">Star Gallery Pages</h3>
+              <p>
+                Signed in, press the star on a gallery project or palette to
+                find it again later. Your starred pages are listed under Starred
+                in My Library, on the Projects and Yarn Palettes pages.
+              </p>
+              <p>
+                Stars are private: only you see them, and they don’t count as
+                views or change the gallery’s Popular order. A star keeps a link
+                to the page rather than a copy, so you always see it as its
+                owner last updated it. Press the star again to unstar it. You
+                can star up to 500 pages.
+              </p>
+            </section>
+          {/if}
 
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="download">
             Download

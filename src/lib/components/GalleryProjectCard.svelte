@@ -34,8 +34,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   views (as on its gallery page), all one link, as on
   My Library. In a grid or row it stands up, the picture over the name; in a
   list it lies down, the picture beside the name.
-  The gallery's cards are only that; My Projects gives its own `nameRow` (with
-  its ⋮ menu, outside the link), `details` and a `footer` with its sharing.
+  The gallery's cards add an `action` beside the name (its star), outside the
+  link; My Projects gives its own `nameRow` (with its ⋮ menu, outside the
+  link), `details` and a `footer` with its sharing.
 -->
 <script lang="ts">
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
@@ -60,6 +61,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** In place of the name and places, outside the link; it has the link
     for screen readers and the keyboard then (the picture's is for the mouse) */
     nameRow?: Snippet;
+    /** One button beside the name, outside the link (the gallery's star) */
+    action?: Snippet;
     /** Under the name */
     details?: Snippet;
     footer?: Snippet;
@@ -78,6 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     layout = 'grid',
     cover,
     nameRow,
+    action,
     details,
     footer,
     reload = false,
@@ -85,7 +89,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   let list = $derived(layout === 'list');
+  // The name has its own link then, so the picture's is for the mouse only
+  let nameOutside = $derived(!!(nameRow || action));
 </script>
+
+{#snippet name()}
+  <span class="flex w-full min-w-0 flex-col text-left">
+    <span class="line-clamp-2 text-sm font-semibold break-words"
+      >{label || 'Untitled Project'}</span
+    >
+    <GalleryCardByline {date} {author} {views} />
+  </span>
+{/snippet}
 
 <div
   class={[
@@ -107,28 +122,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
     data-sveltekit-preload-data="tap"
     data-sveltekit-reload={reload ? '' : undefined}
     class={list
-      ? ['flex min-w-0 items-center gap-3', nameRow ? 'shrink-0' : 'grow']
+      ? ['flex min-w-0 items-center gap-3', nameOutside ? 'shrink-0' : 'grow']
       : 'flex w-full flex-col items-center gap-1'}
-    aria-hidden={nameRow ? 'true' : undefined}
-    tabindex={nameRow ? -1 : undefined}
+    aria-hidden={nameOutside ? 'true' : undefined}
+    tabindex={nameOutside ? -1 : undefined}
   >
     {#if image}
       <img src={image} alt="" class={imageClasses[layout]} loading="lazy" />
     {:else}
       {@render cover?.()}
     {/if}
-    {#if !nameRow}
-      <span class="flex w-full min-w-0 flex-col text-left">
-        <span class="line-clamp-2 text-sm font-semibold break-words"
-          >{label || 'Untitled Project'}</span
-        >
-        <GalleryCardByline {date} {author} {views} />
-      </span>
+    {#if !nameOutside}
+      {@render name()}
     {/if}
   </a>
-  {#if nameRow || details || footer}
+  {#if nameRow || action || details || footer}
     <div class={list ? 'flex min-w-0 grow flex-col gap-1' : 'contents'}>
-      {@render nameRow?.()}
+      {#if nameRow}
+        {@render nameRow()}
+      {:else if action}
+        <div class="flex w-full items-start gap-1">
+          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+          <a
+            {href}
+            {title}
+            data-sveltekit-preload-data="tap"
+            data-sveltekit-reload={reload ? '' : undefined}
+            class="flex min-w-0 grow"
+          >
+            {@render name()}
+          </a>
+          {@render action()}
+        </div>
+      {/if}
       {@render details?.()}
       {@render footer?.()}
     </div>

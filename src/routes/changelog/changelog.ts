@@ -57,7 +57,7 @@ export const entries: ChangelogItemGroup[] = [
                     },
                     {
                       IconComponent: GlobeIcon,
-                      text: `Publish a project or yarn palette to the gallery from its Share button. Each one has a single gallery page that updates when you change it, shows your display name or stays anonymous, and follows it into the Trash and back. Pages that show your name are collected on Your Gallery. You can also link your Ravelry account and post a project to Ravelry, photos and yarns included.`,
+                      text: `Publish a project or yarn palette to the gallery from its Share button. Each one has a single gallery page that updates when you change it, shows your display name or stays anonymous, and follows it into the Trash and back. Pages that show your name are collected on Your Gallery. You can also link your Ravelry account and post a project to Ravelry, photos and yarns included. Star other people's projects and palettes to find them again under Starred in My Library; only you see your stars.`,
                       title: 'Gallery Pages & Ravelry',
                     },
                   ]

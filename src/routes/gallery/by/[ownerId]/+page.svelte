@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
+  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import { masonry } from '#lib/state/attachments/masonry.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
@@ -216,7 +217,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title={getTitleTextFromLocationsMeta(locations)}
             {views}
             layout={ownerFilters.layout}
-          />
+          >
+            {#snippet action()}
+              <GalleryStarButton
+                postId={databaseId}
+                kind="project"
+                name={projectName
+                  ? decodeHtmlEntities(projectName)
+                  : getTitleTextFromLocationsMeta(locations)}
+              />
+            {/snippet}
+          </GalleryProjectCard>
         </li>
       {/each}
     </ul>

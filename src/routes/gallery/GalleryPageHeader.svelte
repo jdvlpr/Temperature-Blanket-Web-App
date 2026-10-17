@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import ViewCount from '#lib/components/ViewCount.svelte';
+  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import GalleryPageEdit from '#lib/components/account/GalleryPageEdit.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
   import type { Component, Snippet } from 'svelte';
@@ -130,6 +131,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <open.icon />
         Open a Copy
       </a>
+    {/if}
+    <!-- Starring a page that's there; not one's own -->
+    {#if __ACCOUNTS_ENABLED__ && sharedOn}
+      <GalleryStarButton {postId} {kind} labelled />
     {/if}
     <!-- Even when the page can't be found, so its owner can unpublish it -->
     {#if __ACCOUNTS_ENABLED__}

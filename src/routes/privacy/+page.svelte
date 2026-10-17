@@ -205,6 +205,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               other devices.
             </li>
             <li>
+              <span class="font-bold">Your stars</span>: the gallery pages you
+              starred to find again. Only you see them; they aren’t counted as
+              views, and they’re removed when you delete your account.
+            </li>
+            <li>
               <span class="font-bold">Security records</span>: to prevent abuse,
               counts of recent sign-in requests from each IP address, kept for
               about a day. Before you send a project to the gallery while signed

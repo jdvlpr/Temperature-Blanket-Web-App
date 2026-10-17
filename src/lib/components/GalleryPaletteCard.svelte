@@ -17,13 +17,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A palette from the gallery, as a card. In the gallery (`mode="page"`)
   tapping it opens its gallery page. In the Yarn Palette Creator's Browse
   Palettes (`mode="use"`) tapping it uses it (`onclick`). Either way it says when it was published, who by
-  (when their name shows on its page) and its page's views. In a list
+  (when their name shows on its page) and its page's views, with a star
+  beside the name in the gallery (a palette page's). In a list
   (`layout="list"`) it lies down, the colors beside the name.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import PaletteCard from '#lib/components/PaletteCard.svelte';
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
+  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
 
   interface Props {
@@ -64,6 +66,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {layout}
   card={mode === 'use'}
 >
+  {#snippet action()}
+    {#if mode === 'page' && palette.page.kind === 'palette'}
+      <GalleryStarButton
+        postId={Number(palette.page.id)}
+        kind="palette"
+        name={palette.page.title || 'Untitled Palette'}
+      />
+    {/if}
+  {/snippet}
   {#snippet details()}
     <GalleryCardByline
       date={palette.page.date}
