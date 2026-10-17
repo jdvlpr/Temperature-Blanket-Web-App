@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   line under it, then "Published <date>" and under that "By <name> · 1.2K
   views" (the order gallery cards use too),
   then Open a Copy and, for its owner, Edit Gallery Page (the dialog its
-  Share dialog in My Library opens).
+  card's ⋮ in My Library opens).
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';

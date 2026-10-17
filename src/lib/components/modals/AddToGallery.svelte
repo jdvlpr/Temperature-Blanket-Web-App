@@ -18,8 +18,9 @@ project shares. Its gallery page (published, or updated in place when the
 project changed: same link, views and settings), Anonymous, by the name, and,
 for a project in the account with Ravelry connected, its Ravelry project: Also
 post to Ravelry, or once posted its details, yarns and photos, all saved with
-one Save. Once published, Unpublish is here too. Opened from the Share dialog
-and from the gallery page itself (`onsaved`). Publishing needs an account; signed out, it says so with a way to
+one Save. Once published, Unpublish is here too. Opened from the share rows (a
+My Library card's ⋮, the Project menu, the preview's Share menu) and from the
+gallery page itself or its card's ⋮ (`onsaved`). Publishing needs an account; signed out, it says so with a way to
 sign in. From My Library, the saved project loads behind the dialog first (with
 its weather, when that isn't kept with it). -->
 

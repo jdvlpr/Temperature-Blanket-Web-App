@@ -222,8 +222,8 @@ connecting Ravelry, where it's set up. That goes last: it leaves the site. -->
         </li>
         <li class="flex items-start gap-3">
           <GalleryVerticalEndIcon class="icon-sm mt-0.5 shrink-0 opacity-70" />
-          Share a project or palette from its Share button, and publish it to the
-          gallery if you like.
+          Share a project or palette from its menu, and publish it to the gallery
+          if you like.
         </li>
       </ul>
 

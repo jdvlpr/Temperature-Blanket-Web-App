@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // Changes made on Ravelry, brought here: photos, notes, yarns, and projects
-// deleted there. Only when someone looks (My Projects, the Share dialog), never
+// deleted there. Only when someone looks (My Projects, the share rows), never
 // on a timer: one projects/list call tells which linked projects changed, and
 // only those are read in full.
 

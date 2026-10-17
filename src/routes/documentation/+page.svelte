@@ -1662,9 +1662,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               names, open the Palette menu in the Yarn Palette Creator (or the
               Project menu in the Project Planner), press Download / Export,
               then choose a palette and format and press Copy or Download. To
-              share a palette's link, open the Palette menu, press Share, then
-              Copy Link. Share or paste the copied text somewhere you can find
-              it later.
+              share a palette's link, open the Palette menu and press Copy Link.
+              Share or paste the copied text somewhere you can find it later.
             </p>
             <p>
               To paste colors into a palette, press Get Colors, then Paste
@@ -1984,8 +1983,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <h3 class="text-xl font-bold">Star Gallery Pages</h3>
               <p>
                 Signed in, press the star on a gallery project or palette to
-                find it again later. Your starred pages are listed under Starred
-                in My Library, on the Projects and Yarn Palettes pages.
+                find it again later. Your starred pages are listed in My
+                Library: press Starred, above the list, on the Projects or Yarn
+                Palettes page.
               </p>
               <p>
                 Stars are private: only you see them, and they don’t count as

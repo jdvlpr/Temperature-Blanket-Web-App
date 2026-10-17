@@ -154,12 +154,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-2xl font-bold">My Library</p>
 
             <p>
-              <a href="/my-projects" class="link">My Library</a>, at the top of
-              the site menu, has everything you've saved: your projects on one
-              tab and your yarn palettes on the other. Show them as cards or as
-              a list, filter them, and give your projects names. You don't need
-              an account for any of this; signed out, they're kept in your
-              browser.
+              <a href="/my-projects" class="link">My Library</a>, near the top
+              of the site menu, has everything you've saved: your projects on
+              one tab and your yarn palettes on the other. Show them as cards or
+              as a list, filter them, and give your projects names. You don't
+              need an account for any of this; signed out, they're kept in your
+              browser. Signed in, <span class="italic">Starred</span> lists the gallery
+              pages you've starred, with the same search and filters.
             </p>
             <p>
               Projects and palettes you delete go to the Trash for 30 days, and
@@ -173,11 +174,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="text-2xl font-bold">Sharing</p>
 
-            <p class="font-bold">One Share button</p>
+            <p class="font-bold">Sharing, right where you are</p>
             <p>
-              Every project and palette has a <span class="italic">Share</span>
-              button: on its card in My Library, in the Project Planner's
-              <span class="italic">Project</span> menu, and next to the preview.
+              Every project and palette has the same sharing options wherever
+              you are: in the menu on its card in My Library, in the Project
+              Planner's <span class="italic">Project</span> menu, under the
+              <span class="italic">Share</span> button next to the preview, and
+              in the Yarn Palette Creator's <span class="italic">Palette</span>
+              menu.
               <span class="italic">Copy Link</span> gives you a link anyone can open
               to get their own copy. Yours never changes.
             </p>
