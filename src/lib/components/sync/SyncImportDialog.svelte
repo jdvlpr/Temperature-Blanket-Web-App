@@ -110,7 +110,6 @@ someone asks to add them from My Library (`later`). -->
   const DETAIL = 'block text-sm';
   const CHOICE = 'flex cursor-pointer items-center gap-3';
   // Its picture (a palette, its colors) beside its name, as in the Trash
-  const COVER = 'h-24 w-20 shrink-0';
   const NAME = 'line-clamp-2 text-sm font-semibold break-words';
   const projectLabel = (project: StoredProjectIndexItem) =>
     project.meta.name || project.meta.title || 'Untitled Project';
@@ -204,8 +203,8 @@ someone asks to add them from My Library (`later`). -->
           href={project.meta.href}
           picturesVersion={pictures.version}
           pictureSettled={pictures.isSettled(project.id, project.meta.href)}
-          imageClass="{COVER} object-contain"
-          coverClass={COVER}
+          imageClass="h-24 w-20 shrink-0 object-contain"
+          coverClass="h-24 w-20 shrink-0"
           stripHeight="50px"
         />
         <span class="flex min-w-0 flex-1 flex-col">
@@ -224,7 +223,7 @@ someone asks to add them from My Library (`later`). -->
           value={palette.id}
           bind:group={chosenPalettes}
         />
-        <span class="flex items-center {COVER}" aria-hidden="true">
+        <span class="flex h-12 w-28 items-center" aria-hidden="true">
           <span class="w-full">
             <PaletteStrip colors={palette.colors} height="50px" insideControl />
           </span>

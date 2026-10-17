@@ -1,12 +1,12 @@
 import adapter from '@sveltejs/adapter-cloudflare';
+import { sveltekit } from '@sveltejs/kit/vite';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'fs';
+import fs from 'node:fs';
 import { createRequire, register } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'url';
-import { sveltekit } from '@sveltejs/kit/vite';
-import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
-import fs from 'node:fs';
 
 const file = fileURLToPath(new URL('package.json', import.meta.url));
 const json = readFileSync(file, 'utf8');
@@ -93,6 +93,7 @@ export default defineConfig(({ mode }) => {
       previewCloudflareWorkers(),
       tailwindcss(),
       sveltekit({
+        inspector: true,
         // Consult https://kit.svelte.dev/docs/integrations#preprocessors
         // for more information about preprocessors
         preprocess: vitePreprocess(),

@@ -217,7 +217,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
             />
           {:else}
             <div
-              class="flex h-24 w-20 shrink-0 items-center"
+              class="flex h-12 w-28 shrink-0 items-center"
               aria-hidden="true"
             >
               <div class="w-full">
