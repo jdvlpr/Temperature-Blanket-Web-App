@@ -351,7 +351,8 @@ test.describe('Sync in the browser', () => {
     await expect
       .poll(async () => (await serverPalettes())[0]?.deletedAt)
       .not.toBeNull();
-    await phone.goto('/my-projects');
+    // Each Library page has its own kind's Trash
+    await phone.goto('/my-palettes');
     await phone.getByRole('button', { name: 'Trash (1)' }).click();
     await expect(
       phone.getByRole('dialog').getByRole('list', { name: 'Trash' }),
@@ -422,7 +423,7 @@ test.describe('Sync in the browser', () => {
     expect(kept[0].sync).toBeUndefined();
   });
 
-  test('an ended session keeps projects here; another account can’t see them', async ({
+  test('an ended session signs out here, keeping projects that hadn’t synced', async ({
     browser,
     baseURL,
   }) => {
@@ -439,34 +440,26 @@ test.describe('Sync in the browser', () => {
     // The session ends on the server (expired, or signed out elsewhere)
     localD1(`delete from "session" where "userId" = '${userId}'`);
 
+    // The refused sync finds the session over and signs out, as signing out
+    // does: the project that hadn't synced stays as this browser's own
     await openSavedProjects(phone);
-    await expect(phone.getByTestId('sync-status')).toContainText(
-      'Your session ended.',
-    );
+    await expect(
+      phone.getByText(
+        'You’ve been signed out. Changes that hadn’t synced are still saved in this browser. Sign in to sync them.',
+      ),
+    ).toBeVisible();
     await expect(phone.getByRole('link', { name: 'Still here' })).toBeVisible();
-    await expect(phone.getByTestId('sync-label')).toHaveText('Waiting to sync');
+    await expect(phone.getByTestId('sync-label')).toHaveCount(0);
+    const kept = await savedIndex(phone);
+    expect(kept.map((i) => i.meta.title)).toEqual(['Still here']);
+    expect(kept[0].sync).toBeUndefined();
 
-    // Visiting the account page finds the session over and forgets the account;
-    // the project still shows
     await phone.goto('/account');
     await expect(
       phone.getByText(
         'Sign in to keep your projects and yarn palettes on all your devices.',
       ),
     ).toBeVisible();
-    await openSavedProjects(phone);
-    await expect(phone.getByRole('link', { name: 'Still here' })).toBeVisible();
-    await expect(phone.getByTestId('sync-label')).toHaveText('Sign in to sync');
-
-    // Someone else signs in on this browser
-    await signIn(phone, phone.request, uniqueEmail('sync-other-person'));
-    await openSavedProjects(phone, { empty: true });
-    await expect(phone.getByRole('link', { name: 'Still here' })).toHaveCount(
-      0,
-    );
-    expect((await savedIndex(phone)).map((i) => i.meta.title)).toEqual([
-      'Still here',
-    ]);
   });
 
   test('when both devices change a project, both versions are kept', async ({

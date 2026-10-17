@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Once, right after an account is made: a display name to keep or change
@@ -82,15 +82,10 @@ then the projects and palettes in this browser to add, if there are any. -->
 {:else}
   <div role="dialog" aria-modal="true" aria-labelledby="welcome-title">
     <form class="flex flex-col gap-4 p-4" onsubmit={next}>
-      <div class="flex items-start gap-3">
-        <SparklesIcon class="text-primary-500 mt-1 shrink-0" />
         <div class="flex flex-col gap-1">
           {#if hasImport}<p class="text-sm opacity-70">Step 1 of 2</p>{/if}
           <h2 id="welcome-title" class="h4">Welcome!</h2>
-          <p class="text-sm opacity-80">
-            Your account is ready. Accounts are new, and in beta.
-          </p>
-        </div>
+
       </div>
 
       <div class="flex flex-col gap-2">
@@ -109,17 +104,15 @@ then the projects and palettes in this browser to add, if there are any. -->
           bind:value={name}
           disabled={busy}
         />
-        <p id="welcome-name-help" class="text-sm opacity-70">
-          Here’s a made-up name to start. Keep it or type your own. It’s only
-          shown as “By …” on gallery pages you publish, and you can always
-          publish anonymously. Change it anytime on your Account page.
+        <p class="opacity-80">
+          To start, set your display name, which is shown on gallery pages you choose to publish. You can change your display name anytime on your Account page.
         </p>
         {#if errorMessage}
           <p class="text-error-700-300 text-sm" role="alert">{errorMessage}</p>
         {/if}
       </div>
 
-      <ul class="flex flex-col gap-2 text-sm">
+      <ul class="flex flex-col gap-2">
         <li class="flex items-start gap-3">
           <CloudIcon class="icon-sm mt-0.5 shrink-0 opacity-70" />
           Projects, yarn palettes and preferences you save now show up on every device

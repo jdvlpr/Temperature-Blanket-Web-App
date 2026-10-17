@@ -352,94 +352,92 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="mt-2 flex w-full flex-col gap-2">{@render undoAt(null)}</div>
 {/if}
 
-{#key projects}
-  {#if cards.length}
-    <div class="mb-2 flex w-full flex-col items-start justify-center">
-      {#if !onMyProjectsPage}
-        <h2 class="mb-1 text-sm font-bold opacity-70">Recent Projects</h2>
-      {/if}
-      {#if signedIn && sync.active}
-        <SyncStatus class="text-surface-700-300 mb-2" />
-        <AddToAccountButton class="mb-2" kind="projects" />
-      {:else if !onMyProjectsPage}
-        <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
-      {/if}
-      {#if onMyProjectsPage}
-        {@const grid = layout === 'grid'}
-        <div
-          class={grid
-            ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4'
-            : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
-        >
-          {#each cards as card (card.key)}
-            {@const project = card.project}
-            {@render undoAt(card.key, true)}
-            <div class="w-full" {@attach slots.track(card.key)}>
-              <SavedProjectCard
-                item={project}
-                {picturesVersion}
-                pictureSettled={settled.has(
-                  pictureKey(project.id, project.meta.href),
-                )}
-                layout={grid ? 'grid' : 'list'}
-                syncLabel={__ACCOUNTS_ENABLED__
-                  ? syncLabelFor(project, signedIn)
-                  : undefined}
-                onrename={(name) => rename(project.id, name)}
-                onremove={() => remove(project)}
-                oncopy={() => copy(project)}
-              >
-                {#snippet sharing()}
-                  {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}
-                {/snippet}
-              </SavedProjectCard>
-            </div>
-          {/each}
-          {@render undoAt(null, true)}
-        </div>
-      {:else}
-        <div class="flex w-full flex-col items-start justify-center gap-2">
-          {#each shown as project (project.id)}
-            {@const { meta } = project}
-            {@render undoAt(project.id)}
-            <ProjectDetails
-              project={meta}
-              canRemove={false}
+{#if cards.length}
+  <div class="mb-2 flex w-full flex-col items-start justify-center">
+    {#if !onMyProjectsPage}
+      <h2 class="mb-1 text-sm font-bold opacity-70">Recent Projects</h2>
+    {/if}
+    {#if signedIn && sync.active}
+      <SyncStatus class="text-surface-700-300 mb-2" />
+      <AddToAccountButton class="mb-2" kind="projects" />
+    {:else if !onMyProjectsPage}
+      <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
+    {/if}
+    {#if onMyProjectsPage}
+      {@const grid = layout === 'grid'}
+      <div
+        class={grid
+          ? 'grid w-full grid-cols-2 items-start gap-2 md:grid-cols-3 xl:grid-cols-4'
+          : 'grid w-full grid-cols-1 items-start gap-2 md:grid-cols-2'}
+      >
+        {#each cards as card (card.key)}
+          {@const project = card.project}
+          {@render undoAt(card.key, true)}
+          <div class="w-full" {@attach slots.track(card.key)}>
+            <SavedProjectCard
+              item={project}
+              {picturesVersion}
+              pictureSettled={settled.has(
+                pictureKey(project.id, project.meta.href),
+              )}
+              layout={grid ? 'grid' : 'list'}
               syncLabel={__ACCOUNTS_ENABLED__
                 ? syncLabelFor(project, signedIn)
                 : undefined}
-            />
-          {/each}
-          {@render undoAt(null)}
-        </div>
-      {/if}
-      {#if limit}
-        <a
-          href={resolve('my-projects')}
-          class="btn hover:preset-tonal-surface mt-2"
-        >
-          <FolderOpenIcon />
-          {projects.length > shown.length
-            ? `See All ${projects.length} Projects`
-            : 'My Projects'}
-        </a>
-      {/if}
-    </div>
-  {:else if onMyProjectsPage && loaded && filters && allCards.length}
-    <div class="my-8 flex w-full flex-col items-center gap-2 text-center">
-      <p>No projects match these filters.</p>
-      <button
-        type="button"
-        class="btn preset-tonal-primary border-primary-500 border"
-        onclick={() => filters.clear()}
+              onrename={(name) => rename(project.id, name)}
+              onremove={() => remove(project)}
+              oncopy={() => copy(project)}
+            >
+              {#snippet sharing()}
+                {#if onMyProjectsPage}{@render gallerySharing(project)}{/if}
+              {/snippet}
+            </SavedProjectCard>
+          </div>
+        {/each}
+        {@render undoAt(null, true)}
+      </div>
+    {:else}
+      <div class="flex w-full flex-col items-start justify-center gap-2">
+        {#each shown as project (project.id)}
+          {@const { meta } = project}
+          {@render undoAt(project.id)}
+          <ProjectDetails
+            project={meta}
+            canRemove={false}
+            syncLabel={__ACCOUNTS_ENABLED__
+              ? syncLabelFor(project, signedIn)
+              : undefined}
+          />
+        {/each}
+        {@render undoAt(null)}
+      </div>
+    {/if}
+    {#if limit}
+      <a
+        href={resolve('my-projects')}
+        class="btn hover:preset-tonal-surface mt-2"
       >
-        <XIcon />
-        Clear Filters
-      </button>
-    </div>
-  {:else if onMyProjectsPage && loaded}
-    <div class="my-8 flex w-full flex-col gap-2 text-center">
-      <p class="font-bold">No saved projects yet</p>
-    </div>
-  {/if}
-{/key}
+        <FolderOpenIcon />
+        {projects.length > shown.length
+          ? `See All ${projects.length} Projects`
+          : 'My Projects'}
+      </a>
+    {/if}
+  </div>
+{:else if onMyProjectsPage && loaded && filters && allCards.length}
+  <div class="my-8 flex w-full flex-col items-center gap-2 text-center">
+    <p>No projects match these filters.</p>
+    <button
+      type="button"
+      class="btn preset-tonal-primary border-primary-500 border"
+      onclick={() => filters.clear()}
+    >
+      <XIcon />
+      Clear Filters
+    </button>
+  </div>
+{:else if onMyProjectsPage && loaded}
+  <div class="my-8 flex w-full flex-col gap-2 text-center">
+    <p class="font-bold">No saved projects yet</p>
+  </div>
+{/if}
