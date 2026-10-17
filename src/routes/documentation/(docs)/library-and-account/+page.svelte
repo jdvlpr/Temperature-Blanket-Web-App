@@ -21,6 +21,7 @@ show only in builds with accounts. -->
 
 <script lang="ts">
   import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
   import { TRASH_DAYS } from '#lib/storage/trash.js';
 </script>
@@ -35,12 +36,14 @@ show only in builds with accounts. -->
 <section class="flex flex-col gap-3">
   <h2 id="save-project" class="text-2xl font-bold">Save a Project</h2>
   <p>
-    Press <span class="font-bold">Save</span> at the top of the Project Planner
-    (or
+    A dot on <span class="font-bold">Project</span>, at the top of the Project
+    Planner, means the project isn't saved yet. Press
+    <span class="font-bold">Project</span>, then
+    <span class="font-bold">Save Project</span> (or
     <kbd class="kbd">⌘ Cmd</kbd>/<kbd class="kbd">Ctrl</kbd> +
     <kbd class="kbd">s</kbd>). It needs a place, dates and weather first. From
-    then on, changes save automatically, and the Save button is replaced by
-    <span class="font-bold">Project</span>, whose icon shows where it's saved:
+    then on, changes save automatically, and the icon on
+    <span class="font-bold">Project</span> shows where it's saved:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -105,6 +108,11 @@ show only in builds with accounts. -->
     Starting a new project or opening another asks first if this one has unsaved
     changes.
   </p>
+  <DocsShot
+    src="library-and-account/project-menu"
+    alt="The Project menu: the project's name with Save Project; Download; Share with Copy Link; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
+    caption="The Project menu, before the project is saved."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

@@ -1,0 +1,26 @@
+{
+  "gauges-and-ranges/ranges-menu": {
+    "width": 541,
+    "height": 400
+  },
+  "location-and-dates/location": {
+    "width": 768,
+    "height": 643
+  },
+  "weather/weather-source": {
+    "width": 640,
+    "height": 920
+  },
+  "colors-and-yarn/get-colors": {
+    "width": 269,
+    "height": 445
+  },
+  "download/pdf-options": {
+    "width": 448,
+    "height": 938
+  },
+  "library-and-account/project-menu": {
+    "width": 448,
+    "height": 866
+  }
+}

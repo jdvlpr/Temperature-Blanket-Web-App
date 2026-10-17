@@ -21,6 +21,7 @@ HELP_TOPICS). -->
   import GroupingWeather from '#lib/components/docs/help/GroupingWeather.svelte';
   import ImportFileRequirements from '#lib/components/docs/help/ImportFileRequirements.svelte';
   import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
   import {
     METEOSTAT_DELAY_DAYS,
@@ -106,6 +107,11 @@ HELP_TOPICS). -->
     <a href="/documentation/credits" class="link">Data Sources & Credits</a> for the
     licenses.
   </p>
+  <DocsShot
+    src="weather/weather-source"
+    alt="The Weather Source dialog: Open-Meteo chosen, with a 5 day delay, its website and license; the switch to try the other weather source, turned off; and Choose a Model, with Best Match (Default) selected above ERA5 Land and ERA5."
+    caption="Weather Source, with Open-Meteo's models."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 Section ids are the old single page's (OLD_ANCHORS). -->
 
 <script lang="ts">
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
   import {
     MAXIMUM_DAYS_PER_LOCATION,
@@ -56,6 +57,11 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     Small places aren't always listed. If yours isn't, choose a town nearby: the
     weather comes from an area around a place anyway.
   </p>
+  <DocsShot
+    src="location-and-dates/location"
+    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, with Details below it; From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days; and the Search Again and Add Location buttons."
+    caption="A place and a year of dates, ready to search."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

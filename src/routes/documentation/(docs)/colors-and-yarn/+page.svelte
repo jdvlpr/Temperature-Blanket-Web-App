@@ -20,6 +20,7 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
 
 <script lang="ts">
   import LinkUnavailable from '#lib/components/docs/help/LinkUnavailable.svelte';
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
   import { PALETTE_SORTS } from '#lib/utils/color-utils.js';
 </script>
@@ -66,6 +67,11 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
     </li>
   </ul>
   <p>Choosing a palette replaces the gauge's colors. Undo puts them back.</p>
+  <DocsShot
+    src="colors-and-yarn/get-colors"
+    alt="The Get Colors menu: My Palettes, Palette Gallery, Preset Gradients, Choose Colorways, From an Image, Random, and Paste Colors or Code, each with a short description."
+    caption="The Get Colors menu in the Project Planner."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

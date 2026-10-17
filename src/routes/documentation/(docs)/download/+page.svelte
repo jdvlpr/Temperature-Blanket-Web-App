@@ -18,6 +18,7 @@ DownloadExportButton, ExportToGoogleSheetModal. Section ids are the old
 single page's (OLD_ANCHORS). -->
 
 <script lang="ts">
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 </script>
 
@@ -71,6 +72,11 @@ single page's (OLD_ANCHORS). -->
     <span class="font-bold">Download</span>. Your choices are remembered for
     next time.
   </p>
+  <DocsShot
+    src="download/pdf-options"
+    alt="The Download PDF panel: Your PDF will have a summary page, the Temperature Gauge's colors and ranges as a list with days in each range, a weather table of high, average and low temperatures, on US Letter paper. Customize is open, with the Include and Look options, then Cancel and Download."
+    caption="Download PDF, with Customize open."
+  />
 </section>
 
 <section class="flex flex-col gap-3">

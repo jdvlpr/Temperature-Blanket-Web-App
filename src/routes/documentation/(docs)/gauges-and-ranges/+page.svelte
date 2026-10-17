@@ -18,6 +18,7 @@ RangesMenu, range-format. Section ids are the old single page's
 (OLD_ANCHORS); RangesMenu links to #range-calculation-methods. -->
 
 <script lang="ts">
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 
   // Which of 13, 12.5 and 12 a range 13° → 12° holds, for each choice in
@@ -181,6 +182,11 @@ RangesMenu, range-format. Section ids are the old single page's
       >Choosing ranges for your yarn</a
     >.
   </p>
+  <DocsShot
+    src="gauges-and-ranges/ranges-menu"
+    alt="The Ranges menu: Auto ranges (now Equal days · High Temperature), Manual steps…, Direction with High to low checked and Low to high, Linked ranges turned on, and Each range includes (From, not To)."
+    caption="The Ranges menu."
+  />
 </section>
 
 <section class="flex flex-col gap-3">
