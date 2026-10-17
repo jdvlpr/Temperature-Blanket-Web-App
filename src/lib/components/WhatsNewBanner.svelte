@@ -45,10 +45,6 @@ else to the changelog. -->
     class="bg-surface-100-900 rounded-container mb-2 flex items-center gap-2 py-1 pr-1 pl-4 text-sm max-lg:m-2"
     aria-label="What's new"
   >
-    <SparklesIcon
-      class="icon-sm text-primary-500 shrink-0"
-      aria-hidden="true"
-    />
     <p class="min-w-0 flex-1">
       <span class="font-bold">Version 7 is here</span><span
         class="max-sm:hidden"
