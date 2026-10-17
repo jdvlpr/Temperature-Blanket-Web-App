@@ -142,8 +142,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Once you have saved the link and downloaded the weather data for each project
     below, you can close this notification and continue using the site. You can open
     a project using its URL, and
-    <a href="/documentation#import-weather-data" class="link" target="_blank"
-      >import the weather data from the CSV file</a
+    <a
+      href="/documentation/weather#import-weather-data"
+      class="link"
+      target="_blank">import the weather data from the CSV file</a
     >, if necessary. Sorry for any inconvenience.
   </p>
   <p class="opacity-60">

@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite dev",
     "dev:accounts": "PUBLIC_ACCOUNTS_ENABLED=true SYNC_ENABLED=true vite dev",
-    "build": "vite build",
+    "build": "vite build && pagefind --site .svelte-kit/cloudflare --output-subdir pagefind",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -62,6 +62,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.20.0",
     "globals": "^17.7.0",
+    "pagefind": "1.4.0",
     "prettier": "^3.9.4",
     "prettier-plugin-svelte": "^4.1.1",
     "prettier-plugin-tailwindcss": "^0.8.0",

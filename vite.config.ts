@@ -113,6 +113,8 @@ export default defineConfig(({ mode }) => {
             include: ['/*'],
             exclude: [
               '/_app/*',
+              // Guides & Help search, written by Pagefind after the build
+              '/pagefind/*',
               '/.DS_Store',
               '/.dev-tools/*',
               '/apple-icon-180.png',
@@ -136,7 +138,7 @@ export default defineConfig(({ mode }) => {
               '/contact',
               '/contact/*',
               '/documentation',
-              '/faq',
+              '/documentation/*',
               '/gallery',
               '/gallery/palettes',
               '/globe',

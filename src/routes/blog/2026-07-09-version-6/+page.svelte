@@ -177,13 +177,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ul class="ml-8 list-disc">
               <li>
                 Saved projects that used a <a
-                  href="/documentation#add-a-gauge"
+                  href="/documentation/gauges-and-ranges#add-a-gauge"
                   class="link">Daytime Gauge</a
                 >
               </li>
               <li>
                 Saved projects that used the <a
-                  href="/documentation#create-a-preview"
+                  href="/documentation/preview#create-a-preview"
                   class="link">Daytime Rows</a
                 > preview
               </li>

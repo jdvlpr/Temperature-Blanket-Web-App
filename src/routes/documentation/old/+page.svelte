@@ -56,7 +56,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 ></svelte:document>
 
 <svelte:head>
-  <title>Documentation for temperature-blanket.com</title>
+  <!-- Temporary: the single-page documentation, linked from the Guides &
+  Help pages still being written; removed once they all are -->
+  <title>Previous Documentation</title>
+  <meta name="robots" content="noindex" />
   <meta
     name="description"
     content="Instructions and tips for using the Project Planner at temperature-blanket.com."
@@ -70,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     property="og:description"
     content="Instructions and tips for using the Project Planner at temperature-blanket.com."
   />
-  <meta property="og:url" content="{PUBLIC_BASE_URL}/documentation" />
+  <meta property="og:url" content="{PUBLIC_BASE_URL}/documentation/old" />
   <meta property="og:type" content="website" />
 </svelte:head>
 

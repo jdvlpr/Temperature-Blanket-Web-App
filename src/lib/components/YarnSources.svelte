@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             {#if unavailable}
-              <HelpIcon href="/documentation#link-unavailable">
+              <HelpIcon topic="link-unavailable">
                 {#snippet text()}
                   <span class="font-normal">Link Unavailable</span>
                 {/snippet}

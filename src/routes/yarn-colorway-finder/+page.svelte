@@ -533,7 +533,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       These results do not represent official colorway
                       information from their respective companies. The process
                       used to obtain colorway information is described here: <a
-                        href="/documentation/#getting-yarn-colorway-data"
+                        href="/documentation/colors-and-yarn#getting-yarn-colorway-data"
                         class="link">Getting Yarn Colorway Data</a
                       >. If you find an inaccuracy, send an email to
                       hello@temperature-blanket.com.

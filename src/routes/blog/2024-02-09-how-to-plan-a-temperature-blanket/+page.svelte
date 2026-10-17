@@ -197,6 +197,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <p class="text-sm">February 9, 2024</p>
                   </div>
 
+                  <p
+                    class="preset-tonal-primary rounded-container p-4 font-bold"
+                  >
+                    The site has changed a lot since this post. For the
+                    up-to-date steps, see the new guide:
+                    <a href="/documentation/guides/plan-a-blanket" class="link"
+                      >Plan a Blanket, Start to Finish</a
+                    >.
+                  </p>
+
                   <div class="w-full">
                     <YouTubeVideo
                       id="7NRLrpZb0Lo"
@@ -483,7 +493,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         the table to change the value, or
 
                         <a
-                          href="/documentation#import-weather-data"
+                          href="/documentation/weather#import-weather-data"
                           class="link">upload your own CSV file</a
                         >.
                       </p>
@@ -700,7 +710,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           >read this survey and discussion about it</a
                         >. It's also possible to change the
                         <a
-                          href="/documentation#range-calculation-methods"
+                          href="/documentation/gauges-and-ranges#range-calculation-methods"
                           class="link">Range Calculation Method</a
                         >.
                       </p>
@@ -772,12 +782,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                       <p>
                         -
-                        <a href="/documentation#save-project" class="link"
-                          >Save your project</a
+                        <a
+                          href="/documentation/library-and-account#save-project"
+                          class="link">Save your project</a
                         >
                         or
-                        <a href="//documentation#share-to-gallery" class="link"
-                          >share it to the gallery</a
+                        <a
+                          href="/documentation/guides/publish-and-share"
+                          class="link">share it to the gallery</a
                         >
                         so you don't loose your work.
                       </p>
@@ -843,7 +855,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div class="">
                       <p>
                         <a
-                          href="/documentation#download-gauges-and-weather-data-pdf"
+                          href="/documentation/download#download-gauges-and-weather-data-pdf"
                           class="link">Download the PDF</a
                         >
                         to follow along with as you make your project. It contains

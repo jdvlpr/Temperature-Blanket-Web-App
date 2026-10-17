@@ -583,7 +583,7 @@ the keyboard; elsewhere the list drops down from the field. -->
 
   {#if selectedOption?.unavailable}
     <div class="w-fit">
-      <HelpIcon href="/documentation#link-unavailable">
+      <HelpIcon topic="link-unavailable">
         {#snippet text()}
           <span class="font-normal">Link Unavailable</span>
         {/snippet}

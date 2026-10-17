@@ -289,8 +289,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               first (highest), as the documentation says. That bug is fixed, so
               if your ranges overlap, some days in your preview may change
               color. Most projects aren't affected.
-              <a href="/documentation#range-calculation-methods" class="link"
-                >More in the documentation</a
+              <a
+                href="/documentation/gauges-and-ranges#range-calculation-methods"
+                class="link">More in the documentation</a
               >.
             </p>
 

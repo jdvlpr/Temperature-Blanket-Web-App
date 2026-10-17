@@ -73,6 +73,11 @@ const legacyRedirects: Handle = async ({ event, resolve }) => {
     redirect(301, '/gallery/palettes');
   }
 
+  // The FAQ is now Guides & Help's Common Questions
+  if (path === '/faq' || path === '/faq/') {
+    redirect(301, '/documentation#common-questions');
+  }
+
   return resolve(event);
 };
 

@@ -495,7 +495,7 @@ export const entries: ChangelogItemGroup[] = [
               {
                 icon: ICONS.design,
                 instructions:
-                  'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation#assigning-seasons" class="link">Learn more in the documentation</a>.',
+                  'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation/preview#assigning-seasons" class="link">Learn more in the documentation</a>.',
                 text: `Assign different weather parameters for different seasons when previewing your project's colors.`,
                 title:
                   'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
@@ -600,7 +600,7 @@ export const entries: ChangelogItemGroup[] = [
               {
                 IconComponent: CloudCogIcon,
                 instructions: `To see the new settings, press the Weather Source button in the Project Planner. If you notice any issues or have feedback about the new model settings, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
-                text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',
+                text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation/weather#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',
                 title:
                   'New Weather Source Settings <span class="badge bg-tertiary-50-950 ml-2">Beta</span>',
               },
@@ -823,7 +823,7 @@ export const entries: ChangelogItemGroup[] = [
         <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
       </svg>`,
                 instructions:
-                  "For projects with missing or recent weather data, see the Weather section for more information. You can also read the explanation in the <a href='/faq' class='link'>FAQs</a>.",
+                  "For projects with missing or recent weather data, see the Weather section for more information. You can also read the explanation in the <a href='/documentation#common-questions' class='link'>FAQs</a>.",
                 text: 'New alert visuals and revised text clarify that recent weather data can change as weather sources get the latest information.',
                 title: 'Added Note for Recent Weather Data',
               },

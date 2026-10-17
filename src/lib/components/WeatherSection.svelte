@@ -181,12 +181,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="rounded-container bg-surface-100 dark:bg-surface-900 my-2 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
       >
         <p class="">
-          Weekly weather grouping can result in a shorter project. <a
-            href="/documentation/#grouping-weather-data"
-            target="_blank"
-            class="link"
-            rel="noopener noreferrer">Read more details.</a
-          >
+          Weekly weather grouping can result in a shorter project.
+          <HelpIcon topic="grouping-weather-data">
+            {#snippet text()}
+              <span>Read more details.</span>
+            {/snippet}
+          </HelpIcon>
           {#if weather.groupedByWeek}
             Your project starts on {DAYS_OF_THE_WEEK.filter(
               (n) => n.value === weather.groupedByWeek?.[0]?.date.getUTCDay(),
@@ -397,7 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class="my-2 text-sm">
               {#if locations.all.some((n) => n.source === 'Meteostat') && locations.all.some((n) => n.source === 'Open-Meteo')}
                 <HelpIcon
-                  href="/documentation/#mixed-snow-parameters"
+                  topic="mixed-snow-parameters"
                   title="Read About Mixed Snow Parameters"
                 >
                   {#snippet text()}

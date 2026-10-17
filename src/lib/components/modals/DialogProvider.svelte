@@ -24,6 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MediaQuery } from 'svelte/reactivity';
   import { fade, fly, type TransitionConfig } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
+  import HelpView from '#lib/components/docs/HelpView.svelte';
+  import { HELP_TOPICS } from '#lib/docs/help-topics.js';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
 
   // The Project menu: a panel that slides in from the right
@@ -54,7 +56,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const hasHeader = $derived(
     Boolean(dialog.options.title) ||
       dialog.stack.length > 0 ||
-      Boolean(dialog.backAction),
+      Boolean(dialog.backAction) ||
+      Boolean(dialog.help),
+  );
+
+  // Help shown in the dialog's place (from a HelpIcon in it): its title in
+  // the header, and Back returns to the dialog
+  const headerTitle = $derived(
+    dialog.help
+      ? HELP_TOPICS[dialog.help.topic].title
+      : (dialog.options.title ?? ''),
   );
 
   // Moving between views of a dialog: a short slide, forward from the right
@@ -411,6 +422,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   open={dialog.opened}
   onOpenChange={(e) => (dialog.opened = e.open)}
   onEscapeKeyDown={(e) => {
+    if (dialog.help) {
+      e.preventDefault();
+      dialog.hideHelp();
+      return;
+    }
     if (!dialog.escapeAction) return;
     e.preventDefault();
     dialog.escapeAction();
@@ -545,7 +561,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <header
                         class="flex min-h-14 items-center gap-1 px-2 py-2"
                       >
-                        {#if dialog.stack.length || dialog.backAction}
+                        {#if dialog.help || dialog.stack.length || dialog.backAction}
                           <button
                             type="button"
                             class="btn-icon hover:preset-tonal-surface"
@@ -553,22 +569,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             title="Back"
                             data-dialog-back
                             onclick={() =>
-                              dialog.backAction
-                                ? dialog.backAction()
-                                : dialog.back()}
+                              dialog.help
+                                ? dialog.hideHelp()
+                                : dialog.backAction
+                                  ? dialog.backAction()
+                                  : dialog.back()}
                             in:fade={{ duration: reduceMotion ? 0 : 150 }}
                           >
                             <ArrowLeftIcon />
                           </button>
                         {/if}
-                        {#key dialog.options.title}
+                        {#key headerTitle}
                           <Dialog.Title
                             class="min-w-0 flex-1 truncate px-2 text-lg font-bold"
                           >
                             {#snippet element(attributes)}
                               <h2 {...attributes}>
                                 <span class="block truncate" in:fade={viewFade}
-                                  >{dialog.options.title ?? ''}</span
+                                  >{headerTitle}</span
                                 >
                               </h2>
                             {/snippet}
@@ -578,7 +596,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <CloseButton onClose={dialog.close} />
                         {/if}
                       </header>
-                      {#if dialog.headerControl && !phone.current}
+                      {#if dialog.headerControl && !phone.current && !dialog.help}
                         <div class="px-4 pb-2" in:fade={viewFade}>
                           {@render dialog.headerControl()}
                         </div>
@@ -599,6 +617,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     the way it went -->
                       <div
                         in:fly={viewFly}
+                        hidden={Boolean(dialog.help)}
                         class={[
                           dialog.options.size === 'full' &&
                             'flex min-h-0 flex-1 flex-col',
@@ -610,10 +629,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     {/key}
                   {/if}
+                  {#if dialog.help}
+                    <div in:fly={viewFly}>
+                      <HelpView topic={dialog.help.topic} />
+                    </div>
+                  {/if}
                   <!-- On phones the header's control sits at the bottom of the
                   sheet instead, in thumb reach, always in view as the content
                   scrolls behind it -->
-                  {#if dialog.headerControl && phone.current}
+                  {#if dialog.headerControl && phone.current && !dialog.help}
                     <div
                       data-sticky-footer
                       class={[BOTTOM_BAR, 'sticky bottom-0 z-20 mt-0!']}

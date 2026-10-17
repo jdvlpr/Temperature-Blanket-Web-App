@@ -56,6 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ['/gallery', '/gallery/palettes'].includes(pathname),
   );
   const blog = $derived(pathname.includes('/blog'));
+  const docs = $derived(pathname.startsWith('/documentation'));
   const create = $derived(['/', '/yarn'].includes(pathname));
 
   const LINK = 'btn hover:preset-tonal-surface w-fit';
@@ -215,24 +216,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   fit every link on one line -->
   <div class={[SMALL_LINKS, 'w-0 min-w-full px-3']}>
     <a
-      href="/faq"
-      class={['py-1', SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}
-      aria-current={pathname === '/faq' ? 'page' : undefined}>FAQ</a
-    >
-    <a
       href="/blog"
       class={['py-1', SMALL_LINK, blog && SMALL_CURRENT]}
       aria-current={blog ? 'page' : undefined}>Blog</a
     >
     <a
       href="/documentation"
-      class={[
-        'py-1',
-        SMALL_LINK,
-        pathname === '/documentation' && SMALL_CURRENT,
-      ]}
+      class={['py-1', SMALL_LINK, docs && SMALL_CURRENT]}
       aria-current={pathname === '/documentation' ? 'page' : undefined}
-      >Documentation</a
+      >Guides & Help</a
     >
     <a
       href="/changelog"
@@ -263,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={['py-1', SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
       aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
     >
-    <a href="/documentation#credits" class={['py-1', SMALL_LINK]}
+    <a href="/documentation/credits" class={['py-1', SMALL_LINK]}
       >Data Sources & Credits</a
     >
     <a

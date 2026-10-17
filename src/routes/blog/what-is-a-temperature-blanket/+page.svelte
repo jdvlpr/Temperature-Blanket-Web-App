@@ -131,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <p>
                 Want help making your own temperature blanket? See <a
-                  href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
+                  href="/documentation/guides/plan-a-blanket"
                   class="link">How to Plan a Temperature Blanket</a
                 >.
               </p>
@@ -328,7 +328,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <p>
                 Want help making your own temperature blanket? See <a
-                  href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
+                  href="/documentation/guides/plan-a-blanket"
                   class="link">How to Plan a Temperature Blanket</a
                 >.
               </p>

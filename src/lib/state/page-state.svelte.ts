@@ -19,6 +19,7 @@ import { page } from '$app/state';
 import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '#lib/components/modals/Menu.svelte';
 import { openProjectScreen } from '#lib/components/modals/open-project.js';
+import type { HelpTopicId } from '#lib/docs/help-topics.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
@@ -111,6 +112,15 @@ class DialogClass {
    * opened it, as to a color the dialog just added. Null for the default. */
   finalFocus: (() => HTMLElement | null) | null = null;
 
+  /** Help laid over the open dialog (from a HelpIcon in it), in its place
+   * with Back. The dialog's own content stays as it was underneath, hidden,
+   * so nothing in it (a chosen photo, a file) is lost. */
+  help = $state<{
+    topic: HelpTopicId;
+    scrollTop: number;
+    opener: HTMLElement | null;
+  } | null>(null);
+
   /** Which way the last change of view went, for its slide */
   direction = $state<'forward' | 'back' | 'none'>('none');
 
@@ -157,6 +167,7 @@ class DialogClass {
     } else {
       this.stack = [];
     }
+    this.help = null;
     this.backAction = null;
     this.headerControl = null;
     this.escapeAction = null;
@@ -221,10 +232,40 @@ class DialogClass {
     });
   };
 
+  /** Help in place of the open dialog's content, from its top with the
+   * focus on Back */
+  showHelp = (topic: HelpTopicId, opener: HTMLElement | null) => {
+    this.help = {
+      topic,
+      scrollTop: this.scrollElement?.scrollTop ?? 0,
+      opener,
+    };
+    this.direction = 'forward';
+    tick().then(() => {
+      this.scrollElement?.scrollTo({ top: 0 });
+      this.scrollElement
+        ?.querySelector<HTMLElement>('[data-dialog-back]')
+        ?.focus({ preventScroll: true });
+    });
+  };
+
+  /** Back from help to the dialog as it was, the focus on its ? button */
+  hideHelp = () => {
+    const help = this.help;
+    if (!help) return;
+    this.help = null;
+    this.direction = 'back';
+    tick().then(() => {
+      this.scrollElement?.scrollTo({ top: help.scrollTop });
+      help.opener?.focus({ preventScroll: true });
+    });
+  };
+
   /** Back to the dialog this one was opened from */
   back = () => {
     const view = this.stack.pop();
     if (!view) return;
+    this.help = null;
     this.direction = 'back';
     this.type = 'component';
     this.contentComponent = view.component;

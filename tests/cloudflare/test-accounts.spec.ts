@@ -88,7 +88,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const email = uniqueEmail('menu');
     await signIn(page, request, email);
 
-    await page.goto('/faq');
+    await page.goto('/privacy');
     // The prerendered page links to sign-in until the account loads
     await expect(page.getByTestId('account-button')).toHaveAccessibleName(
       'Account',
@@ -105,7 +105,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await page.getByRole('link', { name: 'Account settings' }).click();
     await expect(page).toHaveURL(/\/account$/);
 
-    await page.goto('/faq');
+    await page.goto('/privacy');
     // The prerendered page links to sign-in until the account loads
     await expect(page.getByTestId('account-button')).toHaveAccessibleName(
       'Account',
@@ -179,14 +179,14 @@ test.describe('Accounts: sign in with an emailed code', () => {
     request,
   }) => {
     const email = uniqueEmail('redirect');
-    await page.goto('/auth/sign-in?redirect=/faq');
+    await page.goto('/auth/sign-in?redirect=/privacy');
     await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
     // Pasted codes may carry spaces
     const code = await latestCode(request, email);
     await page.getByLabel('Code').fill(`${code.slice(0, 3)} ${code.slice(3)}`);
-    await expect(page).toHaveURL(/\/faq$/);
+    await expect(page).toHaveURL(/\/privacy$/);
     // Welcomed wherever it lands
     await finishWelcome(page);
 

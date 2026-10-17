@@ -269,7 +269,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       choose a more stable weather data model. This is only
                       possible when using Open-Meteo as the weather source. More
                       details about the new options can be found in the <a
-                        href="/documentation#weather-sources"
+                        href="/documentation/weather#weather-sources"
                         target="_blank"
                         class="link">documentation</a
                       >

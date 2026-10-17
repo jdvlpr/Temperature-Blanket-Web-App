@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { withExtraColorDetails } from '#lib/utils/extra-colors-utils.js';
+  import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
   import type { Color } from '#lib/types/yarn-types.js';
   import NumberInputButton from '#lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
@@ -96,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="w-fit max-w-sm">
     <ToggleSwitch
       label="Seasons <span class='badge bg-tertiary-100-900'>Beta</span>"
-      details="Color each row using different weather parameters depending on the season. <br/><a href='/documentation#assigning-seasons' target='_blank' class='link'>Learn more...</a>"
+      details="Color each row using different weather parameters depending on the season."
       checked={rowsPreview.settings.useSeasonTargets}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;
@@ -104,6 +105,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           previews.active.settings.useSeasonTargets = target.checked;
       }}
     />
+    <HelpIcon topic="assigning-seasons">
+      {#snippet text()}
+        <span class="text-sm">Learn more about seasons</span>
+      {/snippet}
+    </HelpIcon>
   </div>
 
   {#if previews.active && previews.active.settings.useSeasonTargets}

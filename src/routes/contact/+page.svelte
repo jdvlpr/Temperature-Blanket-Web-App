@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">
         <p>
-          See the <a href="/faq" class="link">Frequently Asked Questions</a> for answers
+          See <a href="/documentation" class="link">Guides & Help</a> for answers
           to common questions.
         </p>
       </div>

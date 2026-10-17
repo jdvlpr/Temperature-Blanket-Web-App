@@ -195,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div class="mt-2">
     <HelpIcon
-      href="/documentation/#import-weather-data-file-requirements"
+      topic="import-weather-data-file-requirements"
       title="Get more help"
     >
       {#snippet text()}

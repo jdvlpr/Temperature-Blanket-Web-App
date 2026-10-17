@@ -462,13 +462,8 @@ open in the panel, with a Back button to it. -->
           options: { title: 'Keyboard Shortcuts' },
         })}>Keyboard Shortcuts</button
     >
-    <a href={resolve('faq')} target="_blank" class={SMALL_LINK}
-      >FAQ <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
-        >(opens in a new tab)</span
-      ></a
-    >
     <a href={resolve('documentation')} target="_blank" class={SMALL_LINK}>
-      Documentation
+      Guides & Help
       <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
         >(opens in a new tab)</span
       >

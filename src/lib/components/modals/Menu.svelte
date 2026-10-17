@@ -447,14 +447,8 @@ the same color) says it's waiting here -->
       >Keyboard Shortcuts</button
     >
 
-    <a href={resolve('faq')} target="_blank" class={SMALL_LINK}
-      >FAQ <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
-        >(opens in a new tab)</span
-      ></a
-    >
-
     <a href={resolve('documentation')} target="_blank" class={SMALL_LINK}>
-      Documentation
+      Guides & Help
       <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
         >(opens in a new tab)</span
       >

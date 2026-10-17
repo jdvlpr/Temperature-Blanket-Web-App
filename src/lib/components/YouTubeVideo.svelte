@@ -50,7 +50,8 @@ visiting a page sends nothing to YouTube (see the Privacy Policy). -->
       <button
         type="button"
         class="btn preset-filled-primary-500"
-        onclick={() => (playing = true)}><PlayIcon />Play video</button
+        onclick={() => (playing = true)}
+        ><PlayIcon />Play video<span class="sr-only">: {title}</span></button
       >
 
       <p class="max-w-sm text-sm opacity-80">

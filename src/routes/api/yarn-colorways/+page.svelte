@@ -347,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <span class="code px-2">unavailableDate</span>
                   if the
                   <a
-                    href="/documentation#link-unavailable"
+                    href="/documentation/colors-and-yarn#link-unavailable"
                     target="_blank"
                     class="link">yarn link is no longer available</a
                   >.
@@ -692,7 +692,7 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                       <td
                         >This property is only returned if the yarn link is no
                         longer available. See <a
-                          href="/documentation#link-unavailable"
+                          href="/documentation/colors-and-yarn#link-unavailable"
                           class="link"
                           target="_blank">yarn link unavailable</a
                         > for more information.</td
@@ -705,7 +705,7 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                         >This property is only returned if the yarn link is no
                         longer available. The YYYY-MM-DD date when the
                         colorway's yarn was marked as unavailable. See <a
-                          href="/documentation#link-unavailable"
+                          href="/documentation/colors-and-yarn#link-unavailable"
                           class="link"
                           target="_blank">yarn link unavailable</a
                         > for more information.</td
@@ -970,7 +970,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?nam
                       <td
                         >This property is only returned if the yarn link is no
                         longer available. See <a
-                          href="/documentation#link-unavailable"
+                          href="/documentation/colors-and-yarn#link-unavailable"
                           class="link"
                           target="_blank">yarn link unavailable</a
                         > for more information.</td
@@ -983,7 +983,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?nam
                         >This property is only returned if the yarn link is no
                         longer available. The YYYY-MM-DD date when the
                         colorway's yarn was marked as unavailable. See <a
-                          href="/documentation#link-unavailable"
+                          href="/documentation/colors-and-yarn#link-unavailable"
                           class="link"
                           target="_blank">yarn link unavailable</a
                         > for more information.</td
@@ -1202,7 +1202,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=b
                       <td
                         >This property is only returned if the yarn link is no
                         longer available. See <a
-                          href="/documentation#link-unavailable"
+                          href="/documentation/colors-and-yarn#link-unavailable"
                           class="link"
                           target="_blank">yarn link unavailable</a
                         > for more information.</td
@@ -1215,7 +1215,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=b
                         >This property is only returned if the yarn link is no
                         longer available. The YYYY-MM-DD date when the
                         colorway's yarn was marked as unavailable. See <a
-                          href="/documentation#link-unavailable"
+                          href="/documentation/colors-and-yarn#link-unavailable"
                           class="link"
                           target="_blank">yarn link unavailable</a
                         > for more information.</td
