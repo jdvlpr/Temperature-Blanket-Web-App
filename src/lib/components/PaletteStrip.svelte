@@ -45,6 +45,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label?: string | Snippet;
     height?: string;
     roundedBottom?: boolean;
+    /** Slightly rounded corners, as in lists and cards */
+    smallCorners?: boolean;
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
     insideControl?: boolean;
     /** Called with a color's index when it's pressed; each color is then a button */
@@ -68,6 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label,
     height = '70px',
     roundedBottom = true,
+    smallCorners = false,
     insideControl = false,
     onselect,
     selectedIndex,
@@ -184,10 +187,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // The end colors round their outer corners like the strip, so their
         // outline (hover, selected, focus) follows the curve instead of
         // being clipped by it
-        index === 0 && 'rounded-tl-container',
-        index === 0 && roundedBottom && 'rounded-bl-container',
-        index === colors.length - 1 && 'rounded-tr-container',
-        index === colors.length - 1 && roundedBottom && 'rounded-br-container',
+        index === 0 &&
+          (smallCorners ? 'rounded-tl-sm' : 'rounded-tl-container'),
+        index === 0 &&
+          roundedBottom &&
+          (smallCorners ? 'rounded-bl-sm' : 'rounded-bl-container'),
+        index === colors.length - 1 &&
+          (smallCorners ? 'rounded-tr-sm' : 'rounded-tr-container'),
+        index === colors.length - 1 &&
+          roundedBottom &&
+          (smallCorners ? 'rounded-br-sm' : 'rounded-br-container'),
       ],
       style: `background:${hex};color:${getTextColor(hex)};${
         highlightIndex === index
@@ -243,8 +252,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <span
       class={[
-        'rounded-t-container flex w-full overflow-hidden',
-        roundedBottom && 'rounded-b-container',
+        'flex w-full overflow-hidden',
+        smallCorners ? 'rounded-t-sm' : 'rounded-t-container',
+        roundedBottom &&
+          (smallCorners ? 'rounded-b-sm' : 'rounded-b-container'),
       ]}
       style:height
       role={insideControl ? undefined : 'group'}

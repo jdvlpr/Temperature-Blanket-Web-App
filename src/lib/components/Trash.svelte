@@ -225,6 +225,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
                   colors={entry.colors}
                   height="50px"
                   insideControl
+                  smallCorners
                 />
               </div>
             </div>
