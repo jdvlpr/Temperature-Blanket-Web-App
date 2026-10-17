@@ -30,6 +30,11 @@ class GalleryOwnersState {
     return this.#owners.get(Number(postId))?.name;
   }
 
+  /** Their gallery's ID (`/gallery/by/<id>`), with the name (none while unknown) */
+  publicIdOf(postId: number | string) {
+    return this.#owners.get(Number(postId))?.publicId;
+  }
+
   /** Looks up the owners of these pages' cards, once each */
   load(postIds: (number | string)[]) {
     if (!__ACCOUNTS_ENABLED__ || !browser) return;

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
-  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
+  import GalleryCardMenu from '#lib/components/GalleryCardMenu.svelte';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
     fetchProjects,
@@ -255,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : 'grid grid-cols-1 items-start md:grid-cols-2'}"
         {@attach galleryState.layout === 'grid' ? masonry : undefined}
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
+        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
             image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
@@ -270,12 +270,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             layout={galleryState.layout}
           >
             {#snippet action()}
-              <GalleryStarButton
+              <GalleryCardMenu
                 postId={databaseId}
                 kind="project"
                 name={projectName
                   ? decodeHtmlEntities(projectName)
                   : getTitleTextFromLocationsMeta(locations)}
+                project={{ url: projectUrl, name: projectName }}
               />
             {/snippet}
           </GalleryProjectCard>

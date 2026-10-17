@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
-  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
+  import GalleryCardMenu from '#lib/components/GalleryCardMenu.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { masonry } from '#lib/state/attachments/masonry.js';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Starred projects"
       {@attach layout === 'grid' ? masonry : undefined}
     >
-      {#each projects as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
+      {#each projects as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
         {@const label = projectName
           ? decodeHtmlEntities(projectName)
           : getTitleTextFromLocationsMeta(locations)}
@@ -173,10 +173,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {layout}
           >
             {#snippet action()}
-              <GalleryStarButton
+              <GalleryCardMenu
                 postId={databaseId}
                 kind="project"
                 name={label}
+                project={{ url: projectUrl, name: projectName }}
               />
             {/snippet}
           </GalleryProjectCard>

@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
-  import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
+  import GalleryCardMenu from '#lib/components/GalleryCardMenu.svelte';
   import { masonry } from '#lib/state/attachments/masonry.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Projects by {data.name}"
       {@attach ownerFilters.layout === 'grid' ? masonry : undefined}
     >
-      {#each shown as { databaseId, featuredImage, locations, projectName, date, views } (databaseId)}
+      {#each shown as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
         <li>
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
@@ -219,12 +219,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             layout={ownerFilters.layout}
           >
             {#snippet action()}
-              <GalleryStarButton
+              <GalleryCardMenu
                 postId={databaseId}
                 kind="project"
                 name={projectName
                   ? decodeHtmlEntities(projectName)
                   : getTitleTextFromLocationsMeta(locations)}
+                project={{ url: projectUrl, name: projectName }}
+                moreBy={false}
               />
             {/snippet}
           </GalleryProjectCard>

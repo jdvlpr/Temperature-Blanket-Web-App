@@ -16,6 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A card's "more" menu (⋮), as a colorway's: items that act, or links (on this
   site, or in a new tab), with a separator before any item marked `separate`.
+  An item can say more on a second line (`detail`) or be shown but not
+  chosen (`disabled`, with its `detail` saying why). With `children`, the
+  button shows those instead of ⋮ (the preview's Share button).
 -->
 <script lang="ts" module>
   import type { Component } from 'svelte';
@@ -33,6 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onselect?: () => void;
     /** A line before it */
     separate?: boolean;
+    /** A second line under the label */
+    detail?: string;
+    /** Shown, but can't be chosen (its `detail` says why) */
+    disabled?: boolean;
   };
 </script>
 
@@ -44,39 +51,82 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/components/menu-styles.js';
   import { EllipsisVerticalIcon } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
+  import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes } from 'svelte/elements';
 
   interface Props {
     items: MoreMenuItem[];
     /** Names what it's for, e.g. "More for Autumn" */
     label: string;
+    /** The button's text and icon, in place of ⋮ (`label` still names it) */
+    children?: Snippet;
+    /** The button's look, with `children` */
+    triggerClass?: string;
+    /** The button's tooltip */
+    title?: string;
+    /** Runs as it opens (e.g. to load what its items need) */
+    onopen?: () => void;
   }
 
-  let { items, label }: Props = $props();
+  let {
+    items,
+    label,
+    children,
+    triggerClass,
+    title = 'More',
+    onopen,
+  }: Props = $props();
 </script>
+
+{#snippet text(item: MoreMenuItem)}
+  {#if item.detail}
+    <span class="flex min-w-0 flex-col">
+      <span>{item.label}</span>
+      <span class="text-surface-700-300 text-xs">{item.detail}</span>
+    </span>
+  {:else}
+    <span>{item.label}</span>
+  {/if}
+{/snippet}
 
 <Menu
   positioning={menuPositioning('bottom-end')}
+  onOpenChange={(details) => {
+    if (details.open) onopen?.();
+  }}
   onSelect={(details) => {
     const item = items.find((item) => item.value === details.value);
-    if (item && !item.href) item.onselect?.();
+    if (item && !item.href && !item.disabled) item.onselect?.();
   }}
 >
   <Menu.Trigger
-    class="btn-icon hover:preset-tonal-surface active:bg-surface-200-800 data-[state=open]:bg-surface-200-800 shrink-0"
-    aria-label={label}
-    title="More"
+    class={children
+      ? triggerClass
+      : 'btn-icon hover:preset-tonal-surface active:bg-surface-200-800 data-[state=open]:bg-surface-200-800 shrink-0'}
+    aria-label={children ? undefined : label}
+    {title}
   >
-    <EllipsisVerticalIcon aria-hidden="true" />
+    {#if children}
+      {@render children()}
+    {:else}
+      <EllipsisVerticalIcon aria-hidden="true" />
+    {/if}
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
-      <Menu.Content class={menuContentClass}>
+      <!-- Second lines wrap rather than widen it (it fits a 320px screen) -->
+      <Menu.Content
+        class={[menuContentClass, items.some((item) => item.detail) && 'w-72']}
+      >
         {#each items as item (item.value)}
           {#if item.separate}<Menu.Separator />{/if}
-          <Menu.Item value={item.value} class={menuItemClass}>
+          <Menu.Item
+            value={item.value}
+            class={menuItemClass}
+            disabled={item.disabled}
+          >
             {#snippet element(attributes)}
-              {#if item.href}
+              {#if item.href && !item.disabled}
                 <!-- eslint-disable svelte/no-navigation-without-resolve -- callers resolve their links -->
                 <!-- The item's menu behavior, typed for its default div -->
                 <a
@@ -87,8 +137,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   data-sveltekit-reload={item.reload ? '' : undefined}
                   onclick={() => item.onselect?.()}
                 >
-                  <item.icon aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <item.icon class="shrink-0" aria-hidden="true" />
+                  {@render text(item)}
                   {#if item.newTab}
                     <span class="sr-only">(opens in a new tab)</span>
                   {/if}
@@ -96,8 +146,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <!-- eslint-enable svelte/no-navigation-without-resolve -->
               {:else}
                 <div {...attributes}>
-                  <item.icon aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <item.icon class="shrink-0" aria-hidden="true" />
+                  {@render text(item)}
                 </div>
               {/if}
             {/snippet}

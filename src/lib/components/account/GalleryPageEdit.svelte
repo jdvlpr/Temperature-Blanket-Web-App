@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   On a gallery page, only for the account that published it: Edit Gallery
-  Page, beside Open a Copy. It opens the same dialog as its Share dialog in
+  Page, beside Open a Copy. It opens the same dialog as Edit Gallery Page in
   My Library (update, Anonymous, a project's Ravelry project, Unpublish), with
   its project or palette as saved here; after saving, the page shows what
   changed. Not saved on this device yet (before a sync), the dialog offers
@@ -29,9 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import type { GalleryPage } from '#lib/accounts/gallery.js';
-  import { dialog } from '#lib/state/page-state.svelte.js';
-  import { PaletteStorage } from '#lib/storage/palettes.svelte.js';
-  import { ProjectStorage } from '#lib/storage/projects.svelte.js';
+  import { editGalleryPage } from '#lib/utils/edit-gallery-page.js';
   import { LoaderCircleIcon, PencilIcon } from '@lucide/svelte';
 
   let {
@@ -62,7 +60,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let removed = $state(false);
   let errorMessage = $state('');
 
-  const TITLE = 'Edit Gallery Page';
   const onsaved = () => void invalidateAll();
   const onunpublished = () => (removed = true);
 
@@ -71,80 +68,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     opening = true;
     errorMessage = '';
     try {
-      if (kind === 'project') await openProject(page);
-      else await openPalette(page);
+      await editGalleryPage(page, kind, { onsaved, onunpublished });
     } catch {
       errorMessage = 'It couldn’t be opened. Try again later.';
     } finally {
       opening = false;
     }
-  }
-
-  async function openProject(page: GalleryPage) {
-    const item = (await ProjectStorage.getProjectsForDisplay()).find(
-      (i) => i.id === page.projectId,
-    );
-    if (!item) return openManage(page);
-    const { default: AddToGallery } =
-      await import('#lib/components/modals/AddToGallery.svelte');
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: AddToGallery,
-        props: {
-          request: { action: 'replace', postId: page.postId },
-          href: item.meta.href,
-          onsaved,
-          onunpublished,
-        },
-      },
-      options: { title: TITLE, size: 'medium' },
-    });
-  }
-
-  async function openPalette(page: GalleryPage) {
-    const palette = (await PaletteStorage.list()).find(
-      (p) => p.id === page.projectId,
-    );
-    if (!palette) return openManage(page);
-    const [{ ensureYarnData }, colorUtils, { default: SharePalette }] =
-      await Promise.all([
-        import('#lib/data/yarns/colorways.svelte.js'),
-        import('#lib/utils/color-utils.js'),
-        import('#lib/components/modals/SharePalette.svelte'),
-      ]);
-    await ensureYarnData();
-    const colors = colorUtils.getColorsFromInput({ string: palette.code });
-    if (!colors || !colors.length) return openManage(page);
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: SharePalette,
-        props: {
-          paletteId: palette.id,
-          colors,
-          name: palette.name || colorUtils.getPaletteFallbackName(colors),
-          showOwner: page.showOwner,
-          update: page,
-          onsaved,
-          onunpublished,
-        },
-      },
-      options: { title: TITLE },
-    });
-  }
-
-  async function openManage(page: GalleryPage) {
-    const { default: GalleryPageManage } =
-      await import('#lib/components/modals/GalleryPageManage.svelte');
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: GalleryPageManage,
-        props: { kind, page, onsaved, onunpublished },
-      },
-      options: { title: TITLE },
-    });
   }
 </script>
 
