@@ -14,10 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Project, in the top bar: opens the Project menu. Once the project saves by
-itself (and Save is gone), its icon is the save state, like Google Docs' cloud:
-a cloud for the account or a screen for this browser only, in the text color,
-since saved is the usual state; a slow, dimmed spinner while a change waits
-to save, with a little pop when it lands; red only for a problem, which the menu explains.
+itself (and Save is gone), its icon shows the save state only when there's
+something to see: a slow, dimmed spinner while a change waits to save; red for
+a problem (a cloud for the account or a screen for this browser only), which
+the menu explains. Saved is the usual state, so it's the plain menu icon (the
+label still says where it's saved).
 Until then, a dot in the menu's Save Project color says there's something to save. -->
 
 <script lang="ts">
@@ -28,10 +29,8 @@ Until then, a dot in the menu's Save Project color says there's something to sav
   import { autosave } from '#lib/storage/autosave.svelte.js';
   import {
     CloudAlertIcon,
-    CloudCheckIcon,
     EllipsisVerticalIcon,
     LoaderCircleIcon,
-    MonitorCheckIcon,
     MonitorXIcon,
   } from '@lucide/svelte';
 
@@ -79,7 +78,7 @@ Until then, a dot in the menu's Save Project color says there's something to sav
   data-testid="project-button"
   data-save-status={status}
 >
-  {#if !autosave.on}
+  {#if !autosave.on || saved}
     <EllipsisVerticalIcon />
   {:else if problem}
     {#if autosave.account}
@@ -87,16 +86,6 @@ Until then, a dot in the menu's Save Project color says there's something to sav
     {:else}
       <MonitorXIcon class="text-error-700-300" />
     {/if}
-  {:else if saved}
-    {#key autosave.account}
-      <span class="saved-pop flex">
-        {#if autosave.account}
-          <CloudCheckIcon />
-        {:else}
-          <MonitorCheckIcon />
-        {/if}
-      </span>
-    {/key}
   {:else}
     <LoaderCircleIcon class="saving-spin opacity-60" />
   {/if}
@@ -111,16 +100,6 @@ Until then, a dot in the menu's Save Project color says there's something to sav
 </button>
 
 <style>
-  /* Saved: the check lands with a little pop, once per save */
-  .saved-pop {
-    animation: saved-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  @keyframes saved-pop {
-    from {
-      transform: scale(0.6);
-      opacity: 0.5;
-    }
-  }
   /* Saving: a slow turn, calmer than a busy spinner, since it shows after every change */
   :global(.saving-spin) {
     animation: saving-spin 1.6s linear infinite;
@@ -131,12 +110,10 @@ Until then, a dot in the menu's Save Project color says there's something to sav
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .saved-pop,
     :global(.saving-spin) {
       animation: none;
     }
   }
-  :global([data-motion='reduce']) .saved-pop,
   :global([data-motion='reduce'] .saving-spin) {
     animation: none;
   }

@@ -20,8 +20,8 @@
 // so there's no timer, and sending and looking are kept apart:
 // - Automatic saves of the open project are sent a little over a minute after
 //   the last one (at most five minutes after the first), and straight away when
-//   the tab is hidden. Saving here is instant either way; until then the
-//   project shows "Waiting to sync" on My Projects. Other changes (Save, Save a
+//   the tab is hidden. Saving here is instant either way; My Projects shows
+//   "Waiting to sync" only while sync can't run. Other changes (Save, Save a
 //   Copy, renaming, the Trash, palettes) are sent straight away, and
 //   preferences after a few seconds.
 // - What changed elsewhere is looked for on sign-in and page load, when the tab

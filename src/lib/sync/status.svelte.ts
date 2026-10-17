@@ -46,8 +46,8 @@ export type SyncLabel = {
 
 /**
  * Where a saved project is kept, for the list of saved projects, when that
- * needs saying. Nothing once it's synced (the usual case, so it shows no mark)
- * or for a guest's projects, so the list looks as it always has.
+ * needs saying. Nothing once it's synced or about to be (the usual case, so it
+ * shows no mark) or for a guest's projects, so the list looks as it always has.
  */
 export function syncLabelFor(
   item: { sync?: ProjectSyncState },
@@ -69,7 +69,9 @@ export function syncLabelFor(
   if (state.error === 'PROJECT_TOO_LARGE')
     return { text: 'Not synced: too large', tone: 'error', icon: 'error' };
   if (state.error) return { text: 'Not synced', tone: 'error', icon: 'error' };
-  if (state.dirty)
+  // A change syncs by itself soon after it's made, so it shows only while
+  // sync can't run (offline, paused, the session ended, or failing)
+  if (state.dirty && sync.state !== 'idle' && sync.state !== 'syncing')
     return { text: 'Waiting to sync', tone: 'warning', icon: 'waiting' };
   return undefined;
 }
