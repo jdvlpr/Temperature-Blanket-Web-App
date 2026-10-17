@@ -239,7 +239,7 @@ either. With accounts off, a menu of those two. -->
                 </div>
               </div>
               <Popover.Arrow
-                style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-200-800);"
+                style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-100-900);"
               >
                 <Popover.ArrowTip />
               </Popover.Arrow>

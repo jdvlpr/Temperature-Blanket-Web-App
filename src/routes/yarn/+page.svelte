@@ -202,8 +202,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div>
-      <main class="m-auto max-w-(--breakpoint-xl) text-center">
-        <div class="w-full px-2 py-4">
+      <main class="m-auto max-w-(--breakpoint-xl) text-center max-lg:px-2">
+        <div class="w-full py-4">
           <div class="flex flex-col gap-2">
             <h2 class="h1 text-gradient mb-0">Design a Yarn Palette</h2>
             <p>
