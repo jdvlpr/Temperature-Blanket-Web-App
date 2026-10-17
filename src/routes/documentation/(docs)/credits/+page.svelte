@@ -28,7 +28,9 @@ imagery (globe-imagery.ts) and random photos (GetPaletteFromImage). -->
 </p>
 
 <section class="flex flex-col gap-3">
-  <h2 id="data-sources" class="text-2xl font-bold">Weather, Places and Colors</h2>
+  <h2 id="data-sources" class="text-2xl font-bold">
+    Weather, Places and Colors
+  </h2>
   <DataSourcesCredits />
 </section>
 
@@ -36,8 +38,8 @@ imagery (globe-imagery.ts) and random photos (GetPaletteFromImage). -->
   <h2 id="more-credits" class="text-2xl font-bold">Also</h2>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      The <a href="/globe" class="link">Globe</a>'s imagery is NASA's Blue Marble and
-      Landsat WELD, from
+      The <a href="/globe" class="link">Globe</a>'s imagery is NASA's Blue
+      Marble and Landsat WELD, from
       <a
         href="https://earthdata.nasa.gov/gibs"
         target="_blank"
@@ -62,8 +64,9 @@ imagery (globe-imagery.ts) and random photos (GetPaletteFromImage). -->
     </li>
     <li>
       Yarn colors are worked out from each colorway's own photos:
-      <a href="/documentation/colors-and-yarn#getting-yarn-colorway-data" class="link"
-        >how yarn colors are made</a
+      <a
+        href="/documentation/colors-and-yarn#getting-yarn-colorway-data"
+        class="link">how yarn colors are made</a
       >.
     </li>
     <li>

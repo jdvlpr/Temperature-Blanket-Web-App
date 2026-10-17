@@ -435,7 +435,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#snippet element(attributes)}
                 <a
                   {...attributes as HTMLAnchorAttributes}
-                  href="{resolve('documentation')}#range-calculation-methods"
+                  href="{resolve(
+                    '/documentation/(docs)/gauges-and-ranges',
+                  )}#range-calculation-methods"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

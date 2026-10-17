@@ -28,8 +28,8 @@ export type DocsPage = {
   /** One sentence: the card text and the page's meta description */
   summary: string;
   keywords: string[];
-  /** Until the page is written: its section in the previous documentation */
-  old?: string;
+  /** Until the guide is written: the reference section that covers it */
+  until?: string;
 };
 
 export const DOCS_TITLE = 'Guides & Help';
@@ -51,7 +51,7 @@ export const GUIDES: DocsPage[] = [
       'new project',
       'getting started',
     ],
-    old: 'about-the-project-planner',
+    until: '/documentation/location-and-dates',
   },
   {
     kind: 'guide',
@@ -71,7 +71,7 @@ export const GUIDES: DocsPage[] = [
       'my own data',
       'weather station',
     ],
-    old: 'weather-sources',
+    until: '/documentation/weather#weather-errors',
   },
   {
     kind: 'guide',
@@ -90,7 +90,7 @@ export const GUIDES: DocsPage[] = [
       'decimals',
       'equal',
     ],
-    old: 'range-calculation-methods',
+    until: '/documentation/gauges-and-ranges#increment-modes',
   },
   {
     kind: 'guide',
@@ -108,7 +108,7 @@ export const GUIDES: DocsPage[] = [
       'memorial',
       'wedding',
     ],
-    old: 'multiple-locations',
+    until: '/documentation/location-and-dates#multiple-locations',
   },
   {
     kind: 'guide',
@@ -128,7 +128,7 @@ export const GUIDES: DocsPage[] = [
       'palette',
       'buy',
     ],
-    old: 'choose-yarn-colorways',
+    until: '/documentation/colors-and-yarn#choose-yarn-colorways',
   },
   {
     kind: 'guide',
@@ -147,7 +147,7 @@ export const GUIDES: DocsPage[] = [
       'crochet along',
       'knit along',
     ],
-    old: 'save-project',
+    until: '/documentation/library-and-account#save-project',
   },
   {
     kind: 'guide',
@@ -167,7 +167,7 @@ export const GUIDES: DocsPage[] = [
       'deleted',
       'trash',
     ],
-    old: 'open-project',
+    until: '/documentation/library-and-account#open-project',
   },
   {
     kind: 'guide',
@@ -186,7 +186,7 @@ export const GUIDES: DocsPage[] = [
       'update',
       'stars',
     ],
-    old: 'share-to-gallery',
+    until: '/documentation/gallery-and-ravelry',
   },
   {
     kind: 'guide',
@@ -204,6 +204,7 @@ export const GUIDES: DocsPage[] = [
       'not updating',
       'post',
     ],
+    until: '/documentation/gallery-and-ravelry',
   },
   {
     kind: 'guide',
@@ -223,7 +224,7 @@ export const GUIDES: DocsPage[] = [
       'download',
       'image',
     ],
-    old: 'download-gauges-and-weather-data-pdf',
+    until: '/documentation/download',
   },
   {
     kind: 'guide',
@@ -241,7 +242,7 @@ export const GUIDES: DocsPage[] = [
       'moon',
       'not temperature',
     ],
-    old: 'mixed-snow-parameters',
+    until: '/documentation/gauges-and-ranges#add-a-gauge',
   },
 ];
 
@@ -252,7 +253,6 @@ export const REFERENCE: DocsPage[] = [
     title: 'Location & Dates',
     summary: 'Choosing places and dates, and what to do when one is not found.',
     keywords: ['location', 'place', 'city', 'dates', 'year', 'not found'],
-    old: 'location',
   },
   {
     kind: 'reference',
@@ -272,7 +272,6 @@ export const REFERENCE: DocsPage[] = [
       'monthly',
       'error',
     ],
-    old: 'weather',
   },
   {
     kind: 'reference',
@@ -290,7 +289,6 @@ export const REFERENCE: DocsPage[] = [
       'direction',
       'includes',
     ],
-    old: 'gauges',
   },
   {
     kind: 'reference',
@@ -309,7 +307,6 @@ export const REFERENCE: DocsPage[] = [
       'link unavailable',
       'out of stock',
     ],
-    old: 'colors',
   },
   {
     kind: 'reference',
@@ -317,7 +314,6 @@ export const REFERENCE: DocsPage[] = [
     title: 'Preview',
     summary: 'Preview patterns, their settings, and seasons.',
     keywords: ['preview', 'pattern', 'rows', 'squares', 'hexagons', 'seasons'],
-    old: 'preview',
   },
   {
     kind: 'reference',
@@ -325,7 +321,6 @@ export const REFERENCE: DocsPage[] = [
     title: 'Download',
     summary: 'The PDF, the weather spreadsheet (CSV), and the preview image.',
     keywords: ['download', 'pdf', 'csv', 'png', 'print', 'image'],
-    old: 'download',
   },
   {
     kind: 'reference',
@@ -334,7 +329,6 @@ export const REFERENCE: DocsPage[] = [
     summary:
       'Making yarn palettes on their own: from colorways, gradients or a photo.',
     keywords: ['palette', 'creator', 'gradients', 'photo', 'colors', 'yarn'],
-    old: 'saved-palettes',
   },
   {
     kind: 'reference',
@@ -356,7 +350,6 @@ export const REFERENCE: DocsPage[] = [
       'delete account',
       'undo',
     ],
-    old: 'basics',
   },
   {
     kind: 'reference',
@@ -365,7 +358,6 @@ export const REFERENCE: DocsPage[] = [
     summary:
       'Gallery pages, stars, views, and connecting your Ravelry account.',
     keywords: ['gallery', 'publish', 'stars', 'views', 'ravelry', 'anonymous'],
-    old: 'gallery',
   },
   {
     kind: 'reference',
@@ -373,7 +365,6 @@ export const REFERENCE: DocsPage[] = [
     title: 'Explore',
     summary: 'The Yarn Colorway Finder, the Globe and the Weather page.',
     keywords: ['finder', 'globe', 'map', 'forecast', 'weather page', 'search'],
-    old: 'getting-yarn-colorway-data',
   },
   {
     kind: 'reference',
@@ -381,7 +372,6 @@ export const REFERENCE: DocsPage[] = [
     title: 'Data Sources & Credits',
     summary: 'Where the weather, places and yarn colors come from.',
     keywords: ['credits', 'sources', 'data', 'thanks', 'license'],
-    old: 'credits',
   },
 ];
 

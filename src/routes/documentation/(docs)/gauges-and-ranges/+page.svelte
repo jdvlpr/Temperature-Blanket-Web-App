@@ -49,7 +49,10 @@ RangesMenu, range-format. Section ids are the old single page's
     <li>
       <span class="font-bold">Temperature Gauge:</span> high, average and low temperatures.
     </li>
-    <li><span class="font-bold">Rain Gauge</span> and <span class="font-bold">Snow Gauge</span>: how much fell.</li>
+    <li>
+      <span class="font-bold">Rain Gauge</span> and
+      <span class="font-bold">Snow Gauge</span>: how much fell.
+    </li>
     <li>
       <span class="font-bold">Daytime Gauge:</span> hours from sunrise to sunset.
     </li>
@@ -60,7 +63,8 @@ RangesMenu, range-format. Section ids are the old single page's
   </ul>
   <p>
     A gauge shows up only when the weather has what it needs. To remove one
-    (except temperature), open it and press <span class="font-bold">Delete</span>
+    (except temperature), open it and press <span class="font-bold">Delete</span
+    >
     under the gauge buttons. Which gauge a row or square uses is set in the
     <a href="/documentation/preview" class="link">preview</a>.
   </p>
@@ -69,23 +73,23 @@ RangesMenu, range-format. Section ids are the old single page's
 <section class="flex flex-col gap-3">
   <h2 id="adjust-ranges" class="text-2xl font-bold">Colors and Ranges</h2>
   <p>
-    Each color in the gauge has its range beside it, written From → To:
-    30 → 20 means from 30° down to 20°. Under the colors:
+    Each color in the gauge has its range beside it, written From → To: 30 → 20
+    means from 30° down to 20°. Under the colors:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
       <span class="font-bold">Change a number:</span> press it, type the new
-      number, then press <span class="font-bold">Save</span> (or Enter). ✕,
-      Escape, or pressing anywhere else puts it back.
+      number, then press <span class="font-bold">Save</span> (or Enter). ✕, Escape,
+      or pressing anywhere else puts it back.
     </li>
     <li>
       <span class="font-bold">Change a color:</span> press its swatch, and choose
       a new color or yarn.
     </li>
     <li>
-      <span class="font-bold">Move a color:</span> drag it by its handle (the
-      number). With a keyboard, focus the handle, press Space, move it with the
-      arrow keys, and press Space again.
+      <span class="font-bold">Move a color:</span> drag it by its handle (the number).
+      With a keyboard, focus the handle, press Space, move it with the arrow keys,
+      and press Space again.
     </li>
     <li>
       <span class="font-bold">More (⋮):</span> the yarn's shop page, copy its
@@ -93,10 +97,9 @@ RangesMenu, range-format. Section ids are the old single page's
       <span class="font-bold">after</span>, or remove it.
     </li>
     <li>
-      <span class="font-bold">Number of colors:</span> the menu above the gauge,
-      up to 99. With your own colors, new ones are added at the end and extra ones
-      are taken off the end. With a gradient, the gradient is remade in that many
-      colors.
+      <span class="font-bold">Number of colors:</span> the menu above the gauge, up
+      to 99. With your own colors, new ones are added at the end and extra ones are
+      taken off the end. With a gradient, the gradient is remade in that many colors.
     </li>
   </ul>
   <p>
@@ -107,8 +110,9 @@ RangesMenu, range-format. Section ids are the old single page's
   </p>
   <p>
     <span class="font-bold">View</span> also lays the colors out as a
-    <span class="font-bold">Grid</span> or a <span class="font-bold">List</span>,
-    and <span class="font-bold">Fill backgrounds</span> paints each one in its color.
+    <span class="font-bold">Grid</span> or a
+    <span class="font-bold">List</span>, and
+    <span class="font-bold">Fill backgrounds</span> paints each one in its color.
   </p>
 </section>
 
@@ -120,8 +124,8 @@ RangesMenu, range-format. Section ids are the old single page's
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Auto:</span> made from your weather, and remade
-      when the weather or the number of colors changes.
+      <span class="font-bold">Auto:</span> made from your weather, and remade when
+      the weather or the number of colors changes.
     </li>
     <li>
       <span class="font-bold">Manual:</span> made from a step size you chose.
@@ -140,8 +144,8 @@ RangesMenu, range-format. Section ids are the old single page's
     </li>
     <li>
       <span class="font-bold">Equal days</span> (temperature only, by High, Average
-      or Low): about the same number of days in each range, so every color gets
-      used about as much. Ranges are narrower where most of your days are.
+      or Low): about the same number of days in each range, so every color gets used
+      about as much. Ranges are narrower where most of your days are.
     </li>
     <li>
       <span class="font-bold">Round numbers:</span> appears when an equal size has
@@ -152,8 +156,8 @@ RangesMenu, range-format. Section ids are the old single page's
   <p>
     Choose <span class="font-bold">Manual steps…</span>, then fill in
     <span class="font-bold">Every</span> (the size of each range, like 5°) and
-    <span class="font-bold">From</span> (where the first range starts). The colors
-    update as you type; press <span class="font-bold">Save</span> to keep them.
+    <span class="font-bold">From</span> (where the first range starts). The
+    colors update as you type; press <span class="font-bold">Save</span> to keep them.
   </p>
   <h3 id="gauge-direction" class="text-lg font-bold">Direction</h3>
   <ul class="ml-6 list-disc space-y-1">
@@ -162,8 +166,8 @@ RangesMenu, range-format. Section ids are the old single page's
       range: 30 → 20, 20 → 10…
     </li>
     <li>
-      <span class="font-bold">Low to high:</span> the first color has the lowest
-      range: 10 → 20, 20 → 30…
+      <span class="font-bold">Low to high:</span> the first color has the lowest range:
+      10 → 20, 20 → 30…
     </li>
   </ul>
   <h3 class="text-lg font-bold">Linked ranges</h3>
@@ -236,9 +240,10 @@ RangesMenu, range-format. Section ids are the old single page's
     </table>
   </div>
   <p>
-    If a day fits two ranges, it takes the color of the first one (the higher one
-    in the list), though it's counted in both. With Both or Neither, rounded or
-    manual steps can leave such overlaps or gaps; the gauge warns you when they do.
+    If a day fits two ranges, it takes the color of the first one (the higher
+    one in the list), though it's counted in both. With Both or Neither, rounded
+    or manual steps can leave such overlaps or gaps; the gauge warns you when
+    they do.
   </p>
 </section>
 

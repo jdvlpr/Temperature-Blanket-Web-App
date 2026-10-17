@@ -13,8 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- A page still being written: points to its section of the previous,
-single-page documentation until then, and holds the ids its sections will
+<!-- A guide still being written: points to the reference section that
+covers it until then, and holds the ids its sections will
 have, so links to them (and old links sent on here) already land. -->
 
 <script lang="ts">
@@ -32,11 +32,10 @@ have, so links to them (and old links sent on here) already land. -->
 </script>
 
 <p class="card preset-tonal-surface p-4">
-  This page is being written.
-  {#if current?.old}
-    Until it's ready, see
-    <a href="/documentation/old#{current.old}" class="link"
-      >this part of the previous documentation</a
+  This guide is being written.
+  {#if current?.until}
+    Until it's ready, see <a href={current.until} class="link"
+      >the reference page that covers it</a
     >.
   {/if}
 </p>

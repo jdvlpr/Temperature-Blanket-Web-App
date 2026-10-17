@@ -61,9 +61,10 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="weather-sources" class="text-2xl font-bold">Weather Sources</h2>
   <p>
-    Press <span class="font-bold">Weather Source</span> above the weather to choose
-    where it comes from, then search again. The button shows the source in use,
-    or <span class="font-bold">Custom</span> once you've edited or imported weather.
+    Press <span class="font-bold">Weather Source</span> above the weather to
+    choose where it comes from, then search again. The button shows the source
+    in use, or <span class="font-bold">Custom</span> once you've edited or imported
+    weather.
   </p>
   <h3 class="text-lg font-bold">Open-Meteo</h3>
   <p>
@@ -73,7 +74,8 @@ HELP_TOPICS). -->
   <ul class="ml-6 list-disc space-y-1">
     {#each models as { value, title, timespan, resolution, isDefault } (value)}
       <li>
-        <span class="font-bold">{title}</span>{#if isDefault}&nbsp;(default){/if}:
+        <span class="font-bold">{title}</span
+        >{#if isDefault}&nbsp;(default){/if}:
         {timespan}, {resolution}.
         {#if isDefault}
           It combines several models, so it's the most complete, but a model
@@ -87,9 +89,9 @@ HELP_TOPICS). -->
   <h3 class="text-lg font-bold">Meteostat</h3>
   <p>
     Measurements from real weather stations near your place, combined.
-    <span class="font-bold">Fill Missing Data</span> (on by default) fills days
-    the stations missed with model data. Meteostat's snow is the depth of snow on
-    the ground, not how much fell.
+    <span class="font-bold">Fill Missing Data</span> (on by default) fills days the
+    stations missed with model data. Meteostat's snow is the depth of snow on the
+    ground, not how much fell.
   </p>
   <h3 class="text-lg font-bold">If one source has nothing</h3>
   <p>
@@ -101,8 +103,8 @@ HELP_TOPICS). -->
   <p>
     Weather from any source can change: services correct past days and upgrade
     their models. See
-    <a href="/documentation/credits" class="link">Data Sources & Credits</a> for
-    the licenses.
+    <a href="/documentation/credits" class="link">Data Sources & Credits</a> for the
+    licenses.
   </p>
 </section>
 
@@ -123,21 +125,21 @@ HELP_TOPICS). -->
   <h2 id="view-weather-data" class="text-2xl font-bold">View the Weather</h2>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Summary:</span> the highest, average and lowest
-      temperatures, total rain and snow, and the average daylight of your whole
-      project, with the date of the hottest and coldest day.
+      <span class="font-bold">Summary:</span> the highest, average and lowest temperatures,
+      total rain and snow, and the average daylight of your whole project, with the
+      date of the hottest and coldest day.
     </li>
     <li>
-      <span class="font-bold">Chart:</span> every day's weather. Press a name under
-      the chart (<span class="font-bold">High Temps</span>,
+      <span class="font-bold">Chart:</span> every day's weather. Press a name
+      under the chart (<span class="font-bold">High Temps</span>,
       <span class="font-bold">Rain</span>,
-      <span class="font-bold">Moon Phase</span>…) to hide or show it, in the chart,
-      the summary and the table.
+      <span class="font-bold">Moon Phase</span>…) to hide or show it, in the
+      chart, the summary and the table.
     </li>
     <li>
       <span class="font-bold">Table:</span> every day, one row each. Turn on
-      <span class="font-bold">Show Color Details</span> to color each value with
-      the yarn of its range, with the yarn's name.
+      <span class="font-bold">Show Color Details</span> to color each value with the
+      yarn of its range, with the yarn's name.
     </li>
   </ul>
   <p>
@@ -194,14 +196,14 @@ HELP_TOPICS). -->
     Import Your Own Weather
   </h2>
   <p>
-    Use readings from your own thermometer, a local weather station or any
-    other source. Your weather needs to be <span class="font-bold">Daily</span>.
+    Use readings from your own thermometer, a local weather station or any other
+    source. Your weather needs to be <span class="font-bold">Daily</span>.
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       Press <span class="font-bold">Download</span> under the table, then
-      <span class="font-bold">Download CSV</span>. This is your project's weather
-      as a spreadsheet.
+      <span class="font-bold">Download CSV</span>. This is your project's
+      weather as a spreadsheet.
     </li>
     <li>
       Open it in Excel, Numbers or Google Sheets, change what you want, and save
@@ -235,12 +237,14 @@ HELP_TOPICS). -->
   <ul class="ml-6 list-disc space-y-1">
     <li>dates in the past only (not today or later),</li>
     <li>a bigger town or a place nearby,</li>
-    <li>the other <a href="#weather-sources" class="link">weather source</a>,</li>
+    <li>
+      the other <a href="#weather-sources" class="link">weather source</a>,
+    </li>
     <li>or again in a few minutes.</li>
   </ul>
   <p>
-    <span class="font-bold">Dates Out of Range</span> means the source has no weather
-    that far back (Open-Meteo starts in 1940), and
+    <span class="font-bold">Dates Out of Range</span> means the source has no
+    weather that far back (Open-Meteo starts in 1940), and
     <span class="font-bold">Service Temporarily Unavailable</span> means it's busy:
     try again shortly.
   </p>

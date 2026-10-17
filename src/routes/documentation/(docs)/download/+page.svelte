@@ -23,9 +23,9 @@ single page's (OLD_ANCHORS). -->
 
 <p>
   Take your project with you: a PDF to print, the weather as a spreadsheet, or a
-  picture of the preview. Press <span class="font-bold">Project</span> at the top of
-  the Project Planner, then <span class="font-bold">Download</span>, and choose one.
-  The same downloads are under the weather table and the preview.
+  picture of the preview. Press <span class="font-bold">Project</span> at the
+  top of the Project Planner, then <span class="font-bold">Download</span>, and
+  choose one. The same downloads are under the weather table and the preview.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -38,13 +38,12 @@ single page's (OLD_ANCHORS). -->
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Summary page:</span> your project, its place and
-      dates, and the preview.
+      <span class="font-bold">Summary page:</span> your project, its place and dates,
+      and the preview.
     </li>
     <li>
       <span class="font-bold">Colors and ranges</span> of each gauge, and the
-      preview's <span class="font-bold">Additional colors</span> (border and
-      accent).
+      preview's <span class="font-bold">Additional colors</span> (border and accent).
     </li>
     <li>
       <span class="font-bold">Weather data:</span> a table of every day, with each
@@ -55,9 +54,10 @@ single page's (OLD_ANCHORS). -->
   <p>And how it looks, under <span class="font-bold">Look</span>:</p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Colors:</span> a <span class="font-bold">List</span>
-      (a row for each color) or a <span class="font-bold">Grid</span> (a card for
-      each), with <span class="font-bold">Fill with color</span>,
+      <span class="font-bold">Colors:</span> a
+      <span class="font-bold">List</span>
+      (a row for each color) or a <span class="font-bold">Grid</span> (a card
+      for each), with <span class="font-bold">Fill with color</span>,
       <span class="font-bold">Days in ranges</span> and
       <span class="font-bold">HTML color codes</span> if you want them.
     </li>
@@ -66,8 +66,10 @@ single page's (OLD_ANCHORS). -->
     </li>
   </ul>
   <p>
-    <span class="font-bold">Your PDF will have</span> sums up your choices. Press
-    <span class="font-bold">Download</span>. Your choices are remembered for next time.
+    <span class="font-bold">Your PDF will have</span> sums up your choices.
+    Press
+    <span class="font-bold">Download</span>. Your choices are remembered for
+    next time.
   </p>
 </section>
 
@@ -88,9 +90,9 @@ single page's (OLD_ANCHORS). -->
   <h2 id="download-google-sheet" class="text-2xl font-bold">Google Sheet</h2>
   <p>
     The weather and your gauges' colors and ranges, in a new spreadsheet in your
-    Google Drive. Choose the weather and gauges to
-    include, and whether to show the number of days in each range. Google asks
-    you to sign in; if nothing appears, allow pop-ups for this site.
+    Google Drive. Choose the weather and gauges to include, and whether to show
+    the number of days in each range. Google asks you to sign in; if nothing
+    appears, allow pop-ups for this site.
   </p>
 </section>
 

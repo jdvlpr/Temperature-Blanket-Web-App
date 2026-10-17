@@ -24,9 +24,9 @@ Ravelry need accounts, so show only in builds with them. -->
 </script>
 
 <p>
-  The <a href="/gallery" class="link">Gallery</a> is where people share their
-  temperature blanket projects and yarn palettes. Browse it for ideas, and open a
-  copy of anything you like to make it your own.
+  The <a href="/gallery" class="link">Gallery</a> is where people share their temperature
+  blanket projects and yarn palettes. Browse it for ideas, and open a copy of anything
+  you like to make it your own.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -34,8 +34,8 @@ Ravelry need accounts, so show only in builds with them. -->
   <p>
     Open <span class="font-bold">Gallery</span> in the site menu. It has
     <span class="font-bold">Projects</span> and
-    <span class="font-bold">Yarn Palettes</span>, with a search, filters (like yarn
-    or pattern) and sorting:
+    <span class="font-bold">Yarn Palettes</span>, with a search, filters (like
+    yarn or pattern) and sorting:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -48,8 +48,8 @@ Ravelry need accounts, so show only in builds with them. -->
     </li>
   </ul>
   <p>
-    Each card shows when it was published, by whom (unless it's anonymous) and how
-    many times it's been viewed. Its ⋮ menu has:
+    Each card shows when it was published, by whom (unless it's anonymous) and
+    how many times it's been viewed. Its ⋮ menu has:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -65,27 +65,29 @@ Ravelry need accounts, so show only in builds with them. -->
 
 {#if __ACCOUNTS_ENABLED__}
   <section class="flex flex-col gap-3">
-    <h2 id="share-to-gallery" class="text-2xl font-bold">Publish a Gallery Page</h2>
+    <h2 id="share-to-gallery" class="text-2xl font-bold">
+      Publish a Gallery Page
+    </h2>
     <p>
       Publishing needs a free account, so you can update or unpublish your page
       later. Without one, you can still share with
       <span class="font-bold">Copy Link</span>.
     </p>
     <p>
-      In the Project Planner, press <span class="font-bold">Project</span>; in the
-      Yarn Palette Creator, <span class="font-bold">Palette</span>; or use a card's ⋮
-      in My Library. Under <span class="font-bold">Share</span>:
+      In the Project Planner, press <span class="font-bold">Project</span>; in
+      the Yarn Palette Creator, <span class="font-bold">Palette</span>; or use a
+      card's ⋮ in My Library. Under <span class="font-bold">Share</span>:
     </p>
     <ul class="ml-6 list-disc space-y-1">
       <li>
-        <span class="font-bold">Copy Link:</span> anyone with the link gets their own
-        copy. Yours stays as it is.
+        <span class="font-bold">Copy Link:</span> anyone with the link gets their
+        own copy. Yours stays as it is.
       </li>
       <li>
-        <span class="font-bold">Publish to Gallery…:</span> choose whether to show
-        your name or be <span class="font-bold">Anonymous</span>, then
-        <span class="font-bold">Save</span>. A project must be saved to your account
-        first.
+        <span class="font-bold">Publish to Gallery…:</span> choose whether to
+        show your name or be <span class="font-bold">Anonymous</span>, then
+        <span class="font-bold">Save</span>. A project must be saved to your
+        account first.
       </li>
       <li>
         Once published: <span class="font-bold">View Gallery Page</span>,
@@ -93,33 +95,35 @@ Ravelry need accounts, so show only in builds with them. -->
         <span class="font-bold">Unpublish…</span>.
       </li>
     </ul>
-    <h3 id="gallery-page-rules" class="text-lg font-bold">How gallery pages work</h3>
+    <h3 id="gallery-page-rules" class="text-lg font-bold">
+      How gallery pages work
+    </h3>
     <ul class="ml-6 list-disc space-y-1">
       <li>
-        Each project or palette has one gallery page. Editing it updates the same
-        page: its link and views stay.
+        Each project or palette has one gallery page. Editing it updates the
+        same page: its link and views stay.
       </li>
       <li>
-        It doesn't change by itself when you change your project. When they differ,
-        My Library and the menus say <span class="font-bold"
+        It doesn't change by itself when you change your project. When they
+        differ, My Library and the menus say <span class="font-bold"
           >Changed since publishing</span
         >; press <span class="font-bold">Edit Gallery Page…</span>, then
         <span class="font-bold">Save</span>, to update it.
       </li>
       <li>
-        Publishing a project doesn't publish its palettes. Publish a palette on its
-        own from the Yarn Palette Creator.
+        Publishing a project doesn't publish its palettes. Publish a palette on
+        its own from the Yarn Palette Creator.
       </li>
       <li>
-        Moving the project to the Trash hides its page; restoring it brings the page
-        back.
+        Moving the project to the Trash hides its page; restoring it brings the
+        page back.
       </li>
       <li>
         Pages showing your name are listed together in
-        <span class="font-bold">Your Gallery</span>, linked from My Library. Set the
-        name in your <a
-          href="/documentation/library-and-account#account-page"
-          class="link">Profile</a
+        <span class="font-bold">Your Gallery</span>, linked from My Library. Set
+        the name in your
+        <a href="/documentation/library-and-account#account-page" class="link"
+          >Profile</a
         >.
       </li>
       <li>
@@ -131,36 +135,37 @@ Ravelry need accounts, so show only in builds with them. -->
   <section class="flex flex-col gap-3">
     <h2 id="star-gallery-pages" class="text-2xl font-bold">Stars</h2>
     <p>
-      Signed in, press the star on someone's gallery project or palette to find it
-      again later. Your starred pages are in My Library: switch
-      <span class="font-bold">Mine</span> to <span class="font-bold">Starred</span>,
-      on Projects or Yarn Palettes. Starred palettes are also in
+      Signed in, press the star on someone's gallery project or palette to find
+      it again later. Your starred pages are in My Library: switch
+      <span class="font-bold">Mine</span> to
+      <span class="font-bold">Starred</span>, on Projects or Yarn Palettes.
+      Starred palettes are also in
       <span class="font-bold">Get Colors</span>, under
       <span class="font-bold">My Palettes</span>.
     </p>
     <p>
-      Stars are private: only you see them, and they don't count as views. A star
-      keeps a link to the page, not a copy, so you always see it as its owner last
-      updated it. Press the star again to unstar it. You can star up to 500 pages.
+      Stars are private: only you see them, and they don't count as views. A
+      star keeps a link to the page, not a copy, so you always see it as its
+      owner last updated it. Press the star again to unstar it. You can star up
+      to 500 pages.
     </p>
   </section>
 
   <section class="flex flex-col gap-3">
     <h2 id="ravelry" class="text-2xl font-bold">Ravelry</h2>
     <p>
-      Post a project to your Ravelry notebook, with its yarns and a picture, linking
-      back to its gallery page.
+      Post a project to your Ravelry notebook, with its yarns and a picture,
+      linking back to its gallery page.
     </p>
     <ol class="ml-6 list-decimal space-y-1">
       <li>
         On the <a href="/account" class="link">Account</a> page, under
         <span class="font-bold">Connected accounts</span>, press
-        <span class="font-bold">Connect</span> beside Ravelry, and allow it on
-        Ravelry.
+        <span class="font-bold">Connect</span> beside Ravelry, and allow it on Ravelry.
       </li>
       <li>
-        Publish the project's gallery page, showing your name (Ravelry links to it
-        under your name, so it can't be anonymous).
+        Publish the project's gallery page, showing your name (Ravelry links to
+        it under your name, so it can't be anonymous).
       </li>
       <li>
         In <span class="font-bold">Edit Gallery Page…</span>, turn on
@@ -168,35 +173,41 @@ Ravelry need accounts, so show only in builds with them. -->
         <span class="font-bold">Save</span>.
       </li>
     </ol>
-    <h3 id="ravelry-fields" class="text-lg font-bold">What you can edit here</h3>
+    <h3 id="ravelry-fields" class="text-lg font-bold">
+      What you can edit here
+    </h3>
     <p>
-      Once it's on Ravelry, <span class="font-bold">Edit Gallery Page…</span> shows its
-      <span class="font-bold">Status</span>, <span class="font-bold">Craft</span>,
-      dates, <span class="font-bold">Progress</span>, notes,
-      <span class="font-bold">Yarns</span> and <span class="font-bold">Photos</span>
-      (add, remove and reorder them). The notes always end with "Planned with
-      Temperature Blanket" and a link to the gallery page. The pattern, needles,
-      gauge and private notes on Ravelry aren't changed from here.
+      Once it's on Ravelry, <span class="font-bold">Edit Gallery Page…</span>
+      shows its
+      <span class="font-bold">Status</span>,
+      <span class="font-bold">Craft</span>, dates,
+      <span class="font-bold">Progress</span>, notes,
+      <span class="font-bold">Yarns</span> and
+      <span class="font-bold">Photos</span>
+      (add, remove and reorder them). The notes always end with "Planned with Temperature
+      Blanket" and a link to the gallery page. The pattern, needles, gauge and private
+      notes on Ravelry aren't changed from here.
     </p>
     <h3 id="ravelry-timing" class="text-lg font-bold">When changes show up</h3>
     <ul class="ml-6 list-disc space-y-1">
       <li>
-        <span class="font-bold">Edited here:</span> sent to Ravelry when you press
-        <span class="font-bold">Save</span> in Edit Gallery Page. Nothing is sent by
-        itself.
+        <span class="font-bold">Edited here:</span> sent to Ravelry when you
+        press
+        <span class="font-bold">Save</span> in Edit Gallery Page. Nothing is sent
+        by itself.
       </li>
       <li>
-        <span class="font-bold">Edited on Ravelry:</span> photos, notes and yarns come
-        back here the next time you open My Library, usually within a few hours. A
-        project deleted on Ravelry is unlinked here.
+        <span class="font-bold">Edited on Ravelry:</span> photos, notes and yarns
+        come back here the next time you open My Library, usually within a few hours.
+        A project deleted on Ravelry is unlinked here.
       </li>
     </ul>
     <p>
-      To stop, press <span class="font-bold">Unlink</span> in Edit Gallery Page: the
-      project stays on Ravelry but isn't updated from here, and its photos leave the
-      gallery page. Unpublishing the gallery page unlinks it too.
-      <span class="font-bold">Disconnect</span> on the Account page disconnects
-      Ravelry altogether.
+      To stop, press <span class="font-bold">Unlink</span> in Edit Gallery Page:
+      the project stays on Ravelry but isn't updated from here, and its photos
+      leave the gallery page. Unpublishing the gallery page unlinks it too.
+      <span class="font-bold">Disconnect</span> on the Account page disconnects Ravelry
+      altogether.
     </p>
   </section>
 {/if}

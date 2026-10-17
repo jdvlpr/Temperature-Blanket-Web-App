@@ -69,8 +69,8 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     </li>
     <li>
       <span class="font-bold">Custom:</span> choose any
-      <span class="font-bold">From</span> and <span class="font-bold">To</span> dates,
-      up to {MAXIMUM_DAYS_PER_LOCATION} days.
+      <span class="font-bold">From</span> and <span class="font-bold">To</span>
+      dates, up to {MAXIMUM_DAYS_PER_LOCATION} days.
     </li>
   </ul>
   <p>
@@ -84,13 +84,17 @@ Section ids are the old single page's (OLD_ANCHORS). -->
 </section>
 
 <section class="flex flex-col gap-3">
-  <h2 id="multiple-locations" class="text-2xl font-bold">More Than One Place</h2>
+  <h2 id="multiple-locations" class="text-2xl font-bold">
+    More Than One Place
+  </h2>
   <p>
     A blanket can follow you around: a trip, the places you've lived, or the
-    same day in different years. Press <span class="font-bold">Add Location</span
-    > for another place with its own dates, up to {MAXIMUM_LOCATIONS} of them. The
-    weather of each comes one after the other, in order, and the total number of days
-    shows below.
+    same day in different years. Press <span class="font-bold"
+      >Add Location</span
+    >
+    for another place with its own dates, up to {MAXIMUM_LOCATIONS} of them. The weather
+    of each comes one after the other, in order, and the total number of days shows
+    below.
   </p>
   <p>
     To remove one, press ⋮ beside it, then <span class="font-bold"
@@ -105,7 +109,9 @@ Section ids are the old single page's (OLD_ANCHORS). -->
 </section>
 
 <section class="flex flex-col gap-3">
-  <h2 id="location-errors" class="text-2xl font-bold">If Something Goes Wrong</h2>
+  <h2 id="location-errors" class="text-2xl font-bold">
+    If Something Goes Wrong
+  </h2>
   <h3 class="text-lg font-bold">"Whoa! There's been a problem."</h3>
   <p>
     The place search couldn't reach the service that lists places. If you're
@@ -119,21 +125,25 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   <h3 class="text-lg font-bold">A message under the dates</h3>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">The starting date must be at least one day in the past.</span
+      <span class="font-bold"
+        >The starting date must be at least one day in the past.</span
       > Choose an earlier start.
     </li>
     <li>
-      <span class="font-bold">Please select a maximum of {MAXIMUM_DAYS_PER_LOCATION} days.</span
+      <span class="font-bold"
+        >Please select a maximum of {MAXIMUM_DAYS_PER_LOCATION} days.</span
       > Shorten the dates, or split them into two locations.
     </li>
     <li>
-      <span class="font-bold">…the selected end date comes before the selected start date.</span
+      <span class="font-bold"
+        >…the selected end date comes before the selected start date.</span
       > Swap them.
     </li>
     <li>
-      <span class="font-bold">…of these days are not in the past and won't have weather data.</span
-      > That's fine for a blanket you're making as the year goes: search again
-      later to fill them in.
+      <span class="font-bold"
+        >…of these days are not in the past and won't have weather data.</span
+      > That's fine for a blanket you're making as the year goes: search again later
+      to fill them in.
     </li>
   </ul>
   <h3 class="text-lg font-bold">The places and dates can't be changed</h3>

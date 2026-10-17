@@ -21,11 +21,12 @@ PaletteStatusButton, PaletteTitle, autosave). -->
 </script>
 
 <p>
-  The <a href="/yarn" class="link">Yarn Palette Creator</a> makes a palette on its
-  own, without a project: to plan colors before you have a place and dates, to
-  match yarn you already have, or to share a palette with others. Open it from
-  <span class="font-bold">Create</span>, then <span class="font-bold">Palette</span>,
-  in the site menu.
+  The <a href="/yarn" class="link">Yarn Palette Creator</a> makes a palette on
+  its own, without a project: to plan colors before you have a place and dates,
+  to match yarn you already have, or to share a palette with others. Open it
+  from
+  <span class="font-bold">Create</span>, then
+  <span class="font-bold">Palette</span>, in the site menu.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -37,16 +38,16 @@ PaletteStatusButton, PaletteTitle, autosave). -->
     <span class="font-bold">Choose Colorways</span>,
     <span class="font-bold">From an Image</span>,
     <span class="font-bold">Random</span> or
-    <span class="font-bold">Paste Colors or Code</span>; then change, move, sort and
-    add colors as in a gauge. See
+    <span class="font-bold">Paste Colors or Code</span>; then change, move, sort
+    and add colors as in a gauge. See
     <a href="/documentation/colors-and-yarn" class="link">Colors & Yarn</a> for each
     of these.
   </p>
   <p>
-    <span class="font-bold">Undo</span> and <span class="font-bold">Redo</span> are
-    at the top (<kbd class="kbd">⌘ Cmd</kbd>/<kbd class="kbd">Ctrl</kbd> +
-    <kbd class="kbd">z</kbd>, and with <kbd class="kbd">Shift</kbd> to redo). To
-    rename the palette, press the pencil beside its name.
+    <span class="font-bold">Undo</span> and <span class="font-bold">Redo</span>
+    are at the top (<kbd class="kbd">⌘ Cmd</kbd>/<kbd class="kbd">Ctrl</kbd> +
+    <kbd class="kbd">z</kbd>, and with <kbd class="kbd">Shift</kbd> to redo). To rename
+    the palette, press the pencil beside its name.
   </p>
 </section>
 
@@ -58,8 +59,10 @@ PaletteStatusButton, PaletteTitle, autosave). -->
     then on, changes save automatically a moment after you stop.
   </p>
   <p>
-    The <span class="font-bold">Palette</span> button at the top shows where it's
-    saved: <span class="font-bold">Saved in this browser</span>{#if __ACCOUNTS_ENABLED__}
+    The <span class="font-bold">Palette</span> button at the top shows where
+    it's saved:
+    <span class="font-bold">Saved in this browser</span
+    >{#if __ACCOUNTS_ENABLED__}
       or <span class="font-bold">Saved to your account</span>{/if}. If it says
     <span class="font-bold">Not saved</span>, press it, then
     <span class="font-bold">Try Again</span>.
@@ -71,12 +74,12 @@ PaletteStatusButton, PaletteTitle, autosave). -->
   <p>Press <span class="font-bold">Palette</span> at the top for:</p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Download:</span> an image, the color codes, or the
-      yarn names.
+      <span class="font-bold">Download:</span> an image, the color codes, or the yarn
+      names.
     </li>
     <li>
-      <span class="font-bold">Start a Project with It:</span> opens the Project
-      Planner with this palette on the temperature gauge.
+      <span class="font-bold">Start a Project with It:</span> opens the Project Planner
+      with this palette on the temperature gauge.
     </li>
     <li>
       <span class="font-bold">Share:</span>
@@ -89,8 +92,8 @@ PaletteStatusButton, PaletteTitle, autosave). -->
     <li>
       <span class="font-bold">New Palette</span>,
       <span class="font-bold">Open…</span> (one of your saved palettes),
-      <span class="font-bold">Duplicate</span> (a copy, leaving this one as it is),
-      and <span class="font-bold">Move to Trash</span>.
+      <span class="font-bold">Duplicate</span> (a copy, leaving this one as it
+      is), and <span class="font-bold">Move to Trash</span>.
     </li>
     <li>Getting Started, Keyboard Shortcuts and Guides & Help.</li>
   </ul>

@@ -26,8 +26,8 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
 
 <p>
   A gauge's colors can be any colors, or real yarn colorways. Press
-  <span class="font-bold">Get Colors</span> above a gauge to fill it all at once, or
-  press one color to change just that one.
+  <span class="font-bold">Get Colors</span> above a gauge to fill it all at once,
+  or press one color to change just that one.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -43,8 +43,8 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
       with the gallery's search, filters and sorting.
     </li>
     <li>
-      <span class="font-bold">Preset Gradients:</span> smooth color combinations
-      in any number of colors, like One Hue: Blue or Multi-hue: Yellow to Green.
+      <span class="font-bold">Preset Gradients:</span> smooth color combinations in
+      any number of colors, like One Hue: Blue or Multi-hue: Yellow to Green.
     </li>
     <li>
       <span class="font-bold">Choose Colorways:</span>
@@ -57,17 +57,15 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
     </li>
     <li>
       <span class="font-bold">Random:</span> random colors. Press
-      <span class="font-bold">Randomize</span> (or <kbd class="kbd">r</kbd>) until
-      you like them.
+      <span class="font-bold">Randomize</span> (or <kbd class="kbd">r</kbd>)
+      until you like them.
     </li>
     <li>
       <span class="font-bold">Paste Colors or Code:</span>
       <a href="#importexport" class="link">type or paste colors</a>.
     </li>
   </ul>
-  <p>
-    Choosing a palette replaces the gauge's colors. Undo puts them back.
-  </p>
+  <p>Choosing a palette replaces the gauge's colors. Undo puts them back.</p>
 </section>
 
 <section class="flex flex-col gap-3">
@@ -89,9 +87,9 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
     <li>Press <span class="font-bold">Save</span>.</li>
   </ol>
   <p>
-    To change one color, press its swatch in the gauge. Type a color (a name like
-    "sage" or a hex code like #9CAF88), pick it from a photo, or choose a yarn
-    colorway below; then <span class="font-bold">Save</span>.
+    To change one color, press its swatch in the gauge. Type a color (a name
+    like "sage" or a hex code like #9CAF88), pick it from a photo, or choose a
+    yarn colorway below; then <span class="font-bold">Save</span>.
   </p>
   <p>
     If you keep choosing the same yarn, you'll be asked whether to make it your
@@ -110,25 +108,27 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
       <span class="font-bold">From an Image</span>.
     </li>
     <li>
-      Choose <span class="font-bold">Your Photo</span> (or drop or paste one), or a
-      <span class="font-bold">Random Photo</span>. Your photo stays on your device:
-      it's never uploaded.
+      Choose <span class="font-bold">Your Photo</span> (or drop or paste one),
+      or a
+      <span class="font-bold">Random Photo</span>. Your photo stays on your
+      device: it's never uploaded.
     </li>
     <li>
-      Tap the photo to add colors (<span class="font-bold">Pick Colors</span>), or
-      <span class="font-bold">Draw a Line</span> across it to take the colors along
-      it. <span class="font-bold">Auto</span> picks the colors that best capture the
-      photo.
+      Tap the photo to add colors (<span class="font-bold">Pick Colors</span>),
+      or
+      <span class="font-bold">Draw a Line</span> across it to take the colors
+      along it. <span class="font-bold">Auto</span> picks the colors that best capture
+      the photo.
     </li>
     <li>
-      To use yarn, choose one under <span class="font-bold">Yarn</span>: each color
-      is matched to its closest colorway.
+      To use yarn, choose one under <span class="font-bold">Yarn</span>: each
+      color is matched to its closest colorway.
     </li>
     <li>Press <span class="font-bold">Save</span>.</li>
   </ol>
   <p>
-    <span class="font-bold">Continue with your last photo</span> picks up where you
-    left off.
+    <span class="font-bold">Continue with your last photo</span> picks up where
+    you left off.
     <a href="/documentation/guides/match-your-yarn" class="link"
       >Matching your yarn or a photo</a
     >.
@@ -145,7 +145,9 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
     {#each PALETTE_SORTS as { value, label, details } (value)}
       <li><span class="font-bold">{label}:</span> {details}.</li>
     {/each}
-    <li><span class="font-bold">Reverse:</span> the same order, last to first.</li>
+    <li>
+      <span class="font-bold">Reverse:</span> the same order, last to first.
+    </li>
     <li><span class="font-bold">Shuffle:</span> a random order.</li>
   </ul>
   <p>Name only shows when every color has a name.</p>
@@ -154,37 +156,44 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="saved-palettes" class="text-2xl font-bold">Saved Palettes</h2>
   <p>
-    Keep a gauge's colors to use in other projects. In the Project Planner, press
+    Keep a gauge's colors to use in other projects. In the Project Planner,
+    press
     <span class="font-bold">Project</span>, then your gauge under
     <span class="font-bold">Palettes</span>, then
-    <span class="font-bold">Save to My Palettes</span>. Name it, or leave the name
-    empty to use its yarn and number of colors.
+    <span class="font-bold">Save to My Palettes</span>. Name it, or leave the
+    name empty to use its yarn and number of colors.
   </p>
   <p>
     Saved palettes are in My Library, under
-    <span class="font-bold">Yarn Palettes</span>{#if __ACCOUNTS_ENABLED__}, and on
-      every device where you're signed in{/if}. Open one in the
-    <a href="/documentation/palette-creator" class="link">Yarn Palette Creator</a> to
-    change, share or publish it. To use it in a project, press
+    <span class="font-bold">Yarn Palettes</span>{#if __ACCOUNTS_ENABLED__}, and
+      on every device where you're signed in{/if}. Open one in the
+    <a href="/documentation/palette-creator" class="link"
+      >Yarn Palette Creator</a
+    >
+    to change, share or publish it. To use it in a project, press
     <span class="font-bold">Get Colors</span>, then
     <span class="font-bold">My Palettes</span>.
   </p>
 </section>
 
 <section class="flex flex-col gap-3">
-  <h2 id="importexport" class="text-2xl font-bold">Copy, Export and Paste Colors</h2>
+  <h2 id="importexport" class="text-2xl font-bold">
+    Copy, Export and Paste Colors
+  </h2>
   <p>
     To take colors out: press <span class="font-bold">Project</span>, then your
     gauge under <span class="font-bold">Palettes</span>, then:
   </p>
   <ul class="ml-6 list-disc space-y-1">
-    <li><span class="font-bold">Image:</span> download a PNG of the palette.</li>
+    <li>
+      <span class="font-bold">Image:</span> download a PNG of the palette.
+    </li>
     <li>
       <span class="font-bold">Color Codes:</span> copy hex codes, for other apps.
     </li>
     <li>
-      <span class="font-bold">Yarn Colorway Names:</span> copy the yarn names, for a
-      shopping list.
+      <span class="font-bold">Yarn Colorway Names:</span> copy the yarn names, for
+      a shopping list.
     </li>
   </ul>
   <p>
@@ -212,8 +221,8 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
   <h2 id="yarn" class="text-2xl font-bold">About the Yarn Colors</h2>
   <p>
     Yarn on a screen never looks quite like yarn in your hands. Screens differ,
-    and each colorway is one average color of what is often a mix. Check the real
-    yarn before you buy a lot of it.
+    and each colorway is one average color of what is often a mix. Check the
+    real yarn before you buy a lot of it.
   </p>
   <p>
     Links with a shopping cart go to where the yarn is sold. Buying through some

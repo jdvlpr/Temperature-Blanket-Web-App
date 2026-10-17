@@ -21,8 +21,8 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
 </script>
 
 <p>
-  Beyond planning a blanket, the site has tools to find yarn, look at the weather
-  ahead, and see blankets from around the world. They're under
+  Beyond planning a blanket, the site has tools to find yarn, look at the
+  weather ahead, and see blankets from around the world. They're under
   <span class="font-bold">Explore</span> in the site menu, with the
   <a href="/documentation/gallery-and-ravelry" class="link">Gallery</a>.
 </p>
@@ -42,12 +42,12 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
       image button beside the color field. Photos stay on your device.
     </li>
     <li>
-      <span class="font-bold">Filters</span> narrow it down by yarn weight and
-      colorway name.
+      <span class="font-bold">Filters</span> narrow it down by yarn weight and colorway
+      name.
     </li>
     <li>
-      Sort the results, and switch between a grid and a list. Each colorway's ⋮ has
-      its shop link and copies its name or hex code.
+      Sort the results, and switch between a grid and a list. Each colorway's ⋮
+      has its shop link and copies its name or hex code.
     </li>
   </ul>
   <p>
@@ -61,10 +61,10 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
 <section class="flex flex-col gap-3">
   <h2 id="weather-forecast" class="text-2xl font-bold">Weather Forecast</h2>
   <p>
-    <a href="/weather" class="link">Weather Forecast</a> shows the coming days for
-    any place: an hourly and a daily forecast. Add places to
-    <span class="font-bold">Locations</span> to switch between them, and change the
-    units in <span class="font-bold">Settings</span>.
+    <a href="/weather" class="link">Weather Forecast</a> shows the coming days
+    for any place: an hourly and a daily forecast. Add places to
+    <span class="font-bold">Locations</span> to switch between them, and change
+    the units in <span class="font-bold">Settings</span>.
   </p>
   <p>
     It's for looking ahead. A temperature blanket uses past weather, which comes

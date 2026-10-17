@@ -94,9 +94,9 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
 </script>
 
 <p>
-  The preview shows what your blanket could look like, with your weather and your
-  colors. It's a picture to plan with, not a pattern: a real blanket won't look
-  exactly like it, and how you crochet or knit each part is up to you.
+  The preview shows what your blanket could look like, with your weather and
+  your colors. It's a picture to plan with, not a pattern: a real blanket won't
+  look exactly like it, and how you crochet or knit each part is up to you.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -126,40 +126,39 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     <li>
       <span class="font-bold">Which weather:</span> like
       <span class="font-bold">Color Each Row Using the Day's</span> High, Average
-      or Low Temperature, Rain… Choose more than one to split each row or square
-      between them.
+      or Low Temperature, Rain… Choose more than one to split each row or square between
+      them.
     </li>
     <li>
-      <span class="font-bold">Size:</span> stitches per row, or how many squares
-      or hexagons across and down.
+      <span class="font-bold">Size:</span> stitches per row, or how many squares or
+      hexagons across and down.
     </li>
     <li>
       <span class="font-bold">Accent Color:</span> for anything that isn't a day,
       like padding at the end of a row or squares to fill a grid.
     </li>
     <li>
-      <span class="font-bold">Borders:</span> a border color and size, for
-      patterns made of pieces.
+      <span class="font-bold">Borders:</span> a border color and size, for patterns
+      made of pieces.
     </li>
   </ul>
   <p>
-    Squares and hexagons have a designer, to choose what each round shows. Daytime
-    Rows chooses where the daylight stitches go.
+    Squares and hexagons have a designer, to choose what each round shows.
+    Daytime Rows chooses where the daylight stitches go.
   </p>
 </section>
 
 <section class="flex flex-col gap-3">
   <h2 id="preview-use" class="text-2xl font-bold">Using the Preview</h2>
   <ul class="ml-6 list-disc space-y-1">
-    <li>
-      Touch or click a row or square to see its date and weather.
-    </li>
+    <li>Touch or click a row or square to see its date and weather.</li>
     <li>
       Point at a color in the gauge to see where it's used in the preview.
     </li>
     <li>
-      <span class="font-bold">Download PNG</span> under the preview saves it as a
-      picture. <a href="/documentation/download" class="link">More downloads</a>.
+      <span class="font-bold">Download PNG</span> under the preview saves it as
+      a picture.
+      <a href="/documentation/download" class="link">More downloads</a>.
     </li>
   </ul>
 </section>
@@ -169,4 +168,6 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
   <Seasons />
 </section>
 
-<RelatedGuides slugs={['plan-a-blanket', 'rain-snow-sunshine', 'print-and-track']} />
+<RelatedGuides
+  slugs={['plan-a-blanket', 'rain-snow-sunshine', 'print-and-track']}
+/>
