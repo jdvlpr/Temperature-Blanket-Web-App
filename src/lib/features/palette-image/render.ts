@@ -40,6 +40,16 @@ export type PaletteImageColor = {
   yarnName?: string;
 };
 
+/** The photo the colors were picked from */
+export type PaletteImagePhoto = {
+  image: CanvasImageSource;
+  width: number;
+  height: number;
+  /** Where each color was picked, as fractions of the photo's size; given
+   * when the dots are shown */
+  points?: { x: number; y: number }[];
+};
+
 const BODY_FONT = '"Be Vietnam Pro", sans-serif';
 const HEADING_FONT = '"Fraunces Variable", serif';
 
@@ -432,11 +442,82 @@ function drawCell({
   });
 }
 
+/** The photo, with a dot where each color was picked: the color inside a
+ * white ring, so it shows on any part of the photo */
+function drawPhoto({
+  ctx,
+  photo,
+  rect,
+  colors,
+  numbered,
+}: {
+  ctx: CanvasRenderingContext2D;
+  photo: PaletteImagePhoto;
+  rect: Rect;
+  colors: PaletteImageColor[];
+  numbered: boolean;
+}) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(rect.x, rect.y, rect.width, rect.height, RADIUS);
+  ctx.clip();
+  ctx.drawImage(photo.image, rect.x, rect.y, rect.width, rect.height);
+  ctx.restore();
+
+  if (!photo.points) return;
+  const side = Math.min(rect.width, rect.height);
+  const r = numbered
+    ? Math.max(16, Math.min(side * 0.045, 30))
+    : Math.max(10, Math.min(side * 0.03, 22));
+  photo.points.forEach((point, i) => {
+    const color = colors[i];
+    if (!color) return;
+    const cx = rect.x + point.x * rect.width;
+    const cy = rect.y + point.y * rect.height;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = color.hex;
+    ctx.fill();
+    ctx.lineWidth = Math.max(3, r * 0.2);
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    // A thin dark edge, so the ring shows on light parts of the photo too
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + ctx.lineWidth / 2, 0, Math.PI * 2);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.stroke();
+    if (numbered) {
+      const text = `${i + 1}`;
+      const size = fitFontSize({
+        text,
+        preferred: r * 0.95,
+        maxWidth: r * 1.4,
+        measure: measurer(ctx, 600),
+      });
+      ctx.font = font(600, size);
+      ctx.fillStyle = getTextColor(color.hex);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      const glyphs = ctx.measureText(text);
+      ctx.fillText(
+        text,
+        cx,
+        cy +
+          (glyphs.actualBoundingBoxAscent - glyphs.actualBoundingBoxDescent) /
+            2,
+      );
+      ctx.textAlign = 'left';
+    }
+  });
+}
+
 export function renderPaletteImage({
   canvas,
   colors,
   ranges,
   title,
+  photo,
   settings,
 }: {
   canvas: HTMLCanvasElement;
@@ -444,6 +525,8 @@ export function renderPaletteImage({
   /** Each color's range, in a project */
   ranges?: PaletteImageRange[];
   title?: string;
+  /** Given when it's shown */
+  photo?: PaletteImagePhoto;
   settings: PaletteImageSettings;
 }) {
   const ctx = canvas.getContext('2d');
@@ -455,6 +538,7 @@ export function renderPaletteImage({
     shape: settings.shape,
     gaps: settings.gaps,
     hasTitle: !!heading,
+    photoAspect: photo ? photo.width / photo.height : undefined,
   });
   const theme = THEMES[settings.background];
   const filled = settings.fill;
@@ -463,6 +547,15 @@ export function renderPaletteImage({
   canvas.height = Math.round(geometry.height);
   ctx.fillStyle = theme.background;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (photo && geometry.photo)
+    drawPhoto({
+      ctx,
+      photo,
+      rect: geometry.photo,
+      colors,
+      numbered: settings.labels.number,
+    });
 
   // Without gaps, the colors are one block with rounded outer corners
   ctx.save();

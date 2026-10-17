@@ -35,7 +35,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canvasToBlob,
     loadPaletteImageFonts,
     renderPaletteImage,
+    type PaletteImagePhoto,
   } from '#lib/features/palette-image/render.js';
+  import { getPalettePhoto } from '#lib/features/image-palette/image-palette-state.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
@@ -65,11 +67,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors: Color[];
     /** Each color's range, when the palette is a project's gauge */
     ranges?: PaletteImageRange[];
-    /** The file's name when there's no title */
-    fallbackName: string;
+    /** The palette's title, or a name made from its colors when it has none */
+    title: string;
   }
 
-  let { colors, ranges, fallbackName }: Props = $props();
+  let { colors, ranges, title }: Props = $props();
 
   let paletteColors = $derived(
     colors
@@ -111,7 +113,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     preferences.value.paletteImage = rest;
   }
 
-  let title = $state('');
+  // The photo the colors were picked from, while they still are its colors
+  let photo = $state.raw<PaletteImagePhoto | null>(null);
+
+  onMount(() => {
+    const found = getPalettePhoto(paletteColors.map((color) => color.hex));
+    if (!found) return;
+    let bitmap: ImageBitmap | undefined;
+    let closed = false;
+    createImageBitmap(found.pixels)
+      .then((image) => {
+        if (closed) return image.close();
+        bitmap = image;
+        photo = {
+          image,
+          width: image.width,
+          height: image.height,
+          points: found.points,
+        };
+      })
+      .catch(() => {});
+    return () => {
+      closed = true;
+      bitmap?.close();
+    };
+  });
 
   const LAYOUTS = [
     {
@@ -215,7 +241,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       canvas,
       colors: paletteColors,
       ranges,
-      title,
+      title: settings.title ? title : '',
+      photo:
+        photo && settings.photo
+          ? { ...photo, points: settings.points ? photo.points : undefined }
+          : undefined,
       settings: $state.snapshot(settings),
     });
     canvasToBlob(canvas)
@@ -232,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let fileName = $derived(
-    `${(title.trim() || fallbackName).replace(/[\\/:*?"<>|]+/g, '').trim() || 'Yarn Palette'}.png`,
+    `${title.replace(/[\\/:*?"<>|]+/g, '').trim() || 'Yarn Palette'}.png`,
   );
 
   function download() {
@@ -251,7 +281,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       await navigator.share({
         files: [new File([blob], fileName, { type: 'image/png' })],
-        title: title.trim() || fallbackName,
+        title,
       });
     } catch (error) {
       // Closing the share sheet isn't an error
@@ -276,6 +306,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   const segmentClass = 'bg-surface-100 dark:bg-surface-900 w-full';
+  const toggleGroupClass =
+    'bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700';
 </script>
 
 <!-- A setting with a few choices, as the site's other selects: the current
@@ -334,18 +366,6 @@ choice's icon beside it, and what it's for below -->
     <aside
       class="flex flex-col gap-4 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
     >
-      <label class="label">
-        <span class="label-text">Title (optional)</span>
-        <input
-          type="text"
-          class="input"
-          autocomplete="off"
-          maxlength="80"
-          placeholder="No title"
-          bind:value={title}
-        />
-      </label>
-
       {@render choiceSelect({
         label: 'Layout',
         choices: LAYOUTS,
@@ -398,9 +418,36 @@ choice's icon beside it, and what it's for below -->
         </SegmentedControl>
       </div>
 
-      <div
-        class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
-      >
+      <div class={toggleGroupClass}>
+        <span class="label-text px-4 py-2.5">Show</span>
+        <ToggleSwitch
+          bare
+          label="Title"
+          details={title}
+          bind:checked={settings.title}
+          onchange={remember}
+        />
+        {#if photo}
+          <ToggleSwitch
+            bare
+            label="Photo"
+            details="The photo the colors were picked from"
+            bind:checked={settings.photo}
+            onchange={remember}
+          />
+          {#if settings.photo}
+            <ToggleSwitch
+              bare
+              label="Picked Points"
+              details="A dot where each color was picked"
+              bind:checked={settings.points}
+              onchange={remember}
+            />
+          {/if}
+        {/if}
+      </div>
+
+      <div class={toggleGroupClass}>
         <span class="label-text px-4 py-2.5">Show on each color</span>
         {#each labelOptions as option (option.key)}
           <ToggleSwitch

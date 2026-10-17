@@ -187,6 +187,107 @@ describe('getPaletteImageGeometry', () => {
   });
 });
 
+describe('getPaletteImageGeometry with a photo', () => {
+  const near = (a: number, b: number) => expect(a).toBeCloseTo(b, 6);
+
+  it('keeps a fixed shape its size and the photo its shape', () => {
+    for (const shape of ['square', 'portrait', 'landscape'] as const)
+      for (const layout of PALETTE_IMAGE_LAYOUTS)
+        for (const photoAspect of [0.5, 1, 1.5, 3]) {
+          const { width, height, photo, cells } = getPaletteImageGeometry({
+            count: 6,
+            layout,
+            shape,
+            gaps: true,
+            hasTitle: true,
+            photoAspect,
+          });
+          expect(width).toBe(SHAPE_SIZES[shape].width);
+          expect(height).toBe(SHAPE_SIZES[shape].height);
+          near(photo!.width / photo!.height, photoAspect);
+          // Inside the image, below the title, and clear of the colors
+          expect(photo!.y).toBeGreaterThanOrEqual(PADDING + TITLE_HEIGHT);
+          for (const cell of cells) {
+            expect(cell.y + cell.height).toBeLessThanOrEqual(
+              height - PADDING + 1e-6,
+            );
+            const beside = cell.x >= photo!.x + photo!.width;
+            const below = cell.y >= photo!.y + photo!.height;
+            expect(beside || below).toBe(true);
+          }
+        }
+  });
+
+  it('puts the photo above the colors, or beside them in Landscape', () => {
+    const above = getPaletteImageGeometry({
+      count: 4,
+      layout: 'list',
+      shape: 'portrait',
+      gaps: false,
+      hasTitle: false,
+      photoAspect: 1.5,
+    });
+    expect(above.bounds.y).toBeGreaterThan(
+      above.photo!.y + above.photo!.height,
+    );
+    expect(above.bounds.x).toBe(PADDING);
+    const beside = getPaletteImageGeometry({
+      count: 4,
+      layout: 'list',
+      shape: 'landscape',
+      gaps: false,
+      hasTitle: false,
+      photoAspect: 1.5,
+    });
+    expect(beside.bounds.x).toBeGreaterThan(
+      beside.photo!.x + beside.photo!.width,
+    );
+  });
+
+  it('makes a Fit image taller by the photo, up to a limit', () => {
+    const without = getPaletteImageGeometry({
+      count: 3,
+      layout: 'list',
+      shape: 'fit',
+      gaps: false,
+      hasTitle: false,
+    });
+    const wide = getPaletteImageGeometry({
+      count: 3,
+      layout: 'list',
+      shape: 'fit',
+      gaps: false,
+      hasTitle: false,
+      photoAspect: 2,
+    });
+    expect(wide.photo!.width).toBe(IMAGE_WIDTH - PADDING * 2);
+    expect(wide.height).toBeGreaterThan(without.height + wide.photo!.height);
+    const tall = getPaletteImageGeometry({
+      count: 3,
+      layout: 'list',
+      shape: 'fit',
+      gaps: false,
+      hasTitle: false,
+      photoAspect: 0.25,
+    });
+    expect(tall.photo!.height).toBeLessThanOrEqual(
+      (IMAGE_WIDTH - PADDING * 2) * 1.25 + 1e-6,
+    );
+  });
+
+  it('has no photo without one', () => {
+    expect(
+      getPaletteImageGeometry({
+        count: 3,
+        layout: 'grid',
+        shape: 'square',
+        gaps: false,
+        hasTitle: false,
+      }).photo,
+    ).toBeNull();
+  });
+});
+
 describe('rangeToText', () => {
   it('writes numbers with their unit, or a label as it is', () => {
     expect(rangeToText({ from: 50, to: 59, unit: '°F' })).toBe(

@@ -73,7 +73,7 @@ export function openPaletteExport(
   }: {
     colors: Color[];
     ranges?: PaletteImageRange[];
-    /** The image's title to start with */
+    /** The palette's title, if it has one */
     name?: string;
   },
 ) {
@@ -86,7 +86,7 @@ export function openPaletteExport(
         props: {
           colors,
           ranges,
-          fallbackName: name || getPaletteFallbackName(colors),
+          title: name?.trim() || getPaletteFallbackName(colors),
         },
       },
       options: { size: 'xlarge', title },

@@ -105,6 +105,27 @@ type Session = {
 // visit picks up where you left off
 let session: Session | null = null;
 
+/** The last photo, and where each of `hexes` was picked on it, while they're
+ * still the colors picked from it (in any order) */
+export function getPalettePhoto(
+  hexes: string[],
+): { pixels: ImageData; points: { x: number; y: number }[] } | null {
+  if (!session || !hexes.length || hexes.length !== session.points.length)
+    return null;
+  const { mode } = session;
+  const hexOf = (point: PalettePoint) =>
+    ((mode === 'yarn' && point.yarn?.hex) || point.sourceHex).toLowerCase();
+  const unused = [...session.points];
+  const points: { x: number; y: number }[] = [];
+  for (const hex of hexes) {
+    const i = unused.findIndex((point) => hexOf(point) === hex.toLowerCase());
+    if (i === -1) return null;
+    const [{ x, y }] = unused.splice(i, 1);
+    points.push({ x, y });
+  }
+  return { pixels: session.pixels, points };
+}
+
 export class ImagePaletteState {
   points = $state<PalettePoint[]>([]);
   mode = $state<PaletteMode>('yarn');

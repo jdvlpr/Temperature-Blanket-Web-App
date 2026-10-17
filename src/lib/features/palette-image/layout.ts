@@ -51,6 +51,12 @@ export type PaletteImageSettings = {
    * it's a round swatch beside its text */
   fill: boolean;
   gaps: boolean;
+  /** The palette's title across the top */
+  title: boolean;
+  /** The photo the colors were picked from, when there is one */
+  photo: boolean;
+  /** A dot on the photo where each color was picked */
+  points: boolean;
   labels: PaletteImageLabels;
 };
 
@@ -60,6 +66,9 @@ export const DEFAULT_PALETTE_IMAGE_SETTINGS: PaletteImageSettings = {
   background: 'light',
   fill: true,
   gaps: false,
+  title: true,
+  photo: true,
+  points: false,
   labels: {
     yarn: true,
     colorway: true,
@@ -82,6 +91,12 @@ export const GAP = 16;
 export const TITLE_HEIGHT = 96;
 /** A row's height in a Fit image of a list */
 export const FIT_ROW_HEIGHT = 140;
+/** Space between the photo and the colors */
+export const PHOTO_GAP = 32;
+/** The most of a fixed shape's space the photo takes from the colors */
+export const PHOTO_SHARE = 0.5;
+/** A Fit image's photo is at most this tall, as a part of its width */
+export const FIT_PHOTO_MAX_HEIGHT = 1.25;
 
 export type Rect = { x: number; y: number; width: number; height: number };
 
@@ -89,6 +104,8 @@ export type PaletteImageGeometry = {
   width: number;
   height: number;
   title: Rect | null;
+  /** Where the photo is drawn, whole, at its own shape */
+  photo: Rect | null;
   /** The area the colors fill */
   bounds: Rect;
   cells: Rect[];
@@ -130,24 +147,69 @@ export function getPaletteImageGeometry({
   shape,
   gaps,
   hasTitle,
+  photoAspect,
 }: {
   count: number;
   layout: PaletteImageLayout;
   shape: PaletteImageShape;
   gaps: boolean;
   hasTitle: boolean;
+  /** The photo's width over its height, when there's one to show */
+  photoAspect?: number;
 }): PaletteImageGeometry {
   const n = Math.max(count, 1);
   const gap = gaps ? GAP : 0;
   const width = shape === 'fit' ? IMAGE_WIDTH : SHAPE_SIZES[shape].width;
-  const contentWidth = width - PADDING * 2;
+  const innerWidth = width - PADDING * 2;
   const top = PADDING + (hasTitle ? TITLE_HEIGHT : 0);
+  // Below the title, in a fixed shape
+  const innerHeight =
+    shape === 'fit' ? 0 : SHAPE_SIZES[shape].height - top - PADDING;
+
+  // The photo goes above the colors, or beside them in a Landscape image,
+  // and the colors take the space that's left
+  let photo: Rect | null = null;
+  let contentX = PADDING;
+  let contentY = top;
+  let contentWidth = innerWidth;
+  if (photoAspect && photoAspect > 0) {
+    if (shape === 'landscape') {
+      const photoWidth = Math.min(
+        innerHeight * photoAspect,
+        innerWidth * PHOTO_SHARE,
+      );
+      const photoHeight = photoWidth / photoAspect;
+      photo = {
+        x: PADDING,
+        y: top + (innerHeight - photoHeight) / 2,
+        width: photoWidth,
+        height: photoHeight,
+      };
+      contentX = PADDING + photoWidth + PHOTO_GAP;
+      contentWidth = innerWidth - photoWidth - PHOTO_GAP;
+    } else {
+      const photoHeight = Math.min(
+        innerWidth / photoAspect,
+        shape === 'fit'
+          ? innerWidth * FIT_PHOTO_MAX_HEIGHT
+          : innerHeight * PHOTO_SHARE,
+      );
+      const photoWidth = photoHeight * photoAspect;
+      photo = {
+        x: PADDING + (innerWidth - photoWidth) / 2,
+        y: top,
+        width: photoWidth,
+        height: photoHeight,
+      };
+      contentY = top + photoHeight + PHOTO_GAP;
+    }
+  }
 
   // The colors' height: set by the shape, or by the colors in a Fit image
   let contentHeight: number;
   let columns = 1;
   if (shape !== 'fit') {
-    contentHeight = SHAPE_SIZES[shape].height - top - PADDING;
+    contentHeight = innerHeight - (contentY - top);
     if (layout === 'grid')
       columns = getSwatchColumns({
         count: n,
@@ -164,10 +226,13 @@ export function getPaletteImageGeometry({
     contentHeight = rows * size + gap * (rows - 1);
   }
 
-  const height = top + contentHeight + PADDING;
+  const height =
+    shape === 'fit'
+      ? contentY + contentHeight + PADDING
+      : SHAPE_SIZES[shape].height;
   const bounds = {
-    x: PADDING,
-    y: top,
+    x: contentX,
+    y: contentY,
     width: contentWidth,
     height: contentHeight,
   };
@@ -199,8 +264,9 @@ export function getPaletteImageGeometry({
     width,
     height,
     title: hasTitle
-      ? { x: PADDING, y: PADDING, width: contentWidth, height: TITLE_HEIGHT }
+      ? { x: PADDING, y: PADDING, width: innerWidth, height: TITLE_HEIGHT }
       : null,
+    photo,
     bounds,
     cells,
   };
