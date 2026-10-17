@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ]}
 >
   {#snippet strip()}
-    <PaletteStrip {colors} insideControl smallCorners />
+    <PaletteStrip {colors} insideControl />
   {/snippet}
   {#snippet text()}
     <span class="line-clamp-2 font-semibold break-words">{name}</span>

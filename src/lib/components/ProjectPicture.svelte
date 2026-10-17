@@ -112,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@attach watch}
   >
     <div class="w-full">
-      <PaletteStrip {colors} height={stripHeight} insideControl smallCorners />
+      <PaletteStrip {colors} height={stripHeight} insideControl />
     </div>
   </div>
 {:else}

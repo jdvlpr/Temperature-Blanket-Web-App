@@ -363,7 +363,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col items-center justify-center gap-2 shadow-inner',
+    'rounded-b-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col items-center justify-center gap-2 rounded-t-sm shadow-inner',
     gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
   ]}
 >

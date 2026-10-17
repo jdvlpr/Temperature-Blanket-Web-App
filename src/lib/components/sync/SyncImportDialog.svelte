@@ -225,12 +225,7 @@ someone asks to add them from My Library (`later`). -->
         />
         <span class="flex h-12 w-28 items-center" aria-hidden="true">
           <span class="w-full">
-            <PaletteStrip
-              colors={palette.colors}
-              height="50px"
-              insideControl
-              smallCorners
-            />
+            <PaletteStrip colors={palette.colors} height="50px" insideControl />
           </span>
         </span>
         <span class="min-w-0 flex-1 {NAME}">{palette.label}</span>

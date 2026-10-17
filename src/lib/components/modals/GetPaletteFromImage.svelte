@@ -480,7 +480,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <!-- The palette and its tools, as on the main page -->
           <div
-            class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 pb-2 shadow-inner"
+            class="rounded-b-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-center gap-2 rounded-t-sm pb-2 shadow-inner"
           >
             <!-- Count, Yarn, Auto Palette, Sort and Clear; the bar for a color
             pressed in the strip takes their place while it's open -->
@@ -724,7 +724,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             {:else}
               <div
-                class="rounded-t-container border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center border-2 border-dashed text-sm"
+                class="border-surface-300-700 text-surface-700-300 flex h-[70px] w-full items-center justify-center rounded-t-sm border-2 border-dashed text-sm"
               >
                 Tap the photo to add colors, or use Auto<span
                   class="max-sm:hidden">&nbsp;Palette</span

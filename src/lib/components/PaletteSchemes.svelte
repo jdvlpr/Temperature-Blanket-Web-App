@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Use This Palette"
       >
-        <PaletteStrip {colors} {label} insideControl smallCorners />
+        <PaletteStrip {colors} {label} insideControl />
       </button>
     {/each}
   </div>
