@@ -49,18 +49,12 @@ test.describe('My Projects', () => {
     ]);
   });
 
-  test('shows empty states and is in the account menu', async ({ page }) => {
-    // My Library's link is in the account button's menu
-    const expectLibraryHref = async (href: string) => {
-      await page.getByTestId('account-button').click();
-      await expect(
-        page.getByRole('menuitem', { name: 'My Library' }),
-      ).toHaveAttribute('href', href);
-      await page.keyboard.press('Escape');
-    };
+  test('shows empty states and is in the site menu', async ({ page }) => {
     await page.goto('/my-projects');
     await expect(page.getByText('No saved projects yet')).toBeVisible();
-    await expectLibraryHref('/my-projects');
+    await expect(
+      page.getByRole('link', { name: 'My Library' }).first(),
+    ).toHaveAttribute('href', '/my-projects');
 
     // Palettes have a page of their own, a link away
     await page
@@ -70,10 +64,14 @@ test.describe('My Projects', () => {
     await expect(page).toHaveURL(/\/my-palettes$/);
     await expect(page.getByText('No saved palettes yet')).toBeVisible();
 
-    // The account menu's link goes back to the side that was open last
-    await expectLibraryHref('/my-palettes');
+    // The site menu's link goes back to the side that was open last
+    await expect(
+      page.getByRole('link', { name: 'My Library' }).first(),
+    ).toHaveAttribute('href', '/my-palettes');
     await page.goto('/');
-    await expectLibraryHref('/my-palettes');
+    await expect(
+      page.getByRole('link', { name: 'My Library' }).first(),
+    ).toHaveAttribute('href', '/my-palettes');
   });
 
   test('lists saved projects and palettes', async ({ page }) => {

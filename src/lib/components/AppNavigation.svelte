@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { version } from '$app/env';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
+  import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { yarnBall } from '@lucide/lab';
@@ -35,16 +36,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     HeartIcon,
     Icon,
     LandmarkIcon,
+    LibraryBigIcon,
     NotebookPenIcon,
     ThermometerSunIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
+  import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
   const pathname = $derived(page.url.pathname);
+  const library = $derived(['/my-projects', '/my-palettes'].includes(pathname));
   const gallery = $derived(
     ['/gallery', '/gallery/palettes'].includes(pathname),
   );
@@ -140,7 +144,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Portal>
   </Menu>
 
-  <h2 class={HEADING}>Explore</h2>
+  <!-- Back to the side that was open last (after loading: a link's address
+  isn't updated from the server's) -->
+  <a
+    href={mounted && librarySection.value === 'palettes'
+      ? resolve('my-palettes')
+      : resolve('my-projects')}
+    class={[LINK, library && CURRENT]}
+    aria-current={library ? 'page' : undefined}
+  >
+    <LibraryBigIcon />
+    My Library
+  </a>
 
   <a
     href="/gallery"
@@ -150,6 +165,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <LandmarkIcon />
     Gallery
   </a>
+
+  <h2 class={HEADING}>Explore</h2>
 
   <a
     href="/yarn-colorway-finder"

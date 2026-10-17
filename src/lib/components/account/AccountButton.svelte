@@ -13,10 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The account button in the top bar, and the way to My Library and
-Preferences. Signed in, it opens a panel with the account's details, sync, My
-Library, Preferences and sign out; signed out, a menu to sign in or open
-either. With accounts off, a menu of those two. -->
+<!-- The account button in the top bar, and the way to Preferences. Signed in,
+it opens a panel with the account's details, sync, Account settings,
+Preferences and sign out; signed out, a menu to sign in or open Preferences.
+With accounts off, a plain link to Preferences. My Library is in the sidebar. -->
 
 <script lang="ts">
   import {
@@ -34,11 +34,9 @@ either. With accounts off, a menu of those two. -->
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { toast } from '#lib/state/page-state.svelte.js';
-  import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import {
     CircleUserRoundIcon,
-    LibraryBigIcon,
     LogInIcon,
     LogOutIcon,
     SlidersHorizontalIcon,
@@ -58,47 +56,20 @@ either. With accounts off, a menu of those two. -->
   let onAccountPage = $derived(page.url.pathname === '/account');
   let onPreferencesPage = $derived(page.url.pathname === '/preferences');
   // The button shows as current on any page it leads to
-  let onLibraryPage = $derived(
-    ['/my-projects', '/my-palettes'].includes(page.url.pathname),
-  );
-  let current = $derived(onAccountPage || onPreferencesPage || onLibraryPage);
-
-  let mounted = $state(false);
+  let current = $derived(onAccountPage || onPreferencesPage);
 
   // Signing in comes back to this page, as it is when the menu opens
   let signInTarget = $state('/auth/sign-in');
 
-  // Back to the side of My Library that was open last. After loading, so the
-  // server's page (which can't know) doesn't differ
-  let libraryHref = $derived(
-    mounted && librarySection.value === 'palettes'
-      ? resolve('my-palettes')
-      : resolve('my-projects'),
-  );
-
-  // Where My Library leads, for a signed-in account's panel
-  const libraryItem = $derived({
-    value: 'my-library',
-    label: 'My Library',
-    href: libraryHref,
-    icon: LibraryBigIcon,
-    here: onLibraryPage,
-  });
-
-  // The menu's links, without an account
+  // The menu's links, signed out
   let menuItems = $derived([
-    libraryItem,
-    ...(__ACCOUNTS_ENABLED__
-      ? [
-          {
-            value: 'sign-in',
-            label: 'Sign In',
-            href: signInTarget,
-            icon: LogInIcon,
-            here: onAccountPage,
-          },
-        ]
-      : []),
+    {
+      value: 'sign-in',
+      label: 'Sign In',
+      href: signInTarget,
+      icon: LogInIcon,
+      here: onAccountPage,
+    },
     {
       value: 'preferences',
       label: 'Preferences',
@@ -110,7 +81,6 @@ either. With accounts off, a menu of those two. -->
 
   onMount(() => {
     if (__ACCOUNTS_ENABLED__) loadAccountSummary();
-    mounted = true;
   });
 
   async function signOut() {
@@ -132,7 +102,17 @@ either. With accounts off, a menu of those two. -->
   }
 </script>
 
-{#if __ACCOUNTS_ENABLED__ && account.summary}
+{#if !__ACCOUNTS_ENABLED__}
+  <a
+    href={resolve('preferences')}
+    class={[BUTTON, onPreferencesPage && 'preset-tonal-secondary']}
+    aria-label="Preferences"
+    aria-current={onPreferencesPage ? 'page' : undefined}
+    title="Preferences"
+  >
+    <SlidersHorizontalIcon aria-hidden="true" />
+  </a>
+{:else if account.summary}
   {@const summary = account.summary}
   <Popover
     {open}
@@ -189,16 +169,6 @@ either. With accounts off, a menu of those two. -->
 
                 <!-- The last row rounds its bottom corners like the card -->
                 <div class="[&>:last-child]:rounded-b-container flex flex-col">
-                  {#if !onLibraryPage}
-                    <a
-                      href={libraryHref}
-                      class={ROW}
-                      onclick={() => (open = false)}
-                    >
-                      <LibraryBigIcon class="shrink-0 opacity-70" />
-                      <span class="font-bold">My Library</span>
-                    </a>
-                  {/if}
                   {#if !onAccountPage}
                     <a
                       href={resolve('account')}
@@ -250,9 +220,7 @@ either. With accounts off, a menu of those two. -->
     </Popover.Positioner>
   </Popover>
 {:else}
-  {@const label = __ACCOUNTS_ENABLED__
-    ? 'Sign in, My Library and Preferences'
-    : 'My Library and Preferences'}
+  {@const label = 'Sign in and Preferences'}
   <Menu
     positioning={menuPositioning('bottom-end')}
     onOpenChange={(e) => {
