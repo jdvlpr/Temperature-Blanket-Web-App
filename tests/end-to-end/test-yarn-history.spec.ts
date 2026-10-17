@@ -87,9 +87,36 @@ test.describe('Yarn Palette Creator history and autosave', () => {
       'data-save-status',
       'Saved in this browser',
     );
+
+    // A copy has the same colors: opening the original edits only the original
     await page.goto('/my-palettes');
-    await expect(
-      page.getByRole('list', { name: 'Saved palettes' }).getByRole('listitem'),
-    ).toHaveCount(1);
+    const list = page.getByRole('list', { name: 'Saved palettes' });
+    await expect(list.getByRole('listitem')).toHaveCount(1);
+    await list.getByRole('button', { name: 'More for 3 colors' }).click();
+    await page.getByRole('menuitem', { name: /^Create a Copy/ }).click();
+    await expect(list.getByRole('listitem')).toHaveCount(2);
+    const open = (name: string) =>
+      list.getByRole('link', {
+        name: `Open ${name} in Yarn Palette Creator`,
+        exact: true,
+      });
+    await open('3 colors').click();
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Saved in this browser',
+    );
+    await reverse(page);
+    await expect(page).toHaveURL(new RegExp(`s=${RGB}`));
+    await expect(paletteButton).toHaveAttribute('data-save-status', 'Saving…');
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Saved in this browser',
+    );
+    await page.goto('/my-palettes');
+    await open('3 colors (copy)').click();
+    await expect(page).toHaveURL(new RegExp(`s=${BGR}`));
+    await page.goto('/my-palettes');
+    await open('3 colors').click();
+    await expect(page).toHaveURL(new RegExp(`s=${RGB}`));
   });
 });

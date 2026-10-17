@@ -72,14 +72,15 @@ async function refresh() {
 
 /** A saved palette is open now, with the colors on the page */
 export async function openPalette(id: string) {
+  // Before anything waits: a save now would put these colors in the other one
+  clearTimeout(timer);
+  waitingSince = 0;
   // Another palette opening (Browse Palettes) over one with a change still
   // waiting: that change is kept first
   const previous = paletteAutosave.id;
   const unsaved = lastChange;
   if (previous && previous !== id && unsaved && unsaved !== baseline)
     await PaletteStorage.updateCode(previous, unsaved).catch(() => false);
-  clearTimeout(timer);
-  waitingSince = 0;
   paletteAutosave.id = id;
   paletteAutosave.state = 'saved';
   baseline = codeNow();
@@ -102,10 +103,15 @@ export function closePalette() {
   paletteAutosave.name = '';
 }
 
-/** Opens the saved palette with these colors, if there is one */
-export async function openMatchingPalette() {
+/**
+ * Opens the saved palette with these colors, if there is one. A copy (My
+ * Library's Create a Copy) has the same colors under another name, so the one
+ * with the link's name is the one opened.
+ */
+export async function openMatchingPalette(name: string) {
   const code = codeNow();
-  const match = (await PaletteStorage.list()).find((p) => p.code === code);
+  const matches = (await PaletteStorage.list()).filter((p) => p.code === code);
+  const match = matches.find((p) => p.name === name) ?? matches[0];
   if (match && codeNow() === code) await openPalette(match.id);
 }
 

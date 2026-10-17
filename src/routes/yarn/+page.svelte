@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       closePalette();
       yarnPageState.startHistory();
       // Opened from My Library (or the link is one of the saved palettes)
-      if (s) await openMatchingPalette();
+      if (s) await openMatchingPalette(name);
     } else yarnPageState.showInAddressBar();
 
     yarnPageState.loading = false;

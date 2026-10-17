@@ -706,9 +706,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Undo/Redo</h3>
 
             <p>
-              To undo or redo any previous edit to your project, press the Undo
-              or Redo buttons at the top of the page. You can also use the
-              following keyboard shortcuts:
+              To undo or redo any previous edit to your project, or to your
+              palette in the <a href="/yarn" class="link"
+                >Yarn Palette Creator</a
+              >, press the Undo or Redo buttons at the top of the page. You can
+              also use the following keyboard shortcuts:
             </p>
             <figure class=" ">
               <table>
@@ -1609,7 +1611,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               You can also see all your saved palettes on the
               <a href="/my-palettes" class="link">My Palettes</a> page, and open any
-              of them in the Yarn Palette Creator.
+              of them in the Yarn Palette Creator. There, changes to a saved palette
+              save automatically, and you can rename it by its name at the top of
+              the page or with the Palette button, which also shows where it’s saved.
             </p>
           </section>
           <section
