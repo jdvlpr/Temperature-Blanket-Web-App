@@ -40,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stringToColors,
     yarnDetailsToColors,
   } from '#lib/utils/color-utils.js';
-  import { createSection } from '#lib/storage/library-section.svelte.js';
   import { onMount } from 'svelte';
   import PaletteStatusButton from './PaletteStatusButton.svelte';
   import PaletteTitle from './PaletteTitle.svelte';
@@ -57,8 +56,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   watchColors(() => yarnPageState.gauge.colors);
 
   onMount(() => {
-    // The sidebar's Create link comes back here next time
-    createSection.value = 'yarn';
     initPage();
   });
 

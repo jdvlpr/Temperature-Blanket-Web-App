@@ -68,7 +68,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/gallery-request.js';
   import AddToGallery from '#lib/components/modals/AddToGallery.svelte';
   import { setUnitsFromNavigator } from '#lib/utils/unit-utils.svelte.js';
-  import { createSection } from '#lib/storage/library-section.svelte.js';
   import { onMount, untrack } from 'svelte';
 
   let debounceTimer: number;
@@ -194,8 +193,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   onMount(async () => {
-    // The sidebar's Create link comes back here next time
-    createSection.value = 'planner';
     const isProject = new URL(window.location.href).searchParams.has('project');
 
     if (isProject) {

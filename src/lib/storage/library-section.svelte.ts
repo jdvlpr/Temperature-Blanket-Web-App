@@ -13,12 +13,10 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Which side of a two-sided area was open last on this device, so the
-// sidebar's link goes back to it: My Library (Projects or Palettes) and
-// Create (the planner or the Yarn page). The first side the first time.
+// Which side of My Library (Projects or Palettes) was open last on this
+// device, so the link goes back to it. The first side the first time.
 
 export type LibrarySection = 'projects' | 'palettes';
-export type CreateSection = 'planner' | 'yarn';
 
 class Section<T extends string> {
   #value = $state<T>() as T;
@@ -58,8 +56,3 @@ export const librarySection = new Section<LibrarySection>(
   'my_library_section',
   ['projects', 'palettes'],
 );
-
-export const createSection = new Section<CreateSection>('create_section', [
-  'planner',
-  'yarn',
-]);
