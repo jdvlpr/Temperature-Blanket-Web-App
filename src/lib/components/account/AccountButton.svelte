@@ -13,10 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The account button in the top bar, and the way to Preferences. Signed in,
-it opens a panel with the account's details, sync, Preferences and sign out;
-signed out, a menu to sign in or open Preferences. With accounts off, it's a
-link to Preferences. -->
+<!-- The account button in the top bar, and the way to My Library and
+Preferences. Signed in, it opens a panel with the account's details, sync, My
+Library, Preferences and sign out; signed out, a menu to sign in or open
+either. With accounts off, a menu of those two. -->
 
 <script lang="ts">
   import {
@@ -35,9 +35,11 @@ link to Preferences. -->
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import { accountsIntro } from '#lib/storage/accounts-intro.svelte.js';
+  import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import {
     CircleUserRoundIcon,
+    LibraryBigIcon,
     LogInIcon,
     LogOutIcon,
     SlidersHorizontalIcon,
@@ -56,21 +58,48 @@ link to Preferences. -->
 
   let onAccountPage = $derived(page.url.pathname === '/account');
   let onPreferencesPage = $derived(page.url.pathname === '/preferences');
-  // The button shows as current on either page it leads to
-  let current = $derived(onAccountPage || onPreferencesPage);
+  // The button shows as current on any page it leads to
+  let onLibraryPage = $derived(
+    ['/my-projects', '/my-palettes'].includes(page.url.pathname),
+  );
+  let current = $derived(onAccountPage || onPreferencesPage || onLibraryPage);
+
+  let mounted = $state(false);
 
   // Signing in comes back to this page, as it is when the menu opens
   let signInTarget = $state('/auth/sign-in');
 
-  // Signed out, the menu's links
-  let signedOutItems = $derived([
-    {
-      value: 'sign-in',
-      label: 'Sign In',
-      href: signInTarget,
-      icon: LogInIcon,
-      here: onAccountPage,
-    },
+  // Back to the side of My Library that was open last. After loading, so the
+  // server's page (which can't know) doesn't differ
+  let libraryHref = $derived(
+    mounted && librarySection.value === 'palettes'
+      ? resolve('my-palettes')
+      : resolve('my-projects'),
+  );
+
+  // Where My Library leads, for a signed-in account's panel
+  const libraryItem = $derived({
+    value: 'my-library',
+    label: 'My Library',
+    href: libraryHref,
+    icon: LibraryBigIcon,
+    here: onLibraryPage,
+  });
+
+  // The menu's links, without an account
+  let menuItems = $derived([
+    libraryItem,
+    ...(__ACCOUNTS_ENABLED__
+      ? [
+          {
+            value: 'sign-in',
+            label: 'Sign In',
+            href: signInTarget,
+            icon: LogInIcon,
+            here: onAccountPage,
+          },
+        ]
+      : []),
     {
       value: 'preferences',
       label: 'Preferences',
@@ -79,9 +108,6 @@ link to Preferences. -->
       here: onPreferencesPage,
     },
   ]);
-
-  // After loading, so the server's page (which can't know) doesn't differ
-  let mounted = $state(false);
 
   onMount(() => {
     if (__ACCOUNTS_ENABLED__) loadAccountSummary();
@@ -112,179 +138,177 @@ link to Preferences. -->
   }
 </script>
 
-{#if !__ACCOUNTS_ENABLED__}
-  <a
-    href={resolve('preferences')}
-    class={[BUTTON, onPreferencesPage && 'preset-tonal-secondary']}
-    aria-label="Preferences"
-    aria-current={onPreferencesPage ? 'page' : undefined}
-    title="Preferences"
+{#if __ACCOUNTS_ENABLED__ && account.summary}
+  {@const summary = account.summary}
+  <Popover
+    {open}
+    positioning={menuPositioning('bottom-end')}
+    onOpenChange={(e) => {
+      open = e.open;
+
+      if (!open) errorMessage = '';
+      else // Catch up with changes from other devices while this tab stayed open
+      if (sync.active)
+        import('#lib/sync/sync.svelte.js').then((m) => m.refreshSync());
+    }}
   >
-    <SlidersHorizontalIcon aria-hidden="true" />
-  </a>
-{:else}
-  {#if account.summary}
-    {@const summary = account.summary}
-    <Popover
-      {open}
-      positioning={menuPositioning('bottom-end')}
-      onOpenChange={(e) => {
-        open = e.open;
-
-        if (!open) errorMessage = '';
-        else // Catch up with changes from other devices while this tab stayed open
-        if (sync.active)
-          import('#lib/sync/sync.svelte.js').then((m) => m.refreshSync());
-      }}
+    <Popover.Trigger
+      class={[BUTTON, (open || current) && 'preset-tonal-secondary']}
+      aria-label="Account"
+      title="Account: {summary.name || summary.email}"
+      data-testid="account-button"
     >
-      <Popover.Trigger
-        class={[BUTTON, (open || current) && 'preset-tonal-secondary']}
-        aria-label="Account"
-        title="Account: {summary.name || summary.email}"
-        data-testid="account-button"
+      <AccountAvatar
+        {summary}
+        class="aspect-square size-8 max-w-none text-xs"
+      />
+    </Popover.Trigger>
+    <Popover.Positioner>
+      <Popover.Content
+        class="card bg-surface-100-900 w-96 max-w-[calc(100vw-2rem)] shadow-xl"
       >
-        <AccountAvatar
-          {summary}
-          class="aspect-square size-8 max-w-none text-xs"
-        />
-      </Popover.Trigger>
-      <Popover.Positioner>
-        <Popover.Content
-          class="card bg-surface-100-900 w-96 max-w-[calc(100vw-2rem)] shadow-xl"
-        >
-          {#snippet element(attributes)}
-            {#if !attributes.hidden}
-              <div {...attributes} transition:safeSlide>
-                <div
-                  class="divide-surface-300-700 flex flex-col divide-y overflow-hidden"
-                >
-                  <div class="flex items-center gap-3 px-4 py-3">
-                    <AccountAvatar {summary} class="size-10 text-sm" />
-                    <div class="min-w-0">
-                      {#if summary.name}
-                        <p class="truncate font-bold">{summary.name}</p>
-                      {/if}
-                      <p class="truncate text-sm opacity-75">
-                        {summary.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  {#if sync.active}
-                    <!-- Hidden when there's no notice and nothing to add -->
-                    <div class="hidden flex-col gap-2 px-4 py-3 has-[*]:flex">
-                      <SyncStatus />
-                      <AddToAccountButton />
-                    </div>
-                  {/if}
-
-                  <!-- The last row rounds its bottom corners like the card -->
-                  <div
-                    class="[&>:last-child]:rounded-b-container flex flex-col"
-                  >
-                    {#if !onAccountPage}
-                      <a
-                        href={resolve('account')}
-                        class={ROW}
-                        onclick={() => (open = false)}
-                      >
-                        <UserRoundCogIcon class="shrink-0 opacity-70" />
-                        <span class="font-bold">Account settings</span>
-                      </a>
+        {#snippet element(attributes)}
+          {#if !attributes.hidden}
+            <div {...attributes} transition:safeSlide>
+              <div
+                class="divide-surface-300-700 flex flex-col divide-y overflow-hidden"
+              >
+                <div class="flex items-center gap-3 px-4 py-3">
+                  <AccountAvatar {summary} class="size-10 text-sm" />
+                  <div class="min-w-0">
+                    {#if summary.name}
+                      <p class="truncate font-bold">{summary.name}</p>
                     {/if}
-                    {#if !onPreferencesPage}
-                      <a
-                        href={resolve('preferences')}
-                        class={ROW}
-                        onclick={() => (open = false)}
-                      >
-                        <SlidersHorizontalIcon class="shrink-0 opacity-70" />
-                        <span class="font-bold">Preferences</span>
-                      </a>
-                    {/if}
-                    <button
-                      type="button"
-                      class={ROW}
-                      disabled={busy}
-                      onclick={signOut}
-                    >
-                      <LogOutIcon class="shrink-0 opacity-70" />
-                      <span class="font-bold">Sign out</span>
-                    </button>
-                    {#if errorMessage}
-                      <p
-                        class="text-error-700-300 px-4 pb-3 text-sm"
-                        role="alert"
-                      >
-                        {errorMessage}
-                      </p>
-                    {/if}
+                    <p class="truncate text-sm opacity-75">
+                      {summary.email}
+                    </p>
                   </div>
                 </div>
-                <Popover.Arrow
-                  style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-200-800);"
-                >
-                  <Popover.ArrowTip />
-                </Popover.Arrow>
-              </div>
-            {/if}
-          {/snippet}
-        </Popover.Content>
-      </Popover.Positioner>
-    </Popover>
-  {:else}
-    <!-- A "New" dot, until it's opened, to introduce accounts -->
-    {@const isNew = mounted && accountsIntro.showDot}
-    {@const label = isNew
-      ? 'Sign in and Preferences. Accounts (Beta)'
-      : 'Sign in and Preferences'}
-    <Menu
-      positioning={menuPositioning('bottom-end')}
-      onOpenChange={(e) => {
-        if (!e.open) return;
-        accountsIntro.markButtonSeen();
-        signInTarget = signInHref(window.location);
-      }}
-    >
-      <Menu.Trigger
-        class={[
-          BUTTON,
-          'data-[state=open]:preset-tonal-secondary relative',
-          current && 'preset-tonal-secondary',
-        ]}
-        aria-label={label}
-        title={label}
-        data-testid="account-button"
-      >
-        <CircleUserRoundIcon aria-hidden="true" />
-        {#if isNew}
-          <span
-            class="bg-primary-500 absolute top-1.5 right-1.5 size-2.5 rounded-full"
-            aria-hidden="true"
-          ></span>
-        {/if}
-      </Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content class={menuContentClass}>
-            {#each signedOutItems as item (item.value)}
-              <Menu.Item value={item.value} class={menuItemClass}>
-                {#snippet element(attributes)}
-                  <!-- The item's menu behavior, typed for its default div -->
-                  <a
-                    {...attributes as HTMLAnchorAttributes}
-                    href={item.href}
-                    aria-current={item.here ? 'page' : undefined}
+
+                {#if sync.active}
+                  <!-- Hidden when there's no notice and nothing to add -->
+                  <div class="hidden flex-col gap-2 px-4 py-3 has-[*]:flex">
+                    <SyncStatus />
+                    <AddToAccountButton />
+                  </div>
+                {/if}
+
+                <!-- The last row rounds its bottom corners like the card -->
+                <div class="[&>:last-child]:rounded-b-container flex flex-col">
+                  {#if !onLibraryPage}
+                    <a
+                      href={libraryHref}
+                      class={ROW}
+                      onclick={() => (open = false)}
+                    >
+                      <LibraryBigIcon class="shrink-0 opacity-70" />
+                      <span class="font-bold">My Library</span>
+                    </a>
+                  {/if}
+                  {#if !onAccountPage}
+                    <a
+                      href={resolve('account')}
+                      class={ROW}
+                      onclick={() => (open = false)}
+                    >
+                      <UserRoundCogIcon class="shrink-0 opacity-70" />
+                      <span class="font-bold">Account settings</span>
+                    </a>
+                  {/if}
+                  {#if !onPreferencesPage}
+                    <a
+                      href={resolve('preferences')}
+                      class={ROW}
+                      onclick={() => (open = false)}
+                    >
+                      <SlidersHorizontalIcon class="shrink-0 opacity-70" />
+                      <span class="font-bold">Preferences</span>
+                    </a>
+                  {/if}
+                  <button
+                    type="button"
+                    class={ROW}
+                    disabled={busy}
+                    onclick={signOut}
                   >
-                    <item.icon aria-hidden="true" />
-                    <span>{item.label}</span>
-                  </a>
-                {/snippet}
-              </Menu.Item>
-            {/each}
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu>
-  {/if}
+                    <LogOutIcon class="shrink-0 opacity-70" />
+                    <span class="font-bold">Sign out</span>
+                  </button>
+                  {#if errorMessage}
+                    <p
+                      class="text-error-700-300 px-4 pb-3 text-sm"
+                      role="alert"
+                    >
+                      {errorMessage}
+                    </p>
+                  {/if}
+                </div>
+              </div>
+              <Popover.Arrow
+                style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-200-800);"
+              >
+                <Popover.ArrowTip />
+              </Popover.Arrow>
+            </div>
+          {/if}
+        {/snippet}
+      </Popover.Content>
+    </Popover.Positioner>
+  </Popover>
+{:else}
+  <!-- A "New" dot, until it's opened, to introduce accounts -->
+  {@const isNew = __ACCOUNTS_ENABLED__ && mounted && accountsIntro.showDot}
+  {@const label = !__ACCOUNTS_ENABLED__
+    ? 'My Library and Preferences'
+    : isNew
+      ? 'Sign in, My Library and Preferences. Accounts (Beta)'
+      : 'Sign in, My Library and Preferences'}
+  <Menu
+    positioning={menuPositioning('bottom-end')}
+    onOpenChange={(e) => {
+      if (!e.open) return;
+      accountsIntro.markButtonSeen();
+      signInTarget = signInHref(window.location);
+    }}
+  >
+    <Menu.Trigger
+      class={[
+        BUTTON,
+        'data-[state=open]:preset-tonal-secondary relative',
+        current && 'preset-tonal-secondary',
+      ]}
+      aria-label={label}
+      title={label}
+      data-testid="account-button"
+    >
+      <CircleUserRoundIcon aria-hidden="true" />
+      {#if isNew}
+        <span
+          class="bg-primary-500 absolute top-1.5 right-1.5 size-2.5 rounded-full"
+          aria-hidden="true"
+        ></span>
+      {/if}
+    </Menu.Trigger>
+    <Portal>
+      <Menu.Positioner>
+        <Menu.Content class={menuContentClass}>
+          {#each menuItems as item (item.value)}
+            <Menu.Item value={item.value} class={menuItemClass}>
+              {#snippet element(attributes)}
+                <!-- The item's menu behavior, typed for its default div -->
+                <a
+                  {...attributes as HTMLAnchorAttributes}
+                  href={item.href}
+                  aria-current={item.here ? 'page' : undefined}
+                >
+                  <item.icon aria-hidden="true" />
+                  <span>{item.label}</span>
+                </a>
+              {/snippet}
+            </Menu.Item>
+          {/each}
+        </Menu.Content>
+      </Menu.Positioner>
+    </Portal>
+  </Menu>
 {/if}

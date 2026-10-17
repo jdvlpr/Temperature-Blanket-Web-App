@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { version } from '$app/env';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
-  import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { yarnBall } from '@lucide/lab';
@@ -36,22 +35,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     HeartIcon,
     Icon,
     LandmarkIcon,
-    LibraryBigIcon,
     NotebookPenIcon,
     ThermometerSunIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
-  import {
-    createSection,
-    librarySection,
-  } from '#lib/storage/library-section.svelte.js';
+  import { createSection } from '#lib/storage/library-section.svelte.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
   const pathname = $derived(page.url.pathname);
-  const library = $derived(['/my-projects', '/my-palettes'].includes(pathname));
   const gallery = $derived(
     ['/gallery', '/gallery/palettes'].includes(pathname),
   );
@@ -120,28 +114,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}><TriangleAlertIcon /> Save Your Projects</button
     >
   {/if}
-
-  <!-- Back to the side that was open last (after loading: a link's address
-  isn't updated from the server's) -->
-  <a
-    href={mounted && librarySection.value === 'palettes'
-      ? resolve('my-palettes')
-      : resolve('my-projects')}
-    class={[LINK, library && CURRENT]}
-    aria-current={library ? 'page' : undefined}
-  >
-    <LibraryBigIcon />
-    My Library
-  </a>
-
-  <a
-    href="/supporters"
-    class={[LINK, pathname === '/supporters' && CURRENT]}
-    aria-current={pathname === '/supporters' ? 'page' : undefined}
-  >
-    <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
-    Supporters
-  </a>
 
   <!-- Back to the planner or the Yarn page, whichever was open last (after
   loading, like My Library). The caret picks either one -->
@@ -232,10 +204,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Weather Forecast
   </a>
 
+  <a
+    href="/supporters"
+    class={[LINK, pathname === '/supporters' && CURRENT, 'mt-4']}
+    aria-current={pathname === '/supporters' ? 'page' : undefined}
+  >
+    <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
+    Supporters
+  </a>
+
   <!-- Small links, spaced apart in one row that wraps. It takes the
   sidebar's width rather than setting it, or the sidebar would stretch to
   fit every link on one line -->
-  <div class={[SMALL_LINKS, 'mt-6 w-0 min-w-full px-3']}>
+  <div class={[SMALL_LINKS, 'w-0 min-w-full px-3']}>
     <a
       href="/faq"
       class={['py-1', SMALL_LINK, pathname === '/faq' && SMALL_CURRENT]}
