@@ -80,9 +80,9 @@ test.describe('My Projects', () => {
     const dialog = page.getByRole('dialog');
     // Retried: a click before the page finishes loading does nothing
     await expect(async () => {
-      // Save Palette is in the Save & Export menu
-      await page.getByRole('button', { name: 'Save & Export' }).click();
-      await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
+      // Save Palette is in the Palette menu
+      await page.getByTestId('palette-button').click();
+      await page.getByTestId('menu-save-palette').click();
       await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
         timeout: 1000,
       });

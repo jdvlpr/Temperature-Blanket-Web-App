@@ -75,7 +75,7 @@ export async function openPalette(id: string) {
   // Before anything waits: a save now would put these colors in the other one
   clearTimeout(timer);
   waitingSince = 0;
-  // Another palette opening (Browse Palettes) over one with a change still
+  // Another palette opening (Recent Palettes, Save a Copy) over one with a change still
   // waiting: that change is kept first
   const previous = paletteAutosave.id;
   const unsaved = lastChange;
@@ -86,7 +86,7 @@ export async function openPalette(id: string) {
   baseline = codeNow();
   lastChange = baseline;
   await refresh();
-  // Opened with other colors than it has (Browse Palettes, then an edit
+  // Opened with other colors than it has (an edit
   // before this ran): those are a change to save
   paletteChanged();
 }

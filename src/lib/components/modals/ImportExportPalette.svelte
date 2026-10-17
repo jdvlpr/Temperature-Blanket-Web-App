@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     exportType = 'html',
   }: {
     colors?: Color[];
-    /** What to export; the toolbar's Save & Export menu chooses it */
+    /** What to export; Download / Export chooses it (see palette-export.ts) */
     exportType?: 'html' | 'colorway';
   } = $props();
 

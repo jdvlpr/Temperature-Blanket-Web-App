@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     footer?: Snippet;
     layout?: 'grid' | 'list';
     /** The whole thing is one button on a card, for choosing a palette (as in
-    Browse Palettes): `onclick` only, no `href`, `nameRow`, `action` or `footer` */
+    Get Colors' palettes): `onclick` only, no `href`, `nameRow`, `action` or `footer` */
     card?: boolean;
   }
 

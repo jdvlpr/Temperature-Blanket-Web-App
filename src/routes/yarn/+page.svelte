@@ -213,27 +213,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </div>
         <Card>
-          {#snippet header()}
-            <p class="p-4 text-sm opacity-68">
-              This is a standalone version of the palette creator used in the
-              <a href="/" class="link">Project Planner</a> tool. If you're making
-              a temperature blanket project, use the Project Planner instead, which
-              will automatically save your yarn palette to your project.
-            </p>
-          {/snippet}
           {#snippet content()}
             <div class=" mt-4">
-              <Gauge
-                bind:gauge={yarnPageState.gauge}
-                suggestedName={yarnPageState.suggestedNameFor(
-                  yarnPageState.gauge.colors,
-                )}
-                onopenpalette={(id: string, how: 'saved' | 'chosen') => {
-                  // Another of My Palettes: its own history from here
-                  if (how === 'chosen') yarnPageState.startHistory();
-                  void openPalette(id);
-                }}
-              />
+              <Gauge bind:gauge={yarnPageState.gauge} />
 
               <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
             </div>
@@ -248,7 +230,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet sources()}
           <div class="text-sm">
             <p class="text-surface-700-300">
-              Default color schemes based on <a
+              Gradients based on <a
                 href="https://www.ColorBrewer2.org"
                 target="_blank"
                 rel="noopener noreferrer"

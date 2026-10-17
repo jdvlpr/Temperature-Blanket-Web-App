@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The open palette's name, as ProjectTitle is the project's: a text field
 styled as the title (in the top bar on wider screens), or a labelled field (the
-Palette popover). Click to rename in place; Enter or clicking away keeps the
+Palette menu). Click to rename in place; Enter or clicking away keeps the
 name, Escape puts it back. Not saved yet, focusing the title saves the palette
-first, since naming it means keeping it; the popover's field saves it once a
+first, since naming it means keeping it; the menu's field saves it once a
 name is given. -->
 
 <script lang="ts">
@@ -56,7 +56,7 @@ name is given. -->
     if (!name) name = fallback;
     await tick();
     input.select();
-    // The popover's field can be focused just by opening it: that saves only
+    // The menu's field can be focused just by opening it: that saves only
     // once a name is given
     if (!paletteAutosave.id && !field) await save(savedName);
   }

@@ -16,8 +16,14 @@ test.describe('Palette toolbar', () => {
 
   test('Get Colors lists every color source', async ({ page }) => {
     await page.getByRole('button', { name: 'Get Colors' }).click();
+    // On the Yarn page, saved and gallery palettes open as palettes of their
+    // own (from My Library, the Gallery or the Palette menu), not from here
+    for (const name of ['My Palettes', 'Palette Gallery', 'Browse Palettes'])
+      await expect(
+        page.getByRole('menuitem', { name: new RegExp(name) }),
+      ).toHaveCount(0);
     for (const name of [
-      'Browse Palettes',
+      'Gradients',
       'Choose Colorways',
       'From an Image',
       'Random',
@@ -127,22 +133,22 @@ test.describe('Palette toolbar', () => {
     ).toBeVisible();
   });
 
-  test('Save & Export lists saving and every export', async ({ page }) => {
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    for (const name of [
-      'Save Palette',
-      'Copy Link',
-      'HTML Color Codes',
-      'Image',
-    ]) {
+  test('the Palette menu’s Download / Export lists every export', async ({
+    page,
+  }) => {
+    await page.getByTestId('palette-button').click();
+    await page
+      .getByRole('dialog', { name: 'Palette' })
+      .getByRole('button', { name: /^Download \/ Export/ })
+      .click();
+    const dialog = page.getByRole('dialog');
+    for (const name of ['Image', 'HTML Color Codes'])
       await expect(
-        page.getByRole('menuitem', { name: new RegExp(`^${name}`) }),
+        dialog.getByRole('button', { name: new RegExp(`^${name}`) }),
       ).toBeVisible();
-    }
 
     // Each export opens straight on its format, with no list to go back to
-    await page.getByRole('menuitem', { name: /^HTML Color Codes/ }).click();
-    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('button', { name: /^HTML Color Codes/ }).click();
     await expect(
       dialog.getByRole('heading', { name: 'HTML Color Codes' }),
     ).toBeVisible();
@@ -154,31 +160,35 @@ test.describe('Palette toolbar', () => {
     ).toHaveCount(0);
   });
 
-  test('Publish to Gallery, signed out, offers signing in that comes back to the colors', async ({
+  test('Share, signed out, offers signing in that comes back to the colors', async ({
     page,
   }) => {
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    const item = page.getByRole('menuitem', { name: /^Publish to Gallery/ });
+    await page.getByTestId('palette-button').click();
+    await page
+      .getByRole('dialog', { name: 'Palette' })
+      .getByRole('button', { name: /^Share/ })
+      .click();
+    const signIn = page
+      .getByRole('dialog')
+      .getByRole('link', { name: /^Sign In to Publish/ });
     // Only in builds with accounts (PUBLIC_ACCOUNTS_ENABLED)
-    test.skip((await item.count()) === 0, 'Accounts aren’t built in');
-    await item.click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('needs a free account')).toBeVisible();
-    const signIn = dialog.getByRole('link', {
-      name: 'Sign In or Create Account',
-    });
+    test.skip((await signIn.count()) === 0, 'Accounts aren’t built in');
     const href = (await signIn.getAttribute('href')) ?? '';
     const back = new URL(href, 'https://x.test').searchParams.get('redirect');
     expect(href).toMatch(/^\/auth\/sign-in\?redirect=/);
     expect(back).toMatch(/^\/yarn\?s=[0-9a-f]+/);
-    await expect(
-      dialog.getByRole('button', { name: 'Save Palette' }),
-    ).toBeVisible();
   });
 
   test('Image opens a preview to download', async ({ page }) => {
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Image/ }).click();
+    await page.getByTestId('palette-button').click();
+    await page
+      .getByRole('dialog', { name: 'Palette' })
+      .getByRole('button', { name: /^Download \/ Export/ })
+      .click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^Image/ })
+      .click();
     const dialog = page.getByRole('dialog');
     await expect(
       dialog.getByRole('heading', { name: 'Palette Image' }),
@@ -199,6 +209,24 @@ test.describe('Palette toolbar', () => {
     const download = page.waitForEvent('download');
     await dialog.getByRole('button', { name: 'Download' }).click();
     expect((await download).suggestedFilename()).toMatch(/\.png$/);
+  });
+
+  test('Start a Project with It, not saved, asks first, then opens the planner', async ({
+    page,
+  }) => {
+    await page.getByTestId('palette-button').click();
+    await page
+      .getByRole('dialog', { name: 'Palette' })
+      .getByRole('button', { name: /^Start a Project with It/ })
+      .click();
+    await page
+      .getByRole('dialog', { name: 'Start a Project' })
+      .getByRole('button', { name: 'Don’t Save' })
+      .click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page.getByText('Your palette goes on the Temperature gauge'),
+    ).toBeVisible();
   });
 
   test('paste colors into the palette', async ({ page }) => {
@@ -225,10 +253,16 @@ test.describe('Palette toolbar', () => {
     await page
       .context()
       .grantPermissions(['clipboard-read', 'clipboard-write']);
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Copy Link/ }).click();
-    await expect(page.getByText('Palette link copied')).toBeVisible();
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await page.getByTestId('palette-button').click();
+    await page
+      .getByRole('dialog', { name: 'Palette' })
+      .getByRole('button', { name: /^Share/ })
+      .click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^Copy Link/ })
+      .click();
+    await expect(page.getByText('Link copied')).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(
       /\/yarn\?s=ff0000ffa5000000ff/,
     );
@@ -253,7 +287,7 @@ test.describe('Palette toolbar', () => {
     await page.getByRole('button', { name: 'Get Colors' }).focus();
     await page.keyboard.press('Enter');
     await expect(
-      page.getByRole('menuitem', { name: /Browse Palettes/ }),
+      page.getByRole('menuitem', { name: /Gradients/ }),
     ).toBeVisible();
     // Keys pressed before the menu takes focus go nowhere
     await expect(page.getByRole('menu', { name: 'Get Colors' })).toBeFocused();
@@ -263,33 +297,18 @@ test.describe('Palette toolbar', () => {
     await expect(page.getByRole('dialog')).toBeVisible();
   });
 
-  test('Browse Palettes chooses where palettes come from, and remembers', async ({
-    page,
-  }) => {
+  test('Gradients opens on its own, fitting a phone', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 700 });
     await page.getByRole('button', { name: 'Get Colors' }).click();
-    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
-
-    // All three in view on phones (at the bottom of the sheet); nothing saved,
-    // so it opens on the Gallery
-    const dialog = page.getByRole('dialog', { name: 'Browse Palettes' });
-    let sources = dialog.getByRole('radiogroup', { name: 'Browse' });
-    await expect(sources.getByRole('radio')).toHaveCount(3);
-    await expect(sources.getByRole('radio', { name: 'Gallery' })).toBeChecked();
-    await sources.getByText('My Palettes', { exact: true }).click();
-    await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
-
-    // Opened again, larger, it's where it was left
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog')).toHaveCount(0);
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.getByRole('button', { name: 'Get Colors' }).click();
-    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
-    sources = page
-      .getByRole('dialog')
-      .getByRole('radiogroup', { name: 'Browse' });
+    await page.getByRole('menuitem', { name: /Gradients/ }).click();
+    const dialog = page.getByRole('dialog', { name: 'Gradients' });
     await expect(
-      sources.getByRole('radio', { name: 'My Palettes' }),
-    ).toBeChecked();
+      dialog.getByRole('list', { name: /gradients$/ }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
   });
 });

@@ -70,7 +70,7 @@ export const PALETTE_LIST =
   'grid grid-cols-1 items-start gap-x-6 gap-y-6 lg:grid-cols-2';
 
 /** A switcher pinned to the bottom of the screen on small screens, in thumb
- * reach, with the content scrolling behind it: Browse Palettes' sources on
+ * reach, with the content scrolling behind it: a dialog's sources on
  * phones, and Projects | Yarn Palettes (CollectionNav) below lg */
 export const BOTTOM_BAR =
   'bg-surface-50/90 dark:bg-surface-950/90 border-surface-200-800 border-t px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur';

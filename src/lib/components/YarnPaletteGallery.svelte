@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnPaletteGalleryState,
   } from '#lib/state/gallery-state.svelte.js';
 
-  // On the gallery page each palette opens its page; in Browse Palettes
+  // On the gallery page each palette opens its page; in Get Colors' Palette Gallery
   // (`mode="use"`) choosing one uses it (`onuse`), with the same search,
   // filters, sort and view as the gallery page
   let {
@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={scrollContainer}
       class={[
         'flex scroll-mt-[70px] flex-col items-center justify-center gap-2 text-center',
-        // Browse Palettes spaces its lists as My Palettes does
+        // Get Colors' Palette Gallery spaces its lists as My Palettes does
         mode === 'page' && 'pb-4',
       ]}
     >
@@ -266,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<!-- Browse Palettes has its own -->
+<!-- Get Colors' Palette Gallery has its own -->
 {#if mode === 'page' && showScrollToTopButton && yarnPaletteGalleryState.projects.length}
   <ToTopButton
     bottom="var(--bottom-bar-height, 0px)"

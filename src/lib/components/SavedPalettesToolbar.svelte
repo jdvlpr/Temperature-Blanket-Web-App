@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Search, filters, sort and view for saved palettes, and "3 of 12 palettes"
-  while filtering: My Library's, and Browse Palettes' My Palettes, which share
+  while filtering: My Library's, and Get Colors' My Palettes, which share
   them. Search and filters show once there are a few (or one is on).
 -->
 <script lang="ts">

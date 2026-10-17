@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
   import { onMount, type Snippet } from 'svelte';
 
-  // With updateGauge (Browse Palettes), choosing a palette uses it, and that's
+  // With updateGauge (Get Colors' My Palettes), choosing a palette uses it, and that's
   // all a card does; without it (My Library), each palette is a link to the
   // Yarn Palette Creator, with Rename, Copy and Trash in its menu
   // With sharing (My Projects, signed in), each palette says who can see it
@@ -234,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return name ? `${url}&name=${encodeURIComponent(name)}` : url;
   }
 
-  // As My Library's View menu says, here and in Browse Palettes
+  // As My Library's View menu says, here and in Get Colors' My Palettes
   let grid = $derived(
     (preferences.value.myProjectsLayout ?? 'grid') === 'grid',
   );
@@ -325,7 +325,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </div>
           {:else if updateGauge}
-            <!-- Browse Palettes: just for choosing one -->
+            <!-- Get Colors' My Palettes: just for choosing one -->
             <PaletteCard
               {colors}
               {layout}

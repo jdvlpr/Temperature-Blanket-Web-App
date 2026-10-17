@@ -59,6 +59,7 @@ button to it. -->
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
+    BookmarkPlusIcon,
     ChevronRightIcon,
     CloudAlertIcon,
     CopyPlusIcon,
@@ -78,6 +79,7 @@ button to it. -->
   import { openProjectShare } from '#lib/utils/open-project-share.js';
   import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
   import ExportOptions from './ExportOptions.svelte';
+  import SaveGaugePalettes from './SaveGaugePalettes.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
   import { pluralize } from '#lib/utils/string-utils.js';
@@ -128,6 +130,17 @@ button to it. -->
 
   // Copy Link and its gallery page, in the panel with Back to this menu
   const share = () => openProjectShare(shareName, { item: shareItem });
+
+  // Its gauges' palettes, to keep in My Palettes
+  const savePalettes = () =>
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: SaveGaugePalettes,
+        props: { projectName: shareName || locations.projectTitle },
+      },
+      options: { title: 'Save Palettes' },
+    });
 
   async function copyProject() {
     try {
@@ -317,7 +330,7 @@ the same color) says it's waiting here -->
             <span class="flex flex-1 flex-col">
               <span>Download / Export</span>
               <span class="text-xs opacity-70"
-                >PDF, CSV, PNG or Google Sheets</span
+                >PDF, CSV, PNG, Google Sheets or palettes</span
               >
             </span>
             <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
@@ -330,6 +343,18 @@ the same color) says it's waiting here -->
               <span>Share</span>
               <span class="text-xs opacity-70"
                 >Copy Link, or publish it to the gallery</span
+              >
+            </span>
+            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+          </button>
+        </li>
+        <li>
+          <button type="button" class={ROW} onclick={savePalettes}>
+            <BookmarkPlusIcon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>Save Palettes to My Palettes</span>
+              <span class="text-xs opacity-70"
+                >To use in other projects, or publish</span
               >
             </span>
             <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />

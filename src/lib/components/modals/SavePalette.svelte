@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const after = onsaved ? ' Changes now save automatically.' : '';
       toast.trigger({
         message: added
-          ? `Palette saved. Find it in My Library, or press Get Colors, then Browse Palettes.${after}`
+          ? `Palette saved. Find it in My Library, or in a project press Get Colors, then My Palettes.${after}`
           : `This palette is already saved.${after}`,
         category: added ? 'success' : 'info',
       });

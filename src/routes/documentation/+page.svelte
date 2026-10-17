@@ -1552,26 +1552,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Preset Colors</h3>
 
             <p>
-              To browse collection of preset colors to use in your project,
-              press Get Colors, then Browse Palettes. Choose where the palettes
-              come from (at the top of the dialog, or the bottom on phones),
-              then search, filter, sort and change the view to see different
-              color combinations. Select a palette to use it in your project. It
-              opens where you left it last time. You can choose from:
+              To use a ready-made palette in your project, press Get Colors,
+              then choose where it comes from. Search, filter, sort and change
+              the view to see different color combinations, then select a
+              palette to use it. You can choose from:
             </p>
             <ul class="ml-4 flex flex-col gap-2">
               <li>
-                <span class="font-bold">Gallery</span> – Color palettes shared in
-                the Gallery, most viewed first (sort by Newest to see the latest),
-                with the same search and filters as the Gallery
-              </li>
-              <li>
                 <span class="font-bold">My Palettes</span> – Palettes you saved, as
-                on the My Palettes page
+                on the My Palettes page (in the Project Planner)
               </li>
               <li>
-                <span class="font-bold">Schemes</span>
-                – Color schemes based on
+                <span class="font-bold">Palette Gallery</span> – Color palettes shared
+                in the Gallery, most viewed first (sort by Newest to see the latest),
+                with the same search and filters as the Gallery (in the Project Planner)
+              </li>
+              <li>
+                <span class="font-bold">Gradients</span>
+                – Smooth runs of color, in any number of colors, based on
                 <a
                   class="link"
                   rel="noreferrer noopener"
@@ -1596,24 +1594,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Saved Palettes</h3>
 
             <p>
-              To keep a palette to use again later, press Save & Export under
-              the palette, then Save Palette. You can give it a name, or leave
-              the name empty to use its yarn and number of colors. Saved
-              palettes are stored in this browser{#if __ACCOUNTS_ENABLED__}, or
-                in your account while you’re signed in, so they show up on your
-                other devices too{/if}.
+              To keep a palette to use again later, in the Yarn Palette Creator
+              press the Palette button at the top, then Save Palette. In the
+              Project Planner, press Project, then Save Palettes to My Palettes,
+              and choose the gauges whose palettes to keep. You can give a
+              palette a name, or leave the name empty to use its yarn and number
+              of colors. Saved palettes are stored in this browser{#if __ACCOUNTS_ENABLED__},
+                or in your account while you’re signed in, so they show up on
+                your other devices too{/if}.
             </p>
             <p>
-              To use a saved palette, press Get Colors, then Browse Palettes,
-              then choose My Palettes. To rename one, make a copy, or move it to
-              the Trash, use its More button on the My Palettes page.
+              To use a saved palette in a project, press Get Colors, then My
+              Palettes. To rename one, make a copy, or move it to the Trash, use
+              its More button on the My Palettes page.
             </p>
             <p>
               You can also see all your saved palettes on the
               <a href="/my-palettes" class="link">My Palettes</a> page, and open any
               of them in the Yarn Palette Creator. There, changes to a saved palette
-              save automatically, and you can rename it by its name at the top of
-              the page or with the Palette button, which also shows where it’s saved.
+              save automatically. The Palette button at the top shows where it’s saved,
+              and opens the Palette menu: rename it, download or export it, share
+              it or publish it to the gallery, start a project with it, save a copy,
+              start a new palette, move it to the Trash, or open one of your recent
+              palettes.
+            </p>
+            <p>
+              To publish a palette from a project, first save it to My Palettes,
+              then publish it from the My Palettes page or the Yarn Palette
+              Creator.
             </p>
           </section>
           <section
@@ -1641,11 +1649,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Export and Paste Colors</h3>
 
             <p>
-              To export a color palette as HTML color codes, an image, or yarn
-              names, press Save & Export, then choose a format and press Copy or
-              Download. To share a palette, press Save & Export, then Link: the
-              link is copied right away. Share or paste the copied text
-              somewhere you can find it later.
+              To export a color palette as an image, HTML color codes, or yarn
+              names, open the Palette menu in the Yarn Palette Creator (or the
+              Project menu in the Project Planner), press Download / Export,
+              then choose a palette and format and press Copy or Download. To
+              share a palette's link, open the Palette menu, press Share, then
+              Copy Link. Share or paste the copied text somewhere you can find
+              it later.
             </p>
             <p>
               To paste colors into a palette, press Get Colors, then Paste

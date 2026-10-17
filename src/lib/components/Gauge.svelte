@@ -14,27 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
-  import { version } from '$app/env';
   import { focusGaugeColor } from '#lib/components/GaugeCustomizer.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import SelectNumberOfColors from '#lib/components/SelectNumberOfColors.svelte';
-  import BrowsePalettes from '#lib/components/modals/BrowsePalettes.svelte';
-  import ExportPaletteImage from '#lib/components/modals/ExportPaletteImage.svelte';
-  import type { PaletteImageRange } from '#lib/features/palette-image/layout.js';
+  import PaletteSource, {
+    type PaletteSourceKind,
+  } from '#lib/components/modals/PaletteSource.svelte';
   import ChooseColorways from '#lib/components/modals/ChooseColorways.svelte';
   import GetPaletteFromImage from '#lib/components/modals/GetPaletteFromImage.svelte';
-  import ImportExportPalette from '#lib/components/modals/ImportExportPalette.svelte';
   import PasteColors from '#lib/components/modals/PasteColors.svelte';
   import RandomPalette from '#lib/components/modals/RandomPalette.svelte';
-  import PublishPalette from '#lib/components/modals/PublishPalette.svelte';
-  import SavePalette from '#lib/components/modals/SavePalette.svelte';
   import SortMenu from '#lib/components/SortMenu.svelte';
-  import { preferences } from '#lib/storage/preferences.svelte.js';
   import {
-    getPaletteFallbackName,
     getSortedPalette,
-    getYarnPageURL,
     reverseColors,
     shuffleColors,
   } from '#lib/utils/color-utils.js';
@@ -45,19 +37,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { GaugeSettingsType } from '#lib/types/gauge-types.js';
   import { createGaugeColors } from '#lib/state/gauges-state.svelte.js';
   import {
-    BookmarkPlusIcon,
-    SendIcon,
+    BlendIcon,
+    BookmarkIcon,
     ChevronDownIcon,
     CircleCheckIcon,
-    ClipboardCopyIcon,
     ClipboardPasteIcon,
-    CodeIcon,
     ImageIcon,
-    LinkIcon,
+    LandmarkIcon,
     PaletteIcon,
-    ShareIcon,
     ShuffleIcon,
-    SwatchBookIcon,
   } from '@lucide/svelte';
   import {
     menuContentClass,
@@ -69,12 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauge = $bindable(),
     /** A project's gauge, whose ranges mean something (the Yarn page's don't) */
     inProject = false,
-    /** Save Palette's name to start with (the Yarn page's, from the gallery) */
-    suggestedName = '',
-    /** The Yarn page: a palette was saved, or one of My Palettes chosen in
-    Browse Palettes; it's now the open palette there */
-    onopenpalette = undefined as
-      ((paletteId: string, how: 'saved' | 'chosen') => void) | undefined,
   } = $props();
 
   // Pointing at or focusing a color highlights the days in that yarn on the preview
@@ -100,39 +82,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     historyChange.gaugeId === gauge.id ? historyChange.indices : [],
   );
 
-  /** Each color's range, as the gauge shows it, like 50 → 59 °F */
-  function getRangeLabels(): PaletteImageRange[] | undefined {
-    if (!inProject || !gauge.ranges?.length) return undefined;
-    const unit = gauge.unit.label?.[preferences.value.units ?? 'metric'] ?? '';
-    return gauge.ranges.map(
-      (range: { label?: string; from?: number; to?: number }) =>
-        gauge.unit.type === 'category' || range.label
-          ? { label: range.label ?? '' }
-          : {
-              from: range.from ?? 0,
-              to: range.to ?? 0,
-              unit,
-              raised: gauge.unit.type === 'temperature',
-            },
-    );
-  }
-
   function updateGauge({
     _colors,
     _schemeId = 'Custom',
-    _paletteId,
   }: {
     _colors: Color[];
     _schemeId?: GaugeSettingsType['schemeId'];
-    _paletteId?: string;
   }) {
     if (_colors) {
       gauge.updateColors({ colors: _colors });
     }
 
     gauge.schemeId = _schemeId;
-
-    if (_paletteId) onopenpalette?.(_paletteId, 'chosen');
 
     drawerState.closeAll();
 
@@ -141,13 +102,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toolbarButtonClass = 'hover:preset-tonal-surface btn justify-start';
 
-  const colorSources = [
+  // Palettes to choose from: a project's gauge can use one of My Palettes or
+  // the gallery's; on the Yarn page those are opened from My Library and the
+  // Gallery instead, as palettes of their own. Bookmark matches Save Palette;
+  // Landmark matches Gallery in the sidebar.
+  const paletteSources = $derived([
+    ...(inProject
+      ? [
+          {
+            value: 'saved',
+            label: 'My Palettes',
+            details: 'The ones you’ve saved',
+            icon: BookmarkIcon,
+          },
+          {
+            value: 'gallery',
+            label: 'Palette Gallery',
+            details: 'Shared by everyone',
+            icon: LandmarkIcon,
+          },
+        ]
+      : []),
     {
-      value: 'browse',
-      label: 'Browse Palettes',
-      details: 'Get inspiration, and access saved palettes',
-      icon: SwatchBookIcon,
+      value: 'gradients',
+      label: 'Gradients',
+      details: 'Smooth color runs, any number of colors',
+      icon: BlendIcon,
     },
+  ]);
+
+  const paletteSourceTitles: Record<PaletteSourceKind, string> = {
+    saved: 'My Palettes',
+    gallery: 'Palette Gallery',
+    gradients: 'Gradients',
+  };
+
+  // Ways to make colors
+  const colorTools = [
     {
       value: 'colorways',
       label: 'Choose Colorways',
@@ -176,17 +167,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function openColorSource(value: string) {
     switch (value) {
-      case 'browse':
+      case 'saved':
+      case 'gallery':
+      case 'gradients':
         dialog.trigger({
           type: 'component',
           component: {
-            ref: BrowsePalettes,
+            ref: PaletteSource,
             props: {
+              source: value,
               numberOfColors: gauge.numberOfColors,
               updateGauge,
             },
           },
-          options: { size: 'large', title: 'Browse Palettes' },
+          options: { size: 'large', title: paletteSourceTitles[value] },
         });
         break;
       case 'colorways':
@@ -228,150 +222,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
         break;
     }
-  }
-
-  const paletteOutputs = [
-    {
-      value: 'save',
-      label: 'Save Palette',
-      title: 'Save Palette',
-      details: 'Keep it to use in any project',
-      icon: BookmarkPlusIcon,
-    },
-    // Accounts only (the dialog says so when signed out)
-    ...(__ACCOUNTS_ENABLED__
-      ? [
-          {
-            value: 'publish',
-            label: 'Publish to Gallery',
-            title: 'Publish to Gallery',
-            details: 'Share it in the Yarn Palette Gallery',
-            icon: SendIcon,
-          },
-        ]
-      : []),
-    {
-      value: 'link',
-      label: 'Copy Link',
-      title: 'Palette Link',
-      details: 'Copy a link to share it, or to paste into another palette',
-      icon: LinkIcon,
-    },
-    {
-      value: 'image',
-      label: 'Image',
-      title: 'Palette Image',
-      details: 'Download a PNG image',
-      icon: ImageIcon,
-    },
-    {
-      value: 'html',
-      label: 'HTML Color Codes',
-      title: 'HTML Color Codes',
-      details: 'Copy codes for web and design',
-      icon: CodeIcon,
-    },
-    {
-      value: 'colorway',
-      label: 'Yarn Colorway Names',
-      title: 'Yarn Colorway Names',
-      details: 'Copy colorway names',
-      icon: ClipboardCopyIcon,
-      needsNames: true,
-    },
-  ];
-
-  // Colorway names can only be copied when some colors are yarn colorways,
-  // and there's nothing to publish without colors
-  let availablePaletteOutputs = $derived(
-    paletteOutputs.filter(
-      (output) =>
-        (!('needsNames' in output) ||
-          gauge.colors.some((color: Color) => color.name)) &&
-        (output.value !== 'publish' || gauge.colors.length > 0),
-    ),
-  );
-
-  // Where signing in comes back to: this project as it is, or these colors
-  // on the Yarn page (with the name that came with them)
-  function returnPath(colors: Color[]) {
-    if (inProject)
-      return (
-        window.location.pathname + window.location.search + window.location.hash
-      );
-    const yarnPage = getYarnPageURL({ colors, origin: '' });
-    return suggestedName
-      ? `${yarnPage}&name=${encodeURIComponent(suggestedName)}`
-      : yarnPage;
-  }
-
-  // A link needs nothing chosen first, so it's copied straight away
-  async function copyPaletteLink(colors: Color[]) {
-    await copyToClipboard(
-      getYarnPageURL({ colors, origin: window.location.origin, version }),
-      'Palette link copied',
-    );
-  }
-
-  function openPaletteOutput(value: string) {
-    const output = paletteOutputs.find((output) => output.value === value);
-    if (!output) return;
-    const colors = $state.snapshot(gauge.colors);
-    if (value === 'image') {
-      dialog.trigger({
-        type: 'component',
-        component: {
-          ref: ExportPaletteImage,
-          props: {
-            colors,
-            ranges: getRangeLabels(),
-            fallbackName: getPaletteFallbackName(colors),
-          },
-        },
-        options: { size: 'xlarge', title: output.title },
-      });
-      return;
-    }
-    if (value === 'link') {
-      copyPaletteLink(colors);
-      return;
-    }
-    if (value === 'publish') {
-      dialog.trigger({
-        type: 'component',
-        component: {
-          ref: PublishPalette,
-          props: { colors, suggestedName, returnTo: returnPath(colors) },
-        },
-        options: { size: 'medium', title: output.title },
-      });
-      return;
-    }
-    if (value === 'save') {
-      dialog.trigger({
-        type: 'component',
-        component: {
-          ref: SavePalette,
-          props: {
-            colors,
-            suggestedName,
-            onsaved:
-              onopenpalette &&
-              ((p: { id: string }) => onopenpalette(p.id, 'saved')),
-          },
-        },
-        options: { size: 'medium', title: output.title },
-      });
-      return;
-    }
-    dialog.trigger({
-      type: 'component',
-      component: {
-        ref: ImportExportPalette,
-        props: { colors, exportType: value },
-      },
-      options: { title: output.title },
-    });
   }
 </script>
 
@@ -436,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Menu.Trigger
         class={toolbarButtonClass}
-        title="Get Colors from Palettes, Yarn, an Image, and More"
+        title="Get Colors from Palettes, Gradients, Yarn, an Image, and More"
       >
         <PaletteIcon />
         <span class="flex items-center gap-1"
@@ -446,7 +296,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Portal>
         <Menu.Positioner>
           <Menu.Content class={menuContentClass}>
-            {#each colorSources as source (source.value)}
+            {#each [...paletteSources, ...colorTools] as source, index (source.value)}
+              <!-- Palettes to choose from, then ways to make colors -->
+              {#if index === paletteSources.length}
+                <Menu.Separator />
+              {/if}
               <Menu.Item
                 value={source.value}
                 class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
@@ -456,46 +310,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <p>{source.label}</p>
                   <p class="text-surface-700-300 text-xs">
                     {source.details}
-                  </p>
-                </div>
-              </Menu.Item>
-            {/each}
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu>
-
-    <Menu
-      positioning={menuPositioning('bottom-start')}
-      onSelect={(details) => openPaletteOutput(details.value)}
-    >
-      <!-- Not just "Save": the Project Planner's top bar has a Save for the project -->
-      <Menu.Trigger
-        class={toolbarButtonClass}
-        title="Save This Palette, or Export It as a Link, Color Codes, an Image, or Yarn Names"
-      >
-        <ShareIcon />
-        <span class="flex items-center gap-1"
-          >Save & Export <ChevronDownIcon class="icon-sm" /></span
-        >
-      </Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content class={menuContentClass}>
-            {#each availablePaletteOutputs as output, index (output.value)}
-              <!-- Saving keeps it here; the rest take it elsewhere -->
-              {#if index === 1}
-                <Menu.Separator />
-              {/if}
-              <Menu.Item
-                value={output.value}
-                class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
-              >
-                <output.icon class="shrink-0" />
-                <div class="flex min-w-0 flex-col text-left">
-                  <p>{output.label}</p>
-                  <p class="text-surface-700-300 text-xs">
-                    {output.details}
                   </p>
                 </div>
               </Menu.Item>

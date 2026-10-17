@@ -17,10 +17,10 @@ test.describe('Saved palettes', () => {
   test('save, reload, rename, delete with undo, and use a palette', async ({
     page,
   }) => {
-    // Save with a name
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
-    let dialog = page.getByRole('dialog');
+    // Save with a name, from the Palette menu
+    await page.getByTestId('palette-button').click();
+    await page.getByTestId('menu-save-palette').click();
+    const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Name (optional)').fill('Test Sunset');
     await dialog
       .getByRole('button', { name: 'Save Palette', exact: true })
@@ -28,9 +28,10 @@ test.describe('Saved palettes', () => {
     await expect(page.getByText('Palette saved')).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
-    // The same palette isn't saved twice
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
+    // The same palette isn't saved twice (opened fresh, it isn't open yet)
+    await page.goto('/yarn');
+    await page.getByTestId('palette-button').click();
+    await page.getByTestId('menu-save-palette').click();
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Save Palette', exact: true })
@@ -54,43 +55,69 @@ test.describe('Saved palettes', () => {
     await page.getByRole('button', { name: 'Undo' }).click();
     await expect(list.getByText('Test Dusk')).toBeVisible();
 
-    // Browse Palettes opens on My Palettes, where a palette is only chosen
+    // Recent Palettes in the Palette menu opens it here, in place
     await page.goto('/yarn');
-    await page.getByRole('button', { name: 'Get Colors' }).click();
-    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
-    dialog = page.getByRole('dialog');
-    await expect(
-      dialog.getByRole('radio', { name: 'My Palettes' }),
-    ).toBeChecked();
-    list = dialog.getByRole('list', { name: 'Saved palettes' });
-    await expect(list.getByText('Test Dusk')).toBeVisible();
-    await expect(
-      list.getByRole('button', { name: 'More for Test Dusk' }),
-    ).toHaveCount(0);
-
-    // Use it with its button (the name in the label): the dialog closes
-    await list.getByRole('button', { name: 'Use Test Dusk' }).click();
+    const paletteButton = page.getByTestId('palette-button');
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Not saved',
+    );
+    await paletteButton.click();
+    const menu = page.getByRole('dialog', { name: 'Palette' });
+    await menu.getByRole('button', { name: 'Test Dusk' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Saved in this browser',
+    );
+
+    // Move to Trash starts a new palette; Undo brings it back here
+    await paletteButton.click();
+    await page.getByTestId('trash-palette').click();
+    await expect(page.getByText('Moved Test Dusk to the Trash')).toBeVisible();
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Not saved',
+    );
+    await page
+      .getByTestId('toast')
+      .getByRole('button', { name: 'Undo' })
+      .click();
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Saved in this browser',
+    );
+
+    // New Palette leaves it in My Palettes
+    await paletteButton.click();
+    await menu.getByRole('button', { name: /^New Palette/ }).click();
+    await expect(paletteButton).toHaveAttribute(
+      'data-save-status',
+      'Not saved',
+    );
   });
 
   test('a name in the link is offered by Save Palette, for those colors', async ({
     page,
   }) => {
     await page.goto('/yarn?s=ff000000ff000000ff&name=Gallery%20Sunset');
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
+    await page.getByTestId('palette-button').click();
+    await page.getByTestId('menu-save-palette').click();
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByLabel('Name (optional)')).toHaveValue(
       'Gallery Sunset',
     );
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    // Back to the menu, then closed
+    await expect(async () => {
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 500 });
+    }).toPass();
 
     // Other colors are another palette: no name
     await page.getByRole('button', { name: 'Sort', exact: true }).click();
     await page.getByRole('menuitem', { name: /^Reverse/ }).click();
-    await page.getByRole('button', { name: 'Save & Export' }).click();
-    await page.getByRole('menuitem', { name: /^Save Palette/ }).click();
+    await page.getByTestId('palette-button').click();
+    await page.getByTestId('menu-save-palette').click();
     await expect(
       page.getByRole('dialog').getByLabel('Name (optional)'),
     ).toHaveValue('');
@@ -102,12 +129,17 @@ test.describe('Saved palettes', () => {
       .grantPermissions(['clipboard-read', 'clipboard-write']);
     // Retried: a click before the page finishes loading does nothing
     await expect(async () => {
-      await page.getByRole('button', { name: 'Save & Export' }).click();
+      await page.getByTestId('palette-button').click();
       await page
-        .getByRole('menuitem', { name: /^Copy Link/ })
+        .getByRole('dialog', { name: 'Palette' })
+        .getByRole('button', { name: /^Share/ })
         .click({ timeout: 1000 });
     }).toPass();
-    await expect(page.getByText('Palette link copied')).toBeVisible();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^Copy Link/ })
+      .click();
+    await expect(page.getByText('Link copied')).toBeVisible();
 
     const copied = await page.evaluate(() => navigator.clipboard.readText());
     const url = new URL(copied.trim());

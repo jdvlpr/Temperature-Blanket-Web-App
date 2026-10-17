@@ -50,6 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
   import { takeJustTrashed } from '#lib/storage/trash.js';
   import {
+    startingPalette,
+    takeStartingPalette,
+  } from '#lib/state/starting-palette.js';
+  import {
     loadFromHistory,
     updateHistory,
   } from '#lib/utils/history-utils.svelte.js';
@@ -201,6 +205,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Load the default units based on window.navigator
       setUnitsFromNavigator();
       showUndoTrash();
+      // Started from a palette: it's used once there's weather
+      await takeStartingPalette();
+      if (startingPalette.colors)
+        toast.trigger({
+          message:
+            'Choose a location and dates to start your project. Your palette goes on the Temperature gauge.',
+          category: 'success',
+        });
     }
 
     project.status.loading = false;

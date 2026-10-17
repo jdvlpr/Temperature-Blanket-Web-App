@@ -12,7 +12,12 @@ import {
   describeGaugeChange,
   historyToast,
 } from '#lib/utils/history-utils.svelte.js';
-import { paletteAutosave, paletteChanged } from './autosave.svelte';
+import {
+  closePalette,
+  openPalette,
+  paletteAutosave,
+  paletteChanged,
+} from './autosave.svelte';
 
 class YarnState {
   gauge = $state(new TemperatureGauge());
@@ -50,6 +55,23 @@ class YarnState {
     this.history.stack = [this.#entry()];
     this.history.currentIndex = 0;
     this.showInAddressBar();
+  }
+
+  /** A new palette, as on a fresh visit (the Palette menu's New Palette) */
+  startNew() {
+    this.gauge = new TemperatureGauge();
+    this.suggestion = null;
+    closePalette();
+    this.startHistory();
+  }
+
+  /** One of My Palettes, open here in place of this one, with its own history */
+  async openSaved(id: string, colors: Color[]) {
+    this.gauge.updateColors({ colors });
+    this.gauge.schemeId = 'Custom';
+    this.suggestion = null;
+    this.startHistory();
+    await openPalette(id);
   }
 
   /** Called a moment after the colors change: one undo step */

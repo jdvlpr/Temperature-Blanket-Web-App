@@ -70,7 +70,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: PaletteIcon,
-                text: `Save yarn palettes to use again later, copy a palette's link in one click, and save a palette as an image with a choice of layouts. Paste Colors reads lists of hex codes forgivingly, Get Colors From an Image has been rebuilt around markers on the photo, and palettes can be sorted from warm to cool.`,
+                text: `Save yarn palettes to use again later, copy a palette's link in one click, and save a palette as an image with a choice of layouts. Paste Colors reads lists of hex codes forgivingly, Get Colors From an Image has been rebuilt around markers on the photo, and palettes can be sorted from warm to cool. The Yarn Palette Creator has a Palette menu, like the Project menu, to export or share a palette, start a project with it, or open a recent one. In the Project Planner, Get Colors offers My Palettes, the Palette Gallery and Gradients (formerly Schemes), and the Project menu exports and saves each gauge's palette.`,
                 title: 'Yarn Palette Tools',
               },
               {

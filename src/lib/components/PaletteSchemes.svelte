@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col items-center px-2">
   <div class="my-2 flex w-full flex-wrap items-center justify-center gap-2">
     <ChoiceMenu
-      label="Color Scheme"
+      label="Gradients"
       icon={PaletteIcon}
       options={schemes}
       value={currentScheme}
@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? 'grid grid-cols-2 items-start gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-3'
         : PALETTE_LIST,
     ]}
-    aria-label="{currentScheme} color schemes"
+    aria-label="{currentScheme} gradients"
   >
     {#each palettes as { value, label, colors } (value)}
       <li class="flex w-full min-w-0">
@@ -102,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </ul>
 </div>
 <p class="text-surface-700-300 mt-4 w-full px-2 text-center text-xs">
-  Color schemes based on <a
+  Gradients based on <a
     href="https://colorbrewer2.org/"
     target="_blank"
     rel="noopener noreferrer"

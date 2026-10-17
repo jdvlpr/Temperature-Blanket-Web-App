@@ -20,6 +20,7 @@ import { weather } from '#lib/state/weather-state.svelte.js';
 import type { LocationType } from '#lib/types/location-types.js';
 import type { WeatherDay } from '#lib/types/weather-types.js';
 import { setSeasonsByLocation } from '#lib/utils/seasons-utils.svelte.js';
+import { useStartingPalette } from '#lib/state/starting-palette.js';
 
 /** The weather already there, to put back if the search is cancelled */
 type Restore = {
@@ -100,8 +101,15 @@ class WeatherSearch {
       if (abort.signal.aborted) return;
       controller.value = null;
       weather.setRawData(data);
-      // Add the default temperature gauge
+      // Add the default temperature gauge, with the palette the project was
+      // started from, if any
       gauges.addById('temp');
+      const startingColors = useStartingPalette();
+      const temperature = gauges.allCreated.find((g) => g.id === 'temp');
+      if (startingColors && temperature) {
+        temperature.updateColors({ colors: startingColors });
+        temperature.schemeId = 'Custom';
+      }
       weather.isUserEdited = false;
       weather.wasLoadedFromStorage = false;
       this.#restore = null;
