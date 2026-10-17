@@ -441,6 +441,32 @@ if (typeof document !== 'undefined') {
   });
 }
 
+/**
+ * Whether leaving the page now would lose changes: a project changed since
+ * it was last saved, or changes that couldn't be saved. The page's "leave
+ * the page?" prompt and the Project menu's New Project and Recent ask on it.
+ */
+export function unsavedWork() {
+  if (
+    autosave.on &&
+    (autosave.state === 'conflict' || autosave.state === 'error')
+  )
+    return true;
+  return (
+    !project.status.saved &&
+    openProjectId() !== null &&
+    project.history.length > 0
+  );
+}
+
+// Set when the Project menu leaves for another project, having asked
+// already, so the page's prompt doesn't ask again
+let leaving = false;
+export function leaveOnPurpose() {
+  leaving = true;
+}
+export const leavingOnPurpose = () => leaving;
+
 /** For tests */
 export function resetAutosave() {
   clearTimeout(timer);

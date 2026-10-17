@@ -13,11 +13,12 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The Palette menu, as the planner's Project menu is the project's: a card
-with the palette's name and where it's saved (or Save Palette), what to do
-with it, Move to Trash, a few recent palettes, and a line of help links. A side
-panel on large screens (see openPaletteMenu); screens opened from here open in
-the panel, with a Back button to it. -->
+<!-- The Palette menu, in the same shape as the planner's Project menu: a card
+with the palette's name and where it's saved (or Save Palette); Download and
+Start a Project with It; its Share rows; the Palette itself (New, Duplicate,
+Move to Trash); a few recent palettes, opened here; a line of help links. A
+side panel on large screens (see openPaletteMenu); screens opened from here
+open in the panel, with a Back button to it. -->
 
 <script lang="ts">
   import { browser, version } from '$app/env';
@@ -29,16 +30,20 @@ the panel, with a Back button to it. -->
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import PanelGroup from '#lib/components/PanelGroup.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
+  import KeyboardShortcuts from '#lib/components/modals/KeyboardShortcuts.svelte';
+  import SaveFirst from '#lib/components/modals/SaveFirst.svelte';
   import SharePalette from '#lib/components/modals/SharePalette.svelte';
   import ShareRows from '#lib/components/ShareRows.svelte';
   import { loadShareState, shareRows } from '#lib/accounts/share-rows.js';
   import {
-    PANEL_LIST,
+    BTN_PRIMARY,
     PANEL_ROW,
     SMALL_LINK,
     SMALL_LINKS,
   } from '#lib/constants/class-constants.js';
+  import { YARN_KEYBOARD_SHORTCUTS } from '#lib/constants/page-constants.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { startingPaletteSearch } from '#lib/state/starting-palette.js';
   import {
@@ -72,9 +77,9 @@ the panel, with a Back button to it. -->
     Trash2Icon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import GettingStarted from './GettingStarted.svelte';
   import PaletteExport from './PaletteExport.svelte';
   import PaletteTitle from './PaletteTitle.svelte';
-  import SaveFirst from './SaveFirst.svelte';
   import {
     addOpenPaletteToAccount,
     openPalette,
@@ -190,6 +195,9 @@ the panel, with a Back button to it. -->
       component: {
         ref: SaveFirst,
         props: {
+          message:
+            'Save this palette first? It goes on the new project’s Temperature gauge either way. Saved, you can come back to it from My Palettes.',
+          saveLabel: 'Save and Start',
           onsave: async () => {
             await saveNewPalette(yarnPageState.suggestedNameFor(colors));
           },
@@ -329,7 +337,7 @@ the panel, with a Back button to it. -->
         </p>
         <button
           type="button"
-          class="btn preset-filled-primary-500 self-start"
+          class="{BTN_PRIMARY} self-start"
           onclick={onsave}
           data-testid="menu-save-palette"
         >
@@ -361,152 +369,166 @@ the panel, with a Back button to it. -->
     {/if}
   </section>
 
-  <section aria-label="Palette actions">
-    <ul class={PANEL_LIST}>
+  <PanelGroup label="Download and use">
+    <li>
+      <button
+        type="button"
+        class={ROW}
+        onclick={() =>
+          dialog.trigger({
+            type: 'component',
+            component: { ref: PaletteExport },
+            options: { title: 'Download', returnable: true },
+          })}
+      >
+        <DownloadIcon class="shrink-0 opacity-70" />
+        <span class="flex flex-1 flex-col">
+          <span>Download</span>
+          <span class="text-xs opacity-70"
+            >Image, color codes or yarn names</span
+          >
+        </span>
+        <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+      </button>
+    </li>
+    <li>
+      <button type="button" class={ROW} onclick={startProject}>
+        <LayoutGridIcon class="shrink-0 opacity-70" />
+        <span class="flex flex-1 flex-col">
+          <span>Start a Project with It</span>
+          <span class="text-xs opacity-70"
+            >In the Project Planner, on the Temperature gauge</span
+          >
+        </span>
+      </button>
+    </li>
+  </PanelGroup>
+
+  <PanelGroup heading="Share">
+    <ShareRows rows={shareRowsList} />
+  </PanelGroup>
+
+  <PanelGroup heading="Palette">
+    <li>
+      <button type="button" class={ROW} onclick={newPalette}>
+        <PlusIcon class="shrink-0 opacity-70" />
+        <span class="flex flex-1 flex-col">
+          <span>New Palette</span>
+          <span class="text-xs opacity-70"
+            >{saved
+              ? 'This one stays in My Palettes'
+              : 'Undo brings these colors back'}</span
+          >
+        </span>
+      </button>
+    </li>
+    {#if saved}
       <li>
         <button
           type="button"
           class={ROW}
-          onclick={() =>
-            dialog.trigger({
-              type: 'component',
-              component: { ref: PaletteExport },
-              options: { title: 'Download / Export', returnable: true },
-            })}
+          title="Save these colors as a new palette, and leave this one as it is"
+          onclick={copyPalette}
         >
-          <DownloadIcon class="shrink-0 opacity-70" />
+          <CopyPlusIcon class="shrink-0 opacity-70" />
           <span class="flex flex-1 flex-col">
-            <span>Download / Export</span>
-            <span class="text-xs opacity-70"
-              >Image, color codes or yarn names</span
-            >
+            <span>Duplicate</span>
+            <span class="text-xs opacity-70">A new palette from this one</span>
           </span>
-          <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
         </button>
       </li>
-      <ShareRows rows={shareRowsList} />
       <li>
-        <button type="button" class={ROW} onclick={startProject}>
-          <LayoutGridIcon class="shrink-0 opacity-70" />
+        <button
+          type="button"
+          class="{ROW} text-error-700-300"
+          onclick={trashPalette}
+          data-testid="trash-palette"
+        >
+          <Trash2Icon class="shrink-0 opacity-70" />
           <span class="flex flex-1 flex-col">
-            <span>Start a Project with It</span>
+            <span>Move to Trash</span>
             <span class="text-xs opacity-70"
-              >In the Project Planner, on the Temperature gauge</span
+              >Restore it from My Library for {TRASH_DAYS} days</span
             >
           </span>
         </button>
       </li>
-      {#if saved}
-        <li>
-          <button
-            type="button"
-            class={ROW}
-            title="Save these colors as a new palette, and leave this one as it is"
-            onclick={copyPalette}
-          >
-            <CopyPlusIcon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Duplicate</span>
-              <span class="text-xs opacity-70">A new palette from this one</span
-              >
-            </span>
-          </button>
-        </li>
-      {/if}
-      <li>
-        <button type="button" class={ROW} onclick={newPalette}>
-          <PlusIcon class="shrink-0 opacity-70" />
-          <span class="flex flex-1 flex-col">
-            <span>New Palette</span>
-            <span class="text-xs opacity-70"
-              >{saved
-                ? 'This one stays in My Palettes'
-                : 'Undo brings these colors back'}</span
-            >
-          </span>
-        </button>
-      </li>
-    </ul>
-  </section>
+    {/if}
+  </PanelGroup>
 
-  <!-- Deleting it, apart from the rest -->
-  {#if saved}
-    <section aria-label="Delete palette">
-      <ul class={PANEL_LIST}>
-        <li>
-          <button
-            type="button"
-            class="{ROW} text-error-700-300"
-            onclick={trashPalette}
-            data-testid="trash-palette"
-          >
-            <Trash2Icon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Move to Trash</span>
-              <span class="text-xs opacity-70"
-                >Restore it from My Library for {TRASH_DAYS} days</span
-              >
-            </span>
-          </button>
-        </li>
-      </ul>
-    </section>
-  {/if}
-
-  <!-- A few recent palettes; My Palettes has them all, the gallery more -->
-  <section class="flex flex-col gap-2" aria-labelledby="recent-palettes">
-    <h2 id="recent-palettes" class="text-sm font-bold opacity-70">
-      {recent.length ? 'Recent Palettes' : 'Open a Palette'}
-    </h2>
-    <ul class={PANEL_LIST}>
-      {#each recent as item (item.id)}
-        <li>
-          <button
-            type="button"
-            class={ROW}
-            onclick={() => openRecent(item.id, item.colors)}
-          >
-            <span class="w-12 shrink-0" aria-hidden="true">
-              <PaletteStrip
-                colors={item.colors}
-                height="40px"
-                corners="small"
-                insideControl
-              />
-            </span>
-            <span
-              class="line-clamp-2 min-w-0 flex-1 text-sm font-semibold break-words"
-              >{item.label}</span
-            >
-          </button>
-        </li>
-      {/each}
-      {#if recentTotal}
-        <li>
-          <a href={resolve('/my-palettes')} class={ROW}>
-            <FolderOpenIcon class="shrink-0 opacity-70" />
-            <span class="flex-1"
-              >{recentTotal > recent.length + (saved ? 1 : 0)
-                ? `All ${recentTotal} ${pluralize('Palette', recentTotal)}`
-                : 'My Palettes'}</span
-            >
-          </a>
-        </li>
-      {/if}
+  <!-- A few recent palettes, opened here; My Palettes has them all, the
+  gallery more -->
+  <PanelGroup heading={recent.length ? 'Recent Palettes' : 'Open a Palette'}>
+    {#each recent as item (item.id)}
       <li>
-        <a href={resolve('/gallery/palettes')} class={ROW}>
-          <LandmarkIcon class="shrink-0 opacity-70" />
-          <span class="flex-1">Palette Gallery</span>
+        <button
+          type="button"
+          class={ROW}
+          onclick={() => openRecent(item.id, item.colors)}
+        >
+          <span class="w-12 shrink-0" aria-hidden="true">
+            <PaletteStrip
+              colors={item.colors}
+              height="40px"
+              corners="small"
+              insideControl
+            />
+          </span>
+          <span
+            class="line-clamp-2 min-w-0 flex-1 text-sm font-semibold break-words"
+            >{item.label}</span
+          >
+        </button>
+      </li>
+    {/each}
+    {#if recentTotal}
+      <li>
+        <a href={resolve('/my-palettes')} class={ROW}>
+          <FolderOpenIcon class="shrink-0 opacity-70" />
+          <span class="flex-1"
+            >{recentTotal > recent.length + (saved ? 1 : 0)
+              ? `All ${recentTotal} ${pluralize('Palette', recentTotal)}`
+              : 'My Palettes'}</span
+          >
         </a>
       </li>
-    </ul>
-  </section>
+    {/if}
+    <li>
+      <a href={resolve('/gallery/palettes')} class={ROW}>
+        <LandmarkIcon class="shrink-0 opacity-70" />
+        <span class="flex-1">Palette Gallery</span>
+      </a>
+    </li>
+  </PanelGroup>
 
   <!-- Help, in one line: the site menu has the rest -->
   <nav
     class={[SMALL_LINKS, 'border-surface-200-800 border-t pt-4']}
     aria-label="Help"
   >
+    <button
+      type="button"
+      class={SMALL_LINK}
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: { ref: GettingStarted },
+          options: { title: 'Getting Started' },
+        })}>Getting Started</button
+    >
+    <button
+      type="button"
+      class={SMALL_LINK}
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: KeyboardShortcuts,
+            props: { shortcuts: YARN_KEYBOARD_SHORTCUTS },
+          },
+          options: { title: 'Keyboard Shortcuts' },
+        })}>Keyboard Shortcuts</button
+    >
     <a href={resolve('faq')} target="_blank" class={SMALL_LINK}
       >FAQ <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
         >(opens in a new tab)</span

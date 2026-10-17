@@ -13,16 +13,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The Project menu, about the open project only: a card with its name, save
-state and colors (on wider screens, the top bar has its name, so the card is
-only its save state); a list of what to do with it; a few recent projects; a line
-of help links. Save itself is in the top bar. A side panel on large screens
-(see openProjectMenu); dialogs opened from here open in the panel, with a Back
-button to it. -->
+<!-- The Project menu, about the open project only, in the same shape as the
+Yarn page's Palette menu: a card with its name and save state; Download; its
+Share rows; its gauges' Palettes; the Project itself (New, Duplicate, Move to
+Trash); a few recent projects; a line of help links. New Project and recent
+ones open here, in its place, asking first when that would lose changes. A
+side panel on large screens (see openProjectMenu); dialogs opened from here
+open in the panel, with a Back button to it. -->
 
 <script lang="ts">
   import {
-    PANEL_LIST,
+    BTN_PRIMARY,
     PANEL_ROW,
     SMALL_LINK,
     SMALL_LINKS,
@@ -32,9 +33,12 @@ button to it. -->
   import { page } from '$app/state';
   import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account } from '#lib/accounts/summary.svelte.js';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import PanelGroup from '#lib/components/PanelGroup.svelte';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
   import { locations } from '#lib/state/location-state.svelte.js';
+  import { gauges } from '#lib/state/gauges-state.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
@@ -42,9 +46,12 @@ button to it. -->
     addOpenProjectToAccount,
     autosave,
     changedElsewhereMessage,
+    leaveOnPurpose,
     saveCopy,
+    saveNow,
     storedItem,
     trashOpenProject,
+    unsavedWork,
   } from '#lib/storage/autosave.svelte.js';
   import {
     ProjectStorage,
@@ -59,13 +66,13 @@ button to it. -->
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
-    BookmarkPlusIcon,
     ChevronRightIcon,
     CloudAlertIcon,
     CopyPlusIcon,
     DownloadIcon,
     ExternalLinkIcon,
     FolderOpenIcon,
+    LandmarkIcon,
     LoaderCircleIcon,
     LogInIcon,
     MonitorIcon,
@@ -81,7 +88,8 @@ button to it. -->
   import { onMount } from 'svelte';
   import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
   import ExportOptions from './ExportOptions.svelte';
-  import SaveGaugePalettes from './SaveGaugePalettes.svelte';
+  import { openGaugePalette } from './gauge-palette.js';
+  import SaveFirst from './SaveFirst.svelte';
   import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
   import { pluralize } from '#lib/utils/string-utils.js';
@@ -135,16 +143,56 @@ button to it. -->
   const shareRowsList = $derived(projectShareRows(shareName, shareItem));
   onMount(() => loadShareState('project'));
 
-  // Its gauges' palettes, to keep in My Palettes
-  const savePalettes = () =>
+  // Another project, or a new one, here in this one's place: a change
+  // waiting to save saves first, and changes that would be lost ask first
+  async function leaveFor(href: string) {
+    if (autosave.on && !problem) await saveNow();
+    const go = () => {
+      leaveOnPurpose();
+      window.location.assign(href);
+    };
+    if (!unsavedWork()) {
+      go();
+      return;
+    }
     dialog.trigger({
       type: 'component',
       component: {
-        ref: SaveGaugePalettes,
-        props: { projectName: shareName || locations.projectTitle },
+        ref: SaveFirst,
+        props: problem
+          ? {
+              message:
+                'This project’s latest changes couldn’t be saved. Leave without them?',
+              ongo: go,
+            }
+          : {
+              message:
+                'Save this project first? Saved, you can come back to it from My Projects.',
+              saveLabel: 'Save and Continue',
+              onsave: async () => {
+                if (!(await saveProject())) throw new Error('Not saved');
+              },
+              ongo: go,
+            },
       },
-      options: { title: 'Save Palettes' },
+      options: { title: 'Save Project?' },
     });
+  }
+
+  // A plain click opens it here; Cmd, Ctrl or Shift-click and the middle
+  // button still open it in a new tab
+  function openHere(event: MouseEvent, href: string) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    event.preventDefault();
+    void leaveFor(href);
+  }
 
   async function copyProject() {
     try {
@@ -210,7 +258,7 @@ the same color) says it's waiting here -->
 {#snippet saveButton()}
   <button
     type="button"
-    class="btn preset-tonal-primary self-start"
+    class="{BTN_PRIMARY} self-start"
     disabled={saving}
     onclick={save}
     data-testid="menu-save"
@@ -322,75 +370,102 @@ the same color) says it's waiting here -->
 
   <!-- What to do with it: nothing until there's a project -->
   {#if hasWeather}
-    <section aria-label="Project actions">
-      <ul class={PANEL_LIST}>
-        <li>
-          <button
-            type="button"
-            class={ROW}
-            onclick={() => open(ExportOptions, 'Download / Export', true)}
-          >
-            <DownloadIcon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Download / Export</span>
-              <span class="text-xs opacity-70"
-                >PDF, CSV, PNG, Google Sheets or palettes</span
-              >
-            </span>
-            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
-          </button>
-        </li>
-        <ShareRows rows={shareRowsList} />
-        <li>
-          <button type="button" class={ROW} onclick={savePalettes}>
-            <BookmarkPlusIcon class="shrink-0 opacity-70" />
-            <span class="flex flex-1 flex-col">
-              <span>Save Palettes to My Palettes</span>
-              <span class="text-xs opacity-70"
-                >To use in other projects, or publish</span
-              >
-            </span>
-            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
-          </button>
-        </li>
-        {#if hasProject}
+    <PanelGroup label="Download">
+      <li>
+        <button
+          type="button"
+          class={ROW}
+          onclick={() => open(ExportOptions, 'Download', true)}
+        >
+          <DownloadIcon class="shrink-0 opacity-70" />
+          <span class="flex flex-1 flex-col">
+            <span>Download</span>
+            <span class="text-xs opacity-70"
+              >PDF, preview image, Google Sheet or weather data</span
+            >
+          </span>
+          <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+        </button>
+      </li>
+    </PanelGroup>
+
+    <PanelGroup heading="Share">
+      <ShareRows rows={shareRowsList} />
+    </PanelGroup>
+
+    <!-- Each gauge's palette: to keep in My Palettes, or export -->
+    {#if gauges.allCreated.length}
+      <PanelGroup heading="Palettes">
+        {#each gauges.allCreated as gauge (gauge.id)}
           <li>
             <button
               type="button"
               class={ROW}
-              title="Save these settings as a new project, and leave this one as it is"
-              onclick={copyProject}
+              onclick={() =>
+                openGaugePalette(
+                  gauge.id,
+                  gauge.label,
+                  shareName || locations.projectTitle,
+                )}
             >
-              <CopyPlusIcon class="shrink-0 opacity-70" />
-              <span class="flex flex-1 flex-col">
-                <span>Duplicate</span>
+              <span class="w-16 shrink-0" aria-hidden="true">
+                <PaletteStrip
+                  colors={gauge.colors}
+                  height="24px"
+                  corners="small"
+                  insideControl
+                />
+              </span>
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span>{gauge.label}</span>
                 <span class="text-xs opacity-70"
-                  >A new project from this one</span
+                  >Save, image, color codes or yarn names</span
                 >
               </span>
+              <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
             </button>
           </li>
-        {/if}
+        {/each}
+      </PanelGroup>
+    {/if}
+
+    <PanelGroup heading="Project">
+      <li>
+        <a
+          href={resolve('/')}
+          class={ROW}
+          onclick={(event) => openHere(event, resolve('/'))}
+          data-sveltekit-reload
+        >
+          <PlusIcon class="shrink-0 opacity-70" />
+          <span class="flex flex-1 flex-col">
+            <span>New Project</span>
+            <span class="text-xs opacity-70"
+              >{autosave.stored
+                ? 'This one stays in My Projects'
+                : 'In place of this one'}</span
+            >
+          </span>
+        </a>
+      </li>
+      {#if hasProject}
         <li>
-          <a href={resolve('/')} target="_blank" class={ROW}>
-            <PlusIcon class="shrink-0 opacity-70" />
+          <button
+            type="button"
+            class={ROW}
+            title="Save these settings as a new project, and leave this one as it is"
+            onclick={copyProject}
+          >
+            <CopyPlusIcon class="shrink-0 opacity-70" />
             <span class="flex flex-1 flex-col">
-              <span>Start Another Project</span>
-              <span class="text-xs opacity-70"
-                >In a new tab, leaving this one open</span
+              <span>Duplicate</span>
+              <span class="text-xs opacity-70">A new project from this one</span
               >
             </span>
-            <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
-          </a>
+          </button>
         </li>
-      </ul>
-    </section>
-  {/if}
-
-  <!-- Deleting it, apart from the rest -->
-  {#if hasWeather && autosave.stored}
-    <section aria-label="Delete project">
-      <ul class={PANEL_LIST}>
+      {/if}
+      {#if autosave.stored}
         <li>
           <button
             type="button"
@@ -407,64 +482,64 @@ the same color) says it's waiting here -->
             </span>
           </button>
         </li>
-      </ul>
-    </section>
+      {/if}
+    </PanelGroup>
   {/if}
-  <!-- A few recent projects; My Projects has them all -->
-  {#if recentTotal}
-    <section class="flex flex-col gap-2" aria-labelledby="recent-projects">
-      <h2 id="recent-projects" class="text-sm font-bold opacity-70">
-        Recent Projects
-      </h2>
-      <ul class={PANEL_LIST}>
-        {#each recent as item (item.id)}
-          {@const label =
-            item.meta.name || item.meta.title || 'Untitled Project'}
-          <li>
-            <!-- eslint-disable svelte/no-navigation-without-resolve -- the saved project's address -->
-            <a
-              href={item.meta.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-sveltekit-reload
-              class={ROW}
+
+  <!-- A few recent projects, opened here; My Projects has them all, the
+  gallery more -->
+  <PanelGroup heading={recent.length ? 'Recent Projects' : 'Open a Project'}>
+    {#each recent as item (item.id)}
+      {@const label = item.meta.name || item.meta.title || 'Untitled Project'}
+      <li>
+        <!-- eslint-disable svelte/no-navigation-without-resolve -- the saved project's address -->
+        <a
+          href={item.meta.href}
+          data-sveltekit-reload
+          class={ROW}
+          onclick={(event) => openHere(event, item.meta.href)}
+        >
+          <!-- Its picture, as on My Library -->
+          <ProjectPicture
+            id={item.id}
+            href={item.meta.href}
+            picturesVersion={pictures.version}
+            pictureSettled={pictures.isSettled(item.id, item.meta.href)}
+            imageClass="h-14 w-12 shrink-0 object-contain"
+            coverClass="h-14 w-12 shrink-0"
+            stripHeight="40px"
+          />
+          <span class="flex min-w-0 flex-1 flex-col">
+            <span class="line-clamp-2 text-sm font-semibold break-words"
+              >{label}</span
             >
-              <!-- Its picture, as on My Library -->
-              <ProjectPicture
-                id={item.id}
-                href={item.meta.href}
-                picturesVersion={pictures.version}
-                pictureSettled={pictures.isSettled(item.id, item.meta.href)}
-                imageClass="h-14 w-12 shrink-0 object-contain"
-                coverClass="h-14 w-12 shrink-0"
-                stripHeight="40px"
-              />
-              <span class="flex min-w-0 flex-1 flex-col">
-                <span class="line-clamp-2 text-sm font-semibold break-words"
-                  >{label}</span
-                >
-                <span class="text-surface-700-300 line-clamp-1 text-xs"
-                  >{savedLine(item)}</span
-                >
-              </span>
-              <ExternalLinkIcon class="icon-sm shrink-0 opacity-50" />
-            </a>
-            <!-- eslint-enable svelte/no-navigation-without-resolve -->
-          </li>
-        {/each}
-        <li>
-          <a href={resolve('my-projects')} class={ROW}>
-            <FolderOpenIcon class="shrink-0 opacity-70" />
-            <span class="flex-1"
-              >{recentTotal > recent.length
-                ? `All ${recentTotal} ${pluralize('Project', recentTotal)}`
-                : 'My Projects'}</span
+            <span class="text-surface-700-300 line-clamp-1 text-xs"
+              >{savedLine(item)}</span
             >
-          </a>
-        </li>
-      </ul>
-    </section>
-  {/if}
+          </span>
+        </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
+      </li>
+    {/each}
+    {#if recentTotal}
+      <li>
+        <a href={resolve('/my-projects')} class={ROW}>
+          <FolderOpenIcon class="shrink-0 opacity-70" />
+          <span class="flex-1"
+            >{recentTotal > recent.length + (autosave.stored ? 1 : 0)
+              ? `All ${recentTotal} ${pluralize('Project', recentTotal)}`
+              : 'My Projects'}</span
+          >
+        </a>
+      </li>
+    {/if}
+    <li>
+      <a href={resolve('/gallery')} class={ROW}>
+        <LandmarkIcon class="shrink-0 opacity-70" />
+        <span class="flex-1">Project Gallery</span>
+      </a>
+    </li>
+  </PanelGroup>
 
   <!-- Help, in one line: the site menu has the rest -->
   <nav
@@ -502,16 +577,5 @@ the same color) says it's waiting here -->
         >(opens in a new tab)</span
       ></a
     >
-
-    <a
-      href="{resolve('documentation')}#credits"
-      target="_blank"
-      class={SMALL_LINK}
-    >
-      Data Sources & Credits
-      <ExternalLinkIcon class={LINK_ICON} /><span class="sr-only"
-        >(opens in a new tab)</span
-      >
-    </a>
   </nav>
 </div>

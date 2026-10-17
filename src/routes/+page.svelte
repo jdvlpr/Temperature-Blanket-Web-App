@@ -44,8 +44,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     autosave,
     changedElsewhereMessage,
+    leavingOnPurpose,
     saveCopy,
     saveNow,
+    unsavedWork,
   } from '#lib/storage/autosave.svelte.js';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
   import { takeJustTrashed } from '#lib/storage/trash.js';
@@ -221,13 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onbeforeunload={(event) => {
-    const url = new URL(project.url.href);
-    if (
-      project.status.saved ||
-      !url.searchParams.has('project') ||
-      project.history.length === 0
-    )
-      return;
+    if (leavingOnPurpose() || !unsavedWork()) return;
     event.preventDefault();
     event.returnValue = 'Unsaved Project';
   }}

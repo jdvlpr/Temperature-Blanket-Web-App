@@ -13,12 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Start a Project with It, for a palette that isn't saved: save it first
-(to come back to it from My Palettes), go without saving, or stay -->
+<!-- Leaving something that isn't saved (a palette for Start a Project with It,
+a project for New Project or a recent one): save it first, go without saving,
+or stay. Changes that can't be saved (a project whose saving failed) have no
+save button: leave without them, or stay. -->
 
 <script lang="ts">
   import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
   import {
+    BTN_DANGER,
     BTN_PRIMARY,
     BTN_SECONDARY,
   } from '#lib/constants/class-constants.js';
@@ -26,33 +29,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { BookmarkIcon, LoaderCircleIcon } from '@lucide/svelte';
 
   let {
+    message,
+    saveLabel,
     onsave,
     ongo,
   }: {
-    /** Saves the palette */
-    onsave: () => Promise<void>;
-    /** Goes to the new project */
+    /** What's asked, and what saving it is for */
+    message: string;
+    /** Its save-and-go button, e.g. "Save and Start" */
+    saveLabel?: string;
+    /** Saves it; throws to stay, when it couldn't (and has said so) */
+    onsave?: () => Promise<void>;
+    /** Goes on */
     ongo: () => void;
   } = $props();
 
   let saving = $state(false);
 
   async function saveAndGo() {
+    if (!onsave) return;
     saving = true;
     try {
       await onsave();
-      ongo();
+    } catch {
+      return;
     } finally {
       saving = false;
     }
+    ongo();
   }
 </script>
 
 <div class="flex flex-col gap-4 px-4 pt-2 text-left">
-  <p>
-    Save this palette first? It goes on the new project’s Temperature gauge
-    either way. Saved, you can come back to it from My Palettes.
-  </p>
+  <p>{message}</p>
   <DialogFooter>
     <button
       type="button"
@@ -60,21 +69,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       disabled={saving}
       onclick={() => dialog.close()}>Cancel</button
     >
-    <button type="button" class={BTN_SECONDARY} disabled={saving} onclick={ongo}
-      >Don’t Save</button
-    >
     <button
       type="button"
-      class={BTN_PRIMARY}
+      class={onsave ? BTN_SECONDARY : BTN_DANGER}
       disabled={saving}
-      onclick={saveAndGo}
+      onclick={ongo}>Don’t Save</button
     >
-      {#if saving}
-        <LoaderCircleIcon class="animate-spin" />
-      {:else}
-        <BookmarkIcon />
-      {/if}
-      Save and Start
-    </button>
+    {#if onsave}
+      <button
+        type="button"
+        class={BTN_PRIMARY}
+        disabled={saving}
+        onclick={saveAndGo}
+      >
+        {#if saving}
+          <LoaderCircleIcon class="animate-spin" />
+        {:else}
+          <BookmarkIcon />
+        {/if}
+        {saveLabel}
+      </button>
+    {/if}
   </DialogFooter>
 </div>

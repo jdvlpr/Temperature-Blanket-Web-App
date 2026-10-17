@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     exportType = 'html',
   }: {
     colors?: Color[];
-    /** What to export; Download / Export chooses it (see palette-export.ts) */
+    /** What to export; Download chooses it (see palette-export.ts) */
     exportType?: 'html' | 'colorway';
   } = $props();
 
@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="px-4 pt-2 pb-4">
   {#if colors}
-    <!-- HTML Color Codes Section -->
+    <!-- Color Codes Section -->
     {#if exportType === 'html' && palette}
       <div class="flex w-full flex-wrap items-start gap-4">
         <div class="w-full">
@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <CopyIcon copied={copied.is('hexes')} />
-            Copy HTML Color Codes
+            Copy Color Codes
           </button>
         </div>
       </div>

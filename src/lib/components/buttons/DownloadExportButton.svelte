@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     menuList = ['pdf', 'csv', 'png', 'google-sheet'],
-    buttonText = 'Download / Export',
+    buttonText = 'Download',
   } = $props();
 
   // Actions run from the Menu, not a <button> inside each item: Enter and

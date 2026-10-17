@@ -111,6 +111,41 @@ export const KEYBOARD_SHORTCUTS = [
   },
 ];
 
+/** The Yarn Palette Creator's, in the same shape */
+export const YARN_KEYBOARD_SHORTCUTS = [
+  {
+    group: 'Palette',
+    details: '',
+    items: [
+      {
+        description: 'Save Palette',
+        keys: [
+          ['Cmd ⌘', 's'],
+          ['Ctrl', 's'],
+        ],
+      },
+      {
+        description: 'Undo',
+        keys: [
+          ['Cmd ⌘', 'z'],
+          ['Ctrl', 'z'],
+        ],
+      },
+      {
+        description: 'Redo',
+        keys: [
+          ['Cmd ⌘', 'Shift ⇧', 'z'],
+          ['Ctrl', 'Shift ⇧', 'z'],
+        ],
+      },
+      {
+        description: 'Close any open modal',
+        keys: ['Escape'],
+      },
+    ],
+  },
+];
+
 export const THEMES = [
   {
     description: 'Set the theme to light mode.',

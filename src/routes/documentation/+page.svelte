@@ -1605,12 +1605,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               To keep a palette to use again later, in the Yarn Palette Creator
               press the Palette button at the top, then Save Palette. In the
-              Project Planner, press Project, then Save Palettes to My Palettes,
-              and choose the gauges whose palettes to keep. You can give a
-              palette a name, or leave the name empty to use its yarn and number
-              of colors. Saved palettes are stored in this browser{#if __ACCOUNTS_ENABLED__},
-                or in your account while you’re signed in, so they show up on
-                your other devices too{/if}.
+              Project Planner, press Project, then a gauge under Palettes, then
+              Save to My Palettes. You can give a palette a name, or leave the
+              name empty to use its yarn and number of colors. Saved palettes
+              are stored in this browser{#if __ACCOUNTS_ENABLED__}, or in your
+                account while you’re signed in, so they show up on your other
+                devices too{/if}.
             </p>
             <p>
               To use a saved palette in a project, press Get Colors, then My
@@ -1658,12 +1658,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Export and Paste Colors</h3>
 
             <p>
-              To export a color palette as an image, HTML color codes, or yarn
-              names, open the Palette menu in the Yarn Palette Creator (or the
-              Project menu in the Project Planner), press Download / Export,
-              then choose a palette and format and press Copy or Download. To
-              share a palette's link, open the Palette menu and press Copy Link.
-              Share or paste the copied text somewhere you can find it later.
+              To export a color palette as an image, color codes, or yarn names,
+              open the Palette menu in the Yarn Palette Creator and press
+              Download (or open the Project menu in the Project Planner and
+              press a gauge under Palettes), then choose a format and press Copy
+              or Download. To share a palette's link, open the Palette menu and
+              press Copy Link. Share or paste the copied text somewhere you can
+              find it later.
             </p>
             <p>
               To paste colors into a palette, press Get Colors, then Paste
@@ -2010,9 +2011,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To download your color charts and weather data as a PDF file,
-              press Project at the top of the page, press Download / Export,
-              then press PDF and choose what to include. It’s also in the
-              Download / Export button below the weather data.
+              press Project at the top of the page, press Download, then press
+              PDF and choose what to include. It’s also in the Download button
+              below the weather data.
             </p>
           </section>
           <section
@@ -2022,9 +2023,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Download Weather Data (CSV)</h3>
             <p>
               To download a CSV file with your project’s weather data, press
-              Project at the top of the page, press Download / Export, then
-              press CSV. It’s also in the Download / Export button below the
-              weather data.
+              Project at the top of the page, press Download, then press Weather
+              Data. It’s also in the Download button below the weather data.
             </p>
           </section>
           <section
@@ -2034,8 +2034,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Download Preview Image (PNG)</h3>
             <p>
               To download a PNG file of your project’s preview image, press
-              Project at the top of the page, press Download / Export, then
-              press PNG. Or press Download PNG below the preview.
+              Project at the top of the page, press Download, then press Preview
+              Image. Or press Download PNG below the preview.
             </p>
           </section>
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="credits">

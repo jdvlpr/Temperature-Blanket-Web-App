@@ -269,11 +269,11 @@ test.describe('My Projects', () => {
     await menu.getByRole('button', { name: 'Back' }).click();
     await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
 
-    // Download / Export is a screen of its own, and PDF one over that: Cancel
-    // and Back step back out to the menu
-    await menu.getByRole('button', { name: /Download \/ Export/ }).click();
+    // Download is a screen of its own, and PDF one over that: Cancel and
+    // Back step back out to the menu
+    await menu.getByRole('button', { name: /^Download/ }).click();
     await expect(
-      menu.getByRole('heading', { name: 'Download / Export' }),
+      menu.getByRole('heading', { name: 'Download', exact: true }),
     ).toBeVisible();
     await menu.getByRole('button', { name: /^PDF/ }).click();
     await expect(
@@ -281,10 +281,22 @@ test.describe('My Projects', () => {
     ).toBeVisible();
     await menu.getByText('Cancel').click();
     await expect(
-      menu.getByRole('heading', { name: 'Download / Export' }),
+      menu.getByRole('heading', { name: 'Download', exact: true }),
     ).toBeVisible();
     await menu.getByRole('button', { name: 'Back' }).click();
     await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
+
+    // A gauge's palette, under Palettes: saved to My Palettes once, then
+    // already there
+    await menu
+      .getByRole('region', { name: 'Palettes' })
+      .getByRole('button')
+      .first()
+      .click();
+    await menu.getByTestId('save-gauge-palette').click();
+    await expect(page.getByText('Saved to My Palettes')).toBeVisible();
+    await menu.getByTestId('save-gauge-palette').click();
+    await expect(page.getByText('Already in My Palettes')).toBeVisible();
     await page.keyboard.press('Escape');
 
     // Opened from My Projects, it loads with its saved weather

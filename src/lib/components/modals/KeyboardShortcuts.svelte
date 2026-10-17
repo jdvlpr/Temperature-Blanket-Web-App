@@ -15,10 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { KEYBOARD_SHORTCUTS } from '#lib/constants/page-constants.js';
+
+  // The page's own: the planner's unless another page passes its list
+  let {
+    shortcuts = KEYBOARD_SHORTCUTS,
+  }: { shortcuts?: typeof KEYBOARD_SHORTCUTS } = $props();
 </script>
 
 <div class="p-4 pt-2">
-  {#each KEYBOARD_SHORTCUTS as { group, items, details }}
+  {#each shortcuts as { group, items, details }}
     <p class="mt-2 text-xl font-bold">{group}</p>
     <p class="mb-2 italic">{details}</p>
     <table

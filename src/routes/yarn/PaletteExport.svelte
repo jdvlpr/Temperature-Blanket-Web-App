@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The Palette menu's Download / Export screen: the shared palette export
+<!-- The Palette menu's Download screen: the shared palette export
 rows, for the palette being edited. -->
 
 <script lang="ts">

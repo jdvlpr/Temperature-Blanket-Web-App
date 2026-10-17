@@ -13,31 +13,19 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gauges } from '#lib/state/gauges-state.svelte.js';
 import { dialog } from '#lib/state/page-state.svelte.js';
 import GaugePaletteExport from './GaugePaletteExport.svelte';
-import GaugePalettes from './GaugePalettes.svelte';
 
-/** A gauge's palette exports, in the open panel's place, with Back to it */
-export function openGaugePalette(gaugeId: string, label: string) {
+/** A gauge's palette (Save to My Palettes, then its exports), in the open
+ * panel's place, with Back to it */
+export function openGaugePalette(
+  gaugeId: string,
+  label: string,
+  projectName: string,
+) {
   dialog.trigger({
     type: 'component',
-    component: { ref: GaugePaletteExport, props: { gaugeId } },
+    component: { ref: GaugePaletteExport, props: { gaugeId, projectName } },
     options: { returnable: true, title: `${label} Palette` },
-  });
-}
-
-/** Download / Export's Palettes: the gauges to pick from, or the one gauge's
- * exports when there's just one */
-export function openGaugePalettes() {
-  const all = gauges.allCreated;
-  if (all.length === 1) {
-    openGaugePalette(all[0].id, all[0].label);
-    return;
-  }
-  dialog.trigger({
-    type: 'component',
-    component: { ref: GaugePalettes, props: null },
-    options: { returnable: true, title: 'Palettes' },
   });
 }

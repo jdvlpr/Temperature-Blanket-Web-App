@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// A palette's exports: an image, HTML color codes, or its yarn colorway names.
-// From the Yarn page's Palette menu and the planner's Download / Export, which
-// has one row of them for each gauge.
+// A palette's exports: an image, color codes, or its yarn colorway names.
+// From the Yarn page's Palette menu (Download) and the planner's Project menu,
+// whose Palettes group has a screen of them for each gauge.
 
 import ExportPaletteImage from '#lib/components/modals/ExportPaletteImage.svelte';
 import ImportExportPalette from '#lib/components/modals/ImportExportPalette.svelte';
@@ -29,7 +29,7 @@ export type PaletteExport = 'image' | 'html' | 'colorway';
 
 export const PALETTE_EXPORT_TITLES: Record<PaletteExport, string> = {
   image: 'Palette Image',
-  html: 'HTML Color Codes',
+  html: 'Color Codes',
   colorway: 'Yarn Colorway Names',
 };
 

@@ -13,10 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- A palette's Download / Export screen, shared by the Project menu (one
-gauge's palette) and the Yarn page's Palette menu: the palette as an image,
-its HTML color codes, or its yarn colorway names (when some colors are yarn
-colorways). -->
+<!-- A palette's export rows, shared by the Project menu (one gauge's palette,
+after its Save to My Palettes row, passed as `before`) and the Yarn page's
+Palette menu (Download): the palette as an image, its color codes, or its yarn
+colorway names (when some colors are yarn colorways). -->
 
 <script lang="ts">
   import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
@@ -27,6 +27,7 @@ colorways). -->
   } from '#lib/utils/palette-export.js';
   import type { PaletteImageRange } from '#lib/features/palette-image/layout.js';
   import type { Color } from '#lib/types/yarn-types.js';
+  import type { Snippet } from 'svelte';
   import {
     ChevronRightIcon,
     ClipboardCopyIcon,
@@ -38,11 +39,14 @@ colorways). -->
     colors,
     ranges,
     name,
+    before,
   }: {
     colors: Color[];
     ranges?: PaletteImageRange[];
     /** The palette's title, if it has one */
     name?: string;
+    /** Rows (each an <li>) at the top of the same list */
+    before?: Snippet;
   } = $props();
 
   const rows = [
@@ -54,7 +58,7 @@ colorways). -->
     },
     {
       type: 'html',
-      label: 'HTML Color Codes',
+      label: 'Color Codes',
       details: 'Copy codes for web and design',
       icon: CodeIcon,
     },
@@ -79,6 +83,7 @@ colorways). -->
 
 <div class="flex w-full flex-col gap-6 p-4 pt-2 text-left">
   <ul class={PANEL_LIST}>
+    {@render before?.()}
     {#each rows as row (row.type)}
       {#if row.type !== 'colorway' || named}
         <li>

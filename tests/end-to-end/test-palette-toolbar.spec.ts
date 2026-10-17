@@ -133,27 +133,25 @@ test.describe('Palette toolbar', () => {
     ).toBeVisible();
   });
 
-  test('the Palette menu’s Download / Export lists every export', async ({
-    page,
-  }) => {
+  test('the Palette menu’s Download lists every export', async ({ page }) => {
     await page.getByTestId('palette-button').click();
     await page
       .getByRole('dialog', { name: 'Palette' })
-      .getByRole('button', { name: /^Download \/ Export/ })
+      .getByRole('button', { name: /^Download/ })
       .click();
     const dialog = page.getByRole('dialog');
-    for (const name of ['Image', 'HTML Color Codes'])
+    for (const name of ['Image', 'Color Codes'])
       await expect(
         dialog.getByRole('button', { name: new RegExp(`^${name}`) }),
       ).toBeVisible();
 
     // Each export opens straight on its format, with no list to go back to
-    await dialog.getByRole('button', { name: /^HTML Color Codes/ }).click();
+    await dialog.getByRole('button', { name: /^Color Codes/ }).click();
     await expect(
-      dialog.getByRole('heading', { name: 'HTML Color Codes' }),
+      dialog.getByRole('heading', { name: 'Color Codes' }),
     ).toBeVisible();
     await expect(
-      dialog.getByRole('button', { name: 'Copy HTML Color Codes' }),
+      dialog.getByRole('button', { name: 'Copy Color Codes' }),
     ).toBeVisible();
     await expect(
       dialog.getByRole('button', { name: 'All Export Options' }),
@@ -179,7 +177,7 @@ test.describe('Palette toolbar', () => {
     await page.getByTestId('palette-button').click();
     await page
       .getByRole('dialog', { name: 'Palette' })
-      .getByRole('button', { name: /^Download \/ Export/ })
+      .getByRole('button', { name: /^Download/ })
       .click();
     await page
       .getByRole('dialog')
