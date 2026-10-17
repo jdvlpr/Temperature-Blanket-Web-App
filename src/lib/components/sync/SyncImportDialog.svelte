@@ -107,7 +107,7 @@ someone asks to add them from My Library (`later`). -->
   // fill fits inside the list's border
   const ROW = `flex w-full items-start gap-3 px-4 py-3 text-left transition-colors first:rounded-t-container last:rounded-b-container disabled:opacity-50 ${ROW_FOCUS}`;
   const ICON = 'mt-0.5 shrink-0';
-  const DETAIL = 'block text-sm opacity-75';
+  const DETAIL = 'block text-sm';
   const CHOICE = 'flex cursor-pointer items-center gap-3';
   // Its picture (a palette, its colors) beside its name, as in the Trash
   const COVER = 'h-24 w-20 shrink-0';
@@ -248,7 +248,7 @@ someone asks to add them from My Library (`later`). -->
         disabled={busy || !chosenCount}
         onclick={() => answer(chosenProjects, chosenPalettes)}
       >
-        <CloudUploadIcon class="text-primary-600-400 {ICON}" />
+        <CloudUploadIcon class={ICON} />
         <span class="flex-1">
           <span class="block font-bold">
             {chosenCount
