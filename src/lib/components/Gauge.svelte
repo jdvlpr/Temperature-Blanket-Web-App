@@ -125,8 +125,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : []),
     {
       value: 'gradients',
-      label: 'Gradients',
-      details: 'Smooth color runs, any number of colors',
+      label: 'Preset Gradients',
+      details: 'Automatic color combinations',
       icon: BlendIcon,
     },
   ]);
@@ -134,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const paletteSourceTitles: Record<PaletteSourceKind, string> = {
     saved: 'My Palettes',
     gallery: 'Palette Gallery',
-    gradients: 'Gradients',
+    gradients: 'Preset Gradients',
   };
 
   // Ways to make colors
@@ -286,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Menu.Trigger
         class={toolbarButtonClass}
-        title="Get Colors from Palettes, Gradients, Yarn, an Image, and More"
+        title="Get Colors from Palettes, Preset Gradients, Yarn, an Image, and More"
       >
         <PaletteIcon />
         <span class="flex items-center gap-1"
@@ -296,11 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Portal>
         <Menu.Positioner>
           <Menu.Content class={menuContentClass}>
-            {#each [...paletteSources, ...colorTools] as source, index (source.value)}
-              <!-- Palettes to choose from, then ways to make colors -->
-              {#if index === paletteSources.length}
-                <Menu.Separator />
-              {/if}
+            {#each [...paletteSources, ...colorTools] as source (source.value)}
               <Menu.Item
                 value={source.value}
                 class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"

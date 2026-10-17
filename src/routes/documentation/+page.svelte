@@ -1568,8 +1568,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 with the same search and filters as the Gallery (in the Project Planner)
               </li>
               <li>
-                <span class="font-bold">Gradients</span>
-                – Smooth runs of color, in any number of colors, based on
+                <span class="font-bold">Preset Gradients</span>
+                – Automatic color combinations, in any number of colors, based on
                 <a
                   class="link"
                   rel="noreferrer noopener"

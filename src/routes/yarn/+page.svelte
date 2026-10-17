@@ -215,15 +215,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           </div>
         </div>
-        <Card>
-          {#snippet content()}
-            <div class=" mt-4">
-              <Gauge bind:gauge={yarnPageState.gauge} />
+        <div class=" mt-4">
+          <Gauge bind:gauge={yarnPageState.gauge} />
 
-              <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
-            </div>
-          {/snippet}
-        </Card>
+          <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
+        </div>
       </main>
     </div>
   {/snippet}

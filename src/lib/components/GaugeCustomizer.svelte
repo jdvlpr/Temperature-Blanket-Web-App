@@ -1027,7 +1027,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   />
 {/snippet}
 
-<div class={['mt-4 flex flex-wrap items-center justify-center gap-4']}>
+<div class={['mt-3 flex flex-wrap items-center justify-center gap-4']}>
   {#if isProjectPlannerPage}
     <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
       <RangesMenu />
