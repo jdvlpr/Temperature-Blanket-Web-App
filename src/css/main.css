@@ -162,6 +162,13 @@ image can't use currentColor) */
   --radius-container: 1.5rem;
 }
 
+/* Corners inside a card (rounded-*-nested): the card's, less its padding
+   (p-2), so the curves run side by side, as menu items do. Inline, so it
+   follows the roundness set above. */
+@theme inline {
+  --radius-nested: max(0px, calc(var(--radius-container) - var(--spacing) * 2));
+}
+
 /* Card edges: a shadow alone barely shows (in dark mode hardly at all), so
    raised boxes get a thin border too. Give it at the same breakpoint as the
    shadow (md:card-border with md:shadow-lg), so cards that run edge to edge on

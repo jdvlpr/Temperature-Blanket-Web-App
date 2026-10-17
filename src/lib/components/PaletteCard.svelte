@@ -14,7 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  A palette as a card, wherever palettes are listed: its colors and name are
+  A palette as a card (a raised box, its colors' corners following the
+  box's), wherever palettes are listed: its colors and name are
   one link (`href`) or button (`onclick`), "8 colors · Brand Yarn" under the
   name, and one `action` button beside it. My Projects gives its own
   `nameRow` (with a rename pencil, outside the link) and a `footer`.
@@ -25,7 +26,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import type { Color } from '#lib/types/yarn-types.js';
-  import { ROW_FOCUS } from '#lib/constants/class-constants.js';
+  import {
+    CARD_BOX,
+    CARD_HOVER,
+    ROW_FOCUS,
+  } from '#lib/constants/class-constants.js';
   import { pluralize } from '#lib/utils/string-utils.js';
   import type { Snippet } from 'svelte';
 
@@ -89,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#snippet strip()}
-  <PaletteStrip {colors} insideControl smallCorners />
+  <PaletteStrip {colors} insideControl corners="nested" />
 {/snippet}
 {#snippet text()}
   <span class="line-clamp-2 font-semibold break-words">{name}</span>
@@ -111,7 +116,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {onclick}
     {title}
     class={[
-      'bg-surface-100 dark:bg-surface-900 hover:bg-surface-200 dark:hover:bg-surface-800 rounded-container card-border flex w-full min-w-0 cursor-pointer gap-2 p-2 text-left transition-colors',
+      CARD_BOX,
+      CARD_HOVER,
+      'flex w-full min-w-0 cursor-pointer gap-2 text-left',
       ROW_FOCUS,
       list ? 'flex-col sm:flex-row sm:items-center sm:gap-3' : 'flex-col',
     ]}
@@ -129,6 +136,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else}
   <div
     class={[
+      CARD_BOX,
+      CARD_HOVER,
       'flex w-full min-w-0 gap-1 text-left',
       list ? 'flex-col sm:flex-row sm:items-center sm:gap-3' : 'flex-col',
     ]}

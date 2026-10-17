@@ -21,15 +21,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
   /** The picture itself in each layout: whole, at its own shape */
   export const imageClasses = {
-    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
+    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px] rounded-nested',
     // The whole picture, in a box beside the name
     list: 'h-28 w-24 shrink-0 object-contain sm:h-32 sm:w-32',
-    row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
+    row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px] rounded-nested',
   };
 </script>
 
 <!-- @component
-  A project as a card: its preview image (or a `cover` in its place), its name
+  A project as a card (a raised box, as a palette's): its preview image (or a `cover` in its place), its name
   (or its places and dates), when it was published, then who by and its
   views (as on its gallery page), all one link, as on
   My Library. In a grid or row it stands up, the picture over the name; in a
@@ -39,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
+  import { CARD_BOX, CARD_HOVER } from '#lib/constants/class-constants.js';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -88,7 +89,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'rounded-container hover:bg-surface-100-900 flex gap-1 p-2',
+    CARD_BOX,
+    CARD_HOVER,
+    'flex gap-1',
     layout === 'row'
       ? 'mx-auto min-h-[200px] max-w-[245px] shrink-0 snap-center lg:max-w-[350px]'
       : 'w-full',

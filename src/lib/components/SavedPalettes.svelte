@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import { CARD_BOX, PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
@@ -304,8 +304,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {@render undoAt(card.key, true)}
         <li class="flex w-full min-w-0" {@attach slots.track(card.key)}>
           {#if editingId === palette.id}
-            <div class="flex w-full flex-col gap-2">
-              <PaletteStrip {colors} smallCorners />
+            <!-- In its card still, so the grid doesn't shift -->
+            <div class={[CARD_BOX, 'flex w-full flex-col gap-2']}>
+              <PaletteStrip {colors} corners="nested" />
               <NameField
                 bind:value={editingName}
                 label="Palette name"

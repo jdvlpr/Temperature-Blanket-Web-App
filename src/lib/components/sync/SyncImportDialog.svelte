@@ -229,7 +229,7 @@ someone asks to add them from My Library (`later`). -->
               colors={palette.colors}
               height="50px"
               insideControl
-              smallCorners
+              corners="small"
             />
           </span>
         </span>

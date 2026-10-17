@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import { CARD_BOX, PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$app/env/public';
   import { gallerySortMenu } from '#lib/utils/gallery-utils.js';
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
@@ -167,9 +167,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet placeholders(count: number)}
   {#each Array(count) as _, i (i)}
-    <div class="flex w-full flex-col gap-2" aria-hidden="true">
+    <div class={[CARD_BOX, 'flex w-full flex-col gap-2']} aria-hidden="true">
       <div
-        class="placeholder rounded-container h-[70px] w-full animate-pulse"
+        class="placeholder rounded-nested h-[70px] w-full animate-pulse"
       ></div>
       <div class="placeholder h-4 w-2/3 animate-pulse"></div>
     </div>

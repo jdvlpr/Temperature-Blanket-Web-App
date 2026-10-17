@@ -45,8 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label?: string | Snippet;
     height?: string;
     roundedBottom?: boolean;
-    /** Slightly rounded corners, for small strips in lists and cards */
-    smallCorners?: boolean;
+    /** Its corners: the theme's (`container`), slightly rounded for small
+    strips in rows (`small`), or a card's less its padding, inside a card (`nested`) */
+    corners?: 'container' | 'small' | 'nested';
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
     insideControl?: boolean;
     /** Called with a color's index when it's pressed; each color is then a button */
@@ -65,12 +66,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const WHITE = '#ffffff';
 
+  // Written out whole, so Tailwind finds them
+  const CORNERS = {
+    container: {
+      t: 'rounded-t-container',
+      b: 'rounded-b-container',
+      tl: 'rounded-tl-container',
+      bl: 'rounded-bl-container',
+      tr: 'rounded-tr-container',
+      br: 'rounded-br-container',
+    },
+    small: {
+      t: 'rounded-t-sm',
+      b: 'rounded-b-sm',
+      tl: 'rounded-tl-sm',
+      bl: 'rounded-bl-sm',
+      tr: 'rounded-tr-sm',
+      br: 'rounded-br-sm',
+    },
+    nested: {
+      t: 'rounded-t-nested',
+      b: 'rounded-b-nested',
+      tl: 'rounded-tl-nested',
+      bl: 'rounded-bl-nested',
+      tr: 'rounded-tr-nested',
+      br: 'rounded-br-nested',
+    },
+  };
+
   let {
     colors,
     label,
     height = '70px',
     roundedBottom = true,
-    smallCorners = false,
+    corners = 'container',
     insideControl = false,
     onselect,
     selectedIndex,
@@ -187,16 +216,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // The end colors round their outer corners like the strip, so their
         // outline (hover, selected, focus) follows the curve instead of
         // being clipped by it
-        index === 0 &&
-          (smallCorners ? 'rounded-tl-sm' : 'rounded-tl-container'),
-        index === 0 &&
-          roundedBottom &&
-          (smallCorners ? 'rounded-bl-sm' : 'rounded-bl-container'),
-        index === colors.length - 1 &&
-          (smallCorners ? 'rounded-tr-sm' : 'rounded-tr-container'),
-        index === colors.length - 1 &&
-          roundedBottom &&
-          (smallCorners ? 'rounded-br-sm' : 'rounded-br-container'),
+        index === 0 && CORNERS[corners].tl,
+        index === 0 && roundedBottom && CORNERS[corners].bl,
+        index === colors.length - 1 && CORNERS[corners].tr,
+        index === colors.length - 1 && roundedBottom && CORNERS[corners].br,
       ],
       style: `background:${hex};color:${getTextColor(hex)};${
         highlightIndex === index
@@ -253,9 +276,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span
       class={[
         'flex w-full overflow-hidden',
-        smallCorners ? 'rounded-t-sm' : 'rounded-t-container',
-        roundedBottom &&
-          (smallCorners ? 'rounded-b-sm' : 'rounded-b-container'),
+        CORNERS[corners].t,
+        roundedBottom && CORNERS[corners].b,
       ]}
       style:height
       role={insideControl ? undefined : 'group'}

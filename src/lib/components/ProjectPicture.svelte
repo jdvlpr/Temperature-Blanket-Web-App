@@ -43,6 +43,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     coverClass?: string;
     /** The colors' height, when it has no picture */
     stripHeight?: string;
+    /** `nested` on a card, so its colors and placeholder follow the card's
+    corners; `small` in a row */
+    corners?: 'small' | 'nested';
   }
 
   let {
@@ -54,7 +57,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     imageClass = '',
     coverClass = '',
     stripHeight = '70px',
+    corners = 'small',
   }: Props = $props();
+
+  let placeholderCorners = $derived(
+    corners === 'nested' ? 'rounded-nested' : 'rounded-container',
+  );
 
   // Whichever stands for it now: it's what's watched for the screen
   let box = $state<HTMLElement>();
@@ -101,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <img src={image} alt="" class={imageClass} loading="lazy" {@attach watch} />
 {:else if !pictureSettled}
   <div
-    class="placeholder rounded-container animate-pulse {coverClass}"
+    class="placeholder animate-pulse {placeholderCorners} {coverClass}"
     aria-hidden="true"
     {@attach watch}
   ></div>
@@ -112,13 +120,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@attach watch}
   >
     <div class="w-full">
-      <PaletteStrip {colors} height={stripHeight} insideControl smallCorners />
+      <PaletteStrip {colors} height={stripHeight} insideControl {corners} />
     </div>
   </div>
 {:else}
   <!-- Nothing to show, but its place is kept, so they line up -->
   <div
-    class="placeholder rounded-container {coverClass}"
+    class="placeholder {placeholderCorners} {coverClass}"
     aria-hidden="true"
     {@attach watch}
   ></div>

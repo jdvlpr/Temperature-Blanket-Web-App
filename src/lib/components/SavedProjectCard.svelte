@@ -131,6 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {pictureSettled}
         imageClass={imageClasses[layout]}
         coverClass={coverClasses[layout]}
+        corners="nested"
       />
     {/snippet}
     {#snippet nameRow()}
