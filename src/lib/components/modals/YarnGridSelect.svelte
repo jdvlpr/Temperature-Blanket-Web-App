@@ -59,6 +59,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     limit?: boolean;
     /** A color to match colorways to, or '' for none */
     matchHex?: string;
+    /** The sort to start with when no color is searched */
+    defaultSort?: ColorwaySort;
     onClickScrollToTop: () => void;
     onSelection?: (colors: Color[]) => void;
     scrollToTopButtonBottom?: string;
@@ -71,6 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedColors = $bindable(),
     limit = false,
     matchHex = '',
+    defaultSort = defaultColorwaySort(false),
     onClickScrollToTop,
     onSelection,
     scrollToTopButtonBottom = '100px',
@@ -161,8 +164,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sort = $derived(
     chosenSort === 'best-match' && !matchHex
-      ? defaultColorwaySort(false)
-      : (chosenSort ?? defaultColorwaySort(!!matchHex)),
+      ? defaultSort
+      : (chosenSort ?? (matchHex ? defaultColorwaySort(true) : defaultSort)),
   );
 
   let sorted = $derived(sortColorways(matched, sort, reversed));

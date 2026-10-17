@@ -116,6 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:selectedBrandId
     bind:selectedYarnId
     {matchHex}
+    defaultSort="by-yarn"
     onSelection={() => (cleared = null)}
     onClickScrollToTop={() => {
       container?.scrollIntoView({
