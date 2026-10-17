@@ -349,7 +349,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <SignInCard onsignedin={showSignedIn} />
         <p class="mx-auto max-w-md px-2 py-4 text-center text-sm opacity-80">
-          Accounts are in beta; if something doesn't work as expected, please
+          If something doesn't work as expected, please
           <a href={resolve('contact')} class="link">get in touch</a>
           .
         </p>

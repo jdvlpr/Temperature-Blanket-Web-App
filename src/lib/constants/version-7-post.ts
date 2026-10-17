@@ -19,7 +19,7 @@
 export const VERSION_7_POST = {
   date: '2026-11-01',
   slug: '2026-11-01-version-7',
-  title: 'Version 7: Your Projects on Every Device',
+  title: 'Version 7: Accounts, My Library & a New Look',
 } as const;
 
 export const VERSION_7_POST_HREF = `/blog/${VERSION_7_POST.slug}`;

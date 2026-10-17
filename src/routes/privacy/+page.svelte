@@ -173,8 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span class="font-bold">Your email address</span>, from the Google
               account you sign in with, to identify your account. This site
               doesn’t send you email, and it is not used for newsletters or
-              marketing. While project sync is in a private beta, invited email
-              addresses are also kept in the site’s settings.
+              marketing.
             </li>
             <li>
               <span class="font-bold">A display name and profile picture</span>.

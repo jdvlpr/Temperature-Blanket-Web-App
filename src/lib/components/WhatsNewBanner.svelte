@@ -49,7 +49,7 @@ else to the changelog. -->
       <span class="font-bold">Version 7 is here</span><span
         class="max-sm:hidden"
         >: {__ACCOUNTS_ENABLED__
-          ? 'your projects on every device (Beta), My Library, gallery pages and more.'
+          ? 'your projects on every device, My Library, gallery pages and more.'
           : 'My Library, gallery pages, palette tools and more.'}</span
       >
       <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a constant path -->

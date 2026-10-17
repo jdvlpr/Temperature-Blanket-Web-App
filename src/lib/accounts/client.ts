@@ -47,7 +47,7 @@ export const needsFreshSession = (error: unknown) =>
   (error.code === 'SESSION_EXPIRED' || error.code === 'SESSION_NOT_FRESH');
 
 const SIGN_UPS_PAUSED_MESSAGE =
-  'New sign-ups are paused while the beta is full. Try again later.';
+  'New sign-ups are paused for now. Try again later.';
 
 /** A message for people, from an account API error. */
 export function accountErrorMessage(error: unknown): string {

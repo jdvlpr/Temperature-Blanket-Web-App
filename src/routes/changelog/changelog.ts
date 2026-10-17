@@ -53,7 +53,7 @@ export const entries: ChangelogItemGroup[] = [
                     {
                       IconComponent: UserRoundIcon,
                       text: `Sign in with Google to keep your projects, yarn palettes and preferences in an account and open them on any device. They sync by themselves, and the first time you sign in you can choose which projects and palettes already in your browser to add. Your account starts with a made-up display name, so your real name is never shown unless you choose it. Accounts are optional. Read all about it in the <a href="${VERSION_7_POST_HREF}" class="link">Version 7 blog post</a>.`,
-                      title: 'Accounts (Beta)',
+                      title: 'Accounts',
                     },
                     {
                       IconComponent: GlobeIcon,
@@ -70,7 +70,7 @@ export const entries: ChangelogItemGroup[] = [
               },
               {
                 IconComponent: PaletteIcon,
-                text: `Save yarn palettes to use again later, copy a palette's link in one click, and save a palette as an image with a choice of layouts. Paste Colors reads lists of hex codes forgivingly, Get Colors From an Image has been rebuilt around markers on the photo, and palettes can be sorted from warm to cool. The Yarn Palette Creator has a Palette menu, like the Project menu, to export or share a palette, start a project with it, or open a recent one. In the Project Planner, Get Colors offers My Palettes, the Palette Gallery and Gradients (formerly Schemes), and the Project menu exports and saves each gauge's palette.`,
+                text: `Save yarn palettes to use again later, copy a palette's link in one click, and save a palette as an image with a choice of layouts. Paste Colors reads lists of hex codes forgivingly, Get Colors From an Image has been rebuilt around markers on the photo, and palettes can be sorted from warm to cool. The Yarn Palette Creator has a Palette menu, like the Project menu, to export or share a palette, start a project with it, or open a recent one. In the Project Planner, Get Colors offers My Palettes, the Palette Gallery and Preset Gradients (formerly Schemes), and the Project menu exports and saves each gauge's palette.`,
                 title: 'Yarn Palette Tools',
               },
               {

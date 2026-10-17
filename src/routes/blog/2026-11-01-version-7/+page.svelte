@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
@@ -26,12 +26,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const title = VERSION_7_POST.title;
   const description =
-    'Version 7 of temperature-blanket.com: sign in to keep your temperature blanket projects, yarn palettes and preferences on every device, find them all in My Library, publish them to the gallery under a name you choose, and post projects to Ravelry. Accounts are optional and in beta.';
+    'Version 7 of temperature-blanket.com: optional accounts to keep your projects on every device, a new My Library, posting projects to Ravelry, gallery pages you can update, and simpler navigation and range editing.';
   // At noon, so the date is the same day in every time zone
   const date = new Date(`${VERSION_7_POST.date}T12:00:00`).toLocaleDateString(
     'en-US',
     { month: 'long', day: 'numeric', year: 'numeric' },
   );
+  // The header and social previews share one picture
+  const featuredImage = `/images/blog-images/${VERSION_7_POST.slug}/featured-image.svg`;
+
+  // Where things moved: what to look for, and where it is now
+  const moved = [
+    ['Your saved projects', 'My Library, or Project menu › Open… (⌘/Ctrl+O)'],
+    ['A new project or palette', 'Create, in the site menu'],
+    ['Send to Gallery', 'Project or Palette menu › Share'],
+    ['Downloads (PDF, CSV, image)', 'Project or Palette menu › Download'],
+    ['The Globe', 'Gallery › View Globe'],
+    ['Your display name', 'Person icon › Account'],
+    ['Connect Ravelry', 'Person icon › Account'],
+  ];
 </script>
 
 <svelte:head>
@@ -42,6 +55,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:description" content={description} />
   <meta property="og:url" content="{PUBLIC_BASE_URL}{VERSION_7_POST_HREF}" />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="{PUBLIC_BASE_URL}{featuredImage}" />
+  <meta property="og:image:width" content="1366" />
+  <meta property="og:image:height" content="768" />
 </svelte:head>
 
 <AppShell pageName="Version 7">
@@ -59,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet header()}
           <div>
             <img
-              src="/images/blog-images/{VERSION_7_POST.slug}/featured-image.svg"
+              src={featuredImage}
               class="h-36 w-full object-cover object-center"
               alt="Temperature blanket stripes with a cloud and a check mark"
             />
@@ -75,284 +91,239 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               Hello! This is Thomas, the developer of temperature-blanket.com.
-              One of the most requested features has been a way to get to your
-              projects from more than one device, like starting a plan on your
-              computer and checking your colors on your phone while you crochet
-              or knit. Version 7 does just that, with accounts (in beta), and
-              brings a lot more along with it: a new home for everything you
-              save, gallery pages you can update, and a way to post your
-              projects to Ravelry.
+              Version 7 is a big update. Here's the short version:
             </p>
+            <ul class="ml-6 list-disc space-y-1">
+              <li>
+                <span class="font-bold">New:</span> optional accounts, so your projects
+                and palettes are on every device; My Library; posting projects to
+                Ravelry; gallery pages you can update; and stars.
+              </li>
+              <li>
+                <span class="font-bold">Changed:</span> a simpler site menu, new ways
+                to edit colors and ranges, projects that save by themselves, and gallery
+                projects that keep their weather.
+              </li>
+              <li>
+                <span class="font-bold">Removed or fixed:</span> publishing to the
+                gallery now needs an account, and a bug with overlapping ranges is
+                fixed, which may change some previews.
+              </li>
+            </ul>
 
             <hr class="hr my-2" />
 
-            <p class="text-2xl font-bold">Your account</p>
+            <h2 class="text-2xl font-bold">What's New</h2>
 
-            <p class="font-bold">Sign in with Google</p>
+            <h3 class="font-bold">Accounts</h3>
             <p>
-              Press the person icon in the top right corner, then
-              <span class="italic">Sign In</span>. There's no password to make
-              up or remember. When you're done, you're back on the page you
-              started from.
+              Sign in with Google from the person icon in the top right. Your
+              projects, palettes and preferences are then on any device you sign
+              in on. Accounts are optional (see
+              <a href="#saving" class="link">Saving</a> below for the difference).
             </p>
 
-            <p class="font-bold">A name of your choosing</p>
+            <h3 class="font-bold">My Library</h3>
             <p>
-              The first time you sign in, you'll be welcomed and asked for a
-              display name. To start, it's a made-up one, like
-              <span class="italic">Cozy Purl 27</span>, so your real name never
-              shows anywhere unless you put it there. Keep it, or type your own.
-              It's only shown on gallery pages you publish, and only if you want
-              it to be. You can change it at any time on your
-              <a href="/account" class="link">Account</a> page.
-            </p>
-
-            <p class="font-bold">Projects you've already saved</p>
-            <p>
-              Projects and palettes saved in your browser before you signed in
-              stay there. When you first sign in, you'll see each of them with a
-              checkbox, so you can choose which to add to your account. You can
-              also add them later from
+              Everything you've saved, projects and palettes, in one place near
+              the top of the site menu, with or without an account. Find it at
               <a href="/my-projects" class="link">My Library</a>.
             </p>
 
-            <p class="font-bold">Your projects on every device</p>
+            <h3 class="font-bold">Post to Ravelry</h3>
             <p>
-              When you're signed in, projects and yarn palettes you save are
-              kept in your account. Sign in on another computer, phone or tablet
-              and they're there. Syncing happens by itself in the background.
-              Press your picture or initials in the top bar to see when it last
-              synced. Your preferences follow you too, like your default yarn
-              and your theme.
+              Connect your Ravelry account on your
+              <a href="/account" class="link">Account</a> page, then choose
+              <span class="italic">Also post to Ravelry</span> when you publish a
+              project or edit its gallery page. Your project is added to your Ravelry
+              projects with its preview, its yarns and a link back to its gallery
+              page. You can add photos of your project, in progress or finished, here
+              or on Ravelry, and they show on its gallery page too. Palettes can't
+              be posted to Ravelry (yet).
+            </p>
+            <!-- If linking existing Ravelry projects ships before launch:
+            <p>
+              Already have the project on Ravelry? Link it instead of starting a
+              new one.
+            </p> -->
+            <!-- Screenshot: a gallery page with Ravelry photos -->
+
+            <h3 class="font-bold">Gallery pages you can update</h3>
+            <p>
+              If you choose to publish a project or palette, it gets one gallery
+              page. When you make changes, choose
+              <span class="italic">Edit Gallery Page</span> to update it, with the
+              same link and the same views.
             </p>
 
-            <p class="font-bold">Changes save automatically</p>
+            <h3 class="font-bold">Stars</h3>
             <p>
-              Save a new project once, using <span class="italic">Save</span> in
-              the top bar. After that, any changes you make save on their own a
-              moment after you stop editing. The
-              <span class="italic">Project</span> menu shows whether the latest change
-              is saved. New projects don't save until you save them yourself, so trying
-              out ideas won't fill up your account.
-            </p>
-            <p>
-              If you'd like to try something different without changing the
-              original, use <span class="italic">Duplicate</span> in the
-              <span class="italic">Project</span> menu. You'll keep working on the
-              copy, and the original stays as it was.
-            </p>
-
-            <p class="font-bold">Editing on two devices at once</p>
-            <p>
-              If a project is changed on another device while you have it open,
-              the app won't overwrite those changes. Instead, you can duplicate
-              your version, or reload to get the latest version.
+              Star other people's projects and palettes to find them again under
+              <span class="italic">Starred</span> in My Library. Only you see your
+              stars.
             </p>
 
             <hr class="hr my-2" />
 
-            <p class="text-2xl font-bold">My Library</p>
+            <h2 class="text-2xl font-bold">What's Changed</h2>
 
+            <h3 class="font-bold">A simpler site menu</h3>
             <p>
-              <a href="/my-projects" class="link">My Library</a>, near the top
-              of the site menu, has everything you've saved: your projects on
-              one tab and your yarn palettes on the other. Show them as cards or
-              as a list, filter them, and give your projects names. You don't
-              need an account for any of this; signed out, they're kept in your
-              browser. Signed in, <span class="italic">Starred</span> lists the gallery
-              pages you've starred, with the same search and filters.
+              The site menu is now grouped into
+              <span class="italic">Create</span> (a new project or palette),
+              <span class="italic">My Library</span>, and
+              <span class="italic">Explore</span> (the Gallery, Yarn Colorways and
+              Weather Forecast). Projects and yarn palettes now work the same way:
+              each has its own tool, a matching menu (Project or Palette), and the
+              same ways to share and download.
             </p>
+            <!-- Screenshot: the site menu (Create, My Library, Explore) -->
+
+            <h3 class="font-bold">Editing colors and ranges</h3>
             <p>
-              Projects and palettes you delete go to the Trash for 30 days, and
-              you can put them back, from any device if you're signed in.
-              Changed your mind right away? Press <span class="italic"
-                >Undo</span
+              Ranges are now edited right in the gauge. Tap a range's number,
+              change it and press <span class="italic">Save</span>, and the next
+              range follows along. The
+              <span class="italic">Configure Ranges</span> dialog is replaced by
+              a
+              <span class="italic">Ranges</span> menu (it reads Auto, Manual or
+              Edited), where you can choose auto ranges (<span class="italic"
+                >Equal size</span
+              >
+              or <span class="italic">Equal days</span>), set
+              <span class="italic">Manual steps</span>, flip the direction, or
+              choose which ends each range includes. All the ways to get or
+              import colors are now under
+              <span class="italic">Get Colors</span>.
+            </p>
+            <!-- Screenshot: a gauge with one range number being edited, and the Ranges menu open -->
+
+            <h3 id="saving" class="scroll-mt-20 font-bold">Saving</h3>
+            <p>
+              Save a project once with <span class="italic">Save</span> in the top
+              bar, and after that your changes save by themselves.
+            </p>
+            <ul class="ml-6 list-disc space-y-1">
+              <li>
+                <span class="font-bold">Without an account</span>, projects and
+                palettes are saved in this browser only, as before. Copy a
+                project's link to keep a backup or to open it somewhere else.
+              </li>
+              <li>
+                <span class="font-bold">With an account</span>, they're also
+                saved to your account, so they're on every device you sign in
+                on. You can also publish to the gallery, star pages and post to
+                Ravelry.
+              </li>
+            </ul>
+
+            <h3 class="font-bold">Gallery projects keep their weather</h3>
+            <p>
+              Opening a project from the
+              <a href="/gallery" class="link">gallery</a> now loads the weather
+              it had when it was published, so you see the project as its maker
+              did, even if the weather source has since changed its numbers.
+              This works for pages published or updated since January 2026, but
+              not for projects still in progress (like one for this year), which
+              search for weather as usual. Projects with weather you typed in or
+              imported always open as published, since that weather can't be
+              searched again. You can always get the latest weather by searching
+              again, and if it's your page,
+              <span class="italic">Edit Gallery Page</span> saves the new weather
+              to it.
+            </p>
+
+            <h3 class="font-bold">And many smaller changes</h3>
+            <p>Including:</p>
+            <ul class="ml-6 list-disc space-y-1">
+              <li>
+                a <a href="/preferences" class="link">Preferences</a> page with theme
+                previews and a default yarn
+              </li>
+              <li>a redesigned PDF</li>
+              <li>adding a color before or after another</li>
+              <li>dialogs that open from the bottom of the screen on phones</li>
+            </ul>
+
+            <hr class="hr my-2" />
+
+            <h2 class="text-2xl font-bold">Where to Find Things</h2>
+            <div class="rounded-container border-surface-200-800 border">
+              <table class="w-full text-left">
+                <thead class="max-sm:sr-only">
+                  <tr class="bg-surface-50-950">
+                    <th class="p-2">Looking for…</th>
+                    <th class="p-2">Now it's here</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-surface-200-800 divide-y">
+                  {#each moved as [lookingFor, nowHere] (lookingFor)}
+                    <tr class="max-sm:block max-sm:py-2">
+                      <td class="p-2 max-sm:block max-sm:py-0 max-sm:font-bold"
+                        >{lookingFor}</td
+                      >
+                      <td class="p-2 max-sm:block max-sm:py-0">{nowHere}</td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+
+            <hr class="hr my-2" />
+
+            <h2 class="text-2xl font-bold">What's Removed or Fixed</h2>
+
+            <h3 class="font-bold">
+              Publishing to the gallery needs an account
+            </h3>
+            <p>
+              Before, anyone could send a project to the gallery. Now you'll
+              need to sign in, so each page has an owner who can update it, hide
+              it or take it down. Pages already in the gallery stay there.
+            </p>
+
+            <h3 class="font-bold">Overlapping ranges, fixed</h3>
+            <p>
+              In earlier versions, if you typed in ranges that overlap, a day
+              that fit two ranges took the color of the last one, instead of the
+              first (highest), as the documentation says. That bug is fixed, so
+              if your ranges overlap, some days in your preview may change
+              color. Most projects aren't affected.
+              <a href="/documentation#range-calculation-methods" class="link"
+                >More in the documentation</a
               >.
             </p>
 
-            <hr class="hr my-2" />
-
-            <p class="text-2xl font-bold">Sharing</p>
-
-            <p class="font-bold">Sharing, right where you are</p>
+            <h3 class="font-bold">Version 6, if you need it</h3>
             <p>
-              Every project and palette has the same sharing options wherever
-              you are: in the menu on its card in My Library, in the Project
-              Planner's <span class="italic">Project</span> menu, under the
-              <span class="italic">Share</span> button next to the preview, and
-              in the Yarn Palette Creator's <span class="italic">Palette</span>
-              menu.
-              <span class="italic">Copy Link</span> gives you a link anyone can open
-              to get their own copy. Yours never changes.
-            </p>
-
-            <p class="font-bold">Gallery pages you can update</p>
-            <p>
-              <span class="italic">Publish to Gallery</span> gives your project
-              or palette a page in the
-              <a href="/gallery" class="link">gallery</a>, and you'll need to be
-              signed in to publish. Each project or palette has just one page.
-              When you change your project, press
-              <span class="italic">Edit Gallery Page</span> and save to update it:
-              same link, same views. Yarn palettes can be published on their own,
-              too.
-            </p>
-            <p>
-              A page says “By” and your display name, unless you tick
-              <span class="italic">Anonymous</span>. Pages that show your name
-              are collected on <span class="italic">Your Gallery</span>, a page
-              of your own you can share, linked from My Library. You choose for
-              each page, and you can change your mind at any time.
-            </p>
-            <p>
-              If you move a project or palette to the Trash, its gallery page is
-              hidden, and it comes back if you put the project back.
-              <span class="italic">Unpublish</span> takes a page down for good.
-            </p>
-
-            <p class="font-bold">Popular, and views</p>
-            <p>
-              The gallery now opens sorted by
-              <span class="italic">Popular</span>, the most viewed in the past
-              month (or day, week or year), and works together with search and
-              the yarn and pattern filters. Each card shows how many times it's
-              been viewed, and a project's name, if you've given it one, shows
-              above its locations and dates. Gallery pages are public, so pick a
-              name you're happy for anyone to see.
-            </p>
-
-            <p class="font-bold">Post to Ravelry</p>
-            <p>
-              If you're on Ravelry, press
-              <span class="italic">Connect Ravelry</span> on your
-              <a href="/account" class="link">Account</a> page. Then, when you
-              publish a project or edit its gallery page, choose
-              <span class="italic">Also post to Ravelry</span> to add it to your Ravelry
-              projects, with its picture, your photos and your yarns, and a link back
-              to its gallery page, which needs to show your name rather than be anonymous.
-              Edit the gallery page again to update it there too. Ravelry is only
-              linked for posting; you still sign in with Google.
+              If something doesn't work for you, Version 6 is still at
+              <a href="https://archive-v6.temperature-blanket.com" class="link"
+                >archive-v6.temperature-blanket.com</a
+              >. To open a project there, add
+              <span class="code">archive-v6.</span> before
+              <span class="code">temperature-blanket.com</span> in its link. Projects
+              saved only in your browser don't show up there, so copy the project's
+              link first.
             </p>
 
             <hr class="hr my-2" />
 
-            <p class="text-2xl font-bold">Also new</p>
-
-            <p class="font-bold">Yarn palette tools</p>
+            <h2 class="text-2xl font-bold">Your Privacy</h2>
             <p>
-              Save yarn palettes to use again later, copy a palette's link in
-              one click, and save a palette as an image with a choice of
-              layouts. <span class="italic">Paste Colors</span> reads lists of
-              hex codes forgivingly,
-              <span class="italic">Get Colors From an Image</span> has been rebuilt
-              around markers on the photo, and palettes can be sorted from warm to
-              cool.
-            </p>
-
-            <p class="font-bold">Preferences</p>
-            <p>
-              Preferences have their own page, opened from the person icon in
-              the top bar, with a preview of each theme. Choose a default yarn,
-              which is picked first wherever no yarn is chosen yet, and turn off
-              motion with <span class="italic">Reduce Motion</span>.
-            </p>
-
-            <p class="font-bold">A new PDF</p>
-            <p>
-              The PDF has been redesigned to match the site, with a summary page
-              showing the project and its preview, numbered round swatches, yarn
-              names that are never cut off, and a choice of US Letter or A4
-              paper.
-            </p>
-
-            <p class="font-bold">Easier on phones</p>
-            <p>
-              On phones, dialogs open as sheets from the bottom of the screen.
-              Drag one down to close it.
+              Your data is never sold or used for ads. You can download
+              everything or delete your account at any time from your
+              <a href="/account" class="link">Account</a> page. Gallery pages
+              are public. The <a href="/privacy" class="link">Privacy Policy</a> has
+              the details.
             </p>
 
             <hr class="hr my-2" />
-
-            <p class="text-2xl font-bold">A change to how ranges work</p>
-
-            <p class="font-bold">Ranges read the same everywhere</p>
-            <p>
-              A gauge's ranges are now written the same way everywhere they
-              appear, in the Project Planner, the gallery, palette images, PDFs
-              and Google Sheets: From → To, like 105°F → 92°F. Which ends each
-              range includes (by default its From number, not its To) is said
-              once, just above the ranges.
-            </p>
-
-            <p class="font-bold">If your ranges overlap</p>
-            <p>
-              If a day's weather fits two ranges, it now takes the color of the
-              first one, the highest on the gauge, as the
-              <a href="/documentation#range-calculation-methods" class="link"
-                >documentation</a
-              >
-              has always said. Before, it took the color of the last one. This only
-              happens if you've typed in ranges that overlap, or chose
-              <span class="italic">Both From and To</span> under
-              <span class="italic">Each range includes</span> in the Ranges menu.
-              If so, some days in your preview may change color, so it's worth a look
-              before you keep going. The number of days shown for each range hasn't
-              changed: it still counts every day that fits it.
-            </p>
-            <p>
-              Also fixed: with <span class="italic">Low to High</span> and
-              <span class="italic">Neither</span>, a range wrongly included its
-              To number.
-            </p>
-
-            <hr class="hr my-2" />
-
-            <p class="text-2xl font-bold">Accounts are optional</p>
-            <p>
-              You don't need an account to use the Project Planner, My Library
-              or anything else on the site, apart from publishing to the
-              gallery. Without one, everything works as it always has: projects
-              save in your browser, and you can share or bookmark a project's
-              link.
-            </p>
-
-            <p class="font-bold">Signing out</p>
-            <p>
-              When you sign out, your account's projects and palettes are
-              removed from that browser, which is handy on a shared computer.
-              They stay in your account for next time. If any changes haven't
-              reached your account yet, you'll be asked first, and those stay in
-              the browser.
-            </p>
-
-            <p class="font-bold">Your data</p>
-            <p>
-              From your <a href="/account" class="link">Account</a> page you can
-              change your display name, download everything in your account, or
-              delete your account and its projects. When you delete your
-              account, you can choose to remove what you've published in the
-              gallery or leave it there without your name. An account can hold
-              up to 200 projects. The
-              <a href="/privacy" class="link">Privacy Policy</a> explains what's stored
-              and why. In short, it's what's needed to sign you in and keep your projects,
-              and nothing is sold or used for ads.
-            </p>
-
-            <hr class="hr my-2" />
-
-            <p class="text-2xl font-bold">About the beta</p>
-            <p>
-              Accounts will be in beta for the next few weeks while I make sure
-              everything works well. During the beta, things may change a bit
-              and there may be the occasional bug. Your projects are also kept
-              in your browser, so they stay safe even if syncing has a hiccup.
-            </p>
 
             <h2 class="text-2xl font-bold">Feedback</h2>
             <p>
-              This is a big update, and I'd love to hear how it works for you.
-              If you have feedback of any kind, or run into any issues, please
-              let me know through any of the methods listed on the
+              Thank you to everyone who uses the site and shares ideas; many of
+              these changes came from you. If you have feedback or run into any
+              issues, please let me know through the
               <a href="/contact" class="link">contact page</a>. Thank you!
             </p>
           </div>

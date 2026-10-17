@@ -298,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             If <EmailText {email} /> has an account, we sent it a code.
           </p>
           <p class="text-sm opacity-80" data-testid="sign-ups-paused">
-            New sign-ups are paused while the beta is full. Try again later.
+            New sign-ups are paused for now. Try again later.
           </p>
         {:else}
           <p>
