@@ -18,9 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
-  import ProjectDetails from '#lib/components/ProjectDetails.svelte';
   import SavedProjectCard from '#lib/components/SavedProjectCard.svelte';
-  import { drawInFrame, hasThumbnail } from '#lib/storage/thumbnails.js';
+  import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
   import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
@@ -42,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
   import { sync, syncLabelFor } from '#lib/sync/status.svelte.js';
-  import { withoutVersion } from '#lib/utils/gallery-link-utils.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import type { LibraryFilters } from '#lib/state/library-filters.svelte.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
@@ -55,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortLibrary,
   } from '#lib/utils/collection-filter.js';
   import { FolderOpenIcon, XIcon } from '@lucide/svelte';
-  import { SvelteSet } from 'svelte/reactivity';
 
   // The Menu shows a few recent projects with a link to the My Projects page,
   // which shows them all under its own heading, as cards (the gallery's), with
@@ -104,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return;
     slots.remember(item.id, layout);
     // Back from the Trash, its card waits for the drawing to look again
-    settled.delete(pictureKey(item.id, item.meta.href));
+    pictures.forget(item.id, item.meta.href);
     undos.add(
       item.id,
       labelFor(item),
@@ -257,38 +254,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // On My Projects, each project without a picture of its current version
-  // gets one in the background, one at a time (see thumbnails.ts); its card
-  // shows it as soon as it's kept, and a placeholder until the drawing is
-  // done with it (by version: an edited project is drawn again)
-  let picturesVersion = $state(0);
-  const settled = new SvelteSet<string>();
-  const pictureKey = (id: string, href: string) =>
-    `${id} ${withoutVersion(href)}`;
+  // gets one in the background (see project-pictures.svelte.ts)
+  const pictures = new ProjectPictures();
   $effect(() => {
     if (!onMyProjectsPage || !loaded) return;
-    const queue = projects.map(({ id, meta }) => ({ id, href: meta.href }));
-    let stopped = false;
-    let cancel: (() => void) | null = null;
-    void (async () => {
-      for (const { id, href } of queue) {
-        if (stopped) return;
-        if (await hasThumbnail(id, href)) {
-          settled.add(pictureKey(id, href));
-          continue;
-        }
-        const drawing = drawInFrame(id, href);
-        cancel = drawing.cancel;
-        const ok = await drawing.done;
-        cancel = null;
-        if (stopped) return;
-        settled.add(pictureKey(id, href));
-        if (ok) picturesVersion++;
-      }
-    })();
-    return () => {
-      stopped = true;
-      cancel?.();
-    };
+    return pictures.draw(
+      projects.map(({ id, meta }) => ({ id, href: meta.href })),
+    );
   });
 
   $effect(() => {
@@ -376,10 +348,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="w-full" {@attach slots.track(card.key)}>
             <SavedProjectCard
               item={project}
-              {picturesVersion}
-              pictureSettled={settled.has(
-                pictureKey(project.id, project.meta.href),
-              )}
+              picturesVersion={pictures.version}
+              pictureSettled={pictures.isSettled(project.id, project.meta.href)}
               layout={grid ? 'grid' : 'list'}
               syncLabel={__ACCOUNTS_ENABLED__
                 ? syncLabelFor(project, signedIn)
@@ -395,21 +365,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/each}
         {@render undoAt(null, true)}
-      </div>
-    {:else}
-      <div class="flex w-full flex-col items-start justify-center gap-2">
-        {#each shown as project (project.id)}
-          {@const { meta } = project}
-          {@render undoAt(project.id)}
-          <ProjectDetails
-            project={meta}
-            canRemove={false}
-            syncLabel={__ACCOUNTS_ENABLED__
-              ? syncLabelFor(project, signedIn)
-              : undefined}
-          />
-        {/each}
-        {@render undoAt(null)}
       </div>
     {/if}
     {#if limit}

@@ -21,6 +21,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import ProjectPicture from '#lib/components/ProjectPicture.svelte';
+  import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { toast } from '#lib/state/page-state.svelte.js';
@@ -132,6 +133,19 @@ device, restored everywhere (see $lib/storage/account-trash). -->
       }
   });
 
+  // Projects' pictures, drawn here if they have none yet (the hidden frame
+  // never saves, so it can't bring one back from the Trash)
+  const pictures = new ProjectPictures();
+  $effect(() =>
+    pictures.draw(
+      entries.flatMap((entry) =>
+        entry.kind === 'project' && entry.href
+          ? [{ id: entry.id, href: entry.href }]
+          : [],
+      ),
+    ),
+  );
+
   async function run(action: () => Promise<void>, errorMessage: string) {
     confirming = null;
     try {
@@ -194,6 +208,9 @@ device, restored everywhere (see $lib/storage/account-trash). -->
             <ProjectPicture
               id={entry.id}
               href={entry.href ?? ''}
+              picturesVersion={pictures.version}
+              pictureSettled={!entry.href ||
+                pictures.isSettled(entry.id, entry.href)}
               imageClass="h-24 w-20 shrink-0 object-contain"
               coverClass="h-24 w-20 shrink-0"
               stripHeight="50px"

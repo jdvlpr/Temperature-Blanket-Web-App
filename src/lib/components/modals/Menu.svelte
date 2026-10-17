@@ -46,12 +46,13 @@ button to it. -->
     trashOpenProject,
   } from '#lib/storage/autosave.svelte.js';
   import {
-    lastSavedAt,
     ProjectStorage,
     savedProjects,
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
   import ProjectPicture from '#lib/components/ProjectPicture.svelte';
+  import { savedLine } from '#lib/utils/saved-line.js';
+  import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import { rememberJustTrashed, TRASH_DAYS } from '#lib/storage/trash.js';
   import { sync } from '#lib/sync/status.svelte.js';
   import { saveProject } from '#lib/utils/save-project.svelte.js';
@@ -165,19 +166,6 @@ button to it. -->
     }
   }
 
-  // When each was saved, as on My Library's cards
-  const savedLine = (item: StoredProjectIndexItem) => {
-    const saved = lastSavedAt(item);
-    return `Saved ${
-      saved
-        ? new Date(saved).toLocaleString(undefined, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          })
-        : item.meta.date
-    }`;
-  };
-
   // A few recent projects, not counting this one
   let recent = $state<StoredProjectIndexItem[]>([]);
   let recentTotal = $state(0);
@@ -192,6 +180,11 @@ button to it. -->
       recent = all.filter((item) => item.id !== openId).slice(0, 3);
     });
   });
+  // Their pictures, drawn while the menu's open if they have none yet
+  const pictures = new ProjectPictures();
+  $effect(() =>
+    pictures.draw(recent.map(({ id, meta }) => ({ id, href: meta.href }))),
+  );
 </script>
 
 <!-- Save, until the project saves by itself; the Project button's dot (in
@@ -413,11 +406,12 @@ the same color) says it's waiting here -->
               data-sveltekit-reload
               class={ROW}
             >
-              <!-- Its picture, as on My Library (only drawn there; until
-              then, its colors) -->
+              <!-- Its picture, as on My Library -->
               <ProjectPicture
                 id={item.id}
                 href={item.meta.href}
+                picturesVersion={pictures.version}
+                pictureSettled={pictures.isSettled(item.id, item.meta.href)}
                 imageClass="h-14 w-12 shrink-0 object-contain"
                 coverClass="h-14 w-12 shrink-0"
                 stripHeight="40px"

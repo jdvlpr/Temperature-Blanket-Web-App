@@ -21,10 +21,12 @@ someone asks to add them from My Library (`later`). -->
 <script lang="ts">
   import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
-  import ProjectDetails from '#lib/components/ProjectDetails.svelte';
+  import ProjectPicture from '#lib/components/ProjectPicture.svelte';
+  import { savedLine } from '#lib/utils/saved-line.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { PaletteStorage } from '#lib/storage/palettes.svelte.js';
+  import { ProjectPictures } from '#lib/storage/project-pictures.svelte.js';
   import {
     ProjectStorage,
     type StoredProjectIndexItem,
@@ -90,6 +92,12 @@ someone asks to add them from My Library (`later`). -->
       });
   });
 
+  // Projects' pictures, as on My Library, drawn here if they have none yet
+  const pictures = new ProjectPictures();
+  $effect(() =>
+    pictures.draw(projects.map(({ id, meta }) => ({ id, href: meta.href }))),
+  );
+
   function chooseAll(all: boolean) {
     chosenProjects = all ? [...ids] : [];
     chosenPalettes = all ? [...paletteIds] : [];
@@ -101,6 +109,11 @@ someone asks to add them from My Library (`later`). -->
   const ICON = 'mt-0.5 shrink-0';
   const DETAIL = 'block text-sm opacity-75';
   const CHOICE = 'flex cursor-pointer items-center gap-3';
+  // Its picture (a palette, its colors) beside its name, as in the Trash
+  const COVER = 'h-24 w-20 shrink-0';
+  const NAME = 'line-clamp-2 text-sm font-semibold break-words';
+  const projectLabel = (project: StoredProjectIndexItem) =>
+    project.meta.name || project.meta.title || 'Untitled Project';
 
   const plural = (n: number) => (n === 1 ? 'project' : 'projects');
   const palettesLabel = (n: number) =>
@@ -176,20 +189,30 @@ someone asks to add them from My Library (`later`). -->
         <span class="font-bold">Select all</span>
       </label>
     {/if}
-    <!-- The same cards as in My Library, so projects are easy to tell apart -->
+    <!-- Their pictures, as in My Library, so projects are easy to tell apart -->
     {#each projects as project (project.id)}
       <label class={CHOICE}>
         <input
           type="checkbox"
           class="checkbox shrink-0"
           value={project.id}
-          aria-label="Add {project.meta.name ||
-            project.meta.title ||
-            'Untitled project'}"
+          aria-label="Add {projectLabel(project)}"
           bind:group={chosenProjects}
         />
-        <span class="block min-w-0 flex-1">
-          <ProjectDetails project={project.meta} canRemove={false} />
+        <ProjectPicture
+          id={project.id}
+          href={project.meta.href}
+          picturesVersion={pictures.version}
+          pictureSettled={pictures.isSettled(project.id, project.meta.href)}
+          imageClass="{COVER} object-contain"
+          coverClass={COVER}
+          stripHeight="50px"
+        />
+        <span class="flex min-w-0 flex-1 flex-col">
+          <span class={NAME}>{projectLabel(project)}</span>
+          <span class="text-surface-700-300 line-clamp-1 text-xs"
+            >{savedLine(project)}</span
+          >
         </span>
       </label>
     {/each}
@@ -201,10 +224,12 @@ someone asks to add them from My Library (`later`). -->
           value={palette.id}
           bind:group={chosenPalettes}
         />
-        <span class="flex min-w-0 flex-1 flex-col gap-1">
-          <span class="truncate font-semibold">{palette.label}</span>
-          <PaletteStrip colors={palette.colors} height="24px" insideControl />
+        <span class="flex items-center {COVER}" aria-hidden="true">
+          <span class="w-full">
+            <PaletteStrip colors={palette.colors} height="50px" insideControl />
+          </span>
         </span>
+        <span class="min-w-0 flex-1 {NAME}">{palette.label}</span>
       </label>
     {/each}
   </fieldset>
