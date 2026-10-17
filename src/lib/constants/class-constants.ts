@@ -21,11 +21,12 @@ export const ROW_FOCUS =
 
 // A palette or project as a card, wherever they're listed: a raised box. Its
 // colors or picture take rounded-*-nested corners, so they follow the box's,
-// less its padding. CARD_HOVER steps it darker, when it opens something.
+// less its padding. CARD_HOVER steps it darker, when it opens something (and
+// its buttons' hovers a step further, card-hover in main.css).
 export const CARD_BOX =
   'bg-surface-100 dark:bg-surface-900 rounded-container card-border p-2';
 export const CARD_HOVER =
-  'hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors';
+  'card-hover hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors';
 
 // For the list itself: its first row rounds its top corners and its last row
 // its bottom ones, like the list does, so a focused row's ring follows the

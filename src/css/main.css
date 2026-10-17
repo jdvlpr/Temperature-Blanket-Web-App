@@ -225,6 +225,17 @@ image can't use currentColor) */
   }
 }
 
+/* Buttons on a card that steps darker on hover (CARD_HOVER) would hover, press
+   and stay open in the card's own hover color, so they step a shade further. */
+.card-hover:hover
+  :is(
+    .hover\:preset-tonal-surface:hover:not(:disabled),
+    .active\:bg-surface-200-800:active,
+    .data-\[state\=open\]\:bg-surface-200-800[data-state='open']
+  ) {
+  background-color: var(--color-surface-300-700);
+}
+
 /* Stacked segmented controls: the box takes the container's corners and its
    options follow them (less its padding), as menus do, so a tall box isn't a
    pill with pills inside it. */
