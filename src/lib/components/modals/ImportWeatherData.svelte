@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '#lib/components/Spinner.svelte';
   import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
   import { weather } from '#lib/state/weather-state.svelte.js';
+  import { projectChanged } from '#lib/storage/autosave.svelte.js';
   import { CSVtoArray } from '#lib/utils/weather-utils.svelte.js';
   import {
     celsiusToFahrenheit,
@@ -181,6 +182,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       weather.setRawData(_rawData);
+      // Imported weather is the user's own, like an edit in the table: shown
+      // as Custom, kept when the project is saved and opened again, and never
+      // replaced by a search without asking
+      weather.isUserEdited = true;
+      projectChanged({ weather: true });
 
       imported = true;
       processing = false;
