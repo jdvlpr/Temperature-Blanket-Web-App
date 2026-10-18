@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Get New Days</span> adds the days since you last got
+      <span class="font-bold">Only New Days</span> adds the days since you last got
       its weather, for a project that's still going.
     </li>
     <li>

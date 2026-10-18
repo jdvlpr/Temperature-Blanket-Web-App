@@ -51,13 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#snippet buttonContent()}
-  {#if weather.isUserEdited}
-    Reload Weather Data
-  {:else if kept}
-    Search Again
-  {:else}
-    Search
-  {/if}
+  Get Weather Data
   <ChevronRightIcon />
 {/snippet}
 
@@ -88,12 +82,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   >
     <Menu.Trigger class={BUTTON}>
-      Weather Data
-      <!-- Shown while days are waiting, as What's New shows its news -->
+      Get Weather Data
+      <!-- Shown while days are waiting -->
       {#if weatherDays.newDaysCount}
-        <span
-          class="badge preset-filled-surface-50-950 px-2 py-0.5 text-xs"
-          data-testid="new-days-available"
+        <span class="opacity-80" data-testid="new-days-available"
           ><span class="sr-only">,</span>
           {weatherDays.newDaysCount} new<span class="sr-only">
             {weatherDays.newDaysCount === 1 ? 'day' : 'days'}</span
@@ -105,21 +97,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Portal>
       <Menu.Positioner>
         <Menu.Content class={menuContentClass}>
-          <Menu.Item
-            value="new-days"
-            class={menuItemClass}
-            disabled={!weatherDays.newDaysCount}
-          >
-            <CalendarPlusIcon class="shrink-0" aria-hidden="true" />
-            <div class="flex min-w-0 flex-col text-left">
-              <span>{WEATHER_ACTIONS['new-days'].label}</span>
-              <span class="text-surface-700-300 text-xs"
-                >{weatherDays.newDaysCount
-                  ? WEATHER_ACTIONS['new-days'].description
-                  : WEATHER_ACTIONS['new-days'].upToDate}</span
-              >
-            </div>
-          </Menu.Item>
+          {#if weatherDays.newDaysCount}
+            <Menu.Item
+              value="new-days"
+              class={menuItemClass}
+              disabled={!weatherDays.newDaysCount}
+            >
+              <CalendarPlusIcon class="shrink-0" aria-hidden="true" />
+              <div class="flex min-w-0 flex-col text-left">
+                <span>{WEATHER_ACTIONS['new-days'].label}</span>
+                <span class="text-surface-700-300 text-xs"
+                  >{weatherDays.newDaysCount
+                    ? WEATHER_ACTIONS['new-days'].description
+                    : WEATHER_ACTIONS['new-days'].upToDate}</span
+                >
+              </div>
+            </Menu.Item>
+          {/if}
           <Menu.Item value="again" class={menuItemClass}>
             <RefreshCwIcon class="shrink-0" aria-hidden="true" />
             <div class="flex min-w-0 flex-col text-left">

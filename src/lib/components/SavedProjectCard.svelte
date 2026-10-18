@@ -161,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {href}
               data-sveltekit-reload
               title={linkTitle}
-              class="line-clamp-2 min-w-0 text-sm font-semibold break-words"
+              class="line-clamp-3 min-w-0 text-sm font-semibold break-words"
               >{label}</a
             >
           </span>

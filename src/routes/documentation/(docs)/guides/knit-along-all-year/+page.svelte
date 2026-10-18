@@ -97,7 +97,7 @@ changing saved ones (modals/SearchAgain.svelte). -->
     <li>
       The <span class="font-bold">Weather Data</span> button shows how many new
       days are waiting. Press it, then
-      <span class="font-bold">Get New Days</span>. Only the days since are
+      <span class="font-bold">Only New Days</span>. Only the days since are
       added: the days you've already made stay as they were saved.
     </li>
     <li>

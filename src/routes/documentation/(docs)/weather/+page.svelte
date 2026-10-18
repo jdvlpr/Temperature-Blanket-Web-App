@@ -64,13 +64,13 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="saved-weather-days" class="text-2xl font-bold">Saved Weather</h2>
   <SavedWeatherDays />
-  <h3 class="text-lg font-bold">Get New Days</h3>
+  <h3 class="text-lg font-bold">Only New Days</h3>
   <p>
     For a project that's still going, the
     <span class="font-bold">Weather Data</span> button shows how many new days
     are waiting. Press it, then
-    <span class="font-bold">Get New Days</span>. Only those days are added. It's
-    in the Project menu too.
+    <span class="font-bold">Only New Days</span>. Only those days are added.
+    It's in the Project menu too.
   </p>
   <h3 class="text-lg font-bold">Search Again</h3>
   <p>

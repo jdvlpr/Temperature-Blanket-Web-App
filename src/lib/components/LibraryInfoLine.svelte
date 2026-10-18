@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if publishedOn}
     <GlobeIcon class="icon-sm mr-1 shrink-0" aria-hidden="true" />
   {/if}
-  <span class="truncate">{publishedOn || saved}</span>
+  <span class="clamp-2">{publishedOn || saved}</span>
 </span>
 {#if publishedOn && views}
   <span class="text-surface-700-300 flex min-w-0 items-center text-xs">

@@ -253,8 +253,8 @@ class WeatherSearch {
     toast.trigger({
       category: 'success',
       message: added
-        ? `Added ${added} new ${pluralize('day', added)}. No changes found to your saved days.`
-        : 'No changes found.',
+        ? `Added ${added} new ${pluralize('day', added)}. Weather data is up to date.`
+        : 'Weather data is up to date.',
     });
   }
 
