@@ -47,6 +47,16 @@ type LocalStatePreferencesType = {
   fillColor?: boolean;
   /** The PDF's last choices; its layout, fill and days start as the View menu's; missing until first downloaded */
   pdf?: SavedPdfSettings;
+  /**
+   * Search Again: which values it compares (`all`, or only those the
+   * project's gauges use) and whether a newer value someone kept the old one
+   * over is asked about again only once it changes again (`changed`) or
+   * every time (`every`); missing until first changed (all, changed)
+   */
+  weatherChanges?: {
+    compare?: 'all' | 'gauges';
+    ask?: 'changed' | 'every';
+  };
   /** My Projects' View menu: projects and palettes as cards in a grid, or one per row; missing until first changed (grid) */
   myProjectsLayout?: PageLayout;
 };

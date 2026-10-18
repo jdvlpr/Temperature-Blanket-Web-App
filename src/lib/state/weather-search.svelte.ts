@@ -21,6 +21,19 @@ import type { LocationType } from '#lib/types/location-types.js';
 import type { WeatherDay } from '#lib/types/weather-types.js';
 import { setSeasonsByLocation } from '#lib/utils/seasons-utils.svelte.js';
 import { useStartingPalette } from '#lib/state/starting-palette.js';
+import { weatherDays } from '#lib/state/weather-days.svelte.js';
+import { toast } from '#lib/state/page-state.svelte.js';
+import { projectChanged } from '#lib/storage/autosave.svelte.js';
+import { pluralize } from '#lib/utils/string-utils.js';
+import {
+  addDays,
+  dayKey,
+  hasValues,
+  isoOf,
+  mergeNewDays,
+  type DeclinedValues,
+} from '#lib/utils/weather-days.js';
+import type { TISO8601DateString } from '#lib/types/weather-types.js';
 
 /** The weather already there, to put back if the search is cancelled */
 type Restore = {
@@ -33,12 +46,24 @@ type Restore = {
 class AbortedError extends Error {}
 
 /**
+ * What a search does: `search` gets every day and replaces the weather (a
+ * new project, or new locations, dates or source); `new-days` gets only the
+ * days since the last ones got; `again` gets every day again, adds the new
+ * ones and asks before changing saved ones.
+ */
+export type SearchMode = 'search' | 'new-days' | 'again';
+
+/** Each location's days to get, or null to skip it */
+type Ranges = ({ from: TISO8601DateString; to: TISO8601DateString } | null)[];
+
+/**
  * Searching for every location's weather data, shown full screen
  * (WeatherSearchOverlay). It can be cancelled at any point, which stops the
  * requests and leaves the project's weather as it was.
  */
 class WeatherSearch {
   active = $state(false);
+  mode = $state<SearchMode>('search');
   /** The location being searched */
   label = $state('');
   /** Its position in the list */
@@ -53,8 +78,12 @@ class WeatherSearch {
    * @param onCancel Runs if the search is cancelled or fails, e.g. to put back
    * the weather source settings that started it
    */
-  start({ onCancel }: { onCancel?: () => void } = {}) {
+  start({
+    onCancel,
+    mode = 'search',
+  }: { onCancel?: () => void; mode?: SearchMode } = {}) {
     if (this.active) return;
+    this.mode = mode;
     this.#restore = {
       rawData: $state.snapshot(weather.rawData) as WeatherDay[],
       isUserEdited: weather.isUserEdited,
@@ -96,11 +125,30 @@ class WeatherSearch {
 
   async #run(abort: AbortController) {
     controller.value = abort;
+    const mode = this.mode;
     try {
-      const data = await this.#fetchAll(abort.signal);
+      const ranges = mode === 'new-days' ? weatherDays.newDays : null;
+      const data = await this.#fetchAll(
+        abort.signal,
+        ranges && withDaysBefore(ranges),
+      );
       if (abort.signal.aborted) return;
       controller.value = null;
+      this.#restore = null;
+      this.#onCancel = null;
+      if (mode === 'new-days') {
+        this.active = false;
+        this.#addNewDays(data, ranges ?? []);
+        return;
+      }
+      if (mode === 'again') {
+        this.active = false;
+        await this.#searchedAgain(data);
+        return;
+      }
       weather.setRawData(data);
+      weatherDays.got(data, { all: true });
+      weatherDays.declined = {};
       // Add the default temperature gauge, with the palette the project was
       // started from, if any
       gauges.addById('temp');
@@ -112,8 +160,6 @@ class WeatherSearch {
       }
       weather.isUserEdited = false;
       weather.wasLoadedFromStorage = false;
-      this.#restore = null;
-      this.#onCancel = null;
       this.active = false;
       await goToProjectSection(2, true);
       // Auto-set seasons based on the first location's hemisphere
@@ -126,6 +172,69 @@ class WeatherSearch {
       this.error =
         (e as Error)?.message || 'Something went wrong. Please try again.';
     }
+  }
+
+  /** Puts the days just got in place of the blank ones saved for them */
+  #addNewDays(data: WeatherDay[], ranges: Ranges) {
+    const added = data.filter((day) => {
+      const range = ranges[day.location];
+      const date = isoOf(day.date);
+      return (
+        !!range && date >= range.from && date <= range.to && hasValues(day)
+      );
+    });
+    const locationsGot = ranges.flatMap((range, index) =>
+      range ? [index] : [],
+    );
+    if (added.length) {
+      weather.updateRawData(
+        mergeNewDays($state.snapshot(weather.rawData) as WeatherDay[], added),
+      );
+      projectChanged({ weather: true });
+    }
+    weatherDays.got(added, { all: false, locationsGot });
+    toast.trigger({
+      category: added.length ? 'success' : 'info',
+      message: added.length
+        ? `Added ${added.length} new ${pluralize('day', added.length)}.`
+        : "No new days yet. The weather source doesn't have them yet; try again later.",
+    });
+  }
+
+  /**
+   * Every day got again: new days go in, and the saved days it got
+   * differently are shown to choose from (SearchAgain.svelte).
+   */
+  async #searchedAgain(data: WeatherDay[]) {
+    const before = $state.snapshot(weather.rawData) as WeatherDay[];
+    const fetchedThrough = $state.snapshot(
+      weatherDays.fetchedThrough,
+    ) as (TISO8601DateString | null)[];
+    const declined = $state.snapshot(weatherDays.declined) as DeclinedValues;
+    // Days after the last ones got are new: added without asking
+    const isNew = (day: WeatherDay) => {
+      const through = fetchedThrough[day.location];
+      return hasValues(day) && (!through || isoOf(day.date) > through);
+    };
+    const newDays = data.filter(isNew);
+    const saved = newDays.length ? mergeNewDays(before, newDays) : before;
+    if (newDays.length) {
+      weather.updateRawData(saved);
+      projectChanged({ weather: true });
+    }
+    // Every day was got: early ones are only those still early now
+    weatherDays.got(data, { all: true });
+    const added = new Set(newDays.map(dayKey)).size;
+    const { changesFor, openSearchAgain } =
+      await import('#lib/components/modals/search-again.js');
+    const result = { saved, got: data, fetchedThrough, declined, added };
+    if (changesFor(result).length) return openSearchAgain(result);
+    toast.trigger({
+      category: 'success',
+      message: added
+        ? `Added ${added} new ${pluralize('day', added)}. No changes found to your saved days.`
+        : 'No changes found.',
+    });
   }
 
   /**
@@ -142,7 +251,11 @@ class WeatherSearch {
     }
   }
 
-  async #fetchAll(signal: AbortSignal): Promise<WeatherDay[]> {
+  /** Gets every location's days, or only `ranges` (skipping null ones) */
+  async #fetchAll(
+    signal: AbortSignal,
+    ranges: Ranges | null = null,
+  ): Promise<WeatherDay[]> {
     const stopIfCancelled = () => {
       if (signal.aborted) throw new AbortedError();
     };
@@ -154,6 +267,12 @@ class WeatherSearch {
       thisLocation += 1
     ) {
       const location = locations.all[thisLocation];
+      const range = ranges ? ranges[thisLocation] : undefined;
+      if (range === null) {
+        // Nothing new here; keeps each location's place in the list
+        tempAllData.push([]);
+        continue;
+      }
 
       this.label = location.label ?? '';
       this.index = thisLocation;
@@ -193,7 +312,9 @@ class WeatherSearch {
           try {
             // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
             // we have to manually copy each property to a new non-proxy object
-            const { lat, lng, from, to, id, index, elevation } = location;
+            const { lat, lng, id, index, elevation } = location;
+            const from = range?.from ?? location.from;
+            const to = range?.to ?? location.to;
 
             const _location = { lat, lng, from, to, id, index, elevation };
 
@@ -240,7 +361,9 @@ class WeatherSearch {
         ) {
           try {
             // Uses the controller's signal
-            const data = await weather.getOpenMeteo({ location });
+            const data = await weather.getOpenMeteo({
+              location: range ? requestFor(location, range) : location,
+            });
             tempAllData.push(data);
             location.source = 'Open-Meteo';
           } catch (error) {
@@ -265,6 +388,32 @@ class WeatherSearch {
     tempAllData = [];
     return allData;
   }
+}
+
+/**
+ * New days' ranges starting up to two weeks sooner (not before the
+ * location's From date): days a source doesn't have yet come back blank, and
+ * a request of only blank days fails as if the place had no weather.
+ */
+function withDaysBefore(ranges: Ranges): Ranges {
+  return ranges.map((range, index) => {
+    if (!range) return null;
+    const from = locations.all[index]?.from;
+    const sooner = addDays(range.from, -14);
+    return { from: from && from > sooner ? from : sooner, to: range.to };
+  });
+}
+
+/**
+ * A location as getOpenMeteo() reads it, for only some of its days. A plain
+ * copy, so what it sets (stations) stays off the location.
+ */
+function requestFor(
+  location: LocationType,
+  range: { from: TISO8601DateString; to: TISO8601DateString },
+): LocationType {
+  const { lat, lng, id, index, elevation, label } = location;
+  return { lat, lng, id, index, elevation, label, ...range } as LocationType;
 }
 
 export const weatherSearch = new WeatherSearch();

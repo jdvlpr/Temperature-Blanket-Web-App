@@ -44,6 +44,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const several = $derived(locations.all.length > 1);
 
+  const TITLES = {
+    search: 'Searching for Weather Data',
+    'new-days': 'Getting New Days',
+    again: 'Searching Again',
+  } as const;
+
   // Stops the search and puts the project back as it was
   async function back() {
     weatherSearch.cancel();
@@ -103,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <Spinner size="36" />
                   <div class="flex w-full flex-col items-center gap-2">
                     <Dialog.Title class="text-xl font-bold"
-                      >Searching for Weather Data</Dialog.Title
+                      >{TITLES[weatherSearch.mode]}</Dialog.Title
                     >
                     <p role="status" class="min-h-6">
                       {weatherSearch.label}

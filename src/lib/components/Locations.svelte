@@ -20,6 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations } from '#lib/state/location-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
+  import { weatherDays } from '#lib/state/weather-days.svelte.js';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import { stringToDate } from '#lib/utils/date-utils.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
@@ -52,6 +54,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else if project.status.wasLoaded}
         Loaded project
       {/if}
+      {#if weatherDays.newDaysCount}
+        <span aria-hidden="true">·</span>
+        <span data-testid="new-days-available"
+          >{weatherDays.newDaysCount} new {pluralize(
+            'day',
+            weatherDays.newDaysCount,
+          )} available</span
+        >
+      {/if}
+    </p>
+  {/if}
+
+  <!-- Days got while their values were early, which have settled since -->
+  {#if !loading && weatherDays.settledEarly.length}
+    {@const count = weatherDays.settledEarly.length}
+    <p
+      class="mt-1 flex w-full flex-wrap items-center justify-center gap-x-1 text-center text-sm"
+      data-testid="early-days-settled"
+    >
+      Your last {count === 1 ? 'day was' : `${count} days were`} early data, which
+      may have changed since.
+      <button
+        type="button"
+        class="anchor"
+        onclick={() => weatherSearch.start({ mode: 'again' })}
+        >Search Again</button
+      >
     </p>
   {/if}
 

@@ -58,6 +58,15 @@ vi.mock('#lib/state/weather-state.svelte.js', () => ({
   getMoonPhase: vi.fn(() => 0),
 }));
 
+const vi_mockWeatherDays = vi.hoisted(() => ({
+  loaded: vi.fn(),
+  toStored: vi.fn(() => ({ fetchedThrough: [], early: {}, declined: {} })),
+}));
+
+vi.mock('#lib/state/weather-days.svelte.js', () => ({
+  weatherDays: vi_mockWeatherDays,
+}));
+
 vi.mock('#lib/state/location-state.svelte.js', () => ({
   locations: {
     projectTitle: 'Test Project',
@@ -326,7 +335,12 @@ describe('ProjectStorage', () => {
       expect(vi_mockWeather.setRawData).toHaveBeenCalled();
     });
 
-    it('does not load weather that reaches past the creation date', async () => {
+    it('loads weather that reaches past the creation date, with what was kept about it', async () => {
+      const kept = {
+        fetchedThrough: ['2025-01-01'],
+        early: {},
+        declined: {},
+      };
       await ProjectStorage.save({
         id: UUID,
         localProject: storedProject({
@@ -334,14 +348,20 @@ describe('ProjectStorage', () => {
           href: `http://localhost/?project=${UUID}`,
           isCustomWeatherData: false,
           weatherData,
-        }),
+          weatherDays: kept,
+        } as any),
       });
       openProject(UUID);
+      vi_mockWeatherDays.loaded.mockClear();
       await ProjectStorage.load();
-      expect(vi_mockWeather.setRawData).not.toHaveBeenCalled();
+      expect(vi_mockWeather.setRawData).toHaveBeenCalled();
+      expect(vi_mockWeatherDays.loaded).toHaveBeenCalledWith(
+        expect.any(Array),
+        kept,
+      );
     });
 
-    it('with no known creation date, loads only user-edited weather', async () => {
+    it('with no known creation date, still loads its weather', async () => {
       await ProjectStorage.save({
         id: UUID,
         localProject: storedProject({
@@ -352,18 +372,18 @@ describe('ProjectStorage', () => {
       });
       openProject(UUID);
       await ProjectStorage.load();
-      expect(vi_mockWeather.setRawData).not.toHaveBeenCalled();
-
-      await ProjectStorage.save({
-        id: UUID,
-        localProject: storedProject({
-          href: `http://localhost/?project=${UUID}`,
-          isCustomWeatherData: true,
-          weatherData,
-        }),
-      });
-      await ProjectStorage.load();
       expect(vi_mockWeather.setRawData).toHaveBeenCalled();
+    });
+
+    it('saves what is known about its weather days', async () => {
+      openProject(UUID);
+      await ProjectStorage.save();
+      const stored = await ProjectStorage.getById(UUID);
+      expect(stored?.weatherDays).toEqual({
+        fetchedThrough: [],
+        early: {},
+        declined: {},
+      });
     });
   });
 

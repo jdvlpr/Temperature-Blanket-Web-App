@@ -44,6 +44,8 @@ const DEFAULTS: Record<SyncedPreferenceKey, unknown> = {
   'theme.mode': 'system',
   'theme.roundness': 'pill',
   'theme.headingStyle': 'classic',
+  'weatherChanges.compare': 'all',
+  'weatherChanges.ask': 'changed',
 };
 
 export type PreferencesSyncState = {
@@ -77,19 +79,28 @@ function writeState(state: PreferencesSyncState) {
   }
 }
 
+// A nested preference's group (`theme`, `weatherChanges`) and field
+const groupOf = (key: SyncedPreferenceKey) => {
+  const [group, field] = key.split('.') as ['theme' | 'weatherChanges', string];
+  return { group, field };
+};
+
 function getValue(key: SyncedPreferenceKey): unknown {
   if (key === 'defaultYarn') return preferences.value.defaultYarn ?? '';
-  const field = key.slice(
-    'theme.'.length,
-  ) as keyof typeof preferences.value.theme;
-  return preferences.value.theme[field] ?? DEFAULTS[key];
+  const { group, field } = groupOf(key);
+  const values = preferences.value[group] as
+    Record<string, unknown> | undefined;
+  return values?.[field] ?? DEFAULTS[key];
 }
 
 function setValue(key: SyncedPreferenceKey, value: unknown) {
   if (key === 'defaultYarn') preferences.value.defaultYarn = value as string;
   else {
-    const field = key.slice('theme.'.length);
-    (preferences.value.theme as Record<string, unknown>)[field] = value;
+    const { group, field } = groupOf(key);
+    const values = preferences.value[group] as
+      Record<string, unknown> | undefined;
+    if (values) values[field] = value;
+    else preferences.value[group] = { [field]: value } as never;
   }
 }
 

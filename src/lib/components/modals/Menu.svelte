@@ -41,6 +41,13 @@ open in the panel, with a Back button to it. -->
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
+  import { weatherDays } from '#lib/state/weather-days.svelte.js';
+  import {
+    weatherSearch,
+    type SearchMode,
+  } from '#lib/state/weather-search.svelte.js';
+  import { WEATHER_ACTIONS } from '#lib/utils/weather-actions.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
   import {
     addOpenProjectToAccount,
     autosave,
@@ -57,6 +64,7 @@ open in the panel, with a Back button to it. -->
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
+    CalendarPlusIcon,
     ChevronRightIcon,
     CloudAlertIcon,
     CopyPlusIcon,
@@ -135,6 +143,12 @@ open in the panel, with a Back button to it. -->
   // opens in the panel with Back to this menu
   const shareRowsList = $derived(projectShareRows(shareName, shareItem));
   onMount(() => loadShareState('project'));
+
+  // Over the page, once this panel is out of the way
+  function searchWeather(mode: SearchMode) {
+    dialog.close();
+    weatherSearch.start({ mode });
+  }
 
   async function copyProject() {
     try {
@@ -310,6 +324,47 @@ the same color) says it's waiting here -->
         </button>
       </li>
     </PanelGroup>
+
+    <!-- Its weather again, as the planner's Weather Data menu offers -->
+    {#if weatherDays.canSearchAgain}
+      <PanelGroup heading="Weather Data">
+        {#if weatherDays.offersNewDays}
+          <li>
+            <button
+              type="button"
+              class={ROW}
+              disabled={!weatherDays.newDaysCount}
+              onclick={() => searchWeather('new-days')}
+            >
+              <CalendarPlusIcon class="shrink-0 opacity-70" />
+              <span class="flex flex-1 flex-col">
+                <span>{WEATHER_ACTIONS['new-days'].label}</span>
+                <span class="text-xs opacity-70"
+                  >{weatherDays.newDaysCount
+                    ? `${weatherDays.newDaysCount} new ${pluralize('day', weatherDays.newDaysCount)} available`
+                    : WEATHER_ACTIONS['new-days'].upToDate}</span
+                >
+              </span>
+            </button>
+          </li>
+        {/if}
+        <li>
+          <button
+            type="button"
+            class={ROW}
+            onclick={() => searchWeather('again')}
+          >
+            <RefreshCwIcon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>{WEATHER_ACTIONS.again.label}</span>
+              <span class="text-xs opacity-70"
+                >{WEATHER_ACTIONS.again.description}</span
+              >
+            </span>
+          </button>
+        </li>
+      </PanelGroup>
+    {/if}
 
     <PanelGroup heading="Share">
       <ShareRows rows={shareRowsList} />

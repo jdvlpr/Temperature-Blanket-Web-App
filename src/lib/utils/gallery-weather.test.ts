@@ -102,33 +102,14 @@ describe('galleryWeatherToLoad', () => {
     ).toBeNull();
   });
 
-  it('leaves a blanket published while in progress to a search', () => {
-    expect(
-      galleryWeatherToLoad(page(DAYS, { dateGmt: '2025-01-02T10:00:00' }), [
-        ...ONE_LOCATION,
-      ]),
-    ).toBeNull();
-    // Published on its last day, which wasn't over
-    expect(
-      galleryWeatherToLoad(page(DAYS, { dateGmt: '2025-01-03T23:00:00' }), [
-        ...ONE_LOCATION,
-      ]),
-    ).toBeNull();
-    // Published the day after its last day
-    expect(
-      galleryWeatherToLoad(page(DAYS, { dateGmt: '2025-01-04T00:30:00' }), [
-        ...ONE_LOCATION,
-      ]),
-    ).toHaveLength(3);
-  });
-
-  it('loads custom weather even when published in progress', () => {
-    expect(
-      galleryWeatherToLoad(
-        page(DAYS, { weatherSources: CUSTOM, dateGmt: '2025-01-02T10:00:00' }),
-        [...ONE_LOCATION],
-      ),
-    ).toHaveLength(3);
+  it('loads a blanket published while in progress, custom or not', () => {
+    for (const weatherSources of [OPEN_METEO, CUSTOM])
+      expect(
+        galleryWeatherToLoad(
+          page(DAYS, { weatherSources, dateGmt: '2025-01-02T10:00:00' }),
+          [...ONE_LOCATION],
+        ),
+      ).toHaveLength(3);
   });
 });
 

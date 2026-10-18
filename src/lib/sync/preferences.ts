@@ -28,6 +28,8 @@ export const SYNCED_PREFERENCE_KEYS = [
   'theme.mode',
   'theme.roundness',
   'theme.headingStyle',
+  'weatherChanges.compare',
+  'weatherChanges.ask',
 ] as const;
 
 export type SyncedPreferenceKey = (typeof SYNCED_PREFERENCE_KEYS)[number];
@@ -58,6 +60,8 @@ const ALLOWED: Partial<Record<SyncedPreferenceKey, readonly unknown[]>> = {
   'theme.mode': ['light', 'dark', 'system'],
   'theme.roundness': ['sharp', 'rounded', 'pill'],
   'theme.headingStyle': ['classic', 'playful', 'refined'],
+  'weatherChanges.compare': ['all', 'gauges'],
+  'weatherChanges.ask': ['changed', 'every'],
 };
 
 const MAX_TEXT_LENGTH = 100;

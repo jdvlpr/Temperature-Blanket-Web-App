@@ -19,6 +19,7 @@ import { dialog } from '#lib/state/page-state.svelte.js';
 import { previews } from '#lib/state/preview-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
+import { weatherDays } from '#lib/state/weather-days.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
@@ -67,6 +68,10 @@ export async function loadSavedProject(
   if (galleryWeather && locations.allValid && !weather.rawData.length)
     await loadGalleryWeather(galleryWeather);
 
+  // The days loaded were got for these locations and this source (which the
+  // link may have set after them)
+  if (weather.rawData.length) weatherDays.markCurrent();
+
   if (locations.allValid) project.status.wasLoaded = true;
 }
 
@@ -84,9 +89,12 @@ async function loadGalleryWeather(
   // A search may have started meanwhile
   if (!days || weather.rawData.length) return;
   weather.isUserEdited = isCustomGalleryWeather(page.weatherSources);
-  weather.setRawData(
-    days.map((day) => ({ ...day, moon: day.moon || getMoonPhase(day.date) })),
-  );
+  const loaded = days.map((day) => ({
+    ...day,
+    moon: day.moon || getMoonPhase(day.date),
+  }));
+  weather.setRawData(loaded);
+  weatherDays.loaded(loaded);
   weather.wasLoadedFromStorage = true;
 }
 
@@ -121,6 +129,7 @@ const setPreferences = ({
 /** Empties the app's state of the last project, as a fresh page has it */
 function resetProjectState(id: string | null) {
   weather.reset();
+  weatherDays.reset();
   locations.reset();
   gauges.reset();
   previews.reset();

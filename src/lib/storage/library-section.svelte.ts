@@ -58,7 +58,7 @@ export const librarySection = new Section<LibrarySection>(
   ['projects', 'palettes'],
 );
 
-export const gallerySection = new Section<LibrarySection>(
-  'gallery_section',
-  ['projects', 'palettes'],
-);
+export const gallerySection = new Section<LibrarySection>('gallery_section', [
+  'projects',
+  'palettes',
+]);

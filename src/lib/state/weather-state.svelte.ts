@@ -335,6 +335,18 @@ class WeatherClass {
     this.rawData = value;
   }
 
+  /**
+   * Days added or changed in place (new days, a search's newer values): the
+   * days already there keep their places, so the selected one stays.
+   */
+  updateRawData(value: WeatherDay[]) {
+    this.rawData = value;
+    this.currentIndex = Math.min(
+      this.currentIndex,
+      Math.max(0, this.data.length - 1),
+    );
+  }
+
   /** Back to a new project's weather, before another project loads */
   reset() {
     this.setRawData([]);

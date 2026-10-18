@@ -3,6 +3,8 @@ import { account } from '#lib/accounts/summary.svelte.js';
 import { locations } from '#lib/state/location-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
+import { weatherDays } from '#lib/state/weather-days.svelte.js';
+import type { StoredWeatherDays } from '#lib/utils/weather-days.js';
 import type { LocationType } from '#lib/types/location-types.js';
 import type {
   WeatherDay,
@@ -12,14 +14,10 @@ import type {
 import {
   dateToISO8601String,
   formatDateTime,
-  numberOfDays,
   stringToDate,
 } from '#lib/utils/date-utils.js';
 import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
-import {
-  newProjectId,
-  projectCreatedAtTime,
-} from '#lib/utils/project-id-utils.js';
+import { newProjectId } from '#lib/utils/project-id-utils.js';
 import { cleanName } from '#lib/utils/string-utils.js';
 import type {
   AccountSyncState,
@@ -86,6 +84,8 @@ export type StoredProject = {
   title: string;
   weatherData: WeatherDay[];
   weatherSource: WeatherSourceOptions;
+  /** How far its weather was got, its early days and newer values not used. Missing on projects saved by older versions. */
+  weatherDays?: StoredWeatherDays;
 };
 
 /**
@@ -776,31 +776,10 @@ export class ProjectStorage {
       return { ...n, date, moon };
     });
 
-    // Check if there are any days in the project past the day the project was created
-    const createdAtTime = projectCreatedAtTime({
-      createdAt: matchedProject.createdAt,
-      id,
-    });
-
-    // User-edited weather can't be fetched again, so always load it.
-    // Otherwise, if the creation date is unknown the stored weather may be incomplete, so don't load it.
-    if (createdAtTime === null && !matchedProject.isCustomWeatherData) return;
-
-    if (createdAtTime !== null) {
-      const latestDay = new Date(
-        Math.max(...newWeatherUngrouped.map((n) => n.date.getTime())),
-      ).getTime();
-
-      let daysInFuture = 0;
-      if (latestDay >= createdAtTime)
-        daysInFuture = numberOfDays(createdAtTime, latestDay);
-
-      // If there are days in the future and the weather is not custom, do not load weather from local storage
-      if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
-    }
-
-    // Set the weather data and indicate that it was loaded from storage
+    // Its saved days, always: opening a project never gets its weather
+    // again. Days since it was last got are offered (see weatherDays).
     weather.setRawData(newWeatherUngrouped);
+    weatherDays.loaded(newWeatherUngrouped, matchedProject.weatherDays);
     weather.wasLoadedFromStorage = true;
   }
 
@@ -849,6 +828,7 @@ export class ProjectStorage {
       title: _title,
       weatherData: weatherData as unknown as WeatherDay[],
       weatherSource: weatherSource as unknown as WeatherSourceOptions,
+      weatherDays: weatherDays.toStored(),
     };
   };
 }

@@ -83,12 +83,12 @@ const isStoredDay = (day: any) =>
 
 /**
  * The page's weather days to load into a project with these locations, or
- * null to leave the weather to a search: when the page has none, it doesn't
- * fit the locations' dates, or (unless edited by hand) the blanket was still
- * in progress when published, so later days would be missing.
+ * null to leave the weather to a search: when the page has none, or it
+ * doesn't fit the locations' dates. A blanket published while in progress
+ * loads too: the days since are offered as new ones (see weatherDays).
  */
 export function galleryWeatherToLoad(
-  { rawWeatherData, weatherSources, dateGmt, modifiedGmt }: GalleryWeather,
+  { rawWeatherData }: GalleryWeather,
   locations: { from?: TISO8601DateString; to?: TISO8601DateString }[],
 ): WeatherDay[] | null {
   let stored: unknown;
@@ -118,15 +118,6 @@ export function galleryWeatherToLoad(
       return null;
   }
   if (days.some((day) => day.location >= locations.length)) return null;
-
-  // Edited weather can't be searched again, so it loads however it ends
-  if (isCustomGalleryWeather(weatherSources)) return days;
-
-  // The days from the one it was published (or last updated) on weren't all in yet
-  const publishedAt = new Date(`${modifiedGmt ?? dateGmt}Z`);
-  if (Number.isNaN(publishedAt.getTime())) return null;
-  const publishedOn = stringToDate(dateToISO8601String(publishedAt));
-  if (days.some((day) => day.date >= publishedOn)) return null;
 
   return days;
 }
