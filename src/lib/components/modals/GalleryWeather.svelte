@@ -116,13 +116,18 @@ or copies others published). Asked every time the link opens. -->
       {/each}
     </fieldset>
   {:else if pages[0]}
-    <p>This project has a gallery page with its weather.</p>
+    <p>
+      This project has a gallery page with weather data from when it was
+      published.
+    </p>
     <div class={[CARD_BOX, 'flex items-center gap-3']}>
       {@render card(pages[0])}
     </div>
   {/if}
   <p class="text-surface-700-300 text-sm">
-    Not loading it means searching for the weather of every date.
+    There may have been updates to the weather data since the project was
+    published. You can see if there are any updates by loading the gallery page
+    weather data and searching for weather again.
   </p>
   <DialogFooter>
     <button

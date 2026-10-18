@@ -174,8 +174,8 @@ closing changes nothing, so they're asked about next time. -->
   >
     <ToggleSwitch
       bare
-      label="Only Values My Gauges Use"
-      details="Otherwise any change to high, average, low, rain or snow"
+      label="Show Only Values My Gauges Use"
+      details="Only show high, average, low, rain or snow changes if your project uses them"
       checked={compareGauges}
       onchange={(e) =>
         setPreference(

@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       dialog.trigger({
         type: 'component',
         component: { ref: GalleryWeather, props: { pages: fitting } },
-        options: { title: 'Load Weather from the Gallery?', size: 'medium' },
+        options: { title: 'Load Weather data?', size: 'medium' },
       });
     });
   });

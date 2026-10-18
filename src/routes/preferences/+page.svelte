@@ -391,7 +391,7 @@ site does -->
         >
           <ToggleSwitch
             bare
-            label="Only Values My Gauges Use"
+            label="Show Only Values My Gauges Use"
             details="When you search again, compare only those. Otherwise any change to high, average, low, rain or snow."
             checked={preferences.value.weatherChanges?.compare === 'gauges'}
             onchange={(e) =>
