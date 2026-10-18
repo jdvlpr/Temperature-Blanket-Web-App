@@ -55,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       let _rawData = $state.snapshot(weather.rawData);
+      let matchedDays = 0;
 
       for (var i = 0; i < data.length; i++) {
         const row = data[i];
@@ -179,14 +180,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
         _rawData[index] = day;
+        matchedDays++;
       }
 
       weather.setRawData(_rawData);
       // Imported weather is the user's own, like an edit in the table: shown
       // as Custom, kept when the project is saved and opened again, and never
-      // replaced by a search without asking
-      weather.isUserEdited = true;
-      projectChanged({ weather: true });
+      // replaced by a search without asking. A file with no matching days
+      // changes nothing, so leaves the weather as it was.
+      if (matchedDays) {
+        weather.isUserEdited = true;
+        projectChanged({ weather: true });
+      }
 
       imported = true;
       processing = false;
