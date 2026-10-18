@@ -68,7 +68,9 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
       weather stations near your place, or another
       <span class="font-bold">Open-Meteo</span> model.
     </li>
-    <li>Press <span class="font-bold">Search Again</span>, and compare.</li>
+    <li>
+      Press <span class="font-bold">Save and Search</span>, and compare.
+    </li>
   </ol>
   <p>
     See what each source and model is in

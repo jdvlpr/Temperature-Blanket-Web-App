@@ -139,8 +139,8 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
   <ol class="ml-6 list-decimal space-y-1">
     <li>Press <span class="font-bold">Filters</span>, and choose your yarn.</li>
     <li>
-      Turn on <span class="font-bold">Only</span> and your yarn's name below it, so
-      every color is that yarn, not just some.
+      Check <span class="font-bold">Only</span> followed by your yarn's name (like
+      Only Stylecraft Special DK), so every color is that yarn, not just some.
     </li>
   </ol>
   <p>The same filter is in My Library and the Gallery.</p>

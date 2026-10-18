@@ -41,8 +41,9 @@ change color: hence Manual steps. -->
       whenever you start).
     </li>
     <li>
-      Press <span class="font-bold">Search</span>. A message under the dates
-      says how many days are still to come; that's expected.
+      Press <span class="font-bold">Search</span>. A warning under the dates
+      says some days "are not in the past and won't have weather data". For a
+      year that's still going, that's expected: carry on.
     </li>
     <li>
       Press <span class="font-bold">Project</span>, then
@@ -52,7 +53,7 @@ change color: hence Manual steps. -->
   </ol>
   <DocsShot
     src="knit-along-all-year/future-days"
-    alt="London from 2026-01-01 to 2026-12-31, 365 Days, with a warning under the dates: 75 of these days are not in the past and won't have weather data. Below it, Search Again and Add Location."
+    alt="London from January 1 to December 31 of this year, 365 Days, with a warning under the dates that some of these days are not in the past and won't have weather data. Below it, Search Again and Add Location."
     caption="A year that's still going."
   />
 </section>
