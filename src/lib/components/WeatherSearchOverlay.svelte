@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '#lib/components/Spinner.svelte';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { motionDuration } from '#lib/utils/feedback.svelte.js';
   import { ArrowLeftIcon, CloudOffIcon, XIcon } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
@@ -50,15 +51,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     again: 'Searching Again',
   } as const;
 
-  // Stops the search and puts the project back as it was
-  async function back() {
-    weatherSearch.cancel();
-    await tick();
+  const focusBack = () => {
     const target = returnTo?.isConnected
       ? returnTo
       : document.getElementById('location-action-button');
     target?.focus();
+  };
+
+  // Stops the search and puts the project back as it was
+  async function back() {
+    weatherSearch.cancel();
+    await tick();
+    focusBack();
   }
+
+  // Got new days or searched again: back where it started from (a search
+  // goes on to the project; a list of changes opens with the focus in it)
+  let wasActive = false;
+  $effect(() => {
+    const active = weatherSearch.active;
+    if (wasActive && !active && weatherSearch.mode !== 'search')
+      setTimeout(() => {
+        if (!dialog.opened) focusBack();
+      }, 50);
+    wasActive = active;
+  });
 </script>
 
 {#if weatherSearch.active}

@@ -212,7 +212,7 @@ class WeatherSearch {
       );
       projectChanged({ weather: true });
     }
-    weatherDays.got(added, { all: false, locationsGot });
+    keptWith(() => weatherDays.got(added, { all: false, locationsGot }));
     if (quiet) return;
     toast.trigger({
       category: added.length ? 'success' : 'info',
@@ -244,7 +244,7 @@ class WeatherSearch {
       projectChanged({ weather: true });
     }
     // Every day was got: early ones are only those still early now
-    weatherDays.got(data, { all: true });
+    keptWith(() => weatherDays.got(data, { all: true }));
     const added = new Set(newDays.map(dayKey)).size;
     const { changesFor, openSearchAgain } =
       await import('#lib/components/modals/search-again.js');
@@ -409,6 +409,18 @@ class WeatherSearch {
     tempAllData = [];
     return allData;
   }
+}
+
+/**
+ * Runs a change to what's known about the days, and saves it with the
+ * project when it changed (so a settled early day isn't offered again on
+ * the next open, though nothing else changed)
+ */
+function keptWith(change: () => void) {
+  const before = JSON.stringify(weatherDays.toStored());
+  change();
+  if (JSON.stringify(weatherDays.toStored()) !== before)
+    projectChanged({ weather: true });
 }
 
 /**

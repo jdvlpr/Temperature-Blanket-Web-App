@@ -146,8 +146,7 @@ open in the panel, with a Back button to it. -->
 
   // Over the page, once this panel is out of the way
   function searchWeather(mode: SearchMode) {
-    dialog.close();
-    weatherSearch.start({ mode });
+    dialog.closeThen(() => weatherSearch.start({ mode }));
   }
 
   async function copyProject() {

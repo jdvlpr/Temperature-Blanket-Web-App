@@ -26,8 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { onCancel }: Props = $props();
 
   function setModal() {
-    dialog.close();
-    weatherSearch.start({ onCancel });
+    dialog.closeThen(() => weatherSearch.start({ onCancel }));
   }
 </script>
 

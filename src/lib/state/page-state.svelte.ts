@@ -232,6 +232,19 @@ class DialogClass {
     });
   };
 
+  /**
+   * Closes, then runs `run` once it has closed and given the focus back
+   * (its slowest close takes 250ms): something opening over the page, like
+   * the weather search, would otherwise lose the focus to it and close
+   */
+  closeThen = (run: () => void) => {
+    const opening = this.#openings;
+    this.close();
+    setTimeout(() => {
+      if (opening === this.#openings) run();
+    }, 300);
+  };
+
   /** Help in place of the open dialog's content, from its top with the
    * focus on Back */
   showHelp = (topic: HelpTopicId, opener: HTMLElement | null) => {

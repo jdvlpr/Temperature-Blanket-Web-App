@@ -80,6 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else if withNewDays}
   <!-- As Create asks which kind: each choice says what it does -->
   <Menu
+    ids={{ trigger: 'location-action-button' }}
     positioning={menuPositioning('bottom')}
     onSelect={(details) =>
       weatherSearch.start({
