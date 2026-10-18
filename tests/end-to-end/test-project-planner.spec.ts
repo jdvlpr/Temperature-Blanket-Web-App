@@ -152,8 +152,11 @@ test.describe('Project Planner', () => {
     // state into a shareable URL (saving calls replaceState).
     await page.getByRole('button', { name: /^Project Options/ }).click();
     await page.getByTestId('menu-save').click();
+    // The toast and the menu both say so
     await expect(
-      page.getByText(/Saved in this browser|problem saving your project/),
+      page
+        .getByText(/Saved in this browser|problem saving your project/)
+        .first(),
     ).toBeVisible();
     const savedUrl = page.url();
     expect(savedUrl).toContain('#');
