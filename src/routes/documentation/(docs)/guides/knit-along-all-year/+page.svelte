@@ -40,9 +40,8 @@ changing saved ones (modals/SearchAgain.svelte). -->
       whenever you start).
     </li>
     <li>
-      Press <span class="font-bold">Search</span>. A warning under the dates
-      says some days "are not in the past and won't have weather data". For a
-      year that's still going, that's expected: carry on.
+      Press <span class="font-bold">Search</span>. Under the dates it says how
+      many days haven't happened yet: their weather comes in as they pass.
     </li>
     <li>
       Press <span class="font-bold">Project</span>, then
@@ -52,7 +51,7 @@ changing saved ones (modals/SearchAgain.svelte). -->
   </ol>
   <DocsShot
     src="knit-along-all-year/future-days"
-    alt="London from January 1 to December 31 of this year, 365 Days, with a warning under the dates that some of these days are not in the past and won't have weather data. Below it, Weather Data and Add Location."
+    alt="London from January 1 to December 31 of this year, 365 Days, with a note under the dates that some of these days haven't happened yet. Below it, Weather Data and Add Location."
     caption="A year that's still going."
   />
 </section>

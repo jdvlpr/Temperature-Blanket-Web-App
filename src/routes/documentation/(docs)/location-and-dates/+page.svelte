@@ -147,12 +147,6 @@ Section ids are the old single page's (OLD_ANCHORS). -->
         >…the selected end date comes before the selected start date.</span
       > Swap them.
     </li>
-    <li>
-      <span class="font-bold"
-        >…of these days are not in the past and won't have weather data.</span
-      > That's fine for a blanket you're making as the year goes: get the new days
-      later to fill them in.
-    </li>
   </ul>
   <h3 class="text-lg font-bold">The places and dates can't be changed</h3>
   <p>

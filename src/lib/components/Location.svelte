@@ -95,12 +95,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let days = $derived(getDays(month, year));
 
-  let datesMustBeHistorical = $derived(
-    weather.source.name === 'Open-Meteo' &&
-      location.daysInFuture >= 1 &&
-      !weather.source.useSecondary,
-  );
-
   $effect(() => {
     if (day > days) day = 1;
   });
@@ -668,27 +662,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {location.days}
           {pluralize('Day', location.days)}
         </p>
+        <!-- A year still going is fine: those days come in as they pass -->
         {#if location.daysInFuture}
-          <p
-            class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
-          >
-            <TriangleAlertIcon class="icon-sm relative -top-[1px] inline" />
-
-            {#if !datesMustBeHistorical}
-              For best results, don't include future dates.
-            {/if}
+          <p class="w-full text-sm opacity-80">
             {location.daysInFuture} of these days
-            {pluralize(
-              {
-                singular: 'is',
-                plural: 'are',
-              },
-              location.daysInFuture,
-            )}
-            not in the past and won't have weather data.
-            {#if datesMustBeHistorical}
-              All the dates must be in the past.
-            {/if}
+            {location.daysInFuture === 1 ? "hasn't" : "haven't"} happened yet. Their
+            weather comes in as they pass: use Get New Days.
           </p>
         {/if}
       {:else if location.errorMessage && browser}

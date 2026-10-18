@@ -131,7 +131,7 @@ async function fetchAndProcessDailyWeather(
   const data = await response.json();
 
   const errorMessage =
-    '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>';
+    '<p class="font-bold text-xl my-4">No Weather Found</p><p>No weather was found for this place on these dates. Try a place nearby, other dates, or the other weather source.</p>';
   if (!data.data) {
     // No data property returned from meteostat
     throw error(400, errorMessage);

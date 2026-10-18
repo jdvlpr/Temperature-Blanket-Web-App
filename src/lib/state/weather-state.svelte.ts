@@ -33,7 +33,7 @@ import {
   stringToDate,
 } from '#lib/utils/date-utils.js';
 import { displayNumber, getAverage } from '#lib/utils/number-utils.js';
-import { pluralize } from '#lib/utils/string-utils.js';
+import { escapeHtml } from '#lib/utils/string-utils.js';
 import {
   celsiusToFahrenheit,
   convertTime,
@@ -428,6 +428,9 @@ class WeatherClass {
   }
 
   async getOpenMeteo({ location }: { location: LocationType }) {
+    // (label is the place's name as GeoNames gives it, shown as text)
+    const noWeatherFound = (label?: string) =>
+      `<p class="font-bold text-xl my-4">No Weather Found</p><p>No weather was found for ${label ? escapeHtml(label) : 'this place'} on these dates. Try a place nearby, other dates, or the other weather source.</p>`;
     if (!location.from || !location.to) {
       throw new Error('Location is missing a date range.');
     }
@@ -483,27 +486,14 @@ class WeatherClass {
     if (data?.error === true) {
       // Example Reason: "Parameter 'start_date' is out of allowed range from 1959-01-01 to 2023-02-01"
       if (data?.reason.includes('is out of allowed range')) {
-        const fromDate = stringToDate(from);
-        const toDate = stringToDate(to);
-
-        let today = getLocalISODateString();
-
-        let daysInFuture = null;
-        if (to >= today) {
-          daysInFuture = numberOfDays(stringToDate(today), toDate);
-        }
-
+        // The end is never past yesterday here, so it's the start (before
+        // 1940), or the newest days not in Open-Meteo's archive yet
         let content =
           '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
-
-        if (daysInFuture) {
-          content += `It looks like ${daysInFuture} ${pluralize('day', daysInFuture)} ${pluralize({ singular: 'is', plural: 'are' }, daysInFuture)} not in the past.`;
-          content += ' Change the dates so that all days are in the past.';
-        }
-
-        if (fromDate < new Date('1940-01-01')) {
-          content += 'There may not be weather data for dates before 1940.';
-        }
+        content +=
+          "<p>Open-Meteo doesn't have weather for some of these dates. Try other dates, or Meteostat.</p>";
+        if (from < '1940-01-01')
+          content += '<p class="mt-2">Its weather starts in 1940.</p>';
 
         content += `<p class="italic text-sm mt-4">Error status code: ${response.status}</p>`;
 
@@ -529,9 +519,7 @@ class WeatherClass {
 
     if (!data?.daily) {
       // No data returned from Open-Meteo
-      throw new Error(
-        '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
-      );
+      throw new Error(noWeatherFound(location.label));
     }
 
     if (
@@ -540,9 +528,7 @@ class WeatherClass {
       )
     ) {
       // Empty data
-      throw new Error(
-        '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
-      );
+      throw new Error(noWeatherFound(location.label));
     }
 
     location.stations = null; // No station details from Open-Meteo, only from Meteostat
