@@ -31,7 +31,6 @@ closing changes nothing, so they're asked about next time. -->
   import { projectChanged } from '#lib/storage/autosave.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { WeatherDay } from '#lib/types/weather-types.js';
-  import { getColorInfo } from '#lib/utils/color-utils.js';
   import { pluralize } from '#lib/utils/string-utils.js';
   import {
     applyChanges,
@@ -49,22 +48,27 @@ closing changes nothing, so they're asked about next time. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import {
     changesFor,
+    colorOf,
+    gaugeParams,
     onlyColorChanges,
     type SearchAgainResult,
   } from './search-again.js';
 
   let { result }: { result: SearchAgainResult } = $props();
 
-  // Days kept before, shown again for now
+  // Days kept before, and days whose colors stay the same though the
+  // toggle's on, shown for now
   let showKept = $state(false);
-  const changes = $derived(changesFor(result, { showKept }));
+  let showSameColor = $state(false);
+  const colorsOnly = $derived(onlyColorChanges() && !showSameColor);
+  const changes = $derived(changesFor(result, { showKept, colorsOnly }));
   // What the settings leave out, to say so
   const keptCount = $derived(
     showKept
       ? 0
-      : changesFor(result, { showKept: true }).length - changes.length,
+      : changesFor(result, { showKept: true, colorsOnly }).length -
+          changes.length,
   );
-  const colorsOnly = $derived(onlyColorChanges());
   const sameColorCount = $derived(
     colorsOnly
       ? changesFor(result, { showKept, colorsOnly: false }).length -
@@ -210,15 +214,11 @@ closing changes nothing, so they're asked about next time. -->
   }
 
   // A value's color before and after, when a gauge colors it and it changes
+  const used = $derived(gaugeParams());
   function colors(change: DayChange, param: ComparedParam) {
-    const before = getColorInfo({
-      param,
-      value: valueOf(savedByKey.get(change.key), param),
-    });
-    const after = getColorInfo({
-      param,
-      value: valueOf(gotByKey.get(change.key), param),
-    });
+    const before = colorOf(savedByKey.get(change.key), param, used);
+    const after = colorOf(gotByKey.get(change.key), param, used);
+    if (!before || !after) return null;
     if (before.index === undefined && after.index === undefined) return null;
     if (before.index === after.index) return { before, after: null };
     return { before, after };
@@ -282,6 +282,8 @@ closing changes nothing, so they're asked about next time. -->
       shown,
       chosen,
     );
+    // Chosen: the saved days are as of this search
+    weatherDays.stamp();
     projectChanged({ weather: true });
     const kept = shown.length - chosen.size;
     if (chosen.size && published && updatePage) void editGalleryPage();
@@ -306,13 +308,14 @@ closing changes nothing, so they're asked about next time. -->
   <div class="flex flex-col gap-2">
     <p>
       {#if changes.length}
-        {sources} now has different values for {changes.length}
-        {pluralize('day', changes.length)} you saved{savedOn
-          ? ` ${savedOn}`
-          : ''}. Your saved values stay unless you choose new ones.
+        Today's search of {sources} found different values for {changes.length}
+        {savedOn
+          ? `${pluralize('day', changes.length)} you saved ${savedOn}`
+          : `of your saved ${pluralize('day', changes.length)}`}. Your saved
+        values stay unless you choose new ones.
       {:else if colorsOnly && sameColorCount}
-        {sources || weather.source.name} has different values for some days you saved,
-        but none of them change a color.
+        Today's search of {weather.source.name} found different values for some of
+        your saved days, but none of them change a color.
       {:else}
         No changes to show with these settings.
       {/if}
@@ -337,7 +340,16 @@ closing changes nothing, so they're asked about next time. -->
         <button
           type="button"
           class="anchor"
-          onclick={() => setPreference('show', 'all')}>Show them</button
+          onclick={() => (showSameColor = true)}>Show them</button
+        >
+      </p>
+    {:else if showSameColor && onlyColorChanges()}
+      <p class="text-surface-700-300 text-sm">
+        Showing days whose colors stay the same.
+        <button
+          type="button"
+          class="anchor"
+          onclick={() => (showSameColor = false)}>Hide them</button
         >
       </p>
     {/if}
@@ -381,12 +393,14 @@ closing changes nothing, so they're asked about next time. -->
       bare
       label="Show Only Days Whose Colors Change"
       details="Leave out days whose new values stay in the same ranges"
-      checked={colorsOnly}
-      onchange={(e) =>
+      checked={onlyColorChanges()}
+      onchange={(e) => {
+        showSameColor = false;
         setPreference(
           'show',
           (e.currentTarget as HTMLInputElement).checked ? 'colors' : 'all',
-        )}
+        );
+      }}
     />
   </div>
 

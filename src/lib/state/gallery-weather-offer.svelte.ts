@@ -50,11 +50,23 @@ class GalleryWeatherOffer {
     return this.pages.filter((page) => fitsLocations(page.locations, dates));
   });
 
+  /** Looks them up; a slow gallery (or none here) offers nothing, as
+   * loadGalleryWeather leaves a slow page's weather to a search */
   async lookUp(projectId: string, pages: Promise<GalleryWeatherPage[]>) {
     this.projectId = projectId;
     this.pages = [];
     this.checking = true;
-    const found = await pages;
+    let found: GalleryWeatherPage[];
+    try {
+      found = await Promise.race([
+        pages,
+        new Promise<GalleryWeatherPage[]>((resolve) =>
+          setTimeout(() => resolve([]), 5000),
+        ),
+      ]);
+    } catch {
+      found = [];
+    }
     if (this.projectId !== projectId) return;
     this.pages = found;
     this.checking = false;

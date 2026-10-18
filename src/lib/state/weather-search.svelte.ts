@@ -246,8 +246,9 @@ class WeatherSearch {
       weather.updateRawData(saved);
       projectChanged({ weather: true });
     }
-    // Every day was got: early ones are only those still early now
-    keptWith(() => weatherDays.got(data, { all: true }));
+    // Every day was got: early ones are only those still early now. The
+    // saved days are as of today only once nothing's left to choose
+    keptWith(() => weatherDays.got(data, { all: true, stamp: false }));
     const added = new Set(newDays.map(dayKey)).size;
     const { changesFor, openSearchAgain } =
       await import('#lib/components/modals/search-again.js');
@@ -262,6 +263,7 @@ class WeatherSearch {
     // Any day that differs, though none changes a color: the dialog says so
     if (changesFor(result, { colorsOnly: false }).length)
       return openSearchAgain(result);
+    keptWith(() => weatherDays.stamp());
     toast.trigger({
       category: 'success',
       message: added

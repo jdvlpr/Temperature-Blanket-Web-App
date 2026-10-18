@@ -148,11 +148,16 @@ class WeatherDays {
    * Days were just got: every day of every location (`all`, a search), or
    * only the new days of `locationsGot`. A location's days count as got
    * through its last day with values, so days its source doesn't have yet
-   * are offered again later.
+   * are offered again later. Every day got makes them all as new as today,
+   * unless `stamp` is false (Search Again: only once its choices are saved).
    */
   got(
     data: WeatherDay[],
-    { all, locationsGot }: { all: boolean; locationsGot?: number[] },
+    {
+      all,
+      locationsGot,
+      stamp = all,
+    }: { all: boolean; locationsGot?: number[]; stamp?: boolean },
   ) {
     const today = localToday();
     const todayUTC = utcToday();
@@ -174,10 +179,16 @@ class WeatherDays {
     });
     this.fetchedThrough = through;
     // Only new days leave the saved ones as old as they were
-    if (all) this.fetchedAt = locations.all.map(() => today);
+    if (stamp) this.stamp();
     const early = earlyDaysIn(data, today, sourceOf);
     this.early = all ? early : { ...this.early, ...early };
     this.markCurrent();
+  }
+
+  /** Every location's days are as of today */
+  stamp() {
+    const today = localToday();
+    this.fetchedAt = locations.all.map(() => today);
   }
 
   /** The days were just got for the locations and source as they are now */

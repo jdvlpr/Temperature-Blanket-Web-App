@@ -57,12 +57,12 @@ until there's weather, so it's never lost by closing anything. -->
     dialog.trigger({
       type: 'component',
       component: { ref: GalleryWeather, props: { pages } },
-      options: { title: 'Load Weather Data?', size: 'medium' },
+      options: { title: 'Load Weather data?', size: 'medium' },
     });
   }
 </script>
 
-<div aria-live="polite" class="contents">
+<div aria-live="polite" class="flex w-full flex-col items-center gap-2">
   {#if galleryWeatherOffer.showChecking && !weatherSearch.active}
     <p
       class="text-surface-700-300 flex items-center justify-center gap-2 text-center text-sm"

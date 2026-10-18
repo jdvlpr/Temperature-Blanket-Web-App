@@ -52,16 +52,20 @@ export const gaugeParams = (): ComparedParam[] => {
   return COMPARED_PARAMS.filter((param) => used.has(param));
 };
 
-/** A value's color in the project's gauges now: its range's index, or
- * undefined when no gauge colors it */
-export const colorIndexOf = (
+/** A value's color in the project's gauges now, or undefined when no gauge
+ * uses it (getColorInfo alone gives the Temperature gauge's for any
+ * temperature, used or not) */
+export const colorOf = (
   day: WeatherDay | undefined,
   param: ComparedParam,
+  used: readonly ComparedParam[] = gaugeParams(),
 ) =>
-  getColorInfo({
-    param,
-    value: day?.[param]?.[preferences.value.units ?? 'metric'] ?? null,
-  }).index;
+  used.includes(param)
+    ? getColorInfo({
+        param,
+        value: day?.[param]?.[preferences.value.units ?? 'metric'] ?? null,
+      })
+    : undefined;
 
 /** Whether Search Again shows only days whose colors change (the default) */
 export const onlyColorChanges = () =>
@@ -96,13 +100,16 @@ export const changesFor = (
     askEveryTime: showKept,
   });
   if (!colorsOnly) return changes;
+  const used = gaugeParams();
   const savedByKey = new Map(saved.map((day) => [dayKey(day), day]));
   const gotByKey = new Map(got.map((day) => [dayKey(day), day]));
   return changes.flatMap((change) => {
     const before = savedByKey.get(change.key);
     const after = gotByKey.get(change.key);
     const recolored = change.changes.filter(
-      ({ param }) => colorIndexOf(before, param) !== colorIndexOf(after, param),
+      ({ param }) =>
+        colorOf(before, param, used)?.index !==
+        colorOf(after, param, used)?.index,
     );
     return recolored.length ? [{ ...change, changes: recolored }] : [];
   });

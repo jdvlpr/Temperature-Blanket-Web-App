@@ -37,7 +37,11 @@ published). -->
   import { loadGalleryWeatherWithToast } from '#lib/utils/open-saved-project.js';
   import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
-  import { CloudDownloadIcon, LoaderCircleIcon } from '@lucide/svelte';
+  import {
+    CloudDownloadIcon,
+    ExternalLinkIcon,
+    LoaderCircleIcon,
+  } from '@lucide/svelte';
 
   let { pages }: { pages: GalleryWeatherPage[] } = $props();
 
@@ -92,21 +96,34 @@ published). -->
         to load.</legend
       >
       {#each pages as page (page.postId)}
-        <label
+        <div
           class={[
             CARD_BOX,
-            'has-checked:outline-primary-500 has-focus-visible:outline-primary-500 flex cursor-pointer items-center gap-3 outline-offset-2 has-checked:outline-2 has-focus-visible:outline-2',
+            'has-checked:outline-primary-500 has-focus-visible:outline-primary-500 flex items-center gap-3 outline-offset-2 has-checked:outline-2 has-focus-visible:outline-2',
           ]}
         >
-          <input
-            type="radio"
-            class="radio shrink-0"
-            name="gallery-weather-page"
-            value={page.postId}
-            bind:group={chosen}
-          />
-          {@render card(page)}
-        </label>
+          <label class="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
+            <input
+              type="radio"
+              class="radio shrink-0"
+              name="gallery-weather-page"
+              value={page.postId}
+              bind:group={chosen}
+            />
+            {@render card(page)}
+          </label>
+          <a
+            class="anchor inline-flex shrink-0 items-center gap-1 text-sm"
+            href={`/gallery/${page.postId}`}
+            target="_blank"
+            rel="noreferrer"
+            >View<span class="sr-only">
+              gallery page of {nameOf(page)}</span
+            ><ExternalLinkIcon class="icon-sm" /><span class="sr-only"
+              >(opens in a new tab)</span
+            ></a
+          >
+        </div>
       {/each}
     </fieldset>
   {:else if pages[0]}
