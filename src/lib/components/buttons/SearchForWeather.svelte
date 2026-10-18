@@ -82,10 +82,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   >
     <Menu.Trigger class={BUTTON}>
-      <span class={['flex flex-col', weatherDays.newDaysCount && 'mb-1.5']}>
+      <span class="flex flex-col">
         <!-- Shown while days are waiting -->
         {#if weatherDays.newDaysCount}
-          <span class="text-sm opacity-90" data-testid="new-days-available"
+          <span
+            class="-mt-1.5 text-sm opacity-80"
+            data-testid="new-days-available"
             ><span class="sr-only">,</span>
             {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
               ? 'day'
