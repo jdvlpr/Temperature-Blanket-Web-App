@@ -82,16 +82,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   >
     <Menu.Trigger class={BUTTON}>
-      Get Weather Data
-      <!-- Shown while days are waiting -->
-      {#if weatherDays.newDaysCount}
-        <span class="text-sm opacity-80" data-testid="new-days-available"
-          ><span class="sr-only">,</span>
-          {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
-            ? 'day'
-            : 'days'}</span
-        >
-      {/if}
+      <span class="flex flex-col items-center">
+        <span>Get Weather Data</span>
+        <!-- Shown while days are waiting -->
+        {#if weatherDays.newDaysCount}
+          <span class="text-sm opacity-80" data-testid="new-days-available"
+            ><span class="sr-only">,</span>
+            {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
+              ? 'day'
+              : 'days'}</span
+          >
+        {/if}
+      </span>
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
     </Menu.Trigger>
     <Portal>
