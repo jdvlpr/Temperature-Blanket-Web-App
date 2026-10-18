@@ -73,6 +73,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 {:else if withNewDays}
   <!-- As Create asks which kind: each choice says what it does -->
+  <!-- Shown while days are waiting -->
+  {#if weatherDays.newDaysCount}
+    <span class="text-primary-500 text-sm" data-testid="new-days-available"
+      ><span class="sr-only">,</span>
+      {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
+        ? 'day'
+        : 'days'}</span
+    >
+  {/if}
   <Menu
     ids={{ trigger: 'location-action-button' }}
     positioning={menuPositioning('bottom')}
@@ -81,21 +90,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         mode: details.value === 'again' ? 'again' : 'new-days',
       })}
   >
-    <Menu.Trigger
-      class={[BUTTON, weatherDays.newDaysCount && 'rounded-sm text-left']}
-    >
-      <span class="flex flex-col items-start">
-        <!-- Shown while days are waiting -->
-        {#if weatherDays.newDaysCount}
-          <span class="text-sm" data-testid="new-days-available"
-            ><span class="sr-only">,</span>
-            {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
-              ? 'day'
-              : 'days'}</span
-          >
-        {/if}
-        <span>Get Weather Data</span>
-      </span>
+    <Menu.Trigger class={BUTTON}>
+      <span>Get Weather Data</span>
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
     </Menu.Trigger>
     <Portal>
