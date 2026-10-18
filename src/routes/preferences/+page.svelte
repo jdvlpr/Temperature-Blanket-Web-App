@@ -404,15 +404,15 @@ site does -->
           />
           <ToggleSwitch
             bare
-            label="Ask Every Time"
-            details="Ask about a newer value you kept the old one over every time you search again. Otherwise only once it changes again."
-            checked={preferences.value.weatherChanges?.ask === 'every'}
+            label="Show Only Days Whose Colors Change"
+            details="When you search again, leave out days whose new values stay in the same ranges."
+            checked={preferences.value.weatherChanges?.show !== 'all'}
             onchange={(e) =>
               (preferences.value.weatherChanges = {
                 ...preferences.value.weatherChanges,
-                ask: (e.currentTarget as HTMLInputElement).checked
-                  ? 'every'
-                  : 'changed',
+                show: (e.currentTarget as HTMLInputElement).checked
+                  ? 'colors'
+                  : 'all',
               })}
           />
         </div>

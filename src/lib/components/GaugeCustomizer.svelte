@@ -518,6 +518,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return `About the same number of ${target?.label.toLowerCase() ?? 'temperature'} days in each range`;
   });
 
+  // Auto ranges made from the weather as it was: days updated or added since
+  // (Search Again, new days) leave them as they are, so they're offered again
+  let autoRangesBehind = $derived.by(() => {
+    if (
+      !rules ||
+      isCategory ||
+      rules.mode !== 'auto' ||
+      rules.isCustomRanges ||
+      !weather.rawData.length
+    )
+      return false;
+    const ranges = (gauge.ranges ?? []) as GaugeRange[];
+    const fresh = withGeneratedRanges(gauge, {}).ranges;
+    const same = (a: number, b: number) => a === b || Math.abs(a - b) < 1e-9;
+    return (
+      fresh.length !== ranges.length ||
+      fresh.some(
+        (range, i) =>
+          !same(range.from, ranges[i].from) || !same(range.to, ranges[i].to),
+      )
+    );
+  });
+
+  function updateAutoRanges() {
+    const before = gaugeChangeState(gauge);
+    const result = withGeneratedRanges(gauge, {});
+    gauge.rangeOptions = result.rangeOptions;
+    gauge.ranges = result.ranges;
+    confirmGaugeChange(gauge.id, before, gaugeChangeState(gauge));
+  }
+
   // With both ends included or neither, rounded or manual steps can't make
   // ranges that meet exactly
   let endsDontMeet = $derived(
@@ -1149,6 +1180,17 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         ? ' Editing a range number also automatically updates the next or previous one.'
         : ''}
     </p>
+    {#if autoRangesBehind}
+      <p
+        class="text-surface-700-300 mt-2 flex flex-wrap items-center justify-center gap-x-1 px-2 text-center text-xs"
+        data-testid="auto-ranges-behind"
+      >
+        Your weather changed since these Auto ranges were made.
+        <button type="button" class="anchor" onclick={updateAutoRanges}
+          >Update Ranges</button
+        >
+      </p>
+    {/if}
     {#if endsDontMeet}
       <p
         class="text-warning-800-200 mt-2 flex items-start justify-center gap-1.5 px-2 text-center text-xs"

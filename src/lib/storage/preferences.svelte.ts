@@ -49,13 +49,13 @@ type LocalStatePreferencesType = {
   pdf?: SavedPdfSettings;
   /**
    * Search Again: which values it compares (`all`, or only those the
-   * project's gauges use) and whether a newer value someone kept the old one
-   * over is asked about again only once it changes again (`changed`) or
-   * every time (`every`); missing until first changed (all, changed)
+   * project's gauges use) and which changed days it shows (only those whose
+   * colors change, `colors`, or `all`); missing until first changed (all,
+   * colors). A newer value kept over is asked about only once it changes again.
    */
   weatherChanges?: {
     compare?: 'all' | 'gauges';
-    ask?: 'changed' | 'every';
+    show?: 'colors' | 'all';
   };
   /** My Projects' View menu: projects and palettes as cards in a grid, or one per row; missing until first changed (grid) */
   myProjectsLayout?: PageLayout;

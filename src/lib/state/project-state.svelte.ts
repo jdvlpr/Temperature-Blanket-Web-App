@@ -81,9 +81,13 @@ type ProjectStatusType = {
   wasLoaded: boolean;
   /** Where the loaded project came from, for its Loaded line */
   loadedFrom: LoadedFrom | null;
+  /** The gallery page its weather came from (`gallery`, `link-gallery`) */
+  galleryPostId: number | null;
 };
 
-export type LoadedFrom = 'saved' | 'saved-custom' | 'link' | 'gallery';
+/** `link-gallery`: a link whose weather was loaded from its gallery page */
+export type LoadedFrom =
+  'saved' | 'saved-custom' | 'link' | 'link-gallery' | 'gallery';
 
 class ProjectClass {
   // *****************
@@ -188,6 +192,7 @@ class ProjectClass {
     temporaryUid: '',
     wasLoaded: false,
     loadedFrom: null,
+    galleryPostId: null,
   });
 
   gallery = $state({

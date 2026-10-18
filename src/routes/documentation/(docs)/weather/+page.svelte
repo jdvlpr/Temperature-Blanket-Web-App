@@ -76,10 +76,11 @@ HELP_TOPICS). -->
   <p>
     <span class="font-bold">Search Again</span> (in
     <span class="font-bold">Weather Data</span>, or on its own once a project is
-    finished) gets every day again. If any saved day is different now, it lists
-    them, one card each, with the saved and the new values. Your saved values
-    stay unless you check <span class="font-bold">Use new values</span> for a
-    day, or press <span class="font-bold">Update All</span>, then
+    finished) gets every day again. If any saved day is different now, it says
+    which weather source changed them and when you saved them, then lists the
+    days by month, with the saved and the new values and, when a color changes,
+    both colors. Your saved values stay unless you check a day (or a whole
+    month), or press <span class="font-bold">Update All</span>, then
     <span class="font-bold">Save</span>. Cancel leaves everything as it was.
   </p>
   <p>
@@ -89,8 +90,15 @@ HELP_TOPICS). -->
   </p>
   <p>
     Two <a href="/preferences" class="link">preferences</a>, also in the list
-    itself, choose what's asked: compare only the values your gauges use, and
-    ask about a value you kept every time instead of only once it changes again.
+    itself, choose what's shown: only the values your gauges use, and only days
+    whose colors change (on unless you turn it off). Days you kept before
+    aren't shown again unless their values change again; the list offers to
+    show them.
+  </p>
+  <p>
+    Updating days doesn't change Auto ranges. When your weather no longer
+    matches them, the gauge says so, with
+    <span class="font-bold">Update Ranges</span>.
   </p>
   <h3 id="project-includes" class="text-lg font-bold">
     What a Project Includes

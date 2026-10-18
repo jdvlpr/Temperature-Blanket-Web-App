@@ -45,7 +45,7 @@ const DEFAULTS: Record<SyncedPreferenceKey, unknown> = {
   'theme.roundness': 'pill',
   'theme.headingStyle': 'classic',
   'weatherChanges.compare': 'all',
-  'weatherChanges.ask': 'changed',
+  'weatherChanges.show': 'colors',
 };
 
 export type PreferencesSyncState = {

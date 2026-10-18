@@ -232,6 +232,9 @@ class WeatherSearch {
       weatherDays.fetchedThrough,
     ) as (TISO8601DateString | null)[];
     const declined = $state.snapshot(weatherDays.declined) as DeclinedValues;
+    const fetchedAt = $state.snapshot(
+      weatherDays.fetchedAt,
+    ) as (TISO8601DateString | null)[];
     // Days after the last ones got are new: added without asking
     const isNew = (day: WeatherDay) => {
       const through = fetchedThrough[day.location];
@@ -248,8 +251,17 @@ class WeatherSearch {
     const added = new Set(newDays.map(dayKey)).size;
     const { changesFor, openSearchAgain } =
       await import('#lib/components/modals/search-again.js');
-    const result = { saved, got: data, fetchedThrough, declined, added };
-    if (changesFor(result).length) return openSearchAgain(result);
+    const result = {
+      saved,
+      got: data,
+      fetchedThrough,
+      fetchedAt,
+      declined,
+      added,
+    };
+    // Any day that differs, though none changes a color: the dialog says so
+    if (changesFor(result, { colorsOnly: false }).length)
+      return openSearchAgain(result);
     toast.trigger({
       category: 'success',
       message: added

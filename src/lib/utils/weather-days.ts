@@ -53,6 +53,9 @@ export type EarlyDays = Record<DayKey, TISO8601DateString>;
 export type StoredWeatherDays = {
   /** Each location's last day got (null: none yet) */
   fetchedThrough: (TISO8601DateString | null)[];
+  /** The day each location's saved days were got, by a search of every day
+   * (or the gallery page's update); missing for projects saved before */
+  fetchedAt?: (TISO8601DateString | null)[];
   early: EarlyDays;
   declined: DeclinedValues;
 };

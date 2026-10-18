@@ -32,6 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     flash?: boolean;
     /** Smaller, as in a pop-up's footer */
     small?: boolean;
+    /** Smallest, beside text (Search Again's changed values); no number */
+    tiny?: boolean;
     /** Whether Fill with color grows from it; false where something else
      * (a palette's numbered drag handle) does */
     origin?: boolean;
@@ -44,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pop = false,
     flash = false,
     small = false,
+    tiny = false,
     origin = true,
   }: Props = $props();
 </script>
@@ -51,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <span
   class={[
     'grid shrink-0 place-items-center rounded-full font-semibold',
-    small ? 'size-9 text-xs' : 'size-12 text-sm',
+    tiny ? 'size-4' : small ? 'size-9 text-xs' : 'size-12 text-sm',
     !filled && 'shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
     pop && 'feedback-pop',
     flash && 'history-flash',

@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { gauges } from '#lib/state/gauges-state.svelte.js';
+import { getColorInfo } from '#lib/utils/color-utils.js';
 import { dialog } from '#lib/state/page-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import type {
@@ -23,7 +24,9 @@ import type {
 import {
   COMPARED_PARAMS,
   compareDays,
+  dayKey,
   type ComparedParam,
+  type DayChange,
   type DeclinedValues,
 } from '#lib/utils/weather-days.js';
 
@@ -34,6 +37,8 @@ export type SearchAgainResult = {
   /** Every day it got */
   got: WeatherDay[];
   fetchedThrough: (TISO8601DateString | null)[];
+  /** The day each location's saved days were got, before it (null: not known) */
+  fetchedAt: (TISO8601DateString | null)[];
   declined: DeclinedValues;
   /** How many new days it added */
   added: number;
@@ -47,14 +52,39 @@ export const gaugeParams = (): ComparedParam[] => {
   return COMPARED_PARAMS.filter((param) => used.has(param));
 };
 
-/** The changed saved days, as the Search Again preferences choose them */
-export const changesFor = ({
-  saved,
-  got,
-  fetchedThrough,
-  declined,
-}: Omit<SearchAgainResult, 'added'>) =>
-  compareDays({
+/** A value's color in the project's gauges now: its range's index, or
+ * undefined when no gauge colors it */
+export const colorIndexOf = (
+  day: WeatherDay | undefined,
+  param: ComparedParam,
+) =>
+  getColorInfo({
+    param,
+    value: day?.[param]?.[preferences.value.units ?? 'metric'] ?? null,
+  }).index;
+
+/** Whether Search Again shows only days whose colors change (the default) */
+export const onlyColorChanges = () =>
+  preferences.value.weatherChanges?.show !== 'all';
+
+/**
+ * The changed saved days, as the Search Again preferences choose them: only
+ * the values the gauges use, if so; days kept before only with `showKept`;
+ * only the values that change a color with `colorsOnly`.
+ */
+export const changesFor = (
+  {
+    saved,
+    got,
+    fetchedThrough,
+    declined,
+  }: Pick<SearchAgainResult, 'saved' | 'got' | 'fetchedThrough' | 'declined'>,
+  {
+    showKept = false,
+    colorsOnly = onlyColorChanges(),
+  }: { showKept?: boolean; colorsOnly?: boolean } = {},
+): DayChange[] => {
+  const changes = compareDays({
     saved,
     got,
     fetchedThrough,
@@ -63,8 +93,20 @@ export const changesFor = ({
       preferences.value.weatherChanges?.compare === 'gauges'
         ? gaugeParams()
         : COMPARED_PARAMS,
-    askEveryTime: preferences.value.weatherChanges?.ask === 'every',
+    askEveryTime: showKept,
   });
+  if (!colorsOnly) return changes;
+  const savedByKey = new Map(saved.map((day) => [dayKey(day), day]));
+  const gotByKey = new Map(got.map((day) => [dayKey(day), day]));
+  return changes.flatMap((change) => {
+    const before = savedByKey.get(change.key);
+    const after = gotByKey.get(change.key);
+    const recolored = change.changes.filter(
+      ({ param }) => colorIndexOf(before, param) !== colorIndexOf(after, param),
+    );
+    return recolored.length ? [{ ...change, changes: recolored }] : [];
+  });
+};
 
 export async function openSearchAgain(result: SearchAgainResult) {
   const { default: SearchAgain } = await import('./SearchAgain.svelte');

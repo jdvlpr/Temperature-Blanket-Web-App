@@ -94,13 +94,13 @@ export function fitsLocations(
 
 /**
  * The gallery pages with weather published from a project with this ID
- * (`?project=` in their link; gallery plugin 1.12.0), whose dates are these
- * locations', newest first. Only what shows them: their weather is got for the
- * one chosen. None when the gallery can't say (an older plugin, offline).
+ * (`?project=` in their link; gallery plugin 1.12.0), newest first; which
+ * dates fit is up to the caller (fitsLocations). Only what shows them: their
+ * weather is got for the one chosen. None when the gallery can't say (an
+ * older plugin, offline).
  */
 export async function findGalleryWeatherPages(
   projectId: string,
-  locations: LocationDates[],
 ): Promise<GalleryWeatherPage[]> {
   try {
     const { response, result } = await queryGallery(
@@ -129,11 +129,7 @@ export async function findGalleryWeatherPages(
       } | null;
     }[] = result?.data?.projects?.nodes ?? [];
     return nodes
-      .filter(
-        (node) =>
-          Number.isInteger(node?.databaseId) &&
-          fitsLocations(node.locations, locations),
-      )
+      .filter((node) => Number.isInteger(node?.databaseId))
       .map((node) => ({
         postId: node.databaseId as number,
         projectName: node.projectName ?? '',

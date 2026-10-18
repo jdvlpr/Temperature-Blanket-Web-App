@@ -15,7 +15,7 @@
 
 import { gauges } from '#lib/state/gauges-state.svelte.js';
 import { locations } from '#lib/state/location-state.svelte.js';
-import { dialog } from '#lib/state/page-state.svelte.js';
+import { dialog, toast } from '#lib/state/page-state.svelte.js';
 import { previews } from '#lib/state/preview-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
@@ -25,15 +25,19 @@ import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
 import { projectNameFromHash } from '#lib/utils/project-name-link.js';
 import { timestampFromLegacyProjectId } from '#lib/utils/project-id-utils.js';
-import type { GalleryRequest } from '#lib/utils/gallery-request.js';
+import {
+  FROM_GALLERY_PARAM,
+  type GalleryRequest,
+} from '#lib/utils/gallery-request.js';
 import {
   fetchGalleryWeather,
   findGalleryWeatherPages,
   galleryWeatherToLoad,
-  type GalleryWeatherPage,
   isCustomGalleryWeather,
 } from '#lib/utils/gallery-weather.js';
 import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
+import { galleryWeatherOffer } from '#lib/state/gallery-weather-offer.svelte.js';
+import type { TISO8601DateString } from '#lib/types/weather-types.js';
 
 /**
  * Loads a project into the app's state: the one in the address bar on the
@@ -78,6 +82,7 @@ export async function loadSavedProject(
   if (weather.rawData.length) weatherDays.markCurrent();
 
   if (locations.allValid) project.status.wasLoaded = true;
+  project.status.galleryPostId = fromGalleryPage ? fromGallery : null;
   project.status.loadedFrom = fromGalleryPage
     ? 'gallery'
     : !saved
@@ -88,22 +93,18 @@ export async function loadSavedProject(
 }
 
 /**
- * The gallery pages to offer the weather of, for a link loaded on the project
- * page without any: one not saved here, opened without a gallery page. Pages
- * published from a project with the same ID, with its dates (see
- * findGalleryWeatherPages); none for anything else.
+ * Starts looking up, alongside the link's loading, the gallery pages of its
+ * project that kept their weather, to offer while it has none
+ * (galleryWeatherOffer): a link not saved here, opened without a gallery page.
  */
-export async function galleryPagesForLink(): Promise<GalleryWeatherPage[]> {
-  if (
-    project.status.loadedFrom !== 'link' ||
-    !project.onLoaded.isProject ||
-    !locations.allValid ||
-    weather.rawData.length
-  )
-    return [];
-  return findGalleryWeatherPages(
-    project.id,
-    locations.all.map(({ from, to }) => ({ from, to })),
+export function lookUpGalleryWeather(url: URL) {
+  const id = url.searchParams.get('project');
+  if (!id || url.searchParams.has(FROM_GALLERY_PARAM)) return;
+  void galleryWeatherOffer.lookUp(
+    id,
+    ProjectStorage.getById(id).then((saved) =>
+      saved ? [] : findGalleryWeatherPages(id),
+    ),
   );
 }
 
@@ -113,8 +114,27 @@ export async function loadGalleryPageWeather(postId: number) {
   if (weather.rawData.length) return false;
   if (!(await loadGalleryWeather(fetchGalleryWeather(postId)))) return false;
   weatherDays.markCurrent();
-  project.status.loadedFrom = 'gallery';
+  project.status.loadedFrom = 'link-gallery';
+  project.status.galleryPostId = postId;
   return true;
+}
+
+/** loadGalleryPageWeather, saying how it went */
+export async function loadGalleryWeatherWithToast(postId: number) {
+  const loaded = await loadGalleryPageWeather(postId);
+  toast.trigger(
+    loaded
+      ? {
+          message: 'Loaded the weather from its gallery page.',
+          category: 'success',
+        }
+      : {
+          message:
+            'That gallery page’s weather couldn’t be loaded. Search for weather to get it.',
+          category: 'warning',
+        },
+  );
+  return loaded;
 }
 
 /** Loads a gallery page's weather, as ProjectStorage.load() does a saved one.
@@ -137,7 +157,13 @@ async function loadGalleryWeather(
     moon: day.moon || getMoonPhase(day.date),
   }));
   weather.setRawData(loaded);
-  weatherDays.loaded(loaded);
+  // Its days are from when the page was last updated
+  const updated = page.modifiedGmt || page.dateGmt;
+  weatherDays.loaded(
+    loaded,
+    null,
+    updated ? (updated.slice(0, 10) as TISO8601DateString) : null,
+  );
   weather.wasLoadedFromStorage = true;
   return true;
 }
@@ -185,6 +211,7 @@ function resetProjectState(id: string | null) {
   project.status.loading = true;
   project.status.wasLoaded = false;
   project.status.loadedFrom = null;
+  project.status.galleryPostId = null;
   project.status.error = { code: null, message: '' };
 }
 

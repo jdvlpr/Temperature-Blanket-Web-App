@@ -15,11 +15,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<!-- A link opened without weather whose project has gallery pages that kept
-theirs (galleryPagesForLink): load one's, as opening a copy from it does, or
-not now and search for every date. Each page as its gallery card shows it;
-several are a choice (versions published before pages were updated in place,
-or copies others published). Asked every time the link opens. -->
+<!-- A link opened without weather whose project has several gallery pages
+that kept theirs (GalleryWeatherOffer's Choose a Page): load one's, as
+opening a copy from it does. Each page as its gallery card shows it, a choice
+(versions published before pages were updated in place, or copies others
+published). -->
 
 <script lang="ts">
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
@@ -31,10 +31,10 @@ or copies others published). Asked every time the link opens. -->
     CARD_BOX,
   } from '#lib/constants/class-constants.js';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
-  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import type { GalleryWeatherPage } from '#lib/utils/gallery-weather.js';
-  import { loadGalleryPageWeather } from '#lib/utils/open-saved-project.js';
+  import { loadGalleryWeatherWithToast } from '#lib/utils/open-saved-project.js';
   import { getTitleTextFromLocationsMeta } from '#lib/utils/project-utils.svelte.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
   import { CloudDownloadIcon, LoaderCircleIcon } from '@lucide/svelte';
@@ -63,15 +63,9 @@ or copies others published). Asked every time the link opens. -->
   async function load() {
     if (chosen === undefined) return;
     loading = true;
-    const loaded = await loadGalleryPageWeather(chosen);
+    await loadGalleryWeatherWithToast(chosen);
     loading = false;
     dialog.close();
-    if (!loaded)
-      toast.trigger({
-        message:
-          'That gallery page’s weather couldn’t be loaded. Search for weather to get it.',
-        category: 'warning',
-      });
   }
 </script>
 
@@ -134,7 +128,7 @@ or copies others published). Asked every time the link opens. -->
       type="button"
       class={BTN_SECONDARY}
       disabled={loading}
-      onclick={() => dialog.close()}>Not Now</button
+      onclick={() => dialog.close()}>Cancel</button
     >
     <button
       type="button"

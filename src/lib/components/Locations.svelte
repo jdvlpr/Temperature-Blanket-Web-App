@@ -33,13 +33,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
+  import GalleryWeatherOffer from './GalleryWeatherOffer.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
+  // The words before a link to its gallery page, when its weather is from one
   const LOADED_LABELS: Record<LoadedFrom, string> = {
     saved: 'Loaded saved project',
     'saved-custom': 'Loaded saved project with custom weather',
     link: 'Loaded project from link',
-    gallery: 'Loaded copy from gallery page',
+    'link-gallery': 'Loaded project from link · weather from its',
+    gallery: 'Loaded copy from',
   };
 
   const validLoadedProject = $derived(
@@ -57,7 +60,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <CircleCheckBigIcon class="icon-sm text-success-900-100" />
       <span data-testid="loaded-from"
-        >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}</span
+        >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}
+        {#if project.status.loadedFrom === 'gallery' || project.status.loadedFrom === 'link-gallery'}
+          {#if project.status.galleryPostId}
+            <a
+              class="anchor inline-flex items-center gap-1"
+              href={`/gallery/${project.status.galleryPostId}`}
+              target="_blank"
+              rel="noreferrer"
+              >gallery page<ExternalLinkIcon class="icon-sm" /><span
+                class="sr-only">(opens in a new tab)</span
+              ></a
+            >
+          {:else}
+            gallery page
+          {/if}
+        {/if}</span
       >
       <HelpIcon topic="project-includes">
         {#snippet text()}
@@ -156,6 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     <div class="flex w-full flex-col items-center gap-2">
+      <GalleryWeatherOffer />
       <SearchForWeather />
     </div>
 

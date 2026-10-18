@@ -59,6 +59,8 @@ const inputsKey = () =>
 class WeatherDays {
   /** Each location's last day got (null: none) */
   fetchedThrough = $state<(TISO8601DateString | null)[]>([]);
+  /** The day each location's days were all got (null: not known) */
+  fetchedAt = $state<(TISO8601DateString | null)[]>([]);
   early = $state<EarlyDays>({});
   declined = $state<DeclinedValues>({});
   /** What the days were got for; null until there are days */
@@ -113,6 +115,7 @@ class WeatherDays {
   /** Starts over: a new project, or one with no days yet */
   reset() {
     this.fetchedThrough = [];
+    this.fetchedAt = [];
     this.early = {};
     this.declined = {};
     this.#basis = null;
@@ -121,12 +124,20 @@ class WeatherDays {
   /**
    * The days now loaded (saved, or from a gallery page) are the project's:
    * what was kept about them, or what their values show for projects saved
-   * before that was kept.
+   * before that was kept. A gallery page's days were got when it was last
+   * updated (`fetchedAt`).
    */
-  loaded(days: WeatherDay[], stored?: Partial<StoredWeatherDays> | null) {
+  loaded(
+    days: WeatherDay[],
+    stored?: Partial<StoredWeatherDays> | null,
+    fetchedAt: TISO8601DateString | null = null,
+  ) {
     this.fetchedThrough = locations.all.map(
       (_, index) =>
         stored?.fetchedThrough?.[index] ?? lastDayWithValues(days, index),
+    );
+    this.fetchedAt = locations.all.map(
+      (_, index) => stored?.fetchedAt?.[index] ?? fetchedAt,
     );
     this.early = { ...stored?.early };
     this.declined = { ...stored?.declined };
@@ -162,6 +173,8 @@ class WeatherDays {
       through[index] = last < cap ? last : cap;
     });
     this.fetchedThrough = through;
+    // Only new days leave the saved ones as old as they were
+    if (all) this.fetchedAt = locations.all.map(() => today);
     const early = earlyDaysIn(data, today, sourceOf);
     this.early = all ? early : { ...this.early, ...early };
     this.markCurrent();
@@ -176,6 +189,7 @@ class WeatherDays {
   toStored(): StoredWeatherDays {
     return $state.snapshot({
       fetchedThrough: this.fetchedThrough,
+      fetchedAt: this.fetchedAt,
       early: this.early,
       declined: this.declined,
     }) as StoredWeatherDays;

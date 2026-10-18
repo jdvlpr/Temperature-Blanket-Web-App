@@ -28,9 +28,15 @@ way of opening a project brings with it, the open project's way marked -->
     {
       id: 'link',
       name: 'Link',
-      // Or loads a gallery page's days, when its project has one (GalleryWeather)
-      weather: "Press Search, or a gallery page's days",
+      weather: 'Press Search',
       recent: 'Can differ a little',
+    },
+    {
+      // A link whose project has a gallery page, loaded (GalleryWeatherOffer)
+      id: 'link-gallery',
+      name: 'Link, weather from its gallery page',
+      weather: "Page's days",
+      recent: 'As published',
     },
     {
       id: 'gallery',
