@@ -48,10 +48,10 @@ export function trackSections(): Attachment<HTMLElement> {
       headings = [...node.querySelectorAll<HTMLElement>(HEADINGS)].filter(
         (heading) =>
           !heading.closest('[data-on-this-page-ignore]') &&
-          (heading.id || heading.parentElement?.closest('[id]')),
+          sectionId(heading, node),
       );
       onThisPage.sections = headings.map((heading) => ({
-        id: sectionId(heading),
+        id: sectionId(heading, node),
         text: heading.textContent?.trim() ?? '',
         level: heading.tagName === 'H3' ? 3 : 2,
       }));
@@ -73,7 +73,7 @@ export function trackSections(): Attachment<HTMLElement> {
               break;
             current = heading;
           }
-        onThisPage.current = current ? sectionId(current) : null;
+        onThisPage.current = current ? sectionId(current, node) : null;
       });
     }
 
@@ -124,6 +124,10 @@ export async function goFromSheet(
   await goto(href);
 }
 
-function sectionId(heading: HTMLElement) {
-  return heading.id || heading.parentElement?.closest('[id]')?.id || '';
+/** A heading's id, or else its section's, inside the page (never the
+ * page's own ancestors', which every heading would share) */
+function sectionId(heading: HTMLElement, page: HTMLElement) {
+  if (heading.id) return heading.id;
+  const section = heading.parentElement?.closest('[id]');
+  return section && page.contains(section) ? section.id : '';
 }
