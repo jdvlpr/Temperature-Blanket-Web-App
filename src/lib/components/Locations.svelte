@@ -74,15 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else if project.status.wasLoaded}
         Loaded project
       {/if}
-      {#if weatherDays.newDaysCount}
-        <span aria-hidden="true">·</span>
-        <span data-testid="new-days-available"
-          >{weatherDays.newDaysCount} new {pluralize(
-            'day',
-            weatherDays.newDaysCount,
-          )} available</span
-        >
-      {/if}
     </p>
   {/if}
 

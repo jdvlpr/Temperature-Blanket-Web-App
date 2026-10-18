@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Crochet or Knit Along All Year. A saved project opens with its saved days
 and never searches by itself (storage/projects.svelte.ts, weather-days):
-the planner says how many new days are available, and Weather Data › Get
-New Days adds only those. Search Again gets every day and asks before
+the Weather Data button shows how many new days are waiting, and Get New
+Days adds only those. Search Again gets every day and asks before
 changing saved ones (modals/SearchAgain.svelte). -->
 
 <script lang="ts">
@@ -40,8 +40,8 @@ changing saved ones (modals/SearchAgain.svelte). -->
       whenever you start).
     </li>
     <li>
-      Press <span class="font-bold">Search</span>. Under the dates it says how
-      many days haven't happened yet: their weather comes in as they pass.
+      Press <span class="font-bold">Search</span>. Beside the number of days it
+      says how many are still to come: their weather comes in as they pass.
     </li>
     <li>
       Press <span class="font-bold">Project</span>, then
@@ -51,7 +51,7 @@ changing saved ones (modals/SearchAgain.svelte). -->
   </ol>
   <DocsShot
     src="knit-along-all-year/future-days"
-    alt="London from January 1 to December 31 of this year, 365 Days, with a note under the dates that some of these days haven't happened yet. Below it, Weather Data and Add Location."
+    alt="London from January 1 to December 31 of this year, 365 Days, with how many are still to come. Below it, Weather Data and Add Location."
     caption="A year that's still going."
   />
 </section>
@@ -95,8 +95,8 @@ changing saved ones (modals/SearchAgain.svelte). -->
       <span class="font-bold">Open…</span>
     </li>
     <li>
-      Under the title it says how many new days are available. Press
-      <span class="font-bold">Weather Data</span>, then
+      The <span class="font-bold">Weather Data</span> button shows how many new
+      days are waiting. Press it, then
       <span class="font-bold">Get New Days</span>. Only the days since are
       added: the days you've already made stay as they were saved.
     </li>

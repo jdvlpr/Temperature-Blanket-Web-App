@@ -89,6 +89,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <Menu.Trigger class={BUTTON}>
       Weather Data
+      <!-- Shown while days are waiting, as What's New shows its news -->
+      {#if weatherDays.newDaysCount}
+        <span
+          class="badge preset-filled-surface-50-950 px-2 py-0.5 text-xs"
+          data-testid="new-days-available"
+          ><span class="sr-only">,</span>
+          {weatherDays.newDaysCount} new<span class="sr-only">
+            {weatherDays.newDaysCount === 1 ? 'day' : 'days'}</span
+          ></span
+        >
+      {/if}
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
     </Menu.Trigger>
     <Portal>

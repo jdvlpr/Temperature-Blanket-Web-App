@@ -661,15 +661,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-sm">
           {location.days}
           {pluralize('Day', location.days)}
+          <!-- A year still going is fine: those days come in as they pass -->
+          {#if location.daysInFuture}
+            <span aria-hidden="true">·</span>
+            <span class="opacity-80" data-testid="days-to-come"
+              >{location.daysInFuture} still to come</span
+            >
+          {/if}
         </p>
-        <!-- A year still going is fine: those days come in as they pass -->
-        {#if location.daysInFuture}
-          <p class="w-full text-sm opacity-80">
-            {location.daysInFuture} of these days
-            {location.daysInFuture === 1 ? "hasn't" : "haven't"} happened yet. Their
-            weather comes in as they pass: use Get New Days.
-          </p>
-        {/if}
       {:else if location.errorMessage && browser}
         <p
           class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"

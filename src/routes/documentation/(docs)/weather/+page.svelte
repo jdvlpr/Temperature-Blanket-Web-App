@@ -65,9 +65,9 @@ HELP_TOPICS). -->
   <SavedWeatherDays />
   <h3 class="text-lg font-bold">Get New Days</h3>
   <p>
-    For a project that's still going, the line under the planner's title says
-    how many new days are available. Press
-    <span class="font-bold">Weather Data</span>, then
+    For a project that's still going, the
+    <span class="font-bold">Weather Data</span> button shows how many new days
+    are waiting. Press it, then
     <span class="font-bold">Get New Days</span>. Only those days are added. It's
     in the Project menu too.
   </p>
