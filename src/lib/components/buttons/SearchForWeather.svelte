@@ -82,11 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   >
     <Menu.Trigger class={BUTTON}>
-      <span class="flex flex-col">
-        <span class="flex items-center gap-1">
-          <span>Get Weather Data</span>
-          <ChevronDownIcon class="icon-sm" aria-hidden="true" />
-        </span>
+      <span class={['flex flex-col', weatherDays.newDaysCount && 'mb-1.5']}>
         <!-- Shown while days are waiting -->
         {#if weatherDays.newDaysCount}
           <span class="text-sm opacity-90" data-testid="new-days-available"
@@ -96,6 +92,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : 'days'}</span
           >
         {/if}
+        <span class="flex items-center gap-1">
+          <span>Get Weather Data</span>
+          <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+        </span>
       </span>
     </Menu.Trigger>
     <Portal>
