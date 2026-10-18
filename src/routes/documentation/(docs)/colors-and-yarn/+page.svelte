@@ -87,8 +87,9 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
     </li>
     <li>
       Press colorways to add them to your palette, in order. Rearrange or remove
-      them in the strip above, or press <span class="font-bold">Clear</span> to start
-      over.
+      them in the strip at the bottom, or press <span class="font-bold"
+        >Clear</span
+      > to start over.
     </li>
     <li>Press <span class="font-bold">Save</span>.</li>
   </ol>

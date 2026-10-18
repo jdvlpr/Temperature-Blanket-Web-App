@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import {
     VERSION_7_POST,
     VERSION_7_POST_HREF,
@@ -146,7 +147,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Already have the project on Ravelry? Link it instead of starting a
               new one.
             </p> -->
-            <!-- Screenshot: a gallery page with Ravelry photos -->
+            <!-- Shot needed (owner's real data): a gallery page of a project
+            posted to Ravelry, showing its Ravelry photos (two or three) under
+            the preview, at desktop width, light and dark, captured as
+            static/images/docs/version-7/ravelry-photos-{light,dark}.png with
+            its size in docs-shots.json; then
+            <DocsShot src="version-7/ravelry-photos" alt="A gallery page:
+            the project's name, By <name> · views, its preview, and its
+            Ravelry photos in a row, with On Ravelry beside them." /> -->
 
             <h3 class="font-bold">Gallery pages you can update</h3>
             <p>
@@ -177,7 +185,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               each has its own tool, a matching menu (Project or Palette), and the
               same ways to share and download.
             </p>
-            <!-- Screenshot: the site menu (Create, My Library, Explore) -->
+            <DocsShot
+              src="version-7/site-menu"
+              alt="The site menu: Create and My Library at the top; Explore with Gallery, Yarn Colorways and Weather Forecast; then Supporters, and small links to the Blog, Guides & Help, What's New, Contact, Privacy, Data Sources & Credits, API and GitHub."
+              caption="The new site menu."
+            />
 
             <h3 class="font-bold">Editing colors and ranges</h3>
             <p>
@@ -196,7 +208,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
               import colors are now under
               <span class="italic">Get Colors</span>.
             </p>
-            <!-- Screenshot: a gauge with one range number being edited, and the Ranges menu open -->
+            <DocsShot
+              src="gauges-and-ranges/edit-range"
+              alt="The Temperature Gauge as a list of ten colors, each with its range and how many days fall in it. The third color's range, 23° → 20°, has its To number open for typing, with ✕ and Save beside it."
+              caption="Changing a range right in the gauge."
+            />
+            <DocsShot
+              src="gauges-and-ranges/ranges-menu"
+              alt="The Ranges menu: Auto ranges (now Equal days · High Temperature), Manual steps…, Direction with High to low checked and Low to high, Linked ranges turned on, and Each range includes (From, not To)."
+              caption="The Ranges menu."
+            />
 
             <h3 id="saving" class="scroll-mt-20 font-bold">Saving</h3>
             <p>

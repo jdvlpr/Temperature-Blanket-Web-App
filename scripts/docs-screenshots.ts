@@ -38,6 +38,10 @@ const only = arg('only');
 // London (GeoNames 2643743), all of 2025, from Open-Meteo (s=1, without
 // trying the other source: 0)
 const PROJECT = `/?project=1#l=2643743'2025010120251231&s=10&u=m`;
+// The same place on March 10 of three years, one location each
+const SAME_DATE = `/?project=1#l=${[2023, 2024, 2025].map((year) => `2643743'${year}0310${year}0310`).join('')}&s=10&u=m`;
+// The whole of this year, with days still to come
+const THIS_YEAR = `/?project=1#l=2643743'${new Date().getFullYear()}0101${new Date().getFullYear()}1231&s=10&u=m`;
 
 type Shot = {
   name: string;
@@ -53,16 +57,22 @@ type Shot = {
 async function planner(
   page: Page,
   section: 'location' | 'weather-data' | 'gauges' | 'preview',
+  project = PROJECT,
 ) {
   // Without the analytics question (its old key, still read)
   await page.addInitScript(() =>
     localStorage.setItem('disable_toast_analytics', 'true'),
   );
-  await page.goto(new URL(PROJECT, base).href);
+  await page.goto(new URL(project, base).href);
   await page.getByRole('button', { name: /^Search/ }).click();
   await page.getByRole('button', { name: /^Weather Source/ }).waitFor();
   const key = { location: '1', 'weather-data': '2', gauges: '3', preview: '4' };
   await page.keyboard.press(key[section]);
+  // Without toasts (like "Units set to") over the shot
+  for (const toast of await page
+    .getByRole('button', { name: 'Dismiss toast' })
+    .all())
+    await toast.click();
   await settle(page);
   return page.locator(`#page-section-${section}`);
 }
@@ -91,6 +101,81 @@ const menu = (page: Page) => page.getByRole('menu').last();
 const dialog = (page: Page) => page.getByRole('dialog').last();
 
 const SHOTS: Shot[] = [
+  {
+    name: 'gauges-and-ranges/edit-range',
+    open: async (page) => {
+      const section = await planner(page, 'gauges');
+      await section.locator('.range-to').nth(2).click();
+      await settle(page);
+      return section;
+    },
+    trim: true,
+  },
+  {
+    name: 'weather/edit-day',
+    open: async (page) => {
+      const section = await planner(page, 'weather-data');
+      await section.locator('table tbody button').first().click();
+      await settle(page);
+      return dialog(page);
+    },
+  },
+  {
+    // Days in ranges is on to start with
+    name: 'choose-ranges/days-in-ranges',
+    open: async (page) => planner(page, 'gauges'),
+    trim: true,
+  },
+  {
+    name: 'same-date-several-years/locations',
+    open: async (page) => planner(page, 'location', SAME_DATE),
+    height: 3200,
+  },
+  {
+    name: 'knit-along-all-year/future-days',
+    open: async (page) => planner(page, 'location', THIS_YEAR),
+    height: 2200,
+  },
+  {
+    name: 'match-your-yarn/choose-colorways',
+    open: async (page) => {
+      await planner(page, 'gauges');
+      await page.getByRole('button', { name: /Get Colors/ }).click();
+      await page.getByRole('menuitem', { name: /Choose Colorways/ }).click();
+      const picker = dialog(page);
+      await picker.getByRole('combobox').first().click();
+      await page.keyboard.type('Special DK');
+      await page
+        .getByRole('option', { name: /Special DK/ })
+        .first()
+        .click();
+      await settle(page);
+      // A few colorways, so the strip of picked ones shows
+      const cards = picker.locator('button[aria-pressed]');
+      for (let i = 0; i < 4; i++) await cards.nth(i * 3).click();
+      await settle(page);
+      return picker;
+    },
+    trim: true,
+  },
+  {
+    name: 'rain-snow-sunshine/rain-gauge',
+    open: async (page) => {
+      const section = await planner(page, 'gauges');
+      await page.getByRole('button', { name: /^Rain Gauge/ }).click();
+      await page.getByRole('button', { name: 'Yes' }).click();
+      await settle(page);
+      return section;
+    },
+    trim: true,
+  },
+  {
+    name: 'version-7/site-menu',
+    open: async (page) => {
+      await planner(page, 'location');
+      return page.getByRole('navigation', { name: 'Site' });
+    },
+  },
   {
     name: 'preview/rows',
     open: async (page) => {

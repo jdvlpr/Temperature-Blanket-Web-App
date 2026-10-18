@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Guides & Help: the index and every guide and reference page. A page here
-is only its content; its title, description, breadcrumb and Previous/Next
-all come from docs-index. On a guide or reference page, On this page (its
+is only its content; its title, description, breadcrumb, Previous/Next
+and a guide's video all come from docs-index. On a guide or reference page, On this page (its
 h2/h3 sections, the one being read marked) sits beside the page on wide
 screens; on smaller ones a bar under the top bar names the section being
 read. The index has every page beside it instead, and no bar. Either way,
@@ -28,6 +28,7 @@ page's sections, then every page. Only the page's content
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import YouTubeVideo from '#lib/components/YouTubeVideo.svelte';
   import DocsNav from '#lib/components/docs/DocsNav.svelte';
   import OnThisPage from '#lib/components/docs/OnThisPage.svelte';
   import {
@@ -159,6 +160,18 @@ page's sections, then every page. Only the page's content
             </h1>
             <p class="text-lg opacity-80">{current.summary}</p>
           </header>
+          {#if current.video}
+            <div class="flex flex-col gap-2" data-on-this-page-ignore>
+              <YouTubeVideo
+                id={current.video.id}
+                start={current.video.start}
+                title={current.title}
+              />
+              <p class="text-sm opacity-80">
+                Prefer reading? Every step is written out below.
+              </p>
+            </div>
+          {/if}
           <article
             data-pagefind-body
             class="docs-content flex flex-col gap-6 [&_[id]]:scroll-mt-(--section-scroll-margin)"

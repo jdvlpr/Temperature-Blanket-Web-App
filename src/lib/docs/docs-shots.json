@@ -30,5 +30,37 @@
   "library-and-account/card-menu": {
     "width": 241,
     "height": 247
+  },
+  "gauges-and-ranges/edit-range": {
+    "width": 1002,
+    "height": 1234
+  },
+  "weather/edit-day": {
+    "width": 364,
+    "height": 276
+  },
+  "choose-ranges/days-in-ranges": {
+    "width": 1002,
+    "height": 1234
+  },
+  "same-date-several-years/locations": {
+    "width": 768,
+    "height": 1341
+  },
+  "match-your-yarn/choose-colorways": {
+    "width": 1280,
+    "height": 1288
+  },
+  "knit-along-all-year/future-days": {
+    "width": 768,
+    "height": 729
+  },
+  "rain-snow-sunshine/rain-gauge": {
+    "width": 1002,
+    "height": 810
+  },
+  "version-7/site-menu": {
+    "width": 278,
+    "height": 505
   }
 }

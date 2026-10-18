@@ -28,8 +28,8 @@ export type DocsPage = {
   /** One sentence: the card text and the page's meta description */
   summary: string;
   keywords: string[];
-  /** Until the guide is written: the reference section that covers it */
-  until?: string;
+  /** A guide's video, once there is one: a YouTube ID, and where to start */
+  video?: { id: string; start?: number };
 };
 
 export const DOCS_TITLE = 'Guides & Help';
@@ -51,7 +51,6 @@ export const GUIDES: DocsPage[] = [
       'new project',
       'getting started',
     ],
-    until: '/documentation/location-and-dates',
   },
   {
     kind: 'guide',
@@ -71,7 +70,6 @@ export const GUIDES: DocsPage[] = [
       'my own data',
       'weather station',
     ],
-    until: '/documentation/weather#weather-errors',
   },
   {
     kind: 'guide',
@@ -90,7 +88,6 @@ export const GUIDES: DocsPage[] = [
       'decimals',
       'equal',
     ],
-    until: '/documentation/gauges-and-ranges#increment-modes',
   },
   {
     kind: 'guide',
@@ -108,7 +105,6 @@ export const GUIDES: DocsPage[] = [
       'memorial',
       'wedding',
     ],
-    until: '/documentation/location-and-dates#multiple-locations',
   },
   {
     kind: 'guide',
@@ -128,7 +124,6 @@ export const GUIDES: DocsPage[] = [
       'palette',
       'buy',
     ],
-    until: '/documentation/colors-and-yarn#choose-yarn-colorways',
   },
   {
     kind: 'guide',
@@ -147,7 +142,6 @@ export const GUIDES: DocsPage[] = [
       'crochet along',
       'knit along',
     ],
-    until: '/documentation/library-and-account#save-project',
   },
   {
     kind: 'guide',
@@ -167,7 +161,6 @@ export const GUIDES: DocsPage[] = [
       'deleted',
       'trash',
     ],
-    until: '/documentation/library-and-account#open-project',
   },
   {
     kind: 'guide',
@@ -186,7 +179,6 @@ export const GUIDES: DocsPage[] = [
       'update',
       'stars',
     ],
-    until: '/documentation/gallery-and-ravelry',
   },
   {
     kind: 'guide',
@@ -204,7 +196,6 @@ export const GUIDES: DocsPage[] = [
       'not updating',
       'post',
     ],
-    until: '/documentation/gallery-and-ravelry',
   },
   {
     kind: 'guide',
@@ -224,7 +215,6 @@ export const GUIDES: DocsPage[] = [
       'download',
       'image',
     ],
-    until: '/documentation/download',
   },
   {
     kind: 'guide',
@@ -242,7 +232,6 @@ export const GUIDES: DocsPage[] = [
       'moon',
       'not temperature',
     ],
-    until: '/documentation/gauges-and-ranges#add-a-gauge',
   },
 ];
 
