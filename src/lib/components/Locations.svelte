@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     {/if}
 
-    <div class="flex w-full flex-col items-center gap-4">
+    <div class="flex w-full flex-col items-center gap-2">
       <SearchForWeather />
     </div>
 
