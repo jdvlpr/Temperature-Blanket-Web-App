@@ -85,11 +85,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Get Weather Data
       <!-- Shown while days are waiting -->
       {#if weatherDays.newDaysCount}
-        <span class="opacity-80" data-testid="new-days-available"
+        <span class="text-sm opacity-80" data-testid="new-days-available"
           ><span class="sr-only">,</span>
-          {weatherDays.newDaysCount} new<span class="sr-only">
-            {weatherDays.newDaysCount === 1 ? 'day' : 'days'}</span
-          ></span
+          {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
+            ? 'day'
+            : 'days'}</span
         >
       {/if}
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
