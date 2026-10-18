@@ -18,9 +18,9 @@
 
 import GroupingWeather from '#lib/components/docs/help/GroupingWeather.svelte';
 import ImportFileRequirements from '#lib/components/docs/help/ImportFileRequirements.svelte';
-import LinkWeather from '#lib/components/docs/help/LinkWeather.svelte';
 import LinkUnavailable from '#lib/components/docs/help/LinkUnavailable.svelte';
 import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
+import ProjectIncludes from '#lib/components/docs/help/ProjectIncludes.svelte';
 import SavedWeatherDays from '#lib/components/docs/help/SavedWeatherDays.svelte';
 import Seasons from '#lib/components/docs/help/Seasons.svelte';
 import type { Component } from 'svelte';
@@ -48,10 +48,10 @@ export const HELP_TOPICS = {
     href: '/documentation/weather#import-weather-data-file-requirements',
     content: ImportFileRequirements,
   },
-  'link-weather': {
-    title: 'Weather and Links',
-    href: '/documentation/weather#link-weather',
-    content: LinkWeather,
+  'project-includes': {
+    title: 'What a Project Includes',
+    href: '/documentation/weather#project-includes',
+    content: ProjectIncludes,
   },
   'saved-weather-days': {
     title: 'Saved Weather',

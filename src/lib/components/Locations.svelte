@@ -18,11 +18,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Location from '#lib/components/Location.svelte';
   import { MAXIMUM_LOCATIONS } from '#lib/constants/location-constants.js';
   import { locations } from '#lib/state/location-state.svelte.js';
-  import { project } from '#lib/state/project-state.svelte.js';
+  import { project, type LoadedFrom } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
-  import { autosave } from '#lib/storage/autosave.svelte.js';
   import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
   import { stringToDate } from '#lib/utils/date-utils.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
@@ -36,13 +35,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
-  // A link not saved here, which holds no weather: it's searched for
-  const linkWithoutWeather = $derived(
-    project.onLoaded.isProject &&
-      !weather.wasLoadedFromStorage &&
-      !autosave.stored &&
-      !weather.isUserEdited,
-  );
+  const LOADED_LABELS: Record<LoadedFrom, string> = {
+    saved: 'Loaded saved project',
+    'saved-custom': 'Loaded saved project with custom weather',
+    link: 'Loaded project from link',
+    gallery: 'Loaded copy from gallery page',
+  };
 
   const validLoadedProject = $derived(
     (weather.wasLoadedFromStorage && !!weather.data.length) ||
@@ -58,21 +56,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
       <CircleCheckBigIcon class="icon-sm text-success-900-100" />
-      {#if weather.wasLoadedFromStorage && !!weather.data.length}
-        Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-        data
-      {:else if project.status.wasLoaded && linkWithoutWeather}
-        <span data-testid="link-weather"
-          >Loaded project; search to load weather data</span
-        >
-        <HelpIcon topic="link-weather">
-          {#snippet text()}
-            <span>Why?</span>
-          {/snippet}
-        </HelpIcon>
-      {:else if project.status.wasLoaded}
-        Loaded project
-      {/if}
+      <span data-testid="loaded-from"
+        >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}</span
+      >
+      <HelpIcon topic="project-includes">
+        {#snippet text()}
+          <span>What's included?</span>
+        {/snippet}
+      </HelpIcon>
     </p>
   {/if}
 

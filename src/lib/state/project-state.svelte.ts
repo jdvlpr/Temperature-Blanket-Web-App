@@ -79,7 +79,11 @@ type ProjectStatusType = {
   temporaryProjectsBackup: any[]; // A temporary backup of projects in case migration fails
   temporaryUid: string;
   wasLoaded: boolean;
+  /** Where the loaded project came from, for its Loaded line */
+  loadedFrom: LoadedFrom | null;
 };
+
+export type LoadedFrom = 'saved' | 'saved-custom' | 'link' | 'gallery';
 
 class ProjectClass {
   // *****************
@@ -183,6 +187,7 @@ class ProjectClass {
     temporaryProjectsBackup: [],
     temporaryUid: '',
     wasLoaded: false,
+    loadedFrom: null,
   });
 
   gallery = $state({

@@ -59,35 +59,46 @@ export async function loadSavedProject(
   if (project.onLoaded.isProject) await ProjectStorage.load();
 
   // A shared link's name, unless the project is saved here with its own
+  const saved = !!(await ProjectStorage.getById(project.id));
   const linkName = projectNameFromHash(url.hash);
-  if (linkName && !(await ProjectStorage.getById(project.id)))
-    project.linkName = linkName;
+  if (linkName && !saved) project.linkName = linkName;
 
   await loadProjectFromURL(url.hash.substring(1), { quiet });
 
-  if (galleryWeather && locations.allValid && !weather.rawData.length)
-    await loadGalleryWeather(galleryWeather);
+  const fromGalleryPage =
+    !!galleryWeather &&
+    locations.allValid &&
+    !weather.rawData.length &&
+    (await loadGalleryWeather(galleryWeather));
 
   // The days loaded were got for these locations and this source (which the
   // link may have set after them)
   if (weather.rawData.length) weatherDays.markCurrent();
 
   if (locations.allValid) project.status.wasLoaded = true;
+  project.status.loadedFrom = fromGalleryPage
+    ? 'gallery'
+    : !saved
+      ? 'link'
+      : weather.isUserEdited
+        ? 'saved-custom'
+        : 'saved';
 }
 
-/** Loads a gallery page's weather, as ProjectStorage.load() does a saved one */
+/** Loads a gallery page's weather, as ProjectStorage.load() does a saved one.
+ * Whether it did */
 async function loadGalleryWeather(
   galleryWeather: ReturnType<typeof fetchGalleryWeather>,
-) {
+): Promise<boolean> {
   // A slow gallery leaves the weather to a search rather than hold up the page
   const page = await Promise.race([
     galleryWeather,
     new Promise<null>((resolve) => setTimeout(() => resolve(null), 5000)),
   ]);
-  if (!page) return;
+  if (!page) return false;
   const days = galleryWeatherToLoad(page, locations.all);
   // A search may have started meanwhile
-  if (!days || weather.rawData.length) return;
+  if (!days || weather.rawData.length) return false;
   weather.isUserEdited = isCustomGalleryWeather(page.weatherSources);
   const loaded = days.map((day) => ({
     ...day,
@@ -96,6 +107,7 @@ async function loadGalleryWeather(
   weather.setRawData(loaded);
   weatherDays.loaded(loaded);
   weather.wasLoadedFromStorage = true;
+  return true;
 }
 
 // The saved project last loaded on this page by loadInPlace(), with the
@@ -140,6 +152,7 @@ function resetProjectState(id: string | null) {
   project.gallery = { href: '', title: '' };
   project.status.loading = true;
   project.status.wasLoaded = false;
+  project.status.loadedFrom = null;
   project.status.error = { code: null, message: '' };
 }
 

@@ -37,9 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </li>
   </ul>
   <p>
-    A link doesn't hold weather (see <a
-      href="/documentation/weather#link-weather"
-      class="link">Weather and Links</a
-    >). A gallery page keeps the weather it was published with.
+    A link doesn't hold weather, and a gallery page keeps the weather it was
+    published with (see <a
+      href="/documentation/weather#project-includes"
+      class="link">What a Project Includes</a
+    >).
   </p>
 </div>
