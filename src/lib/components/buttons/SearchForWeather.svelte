@@ -81,18 +81,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         mode: details.value === 'again' ? 'again' : 'new-days',
       })}
   >
-    <Menu.Trigger class={BUTTON}>
-      <span class="flex flex-col items-center">
-        <span>Get Weather Data</span>
+    <Menu.Trigger
+      class={[BUTTON, weatherDays.newDaysCount && 'rounded-sm text-left']}
+    >
+      <span class="flex flex-col items-start">
         <!-- Shown while days are waiting -->
         {#if weatherDays.newDaysCount}
-          <span class="text-sm opacity-80" data-testid="new-days-available"
+          <span class="text-sm" data-testid="new-days-available"
             ><span class="sr-only">,</span>
             {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
               ? 'day'
               : 'days'}</span
           >
         {/if}
+        <span>Get Weather Data</span>
       </span>
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
     </Menu.Trigger>
