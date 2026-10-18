@@ -20,8 +20,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations } from '#lib/state/location-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
-  import { weatherDays } from '#lib/state/weather-days.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
+  import { localToday, weatherDays } from '#lib/state/weather-days.svelte.js';
+  import { addDays, SETTLE_DAYS } from '#lib/utils/weather-days.js';
+  import { autosave } from '#lib/storage/autosave.svelte.js';
+  import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
   import { stringToDate } from '#lib/utils/date-utils.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
@@ -34,6 +37,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
+  // A link not saved here (whose weather is got fresh) with days recent
+  // enough to have changed since it was sent, or still to come
+  const linkWithRecentDays = $derived.by(() => {
+    if (
+      !project.onLoaded.isProject ||
+      weather.wasLoadedFromStorage ||
+      autosave.stored ||
+      weather.isUserEdited ||
+      !locations.allValid
+    )
+      return false;
+    const soon = addDays(localToday(), -SETTLE_DAYS.Meteostat);
+    return locations.all.some(
+      (location) => !!location.to && location.to >= soon,
+    );
+  });
+
   const validLoadedProject = $derived(
     (weather.wasLoadedFromStorage && !!weather.data.length) ||
       project.status.wasLoaded,
@@ -63,6 +83,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           )} available</span
         >
       {/if}
+    </p>
+  {/if}
+
+  <!-- A link's weather is got fresh: days near today may differ from the
+  sender's -->
+  {#if !loading && linkWithRecentDays}
+    <p
+      class="mt-1 w-full text-center text-sm opacity-80"
+      data-testid="link-recent-days"
+    >
+      This link includes recent days, so their weather may be a little different
+      from what the sender saw.
+      <HelpIcon topic="saved-weather-days">
+        {#snippet text()}
+          <span>Why?</span>
+        {/snippet}
+      </HelpIcon>
     </p>
   {/if}
 

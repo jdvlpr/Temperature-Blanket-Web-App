@@ -37,11 +37,23 @@ closing changes nothing, so they're asked about next time. -->
     type DayKey,
   } from '#lib/utils/weather-days.js';
   import { SvelteSet } from 'svelte/reactivity';
+  import { onMount } from 'svelte';
+  import { galleryPageOf, loadShareState } from '#lib/accounts/share-rows.js';
+  import { project } from '#lib/state/project-state.svelte.js';
   import { changesFor, type SearchAgainResult } from './search-again.js';
 
   let { result }: { result: SearchAgainResult } = $props();
 
   const changes = $derived(changesFor(result));
+
+  // Its gallery page, if published, to update with the new values
+  onMount(() => {
+    if (__ACCOUNTS_ENABLED__) loadShareState('project');
+  });
+  const published = $derived(
+    __ACCOUNTS_ENABLED__ && !!galleryPageOf('project', project.id),
+  );
+  let updatePage = $state(true);
   // Days to take the new values of; none to start
   const use = new SvelteSet<DayKey>();
 
@@ -94,6 +106,16 @@ closing changes nothing, so they're asked about next time. -->
     };
   }
 
+  // Edit Gallery Page in this one's place, ready to save the new values
+  async function editGalleryPage() {
+    const { default: AddToGallery } = await import('./AddToGallery.svelte');
+    dialog.trigger({
+      type: 'component',
+      component: { ref: AddToGallery },
+      options: { title: 'Edit Gallery Page', size: 'medium' },
+    });
+  }
+
   function save() {
     const shown = changes;
     const chosen = new Set(
@@ -113,8 +135,9 @@ closing changes nothing, so they're asked about next time. -->
       chosen,
     );
     projectChanged({ weather: true });
-    dialog.close();
     const kept = shown.length - chosen.size;
+    if (chosen.size && published && updatePage) void editGalleryPage();
+    else dialog.close();
     toast.trigger({
       category: 'success',
       message: chosen.size
@@ -123,6 +146,13 @@ closing changes nothing, so they're asked about next time. -->
     });
   }
 </script>
+
+{#snippet alsoUpdate()}
+  <label class="flex cursor-pointer items-center justify-center gap-2 text-sm">
+    <input type="checkbox" class="checkbox" bind:checked={updatePage} />
+    Also update my gallery page
+  </label>
+{/snippet}
 
 <div class="flex flex-col gap-4 px-2 pt-2 text-left">
   <p>
@@ -193,7 +223,7 @@ closing changes nothing, so they're asked about next time. -->
           <p id={headingId} class="font-bold">
             {formatDate(change.date)}{#if several}
               <span class="font-normal opacity-70">
-                · {@html locations.all[change.location]?.label ?? ''}</span
+                · {locations.all[change.location]?.label ?? ''}</span
               >{/if}
           </p>
           <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
@@ -227,6 +257,7 @@ closing changes nothing, so they're asked about next time. -->
   {/if}
 
   <SaveAndCloseButtons
+    above={published && changes.length ? alsoUpdate : undefined}
     onSave={save}
     onClose={() => dialog.close()}
     disabled={!changes.length}

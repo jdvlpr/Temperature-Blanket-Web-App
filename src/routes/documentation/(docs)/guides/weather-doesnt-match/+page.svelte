@@ -140,9 +140,16 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     Keep the Weather From Changing
   </h2>
   <p>
-    Weather you've edited or imported is yours: it's saved with the project and
-    never looked up again. So to keep the weather exactly as it is today, even
-    if the service changes it later:
+    A saved project keeps its weather. Opening it never looks the weather up
+    again, and its saved days only change if you use
+    <a href="/documentation/weather#saved-weather-days" class="link"
+      >Search Again</a
+    > and choose the new values. A gallery page keeps the weather it was published
+    with, too.
+  </p>
+  <p>
+    A link doesn't carry the weather, though: whoever opens it gets the weather
+    fresh. To send someone your weather exactly as it is:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
@@ -151,16 +158,16 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     </li>
     <li>
       Press <span class="font-bold">Download</span> under the table, then
-      <span class="font-bold">Download CSV</span>.
+      <span class="font-bold">Download CSV</span>, and send them the file with
+      the link.
     </li>
     <li>
-      Press <span class="font-bold">Import Weather Data</span>, and choose that
-      same file, without changing it.
+      They press <span class="font-bold">Import Weather Data</span>, and choose
+      that file, without changing it.
     </li>
   </ol>
   <p>
-    The weather source now shows <span class="font-bold">Custom</span>. Keep the
-    file too: it's a copy of your weather to send someone, or to import again.
+    Their weather source then shows <span class="font-bold">Custom</span>.
   </p>
 </section>
 

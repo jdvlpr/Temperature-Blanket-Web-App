@@ -25,6 +25,10 @@
   import DataTable from './datatable/DataTable.svelte';
   import NumberInput from './modals/NumberInput.svelte';
   import TextInput from './modals/TextInput.svelte';
+  import KeptDay from './modals/KeptDay.svelte';
+  import { weatherDays } from '#lib/state/weather-days.svelte.js';
+  import { HistoryIcon } from '@lucide/svelte';
+  import type { DayKey } from '#lib/utils/weather-days.js';
 
   let { tableData, updateTable, uid } = $props();
 
@@ -74,6 +78,7 @@
         {@const index = table.allRows.findIndex((r) => r.date === row.date)}
         {@const isRecentDate = getIsRecentDate(row.date)}
         {@const isFutureDate = getIsFutureDate(row.date)}
+        {@const keptKey = `${row.location}|${row.date}` as DayKey}
         <tr
           class={[
             isRecentDate && '!bg-warning-500/20',
@@ -88,6 +93,29 @@
               <RecentWeatherDataTooltip />
             {/if}
             {row.date}
+            <!-- Saved values kept over newer ones Search Again got -->
+            {#if weather.grouping === 'day' && weatherDays.declined[keptKey]}
+              <button
+                type="button"
+                class="btn-icon btn-icon-sm hover:preset-tonal-surface align-middle"
+                title="Kept your saved values"
+                aria-label="{row.date}: kept your saved values. Show the new ones"
+                onclick={() =>
+                  dialog.trigger({
+                    type: 'component',
+                    component: {
+                      ref: KeptDay,
+                      props: {
+                        key: keptKey,
+                        onchange: updateTable,
+                      },
+                    },
+                    options: { title: `${row.date}` },
+                  })}
+              >
+                <HistoryIcon class="icon-sm" />
+              </button>
+            {/if}
           </td>
           {#each weather.tableWeatherTargets as { id, label, type }}
             <td

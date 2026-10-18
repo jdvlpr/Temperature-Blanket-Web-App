@@ -82,8 +82,10 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   <p>
     The number of days shows under the dates. Weather is only there for days
     that have passed, up to yesterday. A year that's still going is fine: the
-    days still to come are left out for now, and come in when you search again
-    later. <a href="/documentation/guides/knit-along-all-year" class="link"
+    days still to come are left out for now, and come in when you press
+    <span class="font-bold">Weather Data</span>, then
+    <span class="font-bold">Get New Days</span> later.
+    <a href="/documentation/guides/knit-along-all-year" class="link"
       >Making a blanket for this year</a
     >.
   </p>
@@ -148,8 +150,8 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     <li>
       <span class="font-bold"
         >…of these days are not in the past and won't have weather data.</span
-      > That's fine for a blanket you're making as the year goes: search again later
-      to fill them in.
+      > That's fine for a blanket you're making as the year goes: get the new days
+      later to fill them in.
     </li>
   </ul>
   <h3 class="text-lg font-bold">The places and dates can't be changed</h3>

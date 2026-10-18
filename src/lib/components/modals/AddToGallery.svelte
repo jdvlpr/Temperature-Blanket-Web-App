@@ -40,6 +40,7 @@ its weather, when that isn't kept with it). -->
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
+  import { weatherDays } from '#lib/state/weather-days.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import {
     ProjectStorage,
@@ -118,6 +119,18 @@ its weather, when that isn't kept with it). -->
   let destroyed = false;
 
   async function getWeather() {
+    // Saved days stay as they are; only days since are got
+    if (weather.rawData.length && weatherDays.newDaysCount) {
+      preparing = 'weather';
+      const abort = (weatherAbort = new AbortController());
+      try {
+        await weatherSearch.addNewDaysOnly(abort);
+      } catch {
+        // Published with the days it has
+      }
+      if (abort.signal.aborted) return;
+      return (preparing = null);
+    }
     if (weather.rawData.length) return (preparing = null);
     // Edited weather can't be fetched again, and fetching would replace it
     if (weather.isUserEdited) {
@@ -130,6 +143,7 @@ its weather, when that isn't kept with it). -->
     try {
       const data = await weatherSearch.fetchOnly(abort);
       weather.setRawData(data);
+      weatherDays.got(data, { all: true });
       weather.wasLoadedFromStorage = false;
       preparing = null;
     } catch {

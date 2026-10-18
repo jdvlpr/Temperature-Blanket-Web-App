@@ -174,8 +174,28 @@ class WeatherSearch {
     }
   }
 
+  /**
+   * Only gets the days since the last ones got and adds them, without the
+   * overlay, as publishing a gallery page does. Aborting it rejects.
+   */
+  async addNewDaysOnly(abort: AbortController) {
+    const ranges = weatherDays.newDays;
+    controller.value = abort;
+    try {
+      const data = await this.#fetchAll(abort.signal, withDaysBefore(ranges));
+      if (abort.signal.aborted) return;
+      this.#addNewDays(data, ranges, { quiet: true });
+    } finally {
+      if (controller.value === abort) controller.value = null;
+    }
+  }
+
   /** Puts the days just got in place of the blank ones saved for them */
-  #addNewDays(data: WeatherDay[], ranges: Ranges) {
+  #addNewDays(
+    data: WeatherDay[],
+    ranges: Ranges,
+    { quiet = false }: { quiet?: boolean } = {},
+  ) {
     const added = data.filter((day) => {
       const range = ranges[day.location];
       const date = isoOf(day.date);
@@ -193,6 +213,7 @@ class WeatherSearch {
       projectChanged({ weather: true });
     }
     weatherDays.got(added, { all: false, locationsGot });
+    if (quiet) return;
     toast.trigger({
       category: added.length ? 'success' : 'info',
       message: added.length

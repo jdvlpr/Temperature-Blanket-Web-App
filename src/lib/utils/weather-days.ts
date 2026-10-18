@@ -17,6 +17,10 @@
 // days since it was last got are added without asking, and saved days only
 // change when someone says so. Pure, so it's tested without the app's state.
 
+import {
+  METEOSTAT_DELAY_DAYS,
+  OPEN_METEO_DELAY_DAYS,
+} from '#lib/constants/weather-constants.js';
 import type {
   TISO8601DateString,
   WeatherDay,
@@ -55,8 +59,8 @@ export type StoredWeatherDays = {
 
 /** Days after which each source's values stop changing */
 export const SETTLE_DAYS: Record<WeatherSource, number> = {
-  'Open-Meteo': 6,
-  Meteostat: 8,
+  'Open-Meteo': OPEN_METEO_DELAY_DAYS,
+  Meteostat: METEOSTAT_DELAY_DAYS,
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -68,6 +72,16 @@ export const isoOf = (date: Date): TISO8601DateString =>
 
 export const addDays = (iso: TISO8601DateString, days: number) =>
   isoOf(new Date(isoToTime(iso) + days * DAY_MS));
+
+/** Today here, as YYYY-MM-DD */
+export const localToday = (): TISO8601DateString => {
+  const d = new Date();
+  const pad = (n: number) => `${n}`.padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` as TISO8601DateString;
+};
+
+/** Today in UTC, where Meteostat's days end */
+export const utcToday = (): TISO8601DateString => isoOf(new Date());
 
 /** Days from `from` to `to`, both included (0 when `to` comes first) */
 export const daysFrom = (from: TISO8601DateString, to: TISO8601DateString) =>

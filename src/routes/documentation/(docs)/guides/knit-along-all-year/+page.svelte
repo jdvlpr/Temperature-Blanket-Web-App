@@ -13,12 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Crochet or Knit Along All Year. A project with days still to come never
-loads its saved weather (storage/projects.svelte.ts keeps it only if every
-day had passed when the project was created), and nothing searches by
-itself: it opens with Search, and each search gets every day up to
-yesterday. Auto ranges are remade with the weather, so done rows could
-change color: hence Manual steps. -->
+<!-- Crochet or Knit Along All Year. A saved project opens with its saved days
+and never searches by itself (storage/projects.svelte.ts, weather-days):
+the planner says how many new days are available, and Weather Data › Get
+New Days adds only those. Search Again gets every day and asks before
+changing saved ones (modals/SearchAgain.svelte). -->
 
 <script lang="ts">
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
@@ -53,7 +52,7 @@ change color: hence Manual steps. -->
   </ol>
   <DocsShot
     src="knit-along-all-year/future-days"
-    alt="London from January 1 to December 31 of this year, 365 Days, with a warning under the dates that some of these days are not in the past and won't have weather data. Below it, Search Again and Add Location."
+    alt="London from January 1 to December 31 of this year, 365 Days, with a warning under the dates that some of these days are not in the past and won't have weather data. Below it, Weather Data and Add Location."
     caption="A year that's still going."
   />
 </section>
@@ -97,8 +96,10 @@ change color: hence Manual steps. -->
       <span class="font-bold">Open…</span>
     </li>
     <li>
-      Press <span class="font-bold">Search</span>. A project that's still going
-      always looks up its weather fresh, so it has every day up to yesterday.
+      Under the title it says how many new days are available. Press
+      <span class="font-bold">Weather Data</span>, then
+      <span class="font-bold">Get New Days</span>. Only the days since are
+      added: the days you've already made stay as they were saved.
     </li>
     <li>
       Find today's rows in the <span class="font-bold">Table</span> (turn on
@@ -121,8 +122,9 @@ change color: hence Manual steps. -->
   <p>
     Weather services can take up to a week to finish the newest days, so
     yesterday's numbers might still change. If you can, work about
-    {OPEN_METEO_DELAY_DAYS} days behind. Now and then, older days are corrected too,
-    so keep a record of what you've made: download the PDF each month or so.
+    {OPEN_METEO_DELAY_DAYS} days behind. Your saved days stay as they are unless you
+    choose otherwise, but keep a record of what you've made too: download the PDF
+    each month or so.
     <a href="/documentation/guides/print-and-track" class="link"
       >Printing and keeping your place</a
     >.
@@ -140,11 +142,22 @@ change color: hence Manual steps. -->
   </p>
   <h3 class="text-lg font-bold">A day I've already made changed color</h3>
   <p>
-    Either the ranges moved (use Manual steps, above) or the weather source
-    corrected that day. Keep your rows as they are: a blanket doesn't need to
-    match to the decimal.
+    Saved days don't change by themselves, so check whether the ranges moved
+    (use Manual steps, above). If you used Search Again and chose a day's new
+    values, that day changed on purpose: its old values aren't kept. A blanket
+    doesn't need to match to the decimal.
     <a href="/documentation/guides/weather-doesnt-match" class="link"
       >When the weather changes</a
+    >.
+  </p>
+  <h3 class="text-lg font-bold">Weather sources update recent days</h3>
+  <p>
+    The newest days are early data. Once they've settled, the planner says so
+    and offers <span class="font-bold">Search Again</span>, which shows any day
+    that's different now and keeps your saved values unless you choose the new
+    ones.
+    <a href="/documentation/weather#saved-weather-days" class="link"
+      >Saved weather</a
     >.
   </p>
   <h3 class="text-lg font-bold">I edited a day, and now Search is gone</h3>

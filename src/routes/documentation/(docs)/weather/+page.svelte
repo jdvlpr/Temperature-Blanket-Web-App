@@ -21,6 +21,7 @@ HELP_TOPICS). -->
   import GroupingWeather from '#lib/components/docs/help/GroupingWeather.svelte';
   import ImportFileRequirements from '#lib/components/docs/help/ImportFileRequirements.svelte';
   import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
+  import SavedWeatherDays from '#lib/components/docs/help/SavedWeatherDays.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
   import {
@@ -48,14 +49,47 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="get-weather-data" class="text-2xl font-bold">Get the Weather</h2>
   <p>
-    Press <span class="font-bold">Search</span> under your locations. The button
-    is ready once every location has a place chosen from the list and dates that
-    work. After that it says <span class="font-bold">Search Again</span>: press
-    it after changing a place, the dates or the weather source.
+    Press <span class="font-bold">Search</span> under your locations. The button is
+    ready once every location has a place chosen from the list and dates that work.
+    Press it again after changing a place, the dates or the weather source: it gets
+    every day for them.
   </p>
   <p>
     For each day you get the high, average and low temperature, rain, snow,
     daylight (sunrise to sunset) and the phase of the moon.
+  </p>
+</section>
+
+<section class="flex flex-col gap-3">
+  <h2 id="saved-weather-days" class="text-2xl font-bold">Saved Weather</h2>
+  <SavedWeatherDays />
+  <h3 class="text-lg font-bold">Get New Days</h3>
+  <p>
+    For a project that's still going, the line under the planner's title says
+    how many new days are available. Press
+    <span class="font-bold">Weather Data</span>, then
+    <span class="font-bold">Get New Days</span>. Only those days are added. It's
+    in the Project menu too.
+  </p>
+  <h3 class="text-lg font-bold">Search Again</h3>
+  <p>
+    <span class="font-bold">Search Again</span> (in
+    <span class="font-bold">Weather Data</span>, or on its own once a project is
+    finished) gets every day again. If any saved day is different now, it lists
+    them, one card each, with the saved and the new values. Your saved values
+    stay unless you check <span class="font-bold">Use new values</span> for a
+    day, or press <span class="font-bold">Update All</span>, then
+    <span class="font-bold">Save</span>. Cancel leaves everything as it was.
+  </p>
+  <p>
+    Days you keep are marked in the weather table. Tap the mark to see both
+    values and use the new ones. Your project's gallery page can be updated
+    right after, too.
+  </p>
+  <p>
+    Two <a href="/preferences" class="link">preferences</a>, also in the list
+    itself, choose what's asked: compare only the values your gauges use, and
+    ask about a value you kept every time instead of only once it changes again.
   </p>
 </section>
 
@@ -264,8 +298,11 @@ HELP_TOPICS). -->
   <h3 class="text-lg font-bold">The newest days change</h3>
   <p>
     Weather services can take up to a week to settle the latest days. When your
-    project includes recent days, the Project Planner says so. To be safe, stay
-    about {OPEN_METEO_DELAY_DAYS} days behind with Open-Meteo, or {METEOSTAT_DELAY_DAYS}
+    project includes recent days, the Project Planner says so, and once they've
+    settled it suggests <a href="#saved-weather-days" class="link"
+      >Search Again</a
+    >. Saved days never change on their own. To be safe, stay about
+    {OPEN_METEO_DELAY_DAYS} days behind with Open-Meteo, or {METEOSTAT_DELAY_DAYS}
     with Meteostat.
   </p>
   <h3 class="text-lg font-bold">It's different from my thermometer</h3>

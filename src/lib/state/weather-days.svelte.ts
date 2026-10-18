@@ -21,8 +21,9 @@ import type {
 } from '#lib/types/weather-types.js';
 import {
   earlyDaysIn,
+  localToday,
+  utcToday,
   fetchedThroughNow,
-  isoOf,
   lastDayWithValues,
   newDaysRange,
   settledEarlyDays,
@@ -32,16 +33,9 @@ import {
   type StoredWeatherDays,
 } from '#lib/utils/weather-days.js';
 
-/** Today here, as YYYY-MM-DD */
-export const localToday = (): TISO8601DateString => {
-  const d = new Date();
-  return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}` as TISO8601DateString;
-};
-
-/** Today in UTC, where Meteostat's days end */
-export const utcToday = (): TISO8601DateString => isoOf(new Date());
-
 /** Where a location's days came from */
+export { localToday };
+
 const sourceOf = (index: number) =>
   locations.all[index]?.source ?? weather.source.name;
 
