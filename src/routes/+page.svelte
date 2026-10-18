@@ -39,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pageSections,
     toast,
   } from '#lib/state/page-state.svelte.js';
+  import { locations } from '#lib/state/location-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import {
@@ -63,7 +64,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     galleryPagesForLink,
     loadSavedProject,
   } from '#lib/utils/open-saved-project.js';
-  import type { GalleryWeatherPage } from '#lib/utils/gallery-weather.js';
+  import {
+    fitsLocations,
+    type GalleryWeatherPage,
+  } from '#lib/utils/gallery-weather.js';
   import GalleryWeather from '#lib/components/modals/GalleryWeather.svelte';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import { upToDate } from '#lib/utils/other-utils.js';
@@ -139,6 +143,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // A link without weather whose project has gallery pages with theirs:
   // offered once nothing else is open over the page (as the welcome)
   let galleryWeatherPages = $state<GalleryWeatherPage[]>([]);
+  // The project they were found for: another opened in place, or new dates,
+  // and they're no longer offered
+  let galleryWeatherFor = '';
   $effect(() => {
     const pages = galleryWeatherPages;
     if (
@@ -150,10 +157,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return;
     untrack(() => {
       galleryWeatherPages = [];
-      if (weather.rawData.length) return;
+      const dates = locations.all.map(({ from, to }) => ({ from, to }));
+      const fitting = pages.filter((page) =>
+        fitsLocations(page.locations, dates),
+      );
+      if (
+        weather.rawData.length ||
+        project.id !== galleryWeatherFor ||
+        project.status.loadedFrom !== 'link' ||
+        !fitting.length
+      )
+        return;
       dialog.trigger({
         type: 'component',
-        component: { ref: GalleryWeather, props: { pages } },
+        component: { ref: GalleryWeather, props: { pages: fitting } },
         options: { title: 'Load Weather from the Gallery?', size: 'medium' },
       });
     });
@@ -229,6 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Load a project from the URL
       await loadProject();
       galleryRequest = request;
+      galleryWeatherFor = project.id;
       void galleryPagesForLink().then((pages) => (galleryWeatherPages = pages));
     } else {
       // Setup up a new project

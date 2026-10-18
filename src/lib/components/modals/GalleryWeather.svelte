@@ -122,7 +122,7 @@ or copies others published). Asked every time the link opens. -->
     </div>
   {/if}
   <p class="text-surface-700-300 text-sm">
-    Not loading it means searching for the weather of every date again.
+    Not loading it means searching for the weather of every date.
   </p>
   <DialogFooter>
     <button

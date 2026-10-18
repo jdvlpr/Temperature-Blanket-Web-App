@@ -56,7 +56,8 @@ export function parseGalleryRequest(
 
 // Opening a copy from a gallery page: the page's link plus ?fromGallery=<post
 // ID>, so the planner can load the weather the page kept (gallery-weather.ts).
-// Dropped from the address bar like ?gallery=.
+// Kept in the address bar (unlike ?gallery=), so reloading loads it again;
+// Copy Link adds it while the project's page is up to date.
 
 export const FROM_GALLERY_PARAM = 'fromGallery';
 
