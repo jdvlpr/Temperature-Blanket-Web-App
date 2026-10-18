@@ -59,7 +59,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     loadFromHistory,
     updateHistory,
   } from '#lib/utils/history-utils.svelte.js';
-  import { loadSavedProject } from '#lib/utils/open-saved-project.js';
+  import {
+    galleryPagesForLink,
+    loadSavedProject,
+  } from '#lib/utils/open-saved-project.js';
+  import type { GalleryWeatherPage } from '#lib/utils/gallery-weather.js';
+  import GalleryWeather from '#lib/components/modals/GalleryWeather.svelte';
+  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import { upToDate } from '#lib/utils/other-utils.js';
   import {
     FROM_GALLERY_PARAM,
@@ -89,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
 
-    await loadSavedProject(undefined, { fromGallery: takeFromGallery() });
+    await loadSavedProject(undefined, { fromGallery: fromGalleryParam() });
   }
 
   // Leaving for another page of the site: a change waiting to save saves now
@@ -130,6 +136,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Opened from My Projects to add or update its gallery page (?gallery=):
   // the dialog shows once the project is loaded, and gets its weather if needed
+  // A link without weather whose project has gallery pages with theirs:
+  // offered once nothing else is open over the page (as the welcome)
+  let galleryWeatherPages = $state<GalleryWeatherPage[]>([]);
+  $effect(() => {
+    const pages = galleryWeatherPages;
+    if (
+      !pages.length ||
+      project.status.loading ||
+      dialog.opened ||
+      weatherSearch.active
+    )
+      return;
+    untrack(() => {
+      galleryWeatherPages = [];
+      if (weather.rawData.length) return;
+      dialog.trigger({
+        type: 'component',
+        component: { ref: GalleryWeather, props: { pages } },
+        options: { title: 'Load Weather from the Gallery?', size: 'medium' },
+      });
+    });
+  });
+
   let galleryRequest = $state<GalleryRequest | null>(null);
   $effect(() => {
     const request = galleryRequest;
@@ -160,14 +189,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return request;
   }
 
-  // The gallery page this copy was opened from, once, as for ?gallery=
-  function takeFromGallery() {
-    const url = new URL(window.location.href);
-    if (!url.searchParams.has(FROM_GALLERY_PARAM)) return null;
-    const postId = parseFromGallery(url.searchParams.get(FROM_GALLERY_PARAM));
-    url.searchParams.delete(FROM_GALLERY_PARAM);
-    history.replaceState(history.state, '', url);
-    return postId;
+  // The gallery page this copy was opened from. Kept in the address, so
+  // reloading loads its weather again; saving puts the project's own there.
+  function fromGalleryParam() {
+    return parseFromGallery(
+      new URL(window.location.href).searchParams.get(FROM_GALLERY_PARAM),
+    );
   }
 
   // Started over after moving a project to the Trash: offer to put it back
@@ -202,6 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Load a project from the URL
       await loadProject();
       galleryRequest = request;
+      void galleryPagesForLink().then((pages) => (galleryWeatherPages = pages));
     } else {
       // Setup up a new project
       // Load the default units based on window.navigator

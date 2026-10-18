@@ -28,6 +28,7 @@ import { account } from '#lib/accounts/summary.svelte.js';
 import type { MoreMenuItem } from '#lib/components/buttons/MoreMenu.svelte';
 import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
 import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
+import { fromGalleryLink } from '#lib/utils/gallery-request.js';
 import { inAccount } from '#lib/utils/open-ravelry.js';
 import { pluralize } from '#lib/utils/string-utils.js';
 import {
@@ -68,6 +69,22 @@ export function galleryPageOf(
     .sort((a, b) => b.publishedAt - a.publishedAt || b.postId - a.postId)[0];
 }
 
+/**
+ * A project's link naming its gallery page (?fromGallery=), so whoever opens it
+ * gets the weather the page kept rather than searching (gallery-weather.ts).
+ * Only while the page is up to date: one changed since gets offered instead,
+ * if its dates still fit (GalleryWeather).
+ */
+function withGalleryWeather({ kind, id, changed }: ShareTarget, link: string) {
+  const page =
+    kind === 'project' && __ACCOUNTS_ENABLED__ && galleryPages.loaded
+      ? galleryPageOf(kind, id)
+      : undefined;
+  return page && changed && !changed(page)
+    ? fromGalleryLink(link, page.postId)
+    : link;
+}
+
 export const galleryPageHref = (page: GalleryPage) =>
   page.kind === 'palette'
     ? resolve('/gallery/palette/[id]', { id: String(page.postId) })
@@ -87,7 +104,7 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
       icon: LinkIcon,
       onselect: () =>
         copyToClipboard(
-          link,
+          withGalleryWeather(target, link),
           'Link copied',
           'Unable to copy to your clipboard',
         ),

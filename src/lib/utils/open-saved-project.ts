@@ -28,7 +28,9 @@ import { timestampFromLegacyProjectId } from '#lib/utils/project-id-utils.js';
 import type { GalleryRequest } from '#lib/utils/gallery-request.js';
 import {
   fetchGalleryWeather,
+  findGalleryWeatherPages,
   galleryWeatherToLoad,
+  type GalleryWeatherPage,
   isCustomGalleryWeather,
 } from '#lib/utils/gallery-weather.js';
 import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
@@ -83,6 +85,36 @@ export async function loadSavedProject(
       : weather.isUserEdited
         ? 'saved-custom'
         : 'saved';
+}
+
+/**
+ * The gallery pages to offer the weather of, for a link loaded on the project
+ * page without any: one not saved here, opened without a gallery page. Pages
+ * published from a project with the same ID, with its dates (see
+ * findGalleryWeatherPages); none for anything else.
+ */
+export async function galleryPagesForLink(): Promise<GalleryWeatherPage[]> {
+  if (
+    project.status.loadedFrom !== 'link' ||
+    !project.onLoaded.isProject ||
+    !locations.allValid ||
+    weather.rawData.length
+  )
+    return [];
+  return findGalleryWeatherPages(
+    project.id,
+    locations.all.map(({ from, to }) => ({ from, to })),
+  );
+}
+
+/** Loads the weather of a gallery page chosen for the open link, as opening a
+ * copy from it does. Whether it did */
+export async function loadGalleryPageWeather(postId: number) {
+  if (weather.rawData.length) return false;
+  if (!(await loadGalleryWeather(fetchGalleryWeather(postId)))) return false;
+  weatherDays.markCurrent();
+  project.status.loadedFrom = 'gallery';
+  return true;
 }
 
 /** Loads a gallery page's weather, as ProjectStorage.load() does a saved one.

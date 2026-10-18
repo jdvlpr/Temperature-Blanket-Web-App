@@ -56,6 +56,99 @@ export async function fetchGalleryWeather(
   }
 }
 
+/** A gallery page of the same project as a link, offered for its weather */
+export type GalleryWeatherPage = {
+  postId: number;
+  /** The name it was given, or '' (may have HTML entities) */
+  projectName: string;
+  /** Its locations meta, a JSON string */
+  locations: string | null;
+  /** When it was published, site-local, as the gallery cards show it */
+  date: string | null;
+  image: string | null;
+};
+
+type LocationDates = { from?: string; to?: string };
+
+/** Whether a page's locations meta has these locations' dates, each in order */
+export function fitsLocations(
+  locationsMeta: string | null,
+  locations: LocationDates[],
+): boolean {
+  let stored: unknown;
+  try {
+    stored = JSON.parse(locationsMeta ?? '');
+  } catch {
+    return false;
+  }
+  return (
+    Array.isArray(stored) &&
+    stored.length === locations.length &&
+    stored.every(
+      (place, index) =>
+        place?.from === locations[index].from &&
+        place?.to === locations[index].to,
+    )
+  );
+}
+
+/**
+ * The gallery pages with weather published from a project with this ID
+ * (`?project=` in their link; gallery plugin 1.12.0), whose dates are these
+ * locations', newest first. Only what shows them: their weather is got for the
+ * one chosen. None when the gallery can't say (an older plugin, offline).
+ */
+export async function findGalleryWeatherPages(
+  projectId: string,
+  locations: LocationDates[],
+): Promise<GalleryWeatherPage[]> {
+  try {
+    const { response, result } = await queryGallery(
+      `query FIND_PROJECT_PAGES($id: String!) {
+        projects(first: 20, where: { projectLinkId: $id }) {
+          nodes {
+            databaseId projectName locations date
+            featuredImage { node { mediaItemUrl mediaDetails { sizes(include: MEDIUM) { sourceUrl } } } }
+          }
+        }
+      }`,
+      { id: projectId },
+    );
+    // An older plugin doesn't know the argument: no lookup, never every page
+    if (!response.ok || result?.errors?.length) return [];
+    const nodes: {
+      databaseId?: unknown;
+      projectName?: string | null;
+      locations: string | null;
+      date?: string | null;
+      featuredImage?: {
+        node?: {
+          mediaItemUrl?: string;
+          mediaDetails?: { sizes?: { sourceUrl?: string }[] };
+        };
+      } | null;
+    }[] = result?.data?.projects?.nodes ?? [];
+    return nodes
+      .filter(
+        (node) =>
+          Number.isInteger(node?.databaseId) &&
+          fitsLocations(node.locations, locations),
+      )
+      .map((node) => ({
+        postId: node.databaseId as number,
+        projectName: node.projectName ?? '',
+        locations: node.locations,
+        date: node.date ?? null,
+        image:
+          node.featuredImage?.node?.mediaDetails?.sizes?.[0]?.sourceUrl ||
+          node.featuredImage?.node?.mediaItemUrl ||
+          null,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 /** Whether the page's weather was edited by hand (Send to Gallery names it) */
 export function isCustomGalleryWeather(weatherSources: string | null) {
   try {
