@@ -17,8 +17,7 @@
 export const WEATHER_ACTIONS = {
   'new-days': {
     label: 'Only New Days',
-    description:
-      'Gets days since this project was last saved, without replacing older weather data.',
+    description: 'Get data since this project was last saved.',
     upToDate: 'Up to date',
   },
   again: {
