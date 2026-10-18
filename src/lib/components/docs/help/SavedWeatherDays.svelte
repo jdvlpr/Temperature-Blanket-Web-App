@@ -37,9 +37,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </li>
   </ul>
   <p>
-    A link to a project doesn't carry its weather, so opening one gets the
-    weather fresh. For days near today, it can be a little different from what
-    the person who sent it saw. Once you save the project, its days stay as they
-    are. A gallery page keeps the weather it was published with.
+    A link doesn't hold weather (see <a
+      href="/documentation/weather#link-weather"
+      class="link">Weather and Links</a
+    >). A gallery page keeps the weather it was published with.
   </p>
 </div>

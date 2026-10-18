@@ -20,6 +20,7 @@ HELP_TOPICS). -->
 <script lang="ts">
   import GroupingWeather from '#lib/components/docs/help/GroupingWeather.svelte';
   import ImportFileRequirements from '#lib/components/docs/help/ImportFileRequirements.svelte';
+  import LinkWeather from '#lib/components/docs/help/LinkWeather.svelte';
   import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
   import SavedWeatherDays from '#lib/components/docs/help/SavedWeatherDays.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
@@ -91,6 +92,8 @@ HELP_TOPICS). -->
     itself, choose what's asked: compare only the values your gauges use, and
     ask about a value you kept every time instead of only once it changes again.
   </p>
+  <h3 id="link-weather" class="text-lg font-bold">Weather and Links</h3>
+  <LinkWeather />
 </section>
 
 <section class="flex flex-col gap-3">
