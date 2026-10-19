@@ -337,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a full address, with the colors in its query -->
                   <a
                     href={linkFor(colors, palette.name)}
-                    class="font-semibold break-words"
+                    class="font-semibold break-all"
                     title="Open in Yarn Palette Creator"
                   >
                     <span class="sr-only">Open</span>

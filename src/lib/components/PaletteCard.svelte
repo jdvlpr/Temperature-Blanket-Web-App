@@ -97,11 +97,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <PaletteStrip {colors} insideControl corners="nested" />
 {/snippet}
 {#snippet text()}
-  <span class="line-clamp-2 font-semibold break-words">{name}</span>
+  <span class="line-clamp-3 font-semibold break-all">{name}</span>
 {/snippet}
 {#snippet summaryLine()}
   <span
-    class={['text-surface-700-300 line-clamp-1 text-xs', !summary && 'hidden']}
+    class={['text-surface-700-300 line-clamp-2 text-xs', !summary && 'hidden']}
   >
     {colors.length}
     {pluralize('color', colors.length)}{#if yarns.length}{' · '}{yarns.join(

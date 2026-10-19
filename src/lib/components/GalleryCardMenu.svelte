@@ -145,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex shrink-0 items-start">
-  {#if star}<GalleryStarButton {postId} {kind} {name} />{/if}
+<div class="flex shrink-0 flex-col items-start">
   <MoreMenu {items} label="More for {name}" />
+  {#if star}<GalleryStarButton {postId} {kind} {name} />{/if}
 </div>

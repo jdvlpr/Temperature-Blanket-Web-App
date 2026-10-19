@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet name()}
   <span class="flex w-full min-w-0 flex-col text-left">
-    <span class="line-clamp-2 text-sm font-semibold break-words"
+    <span class="line-clamp-3 text-sm font-semibold break-all"
       >{label || 'Untitled Project'}</span
     >
     <GalleryCardByline {date} {author} {views} />

@@ -75,9 +75,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="sr-only">{CHANGED}</span>
     </span>
   {/if}
-  {#if publishedOn}
-    <GlobeIcon class="icon-sm mr-1 shrink-0" aria-hidden="true" />
-  {/if}
   <span class="clamp-2">{publishedOn || saved}</span>
 </span>
 {#if publishedOn && views}

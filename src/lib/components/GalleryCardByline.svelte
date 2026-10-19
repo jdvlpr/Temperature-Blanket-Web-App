@@ -45,8 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if dateLine}
   <span class="text-surface-700-300 flex items-center gap-1 text-xs">
-    <GlobeIcon class="icon-sm shrink-0" aria-hidden="true" />
-    <span class="truncate">{dateLine}</span>
+    <span class="line-clamp-2">{dateLine}</span>
   </span>
 {/if}
 {#if author || views}
