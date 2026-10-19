@@ -421,8 +421,8 @@ its weather, when that isn't kept with it). -->
         : !page
           ? ''
           : galleryUpToDate
-            ? 'Its gallery page is up to date.'
-            : 'Updates its gallery page to the project as it is now. Its link stays the same.',
+            ? 'The gallery page is up to date with the project.'
+            : 'Update the gallery page to the project as it is now. The gallery page link stays the same.',
   );
 
   async function drawPNG() {

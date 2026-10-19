@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if sharedOn || details}
       <p class={META_LINE}>
         {#if sharedOn}<span class="inline-flex items-center gap-1"
-            ><GlobeIcon class="icon-sm" aria-hidden="true" />Published {sharedOn}</span
+            >Published {sharedOn}</span
           >{/if}
         {#if updatedOn}<span>Updated {updatedOn}</span>{/if}
         {@render details?.()}
