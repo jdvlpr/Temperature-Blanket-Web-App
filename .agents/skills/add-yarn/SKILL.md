@@ -43,13 +43,15 @@ Goal: for every colorway, a **name**, a **hex** color, and ideally a **`variant_
 
 **A. Shopify store (most yarn brands).** Look for `cdn.shopify.com` or `/products/` in the URL or page. Fetch `<store>/products/<handle>.js` (strip any `/collections/...` and query string). It returns JSON: `variants[]` with `id`, `title`, and `featured_image.src`. Then:
 
-- name = variant `title`, minus any leading catalog number (`2178-01 White` → `White`)
+- name = variant `title`. If it starts with a catalog/shade number (`2178-01 White`, `001 Silver Grey`), **ask the user whether to keep the numbers** (`2178-01 White`) **or strip them** (`White`) before writing names, and apply the answer to every colorway. Don't decide this yourself. See "Shade numbers in names" below.
 - `variant_href` = `<product page URL>?variant=<id>`
 - photo = `featured_image.src`; append `?width=400` to download a small version
 - Check `variants.length` against the count the page claims ("30 shades"). If they differ (discontinued, bundle or sizes as options, a variant with no image), work out why before continuing.
 - Multiple options (size and color)? Pick the option that is color. Be sure you don't have duplicates.
 
 **B. Not Shopify.** Try, in order: JSON-LD (`<script type="application/ld+json">`), other embedded JSON (`__NEXT_DATA__`, `window.__INITIAL_STATE__`, a "variants" or "swatches" array), a swatch grid in the HTML (`<img alt="...">`, `data-color`, `title=` attributes), then a color-chart page or PDF. WebFetch/curl with a normal browser User-Agent; if the page needs JavaScript to render, use the Chrome tools to read it. If nothing gives per-color names and images, **stop and ask the user** instead of guessing.
+
+**Shade numbers in names.** Many brands (e.g. Holst: `001 Silver Grey`) put a catalog number in front of the colorway name, on any kind of site, not just Shopify. Whenever names from the source appear to carry one (a leading number or code on most or all of them, or the same pattern in the page, feed, image alt text or filenames), ask the user whether to keep it in the name. Existing precedent: Holst Supersoft (`001 Silver Grey`) and Premier Cotton Fair Worsted (`2178-01 White`) both keep the numbers. If the user wants them kept, also put the number into the `name` in `manifest.json` so the contact sheet and `colors.json` carry it into `write-colorways.js`. If the numbers are only a handful of stray cases or clearly not shade numbers (e.g. a size like `100g`), use your judgment and mention it.
 
 **C. Where hex codes come from.** Order of trust:
 
@@ -70,11 +72,19 @@ swift .agents/skills/add-yarn/scripts/sample-swatches.swift <workdir>/manifest.j
 open <workdir>/sheet/contact-sheet.html
 ```
 
-`<workdir>` (`.dev/yarn-work/<brand>-<yarn>/`) holds the downloaded photos, the manifest and the contact sheet. It's for local review only: `.dev` is gitignored, so **never commit anything from it**. Tell the user the full path of `contact-sheet.html` when it's ready.
+`<workdir>` (`.dev/yarn-work/<brand>-<yarn>/`) holds only what's worth keeping for a later re-review: `img/` (photos), `manifest.json`, `html/` (the fetched product/listing pages, if you saved them) and the final `sheet/`. It's for local review only: `.dev` is gitignored, so **never commit anything from it**. Tell the user the full path of `contact-sheet.html` when it's ready.
+
+Keep everything else out of `<workdir>`, or delete it when you're done:
+
+- Intermediate helper files (parsed listing JSON, curl download lists, parse scripts) go in the scratch/temp directory, not `<workdir>`.
+- Trial runs with different `--box` values: write them to a scratch directory (relative `../img/` paths won't resolve there, so for visual review run into `<workdir>/sheet-try/` and delete it afterwards). Only the final run goes to `<workdir>/sheet/`.
+- Don't create empty placeholder folders.
+
+The contact sheet always shows the **whole photo** with the sampling box drawn on it (no cropped variant), so the box is visible wherever it sits.
 
 **Pick the sampling box by looking at one photo first** (open it with the image Read tool). The box is a fraction (0–1) of the photo: `x,y,w,h`. The default (`0.125,0.4125,0.1875,0.175`) suits a ball photographed head-on with the label in the middle: it takes the left skein, in from the edges and clear of the label. Choose the box to sit **inside the yarn, away from the photo edges, labels, background, cast shadow and highlights**, in an area that's representative of the whole color. If the brand's photos are framed differently (single skein, hank, cone, angled), choose a different box. Don't assume the default.
 
-The helper averages the middle of the luminance range in the box (drops the darkest 20% — gaps between strands and shadow — and the brightest 5% — highlights) and writes `colors.json` plus `contact-sheet.html` (each photo with the box drawn on it, the sampled swatch beside it, and a "current" swatch if the manifest has a `hex`).
+The helper averages the middle of the luminance range in the box (drops the darkest 20% — gaps between strands and shadow — and the brightest 5% — highlights) and writes `colors.json` plus `contact-sheet.html` (each full photo with the box drawn on it, the sampled swatch beside it, and a "current" swatch if the manifest has a `hex`).
 
 **Review the contact sheet. Do not skip this, and look at all of them, not a few.** For each colorway, check that the box is on yarn (not label, edge or background), that the swatch looks like the photo, and that similar shades (e.g. the blues) are distinguishable from each other and in the right order of light-to-dark. Re-run with a different `--box` if needed; if one photo needs special handling, you can set that hex by hand in `colors.json` (and say you did). If the photos are not shot consistently, check more carefully, not less.
 

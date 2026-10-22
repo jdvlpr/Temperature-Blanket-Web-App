@@ -159,11 +159,11 @@ let html = """
   <!doctype html><meta charset="utf-8"><title>Colorway contact sheet</title>
   <style>
     body{font:14px system-ui;margin:16px;background:#fafafa;color:#222}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
     figure{margin:0;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden}
-    /* show the middle band of each (square) photo, where the yarn is, so the sheet stays compact */
-    .photo{position:relative;overflow:hidden;aspect-ratio:2/1}
-    .inner{position:relative;width:100%;margin-top:-25%}.inner img{display:block;width:100%}
+    /* always show the whole photo, so the sampling box is fully visible wherever it sits */
+    .photo{position:relative}
+    .inner{position:relative;width:100%}.inner img{display:block;width:100%}
     .box{position:absolute;border:2px solid #f0f;box-sizing:border-box}
     figcaption{padding:8px}.row{display:flex;gap:8px;align-items:center;margin-top:4px}
     .sw{width:34px;height:20px;border:1px solid #0003;border-radius:3px;flex:none}
