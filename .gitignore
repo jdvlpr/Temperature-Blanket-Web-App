@@ -1,6 +1,8 @@
 .dev
 .DS_Store
 .env
+.env.local
+.env.*.local
 .htaccess
 .svelte-kit
 .vscode
@@ -11,3 +13,5 @@ test-results
 .wrangler
 dist
 .claude/worktrees/
+# Local secrets for wrangler (Cloudflare)
+.dev.vars*

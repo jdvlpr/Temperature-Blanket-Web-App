@@ -63,12 +63,14 @@ Goal: for every colorway, a **name**, a **hex** color, and ideally a **`variant_
 The helper is macOS-only (CoreGraphics), no dependencies:
 
 ```bash
-# 1. Download the photos (parallel is fine) into a NEW, empty working folder, e.g. $CLAUDE_JOB_DIR/tmp/yarn-work/img/
+# 1. Download the photos (parallel is fine) into <workdir>/img/, where <workdir> is .dev/yarn-work/<brand>-<yarn>/ (create it; it's gitignored)
 # 2. Write manifest.json next to it: [{ "name": "White", "image": "img/01.jpg", "variant_href": "..." }, ...]
 # 3. Sample + build the contact sheet
 swift .agents/skills/add-yarn/scripts/sample-swatches.swift <workdir>/manifest.json <workdir>/sheet [--box x,y,w,h]
 open <workdir>/sheet/contact-sheet.html
 ```
+
+`<workdir>` (`.dev/yarn-work/<brand>-<yarn>/`) holds the downloaded photos, the manifest and the contact sheet. It's for local review only: `.dev` is gitignored, so **never commit anything from it**. Tell the user the full path of `contact-sheet.html` when it's ready.
 
 **Pick the sampling box by looking at one photo first** (open it with the image Read tool). The box is a fraction (0–1) of the photo: `x,y,w,h`. The default (`0.125,0.4125,0.1875,0.175`) suits a ball photographed head-on with the label in the middle: it takes the left skein, in from the edges and clear of the label. Choose the box to sit **inside the yarn, away from the photo edges, labels, background, cast shadow and highlights**, in an area that's representative of the whole color. If the brand's photos are framed differently (single skein, hank, cone, angled), choose a different box. Don't assume the default.
 
