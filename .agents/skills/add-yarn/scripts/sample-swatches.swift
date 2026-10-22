@@ -99,6 +99,16 @@ func distance(_ a: String, _ b: String) -> Int {
   return zip(x, y).map { abs($0 - $1) }.max() ?? 0
 }
 
+// Path of `file` relative to `dir`, so the sheet works when opened from disk or served over http
+func relativePath(of file: URL, from dir: URL) -> String {
+  let f = file.standardizedFileURL.pathComponents
+  let d = dir.standardizedFileURL.pathComponents
+  var i = 0
+  while i < f.count && i < d.count && f[i] == d[i] { i += 1 }
+  let ups = Array(repeating: "..", count: d.count - i)
+  return (ups + f[i...]).joined(separator: "/")
+}
+
 func esc(_ s: String) -> String {
   s.replacingOccurrences(of: "&", with: "&amp;").replacingOccurrences(of: "<", with: "&lt;")
     .replacingOccurrences(of: "\"", with: "&quot;")
@@ -127,8 +137,10 @@ for (i, e) in entries.enumerated() {
   cards += """
     <figure>
       <div class="photo">
-        <img src="\(esc(e.image.absoluteString))" alt="">
-        <div class="box" style="left:\(box[0] * 100)%;top:\(box[1] * 100)%;width:\(box[2] * 100)%;height:\(box[3] * 100)%"></div>
+        <div class="inner">
+          <img src="\(esc(relativePath(of: e.image, from: outDir)))" alt="">
+          <div class="box" style="left:\(box[0] * 100)%;top:\(box[1] * 100)%;width:\(box[2] * 100)%;height:\(box[3] * 100)%"></div>
+        </div>
       </div>
       <figcaption>
         <strong>\(i + 1). \(esc(e.name))</strong>
@@ -149,7 +161,9 @@ let html = """
     body{font:14px system-ui;margin:16px;background:#fafafa;color:#222}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
     figure{margin:0;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden}
-    .photo{position:relative}.photo img{display:block;width:100%}
+    /* show the middle band of each (square) photo, where the yarn is, so the sheet stays compact */
+    .photo{position:relative;overflow:hidden;aspect-ratio:2/1}
+    .inner{position:relative;width:100%;margin-top:-25%}.inner img{display:block;width:100%}
     .box{position:absolute;border:2px solid #f0f;box-sizing:border-box}
     figcaption{padding:8px}.row{display:flex;gap:8px;align-items:center;margin-top:4px}
     .sw{width:34px;height:20px;border:1px solid #0003;border-radius:3px;flex:none}
