@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -30,6 +31,11 @@ function toKebabCase(str) {
 // Helper to convert snake_case to camelCase
 function toCamelCase(str) {
   return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+// Escape single quotes for use inside generated single-quoted TS strings
+function escapeQuotes(str) {
+  return str.replace(/'/g, "\\'");
 }
 
 // Weight name to ID mapping
@@ -71,13 +77,26 @@ function extractDomain(href) {
 }
 
 async function main() {
-  // Get inputs from command-line arguments
-  const [, , brandNameArg, yarnNameArg, sourceHrefArg, weightArg] =
-    process.argv;
+  // Get inputs from command-line arguments (--version <x.y.z> may appear anywhere)
+  const args = [];
+  let versionOverride;
+  const rawArgs = process.argv.slice(2);
+  for (let i = 0; i < rawArgs.length; i++) {
+    if (rawArgs[i] === '--version') versionOverride = rawArgs[++i];
+    else args.push(rawArgs[i]);
+  }
+  const [brandNameArg, yarnNameArg, sourceHrefArg, weightArg] = args;
+
+  if (versionOverride && !/^\d+\.\d+\.\d+$/.test(versionOverride)) {
+    console.error(
+      `❌ --version must look like 6.5.0 (got "${versionOverride}")`,
+    );
+    process.exit(1);
+  }
 
   if (!brandNameArg || !yarnNameArg || !sourceHrefArg) {
     console.error(
-      '❌ Usage: node add-yarn.js <brandName> <yarnName> <sourceHref> [weight]',
+      '❌ Usage: node add-yarn.js <brandName> <yarnName> <sourceHref> [weight] [--version x.y.z]',
     );
     console.error(
       'Example: node add-yarn.js caron "Simply Soft Solids" "https://..." worsted',
@@ -109,6 +128,9 @@ async function main() {
     'src/lib/data/yarns',
     brandKebab,
   );
+
+  // Files to format with Prettier once everything is written
+  const touchedFiles = [];
 
   try {
     // Validate brand directory exists
@@ -154,6 +176,7 @@ const colorways: Colorway[] = [
 export default colorways;
 `;
     fs.writeFileSync(path.join(yarnDir, 'colorways.ts'), colorwaysContent);
+    touchedFiles.push(path.join(yarnDir, 'colorways.ts'));
     console.log(`✓ Created colorways.ts`);
 
     // Create yarn.ts
@@ -163,10 +186,11 @@ import colorways from './colorways';
 export const yarn: Yarn = {
   colorways,
   id: '${yarnSnake}',
-  name: '${yarnName}',${weightId ? `\n  weightId: '${weightId}',` : ''}
+  name: '${escapeQuotes(yarnName)}',${weightId ? `\n  weightId: '${weightId}',` : ''}
 };
 `;
     fs.writeFileSync(path.join(yarnDir, 'yarn.ts'), yarnContent);
+    touchedFiles.push(path.join(yarnDir, 'yarn.ts'));
     console.log(`✓ Created yarn.ts`);
 
     // Update brand's yarns.ts
@@ -192,7 +216,7 @@ export const yarn: Yarn = {
       // Find where to insert alphabetically
       let insertAfter = null;
       for (const imp of imports) {
-        if (imp.dir < yarnSnake) {
+        if (imp.dir < yarnKebab) {
           insertAfter = imp;
         }
       }
@@ -262,6 +286,21 @@ export const yarn: Yarn = {
       }
 
       fs.writeFileSync(brandYarnsFile, brandYarnsContent);
+      touchedFiles.push(brandYarnsFile);
+      console.log(`✓ Updated ${brandKebab}/yarns.ts`);
+    } else {
+      // Brand file has no yarn imports yet (a brand with an empty `yarns: []`)
+      const newImport = `import { yarn as ${yarnCamel} } from './${yarnKebab}/yarn';`;
+      const updated = brandYarnsContent
+        .replace(/(import type[^\n]*\n)/, `$1${newImport}\n`)
+        .replace(/yarns:\s*\[\s*\]/, `yarns: [${yarnCamel}]`);
+      if (updated === brandYarnsContent) {
+        throw new Error(
+          `Could not add the yarn to ${brandKebab}/yarns.ts; add it by hand`,
+        );
+      }
+      fs.writeFileSync(brandYarnsFile, updated);
+      touchedFiles.push(brandYarnsFile);
       console.log(`✓ Updated ${brandKebab}/yarns.ts`);
     }
 
@@ -349,10 +388,36 @@ export const yarn: Yarn = {
       }
 
       fs.writeFileSync(brandsFile, brandsContent);
+      touchedFiles.push(brandsFile);
       console.log(`✓ Updated brands.ts`);
     }
 
-    // Update changelog.ts
+    // Brand display name and ID as the app knows them (used in the changelog)
+    const brandDisplayName =
+      brandYarnsContent.match(/name:\s*'([^']+)'/)?.[1] ??
+      brandNameArg.charAt(0).toUpperCase() + brandNameArg.slice(1);
+    const brandId =
+      brandYarnsContent.match(/id:\s*'([^']+)'/)?.[1] ?? brandSnake;
+
+    // New yarns are a minor version bump (e.g. 6.3.2 -> 6.4.0) unless --version is given
+    const packageFile = path.join(projectRoot, 'package.json');
+    const packageContent = fs.readFileSync(packageFile, 'utf-8');
+    const versionMatch = packageContent.match(
+      /"version":\s*"(\d+)\.(\d+)\.\d+"/,
+    );
+    if (!versionMatch) {
+      throw new Error('Could not read the version from package.json');
+    }
+    const newVersion =
+      versionOverride ?? `${versionMatch[1]}.${Number(versionMatch[2]) + 1}.0`;
+    fs.writeFileSync(
+      packageFile,
+      packageContent.replace(versionMatch[0], `"version": "${newVersion}"`),
+    );
+    touchedFiles.push(packageFile);
+    console.log(`✓ Updated package.json version to ${newVersion}`);
+
+    // Update changelog.ts (newest first: year > month > item)
     const changelogFile = path.join(
       projectRoot,
       'src/routes/changelog/changelog.ts',
@@ -377,71 +442,94 @@ export const yarn: Yarn = {
     ];
     const currentMonth = monthNames[now.getMonth()];
 
-    // Create new entry — always 2 placeholder colorways; update manually after adding real colors
-    const newEntry = `              {
+    // The colorway count is a placeholder (2) until real colorways are added
+    const newNote = `              {
                 icon: ICONS.checkCircle,
                 text: \`2 colorways\`,
-                title: 'Added New Yarn: ${brandNameArg} - ${yarnName}',
-              },`;
-
-    // Find the current month's items array and insert before the closing bracket
-    const monthPattern = new RegExp(
-      `month: '${currentMonth}',\\s*items: \\[([\\s\\S]*?)\\]`,
-      'm',
-    );
-    const match = changelogContent.match(monthPattern);
-
-    if (match) {
-      // Month exists, add to it
-      const itemsContent = match[1];
-      const lastItemEnd = itemsContent.lastIndexOf('},');
-      const updatedItems =
-        itemsContent.slice(0, lastItemEnd + 2) +
-        '\n' +
-        newEntry +
-        itemsContent.slice(lastItemEnd + 2);
-      const newMonthBlock = `month: '${currentMonth}',\n        items: [${updatedItems}]`;
-      changelogContent = changelogContent.replace(match[0], newMonthBlock);
-    } else {
-      // Month doesn't exist, need to create it
-      const yearPattern = new RegExp(
-        `year: ${currentYear},\\s*months: \\[([\\s\\S]*?)\\]\\s*}`,
-      );
-      const yearMatch = changelogContent.match(yearPattern);
-
-      if (yearMatch) {
-        const monthsContent = yearMatch[1];
-        const newMonthBlock = `{
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=${brandId}-${yarnSnake}&v=${newVersion}" class="link">${escapeQuotes(brandDisplayName)} - ${escapeQuotes(yarnName)}</a>',
+              },
+`;
+    const newItem = `          {
+            notes: [
+${newNote}            ],
+            version: '${newVersion}',
+          },
+`;
+    const monthBlock = `      {
         month: '${currentMonth}',
         items: [
-          {
-            notes: [
-${newEntry}
-            ],
-            version: '5.x.x',
-          },
-        ],
-      },`;
-        const updatedMonths =
-          monthsContent.slice(0, -1) + newMonthBlock + monthsContent.slice(-1);
-        const newYearBlock = `year: ${currentYear},\n    months: [${updatedMonths}]`;
-        changelogContent = changelogContent.replace(
-          yearMatch[0],
-          newYearBlock + '\n    }',
-        );
+${newItem}        ],
+      },
+`;
+    const yearHeader = `    year: ${currentYear},\n    months: [\n`;
+    const monthHeader = `      {\n        month: '${currentMonth}',\n        items: [\n`;
+
+    // With --version, join an existing changelog item for that version if there is one
+    const itemTail = `            ],\n            version: '${newVersion}',`;
+    const itemTailAt = versionOverride
+      ? changelogContent.indexOf(itemTail)
+      : -1;
+
+    const yearStart = changelogContent.indexOf(yearHeader);
+    if (itemTailAt !== -1) {
+      changelogContent =
+        changelogContent.slice(0, itemTailAt) +
+        newNote +
+        changelogContent.slice(itemTailAt);
+    } else if (yearStart === -1) {
+      // First entry of a new year
+      const entriesHeader = 'export const entries: ChangelogItemGroup[] = [\n';
+      const entriesStart = changelogContent.indexOf(entriesHeader);
+      if (entriesStart === -1) {
+        throw new Error('Could not find the changelog entries array');
+      }
+      const at = entriesStart + entriesHeader.length;
+      changelogContent =
+        changelogContent.slice(0, at) +
+        `  {\n${yearHeader}${monthBlock}    ],\n  },\n` +
+        changelogContent.slice(at);
+    } else {
+      const monthsStart = yearStart + yearHeader.length;
+      if (changelogContent.startsWith(monthHeader, monthsStart)) {
+        // Current month is the newest month of this year: add a new item at its top
+        const at = monthsStart + monthHeader.length;
+        changelogContent =
+          changelogContent.slice(0, at) + newItem + changelogContent.slice(at);
       } else {
-        console.warn('⚠ Could not find year in changelog');
+        // First entry of a new month
+        changelogContent =
+          changelogContent.slice(0, monthsStart) +
+          monthBlock +
+          changelogContent.slice(monthsStart);
       }
     }
 
     fs.writeFileSync(changelogFile, changelogContent);
+    touchedFiles.push(changelogFile);
     console.log(`✓ Updated changelog.ts`);
+
+    // Format everything the script wrote
+    try {
+      execFileSync(
+        'npx',
+        ['--no-install', 'prettier', '--write', ...touchedFiles],
+        { cwd: projectRoot, stdio: 'pipe' },
+      );
+      console.log(`✓ Formatted files with Prettier`);
+    } catch {
+      console.warn(
+        '⚠ Could not run Prettier; run `npx prettier --write` on the changed files',
+      );
+    }
 
     console.log('\n✅ Successfully added yarn!\n');
     console.log('📝 Next steps:');
-    console.log(`  1. Update colorways.ts with actual colors`);
     console.log(
-      `  2. Update changelog.ts with the real colorway count and proper version`,
+      `  1. Replace the placeholder colorways in colorways.ts (see SKILL.md)`,
+    );
+    console.log(
+      `  2. Update the "2 colorways" text in changelog.ts with the real count`,
     );
     console.log(
       `  3. Test the application to verify the yarn displays correctly\n`,
