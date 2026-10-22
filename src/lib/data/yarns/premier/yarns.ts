@@ -6,6 +6,7 @@ import { yarn as bambooFair } from './bamboo-fair/yarn';
 import { yarn as basixChenilleBrights } from './basix-chenille-brights/yarn';
 import { yarn as basixDK } from './basix-dk/yarn';
 import { yarn as basixWorsted } from './basix-worsted/yarn';
+import { yarn as cottonFairWorsted } from './cotton-fair-worsted/yarn';
 import { yarn as homeCottonSolids } from './home-cotton-solids/yarn';
 import { yarn as parfaitChunky } from './parfait-chunky/yarn';
 import { yarn as retroVelvet } from './retro-velvet/yarn';
@@ -22,6 +23,7 @@ export const brand: Brand = {
     basixChenilleBrights,
     basixDK,
     basixWorsted,
+    cottonFairWorsted,
     homeCottonSolids,
     parfaitChunky,
     retroVelvet,

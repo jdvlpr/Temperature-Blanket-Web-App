@@ -35,6 +35,22 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'October',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `30 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-cotton_fair_worsted&v=6.4.0" class="link">Premier - Cotton Fair Worsted</a>',
+              },
+            ],
+            version: '6.4.0',
+          },
+        ],
+      },
+      {
         month: 'September',
         items: [
           {
