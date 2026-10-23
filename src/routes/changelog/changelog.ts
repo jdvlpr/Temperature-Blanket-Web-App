@@ -107,6 +107,35 @@ export const entries: ChangelogItemGroup[] = [
             ],
             version: '7.0.0',
           },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `30 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-cotton_fair_worsted&v=6.4.0" class="link">Premier - Cotton Fair Worsted</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `104 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=holst-supersoft&v=6.4.0" class="link">Holst - Supersoft</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `66 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=knitting_for_olive-heavy_merino&v=6.4.0" class="link">Knitting for Olive - Heavy Merino</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `82 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=drops-snow&v=6.4.0" class="link">DROPS - Snow</a>',
+              },
+            ],
+            version: '6.4.0',
+          },
         ],
       },
       {
