@@ -1,6 +1,7 @@
 import type { Brand } from '$lib/types/yarn-types';
 import { yarn as alpaca } from './alpaca/yarn';
 import { yarn as babyMerino } from './baby-merino/yarn';
+import { yarn as belle } from './belle/yarn';
 import { yarn as brushedAlpacaSilk } from './brushed-alpaca-silk/yarn';
 import { yarn as cottonLight } from './cotton-light/yarn';
 import { yarn as cottonMerino } from './cotton-merino/yarn';
@@ -23,6 +24,7 @@ export const brand: Brand = {
   yarns: [
     alpaca,
     babyMerino,
+    belle,
     brushedAlpacaSilk,
     cottonLight,
     cottonMerino,
