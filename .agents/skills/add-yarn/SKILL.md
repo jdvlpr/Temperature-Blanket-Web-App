@@ -68,7 +68,7 @@ The helper is macOS-only (CoreGraphics), no dependencies:
 # 1. Download the photos (parallel is fine) into <workdir>/img/, where <workdir> is .dev/yarn-work/<brand>-<yarn>/ (create it; it's gitignored)
 # 2. Write manifest.json next to it: [{ "name": "White", "image": "img/01.jpg", "variant_href": "..." }, ...]
 # 3. Sample + build the contact sheet
-swift .agents/skills/add-yarn/scripts/sample-swatches.swift <workdir>/manifest.json <workdir>/sheet [--box x,y,w,h]
+swift .agents/skills/add-yarn/scripts/sample-swatches.swift <workdir>/manifest.json <workdir>/sheet [--box x,y,w,h] --title "<Brand Yarn>" --source "<sourceHref>" --yarn-dir src/lib/data/yarns/<brand>/<yarn-folder>
 open <workdir>/sheet/contact-sheet.html
 ```
 

@@ -111,6 +111,35 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `91 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=lana_grossa-cool_wool_big&v=6.5.0" class="link">Lana Grossa - Cool Wool Big</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `114 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=lana_grossa-cool_wool&v=6.5.0" class="link">Lana Grossa - Cool Wool</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `25 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=lana_grossa-summer_softness&v=6.5.0" class="link">Lana Grossa - Summer Softness</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `34 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=drops-belle&v=6.5.0" class="link">DROPS - Belle</a>',
+              },
+            ],
+            version: '6.5.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `30 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-cotton_fair_worsted&v=6.4.0" class="link">Premier - Cotton Fair Worsted</a>',
