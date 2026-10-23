@@ -1,4 +1,16 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+/** Open Save Palette from the Palette menu. A click before the page finishes
+ * loading does nothing, so it's retried until the dialog opens. */
+const openSavePalette = async (page: Page) => {
+  const name = page.getByLabel('Name (optional)');
+  await expect(async () => {
+    if (!(await page.getByTestId('menu-save-palette').isVisible()))
+      await page.getByTestId('palette-button').click({ timeout: 1000 });
+    await page.getByTestId('menu-save-palette').click({ timeout: 1000 });
+    await expect(name).toBeVisible({ timeout: 1000 });
+  }).toPass();
+};
 
 test.describe('Saved palettes', () => {
   test.beforeEach(async ({ page, context, baseURL }) => {
@@ -18,8 +30,7 @@ test.describe('Saved palettes', () => {
     page,
   }) => {
     // Save with a name, from the Palette menu
-    await page.getByTestId('palette-button').click();
-    await page.getByTestId('menu-save-palette').click();
+    await openSavePalette(page);
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Name (optional)').fill('Test Sunset');
     await dialog
@@ -30,8 +41,7 @@ test.describe('Saved palettes', () => {
 
     // The same palette isn't saved twice (opened fresh, it isn't open yet)
     await page.goto('/yarn');
-    await page.getByTestId('palette-button').click();
-    await page.getByTestId('menu-save-palette').click();
+    await openSavePalette(page);
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Save Palette', exact: true })
@@ -47,10 +57,13 @@ test.describe('Saved palettes', () => {
       page.getByRole('menuitem', { name: 'Edit in Yarn Palette Creator' }),
     ).toHaveAttribute('href', /\/yarn\?s=/);
     await expect(page.getByRole('menuitem', { name: 'Rename' })).toHaveCount(0);
-    await page.keyboard.press('Escape');
-    await expect(
-      page.getByRole('menuitem', { name: 'Edit in Yarn Palette Creator' }),
-    ).toBeHidden();
+    // Retried: the menu takes the key once focus has moved into it
+    await expect(async () => {
+      await page.keyboard.press('Escape');
+      await expect(
+        page.getByRole('menuitem', { name: 'Edit in Yarn Palette Creator' }),
+      ).toBeHidden({ timeout: 500 });
+    }).toPass();
     await expect(list.getByText('Test Sunset')).toBeVisible();
 
     // Delete, then undo
@@ -124,8 +137,7 @@ test.describe('Saved palettes', () => {
     page,
   }) => {
     await page.goto('/yarn?s=ff000000ff000000ff&name=Gallery%20Sunset');
-    await page.getByTestId('palette-button').click();
-    await page.getByTestId('menu-save-palette').click();
+    await openSavePalette(page);
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByLabel('Name (optional)')).toHaveValue(
       'Gallery Sunset',
@@ -139,8 +151,7 @@ test.describe('Saved palettes', () => {
     // Other colors are another palette: no name
     await page.getByRole('button', { name: 'Sort', exact: true }).click();
     await page.getByRole('menuitem', { name: /^Reverse/ }).click();
-    await page.getByTestId('palette-button').click();
-    await page.getByTestId('menu-save-palette').click();
+    await openSavePalette(page);
     await expect(
       page.getByRole('dialog').getByLabel('Name (optional)'),
     ).toHaveValue('');

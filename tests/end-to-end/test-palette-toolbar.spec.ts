@@ -12,6 +12,17 @@ test.describe('Palette toolbar', () => {
     await expect(
       page.getByRole('heading', { name: 'Design a Yarn Palette' }),
     ).toBeVisible();
+
+    // The page renders before it responds to clicks, and a click that comes
+    // too early does nothing. Open and close a menu until one responds.
+    const menu = page.getByRole('menu', { name: 'Get Colors' });
+    const trigger = page.getByRole('button', { name: 'Get Colors' });
+    await expect(async () => {
+      await trigger.click();
+      await expect(menu).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await trigger.click();
+    await expect(menu).toBeHidden();
   });
 
   test('Get Colors lists every color source', async ({ page }) => {

@@ -77,8 +77,8 @@ test.describe('My Projects', () => {
     // Retried: a click before the page finishes loading does nothing
     await expect(async () => {
       // Save Palette is in the Palette menu
-      await page.getByTestId('palette-button').click();
-      await page.getByTestId('menu-save-palette').click();
+      await page.getByTestId('palette-button').click({ timeout: 1000 });
+      await page.getByTestId('menu-save-palette').click({ timeout: 1000 });
       await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
         timeout: 1000,
       });
@@ -120,10 +120,13 @@ test.describe('My Projects', () => {
     ).toHaveAttribute('data-sveltekit-reload');
     // Renaming is in the planner, not the menu
     await expect(page.getByRole('menuitem', { name: 'Rename' })).toHaveCount(0);
-    await page.keyboard.press('Escape');
-    await expect(
-      page.getByRole('menuitem', { name: 'Edit in Project Planner' }),
-    ).toBeHidden();
+    // Retried: the menu takes the key once focus has moved into it
+    await expect(async () => {
+      await page.keyboard.press('Escape');
+      await expect(
+        page.getByRole('menuitem', { name: 'Edit in Project Planner' }),
+      ).toBeHidden({ timeout: 500 });
+    }).toPass();
     const named = page.getByRole('link', { name: 'Test Town, 2024' });
     await expect(named).toBeVisible();
 
@@ -188,7 +191,9 @@ test.describe('My Projects', () => {
     await page
       .getByRole('option', { name: 'Austin, Texas, United States' })
       .click();
-    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Get Weather Data', exact: true })
+      .click();
     await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 
     // Before saving, the Project menu has no rename
@@ -311,8 +316,8 @@ test.describe('My Projects', () => {
     // Opened from My Projects, it loads with its saved weather
     await page.goto('/my-projects');
     await page.getByRole('link', { name: 'Austin Blanket' }).click();
-    await expect(
-      page.getByText('Loaded project and weather data'),
-    ).toBeVisible();
+    await expect(page.getByTestId('loaded-from')).toHaveText(
+      /^Loaded saved project/,
+    );
   });
 });

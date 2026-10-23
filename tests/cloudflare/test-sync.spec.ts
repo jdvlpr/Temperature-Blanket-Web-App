@@ -549,7 +549,9 @@ async function buildProject(page: Page) {
   await page
     .getByRole('option', { name: 'Austin, Texas, United States' })
     .click();
-  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Get Weather Data', exact: true })
+    .click();
   await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 }
 
@@ -659,9 +661,9 @@ test.describe('Auto-save', () => {
     // Opening it again isn't a change: nothing is uploaded
     const before = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;
     await laptop.reload();
-    await expect(
-      laptop.getByText('Loaded project and weather data'),
-    ).toBeVisible();
+    await expect(laptop.getByTestId('loaded-from')).toHaveText(
+      /^Loaded saved project/,
+    );
     await expect.poll(() => saveState(laptop)).toBe('Saved to your account');
     await laptop.waitForTimeout(4000);
     const after = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;

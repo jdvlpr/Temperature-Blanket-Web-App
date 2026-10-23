@@ -15,9 +15,16 @@ test('Open lists, searches and opens a palette in place; Cmd+O opens it on both 
   await expect(
     page.getByRole('heading', { name: 'Design a Yarn Palette' }),
   ).toBeVisible();
-  await page.getByTestId('palette-button').click();
-  await page.getByTestId('menu-save-palette').click();
   const dialog = page.getByRole('dialog');
+  // Retried: a click before the page finishes loading does nothing
+  await expect(async () => {
+    if (!(await page.getByTestId('menu-save-palette').isVisible()))
+      await page.getByTestId('palette-button').click({ timeout: 1000 });
+    await page.getByTestId('menu-save-palette').click({ timeout: 1000 });
+    await expect(dialog.getByLabel('Name (optional)')).toBeVisible({
+      timeout: 1000,
+    });
+  }).toPass();
   await dialog.getByLabel('Name (optional)').fill('Test Sunset');
   await dialog
     .getByRole('button', { name: 'Save Palette', exact: true })

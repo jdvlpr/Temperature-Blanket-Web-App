@@ -60,7 +60,9 @@ test.describe('Project Planner', () => {
       .selectOption('2022');
 
     // 4. Search
-    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Get Weather Data', exact: true })
+      .click();
 
     // 5. Verify Results
     await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
@@ -75,7 +77,9 @@ test.describe('Project Planner', () => {
     });
     await expect(option).toBeVisible();
     await option.click();
-    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Get Weather Data', exact: true })
+      .click();
     await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 
     // Dismiss any toasts that might block interactions
@@ -124,7 +128,9 @@ test.describe('Project Planner', () => {
     await page
       .getByRole('option', { name: 'Austin, Texas, United States' })
       .click();
-    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Get Weather Data', exact: true })
+      .click();
     await expect(page.getByRole('button', { name: /^Units: / })).toBeVisible();
 
     const toast = page.getByTestId('toast');
@@ -171,9 +177,9 @@ test.describe('Project Planner', () => {
     await restoredPage.goto(savedUrl);
     // A restored project lands on the Location tab, not Weather -- confirm the
     // restore actually happened before navigating to Colors/Preview.
-    await expect(
-      restoredPage.getByText('Loaded project and weather data'),
-    ).toBeVisible();
+    await expect(restoredPage.getByTestId('loaded-from')).toHaveText(
+      /^Loaded saved project/,
+    );
 
     const restoredTabBar = restoredPage.locator('#bottom-section-nav');
     await restoredTabBar

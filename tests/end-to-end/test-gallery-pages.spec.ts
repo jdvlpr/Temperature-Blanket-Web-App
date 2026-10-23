@@ -20,9 +20,11 @@ test.describe('Project Gallery Pages', () => {
     // Take a project from the gallery list rather than a fixed ID, so the
     // test works against whichever WordPress site the build points at.
     await page.goto('/gallery');
+    // The card pictures are decorative, so take the card's name link, which
+    // says when the project was published
     const projectLink = page
       .locator('a[href^="/gallery/"]')
-      .filter({ has: page.getByAltText('Preview', { exact: true }) })
+      .filter({ hasText: /Published/ })
       .first();
     const href = await projectLink.getAttribute('href', { timeout: 15000 });
     await page.goto(href!);

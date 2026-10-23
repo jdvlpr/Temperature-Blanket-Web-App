@@ -16,9 +16,20 @@ const showList = async (page: Page) => {
   );
 };
 
+/** Search by color name, which is in the Filters, collapsed until opened */
+const searchByName = async (page: Page, name: string) => {
+  await page.getByRole('button', { name: /^Filters/ }).click();
+  const searchInput = page.getByPlaceholder('e.g., Wisteria, Cream');
+  await expect(searchInput).toBeVisible();
+  await searchInput.fill(name);
+};
+
 test.describe('Yarn Colorway Finder', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/yarn-colorway-finder');
+    // The colorways load once the page does, and opening the Filters or
+    // typing before then is lost
+    await expect(colorways(page).first()).toBeVisible();
   });
 
   test('Page loads successfully', async ({ page }) => {
@@ -28,9 +39,7 @@ test.describe('Yarn Colorway Finder', () => {
   });
 
   test('Search by Color Name works', async ({ page }) => {
-    const searchInput = page.getByPlaceholder('e.g., Wisteria, Cream');
-    await expect(searchInput).toBeVisible();
-    await searchInput.fill('Cream');
+    await searchByName(page, 'Cream');
 
     // Wait for results to update - looking for a result that contains "Cream"
     await expect(
@@ -60,7 +69,7 @@ test.describe('Yarn Colorway Finder', () => {
   });
 
   test("A card's more menu has its link and copy options", async ({ page }) => {
-    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await searchByName(page, 'Cream');
     const more = moreMenuButtons(page).first();
     await more.click();
 
@@ -84,7 +93,7 @@ test.describe('Yarn Colorway Finder', () => {
   test("The more menu's link opens by keyboard", async ({ page, context }) => {
     // Don't load the shop itself, just see that the new tab opens
     await context.route(/^https?:\/\/(?!localhost)/, (route) => route.abort());
-    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await searchByName(page, 'Cream');
     await moreMenuButtons(page).first().focus();
     await page.keyboard.press('Enter');
     const link = page.getByRole('menuitem', {
@@ -99,7 +108,7 @@ test.describe('Yarn Colorway Finder', () => {
   });
 
   test('List view rows have the more menu', async ({ page }) => {
-    await page.getByPlaceholder('e.g., Wisteria, Cream').fill('Cream');
+    await searchByName(page, 'Cream');
     await showList(page);
     await expect(
       colorways(page).filter({ hasText: 'Cream' }).first(),
