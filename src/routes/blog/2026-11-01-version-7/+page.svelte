@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     { month: 'long', day: 'numeric', year: 'numeric' },
   );
   // The header and social previews share one picture
-  const featuredImage = `/images/blog-images/${VERSION_7_POST.slug}/featured-image.svg`;
+  const featuredImage = `/images/blog-images/${VERSION_7_POST.slug}/featured-image.jpg`;
 
   // Where things moved: what to look for, and where it is now
   const moved = [
