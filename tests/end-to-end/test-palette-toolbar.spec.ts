@@ -10,7 +10,7 @@ test.describe('Palette toolbar', () => {
     ]);
     await page.goto('/yarn');
     await expect(
-      page.getByRole('heading', { name: 'Design a Yarn Palette' }),
+      page.getByRole('heading', { name: 'Create a Yarn Palette' }),
     ).toBeVisible();
 
     // The page renders before it responds to clicks, and a click that comes

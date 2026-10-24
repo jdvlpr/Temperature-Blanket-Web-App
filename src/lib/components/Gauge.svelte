@@ -42,10 +42,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronDownIcon,
     CircleCheckIcon,
     ClipboardPasteIcon,
+    DiamondPlusIcon,
     ImageIcon,
+    ImportIcon,
     LandmarkIcon,
     PaletteIcon,
+    PlusIcon,
+    SearchIcon,
     ShuffleIcon,
+    TextSearchIcon,
   } from '@lucide/svelte';
   import {
     menuContentClass,
@@ -157,6 +162,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       details: 'Generate random colors',
       icon: ShuffleIcon,
     },
+  ];
+  // Ways to import colors
+  const colorImport = [
     {
       value: 'paste',
       label: 'Paste Colors or Code',
@@ -227,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col items-center justify-center gap-2 shadow-inner',
+    'rounded-container border-surface-200-800 bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col items-center justify-center gap-2 border',
     gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
   ]}
 >
@@ -288,7 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class={toolbarButtonClass}
         title="Get Colors from Palettes, Preset Gradients, Yarn, an Image, and More"
       >
-        <PaletteIcon />
+        <ImportIcon />
         <span class="flex items-center gap-1"
           >Get Colors <ChevronDownIcon class="icon-sm" /></span
         >
@@ -296,19 +304,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Portal>
         <Menu.Positioner>
           <Menu.Content class={menuContentClass}>
-            {#each [...paletteSources, ...colorTools] as source (source.value)}
-              <Menu.Item
-                value={source.value}
-                class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
-              >
-                <source.icon class="shrink-0" />
-                <div class="flex min-w-0 flex-col text-left">
-                  <p>{source.label}</p>
-                  <p class="text-surface-700-300 text-xs">
-                    {source.details}
-                  </p>
-                </div>
-              </Menu.Item>
+            {#each [...colorTools, { value: 'divider1', label: null }, ...paletteSources, { value: 'divider2', label: null }, ...colorImport] as source (source.value)}
+              {#if source.label}
+                <Menu.Item
+                  value={source.value}
+                  class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
+                >
+                  <source.icon class="shrink-0" />
+                  <div class="flex min-w-0 flex-col text-left">
+                    <p>{source.label}</p>
+                    <p class="text-surface-700-300 text-xs">
+                      {source.details}
+                    </p>
+                  </div>
+                </Menu.Item>
+              {:else}
+                <Menu.Separator />
+              {/if}
             {/each}
           </Menu.Content>
         </Menu.Positioner>

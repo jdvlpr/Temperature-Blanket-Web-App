@@ -11,7 +11,7 @@ async function openRandom(page: Page, baseURL: string | undefined) {
   ]);
   await page.goto('/yarn');
   await expect(
-    page.getByRole('heading', { name: 'Design a Yarn Palette' }),
+    page.getByRole('heading', { name: 'Create a Yarn Palette' }),
   ).toBeVisible();
   await expect(async () => {
     await page.getByRole('button', { name: 'Get Colors' }).click();

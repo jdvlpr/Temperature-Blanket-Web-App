@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<section class="{PANEL_LIST} mx-auto w-full max-w-2xl text-left">
+<section class="{PANEL_LIST} mx-auto w-full text-left">
   <div class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2">
     <div class="min-w-0 flex-1">
       <h2 class="text-lg font-semibold">{heading}</h2>

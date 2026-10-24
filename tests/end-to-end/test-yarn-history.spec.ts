@@ -22,7 +22,7 @@ test.describe('Yarn Palette Creator history and autosave', () => {
     ]);
     await page.goto(`/yarn?s=${RGB}`);
     await expect(
-      page.getByRole('heading', { name: 'Design a Yarn Palette' }),
+      page.getByRole('heading', { name: 'Create a Yarn Palette' }),
     ).toBeVisible();
   });
 

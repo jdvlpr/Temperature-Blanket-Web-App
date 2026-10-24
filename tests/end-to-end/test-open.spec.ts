@@ -13,7 +13,7 @@ test('Open lists, searches and opens a palette in place; Cmd+O opens it on both 
   ]);
   await page.goto('/yarn');
   await expect(
-    page.getByRole('heading', { name: 'Design a Yarn Palette' }),
+    page.getByRole('heading', { name: 'Create a Yarn Palette' }),
   ).toBeVisible();
   const dialog = page.getByRole('dialog');
   // Retried: a click before the page finishes loading does nothing

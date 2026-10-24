@@ -213,10 +213,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <main class="m-auto max-w-(--breakpoint-xl) text-center max-lg:px-2">
         <div class="w-full py-4">
           <div class="flex flex-col gap-2">
-            <h2 class="h1 text-gradient mb-0">Design a Yarn Palette</h2>
+            <h2 class="h1 text-gradient mb-0">Create a Yarn Palette</h2>
             <p>
-              Create a yarn palette from a collection of brands and yarns. Find
-              matching colors from hex codes or an image.
+              Get yarn colors and find matching colorways from hex codes or from
+              an image.
             </p>
           </div>
         </div>

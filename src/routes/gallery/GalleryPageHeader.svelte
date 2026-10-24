@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Items on a line, a dot between
   const META_LINE =
-    "text-surface-600-400 flex flex-wrap justify-center gap-x-1.5 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']";
+    "text-surface-600-400 flex flex-wrap justify-start gap-x-1.5 text-sm [&>*+*]:before:mr-1.5 [&>*+*]:before:content-['·']";
 
   const dayOf = (value?: string | null) =>
     value
@@ -86,9 +86,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
+  class="bg-surface-100 dark:bg-surface-900 flex flex-col p-4 text-left"
 >
-  <h1 class="text-2xl font-bold break-words">{@render heading()}</h1>
+  <h1 class="text-2xl font-bold">{@render heading()}</h1>
   {#if subtitle}
     <p>{@render subtitle()}</p>
   {/if}
@@ -120,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div
-    class="mt-2 flex flex-wrap items-center justify-center gap-2 empty:hidden"
+    class="mt-2 flex flex-wrap items-center justify-start gap-2 empty:hidden"
   >
     {#if open}
       <!-- A link on this site, built from the page's own link -->

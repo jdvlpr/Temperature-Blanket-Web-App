@@ -249,7 +249,7 @@ with them. -->
           </GalleryPageHeader>
         {/snippet}
         {#snippet content()}
-          <div class="flex flex-col gap-4 p-4 text-center">
+          <div class="flex flex-col gap-4 px-2 py-4 text-center">
             {#if found === 'missing'}
               <!-- Said in the heading -->
             {:else if found === 'unreachable'}
