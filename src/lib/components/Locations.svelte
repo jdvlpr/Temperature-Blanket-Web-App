@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     saved: 'Loaded saved project',
     'saved-custom': 'Loaded saved project with custom weather',
     link: 'Loaded project from link',
-    gallery: 'Loaded copy from',
+    gallery: 'Loaded project from',
   };
 
   const validLoadedProject = $derived(
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if project.status.loadedFrom === 'gallery'}
           {#if project.status.galleryPostId}
             <a
-              class="anchor inline-flex items-center gap-1"
+              class="link inline-flex items-center gap-1"
               href={`/gallery/${project.status.galleryPostId}`}
               target="_blank"
               rel="noreferrer"
@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <HelpIcon topic="project-includes">
         {#snippet text()}
-          <span>What's included?</span>
+          <span>About</span>
         {/snippet}
       </HelpIcon>
     </p>

@@ -19,19 +19,13 @@ is kept (a saved project, a gallery page's copy) or searched (a link) -->
 <div class="flex flex-col gap-2">
   <p>
     Saved projects keep their weather, and so do copies opened from a gallery
-    page. Their days only change when you choose
-    <span class="font-bold">Only New Days</span> or
-    <span class="font-bold">Search Again</span>.
+    page. Their days only change if you choose
+    <span class="font-bold">Get Weather Data</span>.
   </p>
   <p>
     A link holds a project's settings but not its weather, so you search for it
-    after opening one. Weather sources sometimes update past days, mostly recent
-    ones, so they can come out a little different.
+    after opening one. Weather sources sometimes update past days, so they can
+    come out a little different.
   </p>
-  {#if __ACCOUNTS_ENABLED__}
-    <p>
-      To share a project with its weather, share its gallery page. Copy Link
-      includes the weather too, while your gallery page is up to date.
-    </p>
-  {/if}
+  <p>To share a project with its weather, share its gallery page.</p>
 </div>

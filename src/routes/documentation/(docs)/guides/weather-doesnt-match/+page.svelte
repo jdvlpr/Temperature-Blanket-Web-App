@@ -155,8 +155,7 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     <p>
       The easiest way to share your weather is your project's gallery page:
       <span class="font-bold">Open a Copy</span> there opens it with the weather it
-      was published with. Copy Link includes that weather too, while your gallery
-      page is up to date.
+      was published with.
     </p>
   {/if}
   <p>To send someone your weather exactly as it is, without a gallery page:</p>
