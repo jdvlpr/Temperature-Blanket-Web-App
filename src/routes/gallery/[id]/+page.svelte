@@ -494,7 +494,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
                 {:else if project === undefined}
                   <div
-                    class="placeholder rounded-container m-auto h-[50vh] w-full max-w-3xl animate-pulse"
+                    class="placeholder rounded-container m-auto h-[50vh] w-full animate-pulse"
                   ></div>
                 {/if}
               </div>
