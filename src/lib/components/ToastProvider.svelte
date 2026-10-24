@@ -179,6 +179,8 @@
           }}
           onmouseenter={() => onMouseEnter(i)}
           onmouseleave={() => onMouseLeave(i)}
+          onfocusin={() => onMouseEnter(i)}
+          onfocusout={() => onMouseLeave(i)}
           role={t.hideDismiss ? 'alert' : 'alertdialog'}
           aria-live="polite"
         >

@@ -217,8 +217,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let pattern = $derived(project?.projectTags?.nodes?.[0]);
 
   // Still in progress when it was published or last updated: Open a Copy
-  // searches the weather again for the days since (gallery-weather.ts);
-  // otherwise it loads the same weather as the preview, so there's nothing to say
+  // loads its days and offers the ones since (Only New Days); otherwise it
+  // loads the same weather as the preview, so there's nothing to say
   let inProgress = $derived.by(() => {
     const asOf = project?.modified ?? project?.date;
     if (!asOf || isCustomGalleryWeather(project?.weatherSources)) return false;
@@ -487,7 +487,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {/if}
                     {#if inProgress}
                       <span
-                        >In progress when published · a copy gets the weather
+                        >In progress when published · a copy can get the days
                         since</span
                       >
                     {/if}
