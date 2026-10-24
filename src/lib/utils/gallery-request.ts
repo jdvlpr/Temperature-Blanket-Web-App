@@ -54,12 +54,13 @@ export function parseGalleryRequest(
   return null;
 }
 
-// Opening a copy from a gallery page: the page's link plus ?fromGallery=<post
-// ID>, so the planner can load the weather the page kept (gallery-weather.ts).
-// Kept in the address bar (unlike ?gallery=), so reloading loads it again;
-// Copy Link adds it while the project's page is up to date.
+// Opening a copy from a gallery page: the page's link plus ?g=<post ID>, so
+// the planner can load the weather the page kept (gallery-weather.ts). Kept in
+// the address bar (unlike ?gallery=), so reloading loads it again; Copy Link
+// adds it while the project's page is up to date. A link without it holds no
+// weather.
 
-export const FROM_GALLERY_PARAM = 'fromGallery';
+export const FROM_GALLERY_PARAM = 'g';
 
 /** A gallery page's project link, naming the page it came from. */
 export function fromGalleryLink(href: string, postId: number): string {

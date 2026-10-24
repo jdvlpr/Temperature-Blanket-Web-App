@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
-  import GalleryWeatherOffer from './GalleryWeatherOffer.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
   // The words before a link to its gallery page, when its weather is from one
@@ -41,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     saved: 'Loaded saved project',
     'saved-custom': 'Loaded saved project with custom weather',
     link: 'Loaded project from link',
-    'link-gallery': 'Loaded project from link · weather from its',
     gallery: 'Loaded copy from',
   };
 
@@ -61,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <CircleCheckBigIcon class="icon-sm text-success-900-100" />
       <span data-testid="loaded-from"
         >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}
-        {#if project.status.loadedFrom === 'gallery' || project.status.loadedFrom === 'link-gallery'}
+        {#if project.status.loadedFrom === 'gallery'}
           {#if project.status.galleryPostId}
             <a
               class="anchor inline-flex items-center gap-1"
@@ -174,7 +172,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     <div class="flex w-full flex-col items-center gap-2">
-      <GalleryWeatherOffer />
       <SearchForWeather />
     </div>
 

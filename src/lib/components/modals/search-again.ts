@@ -115,11 +115,16 @@ export const changesFor = (
   });
 };
 
-export async function openSearchAgain(result: SearchAgainResult) {
+/** Opens the dialog; `showSameColor`, showing days whose colors stay the same
+ * too (See Changes, when none changes a color) */
+export async function openSearchAgain(
+  result: SearchAgainResult,
+  { showSameColor = false } = {},
+) {
   const { default: SearchAgain } = await import('./SearchAgain.svelte');
   dialog.trigger({
     type: 'component',
-    component: { ref: SearchAgain, props: { result } },
+    component: { ref: SearchAgain, props: { result, showSameColor } },
     options: { title: 'Search Again', size: 'medium' },
   });
 }

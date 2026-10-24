@@ -91,9 +91,11 @@ HELP_TOPICS). -->
   <p>
     Two <a href="/preferences" class="link">preferences</a>, also in the list
     itself, choose what's shown: only the values your gauges use, and only days
-    whose colors change (on unless you turn it off). Days you kept before
-    aren't shown again unless their values change again; the list offers to
-    show them.
+    whose colors change (on unless you turn it off). When no color changes, a
+    short message says so instead, with
+    <span class="font-bold">See Changes</span>
+    to look anyway. Days you kept before aren't shown again unless their values change
+    again; the list offers to show them.
   </p>
   <p>
     Updating days doesn't change Auto ranges. When your weather no longer

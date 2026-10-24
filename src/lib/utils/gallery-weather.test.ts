@@ -5,7 +5,6 @@ import {
   parseFromGallery,
 } from './gallery-request';
 import {
-  fitsLocations,
   galleryWeatherToLoad,
   isCustomGalleryWeather,
   type GalleryWeather,
@@ -138,33 +137,5 @@ describe('fromGalleryLink', () => {
   it('ignores anything but a post ID', () => {
     for (const value of [null, '', '0', 'abc', '12x'])
       expect(parseFromGallery(value)).toBeNull();
-  });
-});
-
-describe('fitsLocations', () => {
-  const meta = JSON.stringify([
-    { label: 'A', from: '2026-01-01', to: '2026-12-31', latlong: '1,2' },
-    { label: 'B', from: '2025-06-01', to: '2026-05-31', latlong: '3,4' },
-  ]);
-  const both = [
-    { from: '2026-01-01', to: '2026-12-31' },
-    { from: '2025-06-01', to: '2026-05-31' },
-  ];
-
-  it("takes a page with the link's dates, in order", () => {
-    expect(fitsLocations(meta, both)).toBe(true);
-  });
-
-  it('refuses other dates, order or number of places', () => {
-    expect(fitsLocations(meta, [both[1], both[0]])).toBe(false);
-    expect(fitsLocations(meta, [both[0]])).toBe(false);
-    expect(
-      fitsLocations(meta, [both[0], { from: '2025-06-01', to: '2026-06-01' }]),
-    ).toBe(false);
-  });
-
-  it('refuses missing or broken locations', () => {
-    for (const value of [null, '', '{', '{}', '[]'])
-      expect(fitsLocations(value, both)).toBe(false);
   });
 });

@@ -43,7 +43,7 @@ closing changes nothing, so they're asked about next time. -->
   } from '#lib/utils/weather-days.js';
   import { ChevronDownIcon } from '@lucide/svelte';
   import { SvelteSet } from 'svelte/reactivity';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { galleryPageOf, loadShareState } from '#lib/accounts/share-rows.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import {
@@ -54,12 +54,15 @@ closing changes nothing, so they're asked about next time. -->
     type SearchAgainResult,
   } from './search-again.js';
 
-  let { result }: { result: SearchAgainResult } = $props();
+  let {
+    result,
+    showSameColor: showSameColorAtFirst = false,
+  }: { result: SearchAgainResult; showSameColor?: boolean } = $props();
 
   // Days kept before, and days whose colors stay the same though the
   // toggle's on, shown for now
   let showKept = $state(false);
-  let showSameColor = $state(false);
+  let showSameColor = $state(untrack(() => showSameColorAtFirst));
   const colorsOnly = $derived(onlyColorChanges() && !showSameColor);
   const changes = $derived(changesFor(result, { showKept, colorsOnly }));
   // What the settings leave out, to say so

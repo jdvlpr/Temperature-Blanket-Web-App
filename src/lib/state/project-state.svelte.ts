@@ -81,13 +81,11 @@ type ProjectStatusType = {
   wasLoaded: boolean;
   /** Where the loaded project came from, for its Loaded line */
   loadedFrom: LoadedFrom | null;
-  /** The gallery page its weather came from (`gallery`, `link-gallery`) */
+  /** The gallery page its weather came from (`gallery`) */
   galleryPostId: number | null;
 };
 
-/** `link-gallery`: a link whose weather was loaded from its gallery page */
-export type LoadedFrom =
-  'saved' | 'saved-custom' | 'link' | 'link-gallery' | 'gallery';
+export type LoadedFrom = 'saved' | 'saved-custom' | 'link' | 'gallery';
 
 class ProjectClass {
   // *****************

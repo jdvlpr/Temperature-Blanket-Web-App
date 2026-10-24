@@ -70,19 +70,27 @@ export function galleryPageOf(
 }
 
 /**
- * A project's link naming its gallery page (?fromGallery=), so whoever opens it
- * gets the weather the page kept rather than searching (gallery-weather.ts).
- * Only while the page is up to date: one changed since gets offered instead,
- * if its dates still fit (GalleryWeather).
+ * A project's link naming its gallery page (?g=), so whoever opens it gets the
+ * weather the page kept rather than searching (gallery-weather.ts), and what
+ * Copy Link says about it. Only while the page is up to date: a project
+ * changed since gets the plain link.
  */
 function withGalleryWeather({ kind, id, changed }: ShareTarget, link: string) {
   const page =
     kind === 'project' && __ACCOUNTS_ENABLED__ && galleryPages.loaded
       ? galleryPageOf(kind, id)
       : undefined;
-  return page && changed && !changed(page)
-    ? fromGalleryLink(link, page.postId)
-    : link;
+  if (!page || !changed) return { link, copied: 'Link copied' };
+  return changed(page)
+    ? {
+        link,
+        copied:
+          'Link copied, without weather, since this project changed after you published it',
+      }
+    : {
+        link: fromGalleryLink(link, page.postId),
+        copied: 'Link copied, with the weather from your gallery page',
+      };
 }
 
 export const galleryPageHref = (page: GalleryPage) =>
@@ -102,12 +110,14 @@ export function shareRows(target: ShareTarget): MoreMenuItem[] {
       label: 'Copy Link',
       detail: 'Anyone with the link gets their own copy. Yours stays as it is.',
       icon: LinkIcon,
-      onselect: () =>
+      onselect: () => {
+        const share = withGalleryWeather(target, link);
         copyToClipboard(
-          withGalleryWeather(target, link),
-          'Link copied',
+          share.link,
+          share.copied,
           'Unable to copy to your clipboard',
-        ),
+        );
+      },
     });
 
   if (!__ACCOUNTS_ENABLED__) return rows;

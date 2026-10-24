@@ -59,10 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     loadFromHistory,
     updateHistory,
   } from '#lib/utils/history-utils.svelte.js';
-  import {
-    lookUpGalleryWeather,
-    loadSavedProject,
-  } from '#lib/utils/open-saved-project.js';
+  import { loadSavedProject } from '#lib/utils/open-saved-project.js';
   import { upToDate } from '#lib/utils/other-utils.js';
   import {
     FROM_GALLERY_PARAM,
@@ -200,9 +197,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (isProject) {
       const request = takeGalleryRequest();
-      // Its gallery pages' weather is looked up meanwhile, to offer if the
-      // link has none (GalleryWeatherOffer)
-      lookUpGalleryWeather(new URL(window.location.href));
       // Load a project from the URL
       await loadProject();
       galleryRequest = request;

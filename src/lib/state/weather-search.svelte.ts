@@ -250,7 +250,7 @@ class WeatherSearch {
     // saved days are as of today only once nothing's left to choose
     keptWith(() => weatherDays.got(data, { all: true, stamp: false }));
     const added = new Set(newDays.map(dayKey)).size;
-    const { changesFor, openSearchAgain } =
+    const { changesFor, onlyColorChanges, openSearchAgain } =
       await import('#lib/components/modals/search-again.js');
     const result = {
       saved,
@@ -260,15 +260,30 @@ class WeatherSearch {
       declined,
       added,
     };
-    // Any day that differs, though none changes a color: the dialog says so
-    if (changesFor(result, { colorsOnly: false }).length)
+    const differ = changesFor(result, { colorsOnly: false }).length;
+    if (differ && (!onlyColorChanges() || changesFor(result).length))
       return openSearchAgain(result);
+    const addedText = added
+      ? `Added ${added} new ${pluralize('day', added)}. `
+      : '';
+    // Days differ, though none changes a color: said, the saved values staying
+    // (asked about again next time, as closing the dialog leaves them)
+    if (differ) {
+      toast.trigger({
+        category: 'success',
+        message: `${addedText}No colors changed. ${differ} saved ${pluralize('day', differ)} ${differ === 1 ? 'has' : 'have'} slightly different values; yours stay as they are.`,
+        hoverable: true,
+        action: {
+          label: 'See Changes',
+          response: () => openSearchAgain(result, { showSameColor: true }),
+        },
+      });
+      return;
+    }
     keptWith(() => weatherDays.stamp());
     toast.trigger({
       category: 'success',
-      message: added
-        ? `Added ${added} new ${pluralize('day', added)}. Weather data is up to date.`
-        : 'Weather data is up to date.',
+      message: `${addedText}Weather data is up to date.`,
     });
   }
 

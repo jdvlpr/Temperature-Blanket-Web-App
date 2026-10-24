@@ -149,8 +149,17 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   </p>
   <p>
     A link doesn't carry the weather, though: whoever opens it gets the weather
-    fresh. To send someone your weather exactly as it is:
+    fresh.
   </p>
+  {#if __ACCOUNTS_ENABLED__}
+    <p>
+      The easiest way to share your weather is your project's gallery page:
+      <span class="font-bold">Open a Copy</span> there opens it with the weather it
+      was published with. Copy Link includes that weather too, while your gallery
+      page is up to date.
+    </p>
+  {/if}
+  <p>To send someone your weather exactly as it is, without a gallery page:</p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       Wait until your last day is about {OPEN_METEO_DELAY_DAYS} days ago with Open-Meteo,

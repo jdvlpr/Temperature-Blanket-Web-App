@@ -13,85 +13,25 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Help text, shown in a help dialog and on its Guides & Help page: what each
-way of opening a project brings with it, the open project's way marked -->
-<script lang="ts">
-  import { project } from '#lib/state/project-state.svelte.js';
+<!-- Help text, shown in a help dialog and on its Guides & Help page: weather
+is kept (a saved project, a gallery page's copy) or searched (a link) -->
 
-  const WAYS = [
-    {
-      id: 'saved',
-      name: 'Saved project',
-      weather: 'Saved days',
-      recent: 'Stay as saved',
-    },
-    {
-      id: 'link',
-      name: 'Link',
-      weather: 'Press Search',
-      recent: 'Can differ a little',
-    },
-    {
-      // A link whose project has a gallery page, loaded (GalleryWeatherOffer)
-      id: 'link-gallery',
-      name: 'Link, weather from its gallery page',
-      weather: "Page's days",
-      recent: 'As published',
-    },
-    {
-      id: 'gallery',
-      name: 'Gallery copy',
-      weather: "Page's days",
-      recent: 'As published',
-    },
-  ] as const;
-
-  const current = $derived(
-    project.status.loadedFrom === 'saved-custom'
-      ? 'saved'
-      : project.status.loadedFrom,
-  );
-</script>
-
-{#snippet thisOne(id: string)}
-  {#if id === current}<span class="sr-only"> (this project)</span>{/if}
-{/snippet}
-
-<div class="@container flex flex-col gap-2">
-  <table
-    class="hidden w-full text-left text-sm @sm:table [&_td]:p-2 [&_th]:p-2"
-  >
-    <thead>
-      <tr>
-        <td></td>
-        <th scope="col">Weather</th>
-        <th scope="col">Recent days</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each WAYS as way (way.id)}
-        <tr class={[way.id === current && 'bg-surface-200-800']}>
-          <th scope="row">{way.name}{@render thisOne(way.id)}</th>
-          <td>{way.weather}</td>
-          <td>{way.recent}</td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-  <!-- Narrow: one card per way -->
-  <ul class="flex flex-col gap-2 text-left text-sm @sm:hidden">
-    {#each WAYS as way (way.id)}
-      <li
-        class={[
-          'rounded-container p-2',
-          way.id === current && 'bg-surface-200-800',
-        ]}
-      >
-        <p class="font-bold">{way.name}{@render thisOne(way.id)}</p>
-        <p>Weather: {way.weather}</p>
-        <p>Recent days: {way.recent}</p>
-      </li>
-    {/each}
-  </ul>
-  <p>Save the project to keep its days as they are.</p>
+<div class="flex flex-col gap-2">
+  <p>
+    Saved projects keep their weather, and so do copies opened from a gallery
+    page. Their days only change when you choose
+    <span class="font-bold">Only New Days</span> or
+    <span class="font-bold">Search Again</span>.
+  </p>
+  <p>
+    A link holds a project's settings but not its weather, so you search for it
+    after opening one. Weather sources sometimes update past days, mostly recent
+    ones, so they can come out a little different.
+  </p>
+  {#if __ACCOUNTS_ENABLED__}
+    <p>
+      To share a project with its weather, share its gallery page. Copy Link
+      includes the weather too, while your gallery page is up to date.
+    </p>
+  {/if}
 </div>
