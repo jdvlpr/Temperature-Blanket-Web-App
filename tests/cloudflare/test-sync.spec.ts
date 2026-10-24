@@ -586,9 +586,10 @@ async function openMenu(page: Page) {
   await expect(async () => {
     await page.getByRole('button', { name: 'Project Options' }).click();
     await expect(
-      page
-        .getByRole('dialog')
-        .getByRole('heading', { name: 'Project', exact: true }),
+      page.getByRole('banner').getByRole('heading', {
+        name: 'Project',
+        exact: true,
+      }),
     ).toBeVisible({ timeout: 1000 });
   }).toPass();
 }
@@ -596,6 +597,11 @@ async function openMenu(page: Page) {
 /** Saves from the Project menu, as someone does the first time. */
 async function saveFromMenu(page: Page) {
   await openMenu(page);
+  await expect(
+    page
+      .getByRole('dialog')
+      .getByText('This project will be saved to your account.'),
+  ).toBeVisible();
   await page.getByTestId('menu-save').click();
   await expect(page.getByText('Saved to your account.')).toBeVisible();
   await page.keyboard.press('Escape');
@@ -771,6 +777,16 @@ test.describe('Auto-save', () => {
     await laptop.waitForTimeout(4000);
 
     expect(await savedIndex(laptop)).toEqual([]);
+    const title = laptop.getByTestId('top-bar-project-name');
+    await title.click();
+    await title.fill('Account project');
+    await title.press('Enter');
+    const confirm = laptop.getByRole('dialog', { name: 'Save this project?' });
+    await expect(confirm).toContainText('It will be saved to your account.');
+    await confirm.getByRole('button', { name: 'Cancel' }).click();
+    await expect(title).toHaveValue('');
+    expect(await savedIndex(laptop)).toEqual([]);
+
     await openMenu(laptop);
     // The Project button says it isn't saved (its dot), not the menu's status
     await expect(laptop.getByTestId('autosave-status')).toHaveCount(0);

@@ -204,27 +204,50 @@ test.describe('My Projects', () => {
     ).toHaveCount(0);
     // Not saved yet: a dot on the Project button, and Save Project in its menu
     await expect(page.getByTestId('unsaved-dot')).toBeVisible();
-    await menu.getByTestId('menu-save').click();
     await expect(
-      page.getByText('Saved in this browser. Changes now save automatically.'),
+      menu.getByText('This project will be saved in this browser.'),
     ).toBeVisible();
     await page.keyboard.press('Escape');
-    // Saving by itself now, the dot gives way to the Project button's icon
+    await expect(menu).toBeHidden();
+
+    const title = page.getByTestId('top-bar-project-name');
+    const defaultName = await title.inputValue();
+    await title.click();
+    await title.fill('Not saved');
+    // Focusing and editing the title doesn't save the project
+    await expect(page.getByTestId('unsaved-dot')).toBeVisible();
+    await title.press('Enter');
+    let confirm = page.getByRole('dialog', { name: 'Save this project?' });
+    await expect(confirm).toContainText('It will be saved in this browser.');
+    await confirm.getByRole('button', { name: 'Cancel' }).click();
+    await expect(title).toHaveValue(defaultName);
+    await expect(title).toHaveAttribute('placeholder', /Austin/);
+    await expect(page.getByTestId('unsaved-dot')).toBeVisible();
+
+    await title.click();
+    await title.fill('Not saved');
+    await title.press('Enter');
+    await page.keyboard.press('Escape');
+    await expect(
+      page.getByRole('dialog', { name: 'Save this project?' }),
+    ).toBeHidden();
+    await expect(title).toHaveValue(defaultName);
+    await expect(page.getByTestId('unsaved-dot')).toBeVisible();
+
+    // Saving from the title keeps both the project and its new name
+    await title.click();
+    await title.fill('Austin Gift');
+    await title.press('Enter');
+    confirm = page.getByRole('dialog', { name: 'Save this project?' });
+    await confirm.getByRole('button', { name: 'Save project' }).click();
+    await expect(page.getByText('Project renamed')).toBeVisible();
+    await expect(title).toHaveValue('Austin Gift');
     await expect(page.getByTestId('unsaved-dot')).toHaveCount(0);
     await expect(page.getByTestId('project-button')).toHaveAttribute(
       'data-save-status',
       'Saved in this browser',
     );
 
-    // Its name is in the top bar too, as a field: rename it there
-    const title = page.getByTestId('top-bar-project-name');
-    await title.click();
-    // Not named yet, its location title is there to edit
-    await expect(title).toHaveValue(/Austin/);
-    await title.fill('Austin Gift');
-    await title.press('Enter');
-    await expect(page.getByText('Project renamed')).toBeVisible();
-    await expect(title).toHaveValue('Austin Gift');
     await expect(title).not.toBeFocused();
 
     // Escape puts the name back

@@ -191,6 +191,11 @@ open in the panel, with a Back button to it. -->
 <!-- Save, until the project saves by itself; the Project button's dot (in
 the same color) says it's waiting here -->
 {#snippet saveButton()}
+  <p class="text-sm opacity-70">
+    This project will be saved {signedIn
+      ? 'to your account'
+      : 'in this browser'}.
+  </p>
   <button
     type="button"
     class="{BTN_PRIMARY} self-start"

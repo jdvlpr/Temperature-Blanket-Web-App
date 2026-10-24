@@ -16,13 +16,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- The open project's name in the top bar, on wider screens (it can be
 renamed in the Project menu too). It's a text field styled as the title, as in Google Docs:
 click to rename in place; Enter or clicking away keeps the name, Escape puts
-it back. Not saved yet, clicking it saves the project first, since naming it
-means keeping it. Until the project saves by itself, a dot on the Project
+it back. Not saved yet, a changed name asks whether to save the project when
+the field loses focus. Until the project saves by itself, a dot on the Project
 button says it isn't saved; then the button shows the save state. -->
 
 <script lang="ts">
+  import { account } from '#lib/accounts/summary.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
-  import { toast } from '#lib/state/page-state.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import {
     autosave,
@@ -39,6 +40,9 @@ button says it isn't saved; then the button shows the save state. -->
   let savedName = $state('');
   let name = $state('');
   let focused = $state(false);
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
 
   $effect(() => {
     void project.url.href;
@@ -61,7 +65,6 @@ button says it isn't saved; then the button shows the save state. -->
     if (!name) name = fallback;
     await tick();
     input.select();
-    if (!autosave.stored) await saveProject();
   }
 
   async function onblur() {
@@ -70,7 +73,53 @@ button says it isn't saved; then the button shows the save state. -->
     // Left as the location title: still no name, so it follows the locations
     if (!savedName && renamed === fallback) renamed = '';
     name = renamed;
-    if (renamed === savedName || !autosave.stored) return;
+    if (renamed === savedName) return;
+    if (!autosave.stored) {
+      const save = await new Promise<boolean>((resolve) => {
+        const respond = (response: boolean) => {
+          dialog.escapeAction = null;
+          resolve(response);
+        };
+        dialog.trigger({
+          type: 'confirm',
+          title: 'Save this project?',
+          body: `Save this project as "${renamed || fallback}"? It will be saved ${
+            signedIn ? 'to your account' : 'in this browser'
+          }.`,
+          confirmText: 'Save project',
+          response: respond,
+        });
+        dialog.escapeAction = () => {
+          respond(false);
+          dialog.close();
+        };
+      });
+      if (!save) {
+        name = savedName;
+        return;
+      }
+      try {
+        if (!(await saveProject())) {
+          name = savedName;
+          return;
+        }
+        await renameOpenProject(renamed);
+        savedName = renamed;
+        name = renamed;
+        if (renamed)
+          toast.trigger({
+            message: 'Project renamed',
+            category: 'success',
+          });
+      } catch {
+        name = savedName;
+        toast.trigger({
+          message: 'Unable to rename the project',
+          category: 'error',
+        });
+      }
+      return;
+    }
     try {
       await renameOpenProject(renamed);
       savedName = renamed;
