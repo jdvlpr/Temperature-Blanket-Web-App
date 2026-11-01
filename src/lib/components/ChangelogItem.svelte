@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- One bordered card; its notes are borderless tiles inside it, with corners
 that follow the card's (its radius less its padding) -->
 <div
-  class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+  class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-24 flex-col gap-2 p-4"
   id={version}
 >
   <div class="flex flex-wrap gap-2 text-xs">

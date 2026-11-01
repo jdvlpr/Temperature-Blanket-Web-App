@@ -26,13 +26,14 @@ their titles and summaries from docs-index.ts (RelatedGuides' twin) -->
   );
 </script>
 
-<section class="flex flex-col gap-3">
+<section class="flex flex-col gap-3" data-on-this-page-ignore>
   <h2 id="more-detail" class="text-2xl font-bold">More Detail</h2>
   <ul class="flex flex-col gap-2">
     {#each pages as page (page.slug)}
       <li>
-        <a href={docsHref(page)} class="link font-bold">{page.title}</a>
-        <span class="opacity-80">: {page.summary}</span>
+        <a href={docsHref(page)} class="link font-bold">{page.title}</a><span
+          class="opacity-80">: {page.summary}</span
+        >
       </li>
     {/each}
   </ul>

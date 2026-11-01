@@ -10,7 +10,7 @@
     if (highlight) {
       const el = document.getElementById(highlight);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   });
@@ -100,16 +100,13 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="mt-4 flex flex-col gap-2">
-    <h2 class="h2 text-gradient">Yarn Weights</h2>
-    <p class="text-sm">
-      Based on <a
-        href="https://www.ravelry.com/help/yarn/weights"
-        class="link"
-        target="_blank">Ravelry Standard Yarn Weights</a
-      >
-    </p>
-  </div>
+  <p class="text-sm">
+    Based on <a
+      href="https://www.ravelry.com/help/yarn/weights"
+      class="link"
+      target="_blank">Ravelry Standard Yarn Weights</a
+    >
+  </p>
   <div class="overflow-x-auto">
     <table
       class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border text-left"

@@ -13,13 +13,15 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The blog post introducing version 7. Its date is a placeholder until launch:
-// then set it here and rename its folder in src/routes/blog to match `slug`.
+// The release post introducing version 7 (What's New). Its date is a
+// placeholder until launch: then set it here. Its address has no date in it,
+// so nothing else changes.
 
 export const VERSION_7_POST = {
   date: '2026-11-01',
-  slug: '2026-11-01-version-7',
+  slug: 'version-7',
   title: 'Version 7: Accounts, My Library & a New Look',
+  image: '/images/blog-images/2026-11-01-version-7/featured-image.jpg',
 } as const;
 
-export const VERSION_7_POST_HREF = `/blog/${VERSION_7_POST.slug}`;
+export const VERSION_7_POST_HREF = `/whats-new/${VERSION_7_POST.slug}`;

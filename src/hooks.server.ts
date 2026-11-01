@@ -50,7 +50,7 @@ const legacyRedirects: Handle = async ({ event, resolve }) => {
   let matchWIATB = path.match(regexPatternWIATB);
   if (matchWIATB) {
     // Construct the new string
-    let newPath = `/blog/what-is-a-temperature-blanket`;
+    let newPath = `/documentation/basics/what-is-a-temperature-blanket`;
     redirect(301, newPath);
   }
 

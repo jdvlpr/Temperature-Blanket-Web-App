@@ -132,6 +132,7 @@ export default defineConfig(({ mode }) => {
               '/api',
               '/api/yarn-colorways',
               '/auth/*',
+              // Gone: kept static so the root _redirects can send them on
               '/blog',
               '/blog/*',
               '/changelog',
@@ -147,6 +148,8 @@ export default defineConfig(({ mode }) => {
               '/privacy',
               '/supporters',
               '/weather',
+              '/whats-new',
+              '/whats-new/*',
               '/yarn',
               '/yarn-colorway-finder',
               '/yarn-search-request',

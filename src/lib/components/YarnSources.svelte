@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if yarnWeightName}
                 <span class="font-normal">
                   (<a
-                    href="/blog/yarn-weights?highlight={yarnWeightName}"
+                    href="/documentation/basics/yarn-weights?highlight={yarnWeightName}"
                     class="link"
                     target="_blank"
                     title="See the yarn weights chart">{yarnWeightName}</a

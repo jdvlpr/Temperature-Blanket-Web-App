@@ -26,8 +26,10 @@ Back doesn't return to it. -->
   import DocsSearch from '#lib/components/docs/DocsSearch.svelte';
   import { CARD_BOX, CARD_HOVER } from '#lib/constants/class-constants.js';
   import {
+    BASICS,
     DOCS_TITLE,
     GUIDES,
+    KIND_HEADINGS,
     OLD_ANCHORS,
     REFERENCE,
     docsHref,
@@ -84,7 +86,8 @@ Back doesn't return to it. -->
     </p>
   </section>
 
-  {#each [{ id: 'guides', heading: 'Guides', intro: 'Step by step, for the things people most often want to do.', pages: GUIDES }, { id: 'reference', heading: 'Reference', intro: 'Every part of the site, and what each option does.', pages: REFERENCE }] as { id, heading, intro, pages } (id)}
+  <!-- Not id="basics": /documentation#basics is an old anchor (OLD_ANCHORS) -->
+  {#each [{ id: 'blanket-basics', heading: KIND_HEADINGS.basics, intro: 'New to temperature blankets? What they are, and the yarn they take.', pages: BASICS }, { id: 'guides', heading: KIND_HEADINGS.guide, intro: 'Step by step, for the things people most often want to do.', pages: GUIDES }, { id: 'reference', heading: KIND_HEADINGS.reference, intro: 'Every part of the site, and what each option does.', pages: REFERENCE }] as { id, heading, intro, pages } (id)}
     <section {id} class="flex flex-col gap-3" data-pagefind-ignore>
       <h2 class="text-2xl font-bold">{heading}</h2>
       <p class="opacity-80">{intro}</p>
@@ -112,8 +115,9 @@ Back doesn't return to it. -->
       <p>
         A blanket that records the weather: each row or square is one day, in
         the color of that day's temperature (or rain, snow or daylight).
-        <a href="/blog/what-is-a-temperature-blanket" class="link"
-          >More about temperature blankets</a
+        <a
+          href="/documentation/basics/what-is-a-temperature-blanket"
+          class="link">More about temperature blankets</a
         >.
       </p>
     </div>
@@ -195,4 +199,9 @@ Back doesn't return to it. -->
       Have another question? <a href="/contact" class="link">Get in touch</a>.
     </p>
   </section>
+
+  <p class="opacity-80" data-pagefind-ignore>
+    What changed lately? See <a href="/whats-new" class="link">What's New</a>,
+    every version's release post and changes.
+  </p>
 </div>

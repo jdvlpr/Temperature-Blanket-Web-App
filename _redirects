@@ -1,0 +1,26 @@
+# Cloudflare Pages redirects. /blog/* and /documentation/* are static
+# (routes.exclude in vite.config.ts), so redirects for them can't live in
+# hooks.server.ts. The blog was split in 2026: evergreen posts went to
+# Guides & Help, release posts and the changelog to What's New.
+/blog/what-is-a-temperature-blanket /documentation/basics/what-is-a-temperature-blanket 301
+/blog/what-is-a-temperature-blanket/ /documentation/basics/what-is-a-temperature-blanket 301
+/blog/yarn-weights /documentation/basics/yarn-weights 301
+/blog/yarn-weights/ /documentation/basics/yarn-weights 301
+/blog/2024-02-09-how-to-plan-a-temperature-blanket /documentation/guides/plan-a-blanket 301
+/blog/2024-02-09-how-to-plan-a-temperature-blanket/ /documentation/guides/plan-a-blanket 301
+/blog/2023-12-19-version-3-unified-site-design /whats-new/version-3 301
+/blog/2023-12-19-version-3-unified-site-design/ /whats-new/version-3 301
+/blog/2024-09-03-now-open-source /whats-new/open-source 301
+/blog/2024-09-03-now-open-source/ /whats-new/open-source 301
+/blog/2025-03-20-version-5 /whats-new/version-5 301
+/blog/2025-03-20-version-5/ /whats-new/version-5 301
+/blog/2026-07-09-version-6 /whats-new/version-6 301
+/blog/2026-07-09-version-6/ /whats-new/version-6 301
+/blog/2026-11-01-version-7 /whats-new/version-7 301
+/blog/2026-11-01-version-7/ /whats-new/version-7 301
+/blog /whats-new 301
+/blog/ /whats-new 301
+/changelog /whats-new 301
+/changelog/ /whats-new 301
+# Anything else once on the blog: last, since the first matching rule wins
+/blog/* /whats-new 301

@@ -70,8 +70,8 @@ before version 3 are under Earlier. Each change keeps its version as its id
           continue;
         }
         const label = `${month} ${year}`;
-        const last = chapter.months.at(-1);
-        if (last?.label === label) last.items.push(item);
+        const sameMonth = chapter.months.find((m) => m.label === label);
+        if (sameMonth) sameMonth.items.push(item);
         else chapter.months.push({ label, items: [item] });
       }
     }
@@ -146,10 +146,10 @@ before version 3 are under Earlier. Each change keeps its version as its id
             <h3 class="text-xl font-bold">What's in {release?.major}.0</h3>
             <ChangelogItem version={first.version} notes={first.notes} />
           {/if}
-          {#each months as { label, items }}
+          {#each months as { label, items } (label)}
             <h3 class="text-xl font-bold">{label}</h3>
             <div class="flex w-full flex-col gap-4">
-              {#each items as { version, notes }}
+              {#each items as { version, notes }, i (i)}
                 <ChangelogItem {version} {notes} />
               {/each}
             </div>

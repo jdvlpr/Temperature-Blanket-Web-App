@@ -64,7 +64,7 @@ async function planner(
     localStorage.setItem('disable_toast_analytics', 'true'),
   );
   await page.goto(new URL(project, base).href);
-  await page.getByRole('button', { name: /^Search/ }).click();
+  await page.getByRole('button', { name: /^Get Weather Data/ }).click();
   await page.getByRole('button', { name: /^Weather Source/ }).waitFor();
   const key = { location: '1', 'weather-data': '2', gauges: '3', preview: '4' };
   await page.keyboard.press(key[section]);

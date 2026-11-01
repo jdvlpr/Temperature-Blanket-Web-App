@@ -17,11 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 is only its content; its title, description, breadcrumb, Previous/Next
 and a guide's video all come from docs-index. On a guide or reference page, On this page (its
 h2/h3 sections, the one being read marked) sits beside the page on wide
-screens; on smaller ones a bar under the top bar names the section being
-read. The index has every page beside it instead, and no bar. Either way,
-the top bar's Contents button (and that bar) open the Contents sheet: a
-page's sections, then every page. Only the page's content
-(data-pagefind-body) goes into the search index. -->
+screens, with All Guides & Help; on smaller ones a bar under the top bar
+names the section being read, and opens the Contents sheet, which holds
+the same. A page with only a section or two has no On this page and no bar.
+The index lists every page as cards, with nothing beside it and no bar.
+Only the page's content (data-pagefind-body) goes into the search index. -->
 
 <script lang="ts">
   import { page } from '$app/state';
@@ -34,6 +34,7 @@ page's sections, then every page. Only the page's content
   import {
     DOCS_PAGES,
     DOCS_TITLE,
+    KIND_HEADINGS,
     docsHref,
     docsPageAt,
   } from '#lib/docs/docs-index.js';
@@ -104,19 +105,16 @@ page's sections, then every page. Only the page's content
     content="{PUBLIC_BASE_URL}{current ? docsHref(current) : '/documentation'}"
   />
   <meta property="og:type" content="website" />
+  {#if current?.image}
+    <meta property="og:image" content="{PUBLIC_BASE_URL}{current.image.src}" />
+    <meta property="og:image:width" content={String(current.image.width)} />
+    <meta property="og:image:height" content={String(current.image.height)} />
+  {/if}
 </svelte:head>
 
 <AppShell pageName={DOCS_TITLE}>
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
-    <button
-      type="button"
-      class="btn hover:preset-tonal-surface my-2"
-      onclick={openContents}
-    >
-      <TableOfContentsIcon />
-      Contents
-    </button>
   {/snippet}
   {#snippet main()}
     <!-- The section being read, below the wide screens' On this page -->
@@ -151,9 +149,7 @@ page's sections, then every page. Only the page's content
             <a
               href="/documentation"
               class="text-sm opacity-80 hover:underline hover:opacity-100"
-              >{DOCS_TITLE} › {current.kind === 'guide'
-                ? 'Guides'
-                : 'Reference'}</a
+              >{DOCS_TITLE} › {KIND_HEADINGS[current.kind]}</a
             >
             <h1 class="h2 text-gradient" data-pagefind-meta="title">
               {current.title}
@@ -216,17 +212,20 @@ page's sections, then every page. Only the page's content
           </div>
         {/if}
       </main>
-      <aside
-        class="sticky hidden h-fit w-56 shrink-0 [scrollbar-width:thin] overflow-y-auto pt-2 xl:block"
-        style:top="{topBarHeight + 8}px"
-        style:max-height="calc(100dvh - {topBarHeight + 16}px)"
-      >
-        {#if current}
+      {#if current}
+        <aside
+          class="sticky hidden h-fit w-56 shrink-0 [scrollbar-width:thin] flex-col gap-4 overflow-y-auto pt-2 xl:flex"
+          style:top="{topBarHeight + 8}px"
+          style:max-height="calc(100dvh - {topBarHeight + 16}px)"
+        >
           <OnThisPage />
-        {:else}
-          <DocsNav />
-        {/if}
-      </aside>
+          <a
+            href="/documentation"
+            class="rounded-base hover:bg-surface-200-800 flex items-center gap-2 px-3 py-1.5 text-sm transition-colors"
+            ><ArrowLeftIcon class="icon-sm" />All {DOCS_TITLE}</a
+          >
+        </aside>
+      {/if}
     </div>
   {/snippet}
 </AppShell>

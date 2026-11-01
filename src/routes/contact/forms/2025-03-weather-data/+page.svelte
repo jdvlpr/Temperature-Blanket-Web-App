@@ -311,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       After the April 1 update, there was another report of
                       off-by-one weather data date issues. The issue was
                       identified and fixed (<a
-                        href="/changelog#5.2.35"
+                        href="/whats-new#5.2.35"
                         target="_blank"
                         class="link">see the changelog for details</a
                       >).
@@ -357,7 +357,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       reports of off-by-one weather data date issues. With the
                       help of a supporter, I believe we identified and fixed the
                       issue (<a
-                        href="/changelog#5.2.33"
+                        href="/whats-new#5.2.33"
                         target="_blank"
                         class="link">see the changelog for details</a
                       >). If you are still seeing a problem with the weather
@@ -443,7 +443,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div {...attributes} transition:safeSlide>
                       On March 20, 2025, temperature-blanket.com was updated to
                       a new version (<a
-                        href="/blog/2025-03-20-version-5"
+                        href="/whats-new/version-5"
                         class="link"
                         target="_blank">see this blog post for more details</a
                       >). Since then, and through a series of successive updates
@@ -456,7 +456,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       site update on March 20, where weather data for some projects
                       changed—different temperatures were reported. I believe this
                       issue was fixed on March 24, 2025 (<a
-                        href="/changelog#5.2.2"
+                        href="/whats-new#5.2.2"
                         target="_blank"
                         class="link">see the changelog for details</a
                       >).

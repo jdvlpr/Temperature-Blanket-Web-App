@@ -16,7 +16,9 @@
 // A Guides & Help page's sections, for On this page (beside the page, in the
 // Contents sheet, and in the current-section bar on smaller screens), and
 // the one being read. Collected from the page's own h2 and h3 headings, so
-// pages need nothing extra: a heading's id, or else its section's.
+// pages need nothing extra: a heading's id, or else its section's. Headings
+// inside data-on-this-page-ignore (the page header, Related Guides, More
+// Detail) are left out, and a page with fewer than MIN_SECTIONS gets none.
 
 import { goto } from '$app/navigation';
 import type { Attachment } from 'svelte/attachments';
@@ -38,6 +40,8 @@ class OnThisPage {
 export const onThisPage = new OnThisPage();
 
 const HEADINGS = 'h2, h3';
+/** Fewer sections than this and a list of them would only repeat the page */
+const MIN_SECTIONS = 3;
 
 /** On the element holding a page's content: its sections, and which is read */
 export function trackSections(): Attachment<HTMLElement> {
@@ -50,6 +54,7 @@ export function trackSections(): Attachment<HTMLElement> {
           !heading.closest('[data-on-this-page-ignore]') &&
           sectionId(heading, node),
       );
+      if (headings.length < MIN_SECTIONS) headings = [];
       onThisPage.sections = headings.map((heading) => ({
         id: sectionId(heading, node),
         text: heading.textContent?.trim() ?? '',

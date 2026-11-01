@@ -292,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               Get historical weather data, choose yarn colors, and visualize
               your crochet or knitting project. <a
-                href="/blog/what-is-a-temperature-blanket"
+                href="/documentation/basics/what-is-a-temperature-blanket"
                 class="link whitespace-pre-wrap"
                 rel="noreferrer"
               >

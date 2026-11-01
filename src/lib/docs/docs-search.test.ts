@@ -21,6 +21,14 @@ describe('keywordSearch', () => {
     );
   });
 
+  it('finds the basics by the words people use', () => {
+    expect(firstSlug('yarn weights')).toBe('yarn-weights');
+    expect(firstSlug('worsted')).toBe('yarn-weights');
+    expect(firstSlug('what is a temperature blanket')).toBe(
+      'what-is-a-temperature-blanket',
+    );
+  });
+
   it('finds nothing for nothing', () => {
     expect(keywordSearch('')).toEqual([]);
     expect(keywordSearch('   ')).toEqual([]);
@@ -38,6 +46,9 @@ describe('docs index', () => {
     expect(docsPageAt('/documentation/weather')?.slug).toBe('weather');
     expect(docsPageAt('/documentation/guides/choose-ranges/')?.slug).toBe(
       'choose-ranges',
+    );
+    expect(docsPageAt('/documentation/basics/yarn-weights')?.kind).toBe(
+      'basics',
     );
     expect(docsPageAt('/documentation')).toBeUndefined();
   });

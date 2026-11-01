@@ -34,6 +34,11 @@ here. -->
   <h2 id="what-you-need" class="text-2xl font-bold">What You Need</h2>
   <ul class="ml-6 list-disc space-y-1">
     <li>
+      A project you'll finish. A year of rows is a big commitment, so a scarf,
+      shawl or socks, or a shorter stretch of days, are good choices too. The
+      planner works the same for any of them.
+    </li>
+    <li>
       The place your blanket is about, like your town, and its dates: a year, a
       trip, or any stretch up to {MAXIMUM_DAYS_PER_LOCATION} days.
     </li>

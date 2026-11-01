@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const gallery = $derived(
     ['/gallery', '/gallery/palettes'].includes(pathname),
   );
-  const blog = $derived(pathname.includes('/blog'));
+  const whatsNewPage = $derived(pathname.startsWith('/whats-new'));
   const docs = $derived(pathname.startsWith('/documentation'));
   const create = $derived(['/', '/yarn'].includes(pathname));
 
@@ -216,29 +216,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   fit every link on one line -->
   <div class={[SMALL_LINKS, 'w-0 min-w-full px-3']}>
     <a
-      href="/blog"
-      class={['py-1', SMALL_LINK, blog && SMALL_CURRENT]}
-      aria-current={blog ? 'page' : undefined}>Blog</a
-    >
-    <a
       href="/documentation"
       class={['py-1', SMALL_LINK, docs && SMALL_CURRENT]}
       aria-current={pathname === '/documentation' ? 'page' : undefined}
       >Guides & Help</a
     >
     <a
-      href="/changelog"
-      class={['py-1', SMALL_LINK, pathname === '/changelog' && SMALL_CURRENT]}
-      aria-current={pathname === '/changelog' ? 'page' : undefined}
+      href="/whats-new"
+      class={['py-1', SMALL_LINK, whatsNewPage && SMALL_CURRENT]}
+      aria-current={pathname === '/whats-new' ? 'page' : undefined}
     >
       What's New
       <!-- Filled while there's news to see -->
       <span
         class={[
-          'badge px-2 py-0.5 text-xs',
+          'badge px-2 py-0.5 text-xs font-normal',
           mounted && whatsNew.show
             ? 'preset-filled-primary-500'
-            : 'bg-surface-200-800',
+            : 'bg-surface-100-900',
         ]}
         >v{version}{#if mounted && whatsNew.show}<span class="sr-only"
             >, new</span

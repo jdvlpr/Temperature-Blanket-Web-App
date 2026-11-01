@@ -19,7 +19,7 @@
 // their problem, not the site's names for things ("thermometer", not
 // "weather source"); the full text is searched by Pagefind as well.
 
-export type DocsKind = 'guide' | 'reference';
+export type DocsKind = 'basics' | 'guide' | 'reference';
 
 export type DocsPage = {
   kind: DocsKind;
@@ -30,9 +30,69 @@ export type DocsPage = {
   keywords: string[];
   /** A guide's video, once there is one: a YouTube ID, and where to start */
   video?: { id: string; start?: number };
+  /** The picture shown when the page is shared (og:image) */
+  image?: { src: string; width: number; height: number };
 };
 
 export const DOCS_TITLE = 'Guides & Help';
+
+/** Each kind's heading: the index's sections, the contents, the breadcrumb */
+export const KIND_HEADINGS: Record<DocsKind, string> = {
+  basics: 'Temperature Blanket Basics',
+  guide: 'Guides',
+  reference: 'Reference',
+};
+
+/** About temperature blankets themselves, not the site: once blog posts */
+export const BASICS: DocsPage[] = [
+  {
+    kind: 'basics',
+    slug: 'what-is-a-temperature-blanket',
+    title: 'What Is a Temperature Blanket?',
+    summary:
+      'A crocheted or knitted project that records the weather, one row or square for each day.',
+    keywords: [
+      'what is',
+      'meaning',
+      'idea',
+      'weather blanket',
+      'crochet',
+      'knit',
+      'patterns',
+      'inspiration',
+      'ideas',
+    ],
+    image: {
+      src: '/images/blog-images/what-is-a-temperature-blanket/temperature-blanket-featured-image.png',
+      width: 986,
+      height: 1200,
+    },
+  },
+  {
+    kind: 'basics',
+    slug: 'yarn-weights',
+    title: 'Yarn Weights',
+    summary:
+      'A chart of yarn weights, from lace to jumbo: the names used here, ply in the UK, New Zealand and Australia, wraps per inch, and the standard weight numbers.',
+    keywords: [
+      'yarn weight',
+      'worsted',
+      'aran',
+      'dk',
+      'chunky',
+      'fingering',
+      'hook size',
+      'needle size',
+      'wpi',
+      'ply',
+    ],
+    image: {
+      src: '/images/blog-images/yarn-weights/banner.png',
+      width: 1366,
+      height: 768,
+    },
+  },
+];
 
 export const GUIDES: DocsPage[] = [
   {
@@ -61,6 +121,7 @@ export const GUIDES: DocsPage[] = [
     keywords: [
       'thermometer',
       'wrong',
+      'wrong temperature',
       'inaccurate',
       'incorrect',
       'different',
@@ -364,12 +425,12 @@ export const REFERENCE: DocsPage[] = [
   },
 ];
 
-export const DOCS_PAGES = [...GUIDES, ...REFERENCE];
+export const DOCS_PAGES = [...BASICS, ...GUIDES, ...REFERENCE];
 
 export const docsHref = (page: Pick<DocsPage, 'kind' | 'slug'>) =>
-  page.kind === 'guide'
-    ? `/documentation/guides/${page.slug}`
-    : `/documentation/${page.slug}`;
+  page.kind === 'reference'
+    ? `/documentation/${page.slug}`
+    : `/documentation/${page.kind === 'guide' ? 'guides' : 'basics'}/${page.slug}`;
 
 /** The page at a path, ignoring a trailing slash */
 export const docsPageAt = (pathname: string) => {

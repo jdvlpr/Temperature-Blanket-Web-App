@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <p>
     You can <a
-      href="/changelog#{v}"
+      href="/whats-new#{v}"
       target="_blank"
       rel="nofollow noreferrer"
       class="link"
