@@ -86,7 +86,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 {/snippet}
 
-<nav class="mx-auto w-full max-w-xs px-2" aria-label={label}>
+<!-- At the page's left edge; centered in a dialog -->
+<nav class={['w-full max-w-xs', onselect && 'mx-auto px-2']} aria-label={label}>
   <ul
     class="bg-surface-100 dark:bg-surface-900 rounded-container grid grid-cols-2 gap-1 p-1"
   >

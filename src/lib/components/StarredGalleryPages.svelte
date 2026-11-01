@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/shared-palette-utils.js';
   import { projectCopyHref } from '#lib/utils/open-copy.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
-  import { PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import { PAGE_TEXT, PALETTE_LIST } from '#lib/constants/class-constants.js';
   import { LogInIcon, StarIcon, XIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
 
@@ -245,10 +245,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if !signedIn}
   <div
-    class="bg-surface-100-900 rounded-container mx-auto my-4 flex w-full max-w-3xl flex-col items-center gap-3 p-4 text-center"
+    class={[
+      PAGE_TEXT,
+      'bg-surface-100-900 rounded-container my-4 flex w-full flex-wrap items-center gap-3 p-4',
+    ]}
   >
-    <StarIcon class="size-8 opacity-60" aria-hidden="true" />
-    <p class="text-sm">Sign in to star gallery pages and find them here.</p>
+    <StarIcon class="shrink-0 opacity-60" aria-hidden="true" />
+    <p class="min-w-40 flex-1 text-sm">
+      Sign in to star gallery pages and find them here.
+    </p>
     <a
       href={signInHref(page.url)}
       onclick={backHereOnClick}

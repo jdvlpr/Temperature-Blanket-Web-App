@@ -209,7 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class={[
       'my-2 flex w-full flex-wrap items-center gap-2',
-      actions ? 'justify-between' : 'justify-center',
+      actions ? 'justify-between' : 'justify-start',
     ]}
   >
     <div class="flex flex-wrap items-center gap-2">

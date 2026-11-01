@@ -165,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else if !projects.length}
   <p class="my-8 text-center">No projects yet.</p>
 {:else}
-  <div class="px-2 lg:px-0">
+  <div>
     <CollectionToolbar
       kind="project"
       searchIcon="search"
@@ -188,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {showFilters}
     ></CollectionToolbar>
   </div>
-  <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
+  <p class="text-surface-700-300 text-sm" aria-live="polite">
     {#if filtering}
       {shown.length} of {all.length} projects
     {/if}

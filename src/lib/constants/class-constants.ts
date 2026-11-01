@@ -84,3 +84,10 @@ export const BTN_SECONDARY = 'btn hover:preset-tonal-surface';
 export const BTN_PRIMARY = 'btn preset-filled-primary-500';
 // Destructive, in the primary's place
 export const BTN_DANGER = 'btn preset-filled-error-500';
+
+// Every page's <main>: all the width AppShell leaves beside the sidebar, with
+// the same gutter, so pages start at the same left edge and titles line up.
+export const PAGE = 'w-full px-2';
+// Text and forms on a page: a comfortable line length, kept at the page's left
+// edge. Charts, tables and card grids don't take it, so they use the width.
+export const PAGE_TEXT = 'max-w-(--breakpoint-md)';

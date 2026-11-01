@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import {
     consentToMSClarityCookies,
@@ -44,9 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="mx-auto my-2 flex max-w-(--breakpoint-md) flex-col gap-4 px-2 xl:px-0"
-    >
+    <main class={[PAGE, PAGE_TEXT, 'my-2 flex flex-col gap-4']}>
       <h2 class="h2 text-gradient mt-2 max-lg:hidden">Privacy Policy</h2>
       <div class="flex flex-col gap-2">
         <p class="text-xl font-bold">Introduction</p>

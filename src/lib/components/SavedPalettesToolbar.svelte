@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {showFilters}
   {actions}
 ></CollectionToolbar>
-<p class="text-surface-700-300 text-center text-sm" aria-live="polite">
+<p class="text-surface-700-300 text-sm" aria-live="polite">
   {#if libraryFilters.activeFor('palettes', { starred }) && total}
     {matching} of {total} {starred ? 'starred palettes' : 'palettes'}
   {/if}

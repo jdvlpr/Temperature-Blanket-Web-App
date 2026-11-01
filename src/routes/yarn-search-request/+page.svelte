@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import {
     ArrowLeftIcon,
     CircleCheckIcon,
@@ -49,9 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="m-auto mx-auto mb-4 flex max-w-(--breakpoint-md) flex-col gap-4 px-2 text-left lg:mt-4"
-    >
+    <main class={[PAGE, PAGE_TEXT, 'mb-4 flex flex-col gap-4 lg:mt-4']}>
       <a
         href="/contact"
         class="btn hover:preset-tonal-surface w-fit max-lg:mt-2"

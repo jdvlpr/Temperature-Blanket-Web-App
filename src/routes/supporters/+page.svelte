@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import Supporters from '#lib/components/Supporters.svelte';
   import DonateButton from '#lib/components/buttons/DonateButton.svelte';
 </script>
@@ -36,10 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="m-auto mx-auto mt-2 mb-12 flex max-w-3xl flex-col gap-4 px-2 text-center"
-    >
-      <p class="mt-2 text-center text-sm">
+    <main class={[PAGE, 'mt-2 mb-12 flex flex-col gap-4']}>
+      <p class={[PAGE_TEXT, 'mt-2 text-sm']}>
         Thanks to <a
           href={PUBLIC_KOFI_LINK}
           target="_blank"

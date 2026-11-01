@@ -28,6 +28,7 @@ thumbnails for colors and headings
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
@@ -240,10 +241,8 @@ site does -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="mx-auto flex w-full max-w-xl min-w-0 flex-col gap-6 px-2 pt-2 pb-8 text-left"
-    >
-      <h2 class="h2 text-gradient mt-2 text-center">Preferences</h2>
+    <main class={[PAGE, PAGE_TEXT, 'flex min-w-0 flex-col gap-6 pt-2 pb-8']}>
+      <h2 class="h2 text-gradient mt-2">Preferences</h2>
 
       <section
         class="flex flex-col gap-2"

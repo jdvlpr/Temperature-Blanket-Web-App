@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ]);
 </script>
 
-<nav class="mx-auto w-full max-w-md px-2" aria-label={label}>
+<nav class="w-full max-w-md" aria-label={label}>
   <ul
     class="bg-surface-100 dark:bg-surface-900 rounded-container grid grid-cols-2 gap-1 p-1"
   >

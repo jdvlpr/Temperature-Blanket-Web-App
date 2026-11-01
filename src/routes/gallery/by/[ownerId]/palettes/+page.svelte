@@ -140,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else if !yarnDataReady}
   <div class="px-2"><PlaceholderPalettes items={3} maxWFull={true} /></div>
 {:else}
-  <div class="px-2 lg:px-0">
+  <div>
     <CollectionToolbar
       kind="palette"
       searchIcon="search"
@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {showFilters}
     ></CollectionToolbar>
   </div>
-  <p class="text-surface-700-300 text-center text-sm" aria-live="polite">
+  <p class="text-surface-700-300 text-sm" aria-live="polite">
     {#if filtering}
       {palettes.length} of {cards.length} palettes
     {/if}

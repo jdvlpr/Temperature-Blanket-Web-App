@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Footer from '#lib/components/Footer.svelte';
   import Share from '#lib/components/Share.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import UnitMenu from '#lib/components/buttons/UnitMenu.svelte';
   import {
     dialog,
@@ -384,19 +385,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="m-auto mb-8 max-w-(--breakpoint-xl) text-center" in:fade>
-      <div class="w-full px-2 py-4">
+    <main class={[PAGE, 'mb-8 text-center']} in:fade>
+      <div class="py-4 text-left">
         <div class="flex flex-col gap-2">
           <h2 class="h1 text-gradient mb-0">Weather Forecast</h2>
         </div>
       </div>
-      <div class="max-lg:px-2">
+      <div>
         <Location />
       </div>
 
       {#if weatherData && !project.status.loading}
         <div
-          class="max-w-full pb-4 max-lg:px-2"
+          class="max-w-full pb-4"
           id="weather-data"
           bind:this={weatherState.weatherDataElement}
         >

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
+  import { FIELD_GROUP, PAGE } from '#lib/constants/class-constants.js';
   import type { ColorwaySort } from '#lib/components/yarn-colorways/colorway-utils.js';
 
   class YarnColorwayFinderState {
@@ -331,8 +331,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}
-    <main class="m-auto max-w-(--breakpoint-xl) pb-6">
-      <div class="w-full px-2 py-4 text-center">
+    <main class={[PAGE, 'pb-6']}>
+      <div class="py-4">
         <div class="flex flex-col gap-2">
           <h2 class="h1 text-gradient mb-0">Find Yarn by Color</h2>
           <p>
@@ -343,7 +343,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <Card>
         {#snippet content()}
-          <div class=" my-2 flex flex-col items-center">
+          <div class="my-2 flex flex-col items-start">
             <div
               bind:this={filtersContainer}
               class="my-2 grid w-full scroll-mt-[66px] grid-cols-12 items-end justify-between gap-4"
@@ -378,7 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : pluralize('Colorway', sorted.length)}
               </p>
             {/if}
-            <div class="flex flex-wrap items-center justify-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               {#if results.length}
                 <SortSelectMenu
                   options={colorwaySortOptions(!!yarnColorwayFinderState.hex)}
@@ -477,7 +477,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <Spinner />
               </div>
             {:else}
-              <div class="bg-warning-500/20 card mx-auto my-2 p-4 text-center">
+              <div class="bg-warning-500/20 card my-2 w-full p-4">
                 <p>No Matching Colorways</p>
                 <p class="text-sm">Try changing the filters above</p>
               </div>

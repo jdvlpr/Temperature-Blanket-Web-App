@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { beforeNavigate } from '$app/navigation';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
   import Gauge from '#lib/components/Gauge.svelte';
@@ -210,8 +211,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div>
-      <main class="m-auto max-w-(--breakpoint-xl) text-center max-lg:px-2">
-        <div class="w-full py-4">
+      <main class={[PAGE, 'text-center']}>
+        <div class="py-4 text-left">
           <div class="flex flex-col gap-2">
             <h2 class="h1 text-gradient mb-0">Create a Yarn Palette</h2>
             <p>

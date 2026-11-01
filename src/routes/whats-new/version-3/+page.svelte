@@ -17,6 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import OnThisPageLayout from '#lib/components/docs/OnThisPageLayout.svelte';
+  import { PAGE_TEXT } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 </script>
@@ -45,10 +47,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="pb-8">
+    <OnThisPageLayout
+      title="Version 3: Unified Site Design"
+      backHref="/whats-new"
+      backLabel="All What's New"
+      class={PAGE_TEXT}
+    >
       <a
         href="/whats-new"
-        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mt-2"
         ><ArrowLeftIcon /> What's New</a
       >
       <Card>
@@ -66,7 +73,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="px-2 pb-4">
             <div class="flex flex-col gap-4">
               <div class="mt-4 flex flex-col gap-2">
-                <h2 class="h2 text-gradient">Version 3: Unified Site Design</h2>
+                <h2 class="h2 text-gradient" data-on-this-page-ignore>
+                  Version 3: Unified Site Design
+                </h2>
                 <p class="text-sm">December 19, 2023</p>
               </div>
               <p>
@@ -82,7 +91,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 navigation between pages, and improved sharing capabilities.
               </p>
 
-              <h2 class="text-lg font-bold">Updated Project Gallery Pages</h2>
+              <h2 id="updated-project-gallery-pages" class="text-lg font-bold">
+                Updated Project Gallery Pages
+              </h2>
               <p>
                 Hundreds of user-created projects have been shared to the <a
                   href="/gallery"
@@ -110,7 +121,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 the site. The other benefit is that they are easier to maintain.
                 I don't have to maintain two separate sites.
               </p>
-              <h2 class="text-lg font-bold">
+              <h2
+                id="improved-navigation-between-pages"
+                class="text-lg font-bold"
+              >
                 Improved Navigation Between Pages
               </h2>
               <p>
@@ -121,7 +135,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 and smoother.
               </p>
 
-              <h2 class="text-lg font-bold">
+              <h2
+                id="easily-share-a-yarn-palette-colorway-search-or-weather-forecast-page"
+                class="text-lg font-bold"
+              >
                 Easily Share a Yarn Palette, Colorway Search, or Weather
                 Forecast Page
               </h2>
@@ -130,7 +147,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Forecast tools, click the share icon at the top of the page to
                 get a shareable link to that page.
               </p>
-              <h2 class="text-lg font-bold">
+              <h2
+                id="bug-fixes-performance-improvements-and-more"
+                class="text-lg font-bold"
+              >
                 Bug Fixes, Performance Improvements, and More
               </h2>
               <p>
@@ -150,11 +170,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/snippet}
       </Card>
-      <a
-        href="/whats-new#v3"
-        class="btn hover:preset-tonal-surface mt-4 max-lg:mx-2"
+      <a href="/whats-new#v3" class="btn hover:preset-tonal-surface mt-4"
         >All Changes in Version 3<ArrowRightIcon /></a
       >
-    </main>
+    </OnThisPageLayout>
   {/snippet}
 </AppShell>

@@ -17,6 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import OnThisPageLayout from '#lib/components/docs/OnThisPageLayout.svelte';
+  import { PAGE_TEXT } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 </script>
@@ -45,10 +47,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="pb-8">
+    <OnThisPageLayout
+      title="Version 5: Refreshed & Rebuilt"
+      backHref="/whats-new"
+      backLabel="All What's New"
+      class={PAGE_TEXT}
+    >
       <a
         href="/whats-new"
-        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mt-2"
         ><ArrowLeftIcon /> What's New</a
       >
       <Card>
@@ -65,7 +72,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet content()}
           <div class="mb-8 flex flex-col gap-4 px-2 pb-4">
             <div class="mt-4 flex flex-col gap-2">
-              <h2 class="h2 text-gradient">Version 5: Refreshed & Rebuilt</h2>
+              <h2 class="h2 text-gradient" data-on-this-page-ignore>
+                Version 5: Refreshed & Rebuilt
+              </h2>
               <p class="text-sm">March 20, 2025</p>
             </div>
 
@@ -93,7 +102,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Updated Design</h2>
+            <h2 id="updated-design" class="text-2xl font-bold">
+              Updated Design
+            </h2>
             <p class="font-bold">Logo</p>
             <p>
               The first thing you might notice is a new logo, along with a new
@@ -129,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">New Features</h2>
+            <h2 id="new-features" class="text-2xl font-bold">New Features</h2>
 
             <p class="font-bold">Move Gauge Colors</p>
 
@@ -197,9 +208,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Code Overhaul</h2>
+            <h2 id="code-overhaul" class="text-2xl font-bold">Code Overhaul</h2>
 
-            <h2 class="font-bold">
+            <h2 id="svelte-4-5" class="font-bold">
               Svelte 4 <ArrowRightIcon
                 class="icon-sm relative -top-[1px] inline"
               /> 5
@@ -222,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               will hopefully lead to easier maintenance and better features.
             </p>
 
-            <h2 class="font-bold">
+            <h2 id="skeleton-2-3" class="font-bold">
               Skeleton 2 <ArrowRightIcon
                 class="icon-sm relative -top-[1px] inline"
               /> 3
@@ -240,7 +251,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Upcoming Features</h2>
+            <h2 id="upcoming-features" class="text-2xl font-bold">
+              Upcoming Features
+            </h2>
             <p>
               There are several new features planned for upcoming versions of
               this site. Thanks to those of you who have contributed your ideas!
@@ -260,7 +273,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Feedback</h2>
+            <h2 id="feedback" class="text-2xl font-bold">Feedback</h2>
             <p>
               As always, if you have feedback of any kind, or encounter any
               issues, please let me know through any of the methods listed on
@@ -271,11 +284,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/snippet}
       </Card>
-      <a
-        href="/whats-new#v5"
-        class="btn hover:preset-tonal-surface mt-4 max-lg:mx-2"
+      <a href="/whats-new#v5" class="btn hover:preset-tonal-surface mt-4"
         >All Changes in Version 5<ArrowRightIcon /></a
       >
-    </main>
+    </OnThisPageLayout>
   {/snippet}
 </AppShell>

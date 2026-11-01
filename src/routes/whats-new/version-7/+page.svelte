@@ -17,6 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import OnThisPageLayout from '#lib/components/docs/OnThisPageLayout.svelte';
+  import { PAGE_TEXT } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import {
@@ -66,10 +68,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="pb-8">
+    <OnThisPageLayout
+      {title}
+      backHref="/whats-new"
+      backLabel="All What's New"
+      class={PAGE_TEXT}
+    >
       <a
         href="/whats-new"
-        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mt-2"
         ><ArrowLeftIcon /> What's New</a
       >
       <Card>
@@ -86,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet content()}
           <div class="mb-8 flex flex-col gap-4 px-2 pb-4">
             <div class="mt-4 flex flex-col gap-2">
-              <h2 class="h2 text-gradient">{title}</h2>
+              <h2 class="h2 text-gradient" data-on-this-page-ignore>{title}</h2>
               <p class="text-sm">{date}</p>
             </div>
 
@@ -114,9 +121,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">What's New</h2>
+            <h2 id="whats-new" class="text-2xl font-bold">What's New</h2>
 
-            <h3 class="font-bold">Accounts</h3>
+            <h3 id="accounts" class="font-bold">Accounts</h3>
             <p>
               Sign in with Google from the person icon in the top right. Your
               projects, palettes and preferences are then on any device you sign
@@ -124,14 +131,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a href="#saving" class="link">Saving</a> below for the difference).
             </p>
 
-            <h3 class="font-bold">My Library</h3>
+            <h3 id="my-library" class="font-bold">My Library</h3>
             <p>
               Everything you've saved, projects and palettes, in one place near
               the top of the site menu, with or without an account. Find it at
               <a href="/my-projects" class="link">My Library</a>.
             </p>
 
-            <h3 class="font-bold">Post to Ravelry</h3>
+            <h3 id="post-to-ravelry" class="font-bold">Post to Ravelry</h3>
             <p>
               Connect your Ravelry account on your
               <a href="/account" class="link">Account</a> page, then choose
@@ -156,7 +163,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             the project's name, By <name> · views, its preview, and its
             Ravelry photos in a row, with On Ravelry beside them." /> -->
 
-            <h3 class="font-bold">Gallery pages you can update</h3>
+            <h3 id="gallery-pages-you-can-update" class="font-bold">
+              Gallery pages you can update
+            </h3>
             <p>
               If you choose to publish a project or palette, it gets one gallery
               page. When you make changes, choose
@@ -164,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               same link and the same views.
             </p>
 
-            <h3 class="font-bold">Stars</h3>
+            <h3 id="stars" class="font-bold">Stars</h3>
             <p>
               Star other people's projects and palettes to find them again under
               <span class="italic">Starred</span> in My Library. Only you see your
@@ -173,9 +182,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">What's Changed</h2>
+            <h2 id="whats-changed" class="text-2xl font-bold">
+              What's Changed
+            </h2>
 
-            <h3 class="font-bold">A simpler site menu</h3>
+            <h3 id="a-simpler-site-menu" class="font-bold">
+              A simpler site menu
+            </h3>
             <p>
               The site menu is now grouped into
               <span class="italic">Create</span> (a new project or palette),
@@ -191,7 +204,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               caption="The new site menu."
             />
 
-            <h3 class="font-bold">Editing colors and ranges</h3>
+            <h3 id="editing-colors-and-ranges" class="font-bold">
+              Editing colors and ranges
+            </h3>
             <p>
               Ranges are now edited right in the gauge. Tap a range's number,
               change it and press <span class="italic">Save</span>, and the next
@@ -219,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               caption="The Ranges menu."
             />
 
-            <h3 id="saving" class="scroll-mt-20 font-bold">Saving</h3>
+            <h3 id="saving" class="font-bold">Saving</h3>
             <p>
               Save a project once with <span class="italic">Save</span> in the top
               bar, and after that your changes save by themselves.
@@ -238,7 +253,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
 
-            <h3 class="font-bold">Gallery projects keep their weather</h3>
+            <h3 id="gallery-projects-keep-their-weather" class="font-bold">
+              Gallery projects keep their weather
+            </h3>
             <p>
               Opening a project from the
               <a href="/gallery" class="link">gallery</a> now loads the weather
@@ -254,7 +271,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               to it.
             </p>
 
-            <h3 class="font-bold">And many smaller changes</h3>
+            <h3 id="and-many-smaller-changes" class="font-bold">
+              And many smaller changes
+            </h3>
             <p>Including:</p>
             <ul class="ml-6 list-disc space-y-1">
               <li>
@@ -268,7 +287,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Where to Find Things</h2>
+            <h2 id="where-to-find-things" class="text-2xl font-bold">
+              Where to Find Things
+            </h2>
             <div class="rounded-container border-surface-200-800 border">
               <table class="w-full text-left">
                 <thead class="max-sm:sr-only">
@@ -292,9 +313,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">What's Removed or Fixed</h2>
+            <h2 id="whats-removed-or-fixed" class="text-2xl font-bold">
+              What's Removed or Fixed
+            </h2>
 
-            <h3 class="font-bold">
+            <h3
+              id="publishing-to-the-gallery-needs-an-account"
+              class="font-bold"
+            >
               Publishing to the gallery needs an account
             </h3>
             <p>
@@ -303,7 +329,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               it or take it down. Pages already in the gallery stay there.
             </p>
 
-            <h3 class="font-bold">Overlapping ranges, fixed</h3>
+            <h3 id="overlapping-ranges-fixed" class="font-bold">
+              Overlapping ranges, fixed
+            </h3>
             <p>
               In earlier versions, if you typed in ranges that overlap, a day
               that fit two ranges took the color of the last one, instead of the
@@ -316,7 +344,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >.
             </p>
 
-            <h3 class="font-bold">Version 6, if you need it</h3>
+            <h3 id="version-6-if-you-need-it" class="font-bold">
+              Version 6, if you need it
+            </h3>
             <p>
               If something doesn't work for you, Version 6 is still at
               <a href="https://archive-v6.temperature-blanket.com" class="link"
@@ -330,7 +360,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Your Privacy</h2>
+            <h2 id="your-privacy" class="text-2xl font-bold">Your Privacy</h2>
             <p>
               Your data is never sold or used for ads. You can download
               everything or delete your account at any time from your
@@ -341,7 +371,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Feedback</h2>
+            <h2 id="feedback" class="text-2xl font-bold">Feedback</h2>
             <p>
               Thank you to everyone who uses the site and shares ideas; many of
               these changes came from you. If you have feedback or run into any
@@ -351,11 +381,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/snippet}
       </Card>
-      <a
-        href="/whats-new#v7"
-        class="btn hover:preset-tonal-surface mt-4 max-lg:mx-2"
+      <a href="/whats-new#v7" class="btn hover:preset-tonal-surface mt-4"
         >All Changes in Version 7<ArrowRightIcon /></a
       >
-    </main>
+    </OnThisPageLayout>
   {/snippet}
 </AppShell>

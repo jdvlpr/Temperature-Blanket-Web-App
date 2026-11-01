@@ -23,6 +23,7 @@ palettes, each on a page of its own. -->
   import { page } from '$app/state';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
@@ -44,17 +45,15 @@ palettes, each on a page of its own. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="m-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-start gap-4 pb-8"
-    >
+    <main class={[PAGE, 'flex flex-col justify-start gap-4 pb-8']}>
       <a
         href={resolve('/gallery')}
-        class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
+        class="btn hover:preset-tonal-surface mt-2 flex w-fit items-center lg:mt-0"
       >
         <ArrowLeftIcon />
         Gallery</a
       >
-      <h1 class="h2 text-gradient px-2 text-center">
+      <h1 class="h2 text-gradient">
         {data.name}’s Gallery
       </h1>
       <CollectionNav

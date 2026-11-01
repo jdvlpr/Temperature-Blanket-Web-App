@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import {
     CloudAlertIcon,
     CodeIcon,
@@ -54,9 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="mx-auto flex max-w-(--breakpoint-sm) flex-col gap-4 px-4 lg:px-0"
-    >
+    <main class={[PAGE, PAGE_TEXT, 'flex flex-col gap-4']}>
       <div>
         <h2 class="h2 text-gradient mt-2 max-lg:hidden">Contact</h2>
         <div class="mt-2 flex flex-col gap-4">

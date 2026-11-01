@@ -25,6 +25,7 @@ with them. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import GaugeColorsView from '#lib/components/GaugeColorsView.svelte';
@@ -192,12 +193,10 @@ with them. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="m-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-start gap-2 pb-8"
-    >
+    <main class={[PAGE, 'flex flex-col justify-start gap-2 pb-8']}>
       <a
         href={resolve('/gallery/palettes')}
-        class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
+        class="btn hover:preset-tonal-surface mt-2 flex w-fit items-center lg:mt-0"
       >
         <ArrowLeftIcon />
         Yarn Palette Gallery</a
@@ -280,7 +279,7 @@ with them. -->
       </Card>
 
       <section
-        class="mt-6 flex flex-col gap-2 px-2 text-center lg:px-0"
+        class="mt-6 flex flex-col gap-2 text-center"
         aria-labelledby="projects-with-palette"
       >
         {#if projects.length}

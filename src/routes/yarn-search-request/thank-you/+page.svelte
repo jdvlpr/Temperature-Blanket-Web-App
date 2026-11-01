@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import { ICONS } from '#lib/constants/icon-constants.js';
 </script>
 
@@ -44,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="m-auto mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-col items-center gap-4 px-2 text-center"
+      class={[PAGE, PAGE_TEXT, 'mt-4 mb-2 flex flex-col items-start gap-4']}
     >
       <h2 class="h2 text-gradient flex flex-wrap items-center gap-2">
         <span class="text-success-700-300">{@html ICONS.checkCircle}</span> Success!

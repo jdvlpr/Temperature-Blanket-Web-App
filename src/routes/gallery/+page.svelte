@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import { gallerySection } from '#lib/storage/library-section.svelte.js';
   import Gallery from './Gallery.svelte';
 
@@ -56,10 +57,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main
-      class="m-auto mb-8 flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
-    >
-      <h1 class="h1 text-gradient mt-4 text-center">Gallery</h1>
+    <main class={[PAGE, 'mb-8 flex flex-col justify-start gap-2']}>
+      <h1 class="h1 text-gradient mt-4">Gallery</h1>
       <CollectionNav
         label="Gallery"
         current="projects"

@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import SignInCard from '#lib/components/account/SignInCard.svelte';
   import { safeRedirect } from '#lib/accounts/redirect.js';
   import { onMount } from 'svelte';
@@ -39,15 +40,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="mx-auto flex w-full max-w-(--breakpoint-md) flex-col pb-8">
-      <div class="flex flex-col gap-2 px-2 py-4 text-center">
+    <main class={[PAGE, PAGE_TEXT, 'flex flex-col pb-8']}>
+      <div class="flex flex-col gap-2 py-4">
         <h2 class="h1 text-gradient mb-0">Sign In</h2>
         <p>Save your projects and yarn palettes on all your devices.</p>
       </div>
       {#if __ACCOUNTS_ENABLED__}
         <SignInCard {redirectTo} />
       {:else}
-        <p class="text-center">Accounts aren’t available yet.</p>
+        <p>Accounts aren’t available yet.</p>
       {/if}
     </main>
   {/snippet}

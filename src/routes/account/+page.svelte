@@ -14,7 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { LIST_ENDS, ROW_FOCUS } from '#lib/constants/class-constants.js';
+  import {
+    LIST_ENDS,
+    PAGE,
+    PAGE_TEXT,
+    ROW_FOCUS,
+  } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import {
     accountErrorMessage,
@@ -189,9 +194,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="mx-auto flex w-full max-w-(--breakpoint-md) flex-col pb-8">
+    <main class={[PAGE, PAGE_TEXT, 'flex flex-col pb-8']}>
       {#if !__ACCOUNTS_ENABLED__}
-        <div class="flex flex-col gap-2 px-2 py-4 text-center">
+        <div class="flex flex-col gap-2 py-4">
           <h2 class="h1 text-gradient mb-0">Account</h2>
           <p>Accounts aren’t available yet.</p>
         </div>
@@ -200,8 +205,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <LoaderCircleIcon class="size-8 animate-spin opacity-70" />
         </div>
       {:else if status === 'signed-in' && user}
-        <div class="mx-auto flex w-full max-w-lg flex-col gap-6 px-2 py-4">
-          <header class="flex flex-col items-center gap-2 text-center">
+        <div class="flex w-full flex-col gap-6 py-4">
+          <header class="flex items-center gap-4">
             <AccountAvatar summary={user} class="size-20 text-2xl shadow-lg" />
             <div>
               <h2 class="h3">{user.name || 'Welcome!'}</h2>
@@ -333,7 +338,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
         </div>
       {:else if status === 'deleted'}
-        <div class="flex flex-col items-center gap-4 px-2 py-8 text-center">
+        <div class="flex flex-col items-start gap-4 py-8">
           <h2 class="h1 text-gradient mb-0">Account</h2>
           <p role="status">Your account was deleted.</p>
           <a href={resolve('/')} class="btn preset-filled-primary-500"
@@ -341,20 +346,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
         </div>
       {:else if status === 'signed-out'}
-        <div class="flex flex-col gap-2 px-2 py-4 text-center">
+        <div class="flex flex-col gap-2 py-4">
           <h2 class="h1 text-gradient mb-0">Account</h2>
           <p class="text-sm opacity-80">
             Sign in to keep your projects and yarn palettes on all your devices.
           </p>
         </div>
         <SignInCard onsignedin={showSignedIn} />
-        <p class="mx-auto max-w-md px-2 py-4 text-center text-sm opacity-80">
+        <p class="py-4 text-sm opacity-80">
           If something doesn't work as expected, please
           <a href={resolve('contact')} class="link">get in touch</a>
           .
         </p>
       {:else}
-        <div class="flex flex-col gap-2 px-2 py-4 text-center">
+        <div class="flex flex-col gap-2 py-4">
           <h2 class="h1 text-gradient mb-0">Account</h2>
           <p class="text-error-700-300" role="alert">{errorMessage}</p>
         </div>

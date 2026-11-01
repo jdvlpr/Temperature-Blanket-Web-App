@@ -176,12 +176,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/each}
 {/snippet}
 
-<div class="flex flex-col justify-center gap-8 px-2 lg:px-0">
+<!-- On the Gallery page the page's own gutter is enough; in Get Colors it pads itself -->
+<div
+  class={[
+    'flex flex-col justify-center gap-8',
+    mode === 'use' && 'px-2 lg:px-0',
+  ]}
+>
   <div class="inline-grid gap-2 text-center">
     <div
       bind:this={scrollContainer}
       class={[
-        'flex scroll-mt-[70px] flex-col items-center justify-center gap-2 text-center',
+        'flex scroll-mt-[70px] flex-col items-start gap-2',
         // Get Colors' Palette Gallery spaces its lists as My Palettes does
         mode === 'page' && 'pb-4',
       ]}

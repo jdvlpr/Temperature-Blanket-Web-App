@@ -17,6 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import OnThisPageLayout from '#lib/components/docs/OnThisPageLayout.svelte';
+  import { PAGE_TEXT } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 </script>
@@ -51,10 +53,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="pb-8">
+    <OnThisPageLayout
+      title="Version 6: Improved Sun Position Accuracy"
+      backHref="/whats-new"
+      backLabel="All What's New"
+      class={PAGE_TEXT}
+    >
       <a
         href="/whats-new"
-        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mt-2"
         ><ArrowLeftIcon /> What's New</a
       >
       <Card>
@@ -71,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet content()}
           <div class="mb-8 flex flex-col gap-4 px-2 pb-4">
             <div class="mt-4 flex flex-col gap-2">
-              <h2 class="h2 text-gradient">
+              <h2 class="h2 text-gradient" data-on-this-page-ignore>
                 Version 6: Improved Sun Position Accuracy
               </h2>
               <p class="text-sm">July 9, 2026</p>
@@ -87,8 +94,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <p class="text-2xl font-bold">What's in this update?</p>
-            <p class="font-bold">Improved Daylight Accuracy</p>
+            <h2 id="whats-in-this-update" class="text-2xl font-bold">
+              What's in this update?
+            </h2>
+            <h3 id="improved-daylight-accuracy" class="font-bold">
+              Improved Daylight Accuracy
+            </h3>
             <p>
               Version 6 improves the accuracy of daylight times for weather data
               in the Project Planner. A dependency update to the sun position
@@ -137,7 +148,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             </div>
 
-            <p class="font-bold">Appearance Customization</p>
+            <h3 id="appearance-customization" class="font-bold">
+              Appearance Customization
+            </h3>
             <p>
               Along with the improved sun position accuracy, Version 6
               introduces several new customization options for the web app's
@@ -160,10 +173,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <p class="text-2xl font-bold">
+            <h2
+              id="changes-that-may-affect-some-saved-projects"
+              class="text-2xl font-bold"
+            >
               Changes That May Affect Some Saved Projects
-            </p>
-            <p class="font-bold">Which Projects are Affected?</p>
+            </h2>
+            <h3 id="which-projects-are-affected" class="font-bold">
+              Which Projects are Affected?
+            </h3>
             <p>
               Most projects will not be affected by the Version 6 update.
               However, the following types of projects may be affected <span
@@ -221,7 +239,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               meets either of the two criteria listed above.
             </p>
 
-            <p class="font-bold">What are the Changes to Affected Projects?</p>
+            <h3
+              id="what-are-the-changes-to-affected-projects"
+              class="font-bold"
+            >
+              What are the Changes to Affected Projects?
+            </h3>
             <p>
               Affected projects' daytime data may be slightly different. This is
               because of the update for how daytime is calculated in Version 6.
@@ -354,9 +377,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               If there is a difference in the stitch count, it is usually just a
               one-or-two-stitch difference.
             </p>
-            <p class="font-bold">
+            <h3
+              id="what-should-i-do-if-my-project-was-affected"
+              class="font-bold"
+            >
               What Should I Do if my Project was Affected?
-            </p>
+            </h3>
 
             <div class="flex flex-col gap-1">
               <p class="font-semibold opacity-50">
@@ -409,7 +435,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Feedback</h2>
+            <h2 id="feedback" class="text-2xl font-bold">Feedback</h2>
             <p>
               As always, if you have feedback of any kind, or encounter any
               issues, please let me know through any of the methods listed on
@@ -418,11 +444,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/snippet}
       </Card>
-      <a
-        href="/whats-new#v6"
-        class="btn hover:preset-tonal-surface mt-4 max-lg:mx-2"
+      <a href="/whats-new#v6" class="btn hover:preset-tonal-surface mt-4"
         >All Changes in Version 6<ArrowRightIcon /></a
       >
-    </main>
+    </OnThisPageLayout>
   {/snippet}
 </AppShell>

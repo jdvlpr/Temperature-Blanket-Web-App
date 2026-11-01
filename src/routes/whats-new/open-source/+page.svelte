@@ -23,6 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import OnThisPageLayout from '#lib/components/docs/OnThisPageLayout.svelte';
+  import { PAGE_TEXT } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 
@@ -58,10 +60,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="pb-8">
+    <OnThisPageLayout
+      title="Version 4: Now Open Source"
+      backHref="/whats-new"
+      backLabel="All What's New"
+      class={PAGE_TEXT}
+    >
       <a
         href="/whats-new"
-        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mt-2"
         ><ArrowLeftIcon /> What's New</a
       >
       <Card>
@@ -79,7 +86,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="px-2 pb-4">
             <div class="flex flex-col gap-4">
               <div class="mt-4 flex flex-col gap-2">
-                <h2 class="h2 text-gradient">Version 4: Now Open Source</h2>
+                <h2 class="h2 text-gradient" data-on-this-page-ignore>
+                  Version 4: Now Open Source
+                </h2>
                 <p class="text-sm">September 03, 2024</p>
               </div>
 
@@ -113,7 +122,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </a>
               </div>
 
-              <h2 class="text-2xl font-bold">A Short History</h2>
+              <h2 id="a-short-history" class="text-2xl font-bold">
+                A Short History
+              </h2>
 
               <p>
                 From the beginning, the goal of temperature-blanket.com has been
@@ -129,7 +140,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 time is right to share the source code with the world.
               </p>
 
-              <h2 class="text-2xl font-bold">Why Open Source?</h2>
+              <h2 id="why-open-source" class="text-2xl font-bold">
+                Why Open Source?
+              </h2>
 
               <blockquote class="blockquote">
                 If you want to go fast, work alone. If you want to go far, work
@@ -167,7 +180,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </li>
               </ul>
 
-              <h2 class="text-2xl font-bold">How to Get Involved?</h2>
+              <h2 id="how-to-get-involved" class="text-2xl font-bold">
+                How to Get Involved?
+              </h2>
 
               <p>
                 If you discover a bug or want to suggest a new feature, <a
@@ -205,7 +220,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
               {/if}
 
-              <h2 class="text-2xl font-bold">What’s Next?</h2>
+              <h2 id="whats-next" class="text-2xl font-bold">What’s Next?</h2>
 
               <p>
                 I plan to continue maintaining and improving
@@ -222,11 +237,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/snippet}
       </Card>
-      <a
-        href="/whats-new#v4"
-        class="btn hover:preset-tonal-surface mt-4 max-lg:mx-2"
+      <a href="/whats-new#v4" class="btn hover:preset-tonal-surface mt-4"
         >All Changes in Version 4<ArrowRightIcon /></a
       >
-    </main>
+    </OnThisPageLayout>
   {/snippet}
 </AppShell>

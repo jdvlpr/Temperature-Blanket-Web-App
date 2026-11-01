@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
@@ -190,7 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="m-auto mb-4 max-w-(--breakpoint-xl) px-2 pt-2 lg:px-0">
+    <main class={[PAGE, 'mb-4 pt-2']}>
       <img
         src="/images/api-images/yarn-colorways-api.png"
         class="rounded-container mb-4 h-56 w-full object-cover"

@@ -14,7 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
+  import {
+    FIELD_GROUP,
+    PAGE,
+    PAGE_TEXT,
+  } from '#lib/constants/class-constants.js';
   import { browser, version } from '$app/env';
   import { page } from '$app/state';
   import {
@@ -141,9 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="mx-auto flex max-w-screen-sm flex-col gap-2 px-4 pt-4 pb-8 lg:px-0"
-    >
+    <main class={[PAGE, PAGE_TEXT, 'flex flex-col gap-2 pt-4 pb-8']}>
       <a href="/contact" class="btn hover:preset-tonal-surface w-fit"
         ><ArrowLeftIcon /> Contact</a
       >

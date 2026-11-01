@@ -13,7 +13,7 @@
   },
   "colors-and-yarn/get-colors": {
     "width": 269,
-    "height": 445
+    "height": 463
   },
   "download/pdf-options": {
     "width": 448,
@@ -21,7 +21,7 @@
   },
   "library-and-account/project-menu": {
     "width": 448,
-    "height": 915
+    "height": 1061
   },
   "preview/rows": {
     "width": 968,
@@ -33,7 +33,7 @@
   },
   "gauges-and-ranges/edit-range": {
     "width": 1002,
-    "height": 1234
+    "height": 1236
   },
   "weather/edit-day": {
     "width": 364,
@@ -41,7 +41,7 @@
   },
   "choose-ranges/days-in-ranges": {
     "width": 1002,
-    "height": 1234
+    "height": 1236
   },
   "same-date-several-years/locations": {
     "width": 768,
@@ -53,14 +53,14 @@
   },
   "knit-along-all-year/future-days": {
     "width": 768,
-    "height": 729
+    "height": 643
   },
   "rain-snow-sunshine/rain-gauge": {
     "width": 1002,
-    "height": 810
+    "height": 812
   },
   "version-7/site-menu": {
     "width": 278,
-    "height": 505
+    "height": 466
   }
 }

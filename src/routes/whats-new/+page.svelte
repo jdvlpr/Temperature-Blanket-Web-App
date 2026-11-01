@@ -29,6 +29,7 @@ before version 3 are under Earlier. Each change keeps its version as its id
   } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import ChangelogItem from '#lib/components/ChangelogItem.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import type { ChangelogItem as Item } from '#lib/types/page-types.js';
@@ -110,9 +111,7 @@ before version 3 are under Earlier. Each change keeps its version as its id
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="mx-auto mt-2 mb-6 flex max-w-(--breakpoint-md) flex-col gap-8 px-2"
-    >
+    <main class={[PAGE, PAGE_TEXT, 'mt-2 mb-6 flex flex-col gap-8']}>
       <header class="flex flex-col gap-3" bind:this={container}>
         <h1 class="h2 text-gradient mt-2">What's New</h1>
         <p class="text-surface-700-300 text-sm">

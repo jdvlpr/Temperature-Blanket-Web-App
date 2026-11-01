@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
   import YarnSourcesNote from '#lib/components/YarnSourcesNote.svelte';
@@ -314,12 +315,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div class="opacity-100 transition-opacity">
-      <main
-        class="m-auto flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
-      >
+      <main class={[PAGE, 'flex flex-col justify-start gap-2']}>
         <a
           href="/gallery"
-          class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
+          class="btn hover:preset-tonal-surface mt-2 flex w-fit items-center lg:mt-0"
         >
           <ArrowLeftIcon />
           Project Gallery</a

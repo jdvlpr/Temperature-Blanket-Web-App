@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { page } from '$app/state';
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
 </script>
 
 <AppShell pageName="Error">
@@ -24,9 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="m-auto my-12 flex max-w-(--breakpoint-md) flex-col gap-2 px-2 text-center"
-    >
+    <main class={[PAGE, PAGE_TEXT, 'my-12 flex flex-col gap-2']}>
       <p>{page.status} Error</p>
       <p>{page.error?.message}</p>
     </main>

@@ -57,7 +57,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     refreshAccountTrash,
   } from '#lib/storage/account-trash.svelte.js';
   import { onMount, type Snippet } from 'svelte';
-  import { PANEL_LIST, PANEL_ROW } from '#lib/constants/class-constants.js';
+  import {
+    PAGE,
+    PAGE_TEXT,
+    PANEL_LIST,
+    PANEL_ROW,
+  } from '#lib/constants/class-constants.js';
   import { TRASH_DAYS } from '#lib/storage/trash.js';
   import {
     ChevronRightIcon,
@@ -160,13 +165,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<main
-  class="m-auto mx-auto mt-2 mb-12 flex w-full max-w-(--breakpoint-lg) flex-col gap-6 px-2 text-left"
->
-  <h1 class="h1 text-gradient mt-2 text-center">My Library</h1>
+<main class={[PAGE, 'mt-2 mb-12 flex flex-col gap-6']}>
+  <h1 class="h1 text-gradient mt-2">My Library</h1>
 
   <div class="-mt-2 flex flex-col gap-2">
-    <p class="text-surface-700-300 mx-auto max-w-3xl text-center text-sm">
+    <p class={[PAGE_TEXT, 'text-surface-700-300 text-sm']}>
       {#if synced}
         Your projects and yarn palettes are saved to your account and show up on
         every device where you're signed in.
@@ -181,9 +184,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <!-- Signed out: an account keeps them safe, and on every device -->
   {#if browser && __ACCOUNTS_ENABLED__ && !signedIn && !starred}
     <div
-      class="bg-surface-100-900 rounded-container mx-auto flex w-full max-w-3xl flex-col items-center gap-3 p-4 text-center"
+      class={[
+        PAGE_TEXT,
+        'bg-surface-100-900 rounded-container flex w-full flex-wrap items-center gap-3 p-4',
+      ]}
     >
-      <p class="text-sm">
+      <p class="min-w-48 flex-1 text-sm">
         Sign in to keep your projects and yarn palettes on all your devices.
       </p>
 
@@ -195,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <div class="flex flex-col items-center justify-center gap-2">
+  <div class="flex flex-col items-start gap-2">
     <CollectionNav
       label="My Library"
       {current}

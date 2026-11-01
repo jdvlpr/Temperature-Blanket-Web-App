@@ -24,7 +24,11 @@ Back doesn't return to it. -->
   import { goto } from '$app/navigation';
   import { PUBLIC_BASE_DOMAIN_NAME } from '$app/env/public';
   import DocsSearch from '#lib/components/docs/DocsSearch.svelte';
-  import { CARD_BOX, CARD_HOVER } from '#lib/constants/class-constants.js';
+  import {
+    CARD_BOX,
+    CARD_HOVER,
+    PAGE_TEXT,
+  } from '#lib/constants/class-constants.js';
   import {
     BASICS,
     DOCS_TITLE,
@@ -46,7 +50,7 @@ Back doesn't return to it. -->
 </script>
 
 <div class="flex flex-col gap-8" data-pagefind-body>
-  <header class="flex flex-col gap-4">
+  <header class={[PAGE_TEXT, 'flex flex-col gap-4']}>
     <h1 class="h2 text-gradient" data-pagefind-meta="title">{DOCS_TITLE}</h1>
     <p class="text-lg opacity-80">
       Step-by-step guides for planning a temperature blanket, and help with
@@ -57,7 +61,7 @@ Back doesn't return to it. -->
     </div>
   </header>
 
-  <section id="getting-started" class="flex flex-col gap-3">
+  <section id="getting-started" class={[PAGE_TEXT, 'flex flex-col gap-3']}>
     <h2 class="text-2xl font-bold">Getting Started</h2>
     <p>
       The <a href="/" class="link">Project Planner</a> turns the weather of a place
@@ -91,7 +95,7 @@ Back doesn't return to it. -->
     <section {id} class="flex flex-col gap-3" data-pagefind-ignore>
       <h2 class="text-2xl font-bold">{heading}</h2>
       <p class="opacity-80">{intro}</p>
-      <ul class="grid gap-2 sm:grid-cols-2">
+      <ul class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {#each pages as page (page.slug)}
           <li class="flex">
             <a
@@ -107,7 +111,7 @@ Back doesn't return to it. -->
     </section>
   {/each}
 
-  <section id="common-questions" class="flex flex-col gap-4">
+  <section id="common-questions" class={[PAGE_TEXT, 'flex flex-col gap-4']}>
     <h2 class="text-2xl font-bold">Common Questions</h2>
 
     <div id="what-is-temperature-blanket" class="space-y-1">

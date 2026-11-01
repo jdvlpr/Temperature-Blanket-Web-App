@@ -195,12 +195,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col justify-center gap-8">
-  <div class="flex flex-col gap-2 px-2 text-center lg:px-0">
+  <div class="flex flex-col gap-2 text-center">
     <div
       bind:this={scrollContainer}
-      class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
+      class="flex scroll-mt-[70px] flex-wrap items-end"
     >
-      <div class="mb-2 flex w-full items-center justify-center gap-2">
+      <div class="mb-2 flex w-full items-center gap-2">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
         {:else if totalProjects !== undefined}

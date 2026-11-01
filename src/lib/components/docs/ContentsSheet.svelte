@@ -14,32 +14,34 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Contents sheet, from the bar under the top bar on smaller screens:
-the same as beside the page on wide screens, the page's sections then All
-Guides & Help (whose cards list every page). Choosing a link closes it
-(onNavigate). -->
+the same as beside the page on wide screens, the page's sections then the link
+back to where the page is listed (All Guides & Help, All What's New). Choosing
+a link closes it (onNavigate). -->
 
 <script lang="ts">
-  import { page } from '$app/state';
   import OnThisPage from '#lib/components/docs/OnThisPage.svelte';
   import { goFromSheet } from '#lib/docs/on-this-page.svelte.js';
-  import { DOCS_TITLE, docsPageAt } from '#lib/docs/docs-index.js';
   import { ArrowLeftIcon } from '@lucide/svelte';
 
-  let { onNavigate }: { onNavigate?: () => void } = $props();
-
-  const current = $derived(docsPageAt(page.url.pathname));
+  let {
+    title,
+    backHref,
+    backLabel,
+    onNavigate,
+  }: {
+    title: string;
+    backHref: string;
+    backLabel: string;
+    onNavigate?: () => void;
+  } = $props();
 </script>
 
 <div class="flex flex-col gap-4 px-2 pb-6">
-  <OnThisPage
-    heading={`On this page · ${current?.title ?? DOCS_TITLE}`}
-    {onNavigate}
-  />
+  <OnThisPage heading={`On this page · ${title}`} {onNavigate} />
   <a
-    href="/documentation"
+    href={backHref}
     class="rounded-base hover:bg-surface-200-800 flex items-center gap-2 px-3 py-1.5 text-sm transition-colors"
-    onclick={(event) =>
-      onNavigate && goFromSheet(event, '/documentation', onNavigate)}
-    ><ArrowLeftIcon class="icon-sm" />All {DOCS_TITLE}</a
+    onclick={(event) => onNavigate && goFromSheet(event, backHref, onNavigate)}
+    ><ArrowLeftIcon class="icon-sm" />{backLabel}</a
   >
 </div>

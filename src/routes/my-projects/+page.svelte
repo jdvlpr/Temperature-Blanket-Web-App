@@ -139,10 +139,7 @@ and sort once there are a few. -->
               </a>
             {/snippet}
           </CollectionToolbar>
-          <p
-            class="text-surface-700-300 text-center text-sm"
-            aria-live="polite"
-          >
+          <p class="text-surface-700-300 text-sm" aria-live="polite">
             {#if libraryFilters.activeFor( 'projects', { starred } ) && shownTotal}
               {shownMatching} of {shownTotal}
               {starred ? 'starred projects' : 'projects'}
