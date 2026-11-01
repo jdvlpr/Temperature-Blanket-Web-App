@@ -67,9 +67,6 @@ class GaugesState {
     this.allCreated.find((gauge) => gauge.id === this.activeGaugeId),
   );
 
-  // Set this to true so that the active gauge button is scrolled to when the gauge is added. This is only necessary for the first time a gauge is added, and is reset to false after the active gauge button is scrolled to. It is necessary in order to prevent unwanted scrolling when editing an existing gauge, since the scroll behavior is triggered by an effect.
-  allowScrollToActiveGaugeButton = $state(true);
-
   urlHash = $derived.by(() => {
     let hash = '';
     this.allCreated.forEach((gauge) => {
@@ -180,8 +177,6 @@ class GaugesState {
     else if (id === 'dayt') newGauge = new DayTimeGauge();
     else newGauge = new MoonPhaseGauge();
 
-    this.allowScrollToActiveGaugeButton = true;
-
     this.allCreated.push(newGauge);
 
     // This should only happen the first time, when the default temperature gauge is set up.
@@ -197,7 +192,6 @@ class GaugesState {
     this.allCreated = [];
     this.allAvailable = [];
     this.activeGaugeId = '';
-    this.allowScrollToActiveGaugeButton = true;
   }
 
   remove(id: string): void {

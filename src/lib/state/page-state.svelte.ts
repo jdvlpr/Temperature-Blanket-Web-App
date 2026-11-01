@@ -554,22 +554,6 @@ export const goToProjectSection = async (
       behavior: 'smooth',
     });
 
-    // Horizontal scroll active gauge button into view when the gauge section is active
-    if (activeSection?.id === 'page-section-gauges') {
-      await tick();
-      const activeGaugeBtn = document.getElementById('active-gauge-button');
-      const rect = activeGaugeBtn?.getBoundingClientRect();
-      const isHidden =
-        !!rect && (rect.left < 0 || rect.right > window.innerWidth);
-      if (activeGaugeBtn && isHidden) {
-        activeGaugeBtn.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'center',
-        });
-      }
-    }
-
     // Horizontal scroll active preview button into view when the preview section is active
     if (activeSection?.id === 'page-section-preview') {
       await tick();

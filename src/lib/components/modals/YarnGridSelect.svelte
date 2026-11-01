@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
     {#if results.length}
-      <ViewMenu bind:value={layout} fillOption compact />
+      <ViewMenu bind:value={layout} fillOption />
     {/if}
     <FiltersButton
       bind:this={filtersButton}

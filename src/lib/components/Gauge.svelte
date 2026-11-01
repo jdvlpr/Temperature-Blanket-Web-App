@@ -93,13 +93,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isCategory = $derived(gauge.unit?.type === 'category');
 
-  // On wide screens the card stays in view above the list of colors as it
-  // scrolls. Stuck there, it's docked to the top bar like the steps bar is
-  // to the bottom (square against it, see-through like it), its strip is
-  // shorter, and the space after the card grows by as much, so the list
-  // doesn't jump up.
+  // On wide screens the card's toolbar stays in view above the list of colors
+  // as it scrolls: the strip scrolls on up under the top bar like the rest of
+  // the page, and the card sticks once the toolbar reaches the bar (its top
+  // offset leaves the strip and the card's top border above it). Stuck there,
+  // it's docked to the top bar like the steps bar is to the bottom (square
+  // against it, see-through like it), and the strip, hidden under the bar,
+  // fades out so it doesn't show through.
   const STRIP_HEIGHT = 70;
-  const STUCK_STRIP_HEIGHT = 36;
+  const STICK_OFFSET = STRIP_HEIGHT + 1;
   let card: HTMLElement | undefined = $state();
   // Just above the card, where the card's top is until it sticks
   let above: HTMLElement | undefined = $state();
@@ -270,21 +272,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="h-2" bind:this={above} aria-hidden="true"></div>
 <div
   class={[
-    'rounded-container border-surface-200-800 flex w-full flex-col gap-2 border pb-2 lg:sticky lg:top-(--top-bar-height) lg:z-10',
+    'rounded-container border-surface-200-800 flex w-full flex-col gap-2 border pb-2 lg:sticky lg:top-[calc(var(--top-bar-height)_-_var(--stick-offset))] lg:z-10',
+    'duration-300 motion-safe:transition-[background-color,box-shadow]',
     stuck
-      ? 'bg-surface-50/80 dark:bg-surface-950/80 rounded-t-none shadow-lg backdrop-blur-md'
+      ? 'bg-surface-50/80 dark:bg-surface-950/80 shadow-lg backdrop-blur-md'
       : 'bg-surface-100 dark:bg-surface-900',
   ]}
+  style:--stick-offset="{STICK_OFFSET}px"
   bind:this={card}
   data-palette-card
 >
-  <div class="w-full">
+  <div
+    class={[
+      'w-full duration-300 motion-safe:transition-opacity',
+      stuck && 'opacity-0',
+    ]}
+  >
     <!-- The overview: pressing a color goes to it in the list below, where it's edited -->
     <PaletteStrip
       colors={gauge.colors}
       roundedBottom={false}
-      corners={stuck ? 'none' : 'container'}
-      height="{stuck ? STUCK_STRIP_HEIGHT : STRIP_HEIGHT}px"
+      height="{STRIP_HEIGHT}px"
       {flashIndices}
       onhover={(index) => (highlightIndex = index)}
       onselect={(index) => focusGaugeColor(gauge.id, index)}
@@ -396,8 +404,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 </div>
-<div
-  class="motion-safe:transition-[height]"
-  style:height="{stuck ? STRIP_HEIGHT - STUCK_STRIP_HEIGHT : 0}px"
-  aria-hidden="true"
-></div>
