@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
     {#key previews.active}
-      <div class="flex w-full flex-wrap items-start gap-4">
+      <div class="flex w-full flex-wrap items-start justify-center gap-4">
         <previews.active.settingsComponent />
       </div>
     {/key}

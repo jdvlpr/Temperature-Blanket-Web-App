@@ -166,9 +166,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex w-full flex-col items-start gap-2">
-  <div class="flex w-full flex-wrap items-center gap-x-4">
-    <div class="mt-2 flex flex-wrap items-center gap-2">
+<!-- Centered, like the rest of the planner; rows that scroll sideways are
+centered as blocks so their first items never clip -->
+<div class="flex w-full flex-col items-center gap-2">
+  <div class="flex w-full flex-wrap items-center justify-center gap-x-4">
+    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
       <WeatherSourceButton />
 
       <UnitMenu />
@@ -218,7 +220,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   {#if wasDefaultWeatherSourceChanged}
-    <p class="w-full text-sm">
+    <p class="w-full text-center text-sm">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
       so another source was used ({weather.source.name}) and the Weather Source
       setting was automatically updated.
@@ -441,7 +443,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 
-<div class="flex w-full flex-col items-start gap-4">
+<div class="flex w-full flex-col items-center gap-4">
   <div
     class="flex max-w-full snap-x items-center justify-start overflow-auto pb-2"
   >

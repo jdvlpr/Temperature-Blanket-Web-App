@@ -51,15 +51,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div>
   <!-- The card's header: where the project came from, and whether its
-  weather may have changed since, apart from the places below -->
+  weather may have changed since, apart from the places below; centered,
+  like the card's buttons, while the fields stay left-aligned -->
   {#if loading || validLoadedProject || weatherDays.settledEarly.length}
     <div
-      class="border-surface-300 dark:border-surface-600 mb-4 flex flex-col gap-1 border-b pb-4"
+      class="border-surface-300 dark:border-surface-600 mb-4 flex flex-col items-center gap-1 border-b pb-4 text-center"
     >
       {#if loading}
         <p class="h-auto animate-pulse text-sm">Loading project...</p>
       {:else if validLoadedProject}
-        <p class="flex w-full flex-wrap items-center gap-1 text-sm">
+        <p
+          class="flex w-full flex-wrap items-center justify-center gap-1 text-sm"
+        >
           <CircleCheckBigIcon class="icon-sm text-success-900-100" />
           <span data-testid="loaded-from"
             >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}
@@ -91,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !loading && weatherDays.settledEarly.length}
         {@const count = weatherDays.settledEarly.length}
         <p
-          class="flex w-full flex-wrap items-center gap-x-1 text-sm"
+          class="flex w-full flex-wrap items-center justify-center gap-x-1 text-sm"
           data-testid="early-days-settled"
         >
           Your last {count === 1 ? 'day was' : `${count} days were`} early data, which
@@ -163,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
       class={[
-        'btn hover:preset-tonal-surface',
+        'btn hover:preset-tonal-surface mx-auto flex',
         weather.isUserEdited && 'hidden',
       ]}
       disabled={project.status.loading}
@@ -177,14 +180,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <CirclePlusIcon /> Add Location
     </button>
   {:else}
-    <p class={['py-2 text-sm', weather.isUserEdited && 'hidden']}>
+    <p class={['py-2 text-center text-sm', weather.isUserEdited && 'hidden']}>
       You've added the maximum allowed number of locations
     </p>
   {/if}
 
   <!-- Then the weather for all of them -->
   <div
-    class="border-surface-300 dark:border-surface-600 mt-2 flex w-full flex-col items-start gap-2 border-t pt-4"
+    class="border-surface-300 dark:border-surface-600 mt-2 flex w-full flex-col items-center gap-2 border-t pt-4"
   >
     {#if locations.allValid && locations.totalDays === 1}
       <!-- The range calculation functionality expects there to be more than one day of weather data.
@@ -198,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if locations.all.length > 1 && locations.totalDays && locations.allValid && !weather.isUserEdited}
-      <p class="w-full text-sm">
+      <p class="w-full text-center text-sm">
         {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     {/if}

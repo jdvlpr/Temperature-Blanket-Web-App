@@ -130,8 +130,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The project's gauges as tabs, each an icon over a stripe of its colors,
 named when there's room (the open one always, with its own menu); then the
-gauges it could add. All five fit a phone's width without scrolling. -->
-<div class="relative flex items-center gap-2 py-2" bind:clientWidth={rowWidth}>
+gauges it could add, centered. All five fit a phone's width without scrolling. -->
+<div
+  class="relative flex items-center justify-center gap-2 py-2"
+  bind:clientWidth={rowWidth}
+>
   <div
     role="tablist"
     aria-label="Gauges"
@@ -280,7 +283,7 @@ gauges it could add. All five fit a phone's width without scrolling. -->
     aria-labelledby="gauge-tab-{gauges.activeGauge.id}"
   >
     {#if gauges.activeGauge?.isStatic}
-      <p class="text-sm">
+      <p class="text-center text-sm">
         This gauge has a fixed number of colors for the eight phases of the
         moon. You can only edit the colors individually.
       </p>

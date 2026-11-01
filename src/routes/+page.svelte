@@ -287,8 +287,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
-        <!-- The planner's front door: one centered column, unlike its other
-        steps, which start at the page's left edge -->
+        <!-- The planner's front door: one centered column; the other steps
+        use the page's whole width, their content centered too -->
         <div class={[PAGE_TEXT, 'mx-auto']}>
           <div class="flex flex-col gap-2 py-4 text-center">
             <h1 class="h1 text-gradient mb-0">Weather Data + Art</h1>
@@ -326,7 +326,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
             {#if !weather.isUserEdited}
-              <p class="my-4 text-sm">
+              <p class="my-4 text-center text-sm">
                 Weather data from <button
                   class="underline"
                   onclick={() => {
@@ -357,7 +357,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
-            <p class="my-4 text-sm">
+            <p class="my-4 text-center text-sm">
               Real yarn colors will look different than what's on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies.
@@ -370,7 +370,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class={PAGE_TEXT}>
+          <div class={[PAGE_TEXT, 'mx-auto text-center']}>
             <p class="my-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
@@ -385,7 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <SectionNavigationButtons thisSectionIndex={4} />
 
-          <p class="my-4 text-sm">
+          <p class="my-4 text-center text-sm">
             Real projects will look different than the preview. Patterns not
             provided.
           </p>

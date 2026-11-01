@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="mt-4 w-fit">
+<div class="mx-auto mt-4 w-fit">
   <ToggleSwitch
     bind:checked={showColorDetails.value}
     label={'Show Color Details'}
@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     page.url.href,
   )}&projectURL={encodeURIComponent(project.url.href)}&data0={weather.data[0]
     .date}&table0={tableData[0].date}"
-  class="link mb-4 inline-block text-sm"
+  class="link mx-auto mb-4 block w-fit text-sm"
   target="_blank"
 >
   <ExternalLinkIcon class="icon-sm relative -top-[2px] inline" /> Weather Data Feedback

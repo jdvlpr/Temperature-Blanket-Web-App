@@ -10,7 +10,7 @@
   }
 </script>
 
-<div class="flex w-full flex-col items-start gap-2 text-left">
+<div class="flex w-full flex-col items-center gap-2 text-left">
   <button class="btn hover:preset-tonal-surface" onclick={toggleDetails}>
     <InfoIcon />
     {#if previews.showInformation}

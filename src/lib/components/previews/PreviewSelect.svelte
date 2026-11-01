@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex flex-wrap items-end justify-between gap-2">
+  <div class="flex flex-wrap items-end justify-center gap-2">
     <label class="label w-fit">
       <span class="label-text"> Pattern</span>
       <div class="relative flex items-center">
@@ -116,7 +116,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@render actions?.()}
   </div>
 
-  <div class="relative my-2 flex max-w-full snap-x overflow-auto pb-3">
+  <!-- Centered as a block, so the first patterns never clip when it scrolls -->
+  <div
+    class="relative mx-auto my-2 flex w-fit max-w-full snap-x overflow-auto pb-3"
+  >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}

@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh]"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={twelvePointStarPreview.svg}
