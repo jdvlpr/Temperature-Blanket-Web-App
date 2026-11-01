@@ -1,30 +1,16 @@
 <script lang="ts">
-  import { projectChanged } from '#lib/storage/autosave.svelte.js';
-  import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
-  import {
-    celsiusToFahrenheit,
-    fahrenheitToCelsius,
-    hoursToMinutes,
-    inchesToMillimeters,
-    millimetersToInches,
-  } from '#lib/utils/unit-utils.svelte.js';
-  import {
-    dateToISO8601String,
-    getIsFutureDate,
-    getIsRecentDate,
-  } from '#lib/utils/date-utils.js';
-  import { displayNumber } from '#lib/utils/number-utils.js';
+  import { getIsFutureDate, getIsRecentDate } from '#lib/utils/date-utils.js';
+  import { openEditWeather } from '#lib/utils/open-edit-weather.js';
+  import type { EditableParam } from '#lib/utils/weather-edits.js';
   import { getTextColor } from '#lib/utils/color-utils.js';
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { onMount } from 'svelte';
   import RecentWeatherDataTooltip from './RecentWeatherDataTooltip.svelte';
   import { showColorDetails } from './WeatherTableWrapper.svelte';
   import DataTable from './datatable/DataTable.svelte';
-  import NumberInput from './modals/NumberInput.svelte';
-  import TextInput from './modals/TextInput.svelte';
   import KeptDay from './modals/KeptDay.svelte';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
   import { HistoryIcon } from '@lucide/svelte';
@@ -117,7 +103,7 @@
               </button>
             {/if}
           </td>
-          {#each weather.tableWeatherTargets as { id, label, type }}
+          {#each weather.tableWeatherTargets as { id }}
             <td
               class={[showColorDetails.value && !isFutureDate && 'px-2 pb-2']}
               style={row.color[id] &&
@@ -135,101 +121,16 @@
                 ]}
                 disabled={weather.grouping === 'week' || id === 'moon'}
                 onclick={() => {
-                  if (id === 'dayt') {
-                    dialog.trigger({
-                      type: 'component',
-                      component: {
-                        ref: TextInput,
-                        props: {
-                          value: row[id],
-                          title: label,
-                          onOkay: async (_value: string) => {
-                            weather.isUserEdited = true;
-                            projectChanged({ weather: true });
-
-                            const time = _value.split(':');
-
-                            if (time.length !== 2) return;
-
-                            weather.table.rowsPerPage = table.rowsPerPage;
-                            weather.table.page = table.currentPage;
-
-                            const hours = +time[0] + +time[1] / 60;
-                            const mappedWeather = weather.rawData.map(
-                              (n) =>
-                                `${dateToISO8601String(n.date)}-${n.location}`,
-                            );
-                            const i = mappedWeather.indexOf(
-                              `${row.date}-${row.location}`,
-                            );
-                            weather.rawData[i][id].metric = hoursToMinutes(
-                              hours,
-                              4,
-                            );
-                            weather.rawData[i][id].imperial = displayNumber(
-                              +hours,
-                              4,
-                            );
-                            await updateTable();
-                          },
-                        },
-                      },
-                      options: { title: `${row.date}` },
-                    });
-                  } else {
-                    dialog.trigger({
-                      type: 'component',
-                      component: {
-                        ref: NumberInput,
-                        props: {
-                          max: 1000,
-                          value: row[id],
-                          title: `${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span>`,
-                          noMinMax: true,
-                          showSlider: false,
-                          onOkay: async (_value: number) => {
-                            weather.isUserEdited = true;
-                            projectChanged({ weather: true });
-                            const mappedWeather = weather.rawData.map(
-                              (n) =>
-                                `${dateToISO8601String(n.date)}-${n.location}`,
-                            );
-                            const i = mappedWeather.indexOf(
-                              `${row.date}-${row.location}`,
-                            );
-
-                            weather.table.rowsPerPage = table.rowsPerPage;
-                            weather.table.page = table.currentPage;
-
-                            const target = weather.rawData[i][id];
-                            if (
-                              target &&
-                              typeof target === 'object' &&
-                              'metric' in target
-                            ) {
-                              if (preferences.value.units === 'metric') {
-                                target.metric = _value;
-                                if (type === 'temperature')
-                                  target.imperial = celsiusToFahrenheit(_value);
-                                if (type === 'height')
-                                  target.imperial = millimetersToInches(_value);
-                              }
-                              if (preferences.value.units === 'imperial') {
-                                target.imperial = _value;
-                                if (type === 'temperature')
-                                  target.metric = fahrenheitToCelsius(_value);
-                                if (type === 'height')
-                                  target.metric = inchesToMillimeters(_value);
-                              }
-                            }
-
-                            updateTable();
-                          },
-                        },
-                      },
-                      options: { title: `${row.date}` },
-                    });
-                  }
+                  // So the table comes back on the same page after Apply
+                  weather.table.rowsPerPage = table.rowsPerPage;
+                  weather.table.page = table.currentPage;
+                  openEditWeather({
+                    day: {
+                      date: row.date,
+                      location: row.location,
+                      param: id as EditableParam,
+                    },
+                  });
                 }}
               >
                 {row[id]}

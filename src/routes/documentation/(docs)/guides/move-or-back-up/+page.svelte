@@ -100,7 +100,9 @@ can't be imported back. Account parts show only in builds with accounts. -->
     Keep your weather too: press <span class="font-bold">Download</span> under
     the weather table, then <span class="font-bold">Download CSV</span>. To
     restore it, open the link, then press
-    <span class="font-bold">Import Weather Data</span> and choose the file.
+    <span class="font-bold">Import Weather Data</span>, choose the file, and
+    press
+    <span class="font-bold">Apply</span>.
   </p>
 </section>
 

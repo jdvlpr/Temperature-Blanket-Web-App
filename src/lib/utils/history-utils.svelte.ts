@@ -22,6 +22,10 @@ import { previews } from '#lib/state/preview-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { toast } from '#lib/state/page-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
+import {
+  WEATHER_REVISION_KEY,
+  weatherEdits,
+} from '#lib/state/weather-edits.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { showHistoryChange } from '#lib/utils/feedback.svelte.js';
 import { exists } from '#lib/utils/other-utils.js';
@@ -191,6 +195,13 @@ export const loadFromHistory = async ({
 
   // Change Preview
   if (previewChanged) message = 'Preview';
+
+  // Edited weather (Edit Weather Data's Apply), which only history entries carry
+  const weatherChange = weatherEdits.step(
+    +(oldParams[WEATHER_REVISION_KEY]?.value ?? 0),
+    +(newParams[WEATHER_REVISION_KEY]?.value ?? 0),
+  );
+  if (weatherChange) message = weatherChange;
 
   showHistoryChange({
     gaugeId: changedGaugeId,
@@ -409,6 +420,9 @@ export const updateHistory = () => {
 
   // This excludes the location param ('l=...'); changes to the location or dates are not considered to be an undoable or redoable change
   live = live.substring(live.indexOf('&'));
+
+  // Which Apply of Edit Weather Data the weather is at; only in history, never in the address
+  live += weatherEdits.historyToken;
 
   // `previous`/`next` are no longer checked here: now that push() truncates
   // a stale redo branch when mid-history, a live value that happens to match

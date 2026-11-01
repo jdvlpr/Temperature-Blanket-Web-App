@@ -280,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (dragOffset > sheetHeight / 4 || velocity > CLOSE_VELOCITY);
     if (closing) {
       releaseVelocity = Math.max(0, velocity);
-      dialog.close();
+      if (!dialog.close()) dragOffset = 0;
     } else {
       dragOffset = 0;
     }
@@ -419,7 +419,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Dialog
   open={dialog.opened}
-  onOpenChange={(e) => (dialog.opened = e.open)}
+  onOpenChange={(e) => {
+    if (!e.open && dialog.beforeClose && !dialog.beforeClose()) return;
+    dialog.opened = e.open;
+  }}
   onEscapeKeyDown={(e) => {
     if (dialog.help) {
       e.preventDefault();

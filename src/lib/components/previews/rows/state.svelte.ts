@@ -145,6 +145,7 @@ export class RowsPreviewClass {
     // Ensure reactivity to project changes
     project.url.href;
     weatherDataUpdatedKey.value;
+    weather.editCount; // values edited in place (Edit Weather Data, Undo)
     // Early return if no data is available
     if (
       !window ||

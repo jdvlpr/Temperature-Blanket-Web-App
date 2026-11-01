@@ -15,10 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import WeatherTableWrapper from '#lib/components/WeatherTableWrapper.svelte';
-  import ImportWeatherData from '#lib/components/modals/ImportWeatherData.svelte';
-  import { dialog } from '#lib/state/page-state.svelte.js';
-  import { weather } from '#lib/state/weather-state.svelte.js';
-  import { FileUpIcon } from '@lucide/svelte';
+  import { openEditWeather } from '#lib/utils/open-edit-weather.js';
+  import { FileUpIcon, SquarePenIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
   import DownloadExportButton from './buttons/DownloadExportButton.svelte';
 
@@ -50,22 +48,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       menuList={['pdf', 'csv', 'google-sheet']}
     />
 
-    {#if weather.grouping !== 'week'}
-      <button
-        class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
-        onclick={() => {
-          dialog.trigger({
-            type: 'component',
-            component: {
-              ref: ImportWeatherData,
-            },
-            options: { title: 'Import Weather Data' },
-          });
-        }}
-        title="Import Weather Data"
-      >
-        <FileUpIcon class="inline" /> Import Weather Data
-      </button>
-    {/if}
+    <button
+      class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
+      onclick={() => openEditWeather()}
+      title="Edit Weather Data"
+    >
+      <SquarePenIcon class="inline" /> Edit Weather Data
+    </button>
+
+    <button
+      class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
+      onclick={() => openEditWeather({ startWith: 'import' })}
+      title="Import Weather Data"
+    >
+      <FileUpIcon class="inline" /> Import Weather Data
+    </button>
   </div>
 </div>

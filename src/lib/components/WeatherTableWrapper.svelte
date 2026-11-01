@@ -53,6 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     // These three can be together because they don't all change near the same moment, unlike the next three $effect() blocks
     weather.data;
+    weather.editCount; // values edited in place (Edit Weather Data, Undo)
     preferences.value.units;
     weather.tableWeatherTargets;
     tick().then(() => {

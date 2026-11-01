@@ -84,21 +84,19 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   <h2 id="fix-a-few-days" class="text-2xl font-bold">Fix a Few Days</h2>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Make sure <span class="font-bold">Grouping</span> is
-      <span class="font-bold">Daily</span>.
+      In the table under the chart, press the number you want to change. Edit
+      Weather Data opens on it, with every day's weather in a grid.
     </li>
     <li>
-      In the table under the chart, press the number you want to change. A box
-      opens with that day's value.
+      Type your reading and press <kbd class="kbd">Enter</kbd>. Change as many
+      days as you like; to paste readings from a spreadsheet, copy them there
+      and paste them on the first day.
     </li>
-    <li>
-      Type your reading (or use the +1, −1… buttons), then press
-      <span class="font-bold">Save</span>.
-    </li>
+    <li>Press <span class="font-bold">Apply</span>.</li>
   </ol>
   <DocsShot
     src="weather/edit-day"
-    alt="The box for changing one day's weather: 2025-01-01, High Temperature (°C) 11.8, buttons to add or take away 1, 5 or 20, and Cancel and Save."
+    alt="Edit Weather Data: a grid of days with High, Average and Low Temperature, Rain, Snow and Daytime, one day's high selected, and Cancel and Apply."
     caption="Changing one day's high."
   />
 </section>
@@ -123,7 +121,8 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     </li>
     <li>
       Press <span class="font-bold">Import Weather Data</span>, and choose your
-      file.
+      file. The values it changes are marked; check them, then press
+      <span class="font-bold">Apply</span>.
     </li>
   </ol>
   <p>
@@ -170,8 +169,9 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
       the link.
     </li>
     <li>
-      They press <span class="font-bold">Import Weather Data</span>, and choose
-      that file, without changing it.
+      They press <span class="font-bold">Import Weather Data</span>, choose that
+      file (without changing it), and press
+      <span class="font-bold">Apply</span>.
     </li>
   </ol>
   <p>
@@ -183,11 +183,16 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   <h2 id="if-something-goes-wrong" class="text-2xl font-bold">
     If Something Goes Wrong
   </h2>
-  <h3 class="text-lg font-bold">I can't edit or import</h3>
+  <h3 class="text-lg font-bold">Pressing a value does nothing</h3>
   <p>
-    Weekly weather can't be edited. Set <span class="font-bold">Grouping</span>
-    to
-    <span class="font-bold">Daily</span> first.
+    With <span class="font-bold">Grouping</span> set to
+    <span class="font-bold">Weekly</span>, the table shows weeks, which can't be
+    changed. Press <span class="font-bold">Edit Weather Data</span> under the table
+    instead: it always shows days.
+  </p>
+  <h3 class="text-lg font-bold">Apply is greyed out</h3>
+  <p>
+    Nothing has changed yet. A value typed the same as it was isn't a change.
   </p>
   <h3 class="text-lg font-bold">Some rows were skipped</h3>
   <p>

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Help text, shown in a help dialog and on its Guides & Help page. The
-headings are the ones ImportWeatherData reads. -->
+headings are the ones Import reads (CSV_HEADINGS in utils/weather-edits.ts). -->
 
 <div class="flex flex-col gap-2">
   <p>

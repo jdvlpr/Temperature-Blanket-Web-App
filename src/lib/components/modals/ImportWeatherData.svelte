@@ -13,196 +13,54 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<!-- Import File in Edit Weather Data (EditWeather.svelte): reads a CSV file's
+values into the editor's changes, to check before Apply. The headings it
+reads are in weather-edits.ts (CSV_HEADINGS) and ImportFileRequirements. -->
+
 <script lang="ts">
   import Spinner from '#lib/components/Spinner.svelte';
   import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
-  import { weather } from '#lib/state/weather-state.svelte.js';
-  import { projectChanged } from '#lib/storage/autosave.svelte.js';
   import { CSVtoArray } from '#lib/utils/weather-utils.svelte.js';
   import {
-    celsiusToFahrenheit,
-    convertTime,
-    fahrenheitToCelsius,
-    hoursToMinutes,
-    inchesToMillimeters,
-    millimetersToInches,
-  } from '#lib/utils/unit-utils.svelte.js';
-  import { dateToISO8601String, stringToDate } from '#lib/utils/date-utils.js';
-  import type { TISO8601DateString } from '#lib/types/weather-types.js';
-  import { displayNumber } from '#lib/utils/number-utils.js';
+    readImportedRows,
+    type EditRow,
+    type ImportedValue,
+  } from '#lib/utils/weather-edits.js';
   import { FileIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 
-  let imported = $state(false);
+  let {
+    rows,
+    onvalues,
+  }: {
+    rows: EditRow[];
+    /** The file's values, by the editor's row */
+    onvalues: (values: ImportedValue[]) => void;
+  } = $props();
+
   let processing = $state(false);
   let errorMessages: string[] = $state([]);
-  let csvUpload: File[] | undefined = $state();
+  let matchedDays: number | null = $state(null);
 
-  function submitForm() {
-    if (!csvUpload?.[0]) return;
-    const input = csvUpload[0];
+  function read(file: File | undefined) {
+    if (!file) return;
     const reader = new FileReader();
     processing = true;
-
     reader.onload = (e: ProgressEvent<FileReader>) => {
-      errorMessages = [];
+      processing = false;
       const text = e.target?.result;
       if (typeof text !== 'string') return;
-      const data = CSVtoArray({ str: text });
-      if (!weather.rawData.length) return;
-      const weatherToMatch = weather.rawData.map(
-        (n) => `${dateToISO8601String(n.date)}-${n.location}`,
-      );
-
-      let _rawData = $state.snapshot(weather.rawData);
-      let matchedDays = 0;
-
-      for (var i = 0; i < data.length; i++) {
-        const row = data[i];
-        const date = row?.['Date'] || row?.['date'];
-        const locationIndexRaw =
-          row?.['Location Index'] ||
-          row?.['location index'] ||
-          row?.['Location'];
-        const locationIndex =
-          typeof locationIndexRaw === 'string'
-            ? parseInt(locationIndexRaw, 10)
-            : locationIndexRaw;
-
-        const index =
-          date && !isNaN(locationIndex)
-            ? weatherToMatch.indexOf(
-                `${dateToISO8601String(stringToDate(date as TISO8601DateString))}-${locationIndex}`,
-              )
-            : null;
-
-        const hasError =
-          !date || isNaN(locationIndex) || index === -1 || index === null;
-        if (hasError) {
-          if (!date)
-            errorMessages.push(
-              `Row ${i + 2} not imported: Missing or invalid Date.`,
-            );
-
-          if (isNaN(locationIndex))
-            errorMessages.push(
-              `Row ${i + 2} not imported: Missing or invalid Location Index.`,
-            );
-
-          if (index === -1)
-            errorMessages.push(
-              `Row ${i + 2} not imported: Date out of this project's range. (${date})`,
-            );
-          continue;
-        }
-        let day = _rawData[index!];
-
-        const highF = +row?.['High Temperature (°F)'];
-        if (!isNaN(highF)) {
-          day.tmax.imperial = highF;
-          day.tmax.metric = fahrenheitToCelsius(highF);
-        }
-
-        const highC = +row?.['High Temperature (°C)'];
-        if (!isNaN(highC)) {
-          day.tmax.metric = highC;
-          day.tmax.imperial = celsiusToFahrenheit(highC);
-        }
-
-        const avgF = +row?.['Average Temperature (°F)'];
-        if (!isNaN(avgF)) {
-          day.tavg.imperial = avgF;
-          day.tavg.metric = fahrenheitToCelsius(avgF);
-        }
-
-        const avgC = +row?.['Average Temperature (°C)'];
-        if (!isNaN(avgC)) {
-          day.tavg.metric = avgC;
-          day.tavg.imperial = celsiusToFahrenheit(avgC);
-        }
-
-        const lowF = +row?.['Low Temperature (°F)'];
-        if (!isNaN(lowF)) {
-          day.tmin.imperial = lowF;
-          day.tmin.metric = fahrenheitToCelsius(lowF);
-        }
-
-        const lowC = +row?.['Low Temperature (°C)'];
-        if (!isNaN(lowC)) {
-          day.tmin.metric = lowC;
-          day.tmin.imperial = celsiusToFahrenheit(lowC);
-        }
-
-        const rainIn = +row?.['Rain (in)'];
-        if (!isNaN(rainIn)) {
-          day.prcp.imperial = rainIn;
-          day.prcp.metric = inchesToMillimeters(rainIn);
-        }
-
-        const rainMm = +row?.['Rain (mm)'];
-        if (!isNaN(rainMm)) {
-          day.prcp.metric = rainMm;
-          day.prcp.imperial = millimetersToInches(rainMm);
-        }
-
-        const snowIn = +row?.['Snow (in)'];
-        if (!isNaN(snowIn)) {
-          day.snow.imperial = snowIn;
-          day.snow.metric = inchesToMillimeters(snowIn);
-        }
-
-        const snowMm = +row?.['Snow (mm)'];
-        if (!isNaN(snowMm)) {
-          day.snow.metric = snowMm;
-          day.snow.imperial = millimetersToInches(snowMm);
-        }
-
-        const daytime = row?.['Daytime (h:m)'];
-        if (daytime) {
-          if (
-            daytime !==
-              convertTime(day.dayt.imperial, {
-                displayUnits: false,
-                padStart: true,
-                forceUnits: 'imperial',
-              }) ||
-            daytime !==
-              convertTime(day.dayt.metric, {
-                displayUnits: false,
-                padStart: true,
-                forceUnits: 'metric',
-              })
-          ) {
-            const time = daytime.split(':');
-            const hours = +time[0] + +time[1] / 60;
-            day.dayt.imperial = displayNumber(+hours, 4);
-            day.dayt.metric = hoursToMinutes(hours, 4);
-          }
-        }
-        _rawData[index] = day;
-        matchedDays++;
-      }
-
-      weather.setRawData(_rawData);
-      // Imported weather is the user's own, like an edit in the table: shown
-      // as Custom, kept when the project is saved and opened again, and never
-      // replaced by a search without asking. A file with no matching days
-      // changes nothing, so leaves the weather as it was.
-      if (matchedDays) {
-        weather.isUserEdited = true;
-        projectChanged({ weather: true });
-      }
-
-      imported = true;
-      processing = false;
+      const result = readImportedRows(CSVtoArray({ str: text }), rows);
+      errorMessages = result.errors;
+      matchedDays = result.matchedDays;
+      onvalues(result.values);
     };
-
-    reader.readAsText(input);
+    reader.readAsText(file);
   }
 </script>
 
 <div
-  class="inline-flex w-full flex-col items-center justify-center p-4 text-center"
+  class="inline-flex w-full flex-col items-center justify-center p-2 text-center"
 >
   <div class="mt-2">
     <HelpIcon
@@ -215,63 +73,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </HelpIcon>
   </div>
 
-  {#if !processing}
-    {#if !imported || errorMessages.length > 0}
-      <FileUpload
-        name="files"
-        class="mt-4 justify-center"
-        onFileAccept={(e: { files: File[] }) => {
-          csvUpload = e.files;
-          submitForm();
-        }}
-        accept=".csv"
-      >
-        <FileUpload.Dropzone>
-          <FileIcon class="size-10" />
-          <span>Select a CSV file or drag here.</span>
-          <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
-          <FileUpload.HiddenInput />
-        </FileUpload.Dropzone>
-        <FileUpload.ItemGroup>
-          <FileUpload.Context>
-            {#snippet children(fileUpload)}
-              {#each fileUpload().acceptedFiles as file (file.name)}
-                <FileUpload.Item {file}>
-                  <FileUpload.ItemName>{file.name}</FileUpload.ItemName>
-                  <FileUpload.ItemSizeText
-                    >{file.size} bytes</FileUpload.ItemSizeText
-                  >
-                  <FileUpload.ItemDeleteTrigger />
-                </FileUpload.Item>
-              {/each}
-            {/snippet}
-          </FileUpload.Context>
-        </FileUpload.ItemGroup>
-      </FileUpload>
-
-      {#if errorMessages.length > 0}
-        <p>Import finished, but there were some issues (listed below).</p>
-        <p class="mb-2">
-          Close this and check the weather data, or edit your file and try
-          again.
-        </p>
-        {#each errorMessages as message}
-          <p class="text-sm">{message}</p>
-        {/each}
-      {/if}
-    {:else}
-      <div class="my-8">
-        <p class="text-lg font-bold">Done!</p>
-        <p>
-          Close this to check the weather data and continue working on your
-          project.
-        </p>
-      </div>
-    {/if}
-  {:else}
-    <div class="my-8">
+  {#if processing}
+    <div class="my-4">
       <Spinner />
-      <p>Processing...</p>
+      <p>Reading the file…</p>
     </div>
+  {:else}
+    <FileUpload
+      name="files"
+      class="mt-4 justify-center"
+      onFileAccept={(e: { files: File[] }) => read(e.files[0])}
+      accept=".csv"
+    >
+      <FileUpload.Dropzone>
+        <FileIcon class="size-10" />
+        <span>Select a CSV file or drag here.</span>
+        <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
+        <FileUpload.HiddenInput />
+      </FileUpload.Dropzone>
+    </FileUpload>
+
+    {#if matchedDays !== null}
+      <p class="mt-2" role="status">
+        {#if matchedDays}
+          Read {matchedDays}
+          {matchedDays === 1 ? 'day' : 'days'}. The changed values are marked in
+          the table; check them, then Apply.
+        {:else}
+          No days in the file matched this project's days.
+        {/if}
+      </p>
+    {/if}
+    {#if errorMessages.length > 0}
+      <details class="mt-2 text-left text-sm">
+        <summary class="cursor-pointer"
+          >{errorMessages.length}
+          {errorMessages.length === 1 ? 'row was' : 'rows were'} left out</summary
+        >
+        <ul class="mt-1 ml-4 list-disc">
+          {#each errorMessages as message (message)}
+            <li>{message}</li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
   {/if}
 </div>

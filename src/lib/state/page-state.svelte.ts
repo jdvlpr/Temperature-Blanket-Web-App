@@ -103,6 +103,10 @@ class DialogClass {
   /** Set by a view shown inside a dialog, for Escape to leave just that view
    * rather than close the dialog. Cleared whenever another dialog opens. */
   escapeAction = $state<(() => void) | null>(null);
+  /** Set by a dialog with work that would be lost (Edit Weather Data's
+   * changes), to keep it open and ask instead: returns false to stay open.
+   * Cleared whenever another dialog opens. */
+  beforeClose: (() => boolean) | null = null;
   /** Where the focus goes when the dialog closes, instead of back to what
    * opened it, as to a color the dialog just added. Null for the default. */
   finalFocus: (() => HTMLElement | null) | null = null;
@@ -167,6 +171,7 @@ class DialogClass {
     this.help = null;
     this.backAction = null;
     this.escapeAction = null;
+    this.beforeClose = null;
     this.finalFocus = null;
     this.direction = fromReturnable ? 'forward' : 'none';
 
@@ -222,10 +227,12 @@ class DialogClass {
    * parts of it behind in the next dialog
    */
   close = () => {
+    if (this.beforeClose && !this.beforeClose()) return false;
     const opening = this.#openings;
     setTimeout(() => {
       if (opening === this.#openings) this.opened = false;
     });
+    return true;
   };
 
   /**

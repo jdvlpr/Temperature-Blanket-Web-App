@@ -297,6 +297,14 @@ class WeatherClass {
 
   isUserEdited: boolean = $state(false);
 
+  /** Goes up whenever the weather is replaced (a search, new days, a project
+   * opening), so Undo never puts an edit made to other weather back in */
+  dataEpoch = 0;
+
+  /** Goes up whenever an edit is applied, undone or redone in place, for
+   * what shows the values (the table) to read them again */
+  editCount = $state(0);
+
   wasLoadedFromStorage: boolean = $state(false);
 
   // ***************
@@ -331,6 +339,7 @@ class WeatherClass {
    * co-located with the write (keeps the `data` derived pure).
    */
   setRawData(value: WeatherDay[]) {
+    this.dataEpoch++;
     this.currentIndex = 0;
     this.rawData = value;
   }
@@ -340,6 +349,7 @@ class WeatherClass {
    * days already there keep their places, so the selected one stays.
    */
   updateRawData(value: WeatherDay[]) {
+    this.dataEpoch++;
     this.rawData = value;
     this.currentIndex = Math.min(
       this.currentIndex,

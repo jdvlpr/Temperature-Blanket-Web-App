@@ -172,7 +172,8 @@ HELP_TOPICS). -->
   </p>
   <GroupingWeather />
   <p>
-    Weekly weather can't be edited or imported. Switch to Daily to do either.
+    Editing and importing always change days, whichever grouping the table
+    shows.
   </p>
 </section>
 
@@ -207,21 +208,42 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="edit-weather-data" class="text-2xl font-bold">Edit the Weather</h2>
   <p>
-    If a day looks wrong, change it. Your weather needs to be
-    <span class="font-bold">Daily</span>.
+    If a day looks wrong, change it. Press
+    <span class="font-bold">Edit Weather Data</span> under the table (or press a value
+    in the table to start on it). Every day's weather opens in a grid, like a spreadsheet,
+    with each value's yarn color beside it.
   </p>
-  <ol class="ml-6 list-decimal space-y-1">
-    <li>In the table under the chart, press the value you want to change.</li>
+  <ul class="ml-6 list-disc space-y-1">
     <li>
-      Type the new value, then press <span class="font-bold">Save</span>.
-      Daylight is hours:minutes, like 08:12.
+      <span class="font-bold">Change a value:</span> select it and type, then
+      press <kbd class="kbd">Enter</kbd>. Enter, Tab and the arrow keys move.
+      Daylight is hours:minutes, like 08:12. Leave a value empty for missing.
     </li>
-  </ol>
+    <li>
+      <span class="font-bold">Change many:</span> select them with Shift or by
+      dragging, then type a value beside
+      <span class="font-bold">Set</span>, or a number to
+      <span class="font-bold">Add</span> to each (negative to take away).
+      <kbd class="kbd">Delete</kbd> clears them.
+    </li>
+    <li>
+      <span class="font-bold">Paste from a spreadsheet:</span> copy cells in Excel,
+      Numbers or Google Sheets and paste them on the first cell they go in. If the
+      rows you copy start with dates, each goes to its day.
+    </li>
+    <li>
+      <span class="font-bold">Missing days:</span>
+      <span class="font-bold">Find Missing</span> goes to the next empty value;
+      <span class="font-bold">Fill In Missing</span> fills the selected ones (or all
+      of them, with one value selected) from the days on either side.
+    </li>
+  </ul>
   <p>
-    The moon phase can't be edited. To change many days at once, it's easier to
-    edit them in a spreadsheet and <a href="#import-weather-data" class="link"
-      >import them</a
-    >.
+    Changed values are marked. Nothing changes in your project until you press
+    <span class="font-bold">Apply</span>: until then, Undo and Redo in the
+    editor work on your changes, <span class="font-bold">Revert</span> puts the selected
+    values back, and closing asks before leaving them. Once applied, Undo above the
+    project takes them back in one step. The moon phase can't be edited.
   </p>
   <h3 class="text-lg font-bold">Once you've edited the weather</h3>
   <ul class="ml-6 list-disc space-y-1">
@@ -265,14 +287,19 @@ HELP_TOPICS). -->
       it as CSV.
     </li>
     <li>
-      Press <span class="font-bold">Import Weather Data</span>, choose the file
-      (or drag it onto the box), and wait for
-      <span class="font-bold">Done!</span>
+      Press <span class="font-bold">Import Weather Data</span> (or
+      <span class="font-bold">Import File</span> in Edit Weather Data) and choose
+      the file, or drag it onto the box.
+    </li>
+    <li>
+      The values that differ are marked in the grid. Check them, then press
+      <span class="font-bold">Apply</span>.
     </li>
   </ol>
   <p>
-    If some rows can't be read, the import still finishes, and lists what was
-    skipped.
+    Rows that can't be read are left out, and listed. You can also skip the
+    file: copy the cells in your spreadsheet and paste them into Edit Weather
+    Data.
   </p>
   <h3 id="import-weather-data-file-requirements" class="text-lg font-bold">
     CSV File Requirements
