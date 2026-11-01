@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return () => observer.disconnect();
   });
   $effect(() => {
-    onThisPage.offset = topBarHeight + sectionBarHeight;
+    onThisPage.setOffset(topBarHeight + sectionBarHeight);
   });
 </script>
 

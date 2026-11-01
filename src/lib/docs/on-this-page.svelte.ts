@@ -31,6 +31,15 @@ class OnThisPage {
   current = $state<string | null>(null);
   /** How far down the page the top bars reach, in px */
   offset = 0;
+  /** Called as the top bars are measured, so a page opened at a section
+   * can put it back below them */
+  realign: (() => void) | null = null;
+
+  setOffset(offset: number) {
+    if (offset === this.offset) return;
+    this.offset = offset;
+    this.realign?.();
+  }
 
   currentSection = $derived(
     this.sections.find((section) => section.id === this.current),
@@ -115,12 +124,23 @@ export function trackSections(): Attachment<HTMLElement> {
     const userScrolls = ['wheel', 'touchmove', 'keydown', 'pointerdown'];
 
     collect();
-    // Opened at a section
+    // Opened at a section. Checked against the local headings: reading
+    // onThisPage.sections here would make the attachment's effect depend on
+    // the state collect() just wrote, and re-run forever
     if (location.hash) {
       const id = decodeURIComponent(location.hash.slice(1));
-      if (onThisPage.sections.some((section) => section.id === id)) {
+      if (headings.some((heading) => sectionId(heading, node) === id)) {
         chosen = id;
         update();
+        // The browser jumped there before the top bars were measured, so
+        // the heading is under them; put it back below them, until the
+        // reader scrolls
+        onThisPage.realign = () => {
+          if (chosen === id)
+            document
+              .getElementById(id)
+              ?.scrollIntoView({ behavior: 'instant' });
+        };
       }
     }
     // The content changes as pages are navigated within the same layout
@@ -143,6 +163,7 @@ export function trackSections(): Attachment<HTMLElement> {
       document.removeEventListener('click', choose);
       onThisPage.sections = [];
       onThisPage.current = null;
+      onThisPage.realign = null;
     };
   };
 }
