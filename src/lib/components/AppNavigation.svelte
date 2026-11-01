@@ -244,6 +244,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={['py-1', SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
       aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
     >
+    <a
+      href="/preferences"
+      class={['py-1', SMALL_LINK, pathname === '/preferences' && SMALL_CURRENT]}
+      aria-current={pathname === '/preferences' ? 'page' : undefined}
+      >Preferences</a
+    >
     <a href="/documentation/credits" class={['py-1', SMALL_LINK]}
       >Data Sources & Credits</a
     >

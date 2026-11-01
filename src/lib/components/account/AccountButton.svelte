@@ -13,21 +13,20 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- The account button in the top bar, and the way to Preferences. Signed in,
-it opens a panel with the account's details, sync, Account settings,
-Preferences and sign out; signed out, a menu to sign in or open Preferences.
-With accounts off, a plain link to Preferences. My Library is in the sidebar. -->
+<!-- The account button in the top bar. Signed in, it opens a panel with the
+account's details, sync, Account settings, Preferences and sign out; signed
+out, a link to sign in. With accounts off, a plain link to Preferences.
+Preferences and My Library are also in the sidebar. With showLabel (AppShell
+sets it when the top bar has room) it names itself beside its icon: Account,
+Sign In or Preferences. Hidden, the name is still laid out, out of sight, so
+AppShell can measure it (data-account-label) -->
 
 <script lang="ts">
-  import {
-    menuContentClass,
-    menuItemClass,
-    menuPositioning,
-  } from '#lib/components/menu-styles.js';
+  import { menuPositioning } from '#lib/components/menu-styles.js';
   import { ROW_FOCUS } from '#lib/constants/class-constants.js';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import { signInHref } from '#lib/accounts/redirect.js';
+  import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account, loadAccountSummary } from '#lib/accounts/summary.svelte.js';
   import AccountAvatar from '#lib/components/account/AccountAvatar.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
@@ -37,16 +36,20 @@ With accounts off, a plain link to Preferences. My Library is in the sidebar. --
   import { sync } from '#lib/sync/status.svelte.js';
   import {
     CircleUserRoundIcon,
-    LogInIcon,
     LogOutIcon,
     SlidersHorizontalIcon,
     UserRoundCogIcon,
   } from '@lucide/svelte';
-  import { Menu, Popover, Portal } from '@skeletonlabs/skeleton-svelte';
-  import type { HTMLAnchorAttributes } from 'svelte/elements';
+  import { Popover } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
-  const BUTTON = 'btn-icon hover:preset-tonal-surface shrink-0';
+  let { showLabel = false }: { showLabel?: boolean } = $props();
+
+  let BUTTON = $derived(
+    showLabel
+      ? 'btn hover:preset-tonal-surface relative shrink-0 px-3'
+      : 'btn-icon hover:preset-tonal-surface relative shrink-0',
+  );
   const ROW = `hover:preset-tonal-surface flex w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50 ${ROW_FOCUS}`;
 
   let open = $state(false);
@@ -58,26 +61,14 @@ With accounts off, a plain link to Preferences. My Library is in the sidebar. --
   // The button shows as current on any page it leads to
   let current = $derived(onAccountPage || onPreferencesPage);
 
-  // Signing in comes back to this page, as it is when the menu opens
+  // Signing in comes back to this page, as it is when clicked
+  // (backHereOnClick); in the browser only, since prerendering can't read a
+  // page's query
   let signInTarget = $state('/auth/sign-in');
-
-  // The menu's links, signed out
-  let menuItems = $derived([
-    {
-      value: 'sign-in',
-      label: 'Sign In',
-      href: signInTarget,
-      icon: LogInIcon,
-      here: onAccountPage,
-    },
-    {
-      value: 'preferences',
-      label: 'Preferences',
-      href: resolve('preferences'),
-      icon: SlidersHorizontalIcon,
-      here: onPreferencesPage,
-    },
-  ]);
+  $effect(() => {
+    void page.url;
+    signInTarget = signInHref(window.location);
+  });
 
   onMount(() => {
     if (__ACCOUNTS_ENABLED__) loadAccountSummary();
@@ -102,6 +93,16 @@ With accounts off, a plain link to Preferences. My Library is in the sidebar. --
   }
 </script>
 
+{#snippet label(text: string)}
+  <span
+    class={[
+      'whitespace-nowrap',
+      !showLabel && 'pointer-events-none invisible absolute top-0 right-0',
+    ]}
+    data-account-label>{text}</span
+  >
+{/snippet}
+
 {#if !__ACCOUNTS_ENABLED__}
   <a
     href={resolve('preferences')}
@@ -111,6 +112,7 @@ With accounts off, a plain link to Preferences. My Library is in the sidebar. --
     title="Preferences"
   >
     <SlidersHorizontalIcon aria-hidden="true" />
+    {@render label('Preferences')}
   </a>
 {:else if account.summary}
   {@const summary = account.summary}
@@ -134,8 +136,11 @@ With accounts off, a plain link to Preferences. My Library is in the sidebar. --
     >
       <AccountAvatar
         {summary}
-        class="aspect-square size-8 max-w-none text-xs"
+        class="aspect-square size-8 max-w-none text-xs {showLabel
+          ? '-ml-2'
+          : ''}"
       />
+      {@render label('Account')}
     </Popover.Trigger>
     <Popover.Positioner>
       <Popover.Content
@@ -220,46 +225,15 @@ With accounts off, a plain link to Preferences. My Library is in the sidebar. --
     </Popover.Positioner>
   </Popover>
 {:else}
-  {@const label = 'Sign in and Preferences'}
-  <Menu
-    positioning={menuPositioning('bottom-end')}
-    onOpenChange={(e) => {
-      if (!e.open) return;
-      signInTarget = signInHref(window.location);
-    }}
+  <a
+    href={signInTarget}
+    onclick={backHereOnClick}
+    class={BUTTON}
+    aria-label="Sign In"
+    title="Sign In"
+    data-testid="account-button"
   >
-    <Menu.Trigger
-      class={[
-        BUTTON,
-        'data-[state=open]:preset-tonal-secondary relative',
-        current && 'preset-tonal-secondary',
-      ]}
-      aria-label={label}
-      title={label}
-      data-testid="account-button"
-    >
-      <CircleUserRoundIcon aria-hidden="true" />
-    </Menu.Trigger>
-    <Portal>
-      <Menu.Positioner>
-        <Menu.Content class={menuContentClass}>
-          {#each menuItems as item (item.value)}
-            <Menu.Item value={item.value} class={menuItemClass}>
-              {#snippet element(attributes)}
-                <!-- The item's menu behavior, typed for its default div -->
-                <a
-                  {...attributes as HTMLAnchorAttributes}
-                  href={item.href}
-                  aria-current={item.here ? 'page' : undefined}
-                >
-                  <item.icon aria-hidden="true" />
-                  <span>{item.label}</span>
-                </a>
-              {/snippet}
-            </Menu.Item>
-          {/each}
-        </Menu.Content>
-      </Menu.Positioner>
-    </Portal>
-  </Menu>
+    <CircleUserRoundIcon aria-hidden="true" />
+    {@render label('Sign In')}
+  </a>
 {/if}

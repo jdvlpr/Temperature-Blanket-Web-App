@@ -117,8 +117,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     'bg-surface-50/80 dark:bg-surface-950/80 lg:rounded-t-container fixed bottom-0 z-10 flex h-18 w-full justify-center gap-2 overflow-hidden backdrop-blur-md transition-all',
     // Under the page beside the sidebar, edge to edge with it: the sidebar's
     // width (AppShell's --sidebar-width, as it folds too) and the page's
-    // margin (lg:ml-4 lg:mr-2 xl:mr-0), inside the centered frame on the
-    // widest screens
+    // margin (lg:ml-4 lg:mr-2 xl:mr-0); on the widest screens the page's
+    // column is centered beside the sidebar, half of what's past
+    // --breakpoint-xl on each side
     'lg:right-2 lg:left-[calc(var(--sidebar-width)+1rem)] lg:w-auto xl:right-[calc(50%-(var(--breakpoint-xl)/2))] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+var(--sidebar-width)+1rem)]',
     hidden && 'translate-y-full opacity-0',
   ]}

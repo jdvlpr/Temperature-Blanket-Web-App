@@ -74,6 +74,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   }
 
+  // The account button names itself when the top bar has room for that past
+  // the page's own items. Measured, since pages' items differ: the name shows
+  // once the free space would take it with some to spare, and goes once the
+  // items no longer fit beside it
+  let topBar: HTMLElement | undefined = $state();
+  let pageItems: HTMLElement | undefined = $state();
+  let showAccountLabel = $state(false);
+
+  function fitAccountLabel() {
+    if (!topBar || !pageItems) return;
+    const name = topBar.querySelector<HTMLElement>('[data-account-label]');
+    if (!name) return;
+    const range = document.createRange();
+    range.selectNodeContents(pageItems);
+    const itemsWidth = range.getBoundingClientRect().width;
+    // Less whatever the bar already spills past its edge
+    const free =
+      pageItems.clientWidth -
+      parseFloat(getComputedStyle(pageItems).paddingLeft) -
+      itemsWidth -
+      Math.max(0, topBar.scrollWidth - topBar.clientWidth);
+    // The name, its gap from the icon and the wider button's padding
+    const needs = name.offsetWidth + 24;
+    showAccountLabel = showAccountLabel ? free >= 0 : free >= needs + 16;
+  }
+
+  $effect(() => {
+    if (!topBar || !pageItems) return;
+    let frame = 0;
+    const fit = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(fitAccountLabel);
+    };
+    const resized = new ResizeObserver(fit);
+    resized.observe(topBar);
+    resized.observe(pageItems);
+    // A page's items, or the account's state, changing
+    const changed = new MutationObserver(fit);
+    changed.observe(topBar, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['class', 'hidden', 'style'],
+    });
+    fit();
+    return () => {
+      cancelAnimationFrame(frame);
+      resized.disconnect();
+      changed.disconnect();
+    };
+  });
+
   let debounceTimer: number | undefined;
   const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
@@ -99,8 +152,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:clientHeight={topBarHeight}
   >
     <div
-      class="relative m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
+      bind:this={topBar}
+      class="relative flex items-center justify-between px-2 max-sm:gap-1 sm:gap-2 xl:pr-[calc(max(0px,(100%-var(--breakpoint-xl))/2)+0.5rem)]"
     >
+      <!-- The right padding is half of what the window has past
+      --breakpoint-xl, as beside the page's centered column below -->
       <!-- Wide screens: the sidebar's divider carries on up through this bar,
       right over its border, and folds away with it -->
       {#if showNavigationSideBar.value}
@@ -173,21 +229,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Portal>
         </Dialog>
       </div>
-      <!-- The page's own items sit on the right, next to the account link; on
-      wide screens anything at their left starts where a wide page's content
-      does (the page's margin and PAGE's padding past the divider) -->
+      <!-- The page's own items sit on the right, next to the account link,
+      which ends where the page's column does; anything at their left starts
+      past the divider where a wide page's content does (the page's margin
+      and PAGE's padding) -->
       <div
+        bind:this={pageItems}
         class="flex min-w-0 flex-1 items-center justify-end max-sm:gap-1 sm:gap-2 lg:pl-6"
       >
         {@render stickyHeader?.()}
       </div>
 
       <!-- Always the last item in the top bar -->
-      <AccountButton />
+      <AccountButton showLabel={showAccountLabel} />
     </div>
   </div>
 
-  <div class="mx-auto flex max-w-(--breakpoint-xl) justify-start">
+  <!-- The sidebar keeps to the window's left edge; the page's column beside it
+  is centered in the rest, as wide as the sidebar leaves of --breakpoint-xl -->
+  <div class="flex justify-start">
     <!-- Stays in view under the top bar as the page scrolls, scrolling on its
     own when the window is too short for all of it -->
     <div
@@ -211,7 +271,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <div class="min-w-0 flex-1">
+    <div
+      class="mx-auto min-w-0 flex-1 lg:max-w-[calc(var(--breakpoint-xl)-var(--sidebar-width))]"
+    >
       <!-- Clear of the sidebar's divider: with PAGE's gutter, 1.5rem -->
       <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
         <WhatsNewBanner />

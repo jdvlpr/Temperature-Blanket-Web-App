@@ -212,9 +212,11 @@ show only in builds with accounts. -->
 <section class="flex flex-col gap-3">
   <h2 id="preferences" class="text-2xl font-bold">Preferences</h2>
   <p>
-    Open Preferences from the account button at the top of the page. They apply
-    to the whole site{#if __ACCOUNTS_ENABLED__}, and follow you to your other
-      devices when you're signed in{/if}.
+    Open Preferences from the sidebar{#if __ACCOUNTS_ENABLED__}, or from the
+      Account button at the top of the page when you're signed in{:else}, or
+      from the button at the top right of the page{/if}. They apply to the whole
+    site{#if __ACCOUNTS_ENABLED__}, and follow you to your other devices when
+      you're signed in{/if}.
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -277,7 +279,7 @@ show only in builds with accounts. -->
       </li>
     </ul>
     <h3 id="account-page" class="text-lg font-bold">The Account page</h3>
-    <p>Open it from the account button. It has:</p>
+    <p>Open it from the Account button at the top of the page. It has:</p>
     <ul class="ml-6 list-disc space-y-1">
       <li>
         <span class="font-bold">Profile:</span> your display name, shown only on gallery

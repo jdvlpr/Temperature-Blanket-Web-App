@@ -95,7 +95,10 @@ test.describe('Accounts: sign in with an emailed code', () => {
     );
     await page.getByTestId('account-button').click();
     await expect(page.getByRole('dialog').getByText(email)).toBeVisible();
-    await page.getByRole('link', { name: 'Preferences' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('link', { name: 'Preferences' })
+      .click();
     await expect(page).toHaveURL(/\/preferences$/);
     await expect(
       page.getByRole('heading', { name: 'Preferences' }),
@@ -116,17 +119,22 @@ test.describe('Accounts: sign in with an emailed code', () => {
       .getByRole('button', { name: 'Sign out', exact: true })
       .click();
     await expect(page.getByTestId('account-button')).toHaveAccessibleName(
-      /^Sign in and Preferences/,
+      'Sign In',
     );
     await page.reload();
     await expect(page.getByTestId('account-button')).toHaveAccessibleName(
-      /^Sign in and Preferences/,
+      'Sign In',
     );
 
-    // Signed out, the button is a menu to sign in or open Preferences
-    await page.getByTestId('account-button').click();
-    await expect(page.getByRole('menuitem', { name: 'Sign In' })).toBeVisible();
-    await page.getByRole('menuitem', { name: 'Preferences' }).click();
+    // Signed out, the button signs in; Preferences is in the sidebar
+    await expect(page.getByTestId('account-button')).toHaveAttribute(
+      'href',
+      /^\/auth\/sign-in/,
+    );
+    await page
+      .locator('#app-sidebar')
+      .getByRole('link', { name: 'Preferences' })
+      .click();
     await expect(page).toHaveURL(/\/preferences$/);
   });
 
@@ -135,10 +143,9 @@ test.describe('Accounts: sign in with an emailed code', () => {
     request,
   }) => {
     const email = uniqueEmail('top-bar');
-    // Loaded, so the account button's menu works
+    // Loaded, so the Sign In link comes back here as the page is now
     await page.goto('/privacy#top', { waitUntil: 'networkidle' });
     await page.getByTestId('account-button').click();
-    await page.getByRole('menuitem', { name: 'Sign In' }).click();
     await expect(page).toHaveURL(/\/auth\/sign-in\?redirect=%2Fprivacy%23top$/);
     await openEmailSignIn(page);
     await page.getByLabel('Email').fill(email);
