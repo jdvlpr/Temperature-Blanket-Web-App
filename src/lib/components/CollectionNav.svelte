@@ -18,11 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   things (My Library, the Gallery, an owner's gallery page). It looks like a
   segmented control, but each side is a link to its own page, marked as the
   current page when it's this one. A count, when given, follows each label.
-  Below lg it's pinned to the bottom of the screen, in thumb reach, like Browse
-  Palettes' sources; on phones each name sits under its icon.
+  It sits in the page at the top on every screen size.
 -->
 <script lang="ts">
-  import { BOTTOM_BAR } from '#lib/constants/class-constants.js';
   import { NotebookPenIcon, SwatchBookIcon } from '@lucide/svelte';
 
   let {
@@ -58,25 +56,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       count: palettesCount,
     },
   ]);
-
-  // The bottom bar's height (0 from lg, where it's hidden), so the page, its
-  // toasts and To Top buttons make room for it
-  let barHeight = $state(0);
-  const VAR = '--bottom-bar-height';
-
-  $effect(() => {
-    const value = `${barHeight}px`;
-    const root = document.documentElement.style;
-    root.setProperty(VAR, value);
-    // Only its own: the next page's bar may have set it already, as pages
-    // overlap while navigating
-    return () => {
-      if (root.getPropertyValue(VAR) === value) root.removeProperty(VAR);
-    };
-  });
 </script>
 
-{#snippet links()}
+<nav class="mx-auto w-full max-w-md px-2" aria-label={label}>
   <ul
     class="bg-surface-100 dark:bg-surface-900 rounded-container grid grid-cols-2 gap-1 p-1"
   >
@@ -89,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           data-sveltekit-preload-data="hover"
           aria-current={isCurrent ? 'page' : undefined}
           class={[
-            'btn w-full justify-center gap-1 max-sm:h-auto max-sm:flex-col max-sm:gap-0.5 max-sm:py-1 max-sm:text-xs',
+            'btn w-full justify-center gap-1',
             isCurrent
               ? 'preset-filled-surface-50-950 shadow-sm'
               : 'hover:preset-tonal-surface',
@@ -116,24 +98,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </li>
     {/each}
   </ul>
-{/snippet}
-
-<!-- Only one shows at a time, so screen readers find one of these -->
-<nav class="mx-auto w-full max-w-md px-2 max-lg:hidden" aria-label={label}>
-  {@render links()}
-</nav>
-
-<!-- Stays still as the page changes between the two -->
-<nav
-  class={[
-    BOTTOM_BAR,
-    'fixed inset-x-0 bottom-0 z-20 [view-transition-name:collection-nav] lg:hidden',
-  ]}
-  aria-label={label}
-  data-bottom-bar
-  bind:clientHeight={barHeight}
->
-  <div class="mx-auto w-full max-w-md">
-    {@render links()}
-  </div>
 </nav>

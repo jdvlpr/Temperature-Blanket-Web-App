@@ -44,12 +44,6 @@
     border-color: var(--color-gray-200, currentColor);
   }
 
-  /* Keyboard focus and scrolling into view stop above a bar pinned to the
-  bottom of the screen (CollectionNav sets the height while it shows) */
-  html {
-    scroll-padding-bottom: var(--bottom-bar-height, 0px);
-  }
-
   ::selection {
     color: var(--typo-base--color-dark);
   }
@@ -365,7 +359,9 @@ itself animates from script, only when the option changes. */
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
   /* A swatch's room that closes once filled (ColorwayRows), together with the fill */
-  [data-fill-changing] [data-fillable]:not([data-fill-instant]) [data-fill-collapse] {
+  [data-fill-changing]
+    [data-fillable]:not([data-fill-instant])
+    [data-fill-collapse] {
     transition-property: width, margin, opacity !important;
   }
   /* Out of view, or with reduced motion: it just changes */

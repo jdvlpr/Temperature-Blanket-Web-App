@@ -107,27 +107,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toolbarButtonClass = 'hover:preset-tonal-surface btn justify-start';
 
-  // Palettes to choose from: a project's gauge can use one of My Palettes or
-  // the gallery's; on the Yarn page those are opened from My Library and the
-  // Gallery instead, as palettes of their own. Bookmark matches Save Palette;
-  // Landmark matches Gallery in the sidebar.
+  // Palettes to choose from. On the Yarn page, choosing one copies its colors
+  // into the palette being made (Palette › Open… opens one itself), so the
+  // details say so. Bookmark matches Save Palette; Landmark matches Gallery
+  // in the sidebar.
   const paletteSources = $derived([
-    ...(inProject
-      ? [
-          {
-            value: 'saved',
-            label: 'My Palettes',
-            details: 'Saved and starred',
-            icon: BookmarkIcon,
-          },
-          {
-            value: 'gallery',
-            label: 'Palette Gallery',
-            details: 'Shared by everyone',
-            icon: LandmarkIcon,
-          },
-        ]
-      : []),
+    {
+      value: 'saved',
+      label: 'My Palettes',
+      details: inProject
+        ? 'Saved and starred'
+        : 'Copy colors from a saved or starred one',
+      icon: BookmarkIcon,
+    },
+    {
+      value: 'gallery',
+      label: 'Palette Gallery',
+      details: inProject
+        ? 'Shared by everyone'
+        : 'Copy colors from one shared by everyone',
+      icon: LandmarkIcon,
+    },
     {
       value: 'gradients',
       label: 'Preset Gradients',
@@ -184,6 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: PaletteSource,
             props: {
               source: value,
+              inProject,
               numberOfColors: gauge.numberOfColors,
               updateGauge,
             },

@@ -34,6 +34,8 @@ PaletteStatusButton, PaletteTitle, autosave). -->
   <p>
     It works like a project's gauge, without ranges. Press
     <span class="font-bold">Get Colors</span> for
+    <span class="font-bold">My Palettes</span>,
+    <span class="font-bold">Palette Gallery</span>,
     <span class="font-bold">Preset Gradients</span>,
     <span class="font-bold">Choose Colorways</span>,
     <span class="font-bold">From an Image</span>,
@@ -42,6 +44,13 @@ PaletteStatusButton, PaletteTitle, autosave). -->
     and add colors as in a gauge. See
     <a href="/documentation/colors-and-yarn" class="link">Colors & Yarn</a> for each
     of these.
+  </p>
+  <p>
+    Choosing a palette from <span class="font-bold">My Palettes</span> or the
+    <span class="font-bold">Palette Gallery</span> copies its colors into this
+    one; it doesn't open that palette. To edit a saved palette itself, press
+    <span class="font-bold">Palette</span>, then
+    <span class="font-bold">Open…</span>.
   </p>
   <p>
     <span class="font-bold">Undo</span> and <span class="font-bold">Redo</span>

@@ -66,10 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={menuTriggerClass}>
     <current.icon aria-hidden="true" />
-    <span
-      ><span class={{ 'max-sm:sr-only': compact }}>View:</span
-      >{' '}{current.label}</span
-    >
+    <span class={{ 'max-sm:sr-only': compact }}>View</span>
     <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>

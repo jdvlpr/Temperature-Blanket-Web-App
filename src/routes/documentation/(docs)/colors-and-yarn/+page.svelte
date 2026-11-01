@@ -66,7 +66,11 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
       <a href="#importexport" class="link">type or paste colors</a>.
     </li>
   </ul>
-  <p>Choosing a palette replaces the gauge's colors. Undo puts them back.</p>
+  <p>
+    Choosing a palette replaces the gauge's colors (in the Yarn Palette Creator,
+    the colors of the palette you're making; it doesn't open the palette you
+    chose). Undo puts them back.
+  </p>
   <DocsShot
     src="colors-and-yarn/get-colors"
     alt="The Get Colors menu: My Palettes, Palette Gallery, Preset Gradients, Choose Colorways, From an Image, Random, and Paste Colors or Code, each with a short description."

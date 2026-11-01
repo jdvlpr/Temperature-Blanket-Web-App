@@ -9,11 +9,9 @@ const moreMenuButtons = (page: Page) =>
 
 /** Switch the results to the list, through the View menu */
 const showList = async (page: Page) => {
-  await page.getByRole('button', { name: /^View: / }).click();
+  await page.getByRole('button', { name: /^View/ }).click();
   await page.getByRole('menuitemradio', { name: 'List' }).click();
-  await expect(page.getByRole('button', { name: /^View: / })).toHaveText(
-    /List/,
-  );
+  await expect(page.getByRole('button', { name: /^View/ })).toHaveText(/List/);
 };
 
 /** Search by color name, which is in the Filters, collapsed until opened */

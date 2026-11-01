@@ -72,12 +72,6 @@ export const SMALL_LINK = 'hover:underline opacity-80 hover:opacity-100';
 export const PALETTE_LIST =
   'grid grid-cols-1 items-start gap-x-6 gap-y-6 lg:grid-cols-2';
 
-/** A switcher pinned to the bottom of the screen on small screens, in thumb
- * reach, with the content scrolling behind it: a dialog's sources on
- * phones, and Projects | Yarn Palettes (CollectionNav) below lg */
-export const BOTTOM_BAR =
-  'bg-surface-50/90 dark:bg-surface-950/90 border-surface-200-800 border-t px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur';
-
 /** A dialog's action buttons, pinned to its bottom on its own background:
  * centered, any secondary actions first and the one filled action last.
  * Clear of the iPhone's home bar */

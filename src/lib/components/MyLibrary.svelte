@@ -195,31 +195,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <CollectionNav
-    label="My Library"
-    {current}
-    projectsHref={withScope(resolve('my-projects'), starred)}
-    palettesHref={withScope(resolve('my-palettes'), starred)}
-    projectsCount={current === 'projects'
-      ? (currentTotal ?? projectsCount)
-      : projectsCount}
-    palettesCount={current === 'palettes'
-      ? (currentTotal ?? palettesCount)
-      : palettesCount}
-  />
-
-  {#if __ACCOUNTS_ENABLED__}
-    <LibraryScope
-      {starred}
-      label={current === 'projects' ? 'Projects to show' : 'Palettes to show'}
-      mineHref={page.url.pathname}
-      starredHref={withScope(page.url.pathname, true)}
-      mineCount={current === 'projects'
+  <div class="flex flex-col items-center justify-center gap-2">
+    <CollectionNav
+      label="My Library"
+      {current}
+      projectsHref={withScope(resolve('my-projects'), starred)}
+      palettesHref={withScope(resolve('my-palettes'), starred)}
+      projectsCount={current === 'projects'
         ? (currentTotal ?? projectsCount)
-        : (currentTotal ?? palettesCount)}
-      {starredCount}
+        : projectsCount}
+      palettesCount={current === 'palettes'
+        ? (currentTotal ?? palettesCount)
+        : palettesCount}
     />
-  {/if}
+
+    {#if __ACCOUNTS_ENABLED__}
+      <LibraryScope
+        {starred}
+        label={current === 'projects' ? 'Projects to show' : 'Palettes to show'}
+        mineHref={page.url.pathname}
+        starredHref={withScope(page.url.pathname, true)}
+        mineCount={current === 'projects'
+          ? (currentTotal ?? projectsCount)
+          : (currentTotal ?? palettesCount)}
+        {starredCount}
+      />
+    {/if}
+  </div>
 
   <section class="flex flex-col gap-2" aria-labelledby="library-list">
     <h2 id="library-list" class="sr-only">

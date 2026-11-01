@@ -64,7 +64,7 @@ RangesMenu's; Gauges & Ranges has every option. -->
   </p>
   <DocsShot
     src="choose-ranges/days-in-ranges"
-    alt="The Temperature Gauge with Ranges: Auto and View: List, and the sentence About the same number of high temperature days in each range. Each of ten colors shows its range, from 34° → 25° down to 7° → 1°, and its number of high, average and low days with their share of the blanket."
+    alt="The Temperature Gauge with Ranges: Auto and View, and the sentence About the same number of high temperature days in each range. Each of ten colors shows its range, from 34° → 25° down to 7° → 1°, and its number of high, average and low days with their share of the blanket."
     caption="Days in ranges, shown beside each color."
   />
 </section>

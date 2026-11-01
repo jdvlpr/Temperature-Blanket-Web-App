@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { BOTTOM_BAR } from '#lib/constants/class-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
@@ -596,11 +595,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <CloseButton onClose={dialog.close} />
                         {/if}
                       </header>
-                      {#if dialog.headerControl && !phone.current && !dialog.help}
-                        <div class="px-4 pb-2" in:fade={viewFade}>
-                          {@render dialog.headerControl()}
-                        </div>
-                      {/if}
                     {/if}
                   </div>
                 {/if}
@@ -632,17 +626,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if dialog.help}
                     <div in:fly={viewFly}>
                       <HelpView topic={dialog.help.topic} />
-                    </div>
-                  {/if}
-                  <!-- On phones the header's control sits at the bottom of the
-                  sheet instead, in thumb reach, always in view as the content
-                  scrolls behind it -->
-                  {#if dialog.headerControl && phone.current && !dialog.help}
-                    <div
-                      data-sticky-footer
-                      class={[BOTTOM_BAR, 'sticky bottom-0 z-20 mt-0!']}
-                    >
-                      {@render dialog.headerControl()}
                     </div>
                   {/if}
                 {:else if dialog.type === 'confirm'}

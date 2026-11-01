@@ -269,7 +269,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- Get Colors' Palette Gallery has its own -->
 {#if mode === 'page' && showScrollToTopButton && yarnPaletteGalleryState.projects.length}
   <ToTopButton
-    bottom="var(--bottom-bar-height, 0px)"
     onClick={() => {
       scrollContainer?.scrollIntoView({
         behavior: 'smooth',

@@ -17,8 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Mine | Starred on a My Library page, under Projects | Palettes: what's
   saved, or gallery pages starred to find again. A segmented control like
   CollectionNav, each side a link (`?show=starred`), with a count when known.
-  Always in the page, at the top, also on phones (where Projects | Palettes
-  sits in the bottom bar). In a dialog (Get Colors' My Palettes), with
+  Always in the page, at the top. In a dialog (Get Colors' My Palettes), with
   `onselect` instead of addresses, each side is a button.
 -->
 <script lang="ts">

@@ -40,6 +40,9 @@ Gallery (each with the toolbar its page has), or Gradients -->
 
   interface Props {
     source: PaletteSourceKind;
+    /** A project's gauge; on the Yarn page, a palette's colors replace the
+     * palette being made, which the dialog says */
+    inProject?: boolean;
     numberOfColors: number;
     /** `_paletteId`: one of My Palettes was chosen */
     updateGauge: (update: {
@@ -49,7 +52,12 @@ Gallery (each with the toolbar its page has), or Gradients -->
     }) => void;
   }
 
-  let { source, numberOfColors = $bindable(), updateGauge }: Props = $props();
+  let {
+    source,
+    inProject = false,
+    numberOfColors = $bindable(),
+    updateGauge,
+  }: Props = $props();
 
   let container: HTMLElement | undefined = $state();
   let top: HTMLElement | undefined = $state();
@@ -100,6 +108,16 @@ Gallery (each with the toolbar its page has), or Gradients -->
   class="flex w-full max-w-full flex-col px-2 pb-4 sm:min-h-[60svh] sm:w-[36rem] md:w-[44rem] lg:w-[62rem]"
   bind:this={container}
 >
+  {#if !inProject && source !== 'gradients'}
+    <p class="text-surface-700-300 px-2 pb-2 text-sm">
+      Choosing one replaces this palette's colors (Undo puts them back).
+      {#if source === 'saved'}
+        To edit a saved palette itself, use <span class="font-bold"
+          >Palette › Open…</span
+        >.
+      {/if}
+    </p>
+  {/if}
   {#if source === 'saved'}
     {#if signedIn}
       <div class="pb-2">

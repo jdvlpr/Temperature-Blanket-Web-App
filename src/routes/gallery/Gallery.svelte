@@ -343,7 +343,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if showScrollToTopButton && galleryState.projects.length}
   <ToTopButton
-    bottom="calc(1rem + var(--bottom-bar-height, 0px))"
+    bottom="1rem"
     onClick={() => {
       scrollContainer?.scrollIntoView({
         behavior: 'smooth',
