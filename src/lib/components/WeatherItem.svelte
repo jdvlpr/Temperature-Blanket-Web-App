@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex flex-col items-center justify-start p-2">
+<div class="flex flex-col items-center justify-start p-2 text-center">
   <div
     class={['flex', isRecentDate && '!bg-warning-500/20']}
     class:rounded-container={isRecentDate}
@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <RecentWeatherDataTooltip />
     {/if}
   </div>
-  <p class=" ml-1 text-sm">{label}</p>
+  <p class="text-sm">{label}</p>
   {@render button?.()}
   {@render date?.()}
   {@render details?.()}

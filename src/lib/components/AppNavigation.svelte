@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuItemClass,
     menuPositioning,
   } from '#lib/components/menu-styles.js';
-  import { SMALL_LINK, SMALL_LINKS } from '#lib/constants/class-constants.js';
+  import { SMALL_LINK } from '#lib/constants/class-constants.js';
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
@@ -84,6 +84,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
   };
   const SMALL_CURRENT = 'text-secondary-700-300 opacity-100!';
+  const SMALL_LIST = 'flex flex-col items-start px-3 text-sm';
+  // Lines as far apart as the list's, labels kept whole
+  const SMALL_ROW = 'flex flex-wrap gap-x-4 px-3 text-sm whitespace-nowrap';
 
   // After loading, so the server's page (which can't know) doesn't differ
   let mounted = $state(false);
@@ -131,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- Icons line up by what's drawn, with the site logo's edge -->
 <nav
   aria-label="Site"
-  class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-1 text-left lg:pr-2 lg:pl-3"
+  class="my-2 flex w-fit min-w-[278px] grow flex-col items-start justify-start gap-1 text-left lg:pr-2 lg:pl-3"
   data-sveltekit-preload-data="hover"
   {@attach alignIconInk}
 >
@@ -210,70 +213,78 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Supporters
   </a>
 
-  <!-- Small links, spaced apart in one row that wraps. It takes the
-  sidebar's width rather than setting it, or the sidebar would stretch to
-  fit every link on one line -->
-  <div class={[SMALL_LINKS, 'w-0 min-w-full px-3']}>
-    <a
-      href="/documentation"
-      class={['py-1', SMALL_LINK, docs && SMALL_CURRENT]}
-      aria-current={pathname === '/documentation' ? 'page' : undefined}
-      >Guides & Help</a
-    >
-    <a
-      href="/whats-new"
-      class={['py-1', SMALL_LINK, whatsNewPage && SMALL_CURRENT]}
-      aria-current={pathname === '/whats-new' ? 'page' : undefined}
-    >
-      What's New
-      <!-- A dot while there's news to see -->
-      {#if mounted && whatsNew.show}
-        <span
-          class="bg-primary-500 inline-block size-2 rounded-full align-middle"
-          aria-hidden="true"
-        ></span><span class="sr-only">, new</span>
-      {/if}
-    </a>
-    <a
-      href="/contact"
-      class={['py-1', SMALL_LINK, pathname === '/contact' && SMALL_CURRENT]}
-      aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a
-    >
-    <a
-      href="/privacy"
-      class={['py-1', SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
-      aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
-    >
-    <a
-      href="/preferences"
-      class={['py-1', SMALL_LINK, pathname === '/preferences' && SMALL_CURRENT]}
-      aria-current={pathname === '/preferences' ? 'page' : undefined}
-      >Preferences</a
-    >
-    <a href="/documentation/credits" class={['py-1', SMALL_LINK]}
-      >Data Sources & Credits</a
-    >
-    <a
-      href="/api/yarn-colorways"
-      class={[
-        'py-1',
-        SMALL_LINK,
-        pathname === '/api/yarn-colorways' && SMALL_CURRENT,
-      ]}
-      aria-current={pathname === '/api/yarn-colorways' ? 'page' : undefined}
-      >API</a
-    >
-    {#if PUBLIC_GITHUB_LINK}
+  <!-- Small links, kept to the bottom when the sidebar is taller than them:
+  help as a list, then about the site as a row that wraps. The row takes the
+  sidebar's width rather than setting it -->
+  <div class="mt-auto flex flex-col gap-1 self-stretch">
+    <div class={SMALL_LIST}>
       <a
-        href={PUBLIC_GITHUB_LINK}
-        class={['inline-flex items-center gap-1 py-1', SMALL_LINK]}
-        target="_blank"
-        rel="noopener"
+        href="/documentation"
+        class={['py-1', SMALL_LINK, docs && SMALL_CURRENT]}
+        aria-current={pathname === '/documentation' ? 'page' : undefined}
+        >Guides & Help</a
       >
-        GitHub
-        <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
-        <span class="sr-only">(opens in a new tab)</span>
+      <a
+        href="/whats-new"
+        class={['py-1', SMALL_LINK, whatsNewPage && SMALL_CURRENT]}
+        aria-current={pathname === '/whats-new' ? 'page' : undefined}
+      >
+        What's New
+        <!-- A dot while there's news to see -->
+        {#if mounted && whatsNew.show}
+          <span
+            class="bg-primary-500 inline-block size-2 rounded-full align-middle"
+            aria-hidden="true"
+          ></span><span class="sr-only">, new</span>
+        {/if}
       </a>
-    {/if}
+      <a
+        href="/contact"
+        class={['py-1', SMALL_LINK, pathname === '/contact' && SMALL_CURRENT]}
+        aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a
+      >
+      <a
+        href="/preferences"
+        class={[
+          'py-1',
+          SMALL_LINK,
+          pathname === '/preferences' && SMALL_CURRENT,
+        ]}
+        aria-current={pathname === '/preferences' ? 'page' : undefined}
+        >Preferences</a
+      >
+    </div>
+    <div class={[SMALL_ROW, 'mt-5 w-0 min-w-full']}>
+      <a href="/documentation/credits" class={['py-1', SMALL_LINK]}
+        >Data Sources & Credits</a
+      >
+      <a
+        href="/privacy"
+        class={['py-1', SMALL_LINK, pathname === '/privacy' && SMALL_CURRENT]}
+        aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
+      >
+      <a
+        href="/api/yarn-colorways"
+        class={[
+          'py-1',
+          SMALL_LINK,
+          pathname === '/api/yarn-colorways' && SMALL_CURRENT,
+        ]}
+        aria-current={pathname === '/api/yarn-colorways' ? 'page' : undefined}
+        >API</a
+      >
+      {#if PUBLIC_GITHUB_LINK}
+        <a
+          href={PUBLIC_GITHUB_LINK}
+          class={['inline-flex items-center gap-1 py-1', SMALL_LINK]}
+          target="_blank"
+          rel="noopener"
+        >
+          GitHub
+          <ExternalLinkIcon class="icon-sm" aria-hidden="true" />
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      {/if}
+    </div>
   </div>
 </nav>

@@ -74,7 +74,7 @@
           ]}
           id="{uid}-{index}"
         >
-          <td>
+          <td class={[showColorDetails.value && 'text-center']}>
             {#if isRecentDate}
               <RecentWeatherDataTooltip />
             {/if}
@@ -105,7 +105,10 @@
           </td>
           {#each weather.tableWeatherTargets as { id }}
             <td
-              class={[showColorDetails.value && !isFutureDate && 'px-2 pb-2']}
+              class={[
+                showColorDetails.value && 'text-center',
+                showColorDetails.value && !isFutureDate && 'px-2 pb-2',
+              ]}
               style={row.color[id] &&
               showColorDetails.value &&
               typeof row.color[id].index === 'number'

@@ -220,7 +220,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Dialog.Content
                 class="bg-surface-50 dark:bg-surface-950 relative h-screen w-fit -translate-x-full space-y-4 overflow-auto p-4 opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:-translate-x-full starting:data-[state=open]:opacity-0"
               >
-                <div class="mb-20 flex min-w-[265px] flex-col gap-2">
+                <div
+                  class="mb-20 flex min-h-[calc(100%-5rem)] min-w-[265px] flex-col gap-2"
+                >
                   <AppLogo viewTransition={false} />
                   <AppNavigation />
                 </div>
@@ -264,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="border-surface-200-800 hidden min-h-[calc(100dvh-var(--top-bar-height))] w-fit flex-col border-r lg:flex"
           transition:sidebarSlide
         >
-          <div class="mb-4 w-fit">
+          <div class="mb-4 flex w-fit grow flex-col">
             <AppNavigation />
           </div>
         </div>
