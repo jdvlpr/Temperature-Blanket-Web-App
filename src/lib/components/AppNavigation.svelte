@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
-  import { version } from '$app/env';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -227,18 +226,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-current={pathname === '/whats-new' ? 'page' : undefined}
     >
       What's New
-      <!-- Filled while there's news to see -->
-      <span
-        class={[
-          'badge px-2 py-0.5 text-xs font-normal',
-          mounted && whatsNew.show
-            ? 'preset-filled-primary-500'
-            : 'bg-surface-100-900',
-        ]}
-        >v{version}{#if mounted && whatsNew.show}<span class="sr-only"
-            >, new</span
-          >{/if}</span
-      >
+      <!-- A dot while there's news to see -->
+      {#if mounted && whatsNew.show}
+        <span
+          class="bg-primary-500 inline-block size-2 rounded-full align-middle"
+          aria-hidden="true"
+        ></span><span class="sr-only">, new</span>
+      {/if}
     </a>
     <a
       href="/contact"

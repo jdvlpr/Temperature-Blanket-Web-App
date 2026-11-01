@@ -14,8 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // Pointing out what's new in a major version, once, to people who used the
-// site before it: a line above each page (WhatsNewBanner) and a filled version
-// pill in the navigation, until dismissed or What's New is opened. Someone new
+// site before it: a line above each page (WhatsNewBanner) and a dot by What's New
+// in the navigation, until dismissed or What's New is opened. Someone new
 // to the site has nothing to catch up on, so it starts as seen for them.
 
 import { version } from '$app/env';
