@@ -15,7 +15,9 @@
 
 // A palette's colors as the site shows them (View › List or Grid): each a
 // numbered round swatch with its yarn, its range and, if asked for, its days.
-// With Fill with color, each row or card takes its color.
+// With Fill with color, each row or card takes its color. With Space between,
+// each is a card of its own; without, they meet in one block (on each page),
+// with a line between them unless they're filled.
 
 import {
   INK,
@@ -182,6 +184,76 @@ function drawSwatch(
   });
 }
 
+/** A card of its own (a grid's, or a list's with Space between) */
+function drawCard(
+  pdf: Pdf,
+  item: PaletteItem,
+  rect: { x: number; y: number; width: number; height: number },
+  filled: boolean,
+) {
+  const { doc } = pdf;
+  doc.setLineWidth(0.3);
+  // A pale color's card keeps an edge, so it doesn't vanish into the paper
+  doc.setDrawColor(
+    filled && inkOn(item.hex) === '#ffffff' ? item.hex : INK.line,
+  );
+  doc.setFillColor(filled ? item.hex : INK.card);
+  doc.roundedRect(
+    rect.x,
+    rect.y,
+    rect.width,
+    rect.height,
+    RADIUS,
+    RADIUS,
+    'FD',
+  );
+}
+
+/**
+ * Fills a row of a block, square, but taking the block's rounded corners
+ * where it's the block's first or last row on the page: the fill is clipped
+ * to the outline, reaching past it where the block goes on.
+ */
+function fillBlockRow(
+  pdf: Pdf,
+  rect: { x: number; y: number; width: number; height: number },
+  { first, last }: { first: boolean; last: boolean },
+  fill: (doc: Pdf['doc']) => void,
+) {
+  const { doc } = pdf;
+  const reach = RADIUS * 2;
+  const clipTop = first ? rect.y : rect.y - reach;
+  const clipBottom = last ? rect.y + rect.height : rect.y + rect.height + reach;
+  doc.saveGraphicsState();
+  doc.roundedRect(
+    rect.x,
+    clipTop,
+    rect.width,
+    clipBottom - clipTop,
+    RADIUS,
+    RADIUS,
+    null,
+  );
+  doc.clip();
+  doc.discardPath();
+  fill(doc);
+  doc.restoreGraphicsState();
+}
+
+/** A block's outline, from `top` to `bottom` on this page */
+function outlineBlock(
+  pdf: Pdf,
+  left: number,
+  width: number,
+  top: number,
+  bottom: number,
+) {
+  if (bottom <= top) return;
+  pdf.doc.setDrawColor(INK.line);
+  pdf.doc.setLineWidth(0.3);
+  pdf.doc.roundedRect(left, top, width, bottom - top, RADIUS, RADIUS, 'S');
+}
+
 /** One day cell: "High", "20 days", "5.5%" */
 function dayLines(day: NonNullable<PaletteItem['days']>[number]) {
   return [
@@ -191,7 +263,13 @@ function dayLines(day: NonNullable<PaletteItem['days']>[number]) {
   ];
 }
 
-function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
+function drawList(
+  pdf: Pdf,
+  flow: Flow,
+  items: PaletteItem[],
+  filled: boolean,
+  spaced: boolean,
+) {
   const { doc } = pdf;
   const { left, width } = flow.box;
   const dayCount = items[0]?.days?.length ?? 0;
@@ -212,18 +290,7 @@ function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
 
   let chunkTop = flow.y;
   const closeChunk = () => {
-    if (flow.y <= chunkTop) return;
-    doc.setDrawColor(INK.line);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(
-      left,
-      chunkTop,
-      width,
-      flow.y - chunkTop,
-      RADIUS,
-      RADIUS,
-      'S',
-    );
+    if (!spaced) outlineBlock(pdf, left, width, chunkTop, flow.y);
   };
 
   // Every row measured first, so a row knows if it's the last on its page
@@ -261,34 +328,24 @@ function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
     const top = flow.y;
     const ink = colorsFor(item, filled);
 
-    if (filled) {
-      // The list's first and last rows on a page take its rounded corners:
-      // the fill is clipped to the outline, reaching past it where the row
-      // goes on, so only the list's own ends are rounded
-      const first = top === chunkTop;
-      const last =
-        index === items.length - 1 || breaksBefore(index + 1, top + height);
-      const reach = RADIUS * 2;
-      const clipTop = first ? top : top - reach;
-      const clipBottom = last ? top + height : top + height + reach;
-      doc.saveGraphicsState();
-      doc.roundedRect(
-        left,
-        clipTop,
-        width,
-        clipBottom - clipTop,
-        RADIUS,
-        RADIUS,
-        null,
+    if (spaced) drawCard(pdf, item, { x: left, y: top, width, height }, filled);
+    else if (filled)
+      // Only the list's own ends are rounded
+      fillBlockRow(
+        pdf,
+        { x: left, y: top, width, height },
+        {
+          first: top === chunkTop,
+          last:
+            index === items.length - 1 || breaksBefore(index + 1, top + height),
+        },
+        (d) => {
+          d.setFillColor(item.hex);
+          d.rect(left, top, width, height, 'F');
+        },
       );
-      doc.clip();
-      doc.discardPath();
-      doc.setFillColor(item.hex);
-      doc.rect(left, top, width, height, 'F');
-      doc.restoreGraphicsState();
-    }
     // A line between rows, as the site's list has
-    if (index > 0 && top > chunkTop) {
+    if (!spaced && index > 0 && top > chunkTop) {
       doc.setDrawColor(INK.line);
       doc.setLineWidth(0.3);
       doc.line(left, top, left + width, top);
@@ -326,20 +383,36 @@ function drawList(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
     });
 
     flow.y = top + height;
+    if (spaced && index < items.length - 1) flow.y += GRID_GAP;
   });
   closeChunk();
 }
 
-function drawGrid(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
+function drawGrid(
+  pdf: Pdf,
+  flow: Flow,
+  items: PaletteItem[],
+  filled: boolean,
+  spaced: boolean,
+) {
   const { doc } = pdf;
   // A filled card without a number has nothing to show at the top
   const swatchSpace = (item: PaletteItem) =>
     filled && item.number === undefined ? 0 : SWATCH_R * 2 + 2.5;
-  const cells = gridCells(flow.box.left, flow.box.width);
+  const { left, width } = flow.box;
+  const cells = gridCells(left, width, spaced ? GRID_GAP : 0);
   const pad = PAD + 0.5;
+  // Without space between, the rows on a page are one block
+  let chunkTop = flow.y;
+  const breaksBefore = (height: number, y: number) =>
+    height > flow.box.bottom - y && y > flow.box.top;
 
-  for (let start = 0; start < items.length; start += cells.length) {
-    const row = items.slice(start, start + cells.length);
+  // Every row measured first, so a row knows if it's the last on its page
+  const rows: ReturnType<typeof layRow>[] = [];
+  for (let start = 0; start < items.length; start += cells.length)
+    rows.push(layRow(items.slice(start, start + cells.length)));
+
+  function layRow(row: PaletteItem[]) {
     const laid = row.map((item, i) => {
       const inner = cells[i].width - pad * 2;
       const blocks = yarnBlocks(pdf, item, inner);
@@ -359,19 +432,56 @@ function drawGrid(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
         pad;
       return { item, cell: cells[i], inner, blocks, rangeHeight, height };
     });
-    const rowHeight = Math.max(...laid.map((l) => l.height));
-    flow.ensure(rowHeight);
+    return { laid, rowHeight: Math.max(...laid.map((l) => l.height)) };
+  }
+
+  rows.forEach(({ laid, rowHeight }, r) => {
+    if (spaced) flow.ensure(rowHeight);
+    else if (breaksBefore(rowHeight, flow.y)) {
+      outlineBlock(pdf, left, width, chunkTop, flow.y);
+      flow.newPage();
+      chunkTop = flow.y;
+    }
     const top = flow.y;
+
+    if (!spaced) {
+      const next = rows[r + 1];
+      const last = !next || breaksBefore(next.rowHeight, top + rowHeight);
+      fillBlockRow(
+        pdf,
+        { x: left, y: top, width, height: rowHeight },
+        { first: top === chunkTop, last },
+        (d) => {
+          d.setFillColor(INK.card);
+          d.rect(left, top, width, rowHeight, 'F');
+          if (filled)
+            laid.forEach(({ item, cell }) => {
+              d.setFillColor(item.hex);
+              d.rect(cell.x, top, cell.width, rowHeight, 'F');
+            });
+        },
+      );
+      // Unfilled, a line between cards and between rows, as the site's has
+      // (and after a short last row's last card)
+      if (!filled) {
+        doc.setDrawColor(INK.line);
+        doc.setLineWidth(0.3);
+        const ends = Math.min(laid.length + 1, cells.length);
+        for (let i = 1; i < ends; i++)
+          doc.line(cells[i].x, top, cells[i].x, top + rowHeight);
+        if (top > chunkTop) doc.line(left, top, left + width, top);
+      }
+    }
 
     for (const { item, cell, inner, blocks, rangeHeight } of laid) {
       const ink = colorsFor(item, filled);
-      doc.setLineWidth(0.3);
-      // A pale color's card keeps an edge, so it doesn't vanish into the paper
-      doc.setDrawColor(
-        filled && inkOn(item.hex) === '#ffffff' ? item.hex : INK.line,
-      );
-      doc.setFillColor(filled ? item.hex : INK.card);
-      doc.roundedRect(cell.x, top, cell.width, rowHeight, RADIUS, RADIUS, 'FD');
+      if (spaced)
+        drawCard(
+          pdf,
+          item,
+          { x: cell.x, y: top, width: cell.width, height: rowHeight },
+          filled,
+        );
 
       const x = cell.x + pad;
       if (swatchSpace(item))
@@ -411,19 +521,24 @@ function drawGrid(pdf: Pdf, flow: Flow, items: PaletteItem[], filled: boolean) {
         dayY += lineHeight(SIZE.small);
       }
     }
-    flow.y = top + rowHeight + GRID_GAP;
-  }
+    flow.y = top + rowHeight + (spaced ? GRID_GAP : 0);
+  });
+  if (!spaced) outlineBlock(pdf, left, width, chunkTop, flow.y);
 }
 
 export function drawPalette(
   pdf: Pdf,
   flow: Flow,
   items: PaletteItem[],
-  { layout, filled }: { layout: PdfLayout; filled: boolean },
+  {
+    layout,
+    filled,
+    spaced,
+  }: { layout: PdfLayout; filled: boolean; spaced: boolean },
 ) {
   if (!items.length) return;
-  if (layout === 'grid') drawGrid(pdf, flow, items, filled);
-  else drawList(pdf, flow, items, filled);
+  if (layout === 'grid') drawGrid(pdf, flow, items, filled, spaced);
+  else drawList(pdf, flow, items, filled, spaced);
 }
 
 const STRIP_HEIGHT = 3.5;

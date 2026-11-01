@@ -223,8 +223,7 @@ here. -->
       <span class="font-bold">PDF</span>.
     </li>
     <li>
-      Press <span class="font-bold">Customize</span> to choose what's in it,
-      then
+      Choose what's in it, beside a preview of its pages, then press
       <span class="font-bold">Download</span>.
     </li>
   </ol>

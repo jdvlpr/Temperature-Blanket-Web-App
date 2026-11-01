@@ -17,7 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Whether a list shows as a grid or as rows, as a menu styled like the Sort
   menu it often sits beside. The button names the view and shows its icon.
   With `fillOption`, it also has Fill with color, which fills each card or row
-  with its yarn's color everywhere it's offered.
+  with its yarn's color everywhere it's offered, and Space between, whether
+  they sit apart or meet in one block (kept for each layout; see item-spacing).
 -->
 <script lang="ts">
   import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
@@ -27,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuItemClass,
     menuTriggerClass,
   } from '#lib/components/menu-styles.js';
+  import { setSpaced, spaced } from '#lib/components/item-spacing.js';
   import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
   import type { PageLayout } from '#lib/types/page-types.js';
   import {
@@ -35,6 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LayoutGridIcon,
     LayoutListIcon,
     PaintBucketIcon,
+    SeparatorHorizontalIcon,
+    SeparatorVerticalIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import type { Snippet } from 'svelte';
@@ -46,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     children,
   }: {
     value: PageLayout;
-    /** Offer Fill with color (one setting, shared by every list that offers it) */
+    /** Offer Fill with color and Space between (each one setting, shared by every list that offers it) */
     fillOption?: boolean;
     /** Just the view's name on phones ("View:" is still read out) */
     compact?: boolean;
@@ -61,6 +65,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let current = $derived(
     views.find((view) => view.value === value) ?? views[0],
   );
+
+  let isSpaced = $derived(spaced(current.value));
 </script>
 
 <Menu positioning={menuPositioning('bottom-start')}>
@@ -113,6 +119,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             </span>
             <MenuCheckbox checked={fillWithColor.on} />
+          </Menu.OptionItem>
+          <!-- For the layout shown: a grid and a list each keep their own -->
+          <Menu.OptionItem
+            type="checkbox"
+            value="spaced"
+            checked={isSpaced}
+            closeOnSelect={false}
+            onCheckedChange={(checked) => setSpaced(current.value, checked)}
+            class={menuItemClass}
+          >
+            <span
+              class="flex min-w-0 flex-1 items-center justify-start gap-2 text-left"
+            >
+              {#if current.value === 'grid'}
+                <SeparatorVerticalIcon class="shrink-0" />
+              {:else}
+                <SeparatorHorizontalIcon class="shrink-0" />
+              {/if}
+              <div class="flex min-w-0 flex-col text-left">
+                <span>Space between</span>
+                <span class="text-surface-700-300 text-xs"
+                  >Gaps between {current.value === 'grid'
+                    ? 'cards'
+                    : 'rows'}</span
+                >
+              </div>
+            </span>
+            <MenuCheckbox checked={isSpaced} />
           </Menu.OptionItem>
         {/if}
         {@render children?.()}

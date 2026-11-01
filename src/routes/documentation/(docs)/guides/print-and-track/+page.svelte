@@ -37,21 +37,21 @@ spreadsheet. -->
       <span class="font-bold">PDF</span>.
     </li>
     <li>
-      Press <span class="font-bold">Customize</span>. Under
-      <span class="font-bold">Include</span>, keep
+      Under <span class="font-bold">Include</span>, keep
       <span class="font-bold">Weather data</span> on: it's a table of every day, each
       value in the color of its yarn.
     </li>
     <li>
       Under <span class="font-bold">Look</span>, choose
-      <span class="font-bold">Page Size</span> (US Letter or A4).
+      <span class="font-bold">Page Size</span> (US Letter or A4). The pages on the
+      left show what you'll print.
     </li>
     <li>Press <span class="font-bold">Download</span>, and print it.</li>
   </ol>
   <DocsShot
     src="download/pdf-options"
-    alt="The Download PDF panel: Your PDF will have a summary page, the Temperature Gauge's colors and ranges as a list with days in each range, a weather table of high, average and low temperatures, on US Letter paper. Customize is open, with the Include and Look options, then Cancel and Download."
-    caption="Download PDF, with Customize open."
+    alt="The Download PDF dialog: a preview of the PDF's pages on the left, starting with the summary page, and on the right the Include and Look options, then Cancel and Download."
+    caption="Download PDF: its pages beside your choices."
   />
   <p>
     To save paper, list only the weather your preview uses, like just the high

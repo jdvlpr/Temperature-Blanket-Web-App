@@ -177,6 +177,7 @@ export async function createPdf({
     drawPalette(pdf, flow, gaugeItems(gauge, settings), {
       layout: settings.layout,
       filled: settings.fill,
+      spaced: settings.spaced,
     });
   }
 
@@ -193,7 +194,11 @@ export async function createPdf({
         ...yarnFields(color, settings),
         role: label,
       })),
-      { layout: settings.layout, filled: settings.fill },
+      {
+        layout: settings.layout,
+        filled: settings.fill,
+        spaced: settings.spaced,
+      },
     );
   }
 

@@ -25,6 +25,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   With `selection`, each row (but its ⋮ menu) is one toggle button, led by a
   circle that's checked when it's selected.
+
+  With View › Space between on, each row is its own card, apart from the next.
 -->
 <script lang="ts">
   import { ROW_FOCUS } from '#lib/constants/class-constants.js';
@@ -38,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     swatchClass,
     type ColorwaySelection,
   } from './colorway-utils';
+  import { spaced } from '#lib/components/item-spacing.js';
   import { fillFromSwatch, fillWithColor, mutedText } from './fill-with-color';
 
   interface Props {
@@ -48,6 +51,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { colorways, selection }: Props = $props();
 
   let filled = $derived(fillWithColor.on);
+  let isSpaced = $derived(spaced('list'));
+  // Apart, each row is a card, rounded and bordered on its own (its
+  // background is added only where a selected row's tint isn't)
+  let rowClass = $derived(isSpaced ? 'card border-surface-200-800 border' : '');
 </script>
 
 {#snippet fillLayer(colorway: Color)}
@@ -98,11 +105,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if match !== undefined}{@render matchPill(match, 'hidden @md:inline')}{/if}
 {/snippet}
 
-<!-- The end rows round like the list, and so do their toggle buttons on the
-side they meet it, so a focused row's ring follows the list's corners (not
-the ⋮ button, also right in the row) -->
+<!-- Together, the end rows round like the list, and so do their toggle
+buttons on the side they meet it, so a focused row's ring follows the list's
+corners (not the ⋮ button, also right in the row). Apart, every row (and its
+toggle button) rounds like a card. -->
 <ul
-  class="rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 [&>li:first-child]:rounded-t-container [&>li:first-child>[data-row-toggle]]:rounded-tl-container [&>li:last-child]:rounded-b-container [&>li:last-child>[data-row-toggle]]:rounded-bl-container @container w-full divide-y overflow-hidden border"
+  class="@container w-full {isSpaced
+    ? '[&>li>[data-row-toggle]]:rounded-l-container flex flex-col gap-2'
+    : 'rounded-container border-surface-200-800 bg-surface-50-950 divide-surface-200-800 [&>li:first-child]:rounded-t-container [&>li:first-child>[data-row-toggle]]:rounded-tl-container [&>li:last-child]:rounded-b-container [&>li:last-child>[data-row-toggle]]:rounded-bl-container divide-y overflow-hidden border'}"
 >
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}
@@ -110,11 +120,11 @@ the ⋮ button, also right in the row) -->
       <!-- Selected on a color: an outline in the text's color, which
       stands out on any yarn -->
       <li
-        class="relative isolate flex items-center gap-1 overflow-hidden pr-2 {selected
+        class="{rowClass} relative isolate flex items-center gap-1 overflow-hidden pr-2 {selected
           ? filled
             ? 'outline-2 -outline-offset-4 outline-current'
             : 'bg-primary-500/15'
-          : ''}"
+          : ''} {isSpaced && !(selected && !filled) ? 'bg-surface-50-950' : ''}"
         style:color={filled ? iconColorOn(colorway.hex) : undefined}
         data-fillable
         data-filled={filled || undefined}
@@ -144,7 +154,9 @@ the ⋮ button, also right in the row) -->
       </li>
     {:else}
       <li
-        class="relative isolate flex items-center gap-3 overflow-hidden p-2"
+        class="{rowClass} relative isolate flex items-center gap-3 overflow-hidden p-2 {isSpaced
+          ? 'bg-surface-50-950'
+          : ''}"
         style:color={filled ? iconColorOn(colorway.hex) : undefined}
         data-fillable
         data-filled={filled || undefined}

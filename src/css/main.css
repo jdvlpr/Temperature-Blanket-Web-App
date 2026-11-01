@@ -386,6 +386,52 @@ itself animates from script, only when the option changes. */
   }
 }
 
+/* View › Space between off, in a grid (item-spacing.ts): the cards meet in
+   one block, square, with a hairline between them, and only the block's own
+   corners round (with Fill with color, no hairlines). Each card draws its right and bottom hairline on top of
+   itself (its ::after, over its fill and its neighbor's background, which
+   would cover a shadow), and the block's outline is drawn over the cards, so
+   the hairlines on its outer edge fall on it, however many columns there
+   are, and a short last row just ends. The cards themselves take no card or
+   border class. In layer components, so a selected card's ring (a utility)
+   still shows. */
+@layer components {
+  .joined-grid {
+    --joined-line: var(--color-surface-200-800);
+    position: relative;
+    gap: 0;
+    overflow: hidden;
+    border-radius: var(--radius-container);
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border: 1px solid var(--joined-line);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    & > *::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow:
+        inset -1px 0 0 0 var(--joined-line),
+        inset 0 -1px 0 0 var(--joined-line);
+      pointer-events: none;
+    }
+    /* Filled, the colors meet with nothing between them */
+    & > [data-filled]::after {
+      content: none;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .joined-grid {
+      --joined-line: var(--color-surface-500);
+    }
+  }
+}
+
 @keyframes history-flash {
   0%,
   35% {

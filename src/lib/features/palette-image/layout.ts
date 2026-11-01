@@ -50,6 +50,8 @@ export type PaletteImageSettings = {
   /** Each color fills its cell, as View › Fill with color does; otherwise
    * it's a round swatch beside its text */
   fill: boolean;
+  /** Space between the colors, or one block; starts as View › Space between
+   * has it for the layout, each time */
   gaps: boolean;
   /** The palette's title across the top */
   title: boolean;

@@ -28,6 +28,9 @@ export type PdfSettings = {
   layout: PdfLayout;
   /** Each color's card or row takes its color; starts as View › Fill with color */
   fill: boolean;
+  /** Cards or rows apart, or meeting in one block; starts as View › Space
+   * between has it for the layout */
+  spaced: boolean;
   /** Days (or weeks) in each range; starts as View › Days in ranges */
   showDaysInRange: boolean;
   /** Each color's HTML color code */
@@ -44,7 +47,7 @@ export type PdfSettings = {
 /** What's remembered for next time: the rest starts as the View menu has it */
 export type SavedPdfSettings = Omit<
   PdfSettings,
-  'layout' | 'fill' | 'showDaysInRange'
+  'layout' | 'fill' | 'spaced' | 'showDaysInRange'
 >;
 
 /** Where paper is mostly Letter size; A4 everywhere else */

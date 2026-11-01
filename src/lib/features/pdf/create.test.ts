@@ -227,6 +227,7 @@ beforeAll(() => {
 const base: PdfSettings = {
   layout: 'list',
   fill: false,
+  spaced: false,
   showDaysInRange: true,
   hex: true,
   pageSize: 'letter',
@@ -238,8 +239,15 @@ const base: PdfSettings = {
 describe('createPdf', () => {
   const cases: [string, Partial<PdfSettings>][] = [
     ['list-letter', {}],
-    ['grid-a4-fill', { layout: 'grid', fill: true, pageSize: 'a4' }],
-    ['grid-letter', { layout: 'grid' }],
+    [
+      'grid-a4-fill',
+      { layout: 'grid', spaced: true, fill: true, pageSize: 'a4' },
+    ],
+    ['grid-letter', { layout: 'grid', spaced: true }],
+    ['grid-joined', { layout: 'grid' }],
+    ['grid-joined-fill', { layout: 'grid', fill: true }],
+    ['list-spaced', { spaced: true }],
+    ['list-spaced-fill', { spaced: true, fill: true }],
     [
       'all-columns',
       {

@@ -107,15 +107,16 @@ export const gridColumns = (width: number) => (width >= 150 ? 3 : 2);
 
 export const GRID_GAP = 3;
 
-/** Each card's x and width in a grid row */
+/** Each card's x and width in a grid row (no gap: cards that meet) */
 export function gridCells(
   left: number,
   width: number,
+  gap = GRID_GAP,
 ): { x: number; width: number }[] {
   const columns = gridColumns(width);
-  const cellWidth = (width - GRID_GAP * (columns - 1)) / columns;
+  const cellWidth = (width - gap * (columns - 1)) / columns;
   return Array.from({ length: columns }, (_, i) => ({
-    x: left + i * (cellWidth + GRID_GAP),
+    x: left + i * (cellWidth + gap),
     width: cellWidth,
   }));
 }

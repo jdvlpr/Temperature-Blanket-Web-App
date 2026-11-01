@@ -37,14 +37,16 @@ type LocalStatePreferencesType = {
   };
   units: Unit | null;
   /** The palette image export's last settings; missing until first changed */
-  /** The export's last choices; its layout always starts as the View menu's */
-  paletteImage?: Omit<PaletteImageSettings, 'layout'>;
+  /** The export's last choices; its layout and space between always start as the View menu's */
+  paletteImage?: Omit<PaletteImageSettings, 'layout' | 'gaps'>;
   /** Motion settings; missing until first changed */
   effects?: EffectsPreferences;
   /** The yarn chosen first where none is, as `{brandId}-{yarnId}`; missing or `''` for none */
   defaultYarn?: string;
   /** View › Fill with color: colorway cards and rows, and palette colors, take their yarn's color; missing until first changed (off) */
   fillColor?: boolean;
+  /** View › Space between items, for each layout: cards or rows apart (`true`) or meeting in one block; missing until first changed (apart in a grid, meeting in a list) */
+  itemSpacing?: Partial<Record<PageLayout, boolean>>;
   /** The PDF's last choices; its layout, fill and days start as the View menu's; missing until first downloaded */
   pdf?: SavedPdfSettings;
   /**

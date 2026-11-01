@@ -35,6 +35,7 @@
     "idb-keyval": "^6.2.6",
     "jspdf": "^4.2.1",
     "node-fetch": "^3.3.2",
+    "pdfjs-dist": "6.4.299",
     "suncalc": "^2.0.0",
     "three": "0.183.2"
   },

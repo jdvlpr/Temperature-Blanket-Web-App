@@ -34,8 +34,8 @@ single page's (OLD_ANCHORS). -->
     PDF
   </h2>
   <p>
-    Your pattern, ready to print. Choose what goes in it under
-    <span class="font-bold">Include</span>:
+    Your pattern, ready to print. Its pages show on the left, and change as you
+    choose what goes in it under <span class="font-bold">Include</span>:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -59,6 +59,7 @@ single page's (OLD_ANCHORS). -->
       <span class="font-bold">List</span>
       (a row for each color) or a <span class="font-bold">Grid</span> (a card
       for each), with <span class="font-bold">Fill with color</span>,
+      <span class="font-bold">Space between colors</span>,
       <span class="font-bold">Days in ranges</span> and
       <span class="font-bold">HTML color codes</span> if you want them.
     </li>
@@ -67,15 +68,13 @@ single page's (OLD_ANCHORS). -->
     </li>
   </ul>
   <p>
-    <span class="font-bold">Your PDF will have</span> sums up your choices.
-    Press
-    <span class="font-bold">Download</span>. Your choices are remembered for
-    next time.
+    Press <span class="font-bold">Download</span>. Your choices are remembered
+    for next time.
   </p>
   <DocsShot
     src="download/pdf-options"
-    alt="The Download PDF panel: Your PDF will have a summary page, the Temperature Gauge's colors and ranges as a list with days in each range, a weather table of high, average and low temperatures, on US Letter paper. Customize is open, with the Include and Look options, then Cancel and Download."
-    caption="Download PDF, with Customize open."
+    alt="The Download PDF dialog: a preview of the PDF's pages on the left, starting with the summary page, and on the right the Include and Look options, then Cancel and Download."
+    caption="Download PDF: its pages beside your choices."
   />
 </section>
 

@@ -176,6 +176,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isLoaded = true;
   }
 
+  /** The sort when none is chosen: best match during a color search,
+   * otherwise by yarn */
+  const finderDefaultSort = (hasColor: boolean): ColorwaySort =>
+    hasColor ? defaultColorwaySort(true) : 'by-yarn';
+
   function getShareableURL({
     selectedBrandId,
     selectedYarnId,
@@ -208,7 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (hex) params.c = hex.includes('#') ? hex.substring(1) : hex;
     if (search) params.n = search;
-    if (sort && sort !== defaultColorwaySort(!!hex)) params.s = sort;
+    if (sort && sort !== finderDefaultSort(!!hex)) params.s = sort;
     if (reversed) params.r = '1';
 
     if (params.f || params.fw || params.c || params.n || params.s || params.r) {
@@ -274,9 +279,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let sort = $derived(
     yarnColorwayFinderState.sort === 'best-match' &&
       !yarnColorwayFinderState.hex
-      ? defaultColorwaySort(false)
+      ? finderDefaultSort(false)
       : (yarnColorwayFinderState.sort ??
-          defaultColorwaySort(!!yarnColorwayFinderState.hex)),
+          finderDefaultSort(!!yarnColorwayFinderState.hex)),
   );
 
   /** Sorted once per search and sort, so Show More only adds to the end */

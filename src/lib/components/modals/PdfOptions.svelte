@@ -13,18 +13,23 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- What to put in the PDF and how it looks, then download it. Opened by
-downloadPDF; its title is in the dialog's header. Layout, Fill with color and
-Days in ranges start as the View menu has them; the rest is remembered. -->
+<!-- What to put in the PDF and how it looks, beside a preview of its pages,
+then download it. Laid out as the palette image's export: the preview (every
+page, scrolling, drawn again a moment after each change), then the settings.
+Opened by downloadPDF; its title is in the dialog's header. Layout, Fill with
+color, Space between and Days in ranges start as the View menu has them; the
+rest is remembered. -->
 
 <script lang="ts">
   import { FIELD_ICON } from '#lib/constants/class-constants.js';
+  import { spaced } from '#lib/components/item-spacing.js';
   import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
   import {
     DEFAULT_PDF_SETTINGS,
     defaultPageSize,
     type PdfSettings,
   } from '#lib/features/pdf/options.js';
+  import type { PreviewPage } from '#lib/features/pdf/preview.js';
   import {
     allGaugesAttributes,
     gauges,
@@ -35,15 +40,13 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { ProjectStorage } from '#lib/storage/projects.svelte.js';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import {
-    ChevronDownIcon,
     FileTextIcon,
     LayoutGridIcon,
     LayoutListIcon,
     DownloadIcon,
+    LoaderCircleIcon,
   } from '@lucide/svelte';
   import { onMount, type Component } from 'svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
@@ -58,6 +61,7 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
     // As the View menu has them, each time
     layout: preferences.value.layout,
     fill: fillWithColor.on,
+    spaced: spaced(preferences.value.layout),
     showDaysInRange: showDaysInRange.value,
   });
   let gaugeIds = $state(gauges.allCreated.map((gauge) => gauge.id));
@@ -76,41 +80,12 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
       !settings.weatherDataParams.length,
   );
 
-  // The PDF's pages in a few words, as they're chosen
-  let contents = $derived.by(() => {
-    const lines: string[] = [];
-    if (settings.summary)
-      lines.push('A summary page with your project and its preview');
-    const chosen = gauges.allCreated.filter((g) => gaugeIds.includes(g.id));
-    if (chosen.length) {
-      const names = chosen.map((g) => g.label).join(' and ');
-      const extras =
-        settings.showDaysInRange && weather.data.length
-          ? `, with ${weather.grouping}s in each range`
-          : '';
-      lines.push(
-        `${names} colors and ranges, as a ${settings.layout === 'grid' ? 'grid of cards' : 'list'}${extras}`,
-      );
-    }
-    if (hasExtras && settings.additionalColors)
-      lines.push("The preview's border and accent colors");
-    const columns = allGaugesAttributes
-      .flatMap((gauge) => gauge.targets)
-      .filter((target) => settings.weatherDataParams.includes(target.id))
-      .map((target) => target.label);
-    if (columns.length) lines.push(`A weather table: ${columns.join(', ')}`);
-    if (lines.length)
-      lines.push(
-        `On ${settings.pageSize === 'letter' ? 'US Letter' : 'A4'} paper`,
-      );
-    return lines;
-  });
-
   /** Remember the choices for next time (but not those the View menu sets) */
   function remember() {
     const {
       layout: _layout,
       fill: _fill,
+      spaced: _spaced,
       showDaysInRange: _days,
       ...rest
     } = $state.snapshot(settings);
@@ -132,6 +107,66 @@ Days in ranges start as the View menu has them; the rest is remembered. -->
       toast.trigger({ message: 'Unable to create the PDF', category: 'error' });
     }
   }
+
+  // The preview: the pages shown stay until the next ones are ready, so it
+  // doesn't flash empty while it's drawn again
+  /** How wide pages are drawn, in CSS pixels; they shrink to fit */
+  const PAGE_WIDTH = 640;
+  /** A pause after a change, so a few quick changes draw once */
+  const DELAY = 400;
+  let pages = $state.raw<PreviewPage[]>([]);
+  let updating = $state(true);
+  let failed = $state(false);
+  let previewId = 0;
+
+  onMount(() => () => {
+    previewId++;
+    import('#lib/features/pdf/preview.js').then(({ revokePages }) =>
+      revokePages(pages),
+    );
+  });
+
+  $effect(() => {
+    const chosen = {
+      settings: $state.snapshot(settings),
+      gaugeIds: $state.snapshot(gaugeIds),
+      name,
+    };
+    if (isEmpty) {
+      previewId++;
+      updating = false;
+      return;
+    }
+    const id = ++previewId;
+    updating = true;
+    const timer = setTimeout(async () => {
+      try {
+        const [{ createPdf }, { renderPages, revokePages }] = await Promise.all(
+          [
+            import('#lib/features/pdf/create.js'),
+            import('#lib/features/pdf/preview.js'),
+          ],
+        );
+        const doc = await createPdf({ ...chosen, download: false });
+        if (id !== previewId) return;
+        const next = await renderPages(
+          doc.output('arraybuffer'),
+          PAGE_WIDTH,
+          () => id !== previewId,
+        );
+        if (!next) return;
+        revokePages(pages);
+        pages = next;
+        failed = false;
+      } catch (e) {
+        if (id !== previewId) return;
+        console.warn("Can't preview the PDF", { e });
+        failed = true;
+      }
+      updating = false;
+    }, DELAY);
+    return () => clearTimeout(timer);
+  });
 
   type Choice = {
     value: string;
@@ -229,151 +264,169 @@ choice's icon beside it, and what it's for below -->
   </label>
 {/snippet}
 
-{#snippet indicator()}
-  <Accordion.ItemIndicator>
-    <ChevronDownIcon
-      class="icon-sm transition group-data-[state=open]:rotate-180"
-    />
-  </Accordion.ItemIndicator>
-{/snippet}
-
-<div class="flex flex-col gap-4 px-4 pt-2">
-  <!-- What the PDF will have, in a few words, so the defaults can just be downloaded -->
-  <div class="flex flex-col gap-1">
-    <p class="font-bold">Your PDF will have</p>
-    {#if contents.length}
-      <ul class="flex list-disc flex-col gap-0.5 pl-5">
-        {#each contents as line (line)}
-          <li>{line}</li>
-        {/each}
-      </ul>
-    {:else}
-      <p class="text-surface-700-300">
-        Nothing yet: choose something to include under Customize.
-      </p>
-    {/if}
-  </div>
-
-  <Accordion collapsible>
-    <Accordion.Item value="customize" class="group gap-0">
-      <h3>
-        <Accordion.ItemTrigger
-          class="flex items-center justify-between font-bold"
+<div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
+  <div class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row">
+    <section
+      class="bg-surface-100 dark:bg-surface-900 rounded-container relative min-h-0 min-w-0 flex-1 overflow-y-auto p-4 shadow-inner max-lg:h-[45svh]"
+      aria-label="Preview"
+      aria-busy={updating}
+    >
+      {#if isEmpty}
+        <p
+          class="text-surface-700-300 flex h-full items-center justify-center text-center"
         >
-          Customize
-          {@render indicator()}
-        </Accordion.ItemTrigger>
-      </h3>
-      <Accordion.ItemContent>
-        {#snippet element(attributes)}
-          {#if !attributes.hidden}
-            <div
-              {...attributes}
-              transition:safeSlide
-              class="flex flex-col gap-5 pt-2"
-            >
-              <!-- What's in it -->
-              <div class="flex flex-col gap-2">
-                <p class="font-bold">Include</p>
-                {@render check(
-                  'Summary page',
-                  'Project, places and dates, and preview',
-                  settings.summary,
-                  (checked) => (settings.summary = checked),
-                )}
-                {#each gauges.allCreated as { id, label } (id)}
-                  {@render check(
-                    label,
-                    'Colors and ranges',
-                    gaugeIds.includes(id),
-                    (checked) =>
-                      (gaugeIds = checked
-                        ? gauges.allCreated
-                            .map((gauge) => gauge.id)
-                            .filter((g) => g === id || gaugeIds.includes(g))
-                        : gaugeIds.filter((g) => g !== id)),
-                  )}
-                {/each}
-                {#if hasExtras}
-                  {@render check(
-                    'Additional colors',
-                    "The preview's border and accent colors",
-                    settings.additionalColors,
-                    (checked) => (settings.additionalColors = checked),
-                  )}
-                {/if}
-                <fieldset class="flex flex-col gap-1">
-                  <legend class="mb-1">
-                    Weather data
-                    <span class="text-surface-700-300 block text-xs">
-                      A table of every {weather.grouping}, with each value's
-                      color
-                    </span>
-                  </legend>
-                  <div class="flex flex-wrap gap-x-4 gap-y-1">
-                    {#each allGaugesAttributes as { targets } (targets)}
-                      {#each targets as { id, label } (id)}
-                        <label class="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            class="checkbox"
-                            value={id}
-                            bind:group={settings.weatherDataParams}
-                          />
-                          <span>{label}</span>
-                        </label>
-                      {/each}
-                    {/each}
-                  </div>
-                </fieldset>
-              </div>
+          Nothing to put in it yet: choose something under Include.
+        </p>
+      {:else if failed}
+        <p
+          class="text-surface-700-300 flex h-full items-center justify-center text-center"
+        >
+          The preview couldn't be drawn. You can still download the PDF.
+        </p>
+      {:else if pages.length}
+        <div
+          class="flex flex-col items-center gap-4 transition-opacity {updating
+            ? 'opacity-60'
+            : ''}"
+        >
+          {#each pages as page, index (page.url)}
+            <img
+              src={page.url}
+              alt="Page {index + 1} of {pages.length}"
+              width={page.width}
+              height={page.height}
+              class="h-auto w-full bg-white shadow-md"
+              style:max-width="{PAGE_WIDTH}px"
+            />
+          {/each}
+        </div>
+      {/if}
+      {#if updating && !isEmpty}
+        <!-- Over the pages while they're drawn again, or alone the first time -->
+        <div
+          class="pointer-events-none sticky bottom-0 flex justify-center {pages.length
+            ? ''
+            : 'h-full items-center'}"
+        >
+          <LoaderCircleIcon class="size-8 animate-spin opacity-60" />
+        </div>
+      {/if}
+      <p class="sr-only" aria-live="polite">
+        {!updating && pages.length
+          ? `Preview: ${pages.length} ${pages.length === 1 ? 'page' : 'pages'}`
+          : ''}
+      </p>
+    </section>
 
-              <!-- How it looks -->
-              <div class="flex flex-col gap-3">
-                <p class="font-bold">Look</p>
-                <div class="grid gap-3 sm:grid-cols-2">
-                  {@render choiceSelect({
-                    label: 'Colors',
-                    choices: LAYOUTS,
-                    current: settings.layout,
-                    onchoose: (value) =>
-                      (settings.layout = value as PdfSettings['layout']),
-                  })}
-                  {@render choiceSelect({
-                    label: 'Page Size',
-                    choices: PAGE_SIZES,
-                    current: settings.pageSize,
-                    onchoose: (value) =>
-                      (settings.pageSize = value as PdfSettings['pageSize']),
-                  })}
-                </div>
-                {@render check(
-                  'Fill with color',
-                  "Each color's row or card takes its color (uses more ink)",
-                  settings.fill,
-                  (checked) => (settings.fill = checked),
-                )}
-                {#if gaugeIds.length}
-                  {@render check(
-                    'Days in ranges',
-                    `How many ${weather.grouping}s fall in each range`,
-                    settings.showDaysInRange,
-                    (checked) => (settings.showDaysInRange = checked),
-                  )}
-                {/if}
-                {@render check(
-                  'HTML color codes',
-                  null,
-                  settings.hex,
-                  (checked) => (settings.hex = checked),
-                )}
-              </div>
-            </div>
-          {/if}
-        {/snippet}
-      </Accordion.ItemContent>
-    </Accordion.Item>
-  </Accordion>
+    <aside
+      class="flex flex-col gap-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto lg:px-1 lg:pb-2"
+    >
+      <!-- What's in it -->
+      <div class="flex flex-col gap-2">
+        <p class="font-bold">Include</p>
+        {@render check(
+          'Summary page',
+          'Project, places and dates, and preview',
+          settings.summary,
+          (checked) => (settings.summary = checked),
+        )}
+        {#each gauges.allCreated as { id, label } (id)}
+          {@render check(
+            label,
+            'Colors and ranges',
+            gaugeIds.includes(id),
+            (checked) =>
+              (gaugeIds = checked
+                ? gauges.allCreated
+                    .map((gauge) => gauge.id)
+                    .filter((g) => g === id || gaugeIds.includes(g))
+                : gaugeIds.filter((g) => g !== id)),
+          )}
+        {/each}
+        {#if hasExtras}
+          {@render check(
+            'Additional colors',
+            "The preview's border and accent colors",
+            settings.additionalColors,
+            (checked) => (settings.additionalColors = checked),
+          )}
+        {/if}
+        <fieldset class="flex flex-col gap-1">
+          <legend class="mb-1">
+            Weather data
+            <span class="text-surface-700-300 block text-xs">
+              A table of every {weather.grouping}, with each value's color
+            </span>
+          </legend>
+          <div class="flex flex-wrap gap-x-4 gap-y-1">
+            {#each allGaugesAttributes as { targets } (targets)}
+              {#each targets as { id, label } (id)}
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox"
+                    value={id}
+                    bind:group={settings.weatherDataParams}
+                  />
+                  <span>{label}</span>
+                </label>
+              {/each}
+            {/each}
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- How it looks -->
+      <div class="flex flex-col gap-3">
+        <p class="font-bold">Look</p>
+        {@render choiceSelect({
+          label: 'Colors',
+          choices: LAYOUTS,
+          current: settings.layout,
+          // Space between as the View menu has it for that layout
+          onchoose: (value) => {
+            settings.layout = value as PdfSettings['layout'];
+            settings.spaced = spaced(settings.layout);
+          },
+        })}
+        {@render choiceSelect({
+          label: 'Page Size',
+          choices: PAGE_SIZES,
+          current: settings.pageSize,
+          onchoose: (value) =>
+            (settings.pageSize = value as PdfSettings['pageSize']),
+        })}
+        {@render check(
+          'Fill with color',
+          "Each color's row or card takes its color (uses more ink)",
+          settings.fill,
+          (checked) => (settings.fill = checked),
+        )}
+        {@render check(
+          'Space between colors',
+          settings.layout === 'grid'
+            ? 'Cards apart, rather than in one block'
+            : 'Rows apart, rather than in one block',
+          settings.spaced,
+          (checked) => (settings.spaced = checked),
+        )}
+        {#if gaugeIds.length}
+          {@render check(
+            'Days in ranges',
+            `How many ${weather.grouping}s fall in each range`,
+            settings.showDaysInRange,
+            (checked) => (settings.showDaysInRange = checked),
+          )}
+        {/if}
+        {@render check(
+          'HTML color codes',
+          null,
+          settings.hex,
+          (checked) => (settings.hex = checked),
+        )}
+      </div>
+    </aside>
+  </div>
 
   <SaveAndCloseButtons
     saveText="Download"

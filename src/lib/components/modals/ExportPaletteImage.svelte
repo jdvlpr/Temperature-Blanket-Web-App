@@ -45,6 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { toast } from '#lib/state/page-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { fillWithColor } from '#lib/components/yarn-colorways/fill-with-color.js';
+  import { spaced } from '#lib/components/item-spacing.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import {
     DownloadIcon,
@@ -103,6 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ...saved,
     // As the View menu is, each time
     layout: preferences.value.layout,
+    gaps: spaced(preferences.value.layout),
     labels: { ...DEFAULT_PALETTE_IMAGE_SETTINGS.labels, ...saved?.labels },
   });
 
@@ -111,9 +113,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!hasYarn && !hasNames && !hasRanges) settings.labels.hex = true;
   });
 
-  /** Remember a choice for next time (but not the layout: it follows the View menu) */
+  /** Remember a choice for next time (but not the layout or the space
+   * between: they follow the View menu) */
   function remember() {
-    const { layout: _layout, ...rest } = $state.snapshot(settings);
+    const { layout: _layout, gaps: _gaps, ...rest } = $state.snapshot(settings);
     preferences.value.paletteImage = rest;
   }
 
@@ -378,6 +381,8 @@ choice's icon beside it, and what it's for below -->
           const layout = LAYOUTS.find((n) => n.value === value)?.value;
           if (!layout) return;
           settings.layout = layout;
+          // Space between as the View menu has it for that layout
+          settings.gaps = spaced(layout);
           remember();
         },
       })}

@@ -17,17 +17,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   A palette's colors to look at, not edit (a gallery project's gauges), drawn
   like the palette editor's: as cards or rows (View › Grid or List), each a
   numbered round swatch with its yarn, its range, and the "more" menu (⋮) to
-  buy or view the yarn and copy its name or hex code. Colors without a number
+  buy or view the yarn and copy its name or hex code. View › Space between
+  sets them apart or together in one block. Colors without a number
   (a preview's border or accent) show their role instead. With View › Fill
   with color, each card or row takes its color, grown out of its swatch.
 -->
 <script lang="ts">
   import ColorSwatch from '#lib/components/ColorSwatch.svelte';
+  import { spaced } from '#lib/components/item-spacing.js';
   import {
-    paletteCardClass,
-    paletteGridClass,
-    paletteListClass,
-    paletteRowClass,
+    paletteItemClass,
+    paletteItemsClass,
   } from '#lib/components/palette-item-styles.js';
   import RangeValue from '#lib/components/RangeValue.svelte';
   import ColorwayMoreMenu from '#lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
@@ -72,7 +72,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gaugeId,
   }: Props = $props();
 
-  let grid = $derived(preferences.value.layout === 'grid');
+  let layout = $derived(preferences.value.layout);
+  let grid = $derived(layout === 'grid');
+  let isSpaced = $derived(spaced(layout));
   let filled = $derived(fillWithColor.on);
   let hasRanges = $derived(
     items.some((item) => item.range && 'from' in item.range),
@@ -118,12 +120,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {rangeRuleSentence(rangeOptions, gaugeId)}
   </p>
 {/if}
-<div class="text-left {grid ? paletteGridClass : paletteListClass}">
+<div class="text-left {paletteItemsClass(layout, isSpaced)}">
   {#each items as item, index (index)}
     <div
-      class="relative isolate overflow-hidden {grid
-        ? paletteCardClass
-        : paletteRowClass}"
+      class="relative isolate overflow-hidden {paletteItemClass(
+        layout,
+        isSpaced,
+      )}"
       style:color={filled ? iconColorOn(item.color.hex ?? '#fff') : undefined}
       data-fillable
       data-filled={filled || undefined}

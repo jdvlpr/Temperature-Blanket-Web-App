@@ -59,7 +59,7 @@ export const downloadPDF = () => {
   dialog.trigger({
     type: 'component',
     component: { ref: PdfOptions },
-    options: { title: 'Download PDF' },
+    options: { size: 'xlarge', title: 'Download PDF' },
   });
 };
 

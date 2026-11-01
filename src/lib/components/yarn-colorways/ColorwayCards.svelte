@@ -26,6 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   With `selection`, each card (but its ⋮ menu) is one toggle button, led by a
   circle that's checked when it's selected, beside the swatch.
+
+  With View › Space between off, the cards meet in one block (`joined-grid`).
 -->
 <script lang="ts">
   import type { Color } from '#lib/types/yarn-types.js';
@@ -38,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     swatchClass,
     type ColorwaySelection,
   } from './colorway-utils';
+  import { spaced } from '#lib/components/item-spacing.js';
   import { fillFromSwatch, fillWithColor, mutedText } from './fill-with-color';
 
   interface Props {
@@ -48,6 +51,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { colorways, selection }: Props = $props();
 
   let filled = $derived(fillWithColor.on);
+  let joined = $derived(!spaced('grid'));
+  // Joined, a card is a square in the block, with no border of its own
+  let cardClass = $derived(joined ? '' : 'card border');
 
   // A track for the match and "No longer available" only when some card
   // has one, so there's no empty track (and its gap) on every card
@@ -61,6 +67,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let rows = $derived(
     `grid grid-rows-subgrid gap-y-1 ${hasExtras ? 'row-span-4' : 'row-span-3'}`,
   );
+
+  function selectedClass(selected: boolean) {
+    if (joined) {
+      if (!selected) return '';
+      return filled
+        ? 'outline-2 -outline-offset-4 outline-current'
+        : 'ring-primary-500 ring-2 ring-inset';
+    }
+    if (!selected) return 'border-surface-200-800';
+    return `border-primary-500 ring-primary-500 ring-2 ${filled ? 'ring-offset-surface-50-950 ring-offset-2' : ''}`;
+  }
 </script>
 
 <!-- Spans, since in a selectable card they're inside its button -->
@@ -106,19 +123,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <ul
-  class="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+  class="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 {joined
+    ? 'joined-grid bg-surface-50-950'
+    : 'gap-3'}"
 >
   {#each colorways as colorway (colorwayKey(colorway))}
     {#if selection}
       {@const selected = selection.isSelected(colorway)}
       <!-- Selected on a color: the ring stands off the card, so it shows
-      even on a yarn close to the ring's own color -->
+      even on a yarn close to the ring's own color. Joined, there's no room
+      beside it, so it's inside: on a color, an outline in the text's color,
+      as in ColorwayRows. -->
       <li
-        class="card bg-surface-50-950 relative isolate min-w-0 overflow-hidden border {rows} {selected
-          ? 'border-primary-500 ring-primary-500 ring-2'
-          : 'border-surface-200-800'} {selected && filled
-          ? 'ring-offset-surface-50-950 ring-offset-2'
-          : ''}"
+        class="{cardClass} bg-surface-50-950 relative isolate min-w-0 overflow-hidden {rows} {selectedClass(
+          selected,
+        )}"
         style:color={filled ? iconColorOn(colorway.hex) : undefined}
         data-fillable
         data-filled={filled || undefined}
@@ -157,7 +176,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </li>
     {:else}
       <li
-        class="card bg-surface-50-950 border-surface-200-800 relative isolate min-w-0 overflow-hidden border p-2 {rows}"
+        class="{cardClass} bg-surface-50-950 border-surface-200-800 relative isolate min-w-0 overflow-hidden p-2 {rows}"
         style:color={filled ? iconColorOn(colorway.hex) : undefined}
         data-fillable
         data-filled={filled || undefined}

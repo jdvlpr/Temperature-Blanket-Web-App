@@ -114,7 +114,10 @@ RangesMenu, range-format. Section ids are the old single page's
     <span class="font-bold">View</span> also lays the colors out as a
     <span class="font-bold">Grid</span> or a
     <span class="font-bold">List</span>, and
-    <span class="font-bold">Fill backgrounds</span> paints each one in its color.
+    <span class="font-bold">Fill backgrounds</span> paints each one in its
+    color.
+    <span class="font-bold">Space between</span> sets them apart or together in one
+    block (a grid and a list each remember their own).
   </p>
 </section>
 

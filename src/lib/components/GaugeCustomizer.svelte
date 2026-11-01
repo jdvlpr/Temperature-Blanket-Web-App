@@ -33,11 +33,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorSwatch from '#lib/components/ColorSwatch.svelte';
   import RangeArrow from '#lib/components/RangeArrow.svelte';
   import RangeUnit from '#lib/components/RangeUnit.svelte';
+  import { spaced } from '#lib/components/item-spacing.js';
   import {
-    paletteCardClass,
-    paletteGridClass,
-    paletteListClass,
-    paletteRowClass,
+    paletteItemClass,
+    paletteItemsClass,
   } from '#lib/components/palette-item-styles.js';
   import ChangeColor from '#lib/components/modals/ChangeColor.svelte';
   import WeatherTable from '#lib/components/modals/WeatherTable.svelte';
@@ -205,6 +204,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   // View › Fill with color: each color's card or row takes its color
   let filled = $derived(fillWithColor.on);
+  // View › Space between: cards or rows apart, or meeting in one block
+  let isSpaced = $derived(spaced(preferences.value.layout));
   // Filled, there's no swatch (the color is the card's). It goes a moment
   // after filling starts, once the fill has measured it to grow out of.
   let swatchShown = $state(untrack(() => !fillWithColor.on));
@@ -1187,9 +1188,10 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 {/if}
 
 <div
-  class="mt-3 mb-2 lg:mb-4 {preferences.value.layout === 'grid'
-    ? paletteGridClass
-    : paletteListClass}"
+  class="mt-3 mb-2 lg:mb-4 {paletteItemsClass(
+    preferences.value.layout,
+    isSpaced,
+  )}"
   bind:this={listElement}
   use:dragHandleZone={{
     items: sortableColors,
@@ -1205,10 +1207,10 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       data-color-id={id}
-      class="color relative isolate overflow-hidden {preferences.value
-        .layout === 'grid'
-        ? paletteCardClass
-        : paletteRowClass}"
+      class="color relative isolate overflow-hidden {paletteItemClass(
+        preferences.value.layout,
+        isSpaced,
+      )}"
       style:color={filled ? iconColorOn(color.hex ?? '#fff') : undefined}
       data-fillable
       data-filled={filled || undefined}
