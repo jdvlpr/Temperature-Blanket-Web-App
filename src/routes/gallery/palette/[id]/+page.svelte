@@ -23,9 +23,8 @@ with them. -->
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_TOOL } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import GaugeColorsView from '#lib/components/GaugeColorsView.svelte';
@@ -189,11 +188,8 @@ with them. -->
 </svelte:head>
 
 <AppShell pageName="Yarn Palette Gallery">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
-    <main class={[PAGE, 'flex flex-col justify-start gap-2 pb-8']}>
+    <main class={[PAGE, PAGE_TOOL, 'flex flex-col justify-start gap-2 pb-8']}>
       <a
         href={resolve('/gallery/palettes')}
         class="btn hover:preset-tonal-surface mt-2 flex w-fit items-center lg:mt-0"
@@ -356,7 +352,7 @@ with them. -->
     </main>
   {/snippet}
   {#snippet footer()}
-    <Footer>
+    <Footer width={PAGE_TOOL}>
       {#snippet sources()}
         <YarnSourcesNote />
       {/snippet}

@@ -19,10 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
   import { gallerySection } from '#lib/storage/library-section.svelte.js';
   import Gallery from './Gallery.svelte';
 
@@ -52,12 +51,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Project Gallery">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
-
   {#snippet main()}
-    <main class={[PAGE, 'mb-8 flex flex-col justify-start gap-2']}>
+    <main class={[PAGE, PAGE_WIDE, 'mb-8 flex flex-col justify-start gap-2']}>
       <h1 class="h1 text-gradient mt-4">Gallery</h1>
       <CollectionNav
         label="Gallery"

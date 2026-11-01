@@ -141,6 +141,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       card && getComputedStyle(card).position === 'sticky'
         ? `${card.getBoundingClientRect().bottom + 8}px`
         : '';
+    // Nor under the planner's steps bar, fixed at the bottom
+    const nav = document.getElementById('bottom-section-nav');
+    item.style.scrollMarginBottom =
+      nav && !nav.inert ? `${nav.getBoundingClientRect().height + 8}px` : '';
     item.scrollIntoView({
       block: 'nearest',
       behavior: motion.reduced ? 'auto' : 'smooth',

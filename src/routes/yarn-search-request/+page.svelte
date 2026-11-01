@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_BASE_URL,
     PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK,
   } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import {
@@ -46,9 +45,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Request Yarn Colorways">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'mb-4 flex flex-col gap-4 lg:mt-4']}>
       <a

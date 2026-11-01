@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     PAGE,
     PAGE_TEXT,
+    PAGE_WIDE,
     PANEL_LIST,
     PANEL_ROW,
   } from '#lib/constants/class-constants.js';
@@ -165,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<main class={[PAGE, 'mt-2 mb-12 flex flex-col gap-6']}>
+<main class={[PAGE, PAGE_WIDE, 'mt-2 mb-12 flex flex-col gap-6']}>
   <h1 class="h1 text-gradient mt-2">My Library</h1>
 
   <div class="-mt-2 flex flex-col gap-2">

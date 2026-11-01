@@ -39,6 +39,9 @@ class OnThisPage {
 
 export const onThisPage = new OnThisPage();
 
+/** How far below the top bars a section's link puts its heading, in px */
+export const SECTION_GAP = 16;
+
 const HEADINGS = 'h2, h3';
 /** Fewer sections than this and a list of them would only repeat the page */
 const MIN_SECTIONS = 3;
@@ -47,6 +50,10 @@ const MIN_SECTIONS = 3;
 export function trackSections(): Attachment<HTMLElement> {
   return (node) => {
     let headings: HTMLElement[] = [];
+    // The section a link just went to, read until the reader scrolls: one
+    // near the end can't scroll up to the top bars, and the jump passes
+    // the ones on the way
+    let chosen: string | null = null;
 
     function collect() {
       headings = [...node.querySelectorAll<HTMLElement>(HEADINGS)].filter(
@@ -67,6 +74,10 @@ export function trackSections(): Attachment<HTMLElement> {
     function update() {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
+        if (chosen && headings.some((h) => sectionId(h, node) === chosen)) {
+          onThisPage.current = chosen;
+          return;
+        }
         const atBottom =
           window.innerHeight + window.scrollY >=
           document.documentElement.scrollHeight - 2;
@@ -74,7 +85,10 @@ export function trackSections(): Attachment<HTMLElement> {
         if (atBottom) current = headings.at(-1);
         else
           for (const heading of headings) {
-            if (heading.getBoundingClientRect().top > onThisPage.offset + 8)
+            if (
+              heading.getBoundingClientRect().top >
+              onThisPage.offset + SECTION_GAP + 8
+            )
               break;
             current = heading;
           }
@@ -82,17 +96,51 @@ export function trackSections(): Attachment<HTMLElement> {
       });
     }
 
+    function choose(event: MouseEvent) {
+      const link = (event.target as Element | null)?.closest('a');
+      if (!link?.hash) return;
+      if (link.pathname !== location.pathname) return;
+      const id = decodeURIComponent(link.hash.slice(1));
+      if (!onThisPage.sections.some((section) => section.id === id)) return;
+      chosen = id;
+      update();
+    }
+    // Scrolling by hand, not a link's jump (or iOS putting the page back
+    // as the Contents sheet closes)
+    function unchoose() {
+      if (!chosen) return;
+      chosen = null;
+      update();
+    }
+    const userScrolls = ['wheel', 'touchmove', 'keydown', 'pointerdown'];
+
     collect();
+    // Opened at a section
+    if (location.hash) {
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (onThisPage.sections.some((section) => section.id === id)) {
+        chosen = id;
+        update();
+      }
+    }
     // The content changes as pages are navigated within the same layout
     const observer = new MutationObserver(collect);
     observer.observe(node, { childList: true, subtree: true });
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
+    // Pointer down comes before its click, so a link's own press doesn't
+    // undo it
+    for (const type of userScrolls)
+      document.addEventListener(type, unchoose, { passive: true });
+    document.addEventListener('click', choose);
     return () => {
       observer.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
+      for (const type of userScrolls)
+        document.removeEventListener(type, unchoose);
+      document.removeEventListener('click', choose);
       onThisPage.sections = [];
       onThisPage.current = null;
     };

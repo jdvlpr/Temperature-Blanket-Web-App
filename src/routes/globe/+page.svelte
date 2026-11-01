@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import { ArrowLeftIcon } from '@lucide/svelte';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Globe from './Globe.svelte';
 </script>
@@ -41,8 +40,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Globe">
   {#snippet stickyHeader()}
-    <div class="flex items-center gap-2">
-      <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <!-- Back to the gallery, on the left -->
+    <div class="mr-auto flex items-center gap-2">
       <a
         href={resolve('/gallery')}
         class="btn hover:preset-tonal-surface flex w-fit items-center"

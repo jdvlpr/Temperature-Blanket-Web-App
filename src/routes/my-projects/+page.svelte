@@ -26,7 +26,6 @@ and sort once there are a few. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import LocalProjects from '#lib/components/LocalProjects.svelte';
@@ -88,9 +87,6 @@ and sort once there are a few. -->
 </svelte:head>
 
 <AppShell pageName="My Library">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <MyLibrary current="projects" currentTotal={total}>
       {#if browser}

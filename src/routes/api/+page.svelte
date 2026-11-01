@@ -15,9 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
 </script>
 
 <svelte:head>
@@ -36,12 +35,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="API">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
-
   {#snippet main()}
-    <div class={[PAGE, 'my-4 flex flex-wrap justify-start gap-4 lg:mt-0']}>
+    <div
+      class={[
+        PAGE,
+        PAGE_WIDE,
+        'my-4 flex flex-wrap justify-start gap-4 lg:mt-0',
+      ]}
+    >
       <div class="flex flex-col gap-4">
         <a
           class="card hover:bg-surface-100-900 flex w-fit flex-col items-center justify-center gap-2 p-4 text-center whitespace-pre-wrap"

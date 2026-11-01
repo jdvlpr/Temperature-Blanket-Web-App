@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
@@ -41,9 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Privacy Policy">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'my-2 flex flex-col gap-4']}>
       <h2 class="h2 text-gradient mt-2 max-lg:hidden">Privacy Policy</h2>

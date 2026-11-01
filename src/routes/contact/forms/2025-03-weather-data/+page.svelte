@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_BASE_URL,
     PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK,
   } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import Expand from '#lib/components/Expand.svelte';
@@ -141,9 +140,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Weather Data Feedback Form">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'flex flex-col gap-2 pt-4 pb-8']}>
       <a href="/contact" class="btn hover:preset-tonal-surface w-fit"

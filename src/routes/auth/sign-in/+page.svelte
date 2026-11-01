@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import SignInCard from '#lib/components/account/SignInCard.svelte';
@@ -36,9 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Sign In">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'flex flex-col pb-8']}>
       <div class="flex flex-col gap-2 py-4">

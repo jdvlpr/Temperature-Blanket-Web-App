@@ -14,17 +14,26 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
+
   interface Props {
     subtleBackground?: boolean;
+    /** The page's width (PAGE_TEXT, PAGE_TOOL or PAGE_WIDE), so it lines up with the page */
+    width?: string;
     about?: import('svelte').Snippet;
     sources?: import('svelte').Snippet;
   }
 
-  let { subtleBackground = true, about, sources }: Props = $props();
+  let {
+    subtleBackground = true,
+    width = PAGE_WIDE,
+    about,
+    sources,
+  }: Props = $props();
 </script>
 
 <footer
-  class="m-auto grid max-w-(--breakpoint-xl) grid-cols-12 justify-center gap-4 px-2 py-4 text-left xl:px-0"
+  class={[PAGE, width, 'grid grid-cols-12 gap-4 py-4 text-left']}
   class:bg-transparent={subtleBackground}
   class:dark:bg-transparent={subtleBackground}
 >
@@ -38,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <!-- Where the page's data comes from: one quiet line (YarnSourcesNote, or
   the page's attributions), not a card -->
   {#if sources}
-    <div class="text-surface-700-300 col-span-full px-2 text-sm">
+    <div class="text-surface-700-300 col-span-full text-sm">
       {@render sources?.()}
     </div>
   {/if}

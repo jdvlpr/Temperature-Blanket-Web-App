@@ -16,9 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { PUBLIC_BASE_URL } from '$app/env/public';
   import { beforeNavigate } from '$app/navigation';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_TOOL } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
   import Gauge from '#lib/components/Gauge.svelte';
@@ -192,11 +191,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Palette Creator">
   {#snippet stickyHeader()}
-    <div class="hidden shrink-0 lg:inline-flex"><AppLogo /></div>
     <div class="flex min-w-0 flex-1 justify-between gap-2 sm:justify-end">
       <!-- The palette's name, in the space wider screens have spare -->
       {#if isDesktop.current}
-        <div class="flex min-w-0 flex-1 items-center gap-0.5 lg:ml-2">
+        <div class="flex min-w-0 flex-1 items-center gap-0.5">
           <PaletteTitle />
         </div>
       {/if}
@@ -211,17 +209,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div>
-      <main class={[PAGE, 'text-center']}>
-        <div class="py-4 text-left">
+      <main class={[PAGE, PAGE_TOOL, 'text-center']}>
+        <div class="pt-4 text-left">
           <div class="flex flex-col gap-2">
-            <h2 class="h1 text-gradient mb-0">Create a Yarn Palette</h2>
+            <h2 class="h1 text-gradient">Create a Yarn Palette</h2>
             <p>
               Get yarn colors and find matching colorways from hex codes or from
               an image.
             </p>
           </div>
         </div>
-        <div class=" mt-4">
+        <div class="mt-2">
           <Gauge bind:gauge={yarnPageState.gauge} />
 
           <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
@@ -231,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet footer()}
     <div>
-      <Footer>
+      <Footer width={PAGE_TOOL}>
         {#snippet sources()}
           <YarnSourcesNote>
             Gradients are based on <a

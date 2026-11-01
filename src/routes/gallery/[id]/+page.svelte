@@ -27,9 +27,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/env';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_TOOL } from '#lib/constants/class-constants.js';
   import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
   import YarnSourcesNote from '#lib/components/YarnSourcesNote.svelte';
@@ -310,12 +309,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Project Gallery">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <div class="opacity-100 transition-opacity">
-      <main class={[PAGE, 'flex flex-col justify-start gap-2']}>
+      <main class={[PAGE, PAGE_TOOL, 'flex flex-col justify-start gap-2']}>
         <a
           href="/gallery"
           class="btn hover:preset-tonal-surface mt-2 flex w-fit items-center lg:mt-0"
@@ -585,7 +581,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/snippet}
   {#snippet footer()}
-    <Footer>
+    <Footer width={PAGE_TOOL}>
       {#snippet sources()}
         <YarnSourcesNote />
       {/snippet}

@@ -21,9 +21,8 @@ palettes, each on a page of its own. -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
@@ -41,11 +40,8 @@ palettes, each on a page of its own. -->
 </script>
 
 <AppShell pageName="Gallery">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
-    <main class={[PAGE, 'flex flex-col justify-start gap-4 pb-8']}>
+    <main class={[PAGE, PAGE_WIDE, 'flex flex-col justify-start gap-4 pb-8']}>
       <a
         href={resolve('/gallery')}
         class="btn hover:preset-tonal-surface mt-2 flex w-fit items-center lg:mt-0"

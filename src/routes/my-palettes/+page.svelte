@@ -32,7 +32,6 @@ and sort once there are a few. -->
     type GalleryPage,
   } from '#lib/accounts/gallery.js';
   import { sync } from '#lib/sync/status.svelte.js';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import MyLibrary from '#lib/components/MyLibrary.svelte';
   import SavedPalettes from '#lib/components/SavedPalettes.svelte';
@@ -152,9 +151,6 @@ and sort once there are a few. -->
 </svelte:head>
 
 <AppShell pageName="My Library">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <MyLibrary current="palettes" currentTotal={total}>
       {#if browser && starred}

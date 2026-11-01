@@ -26,7 +26,6 @@ Only the page's content (data-pagefind-body) goes into the search index. -->
 <script lang="ts">
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE_TEXT } from '#lib/constants/class-constants.js';
   import YouTubeVideo from '#lib/components/YouTubeVideo.svelte';
@@ -78,9 +77,6 @@ Only the page's content (data-pagefind-body) goes into the search index. -->
 </svelte:head>
 
 <AppShell pageName={DOCS_TITLE}>
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <!-- A page reads at a comfortable line length; the index's cards take the width -->
     <OnThisPageLayout

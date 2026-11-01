@@ -32,7 +32,6 @@
 
 <script lang="ts">
   import { browser, dev } from '$app/env';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Expand from '#lib/components/Expand.svelte';
   import Footer from '#lib/components/Footer.svelte';
@@ -160,9 +159,6 @@
 </svelte:head>
 
 <AppShell pageName="Extract Yarn Colorways">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class="mb-[100vh] max-w-screen-xl px-2 text-left lg:px-0">
       {#if dev}

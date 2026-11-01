@@ -27,8 +27,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { ClassValue } from 'svelte/elements';
   import ContentsSheet from '#lib/components/docs/ContentsSheet.svelte';
   import OnThisPage from '#lib/components/docs/OnThisPage.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
-  import { onThisPage, trackSections } from '#lib/docs/on-this-page.svelte.js';
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
+  import {
+    onThisPage,
+    SECTION_GAP,
+    trackSections,
+  } from '#lib/docs/on-this-page.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import {
     ArrowLeftIcon,
@@ -109,13 +113,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
 {/if}
-<div class={[PAGE, 'flex gap-8 pb-12']}>
+<!-- Wide, with the text and its On this page centered together as one column -->
+<div class={[PAGE, PAGE_WIDE, 'flex justify-center gap-8 pb-12']}>
   <main
     class={[
       'flex w-full min-w-0 flex-col [&_[id]]:scroll-mt-(--section-scroll-margin)',
       mainClass,
     ]}
-    style:--section-scroll-margin="{topBarHeight + sectionBarHeight + 16}px"
+    style:--section-scroll-margin="{topBarHeight +
+      sectionBarHeight +
+      SECTION_GAP}px"
     {@attach track ? trackSections() : undefined}
   >
     {@render children()}

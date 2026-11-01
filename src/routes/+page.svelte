@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/env';
   import { beforeNavigate } from '$app/navigation';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Gauges from '#lib/components/Gauges.svelte';
   import Locations from '#lib/components/Locations.svelte';
@@ -32,7 +31,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
   import ProjectMenuButton from '#lib/components/buttons/ProjectMenuButton.svelte';
   import ProjectTitle from '#lib/components/ProjectTitle.svelte';
-  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
+  import {
+    PAGE,
+    PAGE_TEXT,
+    PAGE_WIDE,
+  } from '#lib/constants/class-constants.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import {
     dialog,
@@ -256,15 +259,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-    <div class="hidden shrink-0 lg:inline-flex">
-      <AppLogo />
-    </div>
     <div class="flex min-w-0 flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length}
         <!-- The project's name and whether it's saved, in the space wider
         screens have spare -->
         {#if isDesktop.current}
-          <div class="flex min-w-0 flex-1 items-center gap-0.5 lg:ml-2">
+          <div class="flex min-w-0 flex-1 items-center gap-0.5">
             <ProjectTitle />
           </div>
         {/if}
@@ -281,7 +281,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class={[PAGE, 'pb-18']} id="main-page">
+    <main class={[PAGE, PAGE_WIDE, 'pb-18']} id="main-page">
       <div
         id="page-section-location"
         class="scroll-mt-[76px]"
@@ -291,7 +291,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         steps, which start at the page's left edge -->
         <div class={[PAGE_TEXT, 'mx-auto']}>
           <div class="flex flex-col gap-2 py-4 text-center">
-            <h2 class="h1 text-gradient mb-0">Weather Data + Art</h2>
+            <h1 class="h1 text-gradient mb-0">Weather Data + Art</h1>
             <p>
               Get historical weather data, choose yarn colors, and visualize
               your crochet or knitting project. <a

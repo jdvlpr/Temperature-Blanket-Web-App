@@ -14,7 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import { FIELD_GROUP, PAGE } from '#lib/constants/class-constants.js';
+  import {
+    FIELD_GROUP,
+    PAGE,
+    PAGE_WIDE,
+  } from '#lib/constants/class-constants.js';
   import type { ColorwaySort } from '#lib/components/yarn-colorways/colorway-utils.js';
 
   class YarnColorwayFinderState {
@@ -35,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser, version } from '$app/env';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
@@ -327,11 +330,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Colorway Finder">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
     <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}
-    <main class={[PAGE, 'pb-6']}>
+    <main class={[PAGE, PAGE_WIDE, 'pb-6']}>
       <div class="py-4">
         <div class="flex flex-col gap-2">
           <h2 class="h1 text-gradient mb-0">Find Yarn by Color</h2>

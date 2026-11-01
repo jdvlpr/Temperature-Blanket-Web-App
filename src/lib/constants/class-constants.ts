@@ -85,9 +85,16 @@ export const BTN_PRIMARY = 'btn preset-filled-primary-500';
 // Destructive, in the primary's place
 export const BTN_DANGER = 'btn preset-filled-error-500';
 
-// Every page's <main>: all the width AppShell leaves beside the sidebar, with
-// the same gutter, so pages start at the same left edge and titles line up.
-export const PAGE = 'w-full px-2';
-// Text and forms on a page: a comfortable line length, kept at the page's left
-// edge. Charts, tables and card grids don't take it, so they use the width.
+// Every page's <main>: a column centered in the width AppShell leaves beside
+// the sidebar, with the same gutter, and one of the three widths below, chosen
+// by what the page holds. Its title starts at the column's left edge.
+export const PAGE = 'mx-auto w-full px-2';
+// Reading, settings and forms (Preferences, Account, Contact, What's New):
+// a comfortable line length. Also a block of text inside a wider page, kept at
+// its left edge.
 export const PAGE_TEXT = 'max-w-(--breakpoint-md)';
+// One task on one thing (Weather Forecast, a gallery page, a palette)
+export const PAGE_TOOL = 'max-w-4xl';
+// Collections and big data (Gallery, My Library, Yarn Colorways, the
+// planner's steps): all the width
+export const PAGE_WIDE = 'max-w-none';

@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     forgetAccountSummary,
     rememberAccountSummary,
   } from '#lib/accounts/summary.svelte.js';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import AccountAvatar from '#lib/components/account/AccountAvatar.svelte';
   import ChangeEmail from '#lib/components/account/ChangeEmail.svelte';
@@ -190,9 +189,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Account">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'flex flex-col pb-8']}>
       {#if !__ACCOUNTS_ENABLED__}

@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import { ArrowLeftIcon, CircleCheckBigIcon } from '@lucide/svelte';
@@ -36,9 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Your form was received">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main
       class={[PAGE, PAGE_TEXT, 'mt-4 mb-2 flex flex-col items-start gap-4']}

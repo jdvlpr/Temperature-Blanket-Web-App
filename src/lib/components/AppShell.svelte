@@ -46,14 +46,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // The sidebar folds both ways at once, so the button under it glides to
   // its place rather than jumping when the navigation is gone
+  let slideWidth = 0;
   function sidebarSlide(node: HTMLElement): TransitionConfig {
     if (motion.reduced) return { duration: 0 };
     const { width, height } = node.getBoundingClientRect();
+    slideWidth = width;
     return {
       duration: 400,
       easing: cubicOut,
       css: (t) =>
         `overflow: hidden; width: ${t * width}px; height: ${t * height}px; opacity: ${Math.min(t * 3, 1)}`,
+    };
+  }
+
+  // The top bar's part of the divider moves and fades with the sidebar's
+  // right edge, frame for frame. Deferred, so the sidebar has been measured
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function dividerSlide(_node: HTMLElement): () => TransitionConfig {
+    return () => {
+      if (motion.reduced) return { duration: 0 };
+      return {
+        duration: 400,
+        easing: cubicOut,
+        css: (t) =>
+          `left: ${t * slideWidth - 1}px; opacity: ${Math.min(t * 3, 1)}`,
+      };
     };
   }
 
@@ -76,28 +93,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   style:--top-bar-height="{topBarHeight}px"
 >
   <div
-    class={[
-      'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
-      stickyHeader && 'lg:py-2',
-    ]}
+    class="bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]"
     data-sticky-bar
     id="top-navbar"
     bind:clientHeight={topBarHeight}
   >
     <div
-      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
+      class="relative m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
     >
-      <!-- Wide screens: shows or hides the sidebar, in the spot the menu
-      button takes on narrow ones, so it never moves. Its box is as wide as
-      the sidebar, so the logo after it lines up with the page's left edge
-      (the sidebar, the page's margin and PAGE's padding, less this bar's
-      padding, the gap and the logo's own inset); it follows the sidebar
-      as it folds, back to beside the button -->
+      <!-- Wide screens: the sidebar's divider carries on up through this bar,
+      right over its border, and folds away with it -->
+      {#if showNavigationSideBar.value}
+        <div
+          class="bg-surface-200-800 pointer-events-none absolute inset-y-0 hidden w-px lg:block"
+          style:left="calc(var(--sidebar-width) - 1px)"
+          aria-hidden="true"
+          transition:dividerSlide
+        ></div>
+      {/if}
+      <!-- Wide screens: the sidebar's header, the site's name then the
+      button that shows or hides the sidebar, over half the name's inset so
+      both fit the sidebar's width. Its box ends half a rem short of the
+      sidebar's divider (with this bar's padding); it follows the sidebar as
+      it folds, the name folding with it into the blanket mark -->
       <div
-        class="hidden shrink-0 lg:flex lg:min-w-[calc(var(--sidebar-width)-1rem)] xl:min-w-[calc(var(--sidebar-width)-1.5rem)]"
+        class="hidden shrink-0 items-center justify-between lg:flex lg:min-w-[calc(var(--sidebar-width)-1rem)]"
       >
+        <div class="-mr-2 flex shrink-0">
+          <AppLogo small mark={!showNavigationSideBar.value} />
+        </div>
         <button
-          class="btn-icon hover:preset-tonal-surface my-2 lg:ml-1"
+          class="btn-icon hover:preset-tonal-surface my-2"
           title={showNavigationSideBar.value ? 'Hide sidebar' : 'Show sidebar'}
           aria-label={showNavigationSideBar.value
             ? 'Hide sidebar'
@@ -124,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           open={drawerState.appNavigation}
         >
           <Dialog.Trigger
-            class="hover:preset-tonal-surface max-sm:btn-icon sm:btn my-2"
+            class="hover:preset-tonal-surface max-sm:btn-icon sm:btn my-1"
             aria-label="Open menu"
           >
             <MenuIcon />
@@ -139,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="bg-surface-50 dark:bg-surface-950 relative h-screen w-fit -translate-x-full space-y-4 overflow-auto p-4 opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:-translate-x-full starting:data-[state=open]:opacity-0"
               >
                 <div class="mb-20 flex min-w-[265px] flex-col gap-2">
-                  <AppLogo />
+                  <AppLogo viewTransition={false} />
                   <AppNavigation />
                 </div>
               </Dialog.Content>
@@ -147,11 +173,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Portal>
         </Dialog>
       </div>
-
-      <!-- The page's own items sit on the right, next to the account link; the
-      first (usually the logo, shown on wide screens) stays on the left -->
+      <!-- The page's own items sit on the right, next to the account link; on
+      wide screens anything at their left starts where a wide page's content
+      does (the page's margin and PAGE's padding past the divider) -->
       <div
-        class="flex min-w-0 flex-1 items-center justify-end max-sm:gap-1 sm:gap-2 [&>:first-child]:mr-auto"
+        class="flex min-w-0 flex-1 items-center justify-end max-sm:gap-1 sm:gap-2 lg:pl-6"
       >
         {@render stickyHeader?.()}
       </div>
@@ -172,7 +198,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       {#if showNavigationSideBar.value}
-        <div class="hidden w-fit flex-col lg:flex" transition:sidebarSlide>
+        <!-- Its divider runs the window's height under the top bar, which
+        carries it on up -->
+        <div
+          class="border-surface-200-800 hidden min-h-[calc(100dvh-var(--top-bar-height))] w-fit flex-col border-r lg:flex"
+          transition:sidebarSlide
+        >
           <div class="mb-4 w-fit">
             <AppNavigation />
           </div>
@@ -181,11 +212,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="min-w-0 flex-1">
-      <div class="lg:m-2 xl:mx-0">
+      <!-- Clear of the sidebar's divider: with PAGE's gutter, 1.5rem -->
+      <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
         <WhatsNewBanner />
         {@render main?.()}
+        {@render footer?.()}
       </div>
-      {@render footer?.()}
     </div>
   </div>
 </div>

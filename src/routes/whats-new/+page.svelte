@@ -27,7 +27,6 @@ before version 3 are under Earlier. Each change keeps its version as its id
     PUBLIC_BASE_URL,
     PUBLIC_GITHUB_LINK,
   } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import ChangelogItem from '#lib/components/ChangelogItem.svelte';
@@ -107,9 +106,6 @@ before version 3 are under Earlier. Each change keeps its version as its id
 </svelte:head>
 
 <AppShell pageName="What's New">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'mt-2 mb-6 flex flex-col gap-8']}>
       <header class="flex flex-col gap-3" bind:this={container}>

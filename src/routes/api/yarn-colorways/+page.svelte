@@ -20,9 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
@@ -152,10 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="API">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex">
-      <AppLogo />
-    </div>
-    <div class="sm:hidden">
+    <div class="mr-auto sm:hidden">
       <Dialog
         open={openTableOfContents}
         onOpenChange={(e) => {
@@ -191,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class={[PAGE, 'mb-4 pt-2']}>
+    <main class={[PAGE, PAGE_WIDE, 'mb-4 pt-2']}>
       <img
         src="/images/api-images/yarn-colorways-api.png"
         class="rounded-container mb-4 h-56 w-full object-cover"

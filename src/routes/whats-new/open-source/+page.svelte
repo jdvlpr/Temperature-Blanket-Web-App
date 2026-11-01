@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_KOFI_LINK,
   } from '$app/env/public';
 
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import OnThisPageLayout from '#lib/components/docs/OnThisPageLayout.svelte';
   import { PAGE_TEXT } from '#lib/constants/class-constants.js';
@@ -56,9 +55,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Version 4: Now Open Source">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <OnThisPageLayout
       title="Version 4: Now Open Source"

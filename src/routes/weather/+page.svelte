@@ -30,12 +30,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/env';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Footer from '#lib/components/Footer.svelte';
   import Share from '#lib/components/Share.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_TOOL } from '#lib/constants/class-constants.js';
   import UnitMenu from '#lib/components/buttons/UnitMenu.svelte';
   import {
     dialog,
@@ -362,8 +361,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Weather Forecast">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-
     <div class="hidden lg:flex">
       {#if mounted}
         <UnitMenu />
@@ -385,7 +382,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class={[PAGE, 'mb-8 text-center']} in:fade>
+    <main class={[PAGE, PAGE_TOOL, 'mb-8 text-center']} in:fade>
       <div class="py-4 text-left">
         <div class="flex flex-col gap-2">
           <h2 class="h1 text-gradient mb-0">Weather Forecast</h2>
@@ -607,7 +604,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet footer()}
-    <Footer subtleBackground={true}>
+    <Footer width={PAGE_TOOL}>
       {#snippet sources()}
         <p>
           Weather data from

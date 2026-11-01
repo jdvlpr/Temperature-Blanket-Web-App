@@ -15,15 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { page } from '$app/state';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
 </script>
 
 <AppShell pageName="Error">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
   {#snippet main()}
     <main class={[PAGE, PAGE_TEXT, 'my-12 flex flex-col gap-2']}>
       <p>{page.status} Error</p>

@@ -16,9 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$app/env/public';
-  import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
-  import { PAGE } from '#lib/constants/class-constants.js';
+  import { PAGE, PAGE_WIDE } from '#lib/constants/class-constants.js';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
   import YarnPaletteGallery from '#lib/components/YarnPaletteGallery.svelte';
   import { gallerySection } from '#lib/storage/library-section.svelte.js';
@@ -48,12 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Yarn Palette Gallery">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
-
   {#snippet main()}
-    <main class={[PAGE, 'mb-8 flex flex-col justify-start gap-2']}>
+    <main class={[PAGE, PAGE_WIDE, 'mb-8 flex flex-col justify-start gap-2']}>
       <h1 class="h1 text-gradient mt-4">Gallery</h1>
       <CollectionNav
         label="Gallery"
