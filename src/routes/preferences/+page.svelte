@@ -366,6 +366,7 @@ site does -->
             </p>
             {#key yarnPickerKey}
               <SelectYarn
+                showSources={false}
                 onselectautocomplete={({ selectedBrandId, selectedYarnId }) => {
                   if (selectedBrandId && selectedYarnId)
                     defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;

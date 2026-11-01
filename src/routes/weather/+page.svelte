@@ -608,38 +608,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet footer()}
     <Footer subtleBackground={true}>
       {#snippet sources()}
-        <div class="text-sm">
-          <p>
-            Weather data from
-            <a
-              href="https://www.open-meteo.com"
-              rel="noopener noreferrer"
-              class="link"
-              target="_blank">Open-Meteo</a
-            >
-            is licenced under
-            <a
-              href="https://creativecommons.org/licenses/by/4.0/"
-              target="_blank"
-              class="link"
-              rel="noreferrer noopener"
-              >Attribution 4.0 International (CC BY 4.0)</a
-            >. Location data is from
-            <a
-              href="https://www.geonames.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="link">Geonames</a
-            >
-            licensed under
-            <a
-              href="https://creativecommons.org/licenses/by/2.0/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="link">CC BY 2.0</a
-            >.
-          </p>
-        </div>
+        <p>
+          Weather data from
+          <a
+            href="https://www.open-meteo.com"
+            rel="noopener noreferrer"
+            class="link"
+            target="_blank">Open-Meteo</a
+          >
+          (<a
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            class="link"
+            rel="noreferrer noopener">CC BY 4.0</a
+          >). Location data from
+          <a
+            href="https://www.geonames.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link">GeoNames</a
+          >
+          (<a
+            href="https://creativecommons.org/licenses/by/2.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link">CC BY 2.0</a
+          >).
+          <span aria-hidden="true">·</span>
+          <a href="/documentation/credits" class="link"
+            >Data Sources & Credits</a
+          >
+        </p>
       {/snippet}
     </Footer>
   {/snippet}

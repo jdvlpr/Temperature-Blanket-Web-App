@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Footer from '#lib/components/Footer.svelte';
   import Gauge from '#lib/components/Gauge.svelte';
   import GaugeCustomizer from '#lib/components/GaugeCustomizer.svelte';
-  import YarnSources from '#lib/components/YarnSources.svelte';
+  import YarnSourcesNote from '#lib/components/YarnSourcesNote.svelte';
   import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
   import SavePalette from '#lib/components/modals/SavePalette.svelte';
   import { openPaletteScreen } from './open-palette';
@@ -232,25 +232,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div>
       <Footer>
         {#snippet sources()}
-          <div class="text-sm">
-            <p class="text-surface-700-300">
-              Gradients based on <a
-                href="https://www.ColorBrewer2.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="link">ColorBrewer2.org</a
-              >
-              by Cynthia A. Brewer, Geography, Pennsylvania State University, licenced
-              under under
-              <a
-                href="https://www.apache.org/licenses/LICENSE-2.0"
-                target="_blank"
-                rel="noreferrer"
-                class="link">Apache 2</a
-              >.
-            </p>
-            <YarnSources />
-          </div>
+          <YarnSourcesNote>
+            Gradients are based on <a
+              href="https://www.ColorBrewer2.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link">ColorBrewer2.org</a
+            >
+            by Cynthia A. Brewer, Pennsylvania State University (<a
+              href="https://www.apache.org/licenses/LICENSE-2.0"
+              target="_blank"
+              rel="noreferrer"
+              class="link">Apache 2</a
+            >).
+          </YarnSourcesNote>
         {/snippet}
       </Footer>
     </div>

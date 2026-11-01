@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarnWeight from '#lib/components/SelectYarnWeight.svelte';
   import Share from '#lib/components/Share.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
-  import YarnSources from '#lib/components/YarnSources.svelte';
+  import YarnSourcesNote from '#lib/components/YarnSourcesNote.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import {
     ALL_YARN_WEIGHTS,
@@ -579,9 +579,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/snippet}
 
       {#snippet sources()}
-        <span>
-          <YarnSources />
-        </span>
+        <YarnSourcesNote />
       {/snippet}
     </Footer>
   {/snippet}

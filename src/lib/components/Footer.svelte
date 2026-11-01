@@ -35,9 +35,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
+  <!-- Where the page's data comes from: one quiet line (YarnSourcesNote, or
+  the page's attributions), not a card -->
   {#if sources}
-    <div class="card preset-tonal-surface col-span-full h-fit p-4 shadow-xl">
-      <h3 class="mb-2 text-xl font-bold">Sources</h3>
+    <div class="text-surface-700-300 col-span-full px-2 text-sm">
       {@render sources?.()}
     </div>
   {/if}

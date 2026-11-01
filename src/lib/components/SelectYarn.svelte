@@ -15,7 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Picks a yarn, or a whole brand, searching by brand or yarn name. On a
 phone it opens a full-screen search, so the list has the whole screen above
-the keyboard; elsewhere the list drops down from the field. -->
+the keyboard; elsewhere the list drops down from the field. Once picked,
+Where These Colors Are From opens Yarn Sources searched for it. -->
 
 <script lang="ts">
   import { FIELD_GROUP } from '#lib/constants/class-constants.js';
@@ -55,6 +56,8 @@ the keyboard; elsewhere the list drops down from the field. -->
   import { onMount, tick } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
   import HelpIcon from './buttons/HelpIcon.svelte';
+  import { openYarnSources } from '#lib/utils/open-yarn-sources.js';
+  import { yarnSourcesSearch } from '#lib/utils/yarn-sources.js';
 
   interface Props {
     selectedBrandId?: string;
@@ -71,6 +74,9 @@ the keyboard; elsewhere the list drops down from the field. -->
     ononlychange?: () => void;
     /** What the "Only" filter lists, for its description */
     onlyKind?: string;
+    /** Offers Where These Colors Are From once picked; off where the yarn
+     * isn't choosing colors (a filter, a setting) */
+    showSources?: boolean;
   }
 
   let {
@@ -83,6 +89,7 @@ the keyboard; elsewhere the list drops down from the field. -->
     only = $bindable(),
     ononlychange,
     onlyKind = 'palette',
+    showSources = true,
   }: Props = $props();
 
   const uid = $props.id();
@@ -581,13 +588,30 @@ the keyboard; elsewhere the list drops down from the field. -->
     </label>
   {/if}
 
-  {#if selectedOption?.unavailable}
-    <div class="w-fit">
-      <HelpIcon topic="link-unavailable">
-        {#snippet text()}
-          <span class="font-normal">Link Unavailable</span>
-        {/snippet}
-      </HelpIcon>
+  {#if selectedOption && (selectedOption.unavailable || showSources)}
+    <div class="flex w-fit flex-wrap items-end gap-x-3 gap-y-1">
+      {#if selectedOption.unavailable}
+        <HelpIcon topic="link-unavailable">
+          {#snippet text()}
+            <span class="font-normal">Link Unavailable</span>
+          {/snippet}
+        </HelpIcon>
+      {/if}
+      {#if showSources}
+        <button
+          type="button"
+          class="link text-sm"
+          aria-haspopup="dialog"
+          onclick={(event) =>
+            openYarnSources({
+              search: yarnSourcesSearch(
+                selectedOption?.brandName,
+                selectedOption?.yarnName,
+              ),
+              opener: event.currentTarget,
+            })}>Where These Colors Are From</button
+        >
+      {/if}
     </div>
   {/if}
 </div>

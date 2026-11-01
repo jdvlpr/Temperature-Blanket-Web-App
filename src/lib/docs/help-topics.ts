@@ -23,6 +23,7 @@ import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
 import ProjectIncludes from '#lib/components/docs/help/ProjectIncludes.svelte';
 import SavedWeatherDays from '#lib/components/docs/help/SavedWeatherDays.svelte';
 import Seasons from '#lib/components/docs/help/Seasons.svelte';
+import YarnSources from '#lib/components/docs/help/YarnSources.svelte';
 import type { Component } from 'svelte';
 
 export type HelpTopic = { title: string; href: string; content: Component };
@@ -32,6 +33,11 @@ export const HELP_TOPICS = {
     title: 'Link Unavailable',
     href: '/documentation/colors-and-yarn#link-unavailable',
     content: LinkUnavailable,
+  },
+  'yarn-sources': {
+    title: 'Yarn Sources',
+    href: '/documentation/credits#yarn-sources',
+    content: YarnSources,
   },
   'grouping-weather-data': {
     title: 'Daily or Weekly Weather',

@@ -13,12 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Data Sources & Credits: DataSourcesCredits (shared with the rest of the
-site, with every yarn's source) plus what it doesn't cover: the Globe's
-imagery (globe-imagery.ts) and random photos (GetPaletteFromImage). -->
+<!-- Data Sources & Credits: DataSourcesCredits, Yarn Sources (the help
+openYarnSources shows, with every yarn's source and a search), plus what
+they don't cover: the Globe's imagery (globe-imagery.ts) and random photos
+(GetPaletteFromImage). -->
 
 <script lang="ts">
   import DataSourcesCredits from '#lib/components/DataSourcesCredits.svelte';
+  import YarnSources from '#lib/components/docs/help/YarnSources.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 </script>
 
@@ -32,6 +34,11 @@ imagery (globe-imagery.ts) and random photos (GetPaletteFromImage). -->
     Weather, Places and Colors
   </h2>
   <DataSourcesCredits />
+</section>
+
+<section class="flex flex-col gap-3">
+  <h2 id="yarn-sources" class="text-2xl font-bold">Yarn Sources</h2>
+  <YarnSources />
 </section>
 
 <section class="flex flex-col gap-3">

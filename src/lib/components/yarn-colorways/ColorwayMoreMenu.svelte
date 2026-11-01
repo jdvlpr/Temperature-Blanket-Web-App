@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   A yarn colorway's "more" menu (⋮): buy it (a shopping cart, marking an
   affiliate link) or view it on the site it's listed on, then copy its name or hex
-  code, each showing what it copies. On the page's surface it's a plain icon
+  code, each showing what it copies, then Where This Color Is From (Yarn
+  Sources, searched for its yarn). On the page's surface it's a plain icon
   button. On the yarn's color (a card or row filled with it), it's the same
   size, with a black or white icon, whichever stands out on that color, and
   a tint of that on hover. Either way it stays tinted while its menu is open, so a tap on a
@@ -30,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CopyIcon,
     EllipsisVerticalIcon,
     ExternalLinkIcon,
+    InfoIcon,
     ShoppingCartIcon,
     Trash2Icon,
   } from '@lucide/svelte';
@@ -40,7 +42,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuPositioning,
     menuItemClass,
   } from '#lib/components/menu-styles.js';
-  import type { HTMLAnchorAttributes } from 'svelte/elements';
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes,
+  } from 'svelte/elements';
+  import { openYarnSources } from '#lib/utils/open-yarn-sources.js';
+  import { yarnSourcesSearch } from '#lib/utils/yarn-sources.js';
   import {
     colorwayLink,
     copyColorwayText,
@@ -95,6 +102,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Boolean(copy.text),
     ),
   );
+
+  // A yarn's colorway (not a color of one's own) has a source
+  let sourceSearch = $derived(
+    yarnSourcesSearch(colorway.brandName, colorway.yarnName),
+  );
+
+  // For Back from Yarn Sources to return to (the menu item is gone by then)
+  let trigger = $state<HTMLButtonElement>();
 </script>
 
 <Menu
@@ -105,6 +120,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (details.value === 'insert-before') oninsert?.('before');
     else if (details.value === 'insert-after') oninsert?.('after');
     else if (details.value === 'remove') onremove?.();
+    else if (details.value === 'yarn-sources')
+      openYarnSources({ search: sourceSearch, opener: trigger });
   }}
 >
   <Menu.Trigger
@@ -115,7 +132,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-label="More for {colorway.name || colorway.hex}"
     title="More"
   >
-    <EllipsisVerticalIcon aria-hidden="true" />
+    {#snippet element(attributes)}
+      <button {...attributes as HTMLButtonAttributes} bind:this={trigger}>
+        <EllipsisVerticalIcon aria-hidden="true" />
+      </button>
+    {/snippet}
   </Menu.Trigger>
   <Portal>
     <Menu.Positioner>
@@ -165,6 +186,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </Menu.Item>
         {/each}
+        {#if sourceSearch}
+          <Menu.Separator />
+          <Menu.Item value="yarn-sources" class={menuItemClass}>
+            <InfoIcon aria-hidden="true" />
+            <span>Where This Color Is From…</span>
+          </Menu.Item>
+        {/if}
         {#if oninsert}
           <Menu.Separator />
           <Menu.Item value="insert-before" class={menuItemClass}>

@@ -29,7 +29,8 @@ with them. -->
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import GaugeColorsView from '#lib/components/GaugeColorsView.svelte';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
-  import YarnSources from '#lib/components/YarnSources.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import YarnSourcesNote from '#lib/components/YarnSourcesNote.svelte';
   import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
@@ -356,8 +357,10 @@ with them. -->
     </main>
   {/snippet}
   {#snippet footer()}
-    <div class="px-2">
-      <YarnSources />
-    </div>
+    <Footer>
+      {#snippet sources()}
+        <YarnSourcesNote />
+      {/snippet}
+    </Footer>
   {/snippet}
 </AppShell>

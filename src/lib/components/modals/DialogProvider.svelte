@@ -625,7 +625,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/if}
                   {#if dialog.help}
                     <div in:fly={viewFly}>
-                      <HelpView topic={dialog.help.topic} />
+                      <HelpView
+                        topic={dialog.help.topic}
+                        props={dialog.help.props}
+                      />
                     </div>
                   {/if}
                 {:else if dialog.type === 'confirm'}

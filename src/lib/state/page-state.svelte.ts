@@ -114,6 +114,8 @@ class DialogClass {
     topic: HelpTopicId;
     scrollTop: number;
     opener: HTMLElement | null;
+    /** For the topic's content, as Yarn Sources' search */
+    props?: Record<string, unknown>;
   } | null>(null);
 
   /** Which way the last change of view went, for its slide */
@@ -240,12 +242,18 @@ class DialogClass {
   };
 
   /** Help in place of the open dialog's content, from its top with the
-   * focus on Back */
-  showHelp = (topic: HelpTopicId, opener: HTMLElement | null) => {
+   * focus on Back. From help already showing (a link in it to another
+   * topic), Back still returns to the dialog as it was. */
+  showHelp = (
+    topic: HelpTopicId,
+    opener: HTMLElement | null,
+    props?: Record<string, unknown>,
+  ) => {
     this.help = {
       topic,
-      scrollTop: this.scrollElement?.scrollTop ?? 0,
-      opener,
+      scrollTop: this.help?.scrollTop ?? this.scrollElement?.scrollTop ?? 0,
+      opener: this.help ? this.help.opener : opener,
+      props,
     };
     this.direction = 'forward';
     tick().then(() => {

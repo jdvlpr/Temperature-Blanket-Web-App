@@ -19,14 +19,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { HELP_TOPICS, type HelpTopicId } from '#lib/docs/help-topics.js';
   import { ExternalLinkIcon } from '@lucide/svelte';
+  import type { Component } from 'svelte';
 
-  let { topic }: { topic: HelpTopicId } = $props();
+  let {
+    topic,
+    props,
+  }: { topic: HelpTopicId; props?: Record<string, unknown> } = $props();
 
   const help = $derived(HELP_TOPICS[topic]);
+  // Only some topics take props (Yarn Sources: its search)
+  const Content = $derived(help.content as Component<Record<string, unknown>>);
 </script>
 
 <div class="flex flex-col gap-4 px-4 pb-6">
-  <help.content />
+  <Content {...props} />
   <a href={help.href} target="_blank" class="link w-fit"
     >More in Guides & Help <ExternalLinkIcon class="icon-sm inline" /><span
       class="sr-only">(opens in a new tab)</span

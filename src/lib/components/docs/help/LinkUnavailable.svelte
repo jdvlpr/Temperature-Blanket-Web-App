@@ -13,7 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Help text, shown in a help dialog and on its Guides & Help page -->
+<!-- Help text, shown in a help dialog and on its Guides & Help page. Yarn
+Sources opens in place in a dialog (Back returns to what was open), and
+goes to Data Sources & Credits from the page. -->
+
+<script lang="ts">
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import { openYarnSources } from '#lib/utils/open-yarn-sources.js';
+</script>
 
 <div class="flex flex-col gap-2">
   <p>
@@ -24,5 +31,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p>
     Its colors are still here, so projects that use it keep working. For a new
     project, you may want a yarn you can still buy.
+  </p>
+  <p>
+    Each yarn's source and the day its colors were found are in
+    <a
+      href="/documentation/credits#yarn-sources"
+      class="link"
+      onclick={(event) => {
+        if (!dialog.opened || !event.currentTarget.closest('[role="dialog"]'))
+          return;
+        event.preventDefault();
+        openYarnSources({ opener: event.currentTarget });
+      }}>Yarn Sources</a
+    >.
   </p>
 </div>

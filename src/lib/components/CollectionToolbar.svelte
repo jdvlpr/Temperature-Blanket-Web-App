@@ -260,6 +260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             bind:only={onlyThisYarn}
             ononlychange={() => onchange?.()}
             onlyKind={kind}
+            showSources={false}
           />
         </div>
       {/if}

@@ -30,7 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '#lib/components/AppLogo.svelte';
   import AppShell from '#lib/components/AppShell.svelte';
   import Card from '#lib/components/Card.svelte';
-  import YarnSources from '#lib/components/YarnSources.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import YarnSourcesNote from '#lib/components/YarnSourcesNote.svelte';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { allGaugesAttributes } from '#lib/state/gauges-state.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
@@ -585,8 +586,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/snippet}
   {#snippet footer()}
-    <div class="px-2">
-      <YarnSources />
-    </div>
+    <Footer>
+      {#snippet sources()}
+        <YarnSourcesNote />
+      {/snippet}
+    </Footer>
   {/snippet}
 </AppShell>
