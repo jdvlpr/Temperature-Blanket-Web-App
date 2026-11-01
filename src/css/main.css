@@ -66,6 +66,13 @@
     height: var(--icon-size);
     flex-shrink: 0;
   }
+
+  /* Room for the scrollbar on every page, so a page doesn't shift sideways
+  between pages that scroll and ones that don't, or as a dialog stops the
+  page scrolling. Only where scrollbars take room (not overlay ones). */
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 
 /* Native select arrow: a Lucide chevron at the small icon size, in a color

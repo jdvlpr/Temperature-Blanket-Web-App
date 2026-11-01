@@ -39,7 +39,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
 
-  let sidebarWidth = $state(0);
+  // The sidebar's least width (AppNavigation's min-w) until it's measured,
+  // so the server's page puts the logo where it will be
+  let sidebarWidth = $state(278);
   let topBarHeight = $state(0);
 
   // The sidebar folds both ways at once, so the button under it glides to
@@ -69,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div>
+<div style:--sidebar-width="{sidebarWidth}px">
   <div
     class={[
       'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
@@ -83,25 +85,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
     >
       <!-- Wide screens: shows or hides the sidebar, in the spot the menu
-      button takes on narrow ones, so it never moves -->
-      <button
-        class="btn-icon hover:preset-tonal-surface my-2 hidden lg:ml-1 lg:flex"
-        title={showNavigationSideBar.value ? 'Hide sidebar' : 'Show sidebar'}
-        aria-label={showNavigationSideBar.value
-          ? 'Hide sidebar'
-          : 'Show sidebar'}
-        aria-expanded={showNavigationSideBar.value}
-        aria-controls="app-sidebar"
-        onclick={() => {
-          showNavigationSideBar.value = !showNavigationSideBar.value;
-        }}
+      button takes on narrow ones, so it never moves. Its box is as wide as
+      the sidebar, so the logo after it lines up with the page's left edge
+      (the sidebar, the page's margin and PAGE's padding, less this bar's
+      padding, the gap and the logo's own inset); it follows the sidebar
+      as it folds, back to beside the button -->
+      <div
+        class="hidden shrink-0 lg:flex lg:min-w-[calc(var(--sidebar-width)-1rem)] xl:min-w-[calc(var(--sidebar-width)-1.5rem)]"
       >
-        {#if showNavigationSideBar.value}
-          <PanelLeftClose />
-        {:else}
-          <PanelLeftOpen />
-        {/if}
-      </button>
+        <button
+          class="btn-icon hover:preset-tonal-surface my-2 lg:ml-1"
+          title={showNavigationSideBar.value ? 'Hide sidebar' : 'Show sidebar'}
+          aria-label={showNavigationSideBar.value
+            ? 'Hide sidebar'
+            : 'Show sidebar'}
+          aria-expanded={showNavigationSideBar.value}
+          aria-controls="app-sidebar"
+          onclick={() => {
+            showNavigationSideBar.value = !showNavigationSideBar.value;
+          }}
+        >
+          {#if showNavigationSideBar.value}
+            <PanelLeftClose />
+          {:else}
+            <PanelLeftOpen />
+          {/if}
+        </button>
+      </div>
 
       <div class="lg:hidden">
         <Dialog
