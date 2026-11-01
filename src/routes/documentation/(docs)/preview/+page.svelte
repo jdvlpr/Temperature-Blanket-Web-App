@@ -162,8 +162,8 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
       Point at a color in the gauge to see where it's used in the preview.
     </li>
     <li>
-      <span class="font-bold">Download PNG</span> under the preview saves it as
-      a picture.
+      <span class="font-bold">Download PNG</span> at the top of the preview
+      saves it as a picture.
       <a href="/documentation/download" class="link">More downloads</a>.
     </li>
   </ul>

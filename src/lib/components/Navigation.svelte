@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     pageSections,
-    showNavigationSideBar,
     goToProjectSection,
   } from '#lib/state/page-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
@@ -116,9 +115,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class={[
     'bg-surface-50/80 dark:bg-surface-950/80 lg:rounded-t-container fixed bottom-0 z-10 flex h-18 w-full justify-center gap-2 overflow-hidden backdrop-blur-md transition-all',
-    showNavigationSideBar.value
-      ? `lg:left-[284px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-302px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+278px)] xl:max-w-[calc(min(100vw,var(--breakpoint-xl))-278px)]`
-      : 'lg:left-[78px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+78px)]',
+    // Under the page beside the sidebar, edge to edge with it: the sidebar's
+    // width (AppShell's --sidebar-width, as it folds too) and the page's
+    // margin (lg:m-2 xl:mx-0), inside the centered frame on the widest screens
+    'lg:right-2 lg:left-[calc(var(--sidebar-width)+0.5rem)] lg:w-auto xl:right-[calc(50%-(var(--breakpoint-xl)/2))] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+var(--sidebar-width))]',
     hidden && 'translate-y-full opacity-0',
   ]}
   inert={hidden}

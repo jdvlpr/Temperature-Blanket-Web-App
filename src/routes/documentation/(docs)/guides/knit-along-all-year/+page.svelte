@@ -51,7 +51,7 @@ changing saved ones (modals/SearchAgain.svelte). -->
   </ol>
   <DocsShot
     src="knit-along-all-year/future-days"
-    alt="London from January 1 to December 31 of this year, 365 Days, with how many are still to come. Below it, Weather Data and Add Location."
+    alt="London from January 1 to December 31 of this year, 365 Days, with how many are still to come. Below it, Add Location, then Get Weather Data."
     caption="A year that's still going."
   />
 </section>

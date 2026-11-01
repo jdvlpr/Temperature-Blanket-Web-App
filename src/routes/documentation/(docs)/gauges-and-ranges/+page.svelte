@@ -64,9 +64,10 @@ RangesMenu, range-format. Section ids are the old single page's
   </ul>
   <p>
     A gauge shows up only when the weather has what it needs. To remove one
-    (except temperature), open it and press <span class="font-bold">Delete</span
-    >
-    under the gauge buttons. Which gauge a row or square uses is set in the
+    (except temperature), open it, press the
+    <span class="font-bold">⋮</span> beside its name and choose
+    <span class="font-bold">Delete</span>. Which gauge a row or square uses is
+    set in the
     <a href="/documentation/preview" class="link">preview</a>.
   </p>
 </section>

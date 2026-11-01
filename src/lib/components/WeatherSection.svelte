@@ -166,9 +166,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex w-full flex-col items-center justify-center gap-2">
-  <div class="flex w-full flex-wrap items-center justify-center gap-x-4 px-2">
-    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+<div class="flex w-full flex-col items-start gap-2">
+  <div class="flex w-full flex-wrap items-center gap-x-4">
+    <div class="mt-2 flex flex-wrap items-center gap-2">
       <WeatherSourceButton />
 
       <UnitMenu />
@@ -201,10 +201,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {pluralize('week', weather.groupedByWeek.length)}.
           {/if}
         </p>
-        <label class="label mx-auto">
+        <label class="label">
           <span class="label-text">Weeks Start On</span>
           <select
-            class="select mx-auto w-fit"
+            class="select w-fit"
             bind:value={weather.monthGroupingStartDay}
             id="weather-weeks-start-week-on"
           >
@@ -218,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   {#if wasDefaultWeatherSourceChanged}
-    <p class="w-full px-2 text-sm">
+    <p class="w-full text-sm">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
       so another source was used ({weather.source.name}) and the Weather Source
       setting was automatically updated.
@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if projectHasRecentWeatherData}
-    <div class="w-fit max-w-(--breakpoint-sm) px-2 text-left text-sm">
+    <div class="w-fit max-w-(--breakpoint-sm) text-left text-sm">
       <Popover>
         <Popover.Trigger
           class="btn hover:preset-tonal-surface text-warning-800-200 text-left text-sm whitespace-pre-wrap"
@@ -286,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class="relative mx-auto flex max-w-full snap-x items-start justify-start gap-x-2 overflow-auto pb-2"
+    class="relative flex max-w-full snap-x items-start justify-start gap-x-2 overflow-auto pb-2"
   >
     {#if weather.table.showParameters.tmax}
       <div class="snap-start">
@@ -429,7 +429,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<div bind:this={graph} class="w-full scroll-m-[60px] px-2">
+<div bind:this={graph} class="w-full scroll-m-[60px]">
   {#if showWeatherChart}
     {#if weather.data.length}
       {#key preferences.value.units}
@@ -441,9 +441,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 
-<div class="flex w-full flex-col items-center justify-center gap-4">
+<div class="flex w-full flex-col items-start gap-4">
   <div
-    class="mx-auto flex max-w-full snap-x items-center justify-start overflow-auto pb-2"
+    class="flex max-w-full snap-x items-center justify-start overflow-auto pb-2"
   >
     <ToggleWeatherData
       view={weather.table.showParameters.tmax}
@@ -517,7 +517,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-center justify-center gap-2 px-2 text-left text-sm"
+      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-start gap-2 text-left text-sm"
     >
       <Popover>
         <Popover.Trigger

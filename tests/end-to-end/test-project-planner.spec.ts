@@ -16,7 +16,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Project Planner', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context, baseURL }) => {
+    // Pre-seed the analytics-consent cookies so the consent toast can't cover
+    // buttons (Get Weather Data sits at the bottom of the location card)
+    await context.addCookies([
+      { name: '_clck', value: '1', url: baseURL },
+      { name: '_clsk', value: '1', url: baseURL },
+    ]);
     await page.goto('/');
     // Close any initial toasts or dialogs if they appear consistently
     // The original test clicked a toast, we'll keep that if it's a consistent blocker,

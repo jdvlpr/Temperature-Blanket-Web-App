@@ -73,7 +73,7 @@ To counts as 1 day, location-state). A new location starts empty
   </ol>
   <DocsShot
     src="same-date-several-years/locations"
-    alt="Three locations in the Project Planner, all London, England, United Kingdom, each with Duration Custom and From and To on the same day: 2023-03-10, 2024-03-10 and 2025-03-10, each 1 Day. Below them, Search Again, 3 Total Days and Add Location."
+    alt="Three locations in the Project Planner, all London, England, United Kingdom, each with Duration Custom and From and To on the same day: 2023-03-10, 2024-03-10 and 2025-03-10, each 1 Day. Below them, Add Location, then 3 Total Days and Search Again."
     caption="March 10, three years in a row."
   />
   <p>

@@ -79,7 +79,7 @@ here. -->
   </p>
   <DocsShot
     src="location-and-dates/location"
-    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, with Details below it; From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days; and the Search Again and Add Location buttons."
+    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, with Details beside its label; From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days; Add Location; and the Search Again button."
     caption="A place and a year of dates."
   />
 </section>

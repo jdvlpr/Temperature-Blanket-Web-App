@@ -162,8 +162,10 @@ const SHOTS: Shot[] = [
     name: 'rain-snow-sunshine/rain-gauge',
     open: async (page) => {
       const section = await planner(page, 'gauges');
-      await page.getByRole('button', { name: /^Rain Gauge/ }).click();
-      await page.getByRole('button', { name: 'Yes' }).click();
+      await page.getByRole('button', { name: 'Add Gauge' }).click();
+      await page.getByRole('menuitem', { name: 'Rain Gauge' }).click();
+      // Off the colors, so none shows its hex code over the gauges
+      await page.mouse.move(0, 0);
       await settle(page);
       return section;
     },

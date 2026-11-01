@@ -236,7 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'rounded-container border-surface-200-800 bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col items-center justify-center gap-2 border',
+    'rounded-container border-surface-200-800 bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col gap-2 border',
     gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
   ]}
 >
@@ -253,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     class={[
-      'flex flex-wrap items-center justify-center gap-2 px-2',
+      'flex flex-wrap items-center gap-2 px-2',
       gauge.unit.type === 'category' && 'hidden',
     ]}
   >

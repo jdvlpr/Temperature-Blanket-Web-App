@@ -108,7 +108,7 @@ single page's (OLD_ANCHORS). -->
   </h2>
   <p>
     A picture of the preview, to share or to keep beside you as you work. It's
-    also <span class="font-bold">Download PNG</span> under the preview.
+    also <span class="font-bold">Download PNG</span> at the top of the preview.
   </p>
 </section>
 

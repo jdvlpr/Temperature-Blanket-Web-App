@@ -69,35 +69,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
     historyChange.preview && 'history-flash-card',
   ]}
 >
-  <PreviewSelect />
+  <PreviewSelect>
+    {#snippet actions()}
+      {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            class="btn hover:preset-tonal-surface"
+            title="Download the preview image (PNG)"
+            onclick={() => {
+              const active = previews.active;
+              if (!active?.width || !active?.height || !active?.svg) return;
+              downloadPreviewPNG(active.width, active.height, active.svg);
+            }}
+          >
+            <ImageIcon />
+            Download PNG
+          </button>
 
-  <div class="flex flex-col items-start justify-center gap-2">
-    {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
-      {#key previews.active}
-        <div class="flex w-full flex-wrap items-start justify-center gap-4">
-          <previews.active.settingsComponent />
+          <!-- Links to the gallery page instead once it's sent -->
+          <SendToGalleryButton isPrimary={true} />
         </div>
-      {/key}
+      {/if}
+    {/snippet}
+  </PreviewSelect>
 
-      <div
-        class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
-      >
-        <button
-          class="btn hover:preset-tonal-surface"
-          title="Download the preview image (PNG)"
-          onclick={() => {
-            const active = previews.active;
-            if (!active?.width || !active?.height || !active?.svg) return;
-            downloadPreviewPNG(active.width, active.height, active.svg);
-          }}
-        >
-          <ImageIcon />
-          Download PNG
-        </button>
-
-        <!-- Links to the gallery page instead once it's sent -->
-        <SendToGalleryButton isPrimary={true} />
+  {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
+    {#key previews.active}
+      <div class="flex w-full flex-wrap items-start gap-4">
+        <previews.active.settingsComponent />
       </div>
-    {/if}
-  </div>
+    {/key}
+  {/if}
 </div>

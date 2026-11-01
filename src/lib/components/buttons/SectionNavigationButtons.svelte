@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="mx-2 my-4 flex flex-wrap items-center justify-between gap-y-2">
+<div class="my-4 flex flex-wrap items-center justify-between gap-y-2">
   {#if previousSectionIndex}
     <button
       class="btn preset-tonal-tertiary shadow-sm"

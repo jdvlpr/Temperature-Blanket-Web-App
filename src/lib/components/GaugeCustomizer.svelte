@@ -1058,7 +1058,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   />
 {/snippet}
 
-<div class={['mt-3 flex flex-wrap items-center justify-center gap-4']}>
+<div class={['mt-3 flex flex-wrap items-center gap-4']}>
   {#if isProjectPlannerPage}
     <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
       <RangesMenu />
@@ -1095,7 +1095,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     a range: Enter saves; ✕, Escape, or tapping or tabbing anywhere else
     puts it back; scrolling doesn't. -->
     <form
-      class="mt-3 flex flex-wrap items-end justify-center gap-2 px-2"
+      class="mt-3 flex flex-wrap items-end gap-2"
       aria-label="Manual steps"
       onsubmit={(e) => {
         e.preventDefault();
@@ -1158,10 +1158,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
         <CheckIcon aria-hidden="true" />
         Save
       </button>
-      <p
-        id="manual-start-hint"
-        class="text-surface-700-300 w-full text-center text-xs"
-      >
+      <p id="manual-start-hint" class="text-surface-700-300 w-full text-xs">
         {manualValid
           ? `From is usually the ${rules.direction === 'high-to-low' ? 'highest' : 'lowest'} value in your weather.`
           : 'Every needs a number above 0, and From a number.'}
@@ -1172,17 +1169,14 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
   button points here with aria-describedby. Hidden while Manual steps are
   being set: it would describe the saved ranges, not the ones being typed. -->
   {#if !showManual}
-    <p
-      id="ranges-description"
-      class="text-surface-700-300 mt-3 px-2 text-center text-xs"
-    >
+    <p id="ranges-description" class="text-surface-700-300 mt-3 text-xs">
       {generatedAs}.{rules.linked
         ? ' Editing a range number also automatically updates the next or previous one.'
         : ''}
     </p>
     {#if autoRangesBehind}
       <p
-        class="text-surface-700-300 mt-2 flex flex-wrap items-center justify-center gap-x-1 px-2 text-center text-xs"
+        class="text-surface-700-300 mt-2 flex flex-wrap items-center gap-x-1 text-xs"
         data-testid="auto-ranges-behind"
       >
         Your weather changed since these Auto ranges were made.
@@ -1192,9 +1186,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       </p>
     {/if}
     {#if endsDontMeet}
-      <p
-        class="text-warning-800-200 mt-2 flex items-start justify-center gap-1.5 px-2 text-center text-xs"
-      >
+      <p class="text-warning-800-200 mt-2 flex items-start gap-1.5 text-xs">
         <TriangleAlertIcon class="mt-px size-3.5 shrink-0" aria-hidden="true" />
         <span
           >With both ends included or neither, these steps leave gaps or
@@ -1208,7 +1200,7 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
 
 <!-- Which ends of each range are in it, said once, just above the ranges -->
 {#if showRanges && !isCategory && rules}
-  <p class="text-surface-700-300 mt-3 px-2 text-center text-xs">
+  <p class="text-surface-700-300 mt-3 text-xs">
     {rangeRuleSentence(rules, gauge.id)}
   </p>
 {/if}

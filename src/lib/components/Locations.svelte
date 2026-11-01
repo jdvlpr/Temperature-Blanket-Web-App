@@ -49,62 +49,68 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="mx-auto mt-2 max-w-(--breakpoint-md)">
-  {#if loading}
-    <p class="h-auto animate-pulse text-sm">Loading project...</p>
-  {:else if validLoadedProject}
-    <p
-      class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
+<div>
+  <!-- The card's header: where the project came from, and whether its
+  weather may have changed since, apart from the places below -->
+  {#if loading || validLoadedProject || weatherDays.settledEarly.length}
+    <div
+      class="border-surface-300 dark:border-surface-600 mb-4 flex flex-col gap-1 border-b pb-4"
     >
-      <CircleCheckBigIcon class="icon-sm text-success-900-100" />
-      <span data-testid="loaded-from"
-        >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}
-        {#if project.status.loadedFrom === 'gallery'}
-          {#if project.status.galleryPostId}
-            <a
-              class="link inline-flex items-center gap-1"
-              href={`/gallery/${project.status.galleryPostId}`}
-              target="_blank"
-              rel="noreferrer"
-              >gallery page<ExternalLinkIcon class="icon-sm" /><span
-                class="sr-only">(opens in a new tab)</span
-              ></a
-            >
-          {:else}
-            gallery page
-          {/if}
-        {/if}</span
-      >
-      <HelpIcon topic="project-includes">
-        {#snippet text()}
-          <span>About</span>
-        {/snippet}
-      </HelpIcon>
-    </p>
-  {/if}
+      {#if loading}
+        <p class="h-auto animate-pulse text-sm">Loading project...</p>
+      {:else if validLoadedProject}
+        <p class="flex w-full flex-wrap items-center gap-1 text-sm">
+          <CircleCheckBigIcon class="icon-sm text-success-900-100" />
+          <span data-testid="loaded-from"
+            >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}
+            {#if project.status.loadedFrom === 'gallery'}
+              {#if project.status.galleryPostId}
+                <a
+                  class="link inline-flex items-center gap-1"
+                  href={`/gallery/${project.status.galleryPostId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  >gallery page<ExternalLinkIcon class="icon-sm" /><span
+                    class="sr-only">(opens in a new tab)</span
+                  ></a
+                >
+              {:else}
+                gallery page
+              {/if}
+            {/if}</span
+          >
+          <HelpIcon topic="project-includes">
+            {#snippet text()}
+              <span>About</span>
+            {/snippet}
+          </HelpIcon>
+        </p>
+      {/if}
 
-  <!-- Days got while their values were early, which have settled since -->
-  {#if !loading && weatherDays.settledEarly.length}
-    {@const count = weatherDays.settledEarly.length}
-    <p
-      class="mt-1 flex w-full flex-wrap items-center justify-center gap-x-1 text-center text-sm"
-      data-testid="early-days-settled"
-    >
-      Your last {count === 1 ? 'day was' : `${count} days were`} early data, which
-      may have changed since.
-      <button
-        type="button"
-        class="anchor"
-        onclick={() => weatherSearch.start({ mode: 'again' })}
-        >Search Again</button
-      >
-    </p>
+      <!-- Days got while their values were early, which have settled since -->
+      {#if !loading && weatherDays.settledEarly.length}
+        {@const count = weatherDays.settledEarly.length}
+        <p
+          class="flex w-full flex-wrap items-center gap-x-1 text-sm"
+          data-testid="early-days-settled"
+        >
+          Your last {count === 1 ? 'day was' : `${count} days were`} early data, which
+          may have changed since.
+          <button
+            type="button"
+            class="anchor"
+            onclick={() => weatherSearch.start({ mode: 'again' })}
+            >Search Again</button
+          >
+        </p>
+      {/if}
+    </div>
   {/if}
 
   {#if weather.isUserEdited}
-    <div class="my-4 flex flex-col items-center gap-2">
+    <div class="my-4 flex flex-col items-start gap-2">
       {#each locations.all as location}
-        <p class="flex flex-wrap items-center justify-center gap-x-1">
+        <p class="flex flex-wrap items-center gap-x-1">
           <span class="font-bold">{@html location.result}</span>
           <span>
             {location.from
@@ -153,39 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/each}
   </div>
 
-  <div
-    class="mb-4 flex w-full flex-col gap-2"
-    class:border-t={locations.all.length > 1}
-    class:border-surface-300={locations.all.length > 1}
-    class:dark:border-surface-600={locations.all.length > 1}
-    class:pt-4={locations.all.length > 1}
-  >
-    {#if locations.allValid && locations.totalDays === 1}
-      <!-- The range calculation functionality expects there to be more than one day of weather data.
-     So if there's only one day of weather data the color ranges will have some NaN values. 
-     This notice discourages users from using only one day of weather data. -->
-      <p class="rounded-container bg-warning-500/20 my-2 p-2 text-sm">
-        <TriangleAlertIcon class="icon-sm inline" />
-        For the best results, include multiple days in your project; otherwise, some
-        features may not work as expected.
-      </p>
-    {/if}
-
-    <div class="flex w-full flex-col items-center gap-2">
-      <SearchForWeather />
-    </div>
-
-    {#if locations.all.length > 1 && locations.totalDays && locations.allValid && !weather.isUserEdited}
-      <p class="w-full text-sm">
-        {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
-      </p>
-    {/if}
-  </div>
-</div>
-
-<div
-  class="rounded-base bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
->
+  <!-- Another place, right under the ones there are -->
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
       class={[
@@ -207,4 +181,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
       You've added the maximum allowed number of locations
     </p>
   {/if}
+
+  <!-- Then the weather for all of them -->
+  <div
+    class="border-surface-300 dark:border-surface-600 mt-2 flex w-full flex-col items-start gap-2 border-t pt-4"
+  >
+    {#if locations.allValid && locations.totalDays === 1}
+      <!-- The range calculation functionality expects there to be more than one day of weather data.
+     So if there's only one day of weather data the color ranges will have some NaN values. 
+     This notice discourages users from using only one day of weather data. -->
+      <p class="rounded-container bg-warning-500/20 my-2 p-2 text-sm">
+        <TriangleAlertIcon class="icon-sm inline" />
+        For the best results, include multiple days in your project; otherwise, some
+        features may not work as expected.
+      </p>
+    {/if}
+
+    {#if locations.all.length > 1 && locations.totalDays && locations.allValid && !weather.isUserEdited}
+      <p class="w-full text-sm">
+        {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
+      </p>
+    {/if}
+
+    <SearchForWeather />
+  </div>
 </div>

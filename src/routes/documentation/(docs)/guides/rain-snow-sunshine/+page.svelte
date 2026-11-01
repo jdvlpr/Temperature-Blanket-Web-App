@@ -36,13 +36,13 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
   <ol class="ml-6 list-decimal space-y-1">
     <li>Get the weather for your place and dates, as usual.</li>
     <li>
-      Above the gauge's colors, press <span class="font-bold">Rain Gauge</span>,
+      Above the gauge's colors, press <span class="font-bold">Add Gauge</span>
+      and choose <span class="font-bold">Rain Gauge</span>,
       <span class="font-bold">Snow Gauge</span>,
       <span class="font-bold">Daytime Gauge</span> or
-      <span class="font-bold">Moon Phase Gauge</span>. A
-      <span class="font-bold">+</span> means it isn't in your project yet.
+      <span class="font-bold">Moon Phase Gauge</span>. It lists the ones your
+      weather has data for that aren't in your project yet.
     </li>
-    <li>Confirm that you want to add it.</li>
     <li>Choose its colors and ranges, just like the temperature gauge.</li>
   </ol>
   <DocsShot

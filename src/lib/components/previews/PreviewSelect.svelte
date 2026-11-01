@@ -18,7 +18,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { THEMES } from '#lib/constants/page-constants.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { onDestroy, onMount, tick, type Snippet } from 'svelte';
+
+  interface Props {
+    /** Beside the pattern picker, at the far end: what to do with the preview */
+    actions?: Snippet;
+  }
+
+  let { actions }: Props = $props();
 
   let theme = $state(
     getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)?.id),
@@ -70,45 +77,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="flex flex-col items-center justify-center gap-2">
-  <label class="label">
-    <span class="label-text"> Pattern</span>
-    <div class="relative flex items-center">
-      <select
-        class="select truncate"
-        id="select-pattern-type"
-        value={activePreviewSelectId}
-        onchange={(e) => {
-          if (!(e.target instanceof HTMLSelectElement)) return;
-          onChangePattern(e.target.value);
-          tick().then(() => {
-            const activePreviewBtn = document.getElementById(
-              'active-preview-button',
-            );
-            if (activePreviewBtn) {
-              activePreviewBtn.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center',
-              });
-            }
-          });
-        }}
-      >
-        {#each previews.all as { name, id }}
-          {#if id === 'twsr'}
-            <option value={id}>{name}</option>
-          {:else}
-            <option value={id}>{name}</option>
-          {/if}
-        {/each}
-      </select>
-    </div>
-  </label>
+<div class="flex flex-col gap-2">
+  <div class="flex flex-wrap items-end justify-between gap-2">
+    <label class="label w-fit">
+      <span class="label-text"> Pattern</span>
+      <div class="relative flex items-center">
+        <select
+          class="select truncate"
+          id="select-pattern-type"
+          value={activePreviewSelectId}
+          onchange={(e) => {
+            if (!(e.target instanceof HTMLSelectElement)) return;
+            onChangePattern(e.target.value);
+            tick().then(() => {
+              const activePreviewBtn = document.getElementById(
+                'active-preview-button',
+              );
+              if (activePreviewBtn) {
+                activePreviewBtn.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'nearest',
+                  inline: 'center',
+                });
+              }
+            });
+          }}
+        >
+          {#each previews.all as { name, id }}
+            {#if id === 'twsr'}
+              <option value={id}>{name}</option>
+            {:else}
+              <option value={id}>{name}</option>
+            {/if}
+          {/each}
+        </select>
+      </div>
+    </label>
+    {@render actions?.()}
+  </div>
 
-  <div
-    class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-3"
-  >
+  <div class="relative my-2 flex max-w-full snap-x overflow-auto pb-3">
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}

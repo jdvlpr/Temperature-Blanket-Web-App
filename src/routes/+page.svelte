@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
   import ProjectMenuButton from '#lib/components/buttons/ProjectMenuButton.svelte';
   import ProjectTitle from '#lib/components/ProjectTitle.svelte';
+  import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import {
     dialog,
@@ -280,13 +281,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="mx-auto pb-18 text-center" id="main-page">
+    <main class={[PAGE, 'pb-18']} id="main-page">
       <div
         id="page-section-location"
-        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
+        class="scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
-        <div class="w-full px-2 py-4">
+        <div class={[PAGE_TEXT, 'py-4']}>
           <div class="flex flex-col gap-2">
             <h2 class="h1 text-gradient mb-0">Weather Data + Art</h2>
             <p>
@@ -303,7 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mx-auto mb-2 px-2 md:p-4 md:shadow-lg"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mb-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>
@@ -323,7 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
             {#if !weather.isUserEdited}
-              <p class="my-4 px-2 text-center text-sm">
+              <p class="my-4 text-sm">
                 Weather data from <button
                   class="underline"
                   onclick={() => {
@@ -354,7 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
-            <p class="my-4 px-2 text-center text-sm">
+            <p class="my-4 text-sm">
               Real yarn colors will look different than what's on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies.
@@ -367,7 +368,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="mx-auto max-w-screen-md px-2">
+          <div class={PAGE_TEXT}>
             <p class="my-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
@@ -382,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <SectionNavigationButtons thisSectionIndex={4} />
 
-          <p class="my-4 px-2 text-center text-sm">
+          <p class="my-4 text-sm">
             Real projects will look different than the preview. Patterns not
             provided.
           </p>
