@@ -287,8 +287,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
-        <div class={[PAGE_TEXT, 'py-4']}>
-          <div class="flex flex-col gap-2">
+        <!-- The planner's front door: one centered column, unlike its other
+        steps, which start at the page's left edge -->
+        <div class={[PAGE_TEXT, 'mx-auto']}>
+          <div class="flex flex-col gap-2 py-4 text-center">
             <h2 class="h1 text-gradient mb-0">Weather Data + Art</h2>
             <p>
               Get historical weather data, choose yarn colors, and visualize
@@ -301,17 +303,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
             </p>
           </div>
-        </div>
 
-        <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mb-2 md:p-4 md:shadow-lg"
-        >
-          <Locations />
-        </div>
+          <div
+            class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:card-border mb-2 md:p-4 md:shadow-lg"
+          >
+            <Locations />
+          </div>
 
-        {#if weather.data.length}
-          <SectionNavigationButtons thisSectionIndex={1} />
-        {/if}
+          {#if weather.data.length}
+            <SectionNavigationButtons thisSectionIndex={1} />
+          {/if}
+        </div>
       </div>
 
       {#if weather.data.length}

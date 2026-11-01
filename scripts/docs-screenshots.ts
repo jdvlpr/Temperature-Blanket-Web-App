@@ -74,7 +74,11 @@ async function planner(
     .all())
     await toast.click();
   await settle(page);
-  return page.locator(`#page-section-${section}`);
+  // Location is a centered column; its shots are of the column, not the
+  // empty width beside it
+  return section === 'location'
+    ? page.locator('#page-section-location > div')
+    : page.locator(`#page-section-${section}`);
 }
 
 /** Lets menus, charts and fonts finish moving */

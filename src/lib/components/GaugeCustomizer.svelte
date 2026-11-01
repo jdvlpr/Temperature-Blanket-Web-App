@@ -39,9 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     paletteListClass,
     paletteRowClass,
   } from '#lib/components/palette-item-styles.js';
-  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
-  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
-  import { menuItemClass } from '#lib/components/menu-styles.js';
   import ChangeColor from '#lib/components/modals/ChangeColor.svelte';
   import WeatherTable from '#lib/components/modals/WeatherTable.svelte';
   import ColorwayMoreMenu from '#lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
@@ -54,7 +51,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { previewHighlight } from '#lib/state/preview-state.svelte.js';
   import {
-    gauges,
     manualRangesEditor,
     showDaysInRange,
   } from '#lib/state/gauges-state.svelte.js';
@@ -98,7 +94,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
-  import { Menu } from '@skeletonlabs/skeleton-svelte';
   import {
     DRAGGED_ELEMENT_ID,
     dragHandle,
@@ -109,7 +104,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-dnd-action';
   import { tick, untrack } from 'svelte';
   import { flip } from 'svelte/animate';
-  import RangesMenu from './buttons/RangesMenu.svelte';
 
   const flipDurationMs = $derived(motionDuration(150));
 
@@ -141,6 +135,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const item =
       listElement.querySelectorAll<HTMLElement>(':scope > .color')[index];
     if (!item) return;
+    // Not under the palette card, where it stays in view above the list
+    const card = document.querySelector<HTMLElement>('[data-palette-card]');
+    item.style.scrollMarginTop =
+      card && getComputedStyle(card).position === 'sticky'
+        ? `${card.getBoundingClientRect().bottom + 8}px`
+        : '';
     item.scrollIntoView({
       block: 'nearest',
       behavior: motion.reduced ? 'auto' : 'smooth',
@@ -1057,37 +1057,6 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
     removeLabel="Remove color {index + 1}"
   />
 {/snippet}
-
-<div class={['mt-3 flex flex-wrap items-center gap-4']}>
-  {#if isProjectPlannerPage}
-    <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
-      <RangesMenu />
-    </div>
-  {/if}
-  <!-- The project page also has Days in ranges -->
-  {#if isProjectPlannerPage}
-    <ViewMenu bind:value={preferences.value.layout} fillOption>
-      <!-- Stays open, so the check shows it took -->
-      <Menu.OptionItem
-        type="checkbox"
-        value="days"
-        checked={showDaysInRange.value}
-        closeOnSelect={false}
-        onCheckedChange={(checked) => (showDaysInRange.value = checked)}
-        class={menuItemClass}
-      >
-        <span class="flex min-w-0 flex-1 flex-col">
-          <span>Days in ranges</span>
-          <span class="text-surface-700-300 text-xs">How many fall in each</span
-          >
-        </span>
-        <MenuCheckbox checked={showDaysInRange.value} />
-      </Menu.OptionItem>
-    </ViewMenu>
-  {:else}
-    <ViewMenu bind:value={preferences.value.layout} fillOption />
-  {/if}
-</div>
 
 {#if showRanges && !isCategory && rules}
   {#if showManual}

@@ -71,7 +71,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div style:--sidebar-width="{sidebarWidth}px">
+<div
+  style:--sidebar-width="{sidebarWidth}px"
+  style:--top-bar-height="{topBarHeight}px"
+>
   <div
     class={[
       'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',

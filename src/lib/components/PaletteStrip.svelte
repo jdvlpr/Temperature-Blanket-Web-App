@@ -46,8 +46,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     height?: string;
     roundedBottom?: boolean;
     /** Its corners: the theme's (`container`), slightly rounded for small
-    strips in rows (`small`), or a card's less its padding, inside a card (`nested`) */
-    corners?: 'container' | 'small' | 'nested';
+    strips in rows (`small`), a card's less its padding, inside a card (`nested`),
+    or square (`none`), as in a card docked under the top bar */
+    corners?: 'container' | 'small' | 'nested' | 'none';
     /** In a link or button: the colors aren't tab stops, and the strip is hidden from screen readers */
     insideControl?: boolean;
     /** Called with a color's index when it's pressed; each color is then a button */
@@ -92,6 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       tr: 'rounded-tr-nested',
       br: 'rounded-br-nested',
     },
+    none: { t: '', b: '', tl: '', bl: '', tr: '', br: '' },
   };
 
   let {
@@ -147,6 +149,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const floating = tooltip;
     if (!reference || !floating) return;
     return autoUpdate(reference, floating, async () => {
+      // Below the color when there's no room above it but under the top bar
+      // (set by AppShell), as when the strip sticks there
+      const topBar =
+        parseFloat(
+          getComputedStyle(reference).getPropertyValue('--top-bar-height'),
+        ) || 0;
       const { x, y, middlewareData, placement } = await computePosition(
         reference,
         floating,
@@ -154,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           placement: 'top',
           middleware: [
             offset(8),
-            flip(),
+            flip({ padding: { top: topBar } }),
             shift({ padding: 4 }),
             tooltipArrow && arrow({ element: tooltipArrow, padding: 4 }),
           ],
@@ -275,7 +283,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <span
       class={[
-        'flex w-full overflow-hidden',
+        // Eases to a new height, as in the palette editor's card once it sticks
+        'flex w-full overflow-hidden motion-safe:transition-[height]',
         CORNERS[corners].t,
         roundedBottom && CORNERS[corners].b,
       ]}

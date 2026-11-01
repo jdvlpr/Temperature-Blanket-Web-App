@@ -25,6 +25,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PasteColors from '#lib/components/modals/PasteColors.svelte';
   import RandomPalette from '#lib/components/modals/RandomPalette.svelte';
   import SortMenu from '#lib/components/SortMenu.svelte';
+  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
+  import RangesMenu from '#lib/components/buttons/RangesMenu.svelte';
+  import ViewMenu from '#lib/components/buttons/ViewMenu.svelte';
   import {
     getSortedPalette,
     reverseColors,
@@ -35,7 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { historyChange } from '#lib/utils/feedback.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import type { GaugeSettingsType } from '#lib/types/gauge-types.js';
-  import { createGaugeColors } from '#lib/state/gauges-state.svelte.js';
+  import {
+    createGaugeColors,
+    showDaysInRange,
+  } from '#lib/state/gauges-state.svelte.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
   import {
     BlendIcon,
     BookmarkIcon,
@@ -54,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import {
     menuContentClass,
+    menuItemClass,
     menuPositioning,
   } from '#lib/components/menu-styles.js';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
@@ -82,6 +90,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     return () => (previewHighlight.hex = null);
   });
+
+  let isCategory = $derived(gauge.unit?.type === 'category');
+
+  // On wide screens the card stays in view above the list of colors as it
+  // scrolls. Stuck there, it's docked to the top bar like the steps bar is
+  // to the bottom (square against it, see-through like it), its strip is
+  // shorter, and the space after the card grows by as much, so the list
+  // doesn't jump up.
+  const STRIP_HEIGHT = 70;
+  const STUCK_STRIP_HEIGHT = 36;
+  let card: HTMLElement | undefined = $state();
+  // Just above the card, where the card's top is until it sticks
+  let above: HTMLElement | undefined = $state();
+  let stuck = $state(false);
+
+  function checkStuck() {
+    if (!card || !above) return;
+    // auto (NaN) where the card doesn't stick
+    const top = parseFloat(getComputedStyle(card).top);
+    stuck = !Number.isNaN(top) && above.getBoundingClientRect().bottom < top;
+  }
+
+  $effect(checkStuck);
 
   let flashIndices = $derived(
     historyChange.gaugeId === gauge.id ? historyChange.indices : [],
@@ -234,98 +265,139 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
+<svelte:window onscroll={checkStuck} onresize={checkStuck} />
+
+<div class="h-2" bind:this={above} aria-hidden="true"></div>
 <div
   class={[
-    'rounded-container border-surface-200-800 bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-col gap-2 border',
-    gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
+    'rounded-container border-surface-200-800 flex w-full flex-col gap-2 border pb-2 lg:sticky lg:top-(--top-bar-height) lg:z-10',
+    stuck
+      ? 'bg-surface-50/80 dark:bg-surface-950/80 rounded-t-none shadow-lg backdrop-blur-md'
+      : 'bg-surface-100 dark:bg-surface-900',
   ]}
+  bind:this={card}
+  data-palette-card
 >
   <div class="w-full">
     <!-- The overview: pressing a color goes to it in the list below, where it's edited -->
     <PaletteStrip
       colors={gauge.colors}
       roundedBottom={false}
+      corners={stuck ? 'none' : 'container'}
+      height="{stuck ? STUCK_STRIP_HEIGHT : STRIP_HEIGHT}px"
       {flashIndices}
       onhover={(index) => (highlightIndex = index)}
       onselect={(index) => focusGaugeColor(gauge.id, index)}
     />
   </div>
 
-  <div
-    class={[
-      'flex flex-wrap items-center gap-2 px-2',
-      gauge.unit.type === 'category' && 'hidden',
-    ]}
-  >
-    <SelectNumberOfColors
-      numberOfColors={gauge.colors.length}
-      onchange={(e: Event) => {
-        const target = e.target as HTMLSelectElement;
-        const colors = createGaugeColors({
-          schemeId: gauge.schemeId,
-          numberOfColors: +target.value,
-          colors: $state.snapshot(gauge.colors),
-        });
-        gauge.updateColors({ colors });
-      }}
-    />
-
-    <SortMenu
-      colors={gauge.colors}
-      triggerClass={toolbarButtonClass}
-      onsort={(sort) => {
-        const colors = $state.snapshot(gauge.colors);
-        updateGauge({
-          _colors:
-            sort === 'reverse'
-              ? reverseColors(colors)
-              : sort === 'shuffle'
-                ? shuffleColors(colors)
-                : getSortedPalette({
-                    palette: colors,
-                    sortColors: sort,
-                  }),
-        });
-      }}
-    />
-
-    <Menu
-      positioning={menuPositioning('bottom-start')}
-      onSelect={(details) => openColorSource(details.value)}
-    >
-      <Menu.Trigger
-        class={toolbarButtonClass}
-        title="Get Colors from Palettes, Preset Gradients, Yarn, an Image, and More"
+  <div class="flex flex-wrap items-center gap-2 px-2">
+    {#if !isCategory}
+      <Menu
+        positioning={menuPositioning('bottom-start')}
+        onSelect={(details) => openColorSource(details.value)}
       >
-        <ImportIcon />
-        <span class="flex items-center gap-1"
-          >Get Colors <ChevronDownIcon class="icon-sm" /></span
+        <Menu.Trigger
+          class={toolbarButtonClass}
+          title="Get Colors from Palettes, Preset Gradients, Yarn, an Image, and More"
         >
-      </Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content class={menuContentClass}>
-            {#each [...colorTools, { value: 'divider1', label: null }, ...paletteSources, { value: 'divider2', label: null }, ...colorImport] as source (source.value)}
-              {#if source.label}
-                <Menu.Item
-                  value={source.value}
-                  class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
-                >
-                  <source.icon class="shrink-0" />
-                  <div class="flex min-w-0 flex-col text-left">
-                    <p>{source.label}</p>
-                    <p class="text-surface-700-300 text-xs">
-                      {source.details}
-                    </p>
-                  </div>
-                </Menu.Item>
-              {:else}
-                <Menu.Separator />
-              {/if}
-            {/each}
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu>
+          <ImportIcon />
+          <span class="flex items-center gap-1"
+            >Get Colors <ChevronDownIcon class="icon-sm" /></span
+          >
+        </Menu.Trigger>
+        <Portal>
+          <Menu.Positioner>
+            <Menu.Content class={menuContentClass}>
+              {#each [...colorTools, { value: 'divider1', label: null }, ...paletteSources, { value: 'divider2', label: null }, ...colorImport] as source (source.value)}
+                {#if source.label}
+                  <Menu.Item
+                    value={source.value}
+                    class="data-highlighted:bg-surface-200-800 flex items-center justify-start gap-2 text-left whitespace-normal data-highlighted:text-inherit"
+                  >
+                    <source.icon class="shrink-0" />
+                    <div class="flex min-w-0 flex-col text-left">
+                      <p>{source.label}</p>
+                      <p class="text-surface-700-300 text-xs">
+                        {source.details}
+                      </p>
+                    </div>
+                  </Menu.Item>
+                {:else}
+                  <Menu.Separator />
+                {/if}
+              {/each}
+            </Menu.Content>
+          </Menu.Positioner>
+        </Portal>
+      </Menu>
+      <SelectNumberOfColors
+        numberOfColors={gauge.colors.length}
+        onchange={(e: Event) => {
+          const target = e.target as HTMLSelectElement;
+          const colors = createGaugeColors({
+            schemeId: gauge.schemeId,
+            numberOfColors: +target.value,
+            colors: $state.snapshot(gauge.colors),
+          });
+          gauge.updateColors({ colors });
+        }}
+      />
+
+      <SortMenu
+        colors={gauge.colors}
+        triggerClass={toolbarButtonClass}
+        onsort={(sort) => {
+          const colors = $state.snapshot(gauge.colors);
+          updateGauge({
+            _colors:
+              sort === 'reverse'
+                ? reverseColors(colors)
+                : sort === 'shuffle'
+                  ? shuffleColors(colors)
+                  : getSortedPalette({
+                      palette: colors,
+                      sortColors: sort,
+                    }),
+          });
+        }}
+      />
+    {/if}
+
+    <!-- How the list of colors below shows: a project's ranges, and its view -->
+    <div class="flex flex-wrap items-center gap-2 sm:ml-auto">
+      {#if inProject && !gauge.isStatic}
+        <RangesMenu />
+      {/if}
+      {#if inProject}
+        <!-- A project's list also has Days in ranges -->
+        <ViewMenu bind:value={preferences.value.layout} fillOption>
+          <!-- Stays open, so the check shows it took -->
+          <Menu.OptionItem
+            type="checkbox"
+            value="days"
+            checked={showDaysInRange.value}
+            closeOnSelect={false}
+            onCheckedChange={(checked) => (showDaysInRange.value = checked)}
+            class={menuItemClass}
+          >
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span>Days in ranges</span>
+              <span class="text-surface-700-300 text-xs"
+                >How many fall in each</span
+              >
+            </span>
+            <MenuCheckbox checked={showDaysInRange.value} />
+          </Menu.OptionItem>
+        </ViewMenu>
+      {:else}
+        <ViewMenu bind:value={preferences.value.layout} fillOption />
+      {/if}
+    </div>
   </div>
 </div>
+<div
+  class="motion-safe:transition-[height]"
+  style:height="{stuck ? STRIP_HEIGHT - STUCK_STRIP_HEIGHT : 0}px"
+  aria-hidden="true"
+></div>

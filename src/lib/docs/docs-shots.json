@@ -4,7 +4,7 @@
     "height": 400
   },
   "location-and-dates/location": {
-    "width": 975,
+    "width": 768,
     "height": 601
   },
   "weather/weather-source": {
@@ -33,7 +33,7 @@
   },
   "gauges-and-ranges/edit-range": {
     "width": 975,
-    "height": 1244
+    "height": 1192
   },
   "weather/edit-day": {
     "width": 364,
@@ -41,10 +41,10 @@
   },
   "choose-ranges/days-in-ranges": {
     "width": 975,
-    "height": 1244
+    "height": 1192
   },
   "same-date-several-years/locations": {
-    "width": 975,
+    "width": 768,
     "height": 1057
   },
   "match-your-yarn/choose-colorways": {
@@ -52,12 +52,12 @@
     "height": 1288
   },
   "knit-along-all-year/future-days": {
-    "width": 975,
+    "width": 768,
     "height": 601
   },
   "rain-snow-sunshine/rain-gauge": {
     "width": 975,
-    "height": 764
+    "height": 712
   },
   "version-7/site-menu": {
     "width": 278,
