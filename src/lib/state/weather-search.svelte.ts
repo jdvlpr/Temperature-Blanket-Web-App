@@ -27,12 +27,18 @@ import { projectChanged } from '#lib/storage/autosave.svelte.js';
 import { pluralize } from '#lib/utils/string-utils.js';
 import {
   addDays,
+  applyChanges,
   dayKey,
   hasValues,
   isoOf,
   mergeNewDays,
+  updateDeclined,
+  type DayChange,
+  type DayKey,
   type DeclinedValues,
+  type EarlyDays,
 } from '#lib/utils/weather-days.js';
+import type { SearchAgainResult } from '#lib/components/modals/search-again.js';
 import type { TISO8601DateString } from '#lib/types/weather-types.js';
 
 /** The weather already there, to put back if the search is cancelled */
@@ -47,11 +53,10 @@ class AbortedError extends Error {}
 
 /**
  * What a search does: `search` gets every day and replaces the weather (a
- * new project, or new locations, dates or source); `new-days` gets only the
- * days since the last ones got; `again` gets every day again, adds the new
- * ones and asks before changing saved ones.
+ * new project, or new locations, dates or source); `again` gets every day
+ * again and adds the new ones, asking first when saved ones changed.
  */
-export type SearchMode = 'search' | 'new-days' | 'again';
+export type SearchMode = 'search' | 'again';
 
 /** Each location's days to get, or null to skip it */
 type Ranges = ({ from: TISO8601DateString; to: TISO8601DateString } | null)[];
@@ -127,20 +132,11 @@ class WeatherSearch {
     controller.value = abort;
     const mode = this.mode;
     try {
-      const ranges = mode === 'new-days' ? weatherDays.newDays : null;
-      const data = await this.#fetchAll(
-        abort.signal,
-        ranges && withDaysBefore(ranges),
-      );
+      const data = await this.#fetchAll(abort.signal);
       if (abort.signal.aborted) return;
       controller.value = null;
       this.#restore = null;
       this.#onCancel = null;
-      if (mode === 'new-days') {
-        this.active = false;
-        this.#addNewDays(data, ranges ?? []);
-        return;
-      }
       if (mode === 'again') {
         this.active = false;
         await this.#searchedAgain(data);
@@ -184,18 +180,14 @@ class WeatherSearch {
     try {
       const data = await this.#fetchAll(abort.signal, withDaysBefore(ranges));
       if (abort.signal.aborted) return;
-      this.#addNewDays(data, ranges, { quiet: true });
+      this.#addNewDays(data, ranges);
     } finally {
       if (controller.value === abort) controller.value = null;
     }
   }
 
   /** Puts the days just got in place of the blank ones saved for them */
-  #addNewDays(
-    data: WeatherDay[],
-    ranges: Ranges,
-    { quiet = false }: { quiet?: boolean } = {},
-  ) {
+  #addNewDays(data: WeatherDay[], ranges: Ranges) {
     const added = data.filter((day) => {
       const range = ranges[day.location];
       const date = isoOf(day.date);
@@ -213,77 +205,81 @@ class WeatherSearch {
       projectChanged({ weather: true });
     }
     keptWith(() => weatherDays.got(added, { all: false, locationsGot }));
-    if (quiet) return;
-    toast.trigger({
-      category: added.length ? 'success' : 'info',
-      message: added.length
-        ? `Added ${added.length} new ${pluralize('day', added.length)}.`
-        : "No new days yet. The weather source doesn't have them yet; try again later.",
-    });
   }
 
   /**
-   * Every day got again: new days go in, and the saved days it got
-   * differently are shown to choose from (SearchAgain.svelte).
+   * Every day got again: when saved days differ (other than ones kept
+   * before), the dialog (SearchAgain.svelte) chooses what to update and
+   * whether to add the new days, and nothing changes until its Save; else
+   * the new days go in.
    */
   async #searchedAgain(data: WeatherDay[]) {
-    const before = $state.snapshot(weather.rawData) as WeatherDay[];
     const fetchedThrough = $state.snapshot(
       weatherDays.fetchedThrough,
     ) as (TISO8601DateString | null)[];
-    const declined = $state.snapshot(weatherDays.declined) as DeclinedValues;
-    const fetchedAt = $state.snapshot(
-      weatherDays.fetchedAt,
-    ) as (TISO8601DateString | null)[];
-    // Days after the last ones got are new: added without asking
+    // Days after the last ones got are new
     const isNew = (day: WeatherDay) => {
       const through = fetchedThrough[day.location];
       return hasValues(day) && (!through || isoOf(day.date) > through);
     };
-    const newDays = data.filter(isNew);
-    const saved = newDays.length ? mergeNewDays(before, newDays) : before;
-    if (newDays.length) {
-      weather.updateRawData(saved);
-      projectChanged({ weather: true });
-    }
-    // Every day was got: early ones are only those still early now. The
-    // saved days are as of today only once nothing's left to choose
-    keptWith(() => weatherDays.got(data, { all: true, stamp: false }));
-    const added = new Set(newDays.map(dayKey)).size;
-    const { changesFor, onlyColorChanges, openSearchAgain } =
-      await import('#lib/components/modals/search-again.js');
-    const result = {
-      saved,
+    const result: SearchAgainResult = {
+      saved: $state.snapshot(weather.rawData) as WeatherDay[],
       got: data,
       fetchedThrough,
-      fetchedAt,
-      declined,
-      added,
+      fetchedAt: $state.snapshot(
+        weatherDays.fetchedAt,
+      ) as (TISO8601DateString | null)[],
+      declined: $state.snapshot(weatherDays.declined) as DeclinedValues,
+      early: $state.snapshot(weatherDays.early) as EarlyDays,
+      newDays: data.filter(isNew),
     };
-    const differ = changesFor(result, { colorsOnly: false }).length;
-    if (differ && (!onlyColorChanges() || changesFor(result).length))
-      return openSearchAgain(result);
-    const addedText = added
-      ? `Added ${added} new ${pluralize('day', added)}. `
-      : '';
-    // Days differ, though none changes a color: said, the saved values staying
-    // (asked about again next time, as closing the dialog leaves them)
-    if (differ) {
-      toast.trigger({
-        category: 'success',
-        message: `${addedText}No colors changed. ${differ} saved ${pluralize('day', differ)} ${differ === 1 ? 'has' : 'have'} slightly different values; yours stay as they are.`,
-        hoverable: true,
-        action: {
-          label: 'See Changes',
-          response: () => openSearchAgain(result, { showSameColor: true }),
-        },
-      });
-      return;
-    }
-    keptWith(() => weatherDays.stamp());
+    const { changesOf, newDayCount, openSearchAgain } =
+      await import('#lib/components/modals/search-again.js');
+    const { all, fresh } = changesOf(result);
+    if (fresh.length) return openSearchAgain(result);
+    const added = newDayCount(result);
+    this.finishAgain(result, { update: new Set(), add: true, considered: all });
     toast.trigger({
       category: 'success',
-      message: `${addedText}Weather data is up to date.`,
+      message: `${added ? `Added ${added} new ${pluralize('day', added)}. ` : ''}Weather data is up to date.`,
+    });
+  }
+
+  /**
+   * Search Again's choices: the saved days in `update` take the new values,
+   * the new days go in if `add`, and the other `considered` changes are
+   * remembered as kept (asked about again only once they change again).
+   * Without `add`, the new days are still new, offered again later.
+   */
+  finishAgain(
+    result: SearchAgainResult,
+    {
+      update,
+      add,
+      considered,
+    }: { update: Set<DayKey>; add: boolean; considered: DayChange[] },
+  ) {
+    let days = result.saved;
+    if (add && result.newDays.length) days = mergeNewDays(days, result.newDays);
+    if (update.size) days = applyChanges(days, result.got, update);
+    if (days !== result.saved) {
+      weather.updateRawData(days);
+      projectChanged({ weather: true });
+    }
+    const newKeys = new Set(result.newDays.map(dayKey));
+    const got = add
+      ? result.got
+      : result.got.filter((day) => !newKeys.has(dayKey(day)));
+    keptWith(() => {
+      // Early days are only those still early now
+      weatherDays.got(got, { all: true, stamp: false });
+      weatherDays.declined = updateDeclined(
+        result.declined,
+        considered,
+        update,
+      );
+      // Chosen: the saved days are as of this search
+      weatherDays.stamp();
     });
   }
 

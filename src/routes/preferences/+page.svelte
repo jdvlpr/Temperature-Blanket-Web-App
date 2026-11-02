@@ -374,46 +374,6 @@ site does -->
         </div>
       </section>
 
-      <!-- How Search Again asks about saved days a search got differently -->
-      <section
-        class="flex flex-col gap-2"
-        aria-labelledby="preferences-weather"
-      >
-        <h3 id="preferences-weather" class="px-2 text-sm font-bold opacity-70">
-          Weather Data
-        </h3>
-        <div
-          class="bg-surface-100 dark:bg-surface-900 rounded-container divide-surface-200-800 flex flex-col divide-y border border-gray-300 dark:border-gray-700"
-        >
-          <ToggleSwitch
-            bare
-            label="Show Only Values My Gauges Use"
-            details="When you search again, compare only those. Otherwise any change to high, average, low, rain or snow."
-            checked={preferences.value.weatherChanges?.compare === 'gauges'}
-            onchange={(e) =>
-              (preferences.value.weatherChanges = {
-                ...preferences.value.weatherChanges,
-                compare: (e.currentTarget as HTMLInputElement).checked
-                  ? 'gauges'
-                  : 'all',
-              })}
-          />
-          <ToggleSwitch
-            bare
-            label="Show Only Days Whose Colors Change"
-            details="When you search again, leave out days whose new values stay in the same ranges."
-            checked={preferences.value.weatherChanges?.show !== 'all'}
-            onchange={(e) =>
-              (preferences.value.weatherChanges = {
-                ...preferences.value.weatherChanges,
-                show: (e.currentTarget as HTMLInputElement).checked
-                  ? 'colors'
-                  : 'all',
-              })}
-          />
-        </div>
-      </section>
-
       <section class="flex flex-col gap-2" aria-labelledby="preferences-motion">
         <h3 id="preferences-motion" class="px-2 text-sm font-bold opacity-70">
           Motion

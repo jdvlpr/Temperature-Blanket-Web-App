@@ -44,8 +44,6 @@ const DEFAULTS: Record<SyncedPreferenceKey, unknown> = {
   'theme.mode': 'system',
   'theme.roundness': 'pill',
   'theme.headingStyle': 'classic',
-  'weatherChanges.compare': 'all',
-  'weatherChanges.show': 'colors',
 };
 
 export type PreferencesSyncState = {
@@ -79,9 +77,9 @@ function writeState(state: PreferencesSyncState) {
   }
 }
 
-// A nested preference's group (`theme`, `weatherChanges`) and field
+// A nested preference's group (`theme`) and field
 const groupOf = (key: SyncedPreferenceKey) => {
-  const [group, field] = key.split('.') as ['theme' | 'weatherChanges', string];
+  const [group, field] = key.split('.') as ['theme', string];
   return { group, field };
 };
 

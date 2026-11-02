@@ -64,7 +64,6 @@ open in the panel, with a Back button to it. -->
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
-    CalendarPlusIcon,
     ChevronRightIcon,
     CloudAlertIcon,
     CopyPlusIcon,
@@ -332,26 +331,6 @@ the same color) says it's waiting here -->
     <!-- Its weather again, as the planner's Weather Data menu offers -->
     {#if weatherDays.canSearchAgain}
       <PanelGroup heading="Weather Data">
-        {#if weatherDays.offersNewDays}
-          <li>
-            <button
-              type="button"
-              class={ROW}
-              disabled={!weatherDays.newDaysCount}
-              onclick={() => searchWeather('new-days')}
-            >
-              <CalendarPlusIcon class="shrink-0 opacity-70" />
-              <span class="flex flex-1 flex-col">
-                <span>{WEATHER_ACTIONS['new-days'].label}</span>
-                <span class="text-xs opacity-70"
-                  >{weatherDays.newDaysCount
-                    ? `${weatherDays.newDaysCount} new ${pluralize('day', weatherDays.newDaysCount)} available`
-                    : WEATHER_ACTIONS['new-days'].upToDate}</span
-                >
-              </span>
-            </button>
-          </li>
-        {/if}
         <li>
           <button
             type="button"
@@ -362,7 +341,9 @@ the same color) says it's waiting here -->
             <span class="flex flex-1 flex-col">
               <span>{WEATHER_ACTIONS.again.label}</span>
               <span class="text-xs opacity-70"
-                >{WEATHER_ACTIONS.again.description}</span
+                >{weatherDays.newDaysCount
+                  ? `${weatherDays.newDaysCount} new ${pluralize('day', weatherDays.newDaysCount)} · `
+                  : ''}{WEATHER_ACTIONS.again.description}</span
               >
             </span>
           </button>

@@ -7,11 +7,15 @@ import {
   applyChanges,
   compareDays,
   daysFrom,
+  differenceRange,
   earlyDaysIn,
   fetchedThroughNow,
+  fillsGap,
+  keptBefore,
   lastDayWithValues,
   mergeNewDays,
   newDaysRange,
+  removesData,
   settledEarlyDays,
   updateDeclined,
   type DayKey,
@@ -254,5 +258,53 @@ describe('early days', () => {
     expect(settledEarlyDays(early, iso('2026-10-19'), source)).toEqual([
       '0|2026-10-13',
     ]);
+  });
+});
+
+describe('kinds of change', () => {
+  const change = (saved: number | null, got: number | null) => ({
+    key: '0|2026-01-01' as DayKey,
+    location: 0,
+    date: iso('2026-01-01'),
+    changes: [{ param: 'tmax' as const, saved, got }],
+  });
+
+  it('tells gaps filled from data removed', () => {
+    expect(fillsGap(change(null, 3))).toBe(true);
+    expect(removesData(change(null, 3))).toBe(false);
+    expect(removesData(change(3, null))).toBe(true);
+    expect(fillsGap(change(3, null))).toBe(false);
+    expect(fillsGap(change(3, 4))).toBe(false);
+    expect(removesData(change(3, 4))).toBe(false);
+  });
+
+  it('measures differences between values both there', () => {
+    expect(
+      differenceRange([
+        { saved: 1, got: 1.5 },
+        { saved: 10, got: 6 },
+        { saved: null, got: 2 },
+        { saved: 4, got: null },
+      ]),
+    ).toEqual({ min: 0.5, max: 4 });
+    expect(differenceRange([{ saved: null, got: 2 }])).toBeNull();
+  });
+
+  it('finds the days kept before', () => {
+    const saved = [day('2026-01-01', 10), day('2026-01-02', 10)];
+    const got = [day('2026-01-01', 12), day('2026-01-02', 13)];
+    const fetchedThrough = [iso('2026-01-02')];
+    const declined = {
+      '0|2026-01-01': { tmax: 12, tavg: 7, tmin: 2 },
+    } as const;
+    const all = compareDays({
+      saved,
+      got,
+      fetchedThrough,
+      declined,
+      askEveryTime: true,
+    });
+    const fresh = compareDays({ saved, got, fetchedThrough, declined });
+    expect([...keptBefore(all, fresh)]).toEqual(['0|2026-01-01']);
   });
 });

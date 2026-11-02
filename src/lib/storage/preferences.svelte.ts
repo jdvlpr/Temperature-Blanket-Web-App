@@ -49,16 +49,6 @@ type LocalStatePreferencesType = {
   itemSpacing?: Partial<Record<PageLayout, boolean>>;
   /** The PDF's last choices; its layout, fill and days start as the View menu's; missing until first downloaded */
   pdf?: SavedPdfSettings;
-  /**
-   * Search Again: which values it compares (`all`, or only those the
-   * project's gauges use) and which changed days it shows (only those whose
-   * colors change, `colors`, or `all`); missing until first changed (all,
-   * colors). A newer value kept over is asked about only once it changes again.
-   */
-  weatherChanges?: {
-    compare?: 'all' | 'gauges';
-    show?: 'colors' | 'all';
-  };
   /** My Projects' View menu: projects and palettes as cards in a grid, or one per row; missing until first changed (grid) */
   myProjectsLayout?: PageLayout;
 };

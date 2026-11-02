@@ -22,13 +22,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Only New Days</span> adds the days since you last got
-      its weather, for a project that's still going.
-    </li>
-    <li>
       <span class="font-bold">Search Again</span> gets every day again. New days are
-      added, and if any saved day's weather is different now, you choose which to
-      keep.
+      added, and if any saved day's weather is different now, you choose whether to
+      update those days and whether to add the new ones.
     </li>
     <li>
       The newest days are early data at first, and weather sources can update

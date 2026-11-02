@@ -341,3 +341,42 @@ export function settledEarlyDays(
     return hasSettled(date, today, sourceOf(Number(location)));
   });
 }
+
+/** Temperatures, as opposed to rain and snow */
+export const isTemperature = (param: ComparedParam) =>
+  param !== 'prcp' && param !== 'snow';
+
+/** Whether the search has a value where the saved day had none */
+export const fillsGap = (change: DayChange) =>
+  change.changes.some(({ saved, got }) => saved === null && got !== null);
+
+/** Whether the search has no value where the saved day had one */
+export const removesData = (change: DayChange) =>
+  change.changes.some(({ saved, got }) => saved !== null && got === null);
+
+/** The smallest and largest difference among values both there, or null */
+export function differenceRange(
+  pairs: { saved: number | null; got: number | null }[],
+): { min: number; max: number } | null {
+  let range: { min: number; max: number } | null = null;
+  for (const { saved, got } of pairs) {
+    if (saved === null || got === null) continue;
+    const size = Math.abs(got - saved);
+    if (size < 1e-9) continue;
+    range = range
+      ? { min: Math.min(range.min, size), max: Math.max(range.max, size) }
+      : { min: size, max: size };
+  }
+  return range;
+}
+
+/**
+ * The changed days someone kept before: in `all` (compared every time) but
+ * not in `fresh` (leaving out values kept over the same newer ones)
+ */
+export function keptBefore(all: DayChange[], fresh: DayChange[]): Set<DayKey> {
+  const asked = new Set(fresh.map((change) => change.key));
+  return new Set(
+    all.filter((change) => !asked.has(change.key)).map((c) => c.key),
+  );
+}

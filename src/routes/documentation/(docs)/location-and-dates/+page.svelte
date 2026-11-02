@@ -83,8 +83,7 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     The number of days shows under the dates. Weather is only there for days
     that have passed, up to yesterday. A year that's still going is fine: the
     days still to come are left out for now, and come in when you press
-    <span class="font-bold">Weather Data</span>, then
-    <span class="font-bold">Only New Days</span> later.
+    <span class="font-bold">Get Weather Data</span> later.
     <a href="/documentation/guides/knit-along-all-year" class="link"
       >Making a blanket for this year</a
     >.

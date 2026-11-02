@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Crochet or Knit Along All Year. A saved project opens with its saved days
 and never searches by itself (storage/projects.svelte.ts, weather-days):
-the Weather Data button shows how many new days are waiting, and Get New
-Days adds only those. Search Again gets every day and asks before
-changing saved ones (modals/SearchAgain.svelte). -->
+the Get Weather Data button shows how many new days are waiting, and
+Search Again adds them, asking before changing saved ones
+(modals/SearchAgain.svelte). -->
 
 <script lang="ts">
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
@@ -95,10 +95,10 @@ changing saved ones (modals/SearchAgain.svelte). -->
       <span class="font-bold">Open…</span>
     </li>
     <li>
-      The <span class="font-bold">Weather Data</span> button shows how many new
-      days are waiting. Press it, then
-      <span class="font-bold">Only New Days</span>. Only the days since are
-      added: the days you've already made stay as they were saved.
+      The <span class="font-bold">Get Weather Data</span> button shows how many new
+      days are waiting. Press it to add them. If a day you saved has different weather
+      now, you're asked first, and the days you've already made stay as they were
+      saved unless you update them.
     </li>
     <li>
       Find today's rows in the <span class="font-bold">Table</span> (turn on

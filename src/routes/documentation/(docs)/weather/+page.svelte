@@ -64,24 +64,32 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="saved-weather-days" class="text-2xl font-bold">Saved Weather</h2>
   <SavedWeatherDays />
-  <h3 class="text-lg font-bold">Only New Days</h3>
-  <p>
-    For a project that's still going, the
-    <span class="font-bold">Weather Data</span> button shows how many new days
-    are waiting. Press it, then
-    <span class="font-bold">Only New Days</span>. Only those days are added.
-    It's in the Project menu too.
-  </p>
   <h3 class="text-lg font-bold">Search Again</h3>
   <p>
-    <span class="font-bold">Search Again</span> (in
-    <span class="font-bold">Weather Data</span>, or on its own once a project is
-    finished) gets every day again. If any saved day is different now, it says
-    which weather source changed them and when you saved them, then lists the
-    days by month, with the saved and the new values and, when a color changes,
-    both colors. Your saved values stay unless you check a day (or a whole
-    month), or press <span class="font-bold">Update All</span>, then
-    <span class="font-bold">Save</span>. Cancel leaves everything as it was.
+    For a saved project, the <span class="font-bold">Get Weather Data</span>
+    button (and the Project menu) offers
+    <span class="font-bold">Search Again</span>, and shows how many new days are
+    waiting while a project is still going. It gets every day again. When no
+    saved day is different, the new days are just added. If any saved day is
+    different now, <span class="font-bold">Update Weather Data</span> opens with
+    two choices: <span class="font-bold">Add New Days</span> (on to start) and
+    <span class="font-bold">Update Past Days</span> (off to start; it says which weather
+    source changed them, when you saved them, how much the values differ and how many
+    days change color). Turn both off to change nothing; the new days are still offered
+    later.
+  </p>
+  <p>
+    <span class="font-bold">View All Changes</span> shows every changed day, the
+    new value over the saved one and how much it changed. Filters narrow the
+    list (days whose colors change, days that have settled, gaps filled, data
+    removed, temperatures or rain and snow that changed by at least an amount, a
+    date range, days you kept before), and
+    <span class="font-bold">Select Shown</span>,
+    <span class="font-bold">Clear Shown</span> and
+    <span class="font-bold">Invert</span> pick the days shown.
+    <span class="font-bold">Show Colors</span> adds each value's color, and both colors
+    where it changes. Nothing changes until you save; Cancel leaves everything as
+    it was.
   </p>
   <p>
     Days you keep are marked in the weather table. Tap the mark to see both
@@ -89,13 +97,10 @@ HELP_TOPICS). -->
     right after, too.
   </p>
   <p>
-    Two <a href="/preferences" class="link">preferences</a>, also in the list
-    itself, choose what's shown: only the values your gauges use, and only days
-    whose colors change (on unless you turn it off). When no color changes, a
-    short message says so instead, with
-    <span class="font-bold">See Changes</span>
-    to look anyway. Days you kept before aren't shown again unless their values change
-    again; the list offers to show them.
+    Days you don't update are remembered as kept, so Search Again doesn't ask
+    about them again unless their values change again. When it opens again, View
+    All Changes shows them too, to update them then (or use the mark in the
+    table).
   </p>
   <p>
     Updating days doesn't change Auto ranges. When your weather no longer

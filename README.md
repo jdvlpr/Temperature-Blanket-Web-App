@@ -235,9 +235,7 @@ Settings and user preferences are stored in the browser's Local Storage.
 
 **`preferences.myProjectsLayout`** (unreleased, after 6.3.2): My Projects' View menu, `'grid'` (projects and palettes as cards side by side) or `'list'` (one per row); missing (grid) until first changed.
 
-**`preferences.weatherChanges`** (unreleased, after 6.3.2): Search Again's choices, `compare` (`'all'` values, or only those the project's gauges use, `'gauges'`) and `show` (only days whose colors change, `'colors'`, or `'all'`); missing (all, colors) until first changed. A kept-over newer value is asked about again only once it changes again.
-
-**Synced to the account** while signed in ([`#lib/sync/preferences`](src/lib/sync/preferences.ts)): `defaultYarn`, `theme.id`, `theme.mode`, `theme.roundness`, `theme.headingStyle`, `weatherChanges.compare` and `weatherChanges.show`; the newest change to each wins. The rest stay on the device: text size, spacing, effects, layout, myProjectsLayout, fillColor, itemSpacing, units and seasons (every project link carries its own units and seasons).
+**Synced to the account** while signed in ([`#lib/sync/preferences`](src/lib/sync/preferences.ts)): `defaultYarn`, `theme.id`, `theme.mode`, `theme.roundness` and `theme.headingStyle`; the newest change to each wins. The rest stay on the device: text size, spacing, effects, layout, myProjectsLayout, fillColor, itemSpacing, units and seasons (every project link carries its own units and seasons).
 
 > **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale`/`headingStyle` fields automatically receive defaults on next page load. No data is lost.
 

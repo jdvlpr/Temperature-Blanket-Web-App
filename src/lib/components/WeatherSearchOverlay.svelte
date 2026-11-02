@@ -47,7 +47,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const TITLES = {
     search: 'Searching for Weather Data',
-    'new-days': 'Getting New Days',
     again: 'Searching Again',
   } as const;
 

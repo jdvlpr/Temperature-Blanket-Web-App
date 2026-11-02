@@ -15,13 +15,8 @@
 
 /** What getting a saved project's weather again is called, wherever it's offered */
 export const WEATHER_ACTIONS = {
-  'new-days': {
-    label: 'Only New Days',
-    description: 'Get data since this project was last saved.',
-    upToDate: 'Up to date',
-  },
   again: {
     label: 'Search Again',
-    description: "Update every day's weather data",
+    description: 'Get every day again and choose which changes to keep.',
   },
 } as const;

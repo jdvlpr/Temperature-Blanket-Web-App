@@ -89,21 +89,9 @@ class WeatherDays {
     this.newDays.reduce((sum, range) => sum + (range?.days ?? 0), 0),
   );
 
-  /** Whether any location's days go on past yesterday */
-  ongoing = $derived(
-    locations.all.some(
-      (location) => !!location.to && location.to >= localToday(),
-    ),
-  );
-
   /** Days got for these locations and source: a search compares them, rather than replacing them */
   canSearchAgain = $derived(
     !weather.isUserEdited && weather.rawData.length > 0 && this.current,
-  );
-
-  /** Still going, or not caught up: new days to get as well */
-  offersNewDays = $derived(
-    this.canSearchAgain && (this.ongoing || this.newDaysCount > 0),
   );
 
   /** Early days whose values have settled since, which a search may change */
