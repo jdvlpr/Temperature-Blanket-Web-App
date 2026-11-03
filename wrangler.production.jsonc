@@ -1,0 +1,58 @@
+// The deployed site, as a Cloudflare Worker (Workers Builds runs
+// `pnpm build`, then `npx wrangler deploy --config wrangler.production.jsonc`).
+//
+// Until launch this Worker is the beta at next.temperature-blanket.com, built
+// from release/v7; at launch it builds main and takes temperature-blanket.com
+// (change `routes`, AUTH_ALLOWED_HOSTS stays). wrangler.jsonc stays the local
+// dev and test configuration.
+//
+// Where settings live:
+// - Build time (PUBLIC_*, SECRET_*, inlined by `pnpm build`): the Worker's
+//   Settings › Build › Variables and secrets, since this file is read only at deploy.
+//   The beta also sets PUBLIC_SITE_CHANNEL=beta and PUBLIC_ACCOUNTS_ENABLED=true.
+// - Runtime, not secret: `vars` below (a deploy replaces what's in the dashboard).
+// - Runtime secrets (BETTER_AUTH_SECRET, GOOGLE_CLIENT_SECRET,
+//   RAVELRY_CLIENT_SECRET): `wrangler secret put <NAME> --config wrangler.production.jsonc`.
+//   Deploys keep them.
+//
+// The adapter builds for Workers in Workers Builds (WORKERS_CI), writing the
+// Worker and its static files to .svelte-kit/cloudflare as for Pages; run
+// `WORKERS_CI=1 pnpm build` to build the same way locally.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "temperature-blanket",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".svelte-kit/cloudflare",
+  },
+  "routes": [
+    { "pattern": "next.temperature-blanket.com", "custom_domain": true },
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tb-accounts",
+      "database_id": "046c07fe-dc2d-4428-836f-5cac43981f18",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [{ "binding": "PROJECTS", "bucket_name": "tb-projects" }],
+  "vars": {
+    "ACCOUNTS_ENABLED": "true",
+    "SYNC_ENABLED": "true",
+    "GALLERY_PUBLISH_ENABLED": "true",
+    // The most accounts there may be (0 = closed to new ones); raise as the beta grows
+    "ACCOUNTS_SIGNUP_LIMIT": "300",
+    "AUTH_ALLOWED_HOSTS": "next.temperature-blanket.com,temperature-blanket.com",
+    "AUTH_PROTOCOL": "https",
+    // Google is the only sign-in (EMAIL_SIGN_IN unset), so nothing is emailed
+    "GOOGLE_CLIENT_ID": "791075822244-d58b98jg0iah5t0e0a9c6oup319r6hvg.apps.googleusercontent.com",
+    "RAVELRY_CLIENT_ID": "537c8e1c8f8c09a3776f12b69a95958b",
+  },
+}

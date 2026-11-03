@@ -17,8 +17,18 @@ export const variables = defineEnvVars({
   SECRET_GEONAMES_USERNAME: { static: true },
   PUBLIC_GOOGLE_API_KEY: { public: true, static: true },
   PUBLIC_GOOGLE_CLIENT_ID: { public: true, static: true },
-  PUBLIC_AFFILIATE_BASE_URL: { public: true, static: true },
-  PUBLIC_AFFILIATE_YARNS: { public: true, static: true },
+  // Affiliate links on yarn colorways. Optional: without them there are none
+  // (PUBLIC_AFFILIATE_YARNS is too big for a Workers build variable)
+  PUBLIC_AFFILIATE_BASE_URL: {
+    public: true,
+    static: true,
+    schema: (value) => value || undefined,
+  },
+  PUBLIC_AFFILIATE_YARNS: {
+    public: true,
+    static: true,
+    schema: (value) => value || undefined,
+  },
   PUBLIC_SUPPORTERS: { public: true, static: true },
   PUBLIC_COOLORS_LINK: { public: true, static: true },
   // Cloudflare Turnstile, for guests' gallery submissions (its secret,
