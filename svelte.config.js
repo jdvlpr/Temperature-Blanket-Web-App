@@ -42,6 +42,7 @@ const config = {
           '/api/yarn-colorways',
           '/blog',
           '/blog/*',
+          '/bring-to-beta',
           '/changelog',
           '/contact',
           '/contact/*',
