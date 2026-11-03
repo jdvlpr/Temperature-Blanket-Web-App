@@ -235,7 +235,9 @@ Settings and user preferences are stored in the browser's Local Storage.
 
 **`preferences.myProjectsLayout`** (unreleased, after 6.3.2): My Projects' View menu, `'grid'` (projects and palettes as cards side by side) or `'list'` (one per row); missing (grid) until first changed.
 
-**Synced to the account** while signed in ([`#lib/sync/preferences`](src/lib/sync/preferences.ts)): `defaultYarn`, `theme.id`, `theme.mode`, `theme.roundness` and `theme.headingStyle`; the newest change to each wins. The rest stay on the device: text size, spacing, effects, layout, myProjectsLayout, fillColor, itemSpacing, units and seasons (every project link carries its own units and seasons).
+**`preferences.weatherShowColors`** (unreleased, after 6.3.2): Show Colors, one setting for every weather table (the Weather step's, Edit Weather Data, View All Changes, a range's days and the Daytime Rows stitches). `true` shows a swatch and "Color 3" beside each value; missing (off) until first changed.
+
+**Synced to the account** while signed in ([`#lib/sync/preferences`](src/lib/sync/preferences.ts)): `defaultYarn`, `theme.id`, `theme.mode`, `theme.roundness` and `theme.headingStyle`; the newest change to each wins. The rest stay on the device: text size, spacing, effects, layout, myProjectsLayout, fillColor, itemSpacing, weatherShowColors, units and seasons (every project link carries its own units and seasons).
 
 > **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale`/`headingStyle` fields automatically receive defaults on next page load. No data is lost.
 

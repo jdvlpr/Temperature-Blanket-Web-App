@@ -51,6 +51,8 @@ type LocalStatePreferencesType = {
   pdf?: SavedPdfSettings;
   /** My Projects' View menu: projects and palettes as cards in a grid, or one per row; missing until first changed (grid) */
   myProjectsLayout?: PageLayout;
+  /** Show Colors in every weather table (the Weather step's, Edit Weather Data, View All Changes, a range's days, the Daytime Rows stitches): a swatch and "Color 3" beside each value; missing until first changed (off) */
+  weatherShowColors?: boolean;
 };
 
 /**

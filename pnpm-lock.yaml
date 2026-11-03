@@ -114,9 +114,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.62.1
         version: 8.71.0(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
-      '@vincjo/datatables':
-        specifier: ^2.8.1
-        version: 2.8.1(svelte@5.57.2(@typescript-eslint/types@8.71.0))
       eslint:
         specifier: ^10.6.0
         version: 10.11.0(jiti@2.7.0)(supports-color@10.2.2)
@@ -1302,11 +1299,6 @@ packages:
   '@typescript-eslint/visitor-keys@8.71.0':
     resolution: {integrity: sha512-8eQ9R218XORK+KLosnf4bu/QsUXvUyVwTbArg7/0NMB1Pu87OJKvj4nhFblkYE8gQV73mW1dx1ptlPCkwRGa7A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@vincjo/datatables@2.8.1':
-    resolution: {integrity: sha512-rWl17XkriNyX3fFB5GSThLlhlPDKchFMMSCuaeSYbZCokkwSACjTLtk9v3gg4PltUaXMsJ2XjQcpnPeKJ0xa5A==}
-    peerDependencies:
-      svelte: ^5.56.1
 
   '@vitest/expect@4.1.11':
     resolution: {integrity: sha512-VX2x5vNJXET47KAFzwERI+KRMtTTCSWTfSMKsW7JsUsXV4psq++e3DvZpuTDOpHcxytiDs6p2nhVb2tVDiiUYw==}
@@ -3898,10 +3890,6 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.71.0
       eslint-visitor-keys: 5.0.1
-
-  '@vincjo/datatables@2.8.1(svelte@5.57.2(@typescript-eslint/types@8.71.0))':
-    dependencies:
-      svelte: 5.57.2(@typescript-eslint/types@8.71.0)
 
   '@vitest/expect@4.1.11':
     dependencies:

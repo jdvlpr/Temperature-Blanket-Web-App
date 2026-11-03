@@ -14,7 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import WeatherTableWrapper from '#lib/components/WeatherTableWrapper.svelte';
+  import { page } from '$app/state';
+  import WeatherDaysTable from '#lib/components/weather-grid/WeatherDaysTable.svelte';
+  import { project } from '#lib/state/project-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
+  import { ExternalLinkIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
   let debounceTimer: number | undefined;
@@ -34,6 +38,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<div class="">
-  <WeatherTableWrapper />
+<div class="my-4">
+  <WeatherDaysTable scroll="window" />
 </div>
+
+<a
+  href="/contact/forms/2025-03-weather-data?pageURL={encodeURIComponent(
+    page.url.href,
+  )}&projectURL={encodeURIComponent(project.url.href)}&data0={weather.data[0]
+    ?.date}"
+  class="link mx-auto mb-4 block w-fit text-sm"
+  target="_blank"
+>
+  <ExternalLinkIcon class="icon-sm relative -top-[2px] inline" /> Weather Data Feedback
+</a>

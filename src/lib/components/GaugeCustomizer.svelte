@@ -39,7 +39,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     paletteItemsClass,
   } from '#lib/components/palette-item-styles.js';
   import ChangeColor from '#lib/components/modals/ChangeColor.svelte';
-  import WeatherTable from '#lib/components/modals/WeatherTable.svelte';
+  import WeatherDaysTable from '#lib/components/weather-grid/WeatherDaysTable.svelte';
+  import { dateToISO8601String } from '#lib/utils/date-utils.js';
   import ColorwayMoreMenu from '#lib/components/yarn-colorways/ColorwayMoreMenu.svelte';
   import { iconColorOn } from '#lib/components/yarn-colorways/colorway-utils.js';
   import {
@@ -1025,7 +1026,28 @@ lists them. In a narrow card (`fill`), each is a row instead: label, then days a
       onclick={() =>
         dialog.trigger({
           type: 'component',
-          component: { ref: WeatherTable, props: { weatherData: list } },
+          component: {
+            ref: WeatherDaysTable,
+            props: {
+              scroll: 'box',
+              startColor: {
+                gaugeId: gauge.id,
+                param: target.id,
+                index,
+                // As counted here (the ranges may not be saved yet)
+                seed: new Set(
+                  list.map(
+                    (day: { location: number; date: Date }) =>
+                      `${day.location}|${dateToISO8601String(day.date)}`,
+                  ),
+                ),
+              },
+            },
+          },
+          options: {
+            title: `${target.gaugeLabel}: Color ${index + 1}`,
+            size: 'xlarge',
+          },
         })}
     >
       <span

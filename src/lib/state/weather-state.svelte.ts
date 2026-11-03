@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { API_SERVICES } from '#lib/constants/api-constants.js';
-import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
 import { locations, signal } from '#lib/state/location-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import type { WeatherParam } from '#lib/types/gauge-types.js';
@@ -24,7 +23,6 @@ import type {
   WeatherDay,
   WeatherSourceOptions,
 } from '#lib/types/weather-types.js';
-import { getColorInfo, type ColorInfo } from '#lib/utils/color-utils.js';
 import {
   createWeeksProperty,
   dateToISO8601String,
@@ -36,7 +34,6 @@ import { displayNumber, getAverage } from '#lib/utils/number-utils.js';
 import { escapeHtml } from '#lib/utils/string-utils.js';
 import {
   celsiusToFahrenheit,
-  convertTime,
   hoursToMinutes,
   millimetersToInches,
 } from '#lib/utils/unit-utils.svelte.js';
@@ -312,11 +309,7 @@ class WeatherClass {
   // ***************
   table: {
     showParameters: { [key: string]: boolean };
-    rowsPerPage: number;
-    page: number;
   } = $state({
-    rowsPerPage: 10,
-    page: 1,
     showParameters: {
       tmin: true,
       tavg: true,
@@ -685,58 +678,6 @@ class WeatherClass {
     }
 
     return sources;
-  }
-
-  getTableData() {
-    return [
-      ...this.data.map((n, i) => {
-        let _weather: Record<string, unknown> & {
-          color: Record<string, ColorInfo>;
-        } = { color: {} };
-        this.tableWeatherTargets.forEach((target) => {
-          const value = this.getWeatherValue({ dayIndex: i, param: target.id });
-          const colorInfo = getColorInfo({
-            param: target.id,
-            value,
-          });
-          _weather.color[target.id] = colorInfo;
-
-          if (target.id === 'dayt') {
-            // make sure daytime is always in the same hr:mn format
-            _weather = {
-              ..._weather,
-              [target.id]: convertTime(
-                n[target.id][preferences.value.units ?? 'metric'],
-                {
-                  displayUnits: false,
-                  padStart: true,
-                },
-              ),
-            };
-          } else if (target.id === 'moon') {
-            const moon = n[target.id];
-            let value = moon !== null ? MOON_PHASE_NAMES[moon] : '-';
-            _weather = {
-              ..._weather,
-              [target.id]: value,
-            };
-          } else {
-            const rawValue = n[target.id][preferences.value.units ?? 'metric'];
-            let value = rawValue !== null ? rawValue : '-';
-            _weather = {
-              ..._weather,
-              [target.id]: value,
-            };
-          }
-        });
-
-        return {
-          date: dateToISO8601String(n.date),
-          location: n.location,
-          ..._weather,
-        };
-      }),
-    ];
   }
 }
 export const weather = new WeatherClass();

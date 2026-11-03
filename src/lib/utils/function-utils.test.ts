@@ -2,9 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { delay } from './function-utils.svelte';
 
 // Mock svelte components/state modules
-vi.mock('#lib/components/WeatherTableWrapper.svelte', () => ({
-  weatherDataUpdatedKey: { value: 0 },
-}));
 vi.mock('#lib/state/gauges-state.svelte.js', () => ({
   gauges: { allCreated: [] },
 }));

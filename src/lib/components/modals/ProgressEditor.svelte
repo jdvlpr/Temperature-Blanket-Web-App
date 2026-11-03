@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Progress: the one place how far the blanket is made gets set. Everything
   else shows it and opens this (`utils/open-progress.ts`).
 
-  Opened from a day (a table circle, a day's details), I've Made Through
+  Opened from a day (a table circle, a day's details), Set Made Through
   that day leads, until progress changes at all. Then where it is now:
   Made through, the day big between ‹ and › (a day back or on; tapping the day
   opens the date picker to jump), the bar, and "62% made · 226 of 365 days".
@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from '@lucide/svelte';
 
   interface Props {
-    /** Opened from this day: leads with I've Made Through it */
+    /** Opened from this day: leads with Set Made Through it */
     day?: TISO8601DateString | null;
     /** Done: closes the dialog (or back to the one it came from) unless given */
     ondone?: () => void;
@@ -98,10 +98,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onclick={() => progress.set(day)}
       >
         <CheckIcon />
-        I've Made Through {shortDay(day)}
+        Set Progress to {shortDay(day)}
       </button>
     </section>
-    <hr class="hr" />
+    <div class="flex items-center justify-center gap-2">
+      <span
+        class="border-surface-300-700 relative top-[1px] h-1 flex-1 border-t"
+      ></span>
+      <span class="text-sm">Or</span>
+      <span
+        class="border-surface-300-700 relative top-[1px] h-1 flex-1 border-t"
+      ></span>
+    </div>
   {/if}
 
   <section class="flex flex-col items-center gap-3">
@@ -109,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="text-surface-700-300 flex items-center gap-1 text-sm"
       id="{uid}-label"
     >
-      Made through
+      Update Progress
     </p>
 
     <div class="flex w-full items-center justify-center gap-3">
@@ -193,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       Clear Progress
     </button>
-    <!-- Not a second main button beside I've Made Through -->
+    <!-- Not a second main button beside Set Made Through To -->
     <button
       type="button"
       class={['btn', leading ? 'preset-tonal' : 'preset-filled-primary-500']}

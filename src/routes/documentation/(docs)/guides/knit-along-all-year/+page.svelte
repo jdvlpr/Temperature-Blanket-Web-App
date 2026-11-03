@@ -101,9 +101,10 @@ them, asking before changing saved ones
       saved unless you update them.
     </li>
     <li>
-      Find today's rows in the <span class="font-bold">Table</span> (turn on
-      <span class="font-bold">Show Color Details</span> for each day's yarn), or touch
-      them in the preview.
+      Find today's rows in the <span class="font-bold">Table</span> (press
+      <span class="font-bold">Today</span>, and turn on
+      <span class="font-bold">Show Colors</span> for each day's color; press a color
+      for its yarn), or touch them in the preview.
     </li>
   </ol>
   {#if __ACCOUNTS_ENABLED__}

@@ -20,20 +20,21 @@ Undo/Redo (state/weather-edits.svelte.ts). Closing with changes asks first.
 Type to change a value, select with Shift or by dragging, paste a block from
 a spreadsheet (by date when it has dates), or Import a CSV file into it. Only
 days are edited, whatever the table's grouping. Opened by
-utils/open-edit-weather.ts. -->
+utils/open-edit-weather.ts. The grid is the weather grid (components/
+weather-grid/), with its filters: the selection, keys, copy, paste and Find
+Missing go by the days shown (`view`, data indexes in order, taken again only
+when a filter changes, so a day doesn't vanish as it's edited); the draft is
+by day (`row|param`, the day's place in the weather), and Fill In Missing
+fills from each day's neighbors whether shown or not. -->
 
 <script lang="ts">
   import ImportWeatherData from '#lib/components/modals/ImportWeatherData.svelte';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
-  import { allGaugesAttributes } from '#lib/state/gauges-state.svelte.js';
-  import { locations } from '#lib/state/location-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherEdits } from '#lib/state/weather-edits.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { Unit, WeatherDay } from '#lib/types/weather-types.js';
-  import type { WeatherParam } from '#lib/types/gauge-types.js';
-  import { getColorInfo, type ColorInfo } from '#lib/utils/color-utils.js';
   import { dateToISO8601String } from '#lib/utils/date-utils.js';
   import {
     loadFromHistory,
@@ -56,8 +57,35 @@ utils/open-edit-weather.ts. -->
     type WeatherChange,
     type WeatherValue,
   } from '#lib/utils/weather-edits.js';
+  import ColorDetails from '#lib/components/weather-grid/ColorDetails.svelte';
+  import DayCell from '#lib/components/weather-grid/DayCell.svelte';
+  import DayFilterSetting from '#lib/components/weather-grid/DayFilterSetting.svelte';
   import {
-    CircleCheckIcon,
+    DayFilters,
+    locationName,
+  } from '#lib/components/weather-grid/day-filters.svelte.js';
+  import {
+    cachedGridColor,
+    hasGauge,
+    showColors,
+  } from '#lib/components/weather-grid/grid-color.svelte.js';
+  import {
+    CELL,
+    CELL_TINT,
+    type GridColumn,
+  } from '#lib/components/weather-grid/grid-styles.js';
+  import GridToolbar from '#lib/components/weather-grid/GridToolbar.svelte';
+  import ValueCell from '#lib/components/weather-grid/ValueCell.svelte';
+  import { weatherColumn } from '#lib/components/weather-grid/weather-columns.js';
+  import WeatherGrid from '#lib/components/weather-grid/WeatherGrid.svelte';
+  import { weatherDays } from '#lib/state/weather-days.svelte.js';
+  import { getIsRecentDate } from '#lib/utils/date-utils.js';
+  import {
+    applyFilters,
+    chipsOf,
+    differenceText,
+  } from '#lib/utils/weather-grid.js';
+  import {
     FileUpIcon,
     RedoIcon,
     SearchIcon,
@@ -66,6 +94,7 @@ utils/open-edit-weather.ts. -->
     Undo2Icon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
+  import type { DayKey } from '#lib/utils/weather-days.js';
   import { progress } from '#lib/state/progress-state.svelte.js';
   import { shortDay } from '#lib/utils/project-progress.js';
 
@@ -91,38 +120,26 @@ utils/open-edit-weather.ts. -->
   }));
   const locationCount = new Set(rows.map((r) => r.location)).size;
 
-  const targets = allGaugesAttributes.flatMap((g) => g.targets);
-  // The values the table shows, or all of them if it shows none that can be edited
-  const shown = weather.tableWeatherTargets
-    .map((t) => t.id)
-    .filter((id): id is EditableParam =>
-      (EDITABLE_PARAMS as readonly string[]).includes(id),
-    );
-  const columns: EditableParam[] = shown.length ? shown : [...EDITABLE_PARAMS];
+  // The values the table shows (View › Values, the same as the chart's), or
+  // all of them if it shows none that can be edited
+  const shownParams = $derived(
+    weather.tableWeatherTargets
+      .map((t) => t.id)
+      .filter((id): id is EditableParam =>
+        (EDITABLE_PARAMS as readonly string[]).includes(id),
+      ),
+  );
+  const columns: EditableParam[] = $derived(
+    shownParams.length ? shownParams : [...EDITABLE_PARAMS],
+  );
 
-  const UNIT_TEXT = {
-    temperature: { metric: '°C', imperial: '°F' },
-    height: { metric: 'mm', imperial: 'in' },
-  } as const;
-  const heading = (param: EditableParam) => {
-    const target = targets.find((t) => t.id === param);
-    const label = target?.label ?? param;
-    if (param === 'dayt') return { label, unit: 'h:m' };
-    const type = target?.type as keyof typeof UNIT_TEXT;
-    return { label, unit: UNIT_TEXT[type]?.[units] ?? '' };
-  };
+  const gridColumns: GridColumn[] = $derived(
+    columns.map((param) => weatherColumn(param, units, { width: '8rem' })),
+  );
+  const heading = (param: EditableParam) =>
+    gridColumns.find((c) => c.id === param) ?? { label: param, unit: '' };
 
-  const locationLabel = (index: number) =>
-    locations.all?.[index]?.label || `Location ${index + 1}`;
-
-  const ROW_HEIGHT = 36;
-  const gridColumns = [
-    '8rem',
-    locationCount > 1 ? '10rem' : null,
-    ...columns.map(() => '7.5rem'),
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const locationLabel = locationName;
 
   // ***************
   // The draft
@@ -182,6 +199,72 @@ utils/open-edit-weather.ts. -->
         .map((row) => rows[row].date),
     ).size,
   );
+
+  // ***************
+  // The days shown (filters)
+  // ***************
+
+  const allRows = rows.map((_, index) => index);
+  const editedRows = $derived(
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- read only
+    new Set([...edits.keys()].map((key) => +key.split('|')[0])),
+  );
+  const keyOfRow = (row: number) =>
+    `${rows[row].location}|${rows[row].date}` as DayKey;
+
+  const filters = new DayFilters<number>(
+    () => allRows,
+    () => ({
+      key: keyOfRow,
+      date: (row) => rows[row].date,
+      location: (row) => rows[row].location,
+      missing: (row) =>
+        columns.some((param) => valueAt(row, param).metric === null),
+      ...(progress.madeThrough && { made: (row: number) => isMadeRow(row) }),
+      recent: (row) => getIsRecentDate(rows[row].date),
+      kept: (row) => !!weatherDays.declined[keyOfRow(row)],
+      edited: (row) => editedRows.has(row),
+      color: {
+        of: (row, param) =>
+          colorOf(param as EditableParam, valueAt(row, param as EditableParam)) ??
+          null,
+        params: columns,
+      },
+    }),
+  );
+  const chips = $derived(chipsOf(allRows, filters.filters, filters.on));
+
+  /** The days shown, as places in the weather, in order: taken again only
+   * when a filter changes (not as values are edited) */
+  let view: number[] = $state.raw(allRows);
+  /** Each shown day's place in `view` */
+  const viewIndex = $derived(new Map(view.map((row, at) => [row, at])));
+
+  $effect(() => {
+    // What the filters are
+    void [...filters.on];
+    void [filters.from, filters.to, filters.place, filters.color];
+    untrack(() => {
+      const next = applyFilters(allRows, filters.filters, filters.on);
+      const day = view[cursor.row];
+      view = next;
+      const at = Math.max(0, next.indexOf(day));
+      cursor = { row: at, column: cursor.column };
+      anchor = { ...cursor };
+      if (editing) stopEditing();
+    });
+  });
+
+  // Values shown or hidden (View): the selection stays in the grid
+  $effect(() => {
+    const last = columns.length - 1;
+    untrack(() => {
+      if (cursor.column > last || anchor.column > last) {
+        cursor = { row: cursor.row, column: Math.min(cursor.column, last) };
+        anchor = { ...cursor };
+      }
+    });
+  });
 
   /** Changes values, as one step of the draft's Undo. Returns how many changed. */
   function setValues(
@@ -262,13 +345,13 @@ utils/open-edit-weather.ts. -->
     const cells: { row: number; param: EditableParam }[] = [];
     for (let row = selection.rows[0]; row <= selection.rows[1]; row++)
       for (let c = selection.columns[0]; c <= selection.columns[1]; c++)
-        cells.push({ row, param: columns[c] });
+        cells.push({ row: view[row], param: columns[c] });
     return cells;
   }
 
   function select(row: number, column: number, extend = false) {
     cursor = {
-      row: Math.max(0, Math.min(rows.length - 1, row)),
+      row: Math.max(0, Math.min(view.length - 1, row)),
       column: Math.max(0, Math.min(columns.length - 1, column)),
     };
     if (!extend) anchor = { ...cursor };
@@ -282,28 +365,20 @@ utils/open-edit-weather.ts. -->
   // Scrolling (only the rows in view are drawn)
   // ***************
 
-  let scroller: HTMLDivElement | undefined = $state();
+  let gridView: ReturnType<typeof WeatherGrid<number>> | undefined =
+    $state();
   let grid: HTMLDivElement | undefined = $state();
-  let scrollTop = $state(0);
-  let viewHeight = $state(600);
 
-  const firstRow = $derived(
-    Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - 8),
-  );
-  const lastRow = $derived(
-    Math.min(rows.length, Math.ceil((scrollTop + viewHeight) / ROW_HEIGHT) + 8),
-  );
-  const visibleRows = $derived(
-    Array.from({ length: lastRow - firstRow }, (_, i) => firstRow + i),
-  );
+  // Rows: the value and the line under it (what it was), and "Color 3"
+  const lines = $derived(showColors.value ? 3 : 2);
+  const rowHeight = $derived(36 + 16 * (lines - 1));
   const pageRows = $derived(
-    Math.max(1, Math.floor(viewHeight / ROW_HEIGHT) - 2),
+    Math.max(1, Math.floor((grid?.clientHeight ?? 600) / rowHeight) - 3),
   );
 
   async function reveal(row: number, column: number) {
-    if (!scroller) return;
-    if (row < firstRow || row >= lastRow)
-      scroller.scrollTop = row * ROW_HEIGHT - viewHeight / 2;
+    if (!gridView) return;
+    await gridView.scrollToRow(row, 'nearest');
     await tick();
     document
       .getElementById(cellId(row, column))
@@ -331,7 +406,7 @@ utils/open-edit-weather.ts. -->
     editing = {
       row: cursor.row,
       column: cursor.column,
-      text: text ?? textAt(cursor.row, columns[cursor.column]),
+      text: text ?? textAt(view[cursor.row], columns[cursor.column]),
     };
     anchor = { ...cursor };
     problem = '';
@@ -351,7 +426,7 @@ utils/open-edit-weather.ts. -->
       input?.focus();
       return false;
     }
-    setValues([{ row: editing.row, param, value }]);
+    setValues([{ row: view[editing.row], param, value }]);
     stopEditing();
     return true;
   }
@@ -401,7 +476,7 @@ utils/open-edit-weather.ts. -->
     if (mod && ev.key.toLowerCase() === 'a') {
       ev.preventDefault();
       anchor = { row: 0, column: 0 };
-      cursor = { row: rows.length - 1, column: columns.length - 1 };
+      cursor = { row: view.length - 1, column: columns.length - 1 };
       return;
     }
 
@@ -414,7 +489,7 @@ utils/open-edit-weather.ts. -->
         return;
       case 'ArrowDown':
         ev.preventDefault();
-        select(mod ? rows.length - 1 : row + 1, column, extend);
+        select(mod ? view.length - 1 : row + 1, column, extend);
         return;
       case 'ArrowLeft':
         ev.preventDefault();
@@ -438,7 +513,7 @@ utils/open-edit-weather.ts. -->
         return;
       case 'End':
         ev.preventDefault();
-        select(mod ? rows.length - 1 : row, columns.length - 1, extend);
+        select(mod ? view.length - 1 : row, columns.length - 1, extend);
         return;
       case 'Tab': {
         // Along the row; out of the grid past its ends
@@ -495,7 +570,7 @@ utils/open-edit-weather.ts. -->
     for (let row = selection.rows[0]; row <= selection.rows[1]; row++) {
       const cells: string[] = [];
       for (let c = selection.columns[0]; c <= selection.columns[1]; c++)
-        cells.push(textAt(row, columns[c]));
+        cells.push(textAt(view[row], columns[c]));
       lines.push(cells.join('\t'));
     }
     ev.clipboardData?.setData('text/plain', lines.join('\n'));
@@ -515,14 +590,18 @@ utils/open-edit-weather.ts. -->
 
   function paste(text: string) {
     const cells = placePaste(parseClipboard(text), {
-      rows,
+      rows: view.map((row) => rows[row]),
       columns: columns.length,
       anchor: { row: selection.rows[0], column: selection.columns[0] },
       selection,
       locations: locationCount,
     });
     if (!cells.length) {
-      say('Nothing pasted: no values matched these days');
+      say(
+        view.length < rows.length
+          ? 'Nothing pasted: no values matched the days shown'
+          : 'Nothing pasted: no values matched these days',
+      );
       return;
     }
     let unread = 0;
@@ -533,7 +612,7 @@ utils/open-edit-weather.ts. -->
         unread++;
         return [];
       }
-      return [{ row, param, value }];
+      return [{ row: view[row], param, value }];
     });
     const changed = setValues(values);
     // Select what was pasted
@@ -562,7 +641,7 @@ utils/open-edit-weather.ts. -->
   let barText = $state('');
   let barFocused = $state(false);
   $effect(() => {
-    const text = textAt(cursor.row, columns[cursor.column]);
+    const text = textAt(view[cursor.row] ?? 0, columns[cursor.column]);
     if (!barFocused) barText = text;
   });
 
@@ -623,7 +702,12 @@ utils/open-edit-weather.ts. -->
    */
   function fillSelectionGaps() {
     const everywhere = selectedCount === 1;
-    const [top, bottom] = everywhere ? [0, rows.length - 1] : selection.rows;
+    // The days to fill: every one shown, or those selected
+    const targets = new Set(
+      everywhere
+        ? view
+        : view.slice(selection.rows[0], selection.rows[1] + 1),
+    );
     const [left, right] = everywhere
       ? [0, columns.length - 1]
       : selection.columns;
@@ -641,12 +725,7 @@ utils/open-edit-weather.ts. -->
         );
         fillGaps(numbers).forEach((filled, i) => {
           const row = places[i];
-          if (
-            row >= top &&
-            row <= bottom &&
-            numbers[i] === null &&
-            filled !== null
-          )
+          if (targets.has(row) && numbers[i] === null && filled !== null)
             values.push({
               row,
               param,
@@ -664,15 +743,17 @@ utils/open-edit-weather.ts. -->
   }
 
   function findNextGap() {
-    const total = rows.length * columns.length;
+    const total = view.length * columns.length;
     const from = cursor.row * columns.length + cursor.column;
     for (let step = 1; step <= total; step++) {
       const at = (from + step) % total;
       const row = Math.floor(at / columns.length);
       const column = at % columns.length;
-      if (valueAt(row, columns[column]).metric === null) {
+      if (valueAt(view[row], columns[column]).metric === null) {
         select(row, column);
-        say(`Missing: ${rows[row].date}, ${heading(columns[column]).label}`);
+        say(
+          `Missing: ${rows[view[row]].date}, ${heading(columns[column]).label}`,
+        );
         return;
       }
     }
@@ -696,7 +777,11 @@ utils/open-edit-weather.ts. -->
   const selectionHasEdits = $derived.by(() => {
     for (const key of edits.keys()) {
       const [row, param] = key.split('|');
-      if (isSelected(+row, columns.indexOf(param as EditableParam)))
+      const at = viewIndex.get(+row);
+      if (
+        at !== undefined &&
+        isSelected(at, columns.indexOf(param as EditableParam))
+      )
         return true;
     }
     return false;
@@ -719,26 +804,25 @@ utils/open-edit-weather.ts. -->
   // Colors (the gauges can't change while this is open)
   // ***************
 
-  // A cache, never shown
-  // eslint-disable-next-line svelte/prefer-svelte-reactivity
-  const colors = new Map<string, ColorInfo>();
-  function colorOf(param: EditableParam, value: WeatherValue) {
-    const number = value[units];
-    const key = `${param}|${number}`;
-    let color = colors.get(key);
-    if (!color) {
-      color = getColorInfo({
-        param: param as WeatherParam['id'],
-        value: number,
-      });
-      colors.set(key, color);
-    }
-    if (typeof color.index === 'number') return color;
-    // A value with a gauge but in none of its ranges, so no yarn
-    if (number !== null && typeof color.gaugeLength === 'number')
-      return 'outside' as const;
-    return null;
-  }
+  const colorFor = cachedGridColor();
+  // The gauges can't change while this is open
+  const gauged = new Set<EditableParam>(
+    untrack(() => EDITABLE_PARAMS.filter(hasGauge)),
+  );
+  /** A value's color; undefined with no gauge for it */
+  const colorOf = (param: EditableParam, value: WeatherValue) =>
+    gauged.has(param) ? colorFor(param, value[units]) : undefined;
+
+  /** The selected value's color, as it's being typed */
+  const cursorColor = $derived.by(() => {
+    const param = columns[cursor.column];
+    const row = view[cursor.row];
+    if (row === undefined || !gauged.has(param)) return undefined;
+    const text = editing ? editing.text : barFocused ? barText : null;
+    const value =
+      text === null ? valueAt(row, param) : parseInput(param, text, units);
+    return value ? colorOf(param, value) : undefined;
+  });
 
   // ***************
   // Apply, or close without
@@ -799,8 +883,9 @@ utils/open-edit-weather.ts. -->
     dialog.beforeClose = beforeClose;
     if (start) {
       const column = Math.max(0, columns.indexOf(start.param));
-      anchor = { row: start.row, column };
-      cursor = { row: start.row, column };
+      const row = Math.max(0, view.indexOf(start.row));
+      anchor = { row, column };
+      cursor = { row, column };
     }
     // After the dialog has opened and placed the focus
     setTimeout(() => {
@@ -877,13 +962,25 @@ utils/open-edit-weather.ts. -->
     </div>
   {/if}
 
+  <GridToolbar
+    {chips}
+    ontoggle={filters.toggle}
+    values={EDITABLE_PARAMS}
+    shown={view.length}
+    total={rows.length}
+  >
+    {#snippet setting(id)}
+      <DayFilterSetting {id} {filters} />
+    {/snippet}
+  </GridToolbar>
+
   <!-- The value bar: what's selected, and a value for all of it -->
   <div class="flex flex-wrap items-center gap-2">
     <label class="flex min-w-0 grow items-center gap-2">
       <span class="shrink-0 text-sm">
         {#if selectedCount === 1}
-          {rows[cursor.row]?.date}{locationCount > 1
-            ? `, ${locationLabel(rows[cursor.row]?.location ?? 0)}`
+          {rows[view[cursor.row]]?.date}{locationCount > 1
+            ? `, ${locationLabel(rows[view[cursor.row]]?.location ?? 0)}`
             : ''}: {heading(columns[cursor.column]).label}
         {:else}
           {selectedCount} selected
@@ -947,167 +1044,106 @@ utils/open-edit-weather.ts. -->
     >
       <Undo2Icon /> Revert
     </button>
+    {#if selectedCount === 1 && cursorColor !== undefined}
+      <span class="min-w-0 basis-full" aria-live="polite">
+        <ColorDetails color={cursorColor} inline />
+      </span>
+    {/if}
   </div>
 
   {#if problem}
     <p class="text-error-700-300 text-sm" role="alert">{problem}</p>
   {/if}
 
-  <!-- The grid -->
-  <div
-    bind:this={scroller}
-    bind:clientHeight={viewHeight}
-    onscroll={() => (scrollTop = scroller?.scrollTop ?? 0)}
-    class="rounded-container border-surface-200-800 min-h-60 flex-1 overflow-auto border"
-  >
-    <div
-      bind:this={grid}
-      role="grid"
-      tabindex="0"
-      aria-label="Weather data by day"
-      aria-rowcount={rows.length + 1}
-      aria-colcount={columns.length + (locationCount > 1 ? 2 : 1)}
-      aria-multiselectable="true"
-      aria-activedescendant={editing
+  <!-- The grid (the focus stays on it; it points to the cell) -->
+  <WeatherGrid
+    bind:this={gridView}
+    bind:grid
+    rows={view}
+    key={(row) => `${row}`}
+    columns={gridColumns}
+    {lines}
+    scroll="box"
+    role="grid"
+    label="Weather data by day"
+    class="min-h-60 flex-1 outline-none select-none focus-visible:ring-2"
+    gridAttributes={{
+      tabindex: 0,
+      'aria-multiselectable': 'true',
+      'aria-activedescendant': editing
         ? undefined
-        : cellId(cursor.row, cursor.column)}
-      class="relative w-max min-w-full outline-none select-none"
-      {onkeydown}
-      {oncopy}
-      {onpaste}
-    >
+        : cellId(cursor.row, cursor.column),
+      onkeydown,
+      oncopy,
+      onpaste,
+    }}
+  >
+    {#snippet day(row)}
+      <DayCell
+        date={rows[row].date}
+        location={locationCount > 1 ? locationLabel(rows[row].location) : ''}
+        made={isMadeRow(row) ? true : null}
+        kept={!!weatherDays.declined[keyOfRow(row)]}
+      />
+    {/snippet}
+    {#snippet cell(row, column, at, c)}
+      {@const param = column.id as EditableParam}
+      {@const value = valueAt(row, param)}
+      {@const changed = edits.has(keyOf(row, param))}
+      {@const selected = isSelected(at, c)}
+      {@const isCursor = cursor.row === at && cursor.column === c}
+      <!-- svelte-ignore a11y_interactive_supports_focus -->
       <div
-        role="row"
-        aria-rowindex={1}
-        class="bg-surface-100-900 border-surface-200-800 sticky top-0 z-20 grid border-b text-sm"
-        style:grid-template-columns={gridColumns}
+        role="gridcell"
+        id={cellId(at, c)}
+        aria-selected={selected}
+        class={[
+          CELL,
+          'scroll-mt-10 scroll-ml-40 cursor-cell',
+          changed && !selected && CELL_TINT.changed,
+          selected && CELL_TINT.selected,
+          isCursor && 'outline-primary-500 outline-2 -outline-offset-2',
+        ]}
+        onpointerdown={(ev) => onpointerdown(ev, at, c)}
+        onpointerenter={() => onpointerenter(at, c)}
+        ondblclick={() => void startEditing()}
       >
-        <div
-          role="columnheader"
-          class="bg-surface-100-900 sticky left-0 z-10 px-2 py-1 font-bold"
+        <ValueCell
+          text={displayValue(param, value, units)}
+          {changed}
+          was={changed
+            ? displayValue(param, original[row][param], units)
+            : undefined}
+          difference={changed
+            ? differenceText(
+                displayNumberOf(param, original[row][param], units),
+                displayNumberOf(param, value, units),
+              )
+            : ''}
+          color={showColors.value ? colorOf(param, value) : undefined}
+          wasColor={showColors.value && changed
+            ? colorOf(param, original[row][param])
+            : undefined}
+          typing={!!editing && editing.row === at && editing.column === c}
         >
-          Day
-        </div>
-        {#if locationCount > 1}
-          <div role="columnheader" class="px-2 py-1 font-bold">Location</div>
-        {/if}
-        {#each columns as param (param)}
-          {@const { label, unit } = heading(param)}
-          <div role="columnheader" class="px-2 py-1 leading-tight font-bold">
-            {label} <span class="text-xs font-normal">({unit})</span>
-          </div>
-        {/each}
+          {#if editing}
+            <input
+              bind:this={input}
+              bind:value={editing.text}
+              class="w-full min-w-0 bg-transparent outline-none select-text"
+              inputmode={param === 'dayt' ? 'text' : 'decimal'}
+              aria-label="{rows[row].date}, {column.label}"
+              aria-invalid={Boolean(problem)}
+              oninput={() => (problem = '')}
+            />
+          {/if}
+        </ValueCell>
       </div>
-
-      <div
-        role="rowgroup"
-        class="relative"
-        style:height="{rows.length * ROW_HEIGHT}px"
-      >
-        {#each visibleRows as row (row)}
-          {@const day = rows[row]}
-          <div
-            role="row"
-            aria-rowindex={row + 2}
-            class={[
-              'absolute right-0 left-0 grid',
-              row % 2 ? 'bg-surface-50-950' : 'bg-surface-100-900',
-            ]}
-            style:top="{row * ROW_HEIGHT}px"
-            style:height="{ROW_HEIGHT}px"
-            style:grid-template-columns={gridColumns}
-          >
-            <div
-              role="rowheader"
-              class={[
-                'border-surface-200-800 sticky left-0 z-10 flex items-center border-r px-2 text-sm tabular-nums',
-                row % 2 ? 'bg-surface-50-950' : 'bg-surface-100-900',
-              ]}
-            >
-              {day.date}
-              {#if isMadeRow(row)}
-                <CircleCheckIcon
-                  class="icon-sm text-success-700-300 ml-1 shrink-0"
-                  aria-label="made"
-                />
-              {/if}
-            </div>
-            {#if locationCount > 1}
-              <div
-                class="flex items-center truncate px-2 text-sm"
-                title={locationLabel(day.location)}
-              >
-                {locationLabel(day.location)}
-              </div>
-            {/if}
-            {#each columns as param, column (param)}
-              {@const value = valueAt(row, param)}
-              {@const changed = edits.has(keyOf(row, param))}
-              {@const selected = isSelected(row, column)}
-              {@const isCursor = cursor.row === row && cursor.column === column}
-              {@const color = colorOf(param, value)}
-              <!-- The grid keeps the focus and points to the cell (aria-activedescendant) -->
-              <!-- svelte-ignore a11y_interactive_supports_focus -->
-              <div
-                role="gridcell"
-                id={cellId(row, column)}
-                aria-selected={selected}
-                class={[
-                  'border-surface-200-800 flex scroll-mt-10 scroll-ml-32 items-center gap-1.5 border-r px-2 tabular-nums',
-                  'cursor-cell',
-                  changed && !selected && 'bg-warning-500/20',
-                  selected && 'bg-primary-500/20',
-                  isCursor && 'outline-primary-500 outline-2 -outline-offset-2',
-                ]}
-                title={changed
-                  ? `Was ${displayValue(param, original[row][param], units) || 'missing'}`
-                  : undefined}
-                onpointerdown={(ev) => onpointerdown(ev, row, column)}
-                onpointerenter={() => onpointerenter(row, column)}
-                ondblclick={() => void startEditing()}
-              >
-                {#if editing && editing.row === row && editing.column === column}
-                  <input
-                    bind:this={input}
-                    bind:value={editing.text}
-                    class="w-full min-w-0 bg-transparent outline-none select-text"
-                    inputmode={param === 'dayt' ? 'text' : 'decimal'}
-                    aria-label="{day.date}, {heading(param).label}"
-                    aria-invalid={Boolean(problem)}
-                    oninput={() => (problem = '')}
-                  />
-                {:else}
-                  {#if color === 'outside'}
-                    <span
-                      class="border-surface-500 size-3 shrink-0 rounded-full border border-dashed"
-                      title="In none of the gauge's ranges: no color"
-                    ></span>
-                  {:else}
-                    <span
-                      class="size-3 shrink-0 rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.25)]"
-                      style:background-color={color?.hex}
-                      style:visibility={color ? 'visible' : 'hidden'}
-                      aria-hidden="true"
-                    ></span>
-                  {/if}
-                  {#if value.metric === null && value.imperial === null}
-                    <span class="opacity-50" aria-label="missing">–</span>
-                  {:else}
-                    <span class={[changed && 'font-semibold']}
-                      >{displayValue(param, value, units)}</span
-                    >
-                  {/if}
-                  {#if changed}
-                    <span class="sr-only">, changed</span>
-                  {/if}
-                {/if}
-              </div>
-            {/each}
-          </div>
-        {/each}
-      </div>
-    </div>
-  </div>
+    {/snippet}
+    {#snippet empty()}
+      No days match these filters.
+    {/snippet}
+  </WeatherGrid>
 
   <!-- What the last action did, else how to use the grid -->
   <p class="min-h-4 text-xs" role="status">

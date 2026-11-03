@@ -25,11 +25,6 @@ with Change… showing the Progress dialog in this one (saved as it's changed):
 days already made aren't offered for update (still listed in View All
 Changes, where they can be picked, with a note that the blanket won't match). Save says what it'll do; the changed days not updated are remembered as kept
 (finishAgain). Cancel changes nothing. -->
-<script module lang="ts">
-  // Show Colors, for the rest of the visit (as the weather table's)
-  const colorDetails = $state({ value: false });
-</script>
-
 <script lang="ts">
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import ProgressEditor from '#lib/components/modals/ProgressEditor.svelte';
@@ -45,7 +40,6 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { WeatherDay } from '#lib/types/weather-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
-  import type { ColorInfo } from '#lib/utils/color-utils.js';
   import {
     COMPARED_PARAMS,
     dayKey,
@@ -60,7 +54,34 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
     type DayChange,
     type DayKey,
   } from '#lib/utils/weather-days.js';
-  import { ChevronRightIcon, HistoryIcon, XIcon } from '@lucide/svelte';
+  import { ChevronRightIcon, HistoryIcon } from '@lucide/svelte';
+  import DayCell from '#lib/components/weather-grid/DayCell.svelte';
+  import DayFilterSetting from '#lib/components/weather-grid/DayFilterSetting.svelte';
+  import {
+    DayFilters,
+    locationName,
+  } from '#lib/components/weather-grid/day-filters.svelte.js';
+  import {
+    gridColor,
+    showColors,
+  } from '#lib/components/weather-grid/grid-color.svelte.js';
+  import {
+    CELL,
+    TINT,
+    type GridColumn,
+  } from '#lib/components/weather-grid/grid-styles.js';
+  import GridToolbar from '#lib/components/weather-grid/GridToolbar.svelte';
+  import ValueCell from '#lib/components/weather-grid/ValueCell.svelte';
+  import { weatherColumn } from '#lib/components/weather-grid/weather-columns.js';
+  import WeatherGrid from '#lib/components/weather-grid/WeatherGrid.svelte';
+  import {
+    CHIP,
+    applyFilters,
+    atLeastLabel,
+    chipsOf,
+    differenceText,
+    type GridFilter,
+  } from '#lib/utils/weather-grid.js';
   import { SvelteSet } from 'svelte/reactivity';
   import { onDestroy, onMount, untrack } from 'svelte';
   import { galleryPageOf, loadShareState } from '#lib/accounts/share-rows.js';
@@ -68,7 +89,6 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   import {
     changesColor,
     changesOf,
-    colorOf,
     projectParams,
     newDayCount,
     type SearchAgainResult,
@@ -99,17 +119,6 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   const several = $derived(locations.all.length > 1);
   const used = $derived(projectParams());
 
-  const LABELS: Record<ComparedParam, string> = {
-    tmax: 'High',
-    tavg: 'Average',
-    tmin: 'Low',
-    prcp: 'Rain',
-    snow: 'Snow',
-  };
-  const unitOf = (param: ComparedParam) =>
-    isTemperature(param)
-      ? UNIT_LABELS.temperature[units]
-      : UNIT_LABELS.height[units];
   const valueOf = (day: WeatherDay | undefined, param: ComparedParam) =>
     day?.[param]?.[units] ?? null;
 
@@ -410,106 +419,80 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
     ),
   );
 
-  // Filters, each shown only when it matches a day
-  let filters = $state({
-    color: false,
-    settled: false,
-    gap: false,
-    removed: false,
-    biggerTemperature: false,
-    biggerHeight: false,
-    dates: false,
-    kept: false,
-    made: false,
-    place: false,
-  });
-  type FilterId = keyof typeof filters;
+  // ***************
+  // The sheet's filters: what changed (each shown only when it matches a
+  // day), then the shared ones (Kept, Made, dates, location)
+  // ***************
+
   let biggerTemperature = $state(1);
   let biggerHeight = $state(preferences.value.units === 'imperial' ? 0.04 : 1);
-  const firstDate = $derived(all[0]?.date ?? '');
-  const lastDate = $derived(all[all.length - 1]?.date ?? '');
-  let from = $state('');
-  let to = $state('');
-  let place = $state(0);
 
-  const matches: Record<FilterId, (row: Row) => boolean> = {
-    color: (row) => row.color,
-    settled: (row) => row.settled,
-    gap: (row) => row.gap,
-    removed: (row) => row.removed,
-    biggerTemperature: (row) =>
-      row.temperature !== null && row.temperature >= biggerTemperature - 1e-9,
-    biggerHeight: (row) =>
-      row.height !== null && row.height >= biggerHeight - 1e-9,
-    dates: (row) =>
-      (!from || row.change.date >= from) && (!to || row.change.date <= to),
-    kept: (row) => row.kept,
-    made: (row) => row.made,
-    place: (row) => row.change.location === place,
-  };
-
-  const chips = $derived(
-    (
-      [
-        ['color', 'Color changes'],
-        ['settled', 'Settled'],
-        ['gap', 'Gaps filled'],
-        ['removed', 'Data removed'],
-        ['biggerTemperature', 'Temp changed'],
-        ['biggerHeight', 'Rain or snow changed'],
-        ['dates', 'Date range'],
-        ['kept', 'Kept before'],
-        ['made', 'Already made'],
-        ['place', 'Location'],
-      ] as [FilterId, string][]
-    )
-      .map(([id, label]) => ({
-        id,
-        label,
-        // How many days it alone matches; the ones with settings, whether
-        // they could match any
-        count:
-          id === 'biggerTemperature'
-            ? rows.filter((r) => r.temperature !== null).length
-            : id === 'biggerHeight'
-              ? rows.filter((r) => r.height !== null).length
-              : id === 'dates'
-                ? firstDate !== lastDate
-                  ? rows.length
-                  : 0
-                : id === 'place'
-                  ? new Set(all.map((c) => c.location)).size > 1
-                    ? rows.length
-                    : 0
-                  : rows.filter(matches[id]).length,
-      }))
-      .filter((chip) => chip.count > 0 || filters[chip.id]),
+  const dayFilters = new DayFilters<Row>(
+    () => rows,
+    () => ({
+      key: (row) => row.change.key,
+      date: (row) => row.change.date,
+      location: (row) => row.change.location,
+      kept: (row) => row.kept,
+      ...(progress.madeThrough && { made: (row: Row) => row.made }),
+    }),
   );
-  const counted: FilterId[] = [
-    'color',
-    'settled',
-    'gap',
-    'removed',
-    'kept',
-    'made',
-  ];
 
-  function toggleFilter(id: FilterId) {
-    filters[id] = !filters[id];
-    if (id === 'dates' && filters.dates && !from && !to) {
-      from = firstDate;
-      to = lastDate;
-    }
-    if (id === 'place' && filters.place) place = all[0]?.location ?? 0;
-  }
-
-  const shown = $derived(
-    rows.filter((row) =>
-      (Object.keys(filters) as FilterId[]).every(
-        (id) => !filters[id] || matches[id](row),
+  const filters: GridFilter<Row>[] = $derived([
+    {
+      id: 'color',
+      label: CHIP.newColor,
+      matches: (row) => row.color,
+      counted: true,
+    },
+    {
+      id: 'settled',
+      label: CHIP.settled,
+      matches: (row) => row.settled,
+      counted: true,
+    },
+    {
+      id: 'gap',
+      label: CHIP.wasMissing,
+      matches: (row) => row.gap,
+      counted: true,
+    },
+    {
+      id: 'removed',
+      label: CHIP.nowMissing,
+      matches: (row) => row.removed,
+      counted: true,
+    },
+    {
+      id: 'biggerTemperature',
+      label: atLeastLabel(
+        'Temp changed',
+        biggerTemperature,
+        UNIT_LABELS.temperature[units],
       ),
-    ),
-  );
+      matches: (row) =>
+        row.temperature !== null &&
+        row.temperature >= biggerTemperature - 1e-9,
+      available: rows.some((r) => r.temperature !== null),
+      setting: true,
+    },
+    {
+      id: 'biggerHeight',
+      label: atLeastLabel(
+        'Rain/snow changed',
+        biggerHeight,
+        UNIT_LABELS.height[units],
+      ),
+      matches: (row) =>
+        row.height !== null && row.height >= biggerHeight - 1e-9,
+      available: rows.some((r) => r.height !== null),
+      setting: true,
+    },
+    ...dayFilters.filters,
+  ]);
+
+  const chips = $derived(chipsOf(rows, filters, dayFilters.on));
+  const shown = $derived(applyFilters(rows, filters, dayFilters.on));
   const pickedShown = $derived(
     shown.filter((row) => use.has(row.change.key)).length,
   );
@@ -521,97 +504,24 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
       use.has(r.change.key) ? use.delete(r.change.key) : use.add(r.change.key),
     );
 
-  // Only the rows in view are drawn
-  const ROW_HEIGHT = 48;
-  let scroller: HTMLDivElement | undefined = $state();
-  let scrollTop = $state(0);
-  let viewHeight = $state(600);
-  const firstRow = $derived(
-    Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - 8),
-  );
-  const lastRow = $derived(
-    Math.min(
-      shown.length,
-      Math.ceil((scrollTop + viewHeight) / ROW_HEIGHT) + 8,
+  const gridColumns: GridColumn[] = $derived(
+    columns.map((param) =>
+      weatherColumn(param, units, { dimmed: !used.includes(param) }),
     ),
-  );
-  const visibleRows = $derived(
-    Array.from(
-      { length: Math.max(0, lastRow - firstRow) },
-      (_, i) => firstRow + i,
-    ),
-  );
-  const gridColumns = $derived(
-    `2.75rem minmax(8rem, auto) repeat(${columns.length}, minmax(6.5rem, 1fr))`,
   );
 
-  // How much a value changed, signed, as precise as the values: "+6.84"
-  function difference(row: Row, param: ComparedParam) {
-    const [from, to] = [valueOf(row.saved, param), valueOf(row.got, param)];
-    if (from === null || to === null) return '';
-    const places = Math.max(
-      ...[from, to].map((n) => `${n}`.split('.')[1]?.length ?? 0),
-    );
-    const diff = +(to - from).toFixed(places);
-    return diff ? `${diff > 0 ? '+' : '−'}${Math.abs(diff)}` : '';
-  }
+  // A value's color, where the project shows it
+  const swatch = (day: WeatherDay | undefined, param: ComparedParam) =>
+    used.includes(param) ? gridColor(param, valueOf(day, param)) : undefined;
 
   const show = (day: WeatherDay | undefined, param: ComparedParam) => {
     const value = valueOf(day, param);
-    return value === null ? '—' : `${value}`;
+    return value === null ? '' : `${value}`;
   };
+
+  const checkboxId = (row: Row) =>
+    `search-again-${row.change.key.replace('|', '-')}`;
 </script>
-
-<!-- A value's color, in the bar at its cell's left edge; hatched for none -->
-{#snippet fill(color: ColorInfo | undefined)}
-  <span
-    class="block flex-1"
-    style:background-color={color?.index !== undefined ? color?.hex : undefined}
-    style:background-image={color?.index === undefined
-      ? 'repeating-linear-gradient(45deg, transparent 0 2px, rgb(128 128 128 / 0.6) 2px 4px)'
-      : undefined}
-  ></span>
-{/snippet}
-
-<!-- The bar: one color, or the new color over the old one, crossed out -->
-{#snippet colorBar(
-  now: ColorInfo | undefined,
-  was: ColorInfo | undefined,
-  faint = false,
-)}
-  <span
-    class={[
-      'absolute top-1.5 bottom-1.5 left-1.5 flex w-3 flex-col overflow-hidden rounded-full ring-1 ring-black/25',
-      faint && 'opacity-50',
-    ]}
-    aria-hidden="true"
-  >
-    {@render fill(now)}
-    {#if now?.index !== was?.index}
-      <span class="relative flex flex-1 flex-col border-t border-black/40">
-        {@render fill(was)}
-        <svg
-          class="absolute inset-0 size-full"
-          viewBox="0 0 10 10"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M2 2 8 8M8 2 2 8"
-            stroke="rgb(0 0 0 / 0.6)"
-            stroke-width="3.5"
-            vector-effect="non-scaling-stroke"
-          />
-          <path
-            d="M2 2 8 8M8 2 2 8"
-            stroke="white"
-            stroke-width="1.75"
-            vector-effect="non-scaling-stroke"
-          />
-        </svg>
-      </span>
-    {/if}
-  </span>
-{/snippet}
 
 {#snippet footerNotes()}
   <div class="flex flex-col items-center gap-2">
@@ -761,298 +671,99 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   </div>
 {:else}
   <div class="flex min-h-0 flex-1 flex-col gap-3 px-2 pt-2 text-left">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <p class="text-sm" role="status">
-        Showing {shown.length} of {all.length} · {use.size} picked
-      </p>
-      <label class="flex cursor-pointer items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          class="checkbox"
-          bind:checked={colorDetails.value}
-        />
-        Show Colors
-      </label>
-    </div>
-
-    {#if chips.length}
-      <div class="flex flex-wrap items-center gap-2" aria-label="Filters">
-        {#each chips as chip (chip.id)}
-          {@const on = filters[chip.id]}
-          <button
-            type="button"
-            class={[
-              'btn btn-sm rounded-full',
-              on ? 'preset-filled' : 'preset-tonal',
-            ]}
-            aria-pressed={on}
-            onclick={() => toggleFilter(chip.id)}
-          >
-            {chip.label}
-            {#if counted.includes(chip.id)}
-              <span class="tabular-nums opacity-70">{chip.count}</span>
-            {/if}
-            {#if on}<XIcon aria-hidden="true" />{/if}
-          </button>
-          {#if on && chip.id === 'biggerTemperature'}
-            <label class="flex items-center gap-1 text-sm">
-              at least
-              <span class="sr-only">(temperature change)</span>
-              <input
-                type="number"
-                class="input w-20"
-                min="0"
-                step="0.1"
-                bind:value={biggerTemperature}
-              />
-              {UNIT_LABELS.temperature[units]}
-            </label>
-          {:else if on && chip.id === 'biggerHeight'}
-            <label class="flex items-center gap-1 text-sm">
-              at least
-              <span class="sr-only">(rain or snow change)</span>
-              <input
-                type="number"
-                class="input w-20"
-                min="0"
-                step={units === 'imperial' ? 0.01 : 0.1}
-                bind:value={biggerHeight}
-              />
-              {UNIT_LABELS.height[units]}
-            </label>
-          {:else if on && chip.id === 'dates'}
-            <span class="flex flex-wrap items-center gap-2 text-sm">
-              <label class="flex items-center gap-1">
-                <span class="sr-only">From</span>
-                <input
-                  type="date"
-                  class="input w-auto"
-                  min={firstDate}
-                  max={lastDate}
-                  bind:value={from}
-                />
-              </label>
-              to
-              <label class="flex items-center gap-1">
-                <span class="sr-only">To</span>
-                <input
-                  type="date"
-                  class="input w-auto"
-                  min={firstDate}
-                  max={lastDate}
-                  bind:value={to}
-                />
-              </label>
-            </span>
-          {:else if on && chip.id === 'place'}
-            <label class="text-sm">
-              <span class="sr-only">Location</span>
-              <select class="select w-auto" bind:value={place}>
-                {#each [...new Set(all.map((c) => c.location))] as index (index)}
-                  <option value={index}
-                    >{locations.all[index]?.label ??
-                      `Location ${index + 1}`}</option
-                  >
-                {/each}
-              </select>
-            </label>
-          {/if}
-        {/each}
-      </div>
-    {/if}
-
-    <div class="flex flex-wrap gap-2">
-      <button
-        type="button"
-        class="btn btn-sm preset-tonal"
-        disabled={!shown.length || pickedShown === shown.length}
-        onclick={selectShown}>Select Shown</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm preset-tonal"
-        disabled={!pickedShown}
-        onclick={clearShown}>Clear Shown</button
-      >
-      <button
-        type="button"
-        class="btn btn-sm preset-tonal"
-        disabled={!shown.length}
-        onclick={invertShown}>Invert</button
-      >
-    </div>
-
-    <div
-      bind:this={scroller}
-      bind:clientHeight={viewHeight}
-      onscroll={() => (scrollTop = scroller?.scrollTop ?? 0)}
-      class="rounded-container border-surface-200-800 min-h-60 flex-1 overflow-auto border"
+    <GridToolbar
+      {chips}
+      ontoggle={dayFilters.toggle}
+      shown={shown.length}
+      total={all.length}
+      picked={use.size}
+      pick={{
+        pickedShown,
+        select: selectShown,
+        clear: clearShown,
+        invert: invertShown,
+      }}
     >
-      <div
-        role="table"
-        aria-label="Changed days"
-        aria-rowcount={shown.length + 1}
-        class="relative w-max min-w-full"
-      >
-        <div
-          role="row"
-          class="bg-surface-100-900 border-surface-200-800 sticky top-0 z-20 grid border-b text-sm"
-          style:grid-template-columns={gridColumns}
-        >
-          <div
-            role="columnheader"
-            class="bg-surface-100-900 sticky left-0 z-10 flex items-center justify-center py-1"
-          >
+      {#snippet setting(id)}
+        {#if id === 'biggerTemperature'}
+          <label class="flex items-center gap-2">
+            Changed by at least
             <input
-              type="checkbox"
-              class="checkbox"
-              aria-label="Update every day shown"
-              disabled={!shown.length}
-              checked={!!shown.length && pickedShown === shown.length}
-              {@attach (node) => {
-                node.indeterminate =
-                  pickedShown > 0 && pickedShown < shown.length;
-              }}
-              onchange={(e) =>
-                e.currentTarget.checked ? selectShown() : clearShown()}
+              type="number"
+              class="input w-20"
+              min="0"
+              step="0.1"
+              bind:value={biggerTemperature}
             />
-          </div>
-          <div
-            role="columnheader"
-            class="bg-surface-100-900 sticky left-11 z-10 px-2 py-1 font-bold"
-          >
-            Day
-          </div>
-          {#each columns as param (param)}
-            <div
-              role="columnheader"
-              class={[
-                'px-2 py-1 leading-tight font-bold',
-                !used.includes(param) && 'opacity-60',
-              ]}
-            >
-              {LABELS[param]}
-              <span class="text-xs font-normal">({unitOf(param)})</span>
-            </div>
-          {/each}
-        </div>
+            {UNIT_LABELS.temperature[units]}
+          </label>
+        {:else if id === 'biggerHeight'}
+          <label class="flex items-center gap-2">
+            Changed by at least
+            <input
+              type="number"
+              class="input w-20"
+              min="0"
+              step={units === 'imperial' ? 0.01 : 0.1}
+              bind:value={biggerHeight}
+            />
+            {UNIT_LABELS.height[units]}
+          </label>
+        {:else}
+          <DayFilterSetting {id} filters={dayFilters} />
+        {/if}
+      {/snippet}
+    </GridToolbar>
 
-        <div
-          role="rowgroup"
-          class="relative"
-          style:height="{shown.length * ROW_HEIGHT}px"
-        >
-          {#each visibleRows as index (shown[index].change.key)}
-            {@const row = shown[index]}
-            {@const key = row.change.key}
-            {@const picked = use.has(key)}
-            {@const checkboxId = `search-again-${key.replace('|', '-')}`}
-            {@const stripe =
-              index % 2 ? 'bg-surface-50-950' : 'bg-surface-100-900'}
-            <div
-              role="row"
-              class={['absolute right-0 left-0 grid', stripe]}
-              style:top="{index * ROW_HEIGHT}px"
-              style:height="{ROW_HEIGHT}px"
-              style:grid-template-columns={gridColumns}
-            >
-              <div
-                role="cell"
-                class={[
-                  'sticky left-0 z-10 flex items-center justify-center',
-                  picked ? 'bg-primary-500/15' : stripe,
-                ]}
-              >
-                <input
-                  id={checkboxId}
-                  type="checkbox"
-                  aria-label="Update {fullDate(row.change.date)}{several
-                    ? `, ${locations.all[row.change.location]?.label ?? ''}`
-                    : ''}"
-                  class="checkbox"
-                  checked={picked}
-                  onchange={(e) =>
-                    e.currentTarget.checked ? use.add(key) : use.delete(key)}
-                />
-              </div>
-              <div
-                role="rowheader"
-                class={[
-                  'border-surface-200-800 sticky left-11 z-10 flex flex-col justify-center border-r px-2 text-sm leading-tight',
-                  picked ? 'bg-primary-500/15' : stripe,
-                ]}
-              >
-                <label
-                  for={checkboxId}
-                  class="flex cursor-pointer items-center gap-1"
-                >
-                  <span class="tabular-nums">{row.change.date}</span>
-                  {#if row.kept}
-                    <HistoryIcon
-                      class="icon-sm opacity-70"
-                      aria-label="Kept before"
-                    />
-                  {/if}
-                </label>
-                {#if several}
-                  <span class="truncate text-xs opacity-70"
-                    >{locations.all[row.change.location]?.label ?? ''}</span
-                  >
-                {/if}
-              </div>
-              {#each columns as param (param)}
-                {@const changed = row.change.changes.some(
-                  (v) => v.param === param,
-                )}
-                {@const colored = colorDetails.value && used.includes(param)}
-                {@const before = colorOf(row.saved, param, used)}
-                {@const after = colorOf(row.got, param, used)}
-                <div
-                  role="cell"
-                  class={[
-                    'border-surface-200-800 relative flex flex-col justify-center border-r px-2 leading-tight tabular-nums',
-                    colored && 'pl-6',
-                    picked && 'bg-primary-500/10',
-                    !used.includes(param) && 'opacity-60',
-                  ]}
-                >
-                  {#if colored}
-                    {@render colorBar(
-                      changed ? after : before,
-                      before,
-                      !changed,
-                    )}
-                  {/if}
-                  {#if changed}
-                    <span class="font-semibold">
-                      {show(row.got, param)}
-                      {#if colored && before?.index !== after?.index}
-                        <span class="sr-only">, color changes</span>
-                      {/if}
-                    </span>
-                    <span class="flex items-center gap-1.5 text-xs">
-                      <span class="sr-only">was</span>
-                      <s class="opacity-70">{show(row.saved, param)}</s>
-                      {#if difference(row, param)}
-                        <span class="sr-only">, changed by</span>
-                        <span class="opacity-70">{difference(row, param)}</span>
-                      {/if}
-                    </span>
-                  {:else}
-                    <span class="opacity-50">{show(row.saved, param)}</span>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-          {/each}
+    <WeatherGrid
+      rows={shown}
+      key={(row) => row.change.key}
+      columns={gridColumns}
+      lines={showColors.value ? 3 : 2}
+      scroll="box"
+      label="Changed days"
+      class="min-h-60 flex-1"
+      rowTint={(row) => use.has(row.change.key) && TINT.picked}
+      lead={{ width: '2.75rem', header: pickAll, cell: pickOne }}
+    >
+      {#snippet day(row)}
+        <DayCell
+          date={row.change.date}
+          location={several ? locationName(row.change.location) : ''}
+          made={progress.madeThrough ? row.made : null}
+          kept={row.kept}
+          labelFor={checkboxId(row)}
+        />
+      {/snippet}
+      {#snippet cell(row, column)}
+        {@const param = column.id as ComparedParam}
+        {@const changed = row.change.changes.some((v) => v.param === param)}
+        <div role="cell" class={[CELL, column.dimmed && 'opacity-60']}>
+          <ValueCell
+            text={show(changed ? row.got : row.saved, param)}
+            {changed}
+            was={changed ? show(row.saved, param) : undefined}
+            difference={changed
+              ? differenceText(
+                  valueOf(row.saved, param),
+                  valueOf(row.got, param),
+                )
+              : ''}
+            color={showColors.value
+              ? swatch(changed ? row.got : row.saved, param)
+              : undefined}
+            wasColor={showColors.value && changed
+              ? swatch(row.saved, param)
+              : undefined}
+            faint={!changed}
+            swatchTitle="{row.change.date}, {column.label}"
+          />
         </div>
-      </div>
-      {#if !shown.length}
-        <p class="text-surface-700-300 p-4 text-center text-sm">
-          No changed days match these filters.
-        </p>
-      {/if}
-    </div>
+      {/snippet}
+      {#snippet empty()}
+        No changed days match these filters.
+      {/snippet}
+    </WeatherGrid>
 
     <SaveAndCloseButtons
       above={footerNotes}
@@ -1062,3 +773,31 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
     />
   </div>
 {/if}
+
+{#snippet pickAll()}
+  <input
+    type="checkbox"
+    class="checkbox"
+    aria-label="Update every day shown"
+    disabled={!shown.length}
+    checked={!!shown.length && pickedShown === shown.length}
+    {@attach (node) => {
+      node.indeterminate = pickedShown > 0 && pickedShown < shown.length;
+    }}
+    onchange={(e) => (e.currentTarget.checked ? selectShown() : clearShown())}
+  />
+{/snippet}
+
+{#snippet pickOne(row: Row)}
+  {@const key = row.change.key}
+  <input
+    id={checkboxId(row)}
+    type="checkbox"
+    aria-label="Update {fullDate(row.change.date)}{several
+      ? `, ${locationName(row.change.location)}`
+      : ''}"
+    class="checkbox"
+    checked={use.has(key)}
+    onchange={(e) => (e.currentTarget.checked ? use.add(key) : use.delete(key))}
+  />
+{/snippet}

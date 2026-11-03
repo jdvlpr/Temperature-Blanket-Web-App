@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { weatherDataUpdatedKey } from '#lib/components/WeatherTableWrapper.svelte';
 import { gauges } from '#lib/state/gauges-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
@@ -34,7 +33,6 @@ export const runPreview = (callback: () => void) => {
   $effect.root(() => {
     $effect(() => {
       project.url.href;
-      weatherDataUpdatedKey.value;
       weather.editCount; // values edited in place (Edit Weather Data, Undo)
       if (!weather.data.length || !gauges.allCreated.length) return;
 

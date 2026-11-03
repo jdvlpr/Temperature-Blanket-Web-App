@@ -1,4 +1,3 @@
-import { weatherDataUpdatedKey } from '#lib/components/WeatherTableWrapper.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
 import { DEFAULT_SEASONS } from '#lib/constants/seasons-constants.js';
 import { gauges } from '#lib/state/gauges-state.svelte.js';
@@ -144,7 +143,6 @@ export class RowsPreviewClass {
   layout = $derived.by(() => {
     // Ensure reactivity to project changes
     project.url.href;
-    weatherDataUpdatedKey.value;
     weather.editCount; // values edited in place (Edit Weather Data, Undo)
     // Early return if no data is available
     if (

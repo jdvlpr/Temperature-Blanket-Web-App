@@ -421,46 +421,4 @@ describe('weather-state', () => {
       expect(weather.getWeatherValue({ dayIndex: 0, param: 'tmax' })).toBe(68);
     });
   });
-
-  describe('getTableData', () => {
-    beforeEach(() => {
-      // Mock tableWeatherTargets property
-      Object.defineProperty(weather, 'tableWeatherTargets', {
-        get: () => [{ id: 'tmax' }, { id: 'moon' }, { id: 'dayt' }],
-        configurable: true,
-      });
-
-      weather.rawData = [
-        {
-          date: new Date('2024-01-01T00:00:00Z'),
-          location: 'Test',
-          tmax: { metric: 20, imperial: 68 },
-          moon: 0,
-          dayt: { metric: 720, imperial: 12 },
-        } as any,
-      ];
-      mockPreferences.value.units = 'metric';
-    });
-
-    afterEach(() => {
-      // Restore prototype getter
-      // @ts-ignore
-      delete weather.tableWeatherTargets;
-    });
-
-    it('should format data for table display', () => {
-      const result = weather.getTableData() as any[];
-      expect(result).toHaveLength(1);
-      expect(result[0].date).toBe('2024-01-01');
-      expect(result[0].tmax).toBe(20);
-      expect(result[0].moon).toBe('New Moon');
-      expect(result[0].color.tmax).toBeDefined();
-    });
-
-    it('should handle null values in table data', () => {
-      weather.rawData[0].tmax.metric = null;
-      const result = weather.getTableData() as any[];
-      expect(result[0].tmax).toBe('-');
-    });
-  });
 });

@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '#lib/components/WeatherItem.svelte';
   import WeatherNavigator from '#lib/components/WeatherNavigator.svelte';
   import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
-  import ToggleWeatherData from '#lib/components/buttons/ToggleWeatherData.svelte';
   import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
   import {
     METEOSTAT_DELAY_DAYS,
@@ -40,6 +39,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import WeatherToolbar from '#lib/components/WeatherToolbar.svelte';
+
+  /** The chart's lines, in its colors (--tmax…, src/css/main.css) */
+  const CHART_KEY = [
+    { id: 'tmax', label: 'High Temps' },
+    { id: 'tavg', label: 'Average Temps' },
+    { id: 'tmin', label: 'Low Temps' },
+    { id: 'prcp', label: 'Rain' },
+    { id: 'snow', label: 'Snow' },
+    { id: 'dayt', label: 'Daytime' },
+  ] as const;
 
   let graph = $state<HTMLDivElement>();
   let defaultWeatherSourceCopy = $state<string>();
@@ -416,78 +425,23 @@ centered as blocks so their first items never clip -->
 </div>
 
 <div class="flex w-full flex-col items-center gap-4">
-  <div
-    class="flex max-w-full snap-x items-center justify-start overflow-auto pb-2"
+  <!-- The chart's key: which line is which (View › Values, above the
+  table, shows or hides them) -->
+  <ul
+    class="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm"
+    aria-label="Chart key"
   >
-    <ToggleWeatherData
-      view={weather.table.showParameters.tmax}
-      onclick={() => {
-        weather.table.showParameters.tmax = !weather.table.showParameters.tmax;
-      }}
-    >
-      <span class="border-b-2 border-(--tmax) whitespace-nowrap"
-        >High Temps</span
-      >
-    </ToggleWeatherData>
-
-    <ToggleWeatherData
-      view={weather.table.showParameters.tavg}
-      onclick={() => {
-        weather.table.showParameters.tavg = !weather.table.showParameters.tavg;
-      }}
-    >
-      <span class="border-b-2 border-(--tavg) whitespace-nowrap"
-        >Average Temps</span
-      >
-    </ToggleWeatherData>
-
-    <ToggleWeatherData
-      view={weather.table.showParameters.tmin}
-      onclick={() => {
-        weather.table.showParameters.tmin = !weather.table.showParameters.tmin;
-      }}
-    >
-      <span class="border-b-2 border-(--tmin) whitespace-nowrap">Low Temps</span
-      >
-    </ToggleWeatherData>
-
-    <ToggleWeatherData
-      view={weather.table.showParameters.prcp}
-      onclick={() => {
-        weather.table.showParameters.prcp = !weather.table.showParameters.prcp;
-      }}
-    >
-      <span class="border-b-2 border-(--prcp) whitespace-nowrap">Rain</span>
-    </ToggleWeatherData>
-    <ToggleWeatherData
-      view={weather.table.showParameters.snow}
-      onclick={() => {
-        weather.table.showParameters.snow = !weather.table.showParameters.snow;
-      }}
-    >
-      <span class="border-b-2 border-(--snow) whitespace-nowrap">Snow</span>
-    </ToggleWeatherData>
-
-    <ToggleWeatherData
-      view={weather.table.showParameters.dayt}
-      onclick={() => {
-        weather.table.showParameters.dayt = !weather.table.showParameters.dayt;
-      }}
-    >
-      <span class="border-b-2 border-(--dayt) whitespace-nowrap">Daytime</span>
-    </ToggleWeatherData>
-
-    <ToggleWeatherData
-      view={weather.table.showParameters.moon}
-      onclick={() => {
-        weather.table.showParameters.moon = !weather.table.showParameters.moon;
-      }}
-    >
-      <span class="border-b-2 border-(--moon) whitespace-nowrap"
-        >Moon Phase
-      </span>
-    </ToggleWeatherData>
-  </div>
+    {#each CHART_KEY.filter(({ id }) => weather.table.showParameters[id]) as { id, label } (id)}
+      <li class="flex items-center gap-1.5 whitespace-nowrap">
+        <span
+          class="inline-block h-0.5 w-4 rounded-full"
+          style:background-color="var(--{id})"
+          aria-hidden="true"
+        ></span>
+        {label}
+      </li>
+    {/each}
+  </ul>
 
   {#if isDataMissing}
     <div

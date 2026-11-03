@@ -89,21 +89,24 @@ HELP_TOPICS). -->
   <p>
     <span class="font-bold">View All Changes</span> (or Review changes) shows
     every changed day, the new value over the saved one and how much it changed.
-    Filters narrow the list (days whose colors change, days that have settled,
-    gaps filled, data removed, temperatures or rain and snow that changed by at
-    least an amount, a date range, days you kept before), and
+    Filters narrow the list (<span class="font-bold">New color</span>,
+    <span class="font-bold">Now settled</span>,
+    <span class="font-bold">Was missing</span>,
+    <span class="font-bold">Now missing</span>, temperatures or rain and snow
+    that changed by at least an amount, <span class="font-bold">Kept</span>,
+    a date range), and
     <span class="font-bold">Select Shown</span>,
     <span class="font-bold">Clear Shown</span> and
     <span class="font-bold">Invert</span> pick the days shown.
     <span class="font-bold">Show Colors</span> adds each value's color, and both colors
-    where it changes. Nothing changes until you save; Cancel leaves everything as
+    where it changes ("Color 2 → 3"). Nothing changes until you save; Cancel leaves everything as
     it was.
   </p>
   <p>
     Days you don't update keep their saved values, and you won't be asked about
     them again unless their values change again. They're marked in the weather
     table: tap the mark to see both values and use the new ones. The next time
-    you check, View All Changes' <span class="font-bold">Kept before</span> filter
+    you check, View All Changes' <span class="font-bold">Kept</span> filter
     shows them too. Your project's gallery page can be updated right after, too.
   </p>
   <p>
@@ -195,16 +198,26 @@ HELP_TOPICS). -->
       date of the hottest and coldest day.
     </li>
     <li>
-      <span class="font-bold">Chart:</span> every day's weather. Press a name
-      under the chart (<span class="font-bold">High Temps</span>,
+      <span class="font-bold">Chart:</span> every day's weather, with a key under
+      it. To hide or show a value (<span class="font-bold">High</span>,
       <span class="font-bold">Rain</span>,
-      <span class="font-bold">Moon Phase</span>…) to hide or show it, in the
-      chart, the summary and the table.
+      <span class="font-bold">Moon Phase</span>…) in the chart, the summary and
+      the table, use <span class="font-bold">View</span> ›
+      <span class="font-bold">Values</span> above the table.
     </li>
     <li>
-      <span class="font-bold">Table:</span> every day, one row each. Turn on
-      <span class="font-bold">Show Color Details</span> to color each value with the
-      yarn of its range, with the yarn's name.
+      <span class="font-bold">Table:</span> every day, one row each. Filters above it
+      narrow the days (<span class="font-bold">Missing</span>,
+      <span class="font-bold">Made</span>,
+      <span class="font-bold">May change</span>,
+      <span class="font-bold">Kept</span>, a date range, a location, or a
+      <span class="font-bold">Color</span>: the days in one of a gauge's colors,
+      in any of its values or just one, like the High). Press a heading to sort by
+      it, or <span class="font-bold">Go to</span> a date.
+      <span class="font-bold">Show Colors</span> puts each value's color beside it
+      ("Color 3"); press a color for its yarn and name. Every weather table (here,
+      Edit Weather Data, the list of changed days, a range's days) has the same
+      filters and colors, and Show Colors is one setting for all of them.
     </li>
   </ul>
   <p>
@@ -221,8 +234,11 @@ HELP_TOPICS). -->
     <span class="font-bold">Edit</span> ›
     <span class="font-bold">Edit Weather Data</span>
     at the top of the Weather step (or press a value in the table to start on it).
-    Every day's weather opens in a grid, like a spreadsheet, with each value's yarn
-    color beside it.
+    Every day's weather opens in a grid, like a spreadsheet, with the same filters as
+    the table (and <span class="font-bold">Edited</span>, for the values you've
+    changed). With Show Colors on, each value's color is beside it, and the
+    selected value's yarn is named above the grid as you type. A changed value
+    shows what it was, crossed out, under it.
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>

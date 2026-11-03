@@ -15,74 +15,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import NumberInputButton from '#lib/components/buttons/NumberInputButton.svelte';
-  import DataTable from '#lib/components/datatable/DataTable.svelte';
-  import Expand from '#lib/components/Expand.svelte';
   import PreviewInfo from '#lib/components/PreviewInfo.svelte';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
-  import { locations } from '#lib/state/location-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { capitalizeFirstLetter } from '#lib/utils/other-utils.js';
-  import { DownloadIcon } from '@lucide/svelte';
-  import { TableHandler } from '@vincjo/datatables';
+  import { TableIcon } from '@lucide/svelte';
+  import { dialog } from '#lib/state/page-state.svelte.js';
+  import StitchTable from './StitchTable.svelte';
   import Preview from './Preview.svelte';
   import { daytimeRowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
-  let isTableExpanded = $state(false);
-
-  let table = $state<TableHandler>(undefined!);
-
-  let tableIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table inline size-6"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>`;
-
-  $effect(() => {
-    daytimeRowsPreview.tableData;
-    table = new TableHandler(daytimeRowsPreview.tableData, {
-      rowsPerPage: 10,
+  function openStitchTable() {
+    dialog.trigger({
+      type: 'component',
+      component: { ref: StitchTable },
+      options: { title: 'Stitches Per Row', size: 'large' },
     });
-  });
-
-  function downloadStitchesTableCSV() {
-    const headers = ['Row', weather.groupingHeading];
-    switch (daytimeRowsPreview.settings.daytimePosition) {
-      case 'left':
-        headers.push(`Daytime stitches (${daytimeRowsPreview.daytimeLabel})`);
-        headers.push(`Night stitches (${daytimeRowsPreview.nightLabel})`);
-        break;
-      case 'right':
-        headers.push(`Night stitches (${daytimeRowsPreview.nightLabel})`);
-        headers.push(`Daytime stitches (${daytimeRowsPreview.daytimeLabel})`);
-        break;
-      case 'center':
-        headers.push(`Night (left side) `);
-        headers.push(`Daytime stitches (${daytimeRowsPreview.daytimeLabel})`);
-        headers.push(`Night (right side) `);
-        break;
-      case 'sides':
-        headers.push(`Daytime (left side) `);
-        headers.push(`Night stitches (${daytimeRowsPreview.nightLabel})`);
-        headers.push(`Daytime (right side) `);
-        break;
-      default:
-        break;
-    }
-    const data = [
-      headers,
-      ...daytimeRowsPreview.tableData.map((n) => Object.values(n)),
-    ];
-    const csvContent = `data:text/csv;charset=utf-8,\uFEFF${data.map((e) => e.join(',')).join('\n')}`;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute(
-      'download',
-      `Stitches Per Row for ${locations.projectFilename}`,
-    );
-    link.className = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   }
 </script>
 
@@ -174,76 +124,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </span>
 
     <div class="mt-2 w-full">
-      <Expand
-        bind:isExpanded={isTableExpanded}
-        label="{tableIcon} Stitches Per Row"
-      />
+      <button
+        type="button"
+        class="btn hover:preset-tonal-surface"
+        onclick={openStitchTable}
+      >
+        <TableIcon /> Stitches Per Row
+      </button>
     </div>
-    {#if isTableExpanded}
-      <div transition:safeSlide class="relative mx-auto w-full max-w-[90vw]">
-        <DataTable {table} search={false} uid="daytime-rows-table">
-          <table class="w-full border-separate border-spacing-0">
-            <thead>
-              <tr>
-                <th>Row</th>
-                <th
-                  >{weather.groupingHeading}
-                  <span class="text-xs">(YYYY-MM-DD)</span></th
-                >
-                {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
-                  <th
-                    >Daytime stitches <br
-                    />({daytimeRowsPreview.daytimeLabel})</th
-                  >
-                  <th>Night stitches<br />({daytimeRowsPreview.nightLabel})</th>
-                {:else if daytimeRowsPreview.settings.daytimePosition === 'right'}
-                  <th>Night stitches<br />({daytimeRowsPreview.nightLabel})</th>
-                  <th
-                    >Daytime stitches<br
-                    />({daytimeRowsPreview.daytimeLabel})</th
-                  >
-                {:else if daytimeRowsPreview.settings.daytimePosition === 'center'}
-                  <th>Night stitches<br />(left side)</th>
-                  <th>Daytime stitches<br />(center)</th>
-                  <th>Night stitches<br />(right side)</th>
-                {:else if daytimeRowsPreview.settings.daytimePosition === 'sides'}
-                  <th>Daytime stitches<br />(left side)</th>
-                  <th>Night stitches<br />(center)</th>
-                  <th>Daytime stitches<br />(right side)</th>
-                {/if}
-              </tr>
-            </thead>
-            <tbody
-              class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-800"
-            >
-              {#if table.rows}
-                {#each table.rows as row}
-                  <tr>
-                    <td>{row.row}</td>
-                    <td>{row.date}</td>
-                    <td>{row.left}</td>
-                    {#if row.center}
-                      <td>{row.center}</td>
-                    {/if}
-                    <td>{row.right}</td>
-                  </tr>
-                {/each}
-              {/if}
-            </tbody>
-          </table>
-        </DataTable>
-        <div class="mt-4">
-          <button
-            class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
-            onclick={downloadStitchesTableCSV}
-            title="Download CSV File"
-          >
-            <DownloadIcon />
-            Download Stitches Per Row (CSV File)</button
-          >
-        </div>
-      </div>
-    {/if}
   {/snippet}
 </PreviewInfo>
 
