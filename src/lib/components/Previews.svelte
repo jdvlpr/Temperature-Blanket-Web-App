@@ -28,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { exists } from '#lib/utils/other-utils.js';
   import { getProjectParametersFromURLHash } from '#lib/utils/project-utils.svelte.js';
   import { ImageIcon } from '@lucide/svelte';
+  import type { MoreMenuItem } from './buttons/MoreMenu.svelte';
   import { historyChange } from '#lib/utils/feedback.svelte.js';
   import { onMount } from 'svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
@@ -51,6 +52,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(() => {
     initDefaultPreview();
   });
+
+  // The Share menu's first item
+  const downloadImage: MoreMenuItem = {
+    value: 'download-png',
+    label: 'Download Image',
+    detail: 'The preview, as a PNG',
+    icon: ImageIcon,
+    onselect: () => {
+      const active = previews.active;
+      if (!active?.width || !active?.height || !active?.svg) return;
+      downloadPreviewPNG(active.width, active.height, active.svg);
+    },
+  };
 
   // While a gauge color is pointed at or focused, every part of the preview in
   // another color fades back, so the days knit in that yarn stand out
@@ -83,31 +97,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#snippet actions()}
       {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
         <div class="flex flex-wrap items-center gap-2">
-          <button
-            class="btn hover:preset-tonal-surface"
-            title="Download the preview image (PNG)"
-            onclick={() => {
-              const active = previews.active;
-              if (!active?.width || !active?.height || !active?.svg) return;
-              downloadPreviewPNG(active.width, active.height, active.svg);
-            }}
-          >
-            <ImageIcon />
-            Download PNG
-          </button>
+          <!-- How far it's made; once set, View: Show my progress -->
+          {#if progress.dates.length}
+            <ProgressLine />
+          {/if}
 
-          <!-- Links to the gallery page instead once it's sent -->
-          <SendToGalleryButton isPrimary={true} />
+          <!-- Download Image first, then Copy Link and the gallery page -->
+          <SendToGalleryButton isPrimary={true} before={[downloadImage]} />
         </div>
       {/if}
     {/snippet}
   </PreviewSelect>
 
-  {#if gauges.activeGauge?.colors && previews.active?.settingsComponent && progress.dates.length}
-    <div class="mb-2">
-      <ProgressLine />
-    </div>
-  {/if}
   {#if progressDim}
     <!-- My Progress's gray, for progressDim's days not made yet -->
     <svg class="absolute size-0" aria-hidden="true" focusable="false">

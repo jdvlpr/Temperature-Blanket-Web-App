@@ -218,9 +218,11 @@ HELP_TOPICS). -->
   <h2 id="edit-weather-data" class="text-2xl font-bold">Edit the Weather</h2>
   <p>
     If a day looks wrong, change it. Press
-    <span class="font-bold">Edit Weather Data</span> under the table (or press a value
-    in the table to start on it). Every day's weather opens in a grid, like a spreadsheet,
-    with each value's yarn color beside it.
+    <span class="font-bold">Edit</span> ›
+    <span class="font-bold">Edit Weather Data</span>
+    at the top of the Weather step (or press a value in the table to start on it).
+    Every day's weather opens in a grid, like a spreadsheet, with each value's yarn
+    color beside it.
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -244,7 +246,8 @@ HELP_TOPICS). -->
       <span class="font-bold">Missing days:</span>
       <span class="font-bold">Find Missing</span> goes to the next empty value;
       <span class="font-bold">Fill In Missing</span> fills the selected ones (or all
-      of them, with one value selected) from the days on either side.
+      of them, with one value selected) from the days on either side. They show only
+      while some values are missing.
     </li>
   </ul>
   <p>
@@ -287,18 +290,18 @@ HELP_TOPICS). -->
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Press <span class="font-bold">Download</span> under the table, then
-      <span class="font-bold">Download CSV</span>. This is your project's
-      weather as a spreadsheet.
+      Press <span class="font-bold">Download</span> at the top of the Weather
+      step, then <span class="font-bold">Download CSV</span>. This is your
+      project's weather as a spreadsheet.
     </li>
     <li>
       Open it in Excel, Numbers or Google Sheets, change what you want, and save
       it as CSV.
     </li>
     <li>
-      Press <span class="font-bold">Import Weather Data</span> (or
-      <span class="font-bold">Import File</span> in Edit Weather Data) and choose
-      the file, or drag it onto the box.
+      Press <span class="font-bold">Edit</span>, then
+      <span class="font-bold">Import File</span>, and choose the file, or drag
+      it onto the box.
     </li>
     <li>
       The values that differ are marked in the grid. Check them, then press

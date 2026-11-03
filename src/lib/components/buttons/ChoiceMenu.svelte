@@ -15,7 +15,8 @@ You should have received a copy of the GNU General Public License along with Tem
 <!-- @component
   One choice from a few, as a menu styled like the View and Sort menus. The
   button names the setting and the current choice, e.g. "Units: °C / mm", and
-  each option can have a few words under it.
+  each option can have a few words under it. `children` adds more items
+  after a line (e.g. Grouping's Weeks Start On).
 -->
 <script lang="ts" generics="T extends string">
   import {
@@ -26,7 +27,7 @@ You should have received a copy of the GNU General Public License along with Tem
   } from '#lib/components/menu-styles.js';
   import { CheckIcon, ChevronDownIcon } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
-  import type { Component } from 'svelte';
+  import type { Component, Snippet } from 'svelte';
 
   interface Props {
     /** Each choice; `short` is what the button shows (the label by default) */
@@ -43,6 +44,8 @@ You should have received a copy of the GNU General Public License along with Tem
     icon: Component<{ size?: number; 'aria-hidden'?: 'true' }>;
     /** The button's classes, when it shouldn't look like the Sort and View menus */
     triggerClass?: string;
+    /** More items, after a line */
+    children?: Snippet;
   }
 
   let {
@@ -52,6 +55,7 @@ You should have received a copy of the GNU General Public License along with Tem
     label,
     icon: Icon,
     triggerClass = menuTriggerClass,
+    children,
   }: Props = $props();
 
   let current = $derived(options.find((option) => option.value === value));
@@ -90,6 +94,10 @@ You should have received a copy of the GNU General Public License along with Tem
             />
           </Menu.OptionItem>
         {/each}
+        {#if children}
+          <Menu.Separator />
+          {@render children()}
+        {/if}
       </Menu.Content>
     </Menu.Positioner>
   </Portal>

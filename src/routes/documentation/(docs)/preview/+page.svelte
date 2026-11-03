@@ -162,8 +162,8 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
       Point at a color in the gauge to see where it's used in the preview.
     </li>
     <li>
-      <span class="font-bold">Download PNG</span> at the top of the preview
-      saves it as a picture.
+      <span class="font-bold">Download Image</span>, in the preview's
+      <span class="font-bold">Share</span> menu, saves it as a picture.
       <a href="/documentation/download" class="link">More downloads</a>.
     </li>
   </ul>
@@ -178,14 +178,14 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     </p>
     <ul class="ml-6 list-disc space-y-1">
       <li>
-        Set it in <span class="font-bold">Progress</span>: the progress under
-        the preview, the Project menu, or a day's circle in the weather table
-        all open it. ‹ and › move it a day; tap the date to pick any day.
+        Set it in <span class="font-bold">Progress</span>: the progress button
+        above the preview, the Project menu, or a day's circle in the weather
+        table all open it. ‹ and › move it a day; tap the date to pick any day.
       </li>
       <li>
-        <span class="font-bold">My Progress</span> above the preview shows the
-        days not made yet in faded gray.
-        <span class="font-bold">All Colors</span> shows every day in color.
+        Once it's set, <span class="font-bold">View</span> ›
+        <span class="font-bold">Show my progress</span> shows the days not made yet
+        in faded gray; turn it off to see every day in color.
       </li>
       <li>
         When you check for updated weather, days you've made aren't offered for

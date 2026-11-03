@@ -121,9 +121,9 @@ spreadsheet. -->
 <section class="flex flex-col gap-3">
   <h2 id="share-a-picture" class="text-2xl font-bold">Share a Picture</h2>
   <p>
-    <span class="font-bold">Download PNG</span>, at the top of the preview,
-    saves it as a picture: for social media, a Ravelry project page, or to keep
-    beside you as you work.
+    <span class="font-bold">Download Image</span>, in the preview's
+    <span class="font-bold">Share</span> menu, saves it as a picture: for social media,
+    a Ravelry project page, or to keep beside you as you work.
   </p>
 </section>
 

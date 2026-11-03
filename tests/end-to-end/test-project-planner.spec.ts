@@ -107,9 +107,12 @@ test.describe('Project Planner', () => {
     // Go to Preview Tab
     await page.getByRole('button', { name: 'Preview' }).nth(1).click();
     await expect(page.getByRole('button', { name: 'Calendar' })).toBeVisible();
+    // The preview's Share menu starts with Download Image (PNG)
+    await page.getByRole('button', { name: 'Share' }).first().click();
     await expect(
-      page.getByRole('button', { name: 'Download PNG' }),
+      page.getByRole('menuitem', { name: /Download Image/ }),
     ).toBeVisible();
+    await page.keyboard.press('Escape');
   });
 
   test('Shared-URL preview restore and Undo/Redo (B2 async preview lazy-load)', async ({
@@ -150,7 +153,7 @@ test.describe('Project Planner', () => {
 
     // The bottom section-nav tab bar renders exactly one button per section, but
     // several other elements on the page also have "Weather"/"Colors"/"Preview"
-    // as a substring of their accessible name (e.g. "Weather Source: Open-Meteo"),
+    // as a substring of their accessible name (e.g. "Source: Open-Meteo"),
     // so scope to the tab bar's own container instead of matching by name alone.
     const tabBar = page.locator('#bottom-section-nav');
     await tabBar.getByRole('button', { name: 'Colors', exact: true }).click();

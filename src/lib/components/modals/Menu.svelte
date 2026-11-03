@@ -15,7 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Project menu, about the open project only, in the same shape as the
 Yarn page's Palette menu: a card with its name and save state; Download; how
-far it's made (Progress); its Share rows; its gauges' Palettes; the Project itself (New, Open…, Duplicate,
+far it's made (Progress); its Weather Data (Check for Updates, Edit (which
+imports too), Source, Units, Grouping: what the Weather step's toolbar has); its Share rows; its gauges' Palettes; the Project itself (New, Open…, Duplicate,
 Move to Trash); a line of help links. New Project and what Open chooses open
 here, in its place, asking first when that would lose changes (leaveFor). A
 side panel on large screens (see openProjectMenu); dialogs opened from here
@@ -25,6 +26,7 @@ open in the panel, with a Back button to it. -->
   import {
     BTN_PRIMARY,
     PANEL_ROW,
+    ROW_FOCUS,
     SMALL_LINK,
     SMALL_LINKS,
   } from '#lib/constants/class-constants.js';
@@ -66,7 +68,12 @@ open in the panel, with a Back button to it. -->
   import { saveProject } from '#lib/utils/save-project.svelte.js';
   import {
     BookmarkIcon,
+    CalendarDaysIcon,
+    CalendarRangeIcon,
     ChevronRightIcon,
+    CloudCogIcon,
+    RulerIcon,
+    SquarePenIcon,
     ChartNoAxesColumnIncreasingIcon,
     CloudAlertIcon,
     CopyPlusIcon,
@@ -89,6 +96,14 @@ open in the panel, with a Back button to it. -->
   import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
   import { openHere } from '#lib/utils/leave-project.js';
   import ExportOptions from './ExportOptions.svelte';
+  import ChooseWeatherSource from './ChooseWeatherSource.svelte';
+  import {
+    DAYS_OF_THE_WEEK,
+    UNIT_LABELS,
+  } from '#lib/constants/weather-constants.js';
+  import { preferences } from '#lib/storage/preferences.svelte.js';
+  import type { Unit } from '#lib/types/weather-types.js';
+  import { openEditWeather } from '#lib/utils/open-edit-weather.js';
   import ProgressEditor from './ProgressEditor.svelte';
   import { openProjectScreen } from './open-project.js';
   import { openGaugePalette } from './gauge-palette.js';
@@ -96,6 +111,16 @@ open in the panel, with a Back button to it. -->
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
 
   const ROW = PANEL_ROW;
+
+  // The Weather step's Units and Grouping, as two choices each
+  const UNIT_CHOICES = (['metric', 'imperial'] as const).map((unit) => ({
+    value: unit,
+    label: `${UNIT_LABELS.temperature[unit]} / ${UNIT_LABELS.height[unit]}`,
+  }));
+  const GROUPING_CHOICES = [
+    { value: 'day', label: 'Daily' },
+    { value: 'week', label: 'Weekly' },
+  ] as const;
   const LINK_ICON = 'icon-sm inline opacity-60';
 
   const hasWeather = $derived(weather.data.length > 0);
@@ -190,6 +215,43 @@ open in the panel, with a Back button to it. -->
     }
   }
 </script>
+
+<!-- A setting with two choices (Units, Grouping), chosen right in its row -->
+{#snippet choiceRow(
+  label: string,
+  Icon: typeof RulerIcon,
+  choices: readonly { value: string; label: string }[],
+  value: string,
+  onchange: (value: string) => void,
+)}
+  <!-- One wrapper, so the list's rounded last row rounds it, not the switch -->
+  <li>
+    <div class="flex min-h-12 w-full items-center gap-3 px-4 py-2">
+      <Icon class="shrink-0 opacity-70" aria-hidden="true" />
+      <span class="flex-1" id="menu-choice-{label}">{label}</span>
+      <span
+        class="bg-surface-200-800 flex shrink-0 gap-0.5 rounded-full p-0.5"
+        role="group"
+        aria-labelledby="menu-choice-{label}"
+      >
+        {#each choices as choice (choice.value)}
+          <button
+            type="button"
+            class={[
+              'rounded-full px-3 py-1 text-sm transition-colors',
+              ROW_FOCUS,
+              choice.value === value
+                ? 'bg-surface-50-950 shadow-sm'
+                : 'hover:bg-surface-300-700',
+            ]}
+            aria-pressed={choice.value === value}
+            onclick={() => onchange(choice.value)}>{choice.label}</button
+          >
+        {/each}
+      </span>
+    </div>
+  </li>
+{/snippet}
 
 <!-- Save, until the project saves by itself; the Project button's dot (in
 the same color) says it's waiting here -->
@@ -359,9 +421,9 @@ the same color) says it's waiting here -->
       </PanelGroup>
     {/if}
 
-    <!-- Its weather again, as the planner's Weather Data menu offers -->
-    {#if weatherDays.canSearchAgain}
-      <PanelGroup heading="Weather Data">
+    <!-- Its weather: what the Weather step's toolbar has, and Check for Updates -->
+    <PanelGroup heading="Weather Data">
+      {#if weatherDays.canSearchAgain}
         <li>
           <button
             type="button"
@@ -379,8 +441,71 @@ the same color) says it's waiting here -->
             </span>
           </button>
         </li>
-      </PanelGroup>
-    {/if}
+      {/if}
+      <li>
+        <button
+          type="button"
+          class={ROW}
+          onclick={() => dialog.closeThen(() => openEditWeather())}
+        >
+          <SquarePenIcon class="shrink-0 opacity-70" />
+          <span class="flex flex-1 flex-col">
+            <span>Edit Weather Data…</span>
+            <span class="text-xs opacity-70"
+              >Change values, fill in missing days, or import a CSV file</span
+            >
+          </span>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class={ROW}
+          disabled={project.status.loading}
+          onclick={() => open(ChooseWeatherSource, 'Weather Source', true)}
+        >
+          <CloudCogIcon class="shrink-0 opacity-70" />
+          <span class="flex flex-1 flex-col">
+            <span>Weather Source</span>
+            <span class="text-xs opacity-70"
+              >{weather.isUserEdited ? 'Custom' : weather.source.name}</span
+            >
+          </span>
+          <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+        </button>
+      </li>
+      {@render choiceRow(
+        'Units',
+        RulerIcon,
+        UNIT_CHOICES,
+        preferences.value.units ?? 'metric',
+        (value) => (preferences.value.units = value as Unit),
+      )}
+      {@render choiceRow(
+        'Grouping',
+        CalendarDaysIcon,
+        GROUPING_CHOICES,
+        weather.grouping,
+        (value) => weather.setGrouping(value as 'day' | 'week'),
+      )}
+      <!-- Weekly: the day weeks start on, as the Grouping menu on the page has -->
+      {#if weather.grouping === 'week'}
+        <li>
+          <label class="flex min-h-12 w-full items-center gap-3 px-4 py-2">
+            <CalendarRangeIcon class="shrink-0 opacity-70" aria-hidden="true" />
+            <span class="flex-1">Weeks Start On</span>
+            <select
+              class="select w-fit shrink-0"
+              bind:value={weather.monthGroupingStartDay}
+            >
+              {#each DAYS_OF_THE_WEEK as { value, label } (value)}
+                <option {value}>{label}</option>
+              {/each}
+            </select>
+          </label>
+        </li>
+      {/if}
+    </PanelGroup>
 
     <PanelGroup heading="Share">
       <ShareRows rows={shareRowsList} />

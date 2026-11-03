@@ -39,6 +39,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     menuList = ['pdf', 'csv', 'png', 'google-sheet'],
     buttonText = 'Download',
+    /** Where the menu opens: above (under the weather table) or below (a toolbar) */
+    placement = /** @type {'top' | 'bottom-end'} */ ('top'),
   } = $props();
 
   // Actions run from the Menu, not a <button> inside each item: Enter and
@@ -70,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Menu
-  positioning={menuPositioning('top')}
+  positioning={menuPositioning(placement)}
   class="m-0 p-0"
   onSelect={(details) => actions[details.value]?.()}
 >

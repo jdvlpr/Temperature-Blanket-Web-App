@@ -14,10 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The preview's Share button: a menu of the open project's share rows
-(Copy Link and its gallery page), as in the Project menu. -->
+(Copy Link and its gallery page), as in the Project menu, after any `before`
+items (the preview's Download Image). -->
 <script lang="ts">
   import { loadShareState } from '#lib/accounts/share-rows.js';
-  import MoreMenu from '#lib/components/buttons/MoreMenu.svelte';
+  import MoreMenu, {
+    type MoreMenuItem,
+  } from '#lib/components/buttons/MoreMenu.svelte';
   import { storedItem } from '#lib/storage/autosave.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import {
@@ -27,7 +30,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { projectShareRows } from '#lib/utils/project-share.js';
   import { Share2Icon } from '@lucide/svelte';
 
-  let { isPrimary = false } = $props();
+  let {
+    isPrimary = false,
+    before = [],
+  }: {
+    isPrimary?: boolean;
+    /** Items above the share rows, set apart by a line */
+    before?: MoreMenuItem[];
+  } = $props();
 
   // The project's name, ready before Copy Link is chosen (see projectShareRows)
   let name = $state('');
@@ -42,13 +52,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   });
 
-  let rows = $derived(projectShareRows(name, shareItem));
+  let rows = $derived.by(() => {
+    const share = projectShareRows(name, shareItem);
+    if (!before.length || !share.length) return [...before, ...share];
+    const [first, ...rest] = share;
+    return [...before, { ...first, separate: true }, ...rest];
+  });
 </script>
 
 <MoreMenu
   items={rows}
   label="Share"
-  title="Copy a link, or publish it to the gallery"
+  title={before.length
+    ? 'Download the image, copy a link, or publish it to the gallery'
+    : 'Copy a link, or publish it to the gallery'}
   onopen={() => loadShareState('project')}
   triggerClass={[
     'btn w-fit whitespace-pre-wrap',

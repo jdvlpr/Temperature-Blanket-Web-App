@@ -22,9 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleWeatherData from '#lib/components/buttons/ToggleWeatherData.svelte';
   import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
   import {
-    DAYS_OF_THE_WEEK,
     METEOSTAT_DELAY_DAYS,
-    MONTHS,
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '#lib/constants/weather-constants.js';
@@ -41,9 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { CloudAlert, TriangleAlertIcon } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import UnitMenu from '#lib/components/buttons/UnitMenu.svelte';
-  import WeatherGrouping from './WeatherGrouping.svelte';
-  import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
+  import WeatherToolbar from '#lib/components/WeatherToolbar.svelte';
 
   let graph = $state<HTMLDivElement>();
   let defaultWeatherSourceCopy = $state<string>();
@@ -169,55 +165,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- Centered, like the rest of the planner; rows that scroll sideways are
 centered as blocks so their first items never clip -->
 <div class="flex w-full flex-col items-center gap-2">
-  <div class="flex w-full flex-wrap items-center justify-center gap-x-4">
-    <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
-      <WeatherSourceButton />
+  <WeatherToolbar />
 
-      <UnitMenu />
-
-      <WeatherGrouping />
-    </div>
-
-    {#if weather.grouping === 'week'}
-      <div
-        class="rounded-container bg-surface-100 dark:bg-surface-900 my-2 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
-      >
-        <p class="">
-          Weekly weather grouping can result in a shorter project.
-          <HelpIcon topic="grouping-weather-data">
-            {#snippet text()}
-              <span>Read more details.</span>
-            {/snippet}
-          </HelpIcon>
-          {#if weather.groupedByWeek}
-            Your project starts on {DAYS_OF_THE_WEEK.filter(
-              (n) => n.value === weather.groupedByWeek?.[0]?.date.getUTCDay(),
-            )[0].label},
-            {MONTHS.filter(
-              (n) =>
-                n.value - 1 === weather.groupedByWeek?.[0]?.date.getUTCMonth(),
-            )[0]?.name}
-            {weather.groupedByWeek[0].date.getUTCDate()},
-            {weather.groupedByWeek[0].date.getUTCFullYear()}. It spans {weather
-              .groupedByWeek.length}
-            {pluralize('week', weather.groupedByWeek.length)}.
-          {/if}
-        </p>
-        <label class="label">
-          <span class="label-text">Weeks Start On</span>
-          <select
-            class="select w-fit"
-            bind:value={weather.monthGroupingStartDay}
-            id="weather-weeks-start-week-on"
-          >
-            {#each DAYS_OF_THE_WEEK as { value, label }}
-              <option {value}>{label}</option>
-            {/each}
-          </select>
-        </label>
-      </div>
-    {/if}
-  </div>
+  <!-- Weekly: when it starts and how long it is (Weeks Start On is in the
+  Grouping menu) -->
+  {#if weather.grouping === 'week'}
+    <p class="w-full max-w-screen-md text-center text-sm">
+      {#if weather.groupedByWeek?.length}
+        Weekly: starts {weather.groupedByWeek[0].date.toLocaleDateString(
+          undefined,
+          {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            timeZone: 'UTC',
+          },
+        )} · {weather.groupedByWeek.length}
+        {pluralize('week', weather.groupedByWeek.length)}, which can make a
+        shorter project.
+      {:else}
+        Weekly grouping can make a shorter project.
+      {/if}
+      <HelpIcon topic="grouping-weather-data" />
+    </p>
+  {/if}
 
   {#if wasDefaultWeatherSourceChanged}
     <p class="w-full text-center text-sm">

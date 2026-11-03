@@ -14,66 +14,95 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  The preview's progress, under its toolbar: one button showing it ("62% made
-  · through Mar 12" and a bar; Not started: Set Progress) that opens the
-  Progress dialog, the one place it's set. Once set, All Colors | My Progress:
-  My Progress fades the days not made yet (kept per project).
+  The preview toolbar's progress: a small button showing it ("62% · Mar 12"
+  over a thin bar; Not started: Progress) that opens the Progress dialog, the
+  one place it's set. Once set, a View menu beside it: Show my progress fades
+  the days not made yet (kept per project), and Edit Progress….
 -->
 <script lang="ts">
   import ProgressBar from '#lib/components/ProgressBar.svelte';
+  import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
+  import {
+    menuContentClass,
+    menuItemClass,
+    menuPositioning,
+    menuTriggerClass,
+  } from '#lib/components/menu-styles.js';
   import { progress } from '#lib/state/progress-state.svelte.js';
   import { openProgress } from '#lib/utils/open-progress.js';
   import { shortDay } from '#lib/utils/project-progress.js';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import {
+    ChartNoAxesColumnIncreasingIcon,
+    ChevronDownIcon,
+    EyeIcon,
+    SquarePenIcon,
+  } from '@lucide/svelte';
+  import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<div
-  class="mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm"
-  data-testid="progress-line"
+<button
+  type="button"
+  class="btn hover:preset-tonal-surface"
+  title={progress.madeThrough
+    ? 'Change how far you’ve made it'
+    : 'Set how far you’ve made it'}
+  onclick={() => openProgress()}
+  data-testid="progress-button"
 >
-  <button
-    type="button"
-    class="btn hover:preset-tonal-surface h-auto flex-col items-stretch gap-1 py-1.5"
-    title="Set how far you've made it"
-    onclick={() => openProgress()}
-    data-testid="progress-button"
-  >
-    {#if progress.madeThrough}
-      <span>
-        {#if progress.progress.finished}
-          <strong>Finished</strong>
-        {:else}
-          <strong>{progress.progress.percent}% made</strong>
-        {/if}
-        · through {shortDay(progress.madeThrough)}
-      </span>
-      <ProgressBar percent={progress.progress.percent} class="w-full" />
-    {:else}
-      <span
-        ><span class="text-surface-700-300">Not started ·</span> Set Progress</span
-      >
-    {/if}
-  </button>
-
+  <ChartNoAxesColumnIncreasingIcon aria-hidden="true" />
   {#if progress.madeThrough}
-    <SegmentedControl
-      value={progress.show ? 'progress' : 'all'}
-      onValueChange={(e) => progress.setShow(e.value === 'progress')}
-    >
-      <SegmentedControl.Control
-        class="bg-surface-100 dark:bg-surface-900"
-        aria-label="What the preview shows"
-      >
-        <SegmentedControl.Indicator />
-        <SegmentedControl.Item value="all">
-          <SegmentedControl.ItemText>All Colors</SegmentedControl.ItemText>
-          <SegmentedControl.ItemHiddenInput />
-        </SegmentedControl.Item>
-        <SegmentedControl.Item value="progress">
-          <SegmentedControl.ItemText>My Progress</SegmentedControl.ItemText>
-          <SegmentedControl.ItemHiddenInput />
-        </SegmentedControl.Item>
-      </SegmentedControl.Control>
-    </SegmentedControl>
+    <span class="flex flex-col items-stretch gap-0.5">
+      <span class="text-sm leading-tight">
+        {progress.progress.finished
+          ? 'Finished'
+          : `${progress.progress.percent}%`} · {shortDay(progress.madeThrough)}
+      </span>
+      <ProgressBar percent={progress.progress.percent} class="h-1 w-full" />
+    </span>
+  {:else}
+    <span>Progress</span>
   {/if}
-</div>
+</button>
+
+{#if progress.madeThrough}
+  <Menu
+    positioning={menuPositioning('bottom-end')}
+    onSelect={(details) => {
+      if (details.value === 'edit-progress') openProgress();
+    }}
+  >
+    <Menu.Trigger class={menuTriggerClass} data-testid="preview-view-menu">
+      <EyeIcon aria-hidden="true" />
+      <span>View</span>
+      <ChevronDownIcon class="icon-sm" aria-hidden="true" />
+    </Menu.Trigger>
+    <Portal>
+      <Menu.Positioner>
+        <Menu.Content class={[menuContentClass, 'w-64']}>
+          <!-- Stays open, so the check shows it took -->
+          <Menu.OptionItem
+            type="checkbox"
+            value="progress"
+            checked={progress.show}
+            closeOnSelect={false}
+            onCheckedChange={(checked) => progress.setShow(checked)}
+            class={menuItemClass}
+          >
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span>Show my progress</span>
+              <span class="text-surface-700-300 text-xs"
+                >Fades the days not made yet</span
+              >
+            </span>
+            <MenuCheckbox checked={progress.show} />
+          </Menu.OptionItem>
+          <Menu.Separator />
+          <Menu.Item value="edit-progress" class={menuItemClass}>
+            <SquarePenIcon class="shrink-0" aria-hidden="true" />
+            <span>Edit Progress…</span>
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Positioner>
+    </Portal>
+  </Menu>
+{/if}

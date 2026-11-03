@@ -11,19 +11,30 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Whether weather is grouped by day or by week.
+  Whether weather is grouped by day or by week, and while it's by week, the
+  day weeks start on.
 -->
 <script lang="ts">
   import ChoiceMenu from '#lib/components/buttons/ChoiceMenu.svelte';
+  import MenuSubmenu from '#lib/components/buttons/MenuSubmenu.svelte';
+  import { menuItemClass } from '#lib/components/menu-styles.js';
+  import { DAYS_OF_THE_WEEK } from '#lib/constants/weather-constants.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
-  import { CalendarDaysIcon } from '@lucide/svelte';
+  import { CalendarDaysIcon, CheckIcon } from '@lucide/svelte';
+  import { Menu } from '@skeletonlabs/skeleton-svelte';
 
   const options = [
     { value: 'day', label: 'Daily' },
     { value: 'week', label: 'Weekly' },
   ] as const;
+
+  let startDay = $derived(
+    DAYS_OF_THE_WEEK.find((n) => n.value === weather.monthGroupingStartDay)
+      ?.label ?? '',
+  );
 </script>
 
 <ChoiceMenu
@@ -32,4 +43,26 @@ You should have received a copy of the GNU General Public License along with Tem
   onchange={(grouping) => weather.setGrouping(grouping)}
   label="Grouping"
   icon={CalendarDaysIcon}
-/>
+>
+  {#if weather.grouping === 'week'}
+    <MenuSubmenu label="Weeks Start On" current={startDay}>
+      {#each DAYS_OF_THE_WEEK as { value, label } (value)}
+        <Menu.OptionItem
+          type="radio"
+          value="week-start-{value}"
+          checked={value === weather.monthGroupingStartDay}
+          onCheckedChange={() => (weather.monthGroupingStartDay = value)}
+          class={menuItemClass}
+        >
+          <span class="min-w-0 flex-1">{label}</span>
+          <CheckIcon
+            class="shrink-0 {value === weather.monthGroupingStartDay
+              ? ''
+              : 'invisible'}"
+            aria-hidden="true"
+          />
+        </Menu.OptionItem>
+      {/each}
+    </MenuSubmenu>
+  {/if}
+</ChoiceMenu>

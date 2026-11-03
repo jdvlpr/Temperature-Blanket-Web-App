@@ -97,11 +97,11 @@ can't be imported back. Account parts show only in builds with accounts. -->
   </h3>
   <p>
     A link doesn't hold weather: it's looked up again when the link is opened.
-    Keep your weather too: press <span class="font-bold">Download</span> under
-    the weather table, then <span class="font-bold">Download CSV</span>. To
-    restore it, open the link, then press
-    <span class="font-bold">Import Weather Data</span>, choose the file, and
-    press
+    Keep your weather too: press <span class="font-bold">Download</span> at the
+    top of the Weather step, then <span class="font-bold">Download CSV</span>.
+    To restore it, open the link, then press
+    <span class="font-bold">Edit</span>, then
+    <span class="font-bold">Import File</span>, choose the file, and press
     <span class="font-bold">Apply</span>.
   </p>
 </section>

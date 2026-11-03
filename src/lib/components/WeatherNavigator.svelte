@@ -15,10 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import WeatherTableWrapper from '#lib/components/WeatherTableWrapper.svelte';
-  import { openEditWeather } from '#lib/utils/open-edit-weather.js';
-  import { FileUpIcon, SquarePenIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
-  import DownloadExportButton from './buttons/DownloadExportButton.svelte';
 
   let debounceTimer: number | undefined;
   const debounce = (callback: () => void, time: number) => {
@@ -39,29 +36,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="">
   <WeatherTableWrapper />
-
-  <div
-    class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 mb-2 flex flex-wrap items-center justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
-  >
-    <DownloadExportButton
-      buttonText="Download"
-      menuList={['pdf', 'csv', 'google-sheet']}
-    />
-
-    <button
-      class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
-      onclick={() => openEditWeather()}
-      title="Edit Weather Data"
-    >
-      <SquarePenIcon class="inline" /> Edit Weather Data
-    </button>
-
-    <button
-      class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
-      onclick={() => openEditWeather({ startWith: 'import' })}
-      title="Import Weather Data"
-    >
-      <FileUpIcon class="inline" /> Import Weather Data
-    </button>
-  </div>
 </div>

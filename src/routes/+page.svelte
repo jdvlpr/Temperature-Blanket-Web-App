@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherSection from '#lib/components/WeatherSection.svelte';
   import DonateButton from '#lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '#lib/components/buttons/SectionNavigationButtons.svelte';
-  import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
   import LegacyNotification from '#lib/components/modals/LegacyNotification.svelte';
   import UndoRedoButtons from '#lib/components/buttons/UndoRedoButtons.svelte';
   import ProjectMenuButton from '#lib/components/buttons/ProjectMenuButton.svelte';
@@ -325,23 +324,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <WeatherSection />
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
-            {#if !weather.isUserEdited}
-              <p class="my-4 text-center text-sm">
-                Weather data from <button
-                  class="underline"
-                  onclick={() => {
-                    dialog.trigger({
-                      type: 'component',
-                      component: { ref: ChooseWeatherSource },
-                      options: {
-                        size: 'small',
-                        title: 'Weather Source',
-                      },
-                    });
-                  }}>{weather.source.name}</button
-                >.
-              </p>
-            {/if}
           {/if}
         </div>
 

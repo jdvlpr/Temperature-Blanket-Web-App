@@ -26,8 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </li>
     <li>
       <span class="font-bold">Weekly:</span> one for each week, starting on the
-      day chosen in <span class="font-bold">Weeks Start On</span>. Each week
-      has:
+      day chosen in <span class="font-bold">Weeks Start On</span> (in the
+      Grouping menu). Each week has:
       <ul class="mt-1 ml-6 list-disc space-y-1">
         <li>the highest high temperature of its days,</li>
         <li>the average of their average temperatures,</li>

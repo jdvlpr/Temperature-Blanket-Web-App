@@ -111,8 +111,8 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Press <span class="font-bold">Download</span> under the table, then
-      <span class="font-bold">Download CSV</span>.
+      Press <span class="font-bold">Download</span> at the top of the Weather
+      step, then <span class="font-bold">Download CSV</span>.
     </li>
     <li>
       Open the file in Excel, Numbers or Google Sheets. Put your readings in
@@ -120,8 +120,9 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
       save it as CSV.
     </li>
     <li>
-      Press <span class="font-bold">Import Weather Data</span>, and choose your
-      file. The values it changes are marked; check them, then press
+      Press <span class="font-bold">Edit</span>, then
+      <span class="font-bold">Import File</span>, and choose your file. The
+      values it changes are marked; check them, then press
       <span class="font-bold">Apply</span>.
     </li>
   </ol>
@@ -164,13 +165,14 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
       or {METEOSTAT_DELAY_DAYS} with Meteostat, so it's settled.
     </li>
     <li>
-      Press <span class="font-bold">Download</span> under the table, then
-      <span class="font-bold">Download CSV</span>, and send them the file with
-      the link.
+      Press <span class="font-bold">Download</span> at the top of the Weather
+      step, then <span class="font-bold">Download CSV</span>, and send them the
+      file with the link.
     </li>
     <li>
-      They press <span class="font-bold">Import Weather Data</span>, choose that
-      file (without changing it), and press
+      They press <span class="font-bold">Edit</span>, then
+      <span class="font-bold">Import File</span>, choose that file (without
+      changing it), and press
       <span class="font-bold">Apply</span>.
     </li>
   </ol>
@@ -187,8 +189,8 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   <p>
     With <span class="font-bold">Grouping</span> set to
     <span class="font-bold">Weekly</span>, the table shows weeks, which can't be
-    changed. Press <span class="font-bold">Edit Weather Data</span> under the table
-    instead: it always shows days.
+    changed. Press <span class="font-bold">Edit</span> ›
+    <span class="font-bold">Edit Weather Data</span> instead: it always shows days.
   </p>
   <h3 class="text-lg font-bold">Apply is greyed out</h3>
   <p>

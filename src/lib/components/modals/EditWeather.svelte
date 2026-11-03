@@ -142,6 +142,28 @@ utils/open-edit-weather.ts. -->
   const textAt = (row: number, param: EditableParam) =>
     displayValue(param, valueAt(row, param), units);
 
+  // Find Missing and Fill In Missing show only when they'd do something:
+  // a value is missing, and (to fill it) its column has a known value at its
+  // location to fill it from
+  const gaps = $derived.by(() => {
+    let missing = false;
+    let fillable = false;
+    for (const param of columns) {
+      const known: boolean[] = [];
+      const empty: boolean[] = [];
+      rows.forEach((r, row) => {
+        if (valueAt(row, param).metric === null) empty[r.location] = true;
+        else known[r.location] = true;
+      });
+      if (empty.some(Boolean)) missing = true;
+      if (empty.some((isEmpty, location) => isEmpty && known[location])) {
+        fillable = true;
+        break;
+      }
+    }
+    return { missing, fillable };
+  });
+
   const editedDays = $derived(
     changedDays(
       [...edits.keys()].map((key) => ({ index: +key.split('|')[0] })),
@@ -805,22 +827,26 @@ utils/open-edit-weather.ts. -->
     >
       <FileUpIcon /> Import File
     </button>
-    <button
-      type="button"
-      class="btn btn-sm hover:preset-tonal-surface"
-      onclick={findNextGap}
-      title="Go to the next missing value"
-    >
-      <SearchIcon /> Find Missing
-    </button>
-    <button
-      type="button"
-      class="btn btn-sm hover:preset-tonal-surface"
-      onclick={fillSelectionGaps}
-      title="Fill in missing values from the days on either side: in the selected cells, or everywhere with one cell selected"
-    >
-      <SparklesIcon /> Fill In Missing
-    </button>
+    {#if gaps.missing}
+      <button
+        type="button"
+        class="btn btn-sm hover:preset-tonal-surface"
+        onclick={findNextGap}
+        title="Go to the next missing value"
+      >
+        <SearchIcon /> Find Missing
+      </button>
+    {/if}
+    {#if gaps.fillable}
+      <button
+        type="button"
+        class="btn btn-sm hover:preset-tonal-surface"
+        onclick={fillSelectionGaps}
+        title="Fill in missing values from the days on either side: in the selected cells, or everywhere with one cell selected"
+      >
+        <SparklesIcon /> Fill In Missing
+      </button>
+    {/if}
     <div class="ml-auto flex gap-1">
       <button
         type="button"
@@ -1129,12 +1155,6 @@ utils/open-edit-weather.ts. -->
               {madeEditedDays === 1 ? 'is a day' : 'are days'} you've already made
               (through {shortDay(progress.madeThrough)}): the blanket won't
               match the new colors.
-            </p>
-          {/if}
-          {#if !weather.isUserEdited}
-            <p class="opacity-80">
-              Applying makes this project's weather your own: Check for Updates
-              and new days won't change it. Undo takes it back.
             </p>
           {/if}
         {:else}

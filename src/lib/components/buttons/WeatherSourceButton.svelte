@@ -8,6 +8,7 @@
 
 <button
   class="btn hover:preset-tonal-surface w-fit"
+  title="Weather Source"
   disabled={project.status.loading}
   onclick={async () => {
     dialog.trigger({
@@ -22,6 +23,6 @@
 >
   <CloudCogIcon />
   <span class="text-left whitespace-pre-wrap"
-    >Weather Source: {weather.isUserEdited ? 'Custom' : weather.source.name}
+    >Source: {weather.isUserEdited ? 'Custom' : weather.source.name}
   </span>
 </button>
