@@ -27,10 +27,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <meta charset="utf-8" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-    /> -->
+    <script>
+      // iOS zooms in on a field with text under 16px as it's focused (our
+      // small fields). maximum-scale=1 stops that, and on iOS pinch zoom
+      // still works; elsewhere it would block pinch zoom, so only on iOS
+      // (iPadOS says it's a Mac, but has touch).
+      if (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      ) {
+        document
+          .querySelector('meta[name="viewport"]')
+          ?.setAttribute(
+            'content',
+            'width=device-width, initial-scale=1, maximum-scale=1',
+          );
+      }
+    </script>
     %sveltekit.head%
   </head>
 

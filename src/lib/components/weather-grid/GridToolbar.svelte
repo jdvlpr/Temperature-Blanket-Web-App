@@ -107,11 +107,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Clear all</button
         >
       </div>
-      <ul class="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+      <!-- minmax(0, 1fr) columns and min-w-0 items: a setting wider than the
+      screen (a long location name) can't push the panel past it -->
+      <ul class="flex flex-col gap-2">
         {#each chips as chip (chip.id)}
           <li
             class={[
-              'flex flex-col gap-2',
+              'flex min-w-0 flex-col gap-2',
               chip.setting && chip.on && 'sm:col-span-2',
             ]}
           >
@@ -128,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
             </label>
             {#if chip.setting && chip.on && setting}
-              <div class="pl-7 text-sm">{@render setting(chip.id)}</div>
+              <div class="min-w-0 pl-7 text-sm">{@render setting(chip.id)}</div>
             {/if}
           </li>
         {/each}

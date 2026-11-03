@@ -200,13 +200,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       `[data-grid-row="${row}"]`,
     );
     if (!element) return;
-    element.animate(
-      [
-        { boxShadow: 'inset 0 0 0 100vmax var(--color-primary-500)' },
-        { boxShadow: 'inset 0 0 0 100vmax transparent' },
-      ],
-      { duration: 900, easing: 'ease-out' },
-    );
+    // Its cells too: the sticky ones (the day) have their own background
+    // over the row's
+    for (const part of [element, ...element.children])
+      part.animate(
+        [
+          { boxShadow: 'inset 0 0 0 100vmax var(--color-primary-500)' },
+          { boxShadow: 'inset 0 0 0 100vmax transparent' },
+        ],
+        { duration: 900, easing: 'ease-out' },
+      );
   }
 
   function toggleSort(column: GridColumn) {

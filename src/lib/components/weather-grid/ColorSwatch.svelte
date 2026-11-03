@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  A value's color in a weather grid: a bar at its cell's left edge. One color;
-  the new one over the old, crossed out, when `was` differs; dashed for a value
-  in none of its gauge's ranges. Pressed or hovered (`title` given, in a grid
+  A value's color in a weather grid: a circle at its cell's left edge. When
+  `was` differs, two: the new color over the old, crossed out. Dashed for a
+  value in none of its gauge's ranges. Pressed or hovered (`title` given, in a grid
   with SwatchDetails), it shows the color's details.
 -->
 <script lang="ts">
@@ -47,48 +47,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const interactive = $derived(!!details && !!title && !!shown);
 </script>
 
-{#snippet fill(c: SwatchColor)}
-  {#if c === 'outside' || !c}
-    <span class="block flex-1" style:background-image={OUTSIDE_STRIPES}></span>
-  {:else}
-    <span class="block flex-1" style:background-color={c.hex}></span>
-  {/if}
+{#snippet circle(c: SwatchColor, crossed = false)}
+  <span
+    class={[
+      'relative block shrink-0 overflow-hidden rounded-full',
+      changed ? 'size-3.5' : 'size-4',
+      c === 'outside' || !c
+        ? 'border-surface-500 border border-dashed'
+        : 'ring-1 ring-black/25',
+    ]}
+    style:background-color={c && c !== 'outside' ? c.hex : undefined}
+    style:background-image={c === 'outside' || !c ? OUTSIDE_STRIPES : undefined}
+  >
+    {#if crossed}
+      <svg class="absolute inset-0 size-full" viewBox="0 0 10 10">
+        <path
+          d="M2.5 2.5 7.5 7.5M7.5 2.5 2.5 7.5"
+          stroke="rgb(0 0 0 / 0.6)"
+          stroke-width="3.5"
+          vector-effect="non-scaling-stroke"
+        />
+        <path
+          d="M2.5 2.5 7.5 7.5M7.5 2.5 2.5 7.5"
+          stroke="white"
+          stroke-width="1.75"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+    {/if}
+  </span>
 {/snippet}
 
 {#snippet bar()}
   <span
-    class={[
-      'flex h-full w-3 flex-col overflow-hidden rounded-full',
-      color === 'outside' && !changed
-        ? 'border-surface-500 border border-dashed'
-        : 'ring-1 ring-black/25',
-      faint && 'opacity-50',
-    ]}
+    class={['flex flex-col items-center gap-1', faint && 'opacity-50']}
     aria-hidden="true"
   >
-    {@render fill(color)}
+    {@render circle(color)}
     {#if changed}
-      <span class="relative flex flex-1 flex-col border-t border-black/40">
-        {@render fill(was ?? null)}
-        <svg
-          class="absolute inset-0 size-full"
-          viewBox="0 0 10 10"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M2 2 8 8M8 2 2 8"
-            stroke="rgb(0 0 0 / 0.6)"
-            stroke-width="3.5"
-            vector-effect="non-scaling-stroke"
-          />
-          <path
-            d="M2 2 8 8M8 2 2 8"
-            stroke="white"
-            stroke-width="1.75"
-            vector-effect="non-scaling-stroke"
-          />
-        </svg>
-      </span>
+      {@render circle(was ?? null, true)}
     {/if}
   </span>
 {/snippet}
@@ -96,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if interactive && shown && details}
   <button
     type="button"
-    class="absolute top-1 bottom-1 left-0.5 flex w-5 cursor-pointer justify-center py-0.5"
+    class="absolute top-1 bottom-1 left-0.5 flex w-5 cursor-pointer items-center justify-center py-0.5"
     aria-label="{title}: color details"
     aria-haspopup="dialog"
     onclick={(e) => {
@@ -117,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </button>
 {:else}
   <span
-    class="pointer-events-none absolute top-1 bottom-1 left-0.5 flex w-5 justify-center py-0.5"
+    class="pointer-events-none absolute top-1 bottom-1 left-0.5 flex w-5 items-center justify-center py-0.5"
   >
     {@render bar()}
   </span>

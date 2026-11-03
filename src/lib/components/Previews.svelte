@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#snippet actions()}
       {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
         <div class="flex flex-wrap items-center gap-2">
-          <!-- How far it's made; once set, View: Show my progress -->
+          <!-- Progress: once set, a menu with Edit Progress… and Show my progress -->
           {#if progress.dates.length}
             <ProgressLine />
           {/if}

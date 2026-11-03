@@ -641,9 +641,11 @@ fills from each day's neighbors whether shown or not. -->
   /** The value bar: the selected value, and typing there sets every selected one */
   let barText = $state('');
   let barFocused = $state(false);
+  // Follows the selected cell, but not focus leaving the bar: pressing Set
+  // blurs it first, which mustn't put back the old value before the click
   $effect(() => {
     const text = textAt(view[cursor.row] ?? 0, columns[cursor.column]);
-    if (!barFocused) barText = text;
+    if (!untrack(() => barFocused)) barText = text;
   });
 
   function setSelection() {

@@ -41,15 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherToolbar from '#lib/components/WeatherToolbar.svelte';
 
   /** The chart's lines, in its colors (--tmax…, src/css/main.css) */
-  const CHART_KEY = [
-    { id: 'tmax', label: 'High Temps' },
-    { id: 'tavg', label: 'Average Temps' },
-    { id: 'tmin', label: 'Low Temps' },
-    { id: 'prcp', label: 'Rain' },
-    { id: 'snow', label: 'Snow' },
-    { id: 'dayt', label: 'Daytime' },
-  ] as const;
-
   let graph = $state<HTMLDivElement>();
   let defaultWeatherSourceCopy = $state<string>();
   let wasDefaultWeatherSourceChanged = $state(false);
@@ -425,24 +416,6 @@ centered as blocks so their first items never clip -->
 </div>
 
 <div class="flex w-full flex-col items-center gap-4">
-  <!-- The chart's key: which line is which (View › Values, above the
-  table, shows or hides them) -->
-  <ul
-    class="flex max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm"
-    aria-label="Chart key"
-  >
-    {#each CHART_KEY.filter(({ id }) => weather.table.showParameters[id]) as { id, label } (id)}
-      <li class="flex items-center gap-1.5 whitespace-nowrap">
-        <span
-          class="inline-block h-0.5 w-4 rounded-full"
-          style:background-color="var(--{id})"
-          aria-hidden="true"
-        ></span>
-        {label}
-      </li>
-    {/each}
-  </ul>
-
   {#if isDataMissing}
     <div
       class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-start gap-2 text-left text-sm"

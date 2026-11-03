@@ -19,7 +19,7 @@
 // aren't a day's (borders), keep their full color. No boundary line.
 
 /** How much of a day not made yet shows */
-export const UNMADE_OPACITY = 0.35;
+export const UNMADE_OPACITY = 0.15;
 
 /** The SVG filter turning a day not made yet gray (CSS `grayscale()` isn't
  * applied to SVG shapes everywhere; an SVG filter is). Downloads keep true colors. */

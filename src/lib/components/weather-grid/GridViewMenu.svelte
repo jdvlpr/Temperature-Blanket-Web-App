@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   A weather table's View menu: Show Colors (one setting for every weather
-  table), and with `values`, which weather values show — the same setting as
-  the names under the Weather step's chart, so it changes the chart, the
-  summary and every table.
+  table), and with `values`, which weather values show — one setting for the
+  Weather step's chart, its summary and every table. Each value has its
+  summary icon, in its chart line's color.
 -->
 <script lang="ts">
   import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ChevronDownIcon, EyeIcon, PaletteIcon } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
   import { showColors } from './grid-color.svelte.js';
-  import { paramLabel } from './weather-columns.js';
+  import { PARAM_ICONS, paramLabel } from './weather-columns.js';
 
   let {
     values,
@@ -94,14 +94,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class={menuItemClass}
               >
                 <span class="flex min-w-0 flex-1 items-center gap-2 text-left">
-                  <!-- Its line in the chart -->
+                  <!-- Its icon in the summary, in its line's color -->
                   <span
-                    class="inline-block h-0.5 w-4 shrink-0 rounded-full"
-                    style:background-color={id === 'moon'
-                      ? 'transparent'
-                      : `var(--${id})`}
-                    aria-hidden="true"
-                  ></span>
+                    class="w-4 shrink-0 text-center font-semibold"
+                    style:color="var(--{id})"
+                    aria-hidden="true">{PARAM_ICONS[id] ?? ''}</span
+                  >
                   {paramLabel(id)}
                 </span>
                 <MenuCheckbox checked={on} />

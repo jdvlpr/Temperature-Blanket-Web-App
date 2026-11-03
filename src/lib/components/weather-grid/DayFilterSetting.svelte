@@ -58,9 +58,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
   </div>
 {:else if id === 'place'}
-  <label class="flex flex-col gap-1">
+  <label class="flex max-w-full flex-col gap-1">
     <span>Location</span>
-    <select class="select w-auto" bind:value={filters.place}>
+    <!-- No wider than the panel; a long name is cut short -->
+    <select class="select w-auto max-w-full" bind:value={filters.place}>
       {#each filters.places as index (index)}
         <option value={index}>{locationName(index)}</option>
       {/each}
@@ -72,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="flex flex-col gap-1">
         <span>Gauge</span>
         <select
-          class="select w-auto"
+          class="select w-auto max-w-full"
           value={setting.gaugeId}
           onchange={(e) => filters.setColor({ gaugeId: e.currentTarget.value })}
         >

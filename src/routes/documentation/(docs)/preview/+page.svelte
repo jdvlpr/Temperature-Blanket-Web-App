@@ -178,12 +178,12 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     </p>
     <ul class="ml-6 list-disc space-y-1">
       <li>
-        Set it in <span class="font-bold">Progress</span>: the progress button
-        above the preview, the Project menu, or a day's circle in the weather
+        Set it in <span class="font-bold">Progress</span>: the Progress button
+        above the preview (once it's set, its menu's Edit Progress…), the Project menu, or a day's circle in the weather
         table all open it. ‹ and › move it a day; tap the date to pick any day.
       </li>
       <li>
-        Once it's set, <span class="font-bold">View</span> ›
+        Once it's set, <span class="font-bold">Progress</span> ›
         <span class="font-bold">Show my progress</span> shows the days not made yet
         in faded gray; turn it off to see every day in color.
       </li>

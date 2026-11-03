@@ -14,13 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  The preview toolbar's progress: a small button showing it ("62% · Mar 12"
-  over a thin bar; Not started: Progress) that opens the Progress dialog, the
-  one place it's set. Once set, a View menu beside it: Show my progress fades
-  the days not made yet (kept per project), and Edit Progress….
+  The preview toolbar's Progress. Not started: a Progress button that opens
+  the Progress dialog, the one place it's set. Once set, a Progress ▾ menu:
+  Edit Progress… (with how far it's made, as in the Project menu), then Show
+  my progress, which fades the days not made yet (kept per project).
 -->
 <script lang="ts">
-  import ProgressBar from '#lib/components/ProgressBar.svelte';
   import MenuCheckbox from '#lib/components/buttons/MenuCheckbox.svelte';
   import {
     menuContentClass,
@@ -34,35 +33,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ChartNoAxesColumnIncreasingIcon,
     ChevronDownIcon,
-    EyeIcon,
     SquarePenIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 </script>
-
-<button
-  type="button"
-  class="btn hover:preset-tonal-surface"
-  title={progress.madeThrough
-    ? 'Change how far you’ve made it'
-    : 'Set how far you’ve made it'}
-  onclick={() => openProgress()}
-  data-testid="progress-button"
->
-  <ChartNoAxesColumnIncreasingIcon aria-hidden="true" />
-  {#if progress.madeThrough}
-    <span class="flex flex-col items-stretch gap-0.5">
-      <span class="text-sm leading-tight">
-        {progress.progress.finished
-          ? 'Finished'
-          : `${progress.progress.percent}%`} · {shortDay(progress.madeThrough)}
-      </span>
-      <ProgressBar percent={progress.progress.percent} class="h-1 w-full" />
-    </span>
-  {:else}
-    <span>Progress</span>
-  {/if}
-</button>
 
 {#if progress.madeThrough}
   <Menu
@@ -71,14 +45,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (details.value === 'edit-progress') openProgress();
     }}
   >
-    <Menu.Trigger class={menuTriggerClass} data-testid="preview-view-menu">
-      <EyeIcon aria-hidden="true" />
-      <span>View</span>
+    <Menu.Trigger class={menuTriggerClass} data-testid="progress-menu">
+      <ChartNoAxesColumnIncreasingIcon aria-hidden="true" />
+      <span>Progress</span>
       <ChevronDownIcon class="icon-sm" aria-hidden="true" />
     </Menu.Trigger>
     <Portal>
       <Menu.Positioner>
         <Menu.Content class={[menuContentClass, 'w-64']}>
+          <Menu.Item value="edit-progress" class={menuItemClass}>
+            <SquarePenIcon class="shrink-0" aria-hidden="true" />
+            <span class="flex min-w-0 flex-1 flex-col">
+              <span>Edit Progress…</span>
+              <span class="text-surface-700-300 text-xs"
+                >{progress.progress.finished
+                  ? `Finished · through ${shortDay(progress.madeThrough)}`
+                  : `${progress.progress.percent}% made · through ${shortDay(progress.madeThrough)}`}</span
+              >
+            </span>
+          </Menu.Item>
+          <Menu.Separator />
           <!-- Stays open, so the check shows it took -->
           <Menu.OptionItem
             type="checkbox"
@@ -96,13 +82,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </span>
             <MenuCheckbox checked={progress.show} />
           </Menu.OptionItem>
-          <Menu.Separator />
-          <Menu.Item value="edit-progress" class={menuItemClass}>
-            <SquarePenIcon class="shrink-0" aria-hidden="true" />
-            <span>Edit Progress…</span>
-          </Menu.Item>
         </Menu.Content>
       </Menu.Positioner>
     </Portal>
   </Menu>
+{:else}
+  <button
+    type="button"
+    class={menuTriggerClass}
+    title="Set how far you’ve made it"
+    onclick={() => openProgress()}
+    data-testid="progress-button"
+  >
+    <ChartNoAxesColumnIncreasingIcon aria-hidden="true" />
+    <span>Progress</span>
+  </button>
 {/if}

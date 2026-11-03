@@ -26,6 +26,17 @@ export const ALL_VALUES = targets.map(
   (target) => target.id as WeatherParam['id'],
 );
 
+/** A weather value's icon, as in the Weather step's summary (shown in its
+ * chart line's color, `var(--<id>)`); none for the moon */
+export const PARAM_ICONS: Partial<Record<WeatherParam['id'], string>> = {
+  tmax: '↑',
+  tavg: '~',
+  tmin: '↓',
+  prcp: '∴',
+  snow: '∗',
+  dayt: '☼',
+};
+
 /** A weather value's name in a grid: "High", "Rain", "Daytime" */
 export const paramLabel = (param: WeatherParam['id']) =>
   targets.find((t) => t.id === param)?.gaugeLabel ?? param;

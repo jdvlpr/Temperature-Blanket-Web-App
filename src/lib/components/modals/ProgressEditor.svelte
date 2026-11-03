@@ -17,27 +17,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Progress: the one place how far the blanket is made gets set. Everything
   else shows it and opens this (`utils/open-progress.ts`).
 
-  Opened from a day (a table circle, a day's details), Set Made Through
-  that day leads, until progress changes at all. Then where it is now:
-  Made through, the day big between ‹ and › (a day back or on; tapping the day
-  opens the date picker to jump), the bar, and "62% made · 226 of 365 days".
-  Clear Progress and Done at the foot. Changes
-  save with the project as they're made. Also shown inside Update Weather
-  Data (`ondone` back to it).
+  Opened from a day (a table circle, a day's details), Set Progress to that
+  day leads (it saves and closes), until the day shown changes at all. Then
+  the day shown: Made through, big between ‹ and › (a day back or on; tapping
+  the day opens the date picker to jump), the bar, and "62% made · 226 of 365
+  days". Changes are a draft until Save; Cancel (or closing) keeps progress
+  as it was. Clear Progress, Cancel and Save at the foot. Also shown inside
+  Update Weather Data (`ondone` back to it).
 -->
 <script lang="ts">
   import ProgressBar from '#lib/components/ProgressBar.svelte';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { untrack } from 'svelte';
   import { progress } from '#lib/state/progress-state.svelte.js';
+  import { weather } from '#lib/state/weather-state.svelte.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
-  import { madeThroughOf, shortDay } from '#lib/utils/project-progress.js';
+  import {
+    madeThroughOf,
+    nextDay,
+    previousDay,
+    progressOf,
+    shortDay,
+  } from '#lib/utils/project-progress.js';
   import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from '@lucide/svelte';
 
   interface Props {
     /** Opened from this day: leads with Set Made Through it */
     day?: TISO8601DateString | null;
-    /** Done: closes the dialog (or back to the one it came from) unless given */
+    /** After Save or Cancel: closes the dialog (or back to the one it came
+     * from) unless given */
     ondone?: () => void;
   }
 
@@ -45,6 +53,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const uid = $props.id();
   let picker = $state<HTMLInputElement>();
+
+  // The draft: what Save sets, from where progress is when it opens
+  const openedAt = untrack(() => progress.madeThrough);
+  let made = $state<TISO8601DateString | null>(openedAt);
+  const shown = $derived(progressOf(weather.rawData, made));
+  const next = $derived(nextDay(progress.dates, made));
+  const previous = $derived(previousDay(progress.dates, made));
+  const changed = $derived(made !== progress.madeThrough);
+
+  const close = () => (ondone ? ondone() : dialog.dismiss());
+  function save(madeThrough: TISO8601DateString | null = made) {
+    progress.set(madeThrough);
+    close();
+  }
 
   /** "Mar 12, 2026" */
   const longDay = (iso: TISO8601DateString) =>
@@ -59,10 +81,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function fromPicker(value: string) {
     const picked = madeThroughOf(value);
     if (!picked) return;
-    if (progress.first && picked < progress.first) progress.set(null);
-    else if (progress.last && picked > progress.last)
-      progress.set(progress.last);
-    else progress.set(picked);
+    if (progress.first && picked < progress.first) made = null;
+    else if (progress.last && picked > progress.last) made = progress.last;
+    else made = picked;
   }
 
   // A tap on a touch screen opens the picker by itself (iOS); opening it
@@ -77,12 +98,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  // The day it was opened from, offered until progress changes at all
-  // (that button, ‹ ›, a picked day): then it's gone for this opening
-  const openedAt = untrack(() => progress.madeThrough);
+  // The day it was opened from, offered until the day shown changes at all
+  // (‹ ›, a picked day, Clear): then it's gone for this opening
   let used = $state(false);
   $effect(() => {
-    if (progress.madeThrough !== openedAt) used = true;
+    if (made !== openedAt) used = true;
   });
   const leading = $derived(!!day && day !== openedAt && !used);
 
@@ -96,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex w-full flex-col gap-5 p-4 pt-2 text-center"
   data-testid="progress-editor"
 >
-  {#if leading && day}
+  {#if day}
     <section
       class="flex flex-col items-center gap-3"
       data-testid="progress-day"
@@ -104,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         class="btn preset-filled-primary-500"
-        onclick={() => progress.set(day)}
+        onclick={() => save(day)}
       >
         <CheckIcon />
         Set Progress to {shortDay(day)}
@@ -133,12 +153,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         class="btn-icon btn-icon-lg preset-tonal shrink-0"
-        aria-label={progress.previous
-          ? `Back a day: made through ${shortDay(progress.previous)}`
+        aria-label={previous
+          ? `Back a day: made through ${shortDay(previous)}`
           : 'Back a day: not started'}
         title="Back a day"
-        disabled={!progress.madeThrough}
-        onclick={() => progress.set(progress.previous)}
+        disabled={!made}
+        onclick={() => (made = previous)}
       >
         <ChevronLeftIcon />
       </button>
@@ -154,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ]}
           aria-hidden="true"
         >
-          {progress.madeThrough ? longDay(progress.madeThrough) : 'Not started'}
+          {made ? longDay(made) : 'Not started'}
         </span>
         <span class="text-surface-700-300 block text-xs" aria-hidden="true"
           >Tap to pick a day</span
@@ -166,7 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-labelledby="{uid}-label"
           min={progress.first}
           max={progress.last}
-          value={progress.madeThrough ?? pickerStart}
+          value={made ?? pickerStart}
           onclick={openPicker}
           oninput={(e) =>
             /* iOS may not send change for the first day picked from empty */
@@ -178,27 +198,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         class="btn-icon btn-icon-lg preset-tonal shrink-0"
-        aria-label={progress.next
-          ? `On a day: made through ${shortDay(progress.next)}`
+        aria-label={next
+          ? `On a day: made through ${shortDay(next)}`
           : 'On a day: finished'}
         title="On a day"
-        disabled={!progress.next}
-        onclick={() => progress.set(progress.next)}
+        disabled={!next}
+        onclick={() => (made = next)}
       >
         <ChevronRightIcon />
       </button>
     </div>
 
     <div class="flex w-full flex-col gap-1.5" role="status">
-      <ProgressBar percent={progress.progress.percent} />
+      <ProgressBar percent={shown.percent} />
       <p class="text-sm">
-        {#if !progress.madeThrough}
-          Nothing made yet · {progress.progress.total} days
-        {:else if progress.progress.finished}
+        {#if !made}
+          Nothing made yet · {shown.total} days
+        {:else if shown.finished}
           <strong>Finished</strong> · every day is made
         {:else}
-          <strong>{progress.progress.percent}% made</strong> · {progress
-            .progress.made} of {progress.progress.total} days
+          <strong>{shown.percent}% made</strong> · {shown.made} of {shown.total}
+          days
         {/if}
       </p>
     </div>
@@ -208,16 +228,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       type="button"
       class="btn hover:preset-tonal-surface"
-      disabled={!progress.madeThrough}
-      onclick={() => progress.set(null)}
+      disabled={!made}
+      onclick={() => (made = null)}
     >
       Clear Progress
     </button>
-    <!-- Not a second main button beside Set Made Through To -->
-    <button
-      type="button"
-      class={['btn', leading ? 'preset-tonal' : 'preset-filled-primary-500']}
-      onclick={() => (ondone ? ondone() : dialog.dismiss())}>Done</button
-    >
+    <div class="flex items-center gap-2">
+      <button type="button" class="btn preset-tonal" onclick={close}
+        >Cancel</button
+      >
+      <!-- Not a second main button beside Set Progress to -->
+      <button
+        type="button"
+        class={['btn', leading ? 'preset-tonal' : 'preset-filled-primary-500']}
+        disabled={!changed}
+        onclick={() => save()}>Save</button
+      >
+    </div>
   </div>
 </div>
