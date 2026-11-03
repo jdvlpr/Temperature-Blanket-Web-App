@@ -24,6 +24,7 @@
 // it to the trash).
 
 import type { RequestHandler } from './$types';
+import { lastingOrigin } from '#lib/constants/site.js';
 
 export const prerender = false;
 
@@ -53,7 +54,7 @@ export const PUT: RequestHandler = async (event) => {
       gallery,
       postId,
       await event.request.json().catch(() => null),
-      event.url.origin,
+      lastingOrigin(event.url.origin),
     );
   if (kind === 'project')
     // As sent, so the payload goes to WordPress exactly as the browser built it

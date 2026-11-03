@@ -17,6 +17,7 @@
 // { paletteId, title, yarnUrl }). There's no anonymous route for palettes.
 
 import type { RequestHandler } from './$types';
+import { lastingOrigin } from '#lib/constants/site.js';
 
 export const prerender = false;
 
@@ -28,5 +29,9 @@ export const POST: RequestHandler = async (event) => {
 
   const body = await event.request.json().catch(() => null);
   if (!body) return galleryError(400, 'INVALID_REQUEST', 'Invalid palette');
-  return publishPaletteFromAccount(gallery, body, event.url.origin);
+  return publishPaletteFromAccount(
+    gallery,
+    body,
+    lastingOrigin(event.url.origin),
+  );
 };

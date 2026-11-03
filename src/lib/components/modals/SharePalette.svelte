@@ -22,6 +22,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
 
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import { lastingOrigin } from '#lib/constants/site.js';
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import {
     GALLERY_PAGES_CHANGED,
@@ -138,8 +139,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
 
   // Without the app version, so the same palette is the same link and the
   // gallery can tell it's already there
-  const yarnUrl = () =>
-    getYarnPageURL({ colors, origin: window.location.origin });
+  const yarnUrl = () => getYarnPageURL({ colors, origin: lastingOrigin() });
 
   async function updatePage(page: { postId: number }, title: string) {
     const result = await updatePalettePage(page.postId, {

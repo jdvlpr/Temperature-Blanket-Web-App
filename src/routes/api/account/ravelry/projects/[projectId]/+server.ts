@@ -15,6 +15,7 @@
 
 import type { RequestEvent } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { lastingOrigin } from '#lib/constants/site.js';
 
 export const prerender = false;
 
@@ -119,7 +120,8 @@ export const POST: RequestHandler = async (event) => {
         'NEEDS_NAME_SHOWN',
         'Show your name on its gallery page first',
       );
-    const pageUrl = `${event.url.origin}/gallery/${page.postId}`;
+    // On the main site, also from the beta, so the link outlasts it
+    const pageUrl = `${lastingOrigin(event.url.origin)}/gallery/${page.postId}`;
 
     let link = await m.getProjectLink(session.db, session.userId, projectId);
     const post = readProjectPost(await event.request.json().catch(() => null), {

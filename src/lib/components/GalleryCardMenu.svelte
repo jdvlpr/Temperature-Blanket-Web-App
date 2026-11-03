@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import { lastingOrigin } from '#lib/constants/site.js';
   import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
@@ -95,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     icon: LinkIcon,
     onselect: () =>
       copyToClipboard(
-        `${window.location.origin}${pagePath}`,
+        `${lastingOrigin()}${pagePath}`,
         'Link copied',
         'Unable to copy to your clipboard',
       ),

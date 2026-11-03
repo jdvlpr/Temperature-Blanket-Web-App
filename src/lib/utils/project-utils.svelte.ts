@@ -14,6 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { resolve } from '$app/paths';
+import { withOrigin } from '#lib/utils/site-origin.js';
+import { lastingOrigin } from '#lib/constants/site.js';
 import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
 import PdfOptions from '#lib/components/modals/PdfOptions.svelte';
 import {
@@ -207,7 +209,7 @@ export const sendToProjectGallery = async (
     const yarnURLDetails = colorsToYarnDetails({
       colors: gaugeColors,
     });
-    let yarnSearchUrl = `${window.location.origin}/yarn?s=${colorsCode}&f=${yarnURLDetails}`;
+    let yarnSearchUrl = `${lastingOrigin()}/yarn?s=${colorsCode}&f=${yarnURLDetails}`;
     yarnUrls.push(yarnSearchUrl);
     tables.push(getWPGauge(gauge));
   });
@@ -231,7 +233,7 @@ export const sendToProjectGallery = async (
     locations: JSON.stringify(_locations),
     missing_days: weather.missingDaysCount(),
     palettes: JSON.stringify(palettes),
-    project_url: project.url.href,
+    project_url: withOrigin(project.url.href, lastingOrigin()),
     raw_weather_data: JSON.stringify(weather.rawData),
     tables: JSON.stringify(tables),
     title: locations.projectTitle,

@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { cubicOut } from 'svelte/easing';
   import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
+  import BetaBanner from './BetaBanner.svelte';
   import WhatsNewBanner from './WhatsNewBanner.svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
@@ -249,7 +250,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <!-- Clear of the sidebar: with PAGE's gutter, 1.5rem -->
       <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
-        <WhatsNewBanner />
+        {#if __SITE_BETA__}
+          <BetaBanner />
+        {:else}
+          <WhatsNewBanner />
+        {/if}
         {@render main?.()}
         {@render footer?.()}
       </div>

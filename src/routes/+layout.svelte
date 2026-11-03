@@ -43,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
   import { ICONS } from '#lib/constants/icon-constants.js';
+  import { IS_BETA } from '#lib/constants/site.js';
 
   interface Props {
     children?: Snippet;
@@ -145,6 +146,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <svelte:head>
+  {#if IS_BETA}
+    <!-- The beta closes after launch: search engines list only the main site -->
+    <meta name="robots" content="noindex" />
+  {/if}
   <link rel="manifest" href="/manifest.json" />
   <link
     rel="apple-touch-icon"

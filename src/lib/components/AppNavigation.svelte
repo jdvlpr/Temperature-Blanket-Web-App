@@ -218,6 +218,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   sidebar's width rather than setting it -->
   <div class="mt-auto flex flex-col gap-1 self-stretch">
     <div class={SMALL_LIST}>
+      {#if __SITE_BETA__}
+        <a
+          href="/beta"
+          class={['py-1', SMALL_LINK, pathname === '/beta' && SMALL_CURRENT]}
+          aria-current={pathname === '/beta' ? 'page' : undefined}
+          >About the Beta</a
+        >
+      {/if}
       <a
         href="/documentation"
         class={['py-1', SMALL_LINK, docs && SMALL_CURRENT]}

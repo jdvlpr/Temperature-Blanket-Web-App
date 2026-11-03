@@ -17,6 +17,7 @@ export default [
         ...globals.node,
         // Build-time constant from vite.config.ts `define`
         __ACCOUNTS_ENABLED__: 'readonly',
+        __SITE_BETA__: 'readonly',
       },
     },
   },

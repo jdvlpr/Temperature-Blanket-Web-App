@@ -88,6 +88,8 @@ export default defineConfig(({ mode }) => {
       __ACCOUNTS_ENABLED__: JSON.stringify(
         env.PUBLIC_ACCOUNTS_ENABLED === 'true',
       ),
+      // The beta at next.temperature-blanket.com: PUBLIC_SITE_CHANNEL=beta
+      __SITE_BETA__: JSON.stringify(env.PUBLIC_SITE_CHANNEL === 'beta'),
     },
     plugins: [
       previewCloudflareWorkers(),

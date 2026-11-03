@@ -150,7 +150,22 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   });
 };
 
+// The beta closes after launch: search engines list only the main site. Its
+// pages say so too (the root layout's robots meta), as prerendered ones never
+// come through here.
+const betaNoIndex: Handle = async ({ event, resolve }) => {
+  if (!__SITE_BETA__) return resolve(event);
+  const response = await resolve(event);
+  try {
+    response.headers.set('X-Robots-Tag', 'noindex');
+  } catch {
+    // A response passed through as it came (immutable headers): left as is
+  }
+  return response;
+};
+
 export const handle: Handle = sequence(
+  betaNoIndex,
   accountsApi,
   legacyRedirects,
   devRedirects,

@@ -45,6 +45,8 @@ declare global {
 
   // Whether account UI is built in: PUBLIC_ACCOUNTS_ENABLED=true at build time (vite.config.ts)
   const __ACCOUNTS_ENABLED__: boolean;
+  // Whether this is the beta (next.temperature-blanket.com): PUBLIC_SITE_CHANNEL=beta at build time
+  const __SITE_BETA__: boolean;
 
   interface Window {
     clarity?: (action: string, ...args: unknown[]) => void;
