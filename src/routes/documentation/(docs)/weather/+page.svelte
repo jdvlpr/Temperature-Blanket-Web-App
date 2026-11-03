@@ -394,10 +394,5 @@ HELP_TOPICS). -->
 </section>
 
 <RelatedGuides
-  slugs={[
-    'weather-doesnt-match',
-    'knit-along-all-year',
-    'rain-snow-sunshine',
-    'same-date-several-years',
-  ]}
+  slugs={['weather-doesnt-match', 'knit-along-all-year', 'rain-snow-sunshine']}
 />

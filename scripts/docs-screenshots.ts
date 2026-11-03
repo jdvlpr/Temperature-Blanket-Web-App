@@ -21,11 +21,27 @@
 // `src` is <name>), and its size goes into src/lib/docs/docs-shots.json, which
 // DocsShot reads, so pages never need sizes by hand. The project is a year of
 // London's weather, looked up live, with the default gauge.
+//
+// It also records the short clips (CLIPS, shown by DocsClip): each is
+// <name>-light.mp4 and -dark.mp4, with the first frame as -light.jpg and
+// -dark.jpg for its poster, and its size in docs-shots.json too. Frames come
+// from Chrome's screencast at twice the size, with a cursor drawn in (headless
+// Chrome has none), and ffmpeg (on the PATH) makes them a video. Each clip
+// also leaves a sheet of a frame a second in .svelte-kit/docs-clips/, to
+// check it by. How to add one: .claude/skills/docs-clips/SKILL.md.
 
-import { chromium, type Locator, type Page } from '@playwright/test';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import {
+  chromium,
+  type BrowserContext,
+  type Locator,
+  type Page,
+} from '@playwright/test';
+import { execFile } from 'node:child_process';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name: string) => {
@@ -38,8 +54,6 @@ const only = arg('only');
 // London (GeoNames 2643743), all of 2025, from Open-Meteo (s=1, without
 // trying the other source: 0)
 const PROJECT = `/?project=1#l=2643743'2025010120251231&s=10&u=m`;
-// The same place on March 10 of three years, one location each
-const SAME_DATE = `/?project=1#l=${[2023, 2024, 2025].map((year) => `2643743'${year}0310${year}0310`).join('')}&s=10&u=m`;
 // The whole of this year, with days still to come
 const THIS_YEAR = `/?project=1#l=2643743'${new Date().getFullYear()}0101${new Date().getFullYear()}1231&s=10&u=m`;
 
@@ -65,7 +79,7 @@ async function planner(
   );
   await page.goto(new URL(project, base).href);
   await page.getByRole('button', { name: /^Get Weather Data/ }).click();
-  await page.getByRole('button', { name: /^Weather Source/ }).waitFor();
+  await page.getByRole('button', { name: /^Source:/ }).waitFor();
   const key = { location: '1', 'weather-data': '2', gauges: '3', preview: '4' };
   await page.keyboard.press(key[section]);
   // Without toasts (like "Units set to") over the shot
@@ -116,24 +130,10 @@ const SHOTS: Shot[] = [
     trim: true,
   },
   {
-    name: 'weather/edit-day',
-    open: async (page) => {
-      const section = await planner(page, 'weather-data');
-      await section.locator('table tbody button').first().click();
-      await settle(page);
-      return dialog(page);
-    },
-  },
-  {
     // Days in ranges is on to start with
     name: 'choose-ranges/days-in-ranges',
     open: async (page) => planner(page, 'gauges'),
     trim: true,
-  },
-  {
-    name: 'same-date-several-years/locations',
-    open: async (page) => planner(page, 'location', SAME_DATE),
-    height: 3200,
   },
   {
     name: 'knit-along-all-year/future-days',
@@ -216,7 +216,7 @@ const SHOTS: Shot[] = [
     name: 'weather/weather-source',
     open: async (page) => {
       await planner(page, 'weather-data');
-      await page.getByRole('button', { name: /^Weather Source/ }).click();
+      await page.getByRole('button', { name: /^Source:/ }).click();
       await settle(page);
       return dialog(page);
     },
@@ -266,6 +266,306 @@ const SHOTS: Shot[] = [
     trim: true,
   },
 ];
+
+// ***************
+// Clips
+// ***************
+
+type Clip = {
+  name: string;
+  /** Opens what the clip starts on (not recorded) */
+  open: (page: Page) => Promise<void>;
+  /** What's recorded, after a moment on the first frame */
+  play: (page: Page) => Promise<void>;
+};
+
+/** The window a clip is recorded in: about the width of a guide's text */
+const CLIP_VIEWPORT = { width: 800, height: 720 };
+
+/** A cursor for the clips (big enough to follow at a guide's width), following the mouse and showing its presses; its tip is at the mouse */
+function drawCursor() {
+  const cursor = document.createElement('div');
+  cursor.innerHTML =
+    '<svg width="38" height="38" viewBox="0 0 24 24"><path d="M4 2v17l4.5-4.2 3.1 6.7 2.8-1.3-3-6.5 6.1-.3z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+  const ring = document.createElement('div');
+  Object.assign(cursor.style, {
+    position: 'fixed',
+    left: '0',
+    top: '0',
+    zIndex: '2147483647',
+    pointerEvents: 'none',
+    transform: 'translate(-100px, -100px)',
+  });
+  Object.assign(ring.style, {
+    position: 'absolute',
+    left: '-18px',
+    top: '-21px',
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    background: 'rgb(59 130 246 / 0.35)',
+    opacity: '0',
+    transition: 'opacity 120ms',
+  });
+  cursor.prepend(ring);
+  addEventListener(
+    'mousemove',
+    (event) =>
+      (cursor.style.transform = `translate(${event.clientX - 6}px, ${event.clientY - 3}px)`),
+    true,
+  );
+  addEventListener('mousedown', () => (ring.style.opacity = '1'), true);
+  addEventListener('mouseup', () => (ring.style.opacity = '0'), true);
+  document.documentElement.append(cursor);
+}
+
+/** Moves the mouse to the middle of something, at a pace you can follow */
+async function moveTo(page: Page, target: Locator, ms = 600) {
+  const box = await target.boundingBox();
+  if (!box) throw new Error(`Nothing to move to: ${target}`);
+  const to = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const from = await page.evaluate(() => window.__clipMouse ?? { x: 0, y: 0 });
+  const steps = Math.max(1, Math.round(ms / 16));
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const ease = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    await page.mouse.move(
+      from.x + (to.x - from.x) * ease,
+      from.y + (to.y - from.y) * ease,
+    );
+    await page.waitForTimeout(16);
+  }
+  await page.evaluate((at) => (window.__clipMouse = at), to);
+}
+
+async function clickOn(page: Page, target: Locator, ms?: number) {
+  await moveTo(page, target, ms);
+  await page.waitForTimeout(150);
+  // If it moved on the way (a late layout), go on to where it is now
+  await moveTo(page, target, 100);
+  await page.mouse.down();
+  await page.waitForTimeout(120);
+  await page.mouse.up();
+}
+
+declare global {
+  interface Window {
+    __clipMouse?: { x: number; y: number };
+  }
+}
+
+const value = (page: Page, date: string, param: string) =>
+  page.getByRole('button', { name: `Edit ${date}, ${param}:` });
+
+/** The Weather step with the table's first rows in view */
+async function weatherTable(page: Page) {
+  const section = await planner(page, 'weather-data');
+  const table = section.getByRole('table');
+  // Again until it stays: the step and the chart, laid out late, can move it
+  for (let tries = 0, still = 0; still < 3 && tries < 30; tries++) {
+    const top = await table.evaluate(
+      (node) => node.getBoundingClientRect().top,
+    );
+    if (Math.abs(top - 72) < 2) still++;
+    else {
+      still = 0;
+      await page.evaluate((y) => scrollTo(0, scrollY + y - 72), top);
+    }
+    await page.waitForTimeout(300);
+  }
+  await settle(page);
+}
+
+/** Edit Weather Data, opened on a day's value */
+async function editWeather(page: Page, date: string, param: string) {
+  await weatherTable(page);
+  await value(page, date, param).click();
+  await dialog(page).getByRole('grid').waitFor();
+  await settle(page);
+}
+
+const cell = (page: Page, row: number, column: number) =>
+  dialog(page)
+    .locator(`[data-grid-row="${row}"]`)
+    .getByRole('gridcell')
+    .nth(column);
+
+const CLIPS: Clip[] = [
+  {
+    name: 'weather-doesnt-match/change-one-day',
+    open: weatherTable,
+    play: async (page) => {
+      await clickOn(page, value(page, '2025-01-03', 'High'), 900);
+      await dialog(page).getByRole('grid').waitFor();
+      await page.waitForTimeout(900);
+      await page.keyboard.type('5.5', { delay: 180 });
+      await page.waitForTimeout(400);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(1200);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Apply', exact: true }),
+        900,
+      );
+      await page.waitForTimeout(600);
+    },
+  },
+  {
+    name: 'weather-doesnt-match/change-several-days',
+    open: (page) => editWeather(page, '2025-01-01', 'High'),
+    play: async (page) => {
+      // High, from the 2nd to the 6th (the grid moves on a row as it nears its end)
+      await moveTo(page, cell(page, 1, 0), 900);
+      await page.waitForTimeout(200);
+      await page.mouse.down();
+      await moveTo(page, cell(page, 4, 0), 900);
+      await page.mouse.up();
+      await page.waitForTimeout(700);
+      await clickOn(page, dialog(page).getByPlaceholder('±0'), 800);
+      await page.waitForTimeout(200);
+      await page.keyboard.type('2', { delay: 180 });
+      await page.waitForTimeout(300);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Add', exact: true }),
+        500,
+      );
+      await page.waitForTimeout(1600);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Apply', exact: true }),
+        900,
+      );
+      await page.waitForTimeout(600);
+    },
+  },
+];
+
+const run = promisify(execFile);
+
+/** Records one clip in one theme; returns its size in CSS pixels */
+async function record(context: BrowserContext, clip: Clip, theme: string) {
+  const page = await context.newPage();
+  await clip.open(page).catch(async (error) => {
+    const failed = join(root, '.svelte-kit/docs-screenshot-failed.png');
+    await page.screenshot({ path: failed, fullPage: true });
+    console.error(`${clip.name} failed; the page is in ${failed}`);
+    throw error;
+  });
+  await page.evaluate(drawCursor);
+  // The cursor starts a little in from the bottom right
+  const start = {
+    x: CLIP_VIEWPORT.width * 0.8,
+    y: CLIP_VIEWPORT.height * 0.85,
+  };
+  await page.mouse.move(start.x, start.y);
+  await page.evaluate((at) => (window.__clipMouse = at), start);
+
+  const frames: { data: Buffer; time: number }[] = [];
+  const cdp = await context.newCDPSession(page);
+  cdp.on('Page.screencastFrame', ({ data, metadata, sessionId }) => {
+    frames.push({
+      data: Buffer.from(data, 'base64'),
+      time: metadata.timestamp ?? Date.now() / 1000,
+    });
+    void cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {});
+  });
+  await cdp.send('Page.startScreencast', {
+    format: 'png',
+    maxWidth: CLIP_VIEWPORT.width * 2,
+    maxHeight: CLIP_VIEWPORT.height * 2,
+  });
+  await page.waitForTimeout(1000);
+  await clip.play(page).catch(async (error) => {
+    const failed = join(root, '.svelte-kit/docs-screenshot-failed.png');
+    await page.screenshot({ path: failed });
+    console.error(`${clip.name} failed; the page is in ${failed}`);
+    throw error;
+  });
+  // The end stays a moment before it starts again
+  await page.waitForTimeout(1800);
+  const end = Date.now() / 1000;
+  await cdp.send('Page.stopScreencast');
+  if (frames.length < 2) throw new Error(`${clip.name}: no frames recorded`);
+
+  const dir = await mkdtemp(join(tmpdir(), 'docs-clip-'));
+  const list: string[] = [];
+  for (const [i, frame] of frames.entries()) {
+    const file = join(dir, `${String(i).padStart(5, '0')}.png`);
+    await writeFile(file, frame.data);
+    const next = frames[i + 1]?.time ?? end;
+    list.push(
+      `file '${file}'`,
+      `duration ${Math.max(next - frame.time, 0.02)}`,
+    );
+  }
+  // The concat demuxer needs the last file again for its duration to count
+  list.push(
+    `file '${join(dir, `${String(frames.length - 1).padStart(5, '0')}.png`)}'`,
+  );
+  await writeFile(join(dir, 'frames.txt'), list.join('\n'));
+
+  const out = join(root, 'static/images/docs', `${clip.name}-${theme}`);
+  await mkdir(dirname(out), { recursive: true });
+  await run('ffmpeg', [
+    '-y',
+    '-loglevel',
+    'error',
+    '-f',
+    'concat',
+    '-safe',
+    '0',
+    '-i',
+    join(dir, 'frames.txt'),
+    '-vf',
+    'fps=30,scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p',
+    '-c:v',
+    'libx264',
+    '-preset',
+    'slow',
+    '-crf',
+    '26',
+    '-tune',
+    'animation',
+    '-movflags',
+    '+faststart',
+    '-an',
+    `${out}.mp4`,
+  ]);
+  // The poster, for whoever has motion reduced: the first frame
+  await run('ffmpeg', [
+    '-y',
+    '-loglevel',
+    'error',
+    '-i',
+    join(dir, '00000.png'),
+    '-q:v',
+    '3',
+    `${out}.jpg`,
+  ]);
+  // A sheet of a frame a second, to check the clip without playing it
+  const sheet = join(
+    root,
+    '.svelte-kit/docs-clips',
+    `${clip.name}-${theme}.png`,
+  );
+  await mkdir(dirname(sheet), { recursive: true });
+  await run('ffmpeg', [
+    '-y',
+    '-loglevel',
+    'error',
+    '-i',
+    `${out}.mp4`,
+    '-vf',
+    'fps=1,scale=400:-1,tile=4x5',
+    '-frames:v',
+    '1',
+    sheet,
+  ]);
+  await rm(dir, { recursive: true });
+  await page.close();
+  return CLIP_VIEWPORT;
+}
 
 async function main() {
   const browser = await chromium.launch();
@@ -319,10 +619,30 @@ async function main() {
       await context.close();
     }
   }
+  // The screencast is at twice the size only with the scale forced
+  const clipBrowser = await chromium.launch({
+    args: ['--force-device-scale-factor=2'],
+  });
+  for (const clip of CLIPS) {
+    if (only && clip.name !== only) continue;
+    for (const theme of ['light', 'dark'] as const) {
+      const context = await clipBrowser.newContext({
+        baseURL: base,
+        ignoreHTTPSErrors: true,
+        viewport: CLIP_VIEWPORT,
+        colorScheme: theme,
+        deviceScaleFactor: 2,
+      });
+      sizes[clip.name] = await record(context, clip, theme);
+      console.log(`${clip.name}-${theme}.mp4`);
+      await context.close();
+    }
+  }
   await writeFile(
     join(root, 'src/lib/docs/docs-shots.json'),
     `${JSON.stringify(sizes, null, 2)}\n`,
   );
+  await clipBrowser.close();
   await browser.close();
 }
 

@@ -164,9 +164,10 @@ Back doesn't return to it. -->
         Can I make a blanket of one date over many years?
       </h3>
       <p>
-        Yes, like a birthday in every year since you were born, though it takes
-        some setting up.
-        <a href={guide('same-date-several-years')} class="link">Here's how</a>.
+        Technically, yes: add one location per year, each set to that single day
+        with a Custom duration. But the Project Planner isn't made for this.
+        Every year is its own weather search, which uses far more requests than
+        a blanket of one stretch of days, so it isn't recommended or supported.
       </p>
     </div>
 

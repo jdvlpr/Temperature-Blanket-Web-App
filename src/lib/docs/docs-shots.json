@@ -35,17 +35,9 @@
     "width": 975,
     "height": 1192
   },
-  "weather/edit-day": {
-    "width": 364,
-    "height": 276
-  },
   "choose-ranges/days-in-ranges": {
     "width": 975,
     "height": 1192
-  },
-  "same-date-several-years/locations": {
-    "width": 768,
-    "height": 1057
   },
   "match-your-yarn/choose-colorways": {
     "width": 1269,
@@ -62,5 +54,13 @@
   "version-7/site-menu": {
     "width": 278,
     "height": 466
+  },
+  "weather-doesnt-match/change-one-day": {
+    "width": 800,
+    "height": 720
+  },
+  "weather-doesnt-match/change-several-days": {
+    "width": 800,
+    "height": 720
   }
 }

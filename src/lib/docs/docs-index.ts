@@ -152,23 +152,6 @@ export const GUIDES: DocsPage[] = [
   },
   {
     kind: 'guide',
-    slug: 'same-date-several-years',
-    title: 'The Same Date Across Several Years',
-    summary:
-      'A blanket of one day, like a birthday or anniversary, in every year you choose.',
-    keywords: [
-      'birthday',
-      'anniversary',
-      'one day',
-      'every year',
-      'multiple years',
-      'specific date',
-      'memorial',
-      'wedding',
-    ],
-  },
-  {
-    kind: 'guide',
     slug: 'match-your-yarn',
     title: 'Match Your Own Yarn, or a Photo',
     summary:

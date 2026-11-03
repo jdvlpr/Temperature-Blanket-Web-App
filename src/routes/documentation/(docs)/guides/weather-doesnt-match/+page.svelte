@@ -20,7 +20,7 @@ created, or the weather is Custom (storage/projects.svelte.ts); a search
 replaces it. So keeping weather fixed means importing it (Custom). -->
 
 <script lang="ts">
-  import DocsShot from '#lib/components/docs/DocsShot.svelte';
+  import DocsClip from '#lib/components/docs/DocsClip.svelte';
   import RelatedReference from '#lib/components/docs/RelatedReference.svelte';
   import {
     METEOSTAT_DELAY_DAYS,
@@ -82,23 +82,91 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
 
 <section class="flex flex-col gap-3">
   <h2 id="fix-a-few-days" class="text-2xl font-bold">Fix a Few Days</h2>
+  <p>
+    Edit Weather Data shows every day's weather in a grid, like a spreadsheet.
+    Nothing in your project changes until you press
+    <span class="font-bold">Apply</span>.
+  </p>
+  <h3 id="change-one-day" class="text-lg font-bold">Change one day</h3>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      In the table under the chart, press the number you want to change. Edit
-      Weather Data opens on it, with every day's weather in a grid.
+      In the table under the chart, press the value you want to change. Edit
+      Weather Data opens on it.
     </li>
     <li>
-      Type your reading and press <kbd class="kbd">Enter</kbd>. Change as many
-      days as you like; to paste readings from a spreadsheet, copy them there
-      and paste them on the first day.
+      Type your reading and press <kbd class="kbd">Enter</kbd>. The new value
+      shows over the old one, struck through, with the difference beside it.
+    </li>
+    <li>
+      Change any other days the same way: <kbd class="kbd">Enter</kbd>,
+      <kbd class="kbd">Tab</kbd> and the arrow keys move between them.
     </li>
     <li>Press <span class="font-bold">Apply</span>.</li>
   </ol>
-  <DocsShot
-    src="weather/edit-day"
-    alt="Edit Weather Data: a grid of days with High, Average and Low Temperature, Rain, Snow and Daytime, one day's high selected, and Cancel and Apply."
+  <DocsClip
+    src="weather-doesnt-match/change-one-day"
+    alt="On the Weather step, the pointer presses January 3's high of 3.4 in the table. Edit Weather Data opens on it, 5.5 is typed in its place, and the cell shows 5.5 over 3.4 struck through, +2.1. Apply is pressed, the dialog closes, and the table shows 5.5 with the message Weather data changed on 1 day."
     caption="Changing one day's high."
   />
+  <h3 id="change-several-days" class="text-lg font-bold">
+    Change several days at once
+  </h3>
+  <p>
+    If your thermometer reads warmer than the weather service, say by about 2°,
+    you can move a run of days by the same amount.
+  </p>
+  <ol class="ml-6 list-decimal space-y-1">
+    <li>
+      Select the days: drag down the column, or press the first one and
+      <kbd class="kbd">Shift</kbd>-press the last.
+    </li>
+    <li>
+      Above the grid, type the difference in <span class="font-bold">Add</span>
+      (a minus number, like -2, takes away) and press
+      <span class="font-bold">Add</span>. Or type one value in the box beside
+      the selection and press <span class="font-bold">Set</span> to give every selected
+      day that value.
+    </li>
+    <li>Press <span class="font-bold">Apply</span>.</li>
+  </ol>
+  <DocsClip
+    src="weather-doesnt-match/change-several-days"
+    alt="In Edit Weather Data, the pointer drags down the High column from January 2 to January 6, and 5 selected shows above the grid. 2 is typed in Add and Add is pressed: each of the five highs goes up by 2, showing the old value struck through and +2. Apply is pressed and the message says Weather data changed on 5 days."
+    caption="Adding 2° to five days' highs."
+  />
+  <h3 id="more-ways-to-edit" class="text-lg font-bold">More ways to edit</h3>
+  <ul class="ml-6 list-disc space-y-1">
+    <li>
+      <span class="font-bold">Paste from a spreadsheet:</span> copy the cells there
+      and paste them on the first cell they go in. If each row you copy starts with
+      a date, it goes to that day.
+    </li>
+    <li>
+      <span class="font-bold">Missing days:</span> when some values are missing,
+      <span class="font-bold">Find Missing</span> goes to the next one, and
+      <span class="font-bold">Fill In Missing</span> fills them in from the days on
+      either side.
+    </li>
+    <li>
+      <span class="font-bold">Only some days:</span>
+      <span class="font-bold">Filters</span> shows just the days you want, such as
+      the missing ones or a few weeks.
+    </li>
+    <li>
+      <span class="font-bold">Changed your mind?</span> The arrows at the top of
+      the editor undo and redo, and <span class="font-bold">Revert</span> puts the
+      selected values back as they were. Once you've applied, Undo at the top of the
+      page takes back all of it in one step.
+    </li>
+  </ul>
+  <p>
+    You can also open the editor from <span class="font-bold">Edit</span> ›
+    <span class="font-bold">Edit Weather Data</span> above the weather. Every
+    part of it is in
+    <a href="/documentation/weather#edit-weather-data" class="link"
+      >Edit the Weather</a
+    >.
+  </p>
 </section>
 
 <section class="flex flex-col gap-3">

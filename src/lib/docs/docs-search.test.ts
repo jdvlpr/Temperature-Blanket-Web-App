@@ -9,7 +9,6 @@ describe('keywordSearch', () => {
     expect(firstSlug('thermometer')).toBe('weather-doesnt-match');
     expect(firstSlug('wrong temperature')).toBe('weather-doesnt-match');
     expect(firstSlug('backup')).toBe('move-or-back-up');
-    expect(firstSlug('birthday')).toBe('same-date-several-years');
     expect(firstSlug('print')).toBe('print-and-track');
   });
 

@@ -107,11 +107,6 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     To remove one, press <span class="font-bold">Remove</span> beside its number of
     days.
   </p>
-  <p>
-    <a href="/documentation/guides/same-date-several-years" class="link"
-      >Using this for one date across several years</a
-    >.
-  </p>
 </section>
 
 <section class="flex flex-col gap-3">
@@ -156,6 +151,4 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   </p>
 </section>
 
-<RelatedGuides
-  slugs={['plan-a-blanket', 'same-date-several-years', 'knit-along-all-year']}
-/>
+<RelatedGuides slugs={['plan-a-blanket', 'knit-along-all-year']} />
