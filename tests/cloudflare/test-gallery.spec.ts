@@ -22,7 +22,14 @@
 // in the browser.
 
 import { expect, test, type Page } from '@playwright/test';
-import { idbSet, localD1, signIn, uniqueEmail, useTestIp } from './helpers';
+import {
+  addFromBrowser,
+  idbSet,
+  localD1,
+  signIn,
+  uniqueEmail,
+  useTestIp,
+} from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
   await useTestIp(page);
@@ -637,8 +644,13 @@ test.describe('Gallery pages from accounts', () => {
     const updates = () => gallery.calls.filter((call) => call.method === 'PUT');
 
     await page.reload();
-    // In the account: a project's page follows the account's copy into the Trash
-    await page.getByRole('button', { name: /^Add 2 projects/ }).click();
+    // In the account: a project's page follows the account's copy into the Trash.
+    // The offer opens over My Library, whose own Add button is behind it
+    await addFromBrowser(page).waitFor();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^Add 2 projects/ })
+      .click();
     const more = (name: string) =>
       page.getByRole('button', { name: `More for ${name}` });
     // Its name and info line

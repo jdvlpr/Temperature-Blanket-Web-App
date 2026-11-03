@@ -9,9 +9,15 @@ const moreMenuButtons = (page: Page) =>
 
 /** Switch the results to the list, through the View menu */
 const showList = async (page: Page) => {
-  await page.getByRole('button', { name: /^View/ }).click();
+  const view = page.getByRole('button', { name: /^View/ });
+  await view.click();
   await page.getByRole('menuitemradio', { name: 'List' }).click();
-  await expect(page.getByRole('button', { name: /^View/ })).toHaveText(/List/);
+  // The button just says View (its icon shows which); the menu checks List
+  await view.click();
+  await expect(
+    page.getByRole('menuitemradio', { name: 'List' }),
+  ).toHaveAttribute('aria-checked', 'true');
+  await page.keyboard.press('Escape');
 };
 
 /** Search by color name, which is in the Filters, collapsed until opened */
@@ -154,7 +160,8 @@ test.describe('Yarn Colorway Finder', () => {
     page,
   }) => {
     const sortButton = page.getByRole('button', { name: /^Sort: / });
-    await expect(sortButton).toHaveText(/Hue/);
+    // Without a color, it sorts by yarn
+    await expect(sortButton).toHaveText(/Yarn/);
     await sortButton.click();
     await expect(
       page.getByRole('menuitemradio', { name: 'Best match' }),

@@ -27,13 +27,14 @@ test.describe('Palette toolbar', () => {
 
   test('Get Colors lists every color source', async ({ page }) => {
     await page.getByRole('button', { name: 'Get Colors' }).click();
-    // On the Yarn page, saved and gallery palettes open as palettes of their
-    // own (from My Library, the Gallery or the Palette menu), not from here
-    for (const name of ['My Palettes', 'Palette Gallery', 'Browse Palettes'])
-      await expect(
-        page.getByRole('menuitem', { name: new RegExp(name) }),
-      ).toHaveCount(0);
+    await expect(
+      page.getByRole('menuitem', { name: /Browse Palettes/ }),
+    ).toHaveCount(0);
+    // On the Yarn page, saved and gallery palettes copy their colors into
+    // the palette being made (Palette › Open… opens one itself)
     for (const name of [
+      'My Palettes',
+      'Palette Gallery',
       'Gradients',
       'Choose Colorways',
       'From an Image',

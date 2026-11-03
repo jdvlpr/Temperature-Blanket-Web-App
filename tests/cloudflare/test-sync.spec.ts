@@ -706,6 +706,8 @@ test.describe('Auto-save', () => {
     browser,
     baseURL,
   }) => {
+    // Two devices signing in, plus 14 s of waiting for sync on purpose
+    test.setTimeout(90_000);
     const { phone, laptop } = await plannerDevices(browser, baseURL!);
     const email = uniqueEmail('autosave-conflict');
     await signIn(laptop, laptop.request, email);

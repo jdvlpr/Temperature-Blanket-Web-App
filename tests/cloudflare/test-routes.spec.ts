@@ -25,6 +25,12 @@ const BUILD_DIR = '.svelte-kit/cloudflare';
 // Excluded so they never reach the Worker in production, but only exist in `pnpm dev`.
 const DEV_ONLY_ROUTES = ['/.dev-tools/*'];
 
+// Gone: excluded only so the root _redirects can send them on, so there are
+// no files; each is checked to redirect instead. A path under it to try.
+const REDIRECT_ONLY_ROUTES: Record<string, string> = {
+  '/blog/*': '/blog/some-old-post',
+};
+
 // Read inside the tests, not at collection time: Playwright collects tests before
 // the webServer command rebuilds, so a module-level read could see a stale build.
 function excludedRoutes() {
@@ -36,7 +42,10 @@ function excludedRoutes() {
   return {
     pages: exclude.filter((route) => !route.endsWith('/*') && !isFile(route)),
     wildcards: exclude.filter(
-      (route) => route.endsWith('/*') && !DEV_ONLY_ROUTES.includes(route),
+      (route) =>
+        route.endsWith('/*') &&
+        !DEV_ONLY_ROUTES.includes(route) &&
+        !(route in REDIRECT_ONLY_ROUTES),
     ),
   };
 }
@@ -79,6 +88,13 @@ test.describe('Cloudflare routing (_routes.json)', () => {
         const response = await request.get(path);
         expect.soft(response.status(), path).toBe(200);
       }
+    }
+  });
+
+  test('routes kept only for redirects redirect', async ({ request }) => {
+    for (const path of Object.values(REDIRECT_ONLY_ROUTES)) {
+      const response = await request.get(path, { maxRedirects: 0 });
+      expect.soft(response.status(), path).toBe(301);
     }
   });
 

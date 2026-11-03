@@ -4,8 +4,14 @@ const RGB = 'ff000000ff000000ff';
 const BGR = '0000ff00ff00ff0000';
 
 async function reverse(page: Page) {
-  await page.getByRole('button', { name: 'Sort', exact: true }).click();
-  await page.getByRole('menuitem', { name: /^Reverse/ }).click();
+  // A click before the page responds does nothing, so try until it opens
+  const reverseItem = page.getByRole('menuitem', { name: /^Reverse/ });
+  await expect(async () => {
+    if (!(await reverseItem.isVisible()))
+      await page.getByRole('button', { name: 'Sort', exact: true }).click();
+    await expect(reverseItem).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await reverseItem.click();
 }
 
 // Shortcuts don't run while a button has focus, as in the planner

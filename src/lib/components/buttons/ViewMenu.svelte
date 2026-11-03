@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Whether a list shows as a grid or as rows, as a menu styled like the Sort
-  menu it often sits beside. The button names the view and shows its icon.
+  menu it often sits beside. The button says View and shows the view's icon.
   With `fillOption`, it also has Fill with color, which fills each card or row
   with its yarn's color everywhere it's offered, and Space between, whether
   they sit apart or meet in one block (kept for each layout; see item-spacing).

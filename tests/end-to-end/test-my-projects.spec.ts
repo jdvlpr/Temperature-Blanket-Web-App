@@ -296,21 +296,24 @@ test.describe('My Projects', () => {
     await menu.getByRole('button', { name: 'Back' }).click();
     await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
 
-    // Download is a screen of its own, and PDF one over that: Cancel and
-    // Back step back out to the menu
+    // Download is a screen of its own: Back steps out to the menu
     await menu.getByRole('button', { name: /^Download/ }).click();
     await expect(
       menu.getByRole('heading', { name: 'Download', exact: true }),
     ).toBeVisible();
+    await menu.getByRole('button', { name: 'Back' }).click();
+    await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
+
+    // PDF is too wide to open in the menu's place, so it replaces it and
+    // Cancel closes it
+    await menu.getByRole('button', { name: /^Download/ }).click();
     await menu.getByRole('button', { name: /^PDF/ }).click();
     await expect(
       menu.getByRole('heading', { name: 'Download PDF' }),
     ).toBeVisible();
     await menu.getByText('Cancel').click();
-    await expect(
-      menu.getByRole('heading', { name: 'Download', exact: true }),
-    ).toBeVisible();
-    await menu.getByRole('button', { name: 'Back' }).click();
+    await expect(menu).toBeHidden();
+    await page.getByRole('button', { name: 'Project Options' }).click();
     await expect(menu.getByTestId('project-name')).toHaveText('Austin Blanket');
 
     // A gauge's palette, under Palettes: saved to My Palettes once, then
@@ -345,7 +348,7 @@ test.describe('My Projects', () => {
     // Its weather is kept: the main button checks for updates (or adds the
     // days waiting) rather than getting it all over again
     await expect(page.locator('#location-action-button')).toHaveText(
-      /^(Check for Updates|Add \d+ New Days?)$/,
+      /^\s*(Check for Updates|Add \d+ New Days?)\s*$/,
     );
   });
 });
