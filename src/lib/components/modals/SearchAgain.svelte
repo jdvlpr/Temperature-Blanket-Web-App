@@ -20,7 +20,10 @@ do, the Update Past Days card (every changed saved day not kept before, off to
 start), led by how many days change color. Either opens View All Changes: the
 same dialog, full size, as a sheet of every changed day (new value over the
 saved one, struck through), filtered by chips, its days picked one by one.
-Save says what it'll do; the changed days not updated are remembered as kept
+When a day would change color, how far it's made (the project's progress),
+with Change… showing the Progress dialog in this one (saved as it's changed):
+days already made aren't offered for update (still listed in View All
+Changes, where they can be picked, with a note that the blanket won't match). Save says what it'll do; the changed days not updated are remembered as kept
 (finishAgain). Cancel changes nothing. -->
 <script module lang="ts">
   // Show Colors, for the rest of the visit (as the weather table's)
@@ -29,6 +32,9 @@ Save says what it'll do; the changed days not updated are remembered as kept
 
 <script lang="ts">
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
+  import ProgressEditor from '#lib/components/modals/ProgressEditor.svelte';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import { shortDay } from '#lib/utils/project-progress.js';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
   import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
@@ -56,7 +62,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
   } from '#lib/utils/weather-days.js';
   import { ChevronRightIcon, HistoryIcon, XIcon } from '@lucide/svelte';
   import { SvelteSet } from 'svelte/reactivity';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, untrack } from 'svelte';
   import { galleryPageOf, loadShareState } from '#lib/accounts/share-rows.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import {
@@ -152,11 +158,52 @@ Save says what it'll do; the changed days not updated are remembered as kept
       : `on ${utcDate(date, { month: 'short', day: 'numeric', year: 'numeric' })}`;
   });
 
-  const colorCount = $derived(
+  // Days already made (through the project's progress) aren't offered
+  const isMade = (change: DayChange) =>
+    !!progress.madeThrough && change.date <= progress.madeThrough;
+  const offered = $derived(fresh.filter((c) => !isMade(c)));
+  const colorChanges = $derived(
     fresh.filter((c) =>
       changesColor(c, savedByKey.get(c.key), gotByKey.get(c.key), used),
-    ).length,
+    ),
   );
+  const colorCount = $derived(colorChanges.filter((c) => !isMade(c)).length);
+  const madeColorCount = $derived(colorChanges.filter(isMade).length);
+
+  // Made through a new day (in Progress, from Change…): those days leave
+  // what's picked
+  let madeThroughSeen = progress.madeThrough;
+  $effect(() => {
+    const madeThrough = progress.madeThrough;
+    if (madeThrough === madeThroughSeen) return;
+    madeThroughSeen = madeThrough;
+    untrack(() => {
+      for (const key of [...use]) {
+        const change = all.find((c) => c.key === key);
+        if (change && isMade(change)) use.delete(key);
+      }
+    });
+  });
+
+  /** Picked days already made: the blanket won't match them */
+  const madePicked = $derived(
+    all.filter((c) => use.has(c.key) && isMade(c)).length,
+  );
+
+  // Change…: the Progress dialog in this one, Back (or Done) returning here
+  let editingProgress = $state(false);
+  function openProgressView() {
+    editingProgress = true;
+    dialog.options.title = 'Progress';
+    dialog.backAction = closeProgressView;
+    dialog.escapeAction = closeProgressView;
+  }
+  function closeProgressView() {
+    editingProgress = false;
+    dialog.options.title = 'Update Weather Data';
+    dialog.backAction = null;
+    dialog.escapeAction = null;
+  }
   const removedCount = $derived(fresh.filter(removesData).length);
 
   // Which saved days have newer values: "9 days saved on Mar 3"
@@ -166,23 +213,28 @@ Save says what it'll do; the changed days not updated are remembered as kept
       : `${fresh.length} saved ${pluralize('day', fresh.length)}`,
   );
   // Nothing in the blanket changes color: a short note, not a card
-  const quiet = $derived(colorCount === 0 && use.size === 0);
+  const quiet = $derived(colorChanges.length === 0 && use.size === 0);
 
   // What matters to the blanket first, then why, calmly (the sizes of the
   // changes are in View All Changes)
   const updateSummary = $derived(
     [
       colorCount
-        ? `${colorCount} ${pluralize('day', colorCount)} in your blanket would change color.`
-        : 'No colors in your blanket would change.',
+        ? `${colorCount} ${pluralize('day', colorCount)} ${madeColorCount ? 'not made yet ' : 'in your blanket '}would change color.`
+        : madeColorCount
+          ? 'No colors in the days not made yet would change.'
+          : 'No colors in your blanket would change.',
+      madeColorCount &&
+        `${madeColorCount} ${madeColorCount === 1 ? 'day you’ve made stays' : 'days you’ve made stay'} as ${madeColorCount === 1 ? 'it is' : 'they are'}.`,
       `${sources} has newer values for ${savedDays}. Weather sources correct readings as stations report in. This is normal.`,
     ]
+      .filter(Boolean)
       .map((line) => `<span class="mt-1 block first:mt-0">${line}</span>`)
       .join(''),
   );
 
   // Picked in the sheet: some, not just every day the switch covers
-  const freshKeys = $derived(new Set(fresh.map((c) => c.key)));
+  const freshKeys = $derived(new Set(offered.map((c) => c.key)));
   const pickedByHand = $derived(
     use.size > 0 &&
       (use.size !== freshKeys.size || [...use].some((k) => !freshKeys.has(k))),
@@ -190,7 +242,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
 
   function setUpdate(on: boolean) {
     use.clear();
-    if (on) fresh.forEach((c) => use.add(c.key));
+    if (on) offered.forEach((c) => use.add(c.key));
   }
 
   const newRange = $derived.by(() => {
@@ -293,8 +345,10 @@ Save says what it'll do; the changed days not updated are remembered as kept
     dialog.escapeAction = null;
   }
   onDestroy(() => {
-    if (dialog.backAction === closeSheet) dialog.backAction = null;
-    if (dialog.escapeAction === closeSheet) dialog.escapeAction = null;
+    for (const close of [closeSheet, closeProgressView]) {
+      if (dialog.backAction === close) dialog.backAction = null;
+      if (dialog.escapeAction === close) dialog.escapeAction = null;
+    }
   });
 
   const sourceOf = (index: number) =>
@@ -325,6 +379,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
     gap: boolean;
     removed: boolean;
     kept: boolean;
+    made: boolean;
     temperature: number | null;
     height: number | null;
   };
@@ -341,6 +396,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
         gap: fillsGap(change),
         removed: removesData(change),
         kept: kept.has(change.key),
+        made: isMade(change),
         temperature: largest(change, true),
         height: largest(change, false),
       };
@@ -364,6 +420,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
     biggerHeight: false,
     dates: false,
     kept: false,
+    made: false,
     place: false,
   });
   type FilterId = keyof typeof filters;
@@ -387,6 +444,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
     dates: (row) =>
       (!from || row.change.date >= from) && (!to || row.change.date <= to),
     kept: (row) => row.kept,
+    made: (row) => row.made,
     place: (row) => row.change.location === place,
   };
 
@@ -401,6 +459,7 @@ Save says what it'll do; the changed days not updated are remembered as kept
         ['biggerHeight', 'Rain or snow changed'],
         ['dates', 'Date range'],
         ['kept', 'Kept before'],
+        ['made', 'Already made'],
         ['place', 'Location'],
       ] as [FilterId, string][]
     )
@@ -426,7 +485,14 @@ Save says what it'll do; the changed days not updated are remembered as kept
       }))
       .filter((chip) => chip.count > 0 || filters[chip.id]),
   );
-  const counted: FilterId[] = ['color', 'settled', 'gap', 'removed', 'kept'];
+  const counted: FilterId[] = [
+    'color',
+    'settled',
+    'gap',
+    'removed',
+    'kept',
+    'made',
+  ];
 
   function toggleFilter(id: FilterId) {
     filters[id] = !filters[id];
@@ -549,6 +615,17 @@ Save says what it'll do; the changed days not updated are remembered as kept
 
 {#snippet footerNotes()}
   <div class="flex flex-col items-center gap-2">
+    {#if madePicked && progress.madeThrough}
+      <p
+        class="text-warning-800-200 text-center text-sm"
+        data-testid="again-made-note"
+      >
+        {madePicked}
+        {madePicked === 1 ? 'picked day is one' : 'picked days are ones'} you've already
+        made (through {shortDay(progress.madeThrough)}): the blanket won't match
+        the new colors.
+      </p>
+    {/if}
     {#if published && (use.size || adding)}
       <label
         class="flex cursor-pointer items-center justify-center gap-2 text-sm"
@@ -570,7 +647,9 @@ Save says what it'll do; the changed days not updated are remembered as kept
   </div>
 {/snippet}
 
-{#if !sheet}
+{#if editingProgress}
+  <ProgressEditor ondone={closeProgressView} />
+{:else if !sheet}
   <div class="flex flex-col gap-4 px-2 pt-2 text-left">
     {#if added}
       <div
@@ -639,6 +718,28 @@ Save says what it'll do; the changed days not updated are remembered as kept
             setUpdate((e.currentTarget as HTMLInputElement).checked)}
         />
         <div class="px-4">{@render notes()}</div>
+        {#if colorChanges.length}
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 px-4 text-sm"
+            data-testid="again-progress"
+          >
+            <span>
+              {#if progress.madeThrough}
+                Made through {shortDay(progress.madeThrough)}: those days stay
+                as they are.
+              {:else}
+                Not started: every day can be updated.
+              {/if}
+            </span>
+            <button
+              type="button"
+              class="btn btn-sm preset-tonal"
+              onclick={openProgressView}
+            >
+              Change…
+            </button>
+          </div>
+        {/if}
         <div class="flex justify-center">
           <button type="button" class="btn preset-tonal" onclick={openSheet}>
             View All Changes <ChevronRightIcon />

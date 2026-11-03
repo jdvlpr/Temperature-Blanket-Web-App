@@ -362,6 +362,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#snippet details()}
                 <!-- Where its weather came from, its neighbours, and Ravelry,
                 beside who made it and when -->
+                {#if typeof data.made === 'number'}
+                  <!-- How far it's made, when its owner shows that -->
+                  <span data-testid="gallery-made"
+                    >{data.made >= 100
+                      ? 'Finished'
+                      : `${data.made}% made`}</span
+                  >
+                {/if}
                 {#if weatherSources?.length}
                   <span
                     >Weather from {#each weatherSources as { name, url }, i (url)}{#if i}<span

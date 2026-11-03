@@ -39,6 +39,8 @@ its weather, when that isn't kept with it). -->
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
@@ -191,6 +193,8 @@ its weather, when that isn't kept with it). -->
     showOwner: boolean;
     link: string | null;
     title: string;
+    /** How much is made, as the page shows it; null: not shown */
+    made: number | null;
   };
   let page = $state<Page | null>(null);
   // The project as saved here, which Ravelry needs (in the account)
@@ -266,8 +270,10 @@ its weather, when that isn't kept with it). -->
         showOwner: !!own.showOwner,
         link: own.link ?? null,
         title: own.title,
+        made: typeof own.made === 'number' ? own.made : null,
       };
       showOwner = page.showOwner;
+      showProgress = page.made !== null;
     }
     if (typeof gallery.name === 'string') serverName = gallery.name;
     publicId = gallery.settings.publicId ?? null;
@@ -315,6 +321,17 @@ its weather, when that isn't kept with it). -->
   );
   // Its name shown or not, changed here, for a page there is
   const ownerChanged = $derived(!!page && showOwner !== page.showOwner);
+
+  // Show my progress: "62% made" on the page, off to start (opt-in). Kept
+  // in the app, not on WordPress, as the percent when last saved here
+  let showProgress = $state(false);
+  const madeNow = $derived(
+    progress.madeThrough ? progress.progress.percent : null,
+  );
+  const wantedMade = $derived(showProgress ? madeNow : null);
+  const madeChanged = $derived(
+    page ? page.made !== wantedMade : wantedMade !== null,
+  );
 
   // ---- Ravelry: for a project in the account, with Ravelry connected
   const linked = $derived(ravelryLinks.links.has(project.id));
@@ -371,6 +388,7 @@ its weather, when that isn't kept with it). -->
     !!page &&
       galleryUpToDate &&
       !ownerChanged &&
+      !madeChanged &&
       !(ravelryOn && ravelryChanged),
   );
 
@@ -514,6 +532,26 @@ its weather, when that isn't kept with it). -->
           problem = result;
           // Unpublished elsewhere: sending again publishes a new page
           if (result.status === 'gone') page = null;
+          return;
+        }
+      }
+
+      // Progress on the page, once there's a page to show it on
+      const madePostId = page?.postId ?? sentSoFar?.postId;
+      if (madeChanged && madePostId) {
+        const { setGalleryPageMade } = await import('#lib/accounts/gallery.js');
+        try {
+          await setGalleryPageMade(madePostId, wantedMade);
+          if (page) page.made = wantedMade;
+          if (page || wantedMade !== null)
+            lines.push(
+              wantedMade === null
+                ? 'Stopped showing your progress on its page'
+                : `Shows ${wantedMade >= 100 ? 'Finished' : `${wantedMade}% made`} on its page`,
+            );
+        } catch {
+          ownerError =
+            'Your progress on the page couldn’t be changed. Try again later.';
           return;
         }
       }
@@ -731,6 +769,19 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
             detail={false}
             describedby="gallery-owner-line"
           />
+          {#if madeNow !== null || page?.made != null}
+            <div class="-mx-4">
+              <ToggleSwitch
+                bare
+                label="Show my progress"
+                details={madeNow === null
+                  ? 'Your progress isn’t set'
+                  : `Shows “${progress.progress.finished ? 'Finished' : `${madeNow}% made`}” on its page`}
+                disabled={busy}
+                bind:checked={showProgress}
+              />
+            </div>
+          {/if}
           {#if ravelryReady}
             {#if linked && showOwner && ravelryLink}
               {#if confirmingUnlink}

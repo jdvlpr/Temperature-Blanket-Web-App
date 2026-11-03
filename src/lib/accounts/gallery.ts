@@ -30,6 +30,8 @@ export type GalleryPage = {
   showOwner?: boolean;
   /** When it was last updated in place, or null */
   updatedAt?: number | null;
+  /** How much of its project is made (percent), shown on the page; null: not shown */
+  made?: number | null;
 };
 
 /** Fired on window when the account's gallery pages change, so lists reload. */
@@ -107,6 +109,17 @@ export async function setGalleryPageShowOwner(
   if (!response.ok)
     throw new Error(`Changing the gallery page failed: ${response.status}`);
   return response.json();
+}
+
+/** Shows how much of a project page's project is made (a percent), or stops (null). */
+export async function setGalleryPageMade(postId: number, made: number | null) {
+  const response = await fetch(`${PATH}/${postId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ made }),
+  });
+  if (!response.ok)
+    throw new Error(`Changing the gallery page failed: ${response.status}`);
 }
 
 /** The gallery's longest palette name (MAX_PALETTE_TITLE_LENGTH on the server) */

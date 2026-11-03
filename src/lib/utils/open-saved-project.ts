@@ -20,6 +20,7 @@ import { previews } from '#lib/state/preview-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
 import { weatherDays } from '#lib/state/weather-days.svelte.js';
+import { progress } from '#lib/state/progress-state.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { ProjectStorage } from '#lib/storage/projects.svelte.js';
 import { loadProjectFromURL } from '#lib/utils/load-project-utils.svelte.js';
@@ -150,6 +151,7 @@ const setPreferences = ({
 function resetProjectState(id: string | null) {
   weather.reset();
   weatherDays.reset();
+  progress.reset();
   locations.reset();
   gauges.reset();
   previews.reset();

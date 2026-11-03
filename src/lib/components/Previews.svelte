@@ -21,6 +21,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     previews,
   } from '#lib/state/preview-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import { progressStyle, UNMADE_FILTER } from '#lib/utils/progress-preview.js';
+  import ProgressLine from './ProgressLine.svelte';
   import { downloadPreviewPNG } from '#lib/utils/preview-utils.svelte.js';
   import { exists } from '#lib/utils/other-utils.js';
   import { getProjectParametersFromURLHash } from '#lib/utils/project-utils.svelte.js';
@@ -56,11 +59,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!hex || !/^#[0-9a-f]{3,8}$/i.test(hex)) return '';
     return `<style>#preview-svg-image :is(rect, path, polygon, polyline, circle, line):not([fill="${hex}" i]):not([stroke="${hex}" i]) { opacity: 0.15; }</style>`;
   });
+
+  // My Progress: the days not made yet fade back in gray (a highlighted color wins)
+  let progressDim = $derived(
+    previewHighlight.hex ? '' : progressStyle(progress.unmade),
+  );
 </script>
 
 <svelte:head>
   <!-- eslint-disable-next-line svelte/no-at-html-tags -- built from a validated hex code -->
   {@html highlightStyle}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- built from day indexes (numbers) -->
+  {@html progressDim}
 </svelte:head>
 
 <div
@@ -92,6 +102,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     {/snippet}
   </PreviewSelect>
+
+  {#if gauges.activeGauge?.colors && previews.active?.settingsComponent && progress.dates.length}
+    <div class="mb-2">
+      <ProgressLine />
+    </div>
+  {/if}
+  {#if progressDim}
+    <!-- My Progress's gray, for progressDim's days not made yet -->
+    <svg class="absolute size-0" aria-hidden="true" focusable="false">
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -- a constant -->
+      <defs>{@html UNMADE_FILTER}</defs>
+    </svg>
+  {/if}
 
   {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
     {#key previews.active}

@@ -30,12 +30,14 @@ export const load: PageServerLoad = async (event) => {
       return null;
     },
   );
-  const owner = await getOwner(event);
+  const [owner, made] = await Promise.all([getOwner(event), getMade(event)]);
   return {
     // Streamed on a move within the app, so the page shows at once; whole on
     // a full load, for its title and link preview
     project: event.isDataRequest ? project : await project,
     owner,
+    // How much of it is made, when its owner shows that
+    made,
     // Its Ravelry photos, streamed, when its owner linked the project there.
     // Only on a page that shows its owner: the photos and link name their
     // Ravelry account
@@ -79,6 +81,24 @@ async function getOwner(
   } catch (e) {
     // Before migration 0004, or D1 unavailable: the page renders without a name
     console.error('Could not look up gallery page owner', e);
+    return null;
+  }
+}
+
+/** How much of the project is made (percent), if its owner chose to show it. */
+async function getMade(
+  event: Parameters<PageServerLoad>[0],
+): Promise<number | null> {
+  const env = getPlatform()?.env;
+  const id = Number(event.params.id);
+  if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB || !Number.isSafeInteger(id))
+    return null;
+  try {
+    const { madeForPost } = await import('#lib/server/gallery/store.js');
+    return await madeForPost(env.DB, id);
+  } catch (e) {
+    // Before migration 0016: the page shows without it
+    console.error('Could not look up gallery page progress', e);
     return null;
   }
 }

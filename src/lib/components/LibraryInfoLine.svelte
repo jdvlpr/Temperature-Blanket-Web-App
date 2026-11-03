@@ -18,7 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   page: published, Ravelry's mark when it's on Ravelry and a warning ⟳ (the
   out-of-sync icon's color) when it changed since its page was published or
   updated, then a globe and "Published <date>", then a line with its views.
-  Not published: "Saved <date>". The marks aren't buttons: each says what it
+  Not published: "Saved <date>". A project whose progress is set adds
+  "· 62% made" (or "· Finished"). The marks aren't buttons: each says what it
   means to screen readers and on hover.
 -->
 <script lang="ts">
@@ -38,6 +39,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     changed?: boolean;
     /** On Ravelry: its photos there; null or none, not on Ravelry */
     ravelryPhotos?: number | null;
+    /** How much of the project is made (percent); null or none, not set */
+    made?: number | null;
   }
 
   let {
@@ -46,7 +49,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     views,
     changed = false,
     ravelryPhotos = null,
+    made = null,
   }: Props = $props();
+
+  let madeText = $derived(
+    typeof made === 'number'
+      ? made >= 100
+        ? 'Finished'
+        : `${made}% made`
+      : '',
+  );
 
   // As gallery cards and pages write it
   let publishedOn = $derived(
@@ -75,7 +87,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="sr-only">{CHANGED}</span>
     </span>
   {/if}
-  <span class="clamp-2">{publishedOn || saved}</span>
+  <span class="clamp-2"
+    >{publishedOn || saved}{#if madeText}<span data-testid="library-made">
+        · {madeText}</span
+      >{/if}</span
+  >
 </span>
 {#if publishedOn && views}
   <span class="text-surface-700-300 flex min-w-0 items-center text-xs">

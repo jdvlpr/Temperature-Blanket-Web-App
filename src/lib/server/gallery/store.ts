@@ -37,6 +37,9 @@ export type GalleryPost = {
   showOwner?: boolean;
   /** When it was last updated in place, or null (migration 0012) */
   updatedAt?: number | null;
+  /** How much of a project is made (percent), shown on its page; null when
+   * not shown (migration 0016) */
+  made?: number | null;
 };
 
 export type GallerySettings = {
@@ -85,7 +88,7 @@ export async function listPosts(
 ): Promise<GalleryPost[]> {
   const { results } = await db
     .prepare(
-      `select "postId", "projectId", "title", "publishedAt", "kind", "link", "showOwner", "updatedAt" from "galleryPost"
+      `select "postId", "projectId", "title", "publishedAt", "kind", "link", "showOwner", "updatedAt", "made" from "galleryPost"
        where "userId" = ? and ${LIVE} order by "publishedAt" desc`,
     )
     .bind(userId)
@@ -112,6 +115,49 @@ export async function setPostShowOwner(
   if (!meta.changes) return false;
   if (showOwner) await ensurePublicId(db, userId);
   return true;
+}
+
+/** The most a project can be made */
+const MADE_MAX = 100;
+
+/** A percent made, or null when it isn't one */
+export const madeOf = (value: unknown): number | null =>
+  typeof value === 'number' &&
+  Number.isInteger(value) &&
+  value >= 0 &&
+  value <= MADE_MAX
+    ? value
+    : null;
+
+/**
+ * Shows how much of one of the user's project pages is made (a percent), or
+ * stops showing it (null). False when the user has no such page.
+ */
+export async function setPostMade(
+  db: D1Database,
+  userId: string,
+  postId: number,
+  made: number | null,
+): Promise<boolean> {
+  const { meta } = await db
+    .prepare(
+      `update "galleryPost" set "made" = ? where "postId" = ? and "userId" = ? and "kind" = 'project' and ${LIVE}`,
+    )
+    .bind(madeOf(made), postId, userId)
+    .run();
+  return meta.changes > 0;
+}
+
+/** How much of a gallery page's project is made, when its owner shows it */
+export async function madeForPost(
+  db: D1Database,
+  postId: number,
+): Promise<number | null> {
+  const row = await db
+    .prepare(`select "made" from "galleryPost" where "postId" = ? and ${LIVE}`)
+    .bind(postId)
+    .first<{ made: number | null }>();
+  return madeOf(row?.made ?? null);
 }
 
 /**

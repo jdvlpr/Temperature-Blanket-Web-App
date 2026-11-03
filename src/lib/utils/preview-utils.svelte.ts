@@ -39,6 +39,8 @@ export const showPreviewImageWeatherDetails = (
         getTargets,
       },
     },
+    // Its made status opens Progress, with Back to this day
+    options: { returnable: true },
   });
 };
 export const svgToPNG = async ({

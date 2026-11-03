@@ -32,7 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getIsRecentDate } from '#lib/utils/date-utils.js';
   import { capitalizeFirstLetter, exists } from '#lib/utils/other-utils.js';
   import { convertTime } from '#lib/utils/unit-utils.svelte.js';
-  import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import { openProgress } from '#lib/utils/open-progress.js';
+  import {
+    CheckIcon,
+    CircleArrowLeftIcon,
+    CircleArrowRightIcon,
+  } from '@lucide/svelte';
 
   let {
     data = weather.data || [],
@@ -110,6 +116,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {capitalizeFirstLetter(weather.grouping)}
     {weather.currentIndex + 1} of {data?.length}
   </p>
+
+  <!-- Made or not (the project's progress); the Progress dialog sets it -->
+  {#if progress.lastDayAt(weather.currentIndex)}
+    {@const made = progress.isMadeAt(weather.currentIndex)}
+    <button
+      type="button"
+      class={[
+        'btn btn-sm mb-2',
+        made ? 'preset-tonal-success' : 'hover:preset-tonal-surface',
+      ]}
+      title="Set how far you've made it"
+      onclick={() => openProgress(progress.lastDayAt(weather.currentIndex))}
+      data-testid="day-made"
+    >
+      {#if made}
+        <CheckIcon />
+        Made
+      {:else}
+        Not made yet
+      {/if}
+    </button>
+  {/if}
 
   <div class="range-select">
     <button

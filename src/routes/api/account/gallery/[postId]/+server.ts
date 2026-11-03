@@ -16,7 +16,8 @@
 // One of the signed-in user's gallery pages: update it in place (PUT: a project
 // with the same payload as publishing, a palette with { title, yarnUrl }; 501
 // UPDATE_UNSUPPORTED with a gallery plugin before 1.9.0), include it on their public gallery
-// or take it off (PATCH { showOwner }), rename a palette's in place (PATCH
+// or take it off (PATCH { showOwner }), show how much of a project is made or
+// stop (PATCH { made: percent | null }), rename a palette's in place (PATCH
 // { title }; 501 RENAME_UNSUPPORTED with an older gallery plugin), move a
 // palette's pages to another saved palette (PATCH { paletteId }: saved again
 // after the first was deleted for good), or remove it (DELETE: WordPress moves
@@ -67,8 +68,13 @@ export const PATCH: RequestHandler = async (event) => {
     renamePaletteFromAccount,
     SAVED_PALETTE_ID,
   } = await import('#lib/server/gallery/index.js');
-  const { setPostShowOwner, getSettings, relinkPalettePages } =
-    await import('#lib/server/gallery/store.js');
+  const {
+    setPostShowOwner,
+    getSettings,
+    relinkPalettePages,
+    setPostMade,
+    madeOf,
+  } = await import('#lib/server/gallery/store.js');
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 
@@ -94,6 +100,18 @@ export const PATCH: RequestHandler = async (event) => {
       return galleryError(404, 'NOT_FOUND', 'No such palette page');
     return Response.json(
       { paletteId: body.paletteId },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+  // Only in the app, like showOwner: WordPress never has it
+  if (postId && body && 'made' in body) {
+    const made = body.made === null ? null : madeOf(body.made);
+    if (body.made !== null && made === null)
+      return galleryError(400, 'INVALID_REQUEST', 'Invalid progress');
+    if (!(await setPostMade(gallery.db, gallery.userId, postId, made)))
+      return galleryError(404, 'NOT_FOUND', 'No such gallery page');
+    return Response.json(
+      { made },
       { headers: { 'Cache-Control': 'no-store' } },
     );
   }

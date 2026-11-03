@@ -118,7 +118,12 @@ describe('project-utils', () => {
       answer({ code: 200, id: 8, link: 'https://example.test/project/8/x/' });
       expect(
         await projectUtils.sendToProjectGallery('img', { postId: 8 }),
-      ).toEqual({ status: 'sent', link: '/gallery/8', updated: true });
+      ).toEqual({
+        status: 'sent',
+        link: '/gallery/8',
+        updated: true,
+        postId: 8,
+      });
       const [url, init] = vi.mocked(fetch).mock.calls[0];
       expect(url).toBe('/api/account/gallery/8');
       expect(init?.method).toBe('PUT');

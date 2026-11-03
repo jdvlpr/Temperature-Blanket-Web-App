@@ -4,6 +4,12 @@ import { locations } from '#lib/state/location-state.svelte.js';
 import { project } from '#lib/state/project-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
 import { weatherDays } from '#lib/state/weather-days.svelte.js';
+import { progress } from '#lib/state/progress-state.svelte.js';
+import {
+  madeThroughOf,
+  progressOf,
+  type StoredProgress,
+} from '#lib/utils/project-progress.js';
 import type { StoredWeatherDays } from '#lib/utils/weather-days.js';
 import type { LocationType } from '#lib/types/location-types.js';
 import type {
@@ -38,6 +44,8 @@ export type StoredProjectIndexItem = {
     /** The name someone gave the project; when empty, show the title */
     name?: string;
     isCustomWeatherData: boolean;
+    /** How much of it is made (percent), once progress is set */
+    made?: number;
   };
   /** Present once the project belongs to an account (see $lib/sync) */
   sync?: ProjectSyncState;
@@ -86,6 +94,8 @@ export type StoredProject = {
   weatherSource: WeatherSourceOptions;
   /** How far its weather was got, its early days and newer values not used. Missing on projects saved by older versions. */
   weatherDays?: StoredWeatherDays;
+  /** How far it's made, and whether the preview shows it. Missing until set. */
+  progress?: StoredProgress;
 };
 
 /**
@@ -120,6 +130,15 @@ function withIndexLock<T>(task: () => Promise<T>): Promise<T> {
   return run;
 }
 
+/** How much of a saved project is made, for its card; nothing when not set */
+const madeOf = (project: StoredProject): { made?: number } => {
+  const madeThrough = madeThroughOf(project.progress?.madeThrough);
+  if (!madeThrough) return {};
+  return {
+    made: progressOf(project.weatherData ?? [], madeThrough).percent,
+  };
+};
+
 const indexItemFor = (
   id: string,
   project: StoredProject,
@@ -134,6 +153,7 @@ const indexItemFor = (
       name: cleanName(project.name, MAX_SAVED_PROJECT_NAME_LENGTH),
     }),
     isCustomWeatherData: project.isCustomWeatherData || false,
+    ...madeOf(project),
   },
   ...(sync && { sync }),
 });
@@ -780,6 +800,7 @@ export class ProjectStorage {
     // again. Days since it was last got are offered (see weatherDays).
     weather.setRawData(newWeatherUngrouped);
     weatherDays.loaded(newWeatherUngrouped, matchedProject.weatherDays);
+    progress.loaded(matchedProject.progress);
     weather.wasLoadedFromStorage = true;
   }
 
@@ -829,6 +850,7 @@ export class ProjectStorage {
       weatherData: weatherData as unknown as WeatherDay[],
       weatherSource: weatherSource as unknown as WeatherSourceOptions,
       weatherDays: weatherDays.toStored(),
+      ...(progress.toStored() && { progress: progress.toStored() }),
     };
   };
 }

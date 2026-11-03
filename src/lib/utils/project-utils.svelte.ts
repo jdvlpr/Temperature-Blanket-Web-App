@@ -141,6 +141,8 @@ export type GallerySendResult =
       link: string;
       /** An existing page was updated in place (same link) */
       updated: boolean;
+      /** Its post ID, when the gallery said */
+      postId?: number;
     }
   /** The same project is in the gallery already: that page */
   | { status: 'duplicate'; link: string; title: string }
@@ -279,6 +281,7 @@ export const sendToProjectGallery = async (
         status: 'sent',
         link,
         updated: postId !== undefined,
+        postId: typeof response.id === 'number' ? response.id : postId,
       };
     }
     if (Number(response.code) === 409) {

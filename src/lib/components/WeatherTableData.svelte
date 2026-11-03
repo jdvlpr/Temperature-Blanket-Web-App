@@ -13,7 +13,9 @@
   import DataTable from './datatable/DataTable.svelte';
   import KeptDay from './modals/KeptDay.svelte';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
-  import { HistoryIcon } from '@lucide/svelte';
+  import { CircleCheckIcon, CircleIcon, HistoryIcon } from '@lucide/svelte';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import { openProgress } from '#lib/utils/open-progress.js';
   import type { DayKey } from '#lib/utils/weather-days.js';
 
   let { tableData, updateTable, uid } = $props();
@@ -65,6 +67,7 @@
         {@const isRecentDate = getIsRecentDate(row.date)}
         {@const isFutureDate = getIsFutureDate(row.date)}
         {@const keptKey = `${row.location}|${row.date}` as DayKey}
+        {@const made = progress.rowOf(keptKey)}
         <tr
           class={[
             isRecentDate && '!bg-warning-500/20',
@@ -77,6 +80,32 @@
           <td class={[showColorDetails.value && 'text-center']}>
             {#if isRecentDate}
               <RecentWeatherDataTooltip />
+            {/if}
+            <!-- Made or not (the project's progress), on every row so the
+            dates line up: opens Progress, which sets it -->
+            {#if made}
+              <button
+                type="button"
+                class={[
+                  'btn-icon btn-icon-sm hover:preset-tonal-surface align-middle',
+                  made.made ? 'text-success-700-300' : 'opacity-35',
+                ]}
+                title={made.made
+                  ? 'Made: set how far you’ve made it'
+                  : 'Not made yet: set how far you’ve made it'}
+                aria-label="{row.date}: {made.made
+                  ? 'made'
+                  : 'not made yet'}. Set progress"
+                onclick={() => openProgress(made.day)}
+                data-testid="table-made"
+                data-made={made.made}
+              >
+                {#if made.made}
+                  <CircleCheckIcon class="icon-sm" />
+                {:else}
+                  <CircleIcon class="icon-sm" />
+                {/if}
+              </button>
             {/if}
             {row.date}
             <!-- Saved values kept over newer ones Check for Updates got -->

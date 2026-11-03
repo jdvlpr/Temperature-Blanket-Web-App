@@ -171,6 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {views}
             {changed}
             {ravelryPhotos}
+            made={item.meta.made}
           />
           {#if syncLabel?.tone === 'error'}
             <span class="text-error-700-300 text-xs">{syncLabel.text}</span>

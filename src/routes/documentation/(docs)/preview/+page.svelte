@@ -170,6 +170,36 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
 </section>
 
 <section class="flex flex-col gap-3">
+  <h2 id="progress" class="text-2xl font-bold">Progress</h2>
+  <div class="flex flex-col gap-2">
+    <p>
+      Progress is the last day you've made. It counts every location's days up
+      to that day, so "62% made" means 62% of the project's days.
+    </p>
+    <ul class="ml-6 list-disc space-y-1">
+      <li>
+        Set it in <span class="font-bold">Progress</span>: the progress under
+        the preview, the Project menu, or a day's circle in the weather table
+        all open it. ‹ and › move it a day; tap the date to pick any day.
+      </li>
+      <li>
+        <span class="font-bold">My Progress</span> above the preview shows the
+        days not made yet in faded gray.
+        <span class="font-bold">All Colors</span> shows every day in color.
+      </li>
+      <li>
+        When you check for updated weather, days you've made aren't offered for
+        update, so your blanket and the project still match.
+      </li>
+    </ul>
+    <p>
+      Progress is saved with your project and is only for you. A link or a copy
+      of the project starts with no progress.
+    </p>
+  </div>
+</section>
+
+<section class="flex flex-col gap-3">
   <h2 id="assigning-seasons" class="text-2xl font-bold">Seasons</h2>
   <Seasons />
 </section>

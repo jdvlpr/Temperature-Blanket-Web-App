@@ -5,6 +5,7 @@ import {
   forgetPost,
   getSettings,
   listPosts,
+  madeForPost,
   newPublicId,
   ownerForPost,
   ownerPage,
@@ -15,6 +16,7 @@ import {
   recordPost,
   relinkPalettePages,
   renamePost,
+  setPostMade,
   setPostShowOwner,
   updateSettings,
 } from './store';
@@ -237,5 +239,36 @@ describe('renaming a palette page', () => {
         [2, 'Project 2'],
       ]),
     );
+  });
+});
+
+describe('progress on a project page', () => {
+  it('is shown only once its owner sets it, and can be taken off', async () => {
+    const { d1 } = setup();
+    await recordPost(d1, 'u1', post(10));
+    expect(await madeForPost(d1, 10)).toBeNull();
+
+    expect(await setPostMade(d1, 'u1', 10, 62)).toBe(true);
+    expect(await madeForPost(d1, 10)).toBe(62);
+    expect((await listPosts(d1, 'u1'))[0].made).toBe(62);
+
+    expect(await setPostMade(d1, 'u1', 10, null)).toBe(true);
+    expect(await madeForPost(d1, 10)).toBeNull();
+  });
+
+  it('is changed only by the page’s owner, and only on a project page', async () => {
+    const { d1 } = setup();
+    await recordPost(d1, 'u1', post(10));
+    await recordPost(d1, 'u1', { ...post(11), kind: 'palette' });
+    expect(await setPostMade(d1, 'u2', 10, 50)).toBe(false);
+    expect(await setPostMade(d1, 'u1', 11, 50)).toBe(false);
+    expect(await madeForPost(d1, 10)).toBeNull();
+  });
+
+  it('keeps only a whole percent', async () => {
+    const { d1 } = setup();
+    await recordPost(d1, 'u1', post(10));
+    await setPostMade(d1, 'u1', 10, 140);
+    expect(await madeForPost(d1, 10)).toBeNull();
   });
 });

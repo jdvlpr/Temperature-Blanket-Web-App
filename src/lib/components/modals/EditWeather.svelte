@@ -57,6 +57,7 @@ utils/open-edit-weather.ts. -->
     type WeatherValue,
   } from '#lib/utils/weather-edits.js';
   import {
+    CircleCheckIcon,
     FileUpIcon,
     RedoIcon,
     SearchIcon,
@@ -65,6 +66,8 @@ utils/open-edit-weather.ts. -->
     Undo2Icon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import { shortDay } from '#lib/utils/project-progress.js';
 
   let {
     start,
@@ -143,6 +146,19 @@ utils/open-edit-weather.ts. -->
     changedDays(
       [...edits.keys()].map((key) => ({ index: +key.split('|')[0] })),
     ),
+  );
+
+  // Days already made (through the project's progress): editing them is
+  // fine, but the blanket won't match, so the footer says so
+  const isMadeRow = (row: number) =>
+    !!progress.madeThrough && (rows[row]?.date ?? '') <= progress.madeThrough;
+  const madeEditedDays = $derived(
+    new Set(
+      [...edits.keys()]
+        .map((key) => +key.split('|')[0])
+        .filter(isMadeRow)
+        .map((row) => rows[row].date),
+    ).size,
   );
 
   /** Changes values, as one step of the draft's Undo. Returns how many changed. */
@@ -983,6 +999,12 @@ utils/open-edit-weather.ts. -->
               ]}
             >
               {day.date}
+              {#if isMadeRow(row)}
+                <CircleCheckIcon
+                  class="icon-sm text-success-700-300 ml-1 shrink-0"
+                  aria-label="made"
+                />
+              {/if}
             </div>
             {#if locationCount > 1}
               <div
@@ -1101,6 +1123,14 @@ utils/open-edit-weather.ts. -->
             {edits.size === 1 ? 'value' : 'values'} changed on {editedDays}
             {editedDays === 1 ? 'day' : 'days'}
           </p>
+          {#if madeEditedDays && progress.madeThrough}
+            <p class="text-warning-800-200" data-testid="edit-made-note">
+              {madeEditedDays}
+              {madeEditedDays === 1 ? 'is a day' : 'are days'} you've already made
+              (through {shortDay(progress.madeThrough)}): the blanket won't
+              match the new colors.
+            </p>
+          {/if}
           {#if !weather.isUserEdited}
             <p class="opacity-80">
               Applying makes this project's weather your own: Check for Updates

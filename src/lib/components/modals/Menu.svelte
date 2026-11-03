@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Project menu, about the open project only, in the same shape as the
-Yarn page's Palette menu: a card with its name and save state; Download; its
-Share rows; its gauges' Palettes; the Project itself (New, Open…, Duplicate,
+Yarn page's Palette menu: a card with its name and save state; Download; how
+far it's made (Progress); its Share rows; its gauges' Palettes; the Project itself (New, Open…, Duplicate,
 Move to Trash); a line of help links. New Project and what Open chooses open
 here, in its place, asking first when that would lose changes (leaveFor). A
 side panel on large screens (see openProjectMenu); dialogs opened from here
@@ -42,6 +42,8 @@ open in the panel, with a Back button to it. -->
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
+  import { progress } from '#lib/state/progress-state.svelte.js';
+  import { shortDay } from '#lib/utils/project-progress.js';
   import {
     weatherSearch,
     type SearchMode,
@@ -65,6 +67,7 @@ open in the panel, with a Back button to it. -->
   import {
     BookmarkIcon,
     ChevronRightIcon,
+    ChartNoAxesColumnIncreasingIcon,
     CloudAlertIcon,
     CopyPlusIcon,
     DownloadIcon,
@@ -86,6 +89,7 @@ open in the panel, with a Back button to it. -->
   import { confirmTrashProject } from '#lib/utils/confirm-trash.js';
   import { openHere } from '#lib/utils/leave-project.js';
   import ExportOptions from './ExportOptions.svelte';
+  import ProgressEditor from './ProgressEditor.svelte';
   import { openProjectScreen } from './open-project.js';
   import { openGaugePalette } from './gauge-palette.js';
   import GettingStarted from './GettingStarted.svelte';
@@ -327,6 +331,33 @@ the same color) says it's waiting here -->
         </button>
       </li>
     </PanelGroup>
+
+    <!-- How far it's made: the Progress dialog, the one place it's set -->
+    {#if hasProject}
+      <PanelGroup heading="Progress">
+        <li>
+          <button
+            type="button"
+            class={ROW}
+            onclick={() => open(ProgressEditor, 'Progress', true)}
+            data-testid="menu-progress"
+          >
+            <ChartNoAxesColumnIncreasingIcon class="shrink-0 opacity-70" />
+            <span class="flex flex-1 flex-col">
+              <span>Progress</span>
+              <span class="text-xs opacity-70"
+                >{!progress.madeThrough
+                  ? 'Not started'
+                  : progress.progress.finished
+                    ? `Finished · through ${shortDay(progress.madeThrough)}`
+                    : `${progress.progress.percent}% made · through ${shortDay(progress.madeThrough)}`}</span
+              >
+            </span>
+            <ChevronRightIcon class="icon-sm shrink-0 opacity-50" />
+          </button>
+        </li>
+      </PanelGroup>
+    {/if}
 
     <!-- Its weather again, as the planner's Weather Data menu offers -->
     {#if weatherDays.canSearchAgain}

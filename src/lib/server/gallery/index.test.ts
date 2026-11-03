@@ -114,6 +114,7 @@ describe('publishFromAccount', () => {
         link: 'https://temperature-blanket.com/?project=p1#h',
         showOwner: false,
         updatedAt: null,
+        made: null,
       },
     ]);
     expect((await getSettings(d1, 'u1')).publicId).toBeNull();
@@ -408,6 +409,7 @@ describe('sharing a palette', () => {
         link,
         showOwner: true,
         updatedAt: null,
+        made: null,
       },
     ]);
     expect((await getSettings(d1, 'u1')).showOwnerDefault).toBe(true);

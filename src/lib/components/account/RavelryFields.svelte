@@ -23,7 +23,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   in a new order) and the picture, sent again only when the project changed.
   Photos come first, under the dialog's picture; the dialog itself has View on
   Ravelry and Unlink. It draws the picture and calls `apply` after its
-  gallery page is published, which the Ravelry project links to.
+  gallery page is published, which the Ravelry project links to. Once the
+  project's progress is set, its percent (and Finished, once made through the
+  last day) fill the form, sent with the next Save like any other change.
 -->
 <script lang="ts" module>
   export type RavelryState = {
@@ -61,6 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ravelryLinks } from '#lib/accounts/ravelry-links.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
+  import { progress as projectProgress } from '#lib/state/progress-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import type { Color } from '#lib/types/yarn-types.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
@@ -116,7 +119,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let root: HTMLElement | null = $state(null);
   let destroyed = false;
 
-
   onDestroy(() => {
     destroyed = true;
     for (const item of added) if (item.url) URL.revokeObjectURL(item.url);
@@ -154,6 +156,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
   function statusChanged() {
     if (finished && !completed) completed = today();
+  }
+
+  // The project's progress, once the form holds what's on Ravelry (or its
+  // starting values) and the statuses are known: never sent by itself
+  let filledFromProgress = false;
+  $effect(() => {
+    if (filledFromProgress || !statuses.length || detailsState !== 'ready')
+      return;
+    filledFromProgress = true;
+    untrack(fillFromProgress);
+  });
+  function fillFromProgress() {
+    if (!projectProgress.madeThrough) return;
+    const { percent, finished: done } = projectProgress.progress;
+    const finishedStatus = statuses.find((s) => /finish/i.test(s.name));
+    if (done && finishedStatus) {
+      statusId = finishedStatus.id;
+      statusChanged();
+      return;
+    }
+    if (finished) return;
+    progress = percent;
+    const inProgress = statuses.find((s) => /progress/i.test(s.name));
+    if (inProgress && statusId === null) statusId = inProgress.id;
   }
 
   const progressOf = (value: number | null | undefined) =>
