@@ -218,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let pattern = $derived(project?.projectTags?.nodes?.[0]);
 
   // Still in progress when it was published or last updated: Open a Copy
-  // loads its days and offers the ones since (Search Again); otherwise it
+  // loads its days and offers the ones since (Check for Updates); otherwise it
   // loads the same weather as the preview, so there's nothing to say
   let inProgress = $derived.by(() => {
     const asOf = project?.modified ?? project?.date;

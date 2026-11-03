@@ -1103,8 +1103,8 @@ utils/open-edit-weather.ts. -->
           </p>
           {#if !weather.isUserEdited}
             <p class="opacity-80">
-              Applying makes this project's weather your own: Search Again and
-              new days won't change it. Undo takes it back.
+              Applying makes this project's weather your own: Check for Updates
+              and new days won't change it. Undo takes it back.
             </p>
           {/if}
         {:else}

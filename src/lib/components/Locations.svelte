@@ -134,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             type="button"
             class="anchor"
             onclick={() => weatherSearch.start({ mode: 'again' })}
-            >Search Again</button
+            >Check for Updates</button
           >
         </p>
       {/if}

@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- A day whose saved values were kept over newer ones Search Again got: both,
+<!-- A day whose saved values were kept over newer ones Check for Updates got: both,
 and the newer ones to use instead (with Undo) -->
 <script lang="ts">
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
@@ -126,7 +126,8 @@ and the newer ones to use instead (with Undo) -->
 
 <div class="flex flex-col gap-4 px-2 pt-2 text-left">
   <p>
-    You kept saved values for this day when Search Again got different ones.
+    You kept the saved values for this day when Check for Updates found newer
+    ones.
   </p>
   <table class="w-fit text-left text-sm [&_td]:pr-4 [&_th]:pr-4">
     <thead>

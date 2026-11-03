@@ -524,7 +524,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   // Auto ranges made from the weather as it was: days updated or added since
-  // (Search Again, new days) leave them as they are, so they're offered again
+  // (Check for Updates, new days) leave them as they are, so they're offered again
   let autoRangesBehind = $derived.by(() => {
     if (
       !rules ||

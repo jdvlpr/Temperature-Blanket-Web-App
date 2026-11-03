@@ -64,26 +64,34 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="saved-weather-days" class="text-2xl font-bold">Saved Weather</h2>
   <SavedWeatherDays />
-  <h3 class="text-lg font-bold">Search Again</h3>
+  <h3 class="text-lg font-bold">Check for Updates</h3>
   <p>
-    For a saved project, the <span class="font-bold">Get Weather Data</span>
-    button (and the Project menu) offers
-    <span class="font-bold">Search Again</span>, and shows how many new days are
-    waiting while a project is still going. It gets every day again. When no
-    saved day is different, the new days are just added. If any saved day is
-    different now, <span class="font-bold">Update Weather Data</span> opens with
-    two choices: <span class="font-bold">Add New Days</span> (on to start) and
-    <span class="font-bold">Update Past Days</span> (off to start; it says which weather
-    source changed them, when you saved them, how much the values differ and how many
-    days change color). Turn both off to change nothing; the new days are still offered
-    later.
+    For a saved project, the main button on the Location step says
+    <span class="font-bold">Add 14 New Days</span> (with however many are
+    waiting) while a project is still going, or
+    <span class="font-bold">Check for Updates</span> when there are none; the Project
+    menu offers Check for Updates too. It gets every day again. When no saved day
+    is different, the new days are just added.
   </p>
   <p>
-    <span class="font-bold">View All Changes</span> shows every changed day, the
-    new value over the saved one and how much it changed. Filters narrow the
-    list (days whose colors change, days that have settled, gaps filled, data
-    removed, temperatures or rain and snow that changed by at least an amount, a
-    date range, days you kept before), and
+    If any saved day is different now, <span class="font-bold"
+      >Update Weather Data</span
+    >
+    opens, so nothing is saved without your say. New days come first (on to start).
+    Weather sources correct readings as stations report in, which is normal, so how
+    much space the changed days take depends on your blanket: when none of them changes
+    color, it's a short note with
+    <span class="font-bold">Review changes</span>; when some do,
+    <span class="font-bold">Update Past Days</span> (off to start) says how many days
+    in your blanket would change color, and which source has newer values. Turn everything
+    off to change nothing; the new days are still offered later.
+  </p>
+  <p>
+    <span class="font-bold">View All Changes</span> (or Review changes) shows
+    every changed day, the new value over the saved one and how much it changed.
+    Filters narrow the list (days whose colors change, days that have settled,
+    gaps filled, data removed, temperatures or rain and snow that changed by at
+    least an amount, a date range, days you kept before), and
     <span class="font-bold">Select Shown</span>,
     <span class="font-bold">Clear Shown</span> and
     <span class="font-bold">Invert</span> pick the days shown.
@@ -92,15 +100,11 @@ HELP_TOPICS). -->
     it was.
   </p>
   <p>
-    Days you keep are marked in the weather table. Tap the mark to see both
-    values and use the new ones. Your project's gallery page can be updated
-    right after, too.
-  </p>
-  <p>
-    Days you don't update are remembered as kept, so Search Again doesn't ask
-    about them again unless their values change again. When it opens again, View
-    All Changes shows them too, to update them then (or use the mark in the
-    table).
+    Days you don't update keep their saved values, and you won't be asked about
+    them again unless their values change again. They're marked in the weather
+    table: tap the mark to see both values and use the new ones. The next time
+    you check, View All Changes' <span class="font-bold">Kept before</span> filter
+    shows them too. Your project's gallery page can be updated right after, too.
   </p>
   <p>
     Updating days doesn't change Auto ranges. When your weather no longer
@@ -117,9 +121,9 @@ HELP_TOPICS). -->
   <h2 id="weather-sources" class="text-2xl font-bold">Weather Sources</h2>
   <p>
     Press <span class="font-bold">Weather Source</span> above the weather to
-    choose where it comes from, then search again. The button shows the source
-    in use, or <span class="font-bold">Custom</span> once you've edited or imported
-    weather.
+    choose where it comes from, then get the weather data again. The button
+    shows the source in use, or <span class="font-bold">Custom</span> once you've
+    edited or imported weather.
   </p>
   <h3 class="text-lg font-bold">Open-Meteo</h3>
   <p>
@@ -347,7 +351,7 @@ HELP_TOPICS). -->
     Weather services can take up to a week to settle the latest days. When your
     project includes recent days, the Project Planner says so, and once they've
     settled it suggests <a href="#saved-weather-days" class="link"
-      >Search Again</a
+      >Check for Updates</a
     >. Saved days never change on their own. To be safe, stay about
     {OPEN_METEO_DELAY_DAYS} days behind with Open-Meteo, or {METEOSTAT_DELAY_DAYS}
     with Meteostat.

@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     flash?: boolean;
     /** Smaller, as in a pop-up's footer */
     small?: boolean;
-    /** Smallest, beside text (Search Again's changed values); no number */
+    /** Smallest, beside text (Check for Updates' changed values); no number */
     tiny?: boolean;
     /** Whether Fill with color grows from it; false where something else
      * (a palette's numbered drag handle) does */

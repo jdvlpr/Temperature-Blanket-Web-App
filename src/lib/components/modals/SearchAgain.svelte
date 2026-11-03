@@ -13,12 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Search Again's choices, nothing changing until Save: two switches, Update
-Past Days (every changed saved day not kept before, off to start) and Add New
-Days (on), each saying what it covers, then View All Changes: the same dialog,
-full size, as a sheet of every changed day (new value over the saved one,
-struck through), filtered by chips, its days picked one by one. Save says
-what it'll do; the changed days not updated are remembered as kept
+<!-- Check for Updates' choices, nothing changing until Save. New days lead
+(Add N new days, on). Changed saved days are scaled to what they mean for this
+blanket: when none changes color, a short note and Review changes; when some
+do, the Update Past Days card (every changed saved day not kept before, off to
+start), led by how many days change color. Either opens View All Changes: the
+same dialog, full size, as a sheet of every changed day (new value over the
+saved one, struck through), filtered by chips, its days picked one by one.
+Save says what it'll do; the changed days not updated are remembered as kept
 (finishAgain). Cancel changes nothing. -->
 <script module lang="ts">
   // Show Colors, for the rest of the visit (as the weather table's)
@@ -104,9 +106,6 @@ what it'll do; the changed days not updated are remembered as kept
       : UNIT_LABELS.height[units];
   const valueOf = (day: WeatherDay | undefined, param: ComparedParam) =>
     day?.[param]?.[units] ?? null;
-  // As precise as a difference needs: tenths, or hundredths of an inch
-  const round = (n: number, param: ComparedParam) =>
-    +n.toFixed(!isTemperature(param) && units === 'imperial' ? 2 : 1);
 
   const utcDate = (iso: string, options: Intl.DateTimeFormatOptions) =>
     new Date(`${iso}T00:00:00Z`).toLocaleDateString(undefined, {
@@ -153,24 +152,6 @@ what it'll do; the changed days not updated are remembered as kept
       : `on ${utcDate(date, { month: 'short', day: 'numeric', year: 'numeric' })}`;
   });
 
-  // The most a kind of value changed, in the units shown: "±18.9°F"
-  function largestChange(changes: DayChange[], params: ComparedParam[]) {
-    const range = differenceRange(
-      changes.flatMap((change) =>
-        change.changes
-          .filter(({ param }) => params.includes(param))
-          .map(({ param }) => ({
-            saved: valueOf(savedByKey.get(change.key), param),
-            got: valueOf(gotByKey.get(change.key), param),
-          })),
-      ),
-    );
-    if (!range) return '';
-    const [param] = params;
-    const unit = isTemperature(param) ? unitOf(param) : ` ${unitOf(param)}`;
-    return `±${round(range.max, param)}${unit}`;
-  }
-
   const colorCount = $derived(
     fresh.filter((c) =>
       changesColor(c, savedByKey.get(c.key), gotByKey.get(c.key), used),
@@ -178,36 +159,27 @@ what it'll do; the changed days not updated are remembered as kept
   );
   const removedCount = $derived(fresh.filter(removesData).length);
 
-  // Three lines: whose values differ, how much (only the kinds that
-  // changed), and how many days change color in what the project shows
-  const updateSummary = $derived.by(() => {
-    const days = savedOn
-      ? `${fresh.length === 1 ? 'a day' : `${fresh.length} of the days`} saved ${savedOn}`
-      : `${fresh.length} saved ${pluralize('day', fresh.length)}`;
-    const changed = (
-      [
-        ['temperatures', ['tmax', 'tavg', 'tmin']],
-        ['rain', ['prcp']],
-        ['snow', ['snow']],
-      ] as [string, ComparedParam[]][]
-    )
-      .map(([name, params]) => [name, largestChange(fresh, params)])
-      .filter(([, size]) => size);
-    const sizes = changed
-      .map(([name, size], i) =>
-        i === 0
-          ? `${name[0].toUpperCase()}${name.slice(1)} changed by up to ${size}`
-          : `${name} by ${size}`,
-      )
-      .join(', ');
-    const colors = colorCount
-      ? `${colorCount} ${pluralize('day', colorCount)} ${colorCount === 1 ? 'changes' : 'change'} color in your project`
-      : 'No days change color in your project';
-    return [`${sources} has different values for ${days}.`, sizes, colors]
-      .filter(Boolean)
+  // Which saved days have newer values: "9 days saved on Mar 3"
+  const savedDays = $derived(
+    savedOn
+      ? `${fresh.length} ${pluralize('day', fresh.length)} saved ${savedOn}`
+      : `${fresh.length} saved ${pluralize('day', fresh.length)}`,
+  );
+  // Nothing in the blanket changes color: a short note, not a card
+  const quiet = $derived(colorCount === 0 && use.size === 0);
+
+  // What matters to the blanket first, then why, calmly (the sizes of the
+  // changes are in View All Changes)
+  const updateSummary = $derived(
+    [
+      colorCount
+        ? `${colorCount} ${pluralize('day', colorCount)} in your blanket would change color.`
+        : 'No colors in your blanket would change.',
+      `${sources} has newer values for ${savedDays}. Weather sources correct readings as stations report in. This is normal.`,
+    ]
       .map((line) => `<span class="mt-1 block first:mt-0">${line}</span>`)
-      .join('');
-  });
+      .join(''),
+  );
 
   // Picked in the sheet: some, not just every day the switch covers
   const freshKeys = $derived(new Set(fresh.map((c) => c.key)));
@@ -585,10 +557,14 @@ what it'll do; the changed days not updated are remembered as kept
         Also update my gallery page
       </label>
     {/if}
-    {#if all.length > use.size}
+    {#if fresh.some((c) => !use.has(c.key))}
       <p class="text-surface-700-300 text-center text-xs">
-        Days you don't update are remembered as kept, so you won't be asked
-        about them again unless you choose to.
+        Your saved values stay as they are, and we won't ask about these days
+        again unless they change again. Review them anytime in the weather
+        table, where they're marked with <HistoryIcon
+          class="icon-sm inline align-text-bottom"
+          aria-label="the kept-day icon"
+        />.
       </p>
     {/if}
   </div>
@@ -602,33 +578,21 @@ what it'll do; the changed days not updated are remembered as kept
       >
         <ToggleSwitch
           bare
-          label="Add New Days"
-          details={`${newSources} has ${added} new ${pluralize('day', added)}: ${newRange}`}
+          label={`Add ${added} new ${pluralize('day', added)}`}
+          details={`${newSources} · ${newRange}`}
           bind:checked={add}
         />
       </div>
     {/if}
 
-    <div
-      class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-3 border border-gray-300 pb-4 dark:border-gray-700"
-    >
-      <ToggleSwitch
-        bare
-        label="Update Past Days"
-        details={pickedByHand
-          ? `${use.size} of ${all.length} changed ${pluralize('day', all.length)} picked`
-          : updateSummary}
-        checked={use.size > 0}
-        onchange={(e) =>
-          setUpdate((e.currentTarget as HTMLInputElement).checked)}
-      />
+    {#snippet notes()}
       {#if (removedCount || kept.size) && !pickedByHand}
-        <ul class="text-surface-700-300 flex flex-col gap-1 px-4 text-sm">
+        <ul class="text-surface-700-300 flex flex-col gap-1 text-sm">
           {#if removedCount}
             <li>
               {removedCount}
-              {removedCount === 1 ? 'day loses' : 'days lose'} data the source no
-              longer has.
+              {removedCount === 1 ? 'day has' : 'days have'} a value the source no
+              longer reports.
             </li>
           {/if}
           {#if kept.size}
@@ -636,27 +600,56 @@ what it'll do; the changed days not updated are remembered as kept
               {kept.size}
               {kept.size === 1 ? 'day' : 'days'} you kept before {kept.size ===
               1
-                ? "isn't"
-                : "aren't"} included. Use View All Changes to include {kept.size ===
-              1
-                ? 'it'
-                : 'them'}.
+                ? 'stays'
+                : 'stay'} as {kept.size === 1 ? 'it is' : 'they are'}. You can
+              still update {kept.size === 1 ? 'it' : 'them'} from the list of changes.
             </li>
           {/if}
         </ul>
       {/if}
-      <div class="flex justify-center">
-        <button type="button" class="btn preset-tonal" onclick={openSheet}>
-          View All Changes <ChevronRightIcon />
+    {/snippet}
+
+    {#if quiet}
+      <!-- Nothing in the blanket changes color: just say so -->
+      <div class="flex flex-col gap-2 px-2" data-testid="past-days-note">
+        <p class="text-sm">
+          {sources} refined {savedDays}. No colors in your blanket change.
+        </p>
+        {@render notes()}
+        <button
+          type="button"
+          class="anchor inline-flex w-fit items-center gap-1 text-sm"
+          onclick={openSheet}
+        >
+          Review changes <ChevronRightIcon class="icon-sm" />
         </button>
       </div>
-    </div>
+    {:else}
+      <div
+        class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-3 border border-gray-300 pb-4 dark:border-gray-700"
+      >
+        <ToggleSwitch
+          bare
+          label="Update Past Days"
+          details={pickedByHand
+            ? `${use.size} of ${all.length} changed ${pluralize('day', all.length)} picked`
+            : updateSummary}
+          checked={use.size > 0}
+          onchange={(e) =>
+            setUpdate((e.currentTarget as HTMLInputElement).checked)}
+        />
+        <div class="px-4">{@render notes()}</div>
+        <div class="flex justify-center">
+          <button type="button" class="btn preset-tonal" onclick={openSheet}>
+            View All Changes <ChevronRightIcon />
+          </button>
+        </div>
+      </div>
+    {/if}
 
     {#if autoGauges.length}
       <p class="text-surface-700-300 text-sm">
-        Your {autoNames}
-        ranges are Auto. Updating days won't change them, so update the ranges afterward
-        to keep them Auto.
+        Your {autoNames} ranges stay as they are. You can update them afterward.
       </p>
     {/if}
 

@@ -137,7 +137,7 @@ class WeatherDays {
    * only the new days of `locationsGot`. A location's days count as got
    * through its last day with values, so days its source doesn't have yet
    * are offered again later. Every day got makes them all as new as today,
-   * unless `stamp` is false (Search Again: only once its choices are saved).
+   * unless `stamp` is false (Check for Updates: only once its choices are saved).
    */
   got(
     data: WeatherDay[],

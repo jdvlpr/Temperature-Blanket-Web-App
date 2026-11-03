@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- Crochet or Knit Along All Year. A saved project opens with its saved days
 and never searches by itself (storage/projects.svelte.ts, weather-days):
-the Get Weather Data button shows how many new days are waiting, and
-Search Again adds them, asking before changing saved ones
+the main button says Add N New Days (or Check for Updates), and adds
+them, asking before changing saved ones
 (modals/SearchAgain.svelte). -->
 
 <script lang="ts">
@@ -95,8 +95,8 @@ Search Again adds them, asking before changing saved ones
       <span class="font-bold">Open…</span>
     </li>
     <li>
-      The <span class="font-bold">Get Weather Data</span> button shows how many new
-      days are waiting. Press it to add them. If a day you saved has different weather
+      The main button says <span class="font-bold">Add 3 New Days</span> (with however
+      many are waiting). Press it to add them. If a day you saved has different weather
       now, you're asked first, and the days you've already made stay as they were
       saved unless you update them.
     </li>
@@ -142,9 +142,9 @@ Search Again adds them, asking before changing saved ones
   <h3 class="text-lg font-bold">A day I've already made changed color</h3>
   <p>
     Saved days don't change by themselves, so check whether the ranges moved
-    (use Manual steps, above). If you used Search Again and chose a day's new
-    values, that day changed on purpose: its old values aren't kept. A blanket
-    doesn't need to match to the decimal.
+    (use Manual steps, above). If you used Check for Updates and chose a day's
+    new values, that day changed on purpose: its old values aren't kept. A
+    blanket doesn't need to match to the decimal.
     <a href="/documentation/guides/weather-doesnt-match" class="link"
       >When the weather changes</a
     >.
@@ -152,9 +152,9 @@ Search Again adds them, asking before changing saved ones
   <h3 class="text-lg font-bold">Weather sources update recent days</h3>
   <p>
     The newest days are early data. Once they've settled, the planner says so
-    and offers <span class="font-bold">Search Again</span>, which shows any day
-    that's different now and keeps your saved values unless you choose the new
-    ones.
+    and offers <span class="font-bold">Check for Updates</span>, which shows any
+    day that's different now and keeps your saved values unless you choose the
+    new ones.
     <a href="/documentation/weather#saved-weather-days" class="link"
       >Saved weather</a
     >.

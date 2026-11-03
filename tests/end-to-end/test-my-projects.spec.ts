@@ -342,5 +342,10 @@ test.describe('My Projects', () => {
     await expect(page.getByTestId('loaded-from')).toHaveText(
       /^Loaded saved project/,
     );
+    // Its weather is kept: the main button checks for updates (or adds the
+    // days waiting) rather than getting it all over again
+    await expect(page.locator('#location-action-button')).toHaveText(
+      /^(Check for Updates|Add \d+ New Days?)$/,
+    );
   });
 });

@@ -246,7 +246,7 @@ class WeatherSearch {
   }
 
   /**
-   * Search Again's choices: the saved days in `update` take the new values,
+   * Check for Updates' choices: the saved days in `update` take the new values,
    * the new days go in if `add`, and the other `considered` changes are
    * remembered as kept (asked about again only once they change again).
    * Without `add`, the new days are still new, offered again later.

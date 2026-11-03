@@ -59,7 +59,7 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   </p>
   <DocsShot
     src="location-and-dates/location"
-    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days with Details beside it; Add another location; and the Search Again button."
+    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days with Details beside it; Add another location; and the Check for Updates button."
     caption="A place and a year of dates, ready to search."
   />
 </section>

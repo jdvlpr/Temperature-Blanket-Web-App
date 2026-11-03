@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ChevronRightIcon } from '@lucide/svelte';
   import { scale } from 'svelte/transition';
   import { WEATHER_ACTIONS } from '#lib/utils/weather-actions.js';
+  import { pluralize } from '#lib/utils/string-utils.js';
 
   let popover = new PopoverInstance();
 
@@ -36,8 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     'btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit';
 </script>
 
-{#snippet buttonContent()}
-  Get Weather Data
+<!-- New project: Get Weather Data; saved, days waiting: Add N New Days;
+saved, none waiting: Check for Updates -->
+{#snippet buttonContent(label = 'Get Weather Data')}
+  {label}
   <ChevronRightIcon />
 {/snippet}
 
@@ -73,21 +76,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="location-action-button"
     {disabled}
   >
-    {#if kept && weatherDays.newDaysCount}
-      <!-- Shown while days are waiting: Search Again adds them -->
-      <span class="flex flex-col">
-        <span
-          class="-mt-1.5 text-sm opacity-80"
-          data-testid="new-days-available"
-          ><span class="sr-only">,</span>
-          {weatherDays.newDaysCount} new {weatherDays.newDaysCount === 1
-            ? 'day'
-            : 'days'}</span
-        >
-        <span class="flex items-center gap-1">{@render buttonContent()}</span>
-      </span>
-    {:else}
-      {@render buttonContent()}
-    {/if}
+    {@render buttonContent(
+      !kept
+        ? 'Get Weather Data'
+        : weatherDays.newDaysCount
+          ? `Add ${weatherDays.newDaysCount} New ${pluralize('Day', weatherDays.newDaysCount)}`
+          : WEATHER_ACTIONS.again.label,
+    )}
   </button>
 {/if}

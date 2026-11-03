@@ -142,7 +142,7 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     A saved project keeps its weather. Opening it never looks the weather up
     again, and its saved days only change if you use
     <a href="/documentation/weather#saved-weather-days" class="link"
-      >Search Again</a
+      >Check for Updates</a
     > and choose the new values. A gallery page keeps the weather it was published
     with, too.
   </p>

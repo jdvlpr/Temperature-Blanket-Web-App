@@ -79,7 +79,7 @@
               <RecentWeatherDataTooltip />
             {/if}
             {row.date}
-            <!-- Saved values kept over newer ones Search Again got -->
+            <!-- Saved values kept over newer ones Check for Updates got -->
             {#if weather.grouping === 'day' && weatherDays.declined[keptKey]}
               <button
                 type="button"
