@@ -65,7 +65,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else progress.set(picked);
   }
 
+  // A tap on a touch screen opens the picker by itself (iOS); opening it
+  // again in the same tap can lose the first day picked. A mouse click on
+  // the hidden field would only focus it, so open the picker for it
   function openPicker() {
+    if (!matchMedia('(pointer: fine)').matches) return;
     try {
       picker?.showPicker();
     } catch {
@@ -81,6 +85,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (progress.madeThrough !== openedAt) used = true;
   });
   const leading = $derived(!!day && day !== openedAt && !used);
+
+  // Not started, the picker opens on the day it was opened from, else the
+  // project's first day, not today (iOS opens an empty one on today). Those
+  // days aren't picked by tapping them again, but Set Progress and › set them
+  const pickerStart = $derived(day ?? progress.first ?? '');
 </script>
 
 <div
@@ -157,8 +166,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-labelledby="{uid}-label"
           min={progress.first}
           max={progress.last}
-          value={progress.madeThrough ?? ''}
+          value={progress.madeThrough ?? pickerStart}
           onclick={openPicker}
+          oninput={(e) =>
+            /* iOS may not send change for the first day picked from empty */
+            fromPicker(e.currentTarget.value)}
           onchange={(e) => fromPicker(e.currentTarget.value)}
         />
       </div>

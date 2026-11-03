@@ -89,6 +89,17 @@ image can't use currentColor) */
     height: calc(var(--field-size) * 2 + --spacing(1.5));
   }
 
+  /* iOS draws an empty date field with no text in it, so one sized to its
+  content (w-auto) shrinks to almost nothing, and its picker opens against
+  that sliver, partly off screen. Keep room for a date, and keep the date at
+  the start like other fields (iOS centers it). */
+  input[type='date'].input {
+    min-width: 9.5rem;
+  }
+  input[type='date'].input::-webkit-date-and-time-value {
+    text-align: left;
+  }
+
   select:not([multiple]):not([size]) {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e");
     background-size: var(--icon-size-sm) var(--icon-size-sm);

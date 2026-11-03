@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Edit Weather Data on it.
 -->
 <script lang="ts">
+  import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import KeptDay from '#lib/components/modals/KeptDay.svelte';
   import { MOON_PHASE_NAMES } from '#lib/constants/weather-constants.js';
   import { locations } from '#lib/state/location-state.svelte.js';
@@ -162,7 +163,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // ***************
 
   let grid: ReturnType<typeof WeatherGrid<Row>> | undefined = $state();
-  let goTo = $state('');
+  // Starts on the first day, so the field shows a date (iOS shows an empty
+  // one as a blank box) and its picker opens there
+  let picked = $state('');
+  const goTo = $derived(picked || all[0]?.date || '');
   const today = new Date().toISOString().slice(0, 10);
   const hasToday = $derived(!byWeek && all.some((row) => row.date === today));
 
@@ -187,9 +191,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   const editable = (param: WeatherParam['id']) => !byWeek && param !== 'moon';
+
+  // ***************
+  // Back to top: on the page (scroll="window"), once the table's top is
+  // a screen or so above the window
+  // ***************
+
+  let top: HTMLDivElement | undefined = $state();
+  let scrolledBy = $state(false);
+
+  $effect(() => {
+    if (scroll !== 'window' || !top) return;
+    const el = top;
+    const onscroll = () => {
+      scrolledBy = el.getBoundingClientRect().top < -window.innerHeight;
+    };
+    onscroll();
+    window.addEventListener('scroll', onscroll, { passive: true });
+    return () => window.removeEventListener('scroll', onscroll);
+  });
+
+  /** The toolbar's top, just under the top bar */
+  function toTop() {
+    if (!top) return;
+    const topBar =
+      parseFloat(getComputedStyle(top).getPropertyValue('--top-bar-height')) ||
+      0;
+    window.scrollTo({
+      top: top.getBoundingClientRect().top + window.scrollY - topBar - 8,
+      behavior: 'smooth',
+    });
+  }
 </script>
 
 <div
+  bind:this={top}
   class={[
     'flex flex-col gap-3 text-left',
     scroll === 'box' && 'px-2 pb-2 sm:px-4',
@@ -220,8 +256,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="input field-sm w-auto"
           min={all[0]?.date}
           max={all.at(-1)?.date}
-          bind:value={goTo}
-          onchange={() => goTo && void go(goTo)}
+          value={goTo}
+          onchange={(e) => {
+            const date = e.currentTarget.value;
+            picked = date;
+            if (!date) return;
+            const field = e.currentTarget;
+            // On a touch screen (iOS) the picker stays open over the table,
+            // and closing it scrolls back to the still-focused field: close
+            // it first, then go once it's gone
+            if (!matchMedia('(pointer: fine)').matches) {
+              field.blur();
+              setTimeout(() => void go(date), 300);
+            } else void go(date);
+          }}
         />
       </label>
       {#if hasToday}
@@ -295,4 +343,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       No {weather.grouping}s match these filters.
     {/snippet}
   </WeatherGrid>
+
+  <!-- Above the planner's steps bar (Navigation, h-18) -->
+  {#if scrolledBy}
+    <ToTopButton bottom="4.5rem" onClick={toTop} />
+  {/if}
 </div>

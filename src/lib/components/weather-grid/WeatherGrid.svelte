@@ -174,11 +174,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else {
       const top = body.getBoundingClientRect().top + window.scrollY;
       const headerHeight = header?.offsetHeight ?? 0;
+      // Set by AppShell on its own element, not the document's
       const topBar =
         parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue(
-            '--top-bar-height',
-          ),
+          getComputedStyle(body).getPropertyValue('--top-bar-height'),
         ) || 0;
       const viewTop = window.scrollY + topBar + headerHeight;
       const at = top + rowTop;
