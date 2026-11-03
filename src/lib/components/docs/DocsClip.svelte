@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- A short silent clip in Guides & Help, like DocsShot but moving: light or
-dark by the site's own .dark, looping while it's in view, with a button to
+dark by the site's own .dark, looping while it's in view, with a button below to
 pause it. With motion reduced it waits on its first frame for Play. Nothing
 loads until it's near: then the poster, and the video once it plays (only
 the theme shown). Files are /images/docs/<src>-light.mp4 and -dark.mp4, with
@@ -102,7 +102,7 @@ the theme shown). Files are /images/docs/<src>-light.mp4 and -dark.mp4, with
 </script>
 
 <figure bind:this={figure} class="flex flex-col items-center gap-2">
-  <div class="relative max-w-full">
+  <div class="max-w-full">
     {#each [{ theme: 'light', show: 'dark:hidden' }, { theme: 'dark', show: 'hidden dark:block' }] as { theme, show }, i (theme)}
       <video
         bind:this={videos[i]}
@@ -126,21 +126,22 @@ the theme shown). Files are /images/docs/<src>-light.mp4 and -dark.mp4, with
         ]}
       ></video>
     {/each}
+  </div>
+  <!-- Below the clip, so it never covers any of it -->
+  <figcaption class="flex flex-wrap items-center justify-center gap-x-2">
     <button
       type="button"
-      class="btn-icon preset-filled-surface-950-50 absolute right-2 bottom-2 opacity-80 shadow hover:opacity-100"
+      class="btn btn-sm hover:preset-tonal-surface"
       onclick={toggle}
-      aria-label={playing ? 'Pause' : 'Play'}
-      title={playing ? 'Pause' : 'Play'}
     >
       {#if playing}
-        <PauseIcon />
+        <PauseIcon /> Pause
       {:else}
-        <PlayIcon />
+        <PlayIcon /> Play
       {/if}
     </button>
-  </div>
-  {#if caption}
-    <figcaption class="text-sm opacity-80">{caption}</figcaption>
-  {/if}
+    {#if caption}
+      <span class="text-sm opacity-80">{caption}</span>
+    {/if}
+  </figcaption>
 </figure>
