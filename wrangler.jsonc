@@ -7,7 +7,9 @@
 // local D1 database and R2 bucket, stored under .wrangler/state.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "temperature-blanket",
+  // Not the deployed Worker's name (temperature-blanket, wrangler.production.jsonc),
+  // so a deploy that picks up this file by mistake is refused
+  "name": "temperature-blanket-local",
   // Pinned because the local runtime rejects today's date
   "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
