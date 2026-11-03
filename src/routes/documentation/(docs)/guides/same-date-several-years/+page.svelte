@@ -59,8 +59,8 @@ To counts as 1 day, location-state). A new location starts empty
       March 10, 1985. It shows <span class="font-bold">1 Day</span>.
     </li>
     <li>
-      Press <span class="font-bold">Add Location</span>. A new, empty location
-      appears below.
+      Press <span class="font-bold">Add another location</span> under the dates. A
+      new, empty location appears below.
     </li>
     <li>
       Choose the same place again, set it to <span class="font-bold"
@@ -102,9 +102,10 @@ To counts as 1 day, location-state). A new location starts empty
   </h2>
   <h3 class="text-lg font-bold">A year is missing in the middle</h3>
   <p>
-    Locations can't be reordered. Remove the ones after the gap (⋮, then
-    <span class="font-bold">Remove Location</span>) and add them again in order,
-    or leave it: a blanket of dates doesn't have to be in order.
+    Locations can't be reordered. Remove the ones after the gap (<span
+      class="font-bold">Remove</span
+    > beside each one's number of days) and add them again in order, or leave it:
+    a blanket of dates doesn't have to be in order.
   </p>
   <h3 class="text-lg font-bold">Searching is slow, or fails</h3>
   <p>

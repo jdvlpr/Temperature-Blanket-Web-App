@@ -16,8 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { version } from '$app/env';
   import Location from '#lib/components/Location.svelte';
+  import { SMALL_LINK } from '#lib/constants/class-constants.js';
   import { MAXIMUM_LOCATIONS } from '#lib/constants/location-constants.js';
   import { locations } from '#lib/state/location-state.svelte.js';
+  import { dialog } from '#lib/state/page-state.svelte.js';
   import { project, type LoadedFrom } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
@@ -27,8 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pluralize } from '#lib/utils/string-utils.js';
   import {
     CircleCheckBigIcon,
-    CirclePlusIcon,
     ExternalLinkIcon,
+    PlusIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
@@ -59,6 +61,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? 'Loaded project and weather data from'
           : 'Loaded project from';
     }
+  };
+
+  // Another place changes which days the weather covers, so it clears the
+  // weather got so far: asks first when there is some
+  const addLocation = async () => {
+    if (weather.rawData.length > 0) {
+      const ok = await new Promise<boolean>((resolve) =>
+        dialog.trigger({
+          type: 'confirm',
+          title: 'Add another location?',
+          body: 'This clears the weather data you have now. Choose the new place and its dates, then Get Weather Data again for all of them.',
+          confirmText: 'Add Location',
+          response: resolve,
+        }),
+      );
+      if (!ok) return;
+      weather.setRawData([]);
+    }
+    locations.add();
   };
 
   const validLoadedProject = $derived(
@@ -172,27 +193,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/each}
   </div>
 
-  <!-- Another place, right under the ones there are -->
-  {#if locations.all.length < MAXIMUM_LOCATIONS}
-    <button
-      class={[
-        'btn hover:preset-tonal-surface mx-auto flex',
-        weather.isUserEdited && 'hidden',
-      ]}
-      disabled={project.status.loading}
-      onclick={() => {
-        // Clear now-stale weather data before adding the new location.
-        if (weather.rawData.length > 0) weather.setRawData([]);
-        locations.add();
-      }}
-      title="Add a New Location"
-    >
-      <CirclePlusIcon /> Add Location
-    </button>
-  {:else}
-    <p class={['py-2 text-center text-sm', weather.isUserEdited && 'hidden']}>
-      You've added the maximum allowed number of locations
-    </p>
+  <!-- Another place: a quiet link under the dates, only once every place
+  so far is filled in (most projects have just one) -->
+  {#if locations.allValid && !weather.isUserEdited && !loading}
+    {#if locations.all.length < MAXIMUM_LOCATIONS}
+      <button
+        type="button"
+        class={[SMALL_LINK, 'mb-2 inline-flex items-center gap-1 text-sm']}
+        disabled={project.status.loading}
+        onclick={addLocation}
+        title="Add another location to this project"
+      >
+        <PlusIcon class="icon-sm" aria-hidden="true" /> Add another location
+      </button>
+    {:else}
+      <p class="mb-2 text-sm opacity-80">
+        You've added the maximum allowed number of locations
+      </p>
+    {/if}
   {/if}
 
   <!-- Then the weather for all of them -->

@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { FIELD_GROUP, SMALL_LINK } from '#lib/constants/class-constants.js';
   import { browser } from '$app/env';
   import { MONTHS } from '#lib/constants/weather-constants.js';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
@@ -39,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/location-utils.svelte.js';
   import { pluralize } from '#lib/utils/string-utils.js';
   import {
-    EllipsisVerticalIcon,
     MapIcon,
     MapPinIcon,
     SearchIcon,
@@ -47,7 +45,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
-  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
@@ -285,6 +282,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * @param {number} _year - The year.
    * @returns {number} - The number of days in the given month and year.
    */
+  // Removing a place changes which days the weather covers, so it clears the
+  // weather got so far: asks first when there is some
+  async function removeLocation() {
+    if (weather.rawData.length > 0) {
+      const ok = await new Promise<boolean>((resolve) =>
+        dialog.trigger({
+          type: 'confirm',
+          title: `Remove Location ${index + 1}?`,
+          body: 'This clears the weather data you have now. Get Weather Data again for the places left.',
+          confirmText: 'Remove',
+          danger: true,
+          response: resolve,
+        }),
+      );
+      if (!ok) return;
+    }
+    locations.remove(location.uuid ?? '');
+    weather.setRawData([]);
+  }
+
   function getDays(_month: number, _year: number): number {
     switch (_month) {
       case 1:
@@ -313,84 +330,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-1 items-end gap-4 py-4 first:pt-0">
   <div class="grid grid-cols-1 gap-4">
     <div class="label">
-      <!-- The place's Details and options on the label's line, so they take
-      no row of their own -->
-      <div class="flex items-center gap-3">
-        <label class="label-text mr-auto" for="location-{location.uuid}">
-          {#if showSelectLocationLabelMessage}
-            <span class="text-error-900-100">Choose a result</span>
-          {:else if locations.all.length > 1 && location?.label}
-            Location {locations.all.length > 1 ? index + 1 : ''}
-          {:else}
-            Search for a city, region, or landmark
-          {/if}
-        </label>
-        {#if location.id && location.lat && location.lng}
-          <button
-            type="button"
-            class={[SMALL_LINK, 'inline-flex items-center gap-1 text-xs']}
-            onclick={() => {
-              dialog.trigger({
-                type: 'component',
-                component: {
-                  ref: LocationDetails,
-                  props: { location },
-                },
-              });
-            }}
-          >
-            <MapIcon class="icon-sm" aria-hidden="true" />
-            Details
-          </button>
+      <label class="label-text" for="location-{location.uuid}">
+        {#if showSelectLocationLabelMessage}
+          <span class="text-error-900-100">Choose a result</span>
+        {:else if locations.all.length > 1 && location?.label}
+          Location {locations.all.length > 1 ? index + 1 : ''}
+        {:else}
+          Search for a city, region, or landmark
         {/if}
-        {#if locations.all?.length > 1}
-          <Popover>
-            <Popover.Trigger
-              class="btn-icon hover:preset-tonal-surface -my-2 size-8"
-              title="Location Options"
-            >
-              <EllipsisVerticalIcon />
-            </Popover.Trigger>
-            <Portal>
-              <Popover.Positioner>
-                <Popover.Content
-                  class="bg-surface-200-800 rounded-container z-50 flex items-center justify-center gap-2 p-2 shadow-xl"
-                >
-                  {#snippet element(attributes)}
-                    {#if !attributes.hidden}
-                      <div {...attributes} transition:safeSlide>
-                        <Popover.Description>
-                          <button
-                            class="btn hover:preset-tonal-surface"
-                            onclick={() => {
-                              locations.remove(location.uuid ?? '');
-                              weather.setRawData([]);
-                            }}
-                            disabled={weather.isUserEdited ||
-                              project.status.loading}
-                            title="Remove Location"
-                          >
-                            <Trash2Icon />
-                            <p>
-                              Remove Location {index + 1}
-                            </p>
-                          </button>
-                        </Popover.Description>
-                        <Popover.Arrow
-                          class="-z-10"
-                          style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
-                        >
-                          <Popover.ArrowTip />
-                        </Popover.Arrow>
-                      </div>
-                    {/if}
-                  {/snippet}
-                </Popover.Content>
-              </Popover.Positioner>
-            </Portal>
-          </Popover>
-        {/if}
-      </div>
+      </label>
       <div
         class={[FIELD_GROUP, 'grid-cols-[auto_1fr_auto]']}
         bind:this={locationGroup}
@@ -659,7 +607,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class="flex w-full flex-col items-start gap-2">
+  <!-- The day count, then this place's own actions at the end of its row,
+  where the place's block ends -->
+  <div class="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
     {#if !location.errorMessage && location.days}
       <p class="text-sm">
         {location.days}
@@ -679,6 +629,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     {:else if project.status.loading}
       <p class="animate-pulse text-sm">...</p>
+    {/if}
+    {#if (location.id && location.lat && location.lng) || locations.all?.length > 1}
+      <div class="ml-auto flex items-center gap-4">
+        {#if location.id && location.lat && location.lng}
+          <button
+            type="button"
+            class={[SMALL_LINK, 'inline-flex items-center gap-1 text-xs']}
+            onclick={() => {
+              dialog.trigger({
+                type: 'component',
+                component: {
+                  ref: LocationDetails,
+                  props: { location },
+                },
+              });
+            }}
+          >
+            <MapIcon class="icon-sm" aria-hidden="true" />
+            Details
+          </button>
+        {/if}
+        {#if locations.all?.length > 1}
+          <button
+            type="button"
+            class={[SMALL_LINK, 'inline-flex items-center gap-1 text-xs']}
+            onclick={removeLocation}
+            disabled={weather.isUserEdited || project.status.loading}
+            title="Remove Location {index + 1}"
+          >
+            <Trash2Icon class="icon-sm" aria-hidden="true" />
+            Remove
+          </button>
+        {/if}
+      </div>
     {/if}
   </div>
 </div>

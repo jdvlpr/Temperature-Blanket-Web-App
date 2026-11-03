@@ -59,7 +59,7 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   </p>
   <DocsShot
     src="location-and-dates/location"
-    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, with Details beside its label; From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days; Add Location; and the Search Again button."
+    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days with Details beside it; Add another location; and the Search Again button."
     caption="A place and a year of dates, ready to search."
   />
 </section>
@@ -96,17 +96,16 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   </h2>
   <p>
     A blanket can follow you around: a trip, the places you've lived, or the
-    same day in different years. Press <span class="font-bold"
-      >Add Location</span
+    same day in different years. Once a place and its dates are chosen, press <span
+      class="font-bold">Add another location</span
     >
-    for another place with its own dates, up to {MAXIMUM_LOCATIONS} of them. The weather
-    of each comes one after the other, in order, and the total number of days shows
-    below.
+    (under the dates) for another place with its own dates, up to {MAXIMUM_LOCATIONS}
+    of them. The weather of each comes one after the other, in order, and the total
+    number of days shows below.
   </p>
   <p>
-    To remove one, press ⋮ beside it, then <span class="font-bold"
-      >Remove Location</span
-    >.
+    To remove one, press <span class="font-bold">Remove</span> beside its number of
+    days.
   </p>
   <p>
     <a href="/documentation/guides/same-date-several-years" class="link"

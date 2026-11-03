@@ -52,9 +52,9 @@ test.describe('Project Planner', () => {
       .getByRole('option', { name: 'Austin, Texas, United States' })
       .click();
 
-    // 2. Verify "Add Location" appears (confirming selection)
+    // 2. Verify "Add another location" appears (confirming selection)
     await expect(
-      page.getByRole('button', { name: 'Add Location' }),
+      page.getByRole('button', { name: 'Add another location' }),
     ).toBeVisible();
 
     // 3. Select Year
