@@ -16,13 +16,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- The open palette's name, as ProjectTitle is the project's: a text field
 styled as the title (in the top bar on wider screens), or a labelled field (the
 Palette menu). Click to rename in place; Enter or clicking away keeps the
-name, Escape puts it back. Not saved yet, focusing the title saves the palette
-first, since naming it means keeping it; the menu's field saves it once a
-name is given. -->
+name, Escape puts it back. Not saved yet, a changed name in the title asks
+whether to save the palette when the field loses focus; the menu's field
+saves it once a name is given. -->
 
 <script lang="ts">
-  import { toast } from '#lib/state/page-state.svelte.js';
-  import { MAX_SAVED_PALETTE_NAME_LENGTH } from '#lib/storage/palettes.svelte.js';
+  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import {
+    MAX_SAVED_PALETTE_NAME_LENGTH,
+    PaletteStorage,
+  } from '#lib/storage/palettes.svelte.js';
   import { tick } from 'svelte';
   import {
     paletteAutosave,
@@ -56,9 +59,29 @@ name is given. -->
     if (!name) name = fallback;
     await tick();
     input.select();
-    // The menu's field can be focused just by opening it: that saves only
-    // once a name is given
-    if (!paletteAutosave.id && !field) await save(savedName);
+  }
+
+  /** Asks whether to save the palette not saved yet, as the project's title does */
+  function confirmSave(withName: string) {
+    return new Promise<boolean>((resolve) => {
+      const respond = (response: boolean) => {
+        dialog.escapeAction = null;
+        resolve(response);
+      };
+      dialog.trigger({
+        type: 'confirm',
+        title: 'Save this palette?',
+        body: `Save this palette as "${withName || fallback}"? It will be saved ${
+          PaletteStorage.syncOwner() ? 'to your account' : 'in this browser'
+        }.`,
+        confirmText: 'Save palette',
+        response: respond,
+      });
+      dialog.escapeAction = () => {
+        respond(false);
+        dialog.close();
+      };
+    });
   }
 
   async function save(withName: string) {
@@ -86,7 +109,11 @@ name is given. -->
     name = renamed;
     if (renamed === savedName) return;
     if (!paletteAutosave.id) {
-      if (!field || !renamed) return;
+      if (field && !renamed) return;
+      if (!field && !(await confirmSave(renamed))) {
+        name = savedName;
+        return;
+      }
       await save(renamed);
       // Already saved under another name: it takes this one
       if (paletteAutosave.id && paletteAutosave.name !== renamed)

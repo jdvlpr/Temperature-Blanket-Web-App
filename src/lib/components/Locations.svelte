@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherSearch } from '#lib/state/weather-search.svelte.js';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
-  import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
   import { stringToDate } from '#lib/utils/date-utils.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
@@ -82,11 +81,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
             {/if}</span
           >
-          <HelpIcon topic="project-includes">
-            {#snippet text()}
-              <span>About</span>
-            {/snippet}
-          </HelpIcon>
         </p>
       {/if}
 

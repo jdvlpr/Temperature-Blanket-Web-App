@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Help text, shown in a help dialog and on its Guides & Help page: weather
+<!-- Help text on the Weather Guides & Help page (no longer a help dialog): weather
 is kept (a saved project, a gallery page's copy) or searched (a link) -->
 
 <div class="flex flex-col gap-2">

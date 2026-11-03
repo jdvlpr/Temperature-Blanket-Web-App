@@ -182,7 +182,7 @@ what it'll do; the changed days not updated are remembered as kept
   // changed), and how many days change color in what the project shows
   const updateSummary = $derived.by(() => {
     const days = savedOn
-      ? `${fresh.length === 1 ? 'a day' : `${fresh.length} of the days`} you saved ${savedOn}`
+      ? `${fresh.length === 1 ? 'a day' : `${fresh.length} of the days`} saved ${savedOn}`
       : `${fresh.length} saved ${pluralize('day', fresh.length)}`;
     const changed = (
       [
@@ -290,7 +290,7 @@ what it'll do; the changed days not updated are remembered as kept
       adding && `Added ${added} new ${pluralize('day', added)}.`,
       update.size && `Updated ${update.size} ${pluralize('day', update.size)}.`,
       keptNow &&
-        `Kept your saved values for ${keptNow} ${pluralize('day', keptNow)}.`,
+        `Kept saved values for ${keptNow} ${pluralize('day', keptNow)}.`,
     ]
       .filter(Boolean)
       .join(' ');

@@ -68,7 +68,7 @@ goes) -->
     </figcaption>
   </figure>
   <p
-    class="order-1 col-span-full text-center text-xl font-light text-balance md:relative md:-top-6 md:order-3 md:col-span-4"
+    class="order-1 col-span-full text-center text-xl font-light text-balance md:relative md:-top-3 md:order-3 md:col-span-5"
   >
     These 366 rows of yarn are the temperature in Göppingen, Germany, from May
     15, 1943 to May 14, 1944!

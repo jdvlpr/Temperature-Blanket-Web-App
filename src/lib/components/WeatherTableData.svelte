@@ -84,8 +84,8 @@
               <button
                 type="button"
                 class="btn-icon btn-icon-sm hover:preset-tonal-surface align-middle"
-                title="Kept your saved values"
-                aria-label="{row.date}: kept your saved values. Show the new ones"
+                title="Kept saved values"
+                aria-label="{row.date}: kept saved values. Show the new ones"
                 onclick={() =>
                   dialog.trigger({
                     type: 'component',

@@ -126,8 +126,7 @@ and the newer ones to use instead (with Undo) -->
 
 <div class="flex flex-col gap-4 px-2 pt-2 text-left">
   <p>
-    You kept your saved values for this day when Search Again got different
-    ones.
+    You kept saved values for this day when Search Again got different ones.
   </p>
   <table class="w-fit text-left text-sm [&_td]:pr-4 [&_th]:pr-4">
     <thead>

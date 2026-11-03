@@ -46,31 +46,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // The sidebar folds both ways at once, so the button under it glides to
   // its place rather than jumping when the navigation is gone
-  let slideWidth = 0;
   function sidebarSlide(node: HTMLElement): TransitionConfig {
     if (motion.reduced) return { duration: 0 };
     const { width, height } = node.getBoundingClientRect();
-    slideWidth = width;
     return {
       duration: 400,
       easing: cubicOut,
       css: (t) =>
         `overflow: hidden; width: ${t * width}px; height: ${t * height}px; opacity: ${Math.min(t * 3, 1)}`,
-    };
-  }
-
-  // The top bar's part of the divider moves and fades with the sidebar's
-  // right edge, frame for frame. Deferred, so the sidebar has been measured
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function dividerSlide(_node: HTMLElement): () => TransitionConfig {
-    return () => {
-      if (motion.reduced) return { duration: 0 };
-      return {
-        duration: 400,
-        easing: cubicOut,
-        css: (t) =>
-          `left: ${t * slideWidth - 1}px; opacity: ${Math.min(t * 3, 1)}`,
-      };
     };
   }
 
@@ -157,20 +140,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <!-- The right padding is half of what the window has past
       --breakpoint-xl, as beside the page's centered column below -->
-      <!-- Wide screens: the sidebar's divider carries on up through this bar,
-      right over its border, and folds away with it -->
-      {#if showNavigationSideBar.value}
-        <div
-          class="bg-surface-200-800 pointer-events-none absolute inset-y-0 hidden w-px lg:block"
-          style:left="calc(var(--sidebar-width) - 1px)"
-          aria-hidden="true"
-          transition:dividerSlide
-        ></div>
-      {/if}
       <!-- Wide screens: the sidebar's header, the site's name then the
       button that shows or hides the sidebar, over half the name's inset so
       both fit the sidebar's width. Its box ends half a rem short of the
-      sidebar's divider (with this bar's padding); it follows the sidebar as
+      sidebar's edge (with this bar's padding); it follows the sidebar as
       it folds, the name folding with it into the blanket mark -->
       <div
         class="hidden shrink-0 items-center justify-between lg:flex lg:min-w-[calc(var(--sidebar-width)-1rem)]"
@@ -179,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <AppLogo small mark={!showNavigationSideBar.value} />
         </div>
         <button
-          class="btn-icon hover:preset-tonal-surface my-2"
+          class="btn-icon hover:preset-tonal-surface my-2 opacity-60 hover:opacity-100"
           title={showNavigationSideBar.value ? 'Hide sidebar' : 'Show sidebar'}
           aria-label={showNavigationSideBar.value
             ? 'Hide sidebar'
@@ -233,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <!-- The page's own items sit on the right, next to the account link,
       which ends where the page's column does; anything at their left starts
-      past the divider where a wide page's content does (the page's margin
+      past the sidebar where a wide page's content does (the page's margin
       and PAGE's padding) -->
       <div
         bind:this={pageItems}
@@ -260,10 +233,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       {#if showNavigationSideBar.value}
-        <!-- Its divider runs the window's height under the top bar, which
-        carries it on up -->
         <div
-          class="border-surface-200-800 hidden min-h-[calc(100dvh-var(--top-bar-height))] w-fit flex-col border-r lg:flex"
+          class="hidden min-h-[calc(100dvh-var(--top-bar-height))] w-fit flex-col lg:flex"
           transition:sidebarSlide
         >
           <div class="mb-4 flex w-fit grow flex-col">
@@ -276,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="mx-auto min-w-0 flex-1 lg:max-w-[calc(var(--breakpoint-xl)-var(--sidebar-width))]"
     >
-      <!-- Clear of the sidebar's divider: with PAGE's gutter, 1.5rem -->
+      <!-- Clear of the sidebar: with PAGE's gutter, 1.5rem -->
       <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
         <WhatsNewBanner />
         {@render main?.()}

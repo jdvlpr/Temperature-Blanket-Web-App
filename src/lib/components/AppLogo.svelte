@@ -24,8 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /**
    * small: the top bar's size (the sidebar's header on wide screens), so
    * it fits over the sidebar.
-   * mark: the blanket in place of the name (while the sidebar is hidden);
-   * one folds away as the other opens, with the sidebar's timing.
+   * mark: the blanket alone, the name folded away (while the sidebar is
+   * hidden), with the sidebar's timing.
    * viewTransition: false for a second logo on screen at once (the menu
    * drawer's), since a view transition's name can be used only once.
    * @type {{ small?: boolean, mark?: boolean, viewTransition?: boolean }}
@@ -53,7 +53,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<!-- The site's name, or the blanket mark while the sidebar is hidden -->
+<!-- The blanket mark and the site's name; just the mark while the sidebar
+is hidden -->
 <button
   class={['text-left', viewTransition && '[view-transition-name:app-logo]']}
   aria-label={PUBLIC_SITE_TITLE}
@@ -66,35 +67,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 >
   <div class="mx-4 flex items-center" aria-hidden="true">
-    {#if mark}
-      <div class="shrink-0" transition:fold>
-        <div class="w-fit overflow-hidden rounded-[0.2rem] shadow">
+    <div class="shrink-0">
+      <div class="w-fit overflow-hidden rounded-[0.2rem] shadow">
+        <div
+          class="flex size-8 flex-col"
+          style:mask-image={HOLE}
+          style:-webkit-mask-image={HOLE}
+        >
+          <!-- These are yarn colorways from the year's most popular project as of March, 2025: /gallery/14729 -->
           <div
-            class="flex size-8 flex-col"
-            style:mask-image={HOLE}
-            style:-webkit-mask-image={HOLE}
-          >
-            <!-- These are yarn colorways from the year's most popular project as of March, 2025: /gallery/14729 -->
-            <div
-              class="w-full flex-auto bg-gradient-to-r from-[#e77e79]/90 to-[#e77e79]"
-            ></div>
-            <div
-              class="w-full flex-auto bg-gradient-to-r from-[#f3d488]/90 to-[#f3d488]"
-            ></div>
-            <div
-              class="w-full flex-auto bg-gradient-to-r from-[#789fb8]/90 to-[#789fb8]"
-            ></div>
-            <div
-              class="w-full flex-auto bg-gradient-to-r from-[#295d7d]/90 to-[#295d7d]"
-            ></div>
-          </div>
+            class="w-full flex-auto bg-gradient-to-r from-[#e77e79]/90 to-[#e77e79]"
+          ></div>
+          <div
+            class="w-full flex-auto bg-gradient-to-r from-[#f3d488]/90 to-[#f3d488]"
+          ></div>
+          <div
+            class="w-full flex-auto bg-gradient-to-r from-[#789fb8]/90 to-[#789fb8]"
+          ></div>
+          <div
+            class="w-full flex-auto bg-gradient-to-r from-[#295d7d]/90 to-[#295d7d]"
+          ></div>
         </div>
       </div>
-    {/if}
+    </div>
     {#if !mark}
       <span
         class={[
-          'h5 text-surface-700 dark:text-surface-100 shrink-0 leading-tight whitespace-nowrap',
+          'h5 text-surface-700 dark:text-surface-100 shrink-0 pl-2.5 leading-tight whitespace-nowrap',
           small && 'text-lg',
         ]}
         transition:fold

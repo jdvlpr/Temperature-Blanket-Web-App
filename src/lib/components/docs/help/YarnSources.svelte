@@ -24,7 +24,7 @@ and on Data Sources & Credits -->
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="flex flex-col gap-2">
+  <div class=" flex flex-col gap-2">
     <p>
       Each yarn's colors came from the site listed with it, on the day shown.
       Real yarn will look different from colors on a screen, and colorways can

@@ -20,7 +20,6 @@ import GroupingWeather from '#lib/components/docs/help/GroupingWeather.svelte';
 import ImportFileRequirements from '#lib/components/docs/help/ImportFileRequirements.svelte';
 import LinkUnavailable from '#lib/components/docs/help/LinkUnavailable.svelte';
 import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
-import ProjectIncludes from '#lib/components/docs/help/ProjectIncludes.svelte';
 import SavedWeatherDays from '#lib/components/docs/help/SavedWeatherDays.svelte';
 import Seasons from '#lib/components/docs/help/Seasons.svelte';
 import YarnSources from '#lib/components/docs/help/YarnSources.svelte';
@@ -53,11 +52,6 @@ export const HELP_TOPICS = {
     title: 'CSV File Requirements',
     href: '/documentation/weather#import-weather-data-file-requirements',
     content: ImportFileRequirements,
-  },
-  'project-includes': {
-    title: 'What a Project Includes',
-    href: '/documentation/weather#project-includes',
-    content: ProjectIncludes,
   },
   'saved-weather-days': {
     title: 'Saved Weather',
