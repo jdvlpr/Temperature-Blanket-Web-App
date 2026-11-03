@@ -16,7 +16,8 @@
 // Bringing saved projects from the main site to the beta. Each site keeps its
 // own browser storage, so the main site (v6) hands them over in the browser:
 //
-//   1. Its Bring My Projects button opens <beta>/beta/import with window.open.
+//   1. Its quiet page /bring-to-beta (on main, linked only from the beta's About
+//      page) opens <beta>/beta/import with window.open.
 //   2. That page posts { type: 'tb-handoff-ready', version: 1 } to its opener,
 //      for the main site's origin only (MAIN_SITE_ORIGIN), every second until
 //      the projects come.

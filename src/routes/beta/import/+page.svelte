@@ -165,10 +165,10 @@ $lib/utils/beta-handoff.ts). Only in the beta's build (+page.ts). -->
           >
         {:else if status === 'not-opened'}
           <p>
-            Open this page with <span class="font-bold">Bring My Projects</span>
-            on
-            <a href={MAIN_SITE_ORIGIN ?? '/'} class="link">{mainName}</a>, in
-            the browser that has your projects.
+            Start from
+            <a href="{MAIN_SITE_ORIGIN ?? ''}/bring-to-beta" class="link"
+              >Bring My Projects on {mainName}</a
+            >, in the browser that has your projects.
           </p>
           <a href={resolve('/beta')} class="link w-fit">About the Beta</a>
         {:else if status === 'timed-out'}

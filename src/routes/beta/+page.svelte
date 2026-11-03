@@ -85,11 +85,15 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
       <section class="flex flex-col gap-2" aria-labelledby="beta-bring">
         <h3 id="beta-bring" class="h4">Bring Your Projects</h3>
         <p>
-          On <a href={mainSite} class="link">{mainName}</a>, choose
-          <span class="font-bold">Bring My Projects</span> in its beta note. It opens
-          this site and copies the projects saved in that browser here. Projects already
-          here are left as they are.
+          In the browser that has your projects, open Bring My Projects on {mainName}.
+          It opens this site and copies the projects saved in that browser here.
+          They stay on {mainName} too, and projects already here are left as they
+          are.
         </p>
+        <a href="{mainSite}/bring-to-beta" class="btn preset-tonal w-fit">
+          Bring My Projects
+          <ExternalLinkIcon class="icon-sm" />
+        </a>
       </section>
 
       <section
