@@ -40,7 +40,7 @@ pnpm dev
 
 #### Local Cloudflare bindings (accounts)
 
-`wrangler.jsonc` gives local development a D1 database (`DB`) and an R2 bucket (`PROJECTS`), stored under `.wrangler/state`. It has no `pages_build_output_dir`, so Cloudflare Pages ignores it for deployed builds; production bindings are set in the Pages dashboard. `pnpm dev`, `pnpm preview` and `wrangler pages dev` all use it.
+`wrangler.jsonc` gives local development a D1 database (`DB`) and an R2 bucket (`PROJECTS`), stored under `.wrangler/state`. It's never deployed: `pnpm dev`, `pnpm preview` and `wrangler pages dev` use it, and its Worker name (`temperature-blanket-local`) matches no deployed Worker. The beta at next.temperature-blanket.com is the `temperature-blanket` Worker, configured by `wrangler.production.jsonc` (its header says where build variables, runtime vars and secrets live); temperature-blanket.com is still the Pages project until launch.
 
 Apply database migrations (from `migrations/`) to the local database:
 
