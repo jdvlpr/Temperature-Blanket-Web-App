@@ -114,6 +114,33 @@ describe('getEvenlyDistributedRangeValuesWithEqualDayCount', () => {
     expect(ranges).toHaveLength(8);
   });
 
+  // The temperature gauge colors highs, averages and lows, so ranges following the
+  // highs still end at the lowest low (and ones following the lows start at the
+  // highest high), as they did before the rain/snow fix.
+  it.each(['tmax', 'tavg', 'tmin'] as const)(
+    'temperature ranges following %s span the highest high to the lowest low',
+    (prop) => {
+      const weatherData = Array.from({ length: 30 }, (_, i) => day(i, i + 10));
+      for (const gaugeDirection of ['high-to-low', 'low-to-high'] as const) {
+        const ranges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+          weatherData,
+          numRanges: 5,
+          prop,
+          gaugeDirection,
+          roundIncrement: true,
+          includeFrom: true,
+          includeTo: false,
+        });
+        const [high, low] =
+          gaugeDirection === 'high-to-low'
+            ? [ranges[0].from, ranges.at(-1)!.to]
+            : [ranges.at(-1)!.to, ranges[0].from];
+        expect(high).toBe(40); // highest high 39
+        expect(low).toBe(-1); // lowest low 0
+      }
+    },
+  );
+
   // Regression: the ends came from tmax/tmin whatever the prop, and days sharing
   // one value (lots of dry days) pushed the ranges below 0, so rain gauges could
   // end with a negative number

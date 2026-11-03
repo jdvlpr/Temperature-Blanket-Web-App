@@ -114,7 +114,19 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
   // Create a list to store the from and to values for each range.
   const rangeValues: GaugeRange[] = [];
   let startValue: number;
-  const values = _weatherData.map((day) => day[prop][_units]!);
+  // The temperature gauge colors highs, averages and lows alike, so whichever one the
+  // breakpoints follow, the ends reach the highest high and the lowest low, so every
+  // temperature has a color. Other gauges use their own values.
+  const isTemp = prop === 'tmax' || prop === 'tavg' || prop === 'tmin';
+  const values = isTemp
+    ? weatherData
+        .flatMap((day) => [
+          day.tmax[_units],
+          day.tavg[_units],
+          day.tmin[_units],
+        ])
+        .filter((n): n is number => n !== null)
+    : _weatherData.map((day) => day[prop][_units]!);
   const maxValue = Math.max(...values);
   const minValue = Math.min(...values);
   // Rain and snow can't go below 0. A range ending at 0 still includes 0 (see isValueInRange)
