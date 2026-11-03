@@ -83,7 +83,7 @@ HELP_TOPICS). -->
     color, it's a short note with
     <span class="font-bold">Review changes</span>; when some do,
     <span class="font-bold">Update Past Days</span> (off to start) says how many days
-    in your blanket would change color, and which source has newer values. Turn everything
+    in the project would change color, and which source has newer values. Turn everything
     off to change nothing; the new days are still offered later.
   </p>
   <p>

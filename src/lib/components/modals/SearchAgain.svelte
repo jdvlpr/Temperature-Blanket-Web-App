@@ -155,7 +155,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
     if (dates.size !== 1 || !date) return '';
     return date === localToday()
       ? 'earlier today'
-      : `on ${utcDate(date, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+      : `${utcDate(date, { month: 'short', day: 'numeric', year: 'numeric' })}`;
   });
 
   // Days already made (through the project's progress) aren't offered
@@ -209,7 +209,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   // Which saved days have newer values: "9 days saved on Mar 3"
   const savedDays = $derived(
     savedOn
-      ? `${fresh.length} ${pluralize('day', fresh.length)} saved ${savedOn}`
+      ? `${fresh.length} ${pluralize('day', fresh.length)}`
       : `${fresh.length} saved ${pluralize('day', fresh.length)}`,
   );
   // Nothing in the blanket changes color: a short note, not a card
@@ -220,13 +220,13 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   const updateSummary = $derived(
     [
       colorCount
-        ? `${colorCount} ${pluralize('day', colorCount)} ${madeColorCount ? 'not made yet ' : 'in your blanket '}would change color.`
+        ? `${colorCount} ${pluralize('day', colorCount)} ${madeColorCount ? 'not made yet ' : 'in the project '}would change color.`
         : madeColorCount
           ? 'No colors in the days not made yet would change.'
-          : 'No colors in your blanket would change.',
+          : 'No colors in the project would change.',
       madeColorCount &&
         `${madeColorCount} ${madeColorCount === 1 ? 'day you’ve made stays' : 'days you’ve made stay'} as ${madeColorCount === 1 ? 'it is' : 'they are'}.`,
-      `${sources} has newer values for ${savedDays}. Weather sources correct readings as stations report in. This is normal.`,
+      `${sources} has newer values for ${savedDays}. Weather sources occasionally correct data. This is normal.`,
     ]
       .filter(Boolean)
       .map((line) => `<span class="mt-1 block first:mt-0">${line}</span>`)
@@ -635,7 +635,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
       </label>
     {/if}
     {#if fresh.some((c) => !use.has(c.key))}
-      <p class="text-surface-700-300 text-center text-xs">
+      <p class="text-surface-700-300 text-center text-sm">
         Your saved values stay as they are, and we won't ask about these days
         again unless they change again. Review them anytime in the weather
         table, where they're marked with <HistoryIcon
@@ -690,9 +690,12 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
 
     {#if quiet}
       <!-- Nothing in the blanket changes color: just say so -->
-      <div class="flex flex-col gap-2 px-2" data-testid="past-days-note">
+      <div
+        class="flex flex-col items-start gap-2 px-2"
+        data-testid="past-days-note"
+      >
         <p class="text-sm">
-          {sources} refined {savedDays}. No colors in your blanket change.
+          {sources} refined {savedDays}. No colors in the project change.
         </p>
         {@render notes()}
         <button
@@ -704,11 +707,8 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
         </button>
       </div>
     {:else}
-      <div
-        class="bg-surface-100 dark:bg-surface-900 rounded-container flex flex-col gap-3 border border-gray-300 pb-4 dark:border-gray-700"
-      >
+      <div class=" flex flex-col gap-3 pb-4">
         <ToggleSwitch
-          bare
           label="Update Past Days"
           details={pickedByHand
             ? `${use.size} of ${all.length} changed ${pluralize('day', all.length)} picked`
@@ -717,19 +717,15 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
           onchange={(e) =>
             setUpdate((e.currentTarget as HTMLInputElement).checked)}
         />
-        <div class="px-4">{@render notes()}</div>
-        {#if colorChanges.length}
+        <div class="">{@render notes()}</div>
+        {#if colorChanges.length && progress.madeThrough}
           <div
-            class="flex flex-wrap items-center justify-between gap-2 px-4 text-sm"
+            class="flex flex-wrap items-center justify-start gap-2 px-4 text-sm"
             data-testid="again-progress"
           >
             <span>
-              {#if progress.madeThrough}
-                Made through {shortDay(progress.madeThrough)}: those days stay
-                as they are.
-              {:else}
-                Not started: every day can be updated.
-              {/if}
+              Made through {shortDay(progress.madeThrough)}: those days stay as
+              they are.
             </span>
             <button
               type="button"
@@ -740,16 +736,18 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
             </button>
           </div>
         {/if}
-        <div class="flex justify-center">
-          <button type="button" class="btn preset-tonal" onclick={openSheet}>
-            View All Changes <ChevronRightIcon />
-          </button>
-        </div>
+        <button
+          type="button"
+          class="btn preset-tonal w-fit"
+          onclick={openSheet}
+        >
+          Choose which days to update <ChevronRightIcon />
+        </button>
       </div>
     {/if}
 
     {#if autoGauges.length}
-      <p class="text-surface-700-300 text-sm">
+      <p class="text-surface-700-300 mx-auto text-sm">
         Your {autoNames} ranges stay as they are. You can update them afterward.
       </p>
     {/if}
