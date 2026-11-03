@@ -102,7 +102,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   param: param as typeof setting.param,
                 })}
             >
-              {param === 'any' ? 'Any' : paramLabel(param as typeof params[number])}
+              {param === 'any'
+                ? 'Any'
+                : paramLabel(param as (typeof params)[number])}
             </button>
           {/each}
         </div>
@@ -122,11 +124,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               type="button"
               role="radio"
               aria-checked={on}
-              aria-label="Color {index + 1}{color.name ? `: ${color.name}` : ''}"
+              aria-label="Color {index + 1}{color.name
+                ? `: ${color.name}`
+                : ''}"
               title="Color {index + 1}{color.name ? `: ${color.name}` : ''}"
               class={[
                 'flex size-8 items-center justify-center rounded-full ring-1 ring-black/25',
-                on && 'ring-primary-500 ring-offset-surface-100-900 ring-2 ring-offset-2',
+                on &&
+                  'ring-primary-500 ring-offset-surface-100-900 ring-2 ring-offset-2',
               ]}
               style:background-color={color.hex}
               style:color={color.hex ? getTextColor(color.hex) : undefined}

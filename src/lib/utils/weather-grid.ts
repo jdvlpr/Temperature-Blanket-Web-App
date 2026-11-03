@@ -128,7 +128,8 @@ export function dateRangeLabel(
       day: 'numeric',
       ...(years && { year: 'numeric' }),
     });
-  if (from && to) return from === to ? show(from) : `${show(from)} – ${show(to)}`;
+  if (from && to)
+    return from === to ? show(from) : `${show(from)} – ${show(to)}`;
   if (from) return `From ${show(from)}`;
   if (to) return `Through ${show(to)}`;
   return 'Dates';
@@ -154,9 +155,7 @@ export const colorChipLabel = (valueLabel: string | null, index: number) =>
  * gauge as `index`), `'outside'` for a value the gauge has but in none of
  * its ranges, or null with no gauge or no value */
 export type GridColor<C = unknown> =
-  | (C & { index: number; gaugeLength: number | undefined })
-  | 'outside'
-  | null;
+  (C & { index: number; gaugeLength: number | undefined }) | 'outside' | null;
 
 /** The line under a value with Show Colors on: "Color 3", "Color 2 → 3"
  * when it changes, "No color" for none */
@@ -178,10 +177,7 @@ export const colorChanges = (now: GridColor, was: GridColor) =>
   (was && was !== 'outside' ? was.index : null);
 
 /** How much a value changed, signed, as precise as the values: "+6.84", "−2" */
-export function differenceText(
-  from: number | null,
-  to: number | null,
-): string {
+export function differenceText(from: number | null, to: number | null): string {
   if (from === null || to === null) return '';
   const places = Math.max(
     ...[from, to].map((n) => `${n}`.split('.')[1]?.length ?? 0),
@@ -207,7 +203,12 @@ export function compareCells(
   direction: SortDirection = 'ascending',
 ): number {
   const missing = (v: unknown) =>
-    v === null || v === undefined || v === '' || v === '-' || v === '–' || v === '—';
+    v === null ||
+    v === undefined ||
+    v === '' ||
+    v === '-' ||
+    v === '–' ||
+    v === '—';
   if (missing(a) && missing(b)) return 0;
   if (missing(a)) return 1;
   if (missing(b)) return -1;
@@ -228,8 +229,7 @@ export function sortRows<Row>(
   return rows
     .map((row, index) => ({ row, index, value: valueOf(row) }))
     .sort(
-      (a, b) =>
-        compareCells(a.value, b.value, direction) || a.index - b.index,
+      (a, b) => compareCells(a.value, b.value, direction) || a.index - b.index,
     )
     .map(({ row }) => row);
 }

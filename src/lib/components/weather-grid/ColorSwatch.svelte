@@ -47,7 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if c === 'outside' || !c}
     <span
       class="block flex-1"
-      style:background-image="repeating-linear-gradient(45deg, transparent 0 2px, rgb(128 128 128 / 0.6) 2px 4px)"
+      style:background-image="repeating-linear-gradient(45deg, transparent 0
+      2px, rgb(128 128 128 / 0.6) 2px 4px)"
     ></span>
   {:else}
     <span class="block flex-1" style:background-color={c.hex}></span>

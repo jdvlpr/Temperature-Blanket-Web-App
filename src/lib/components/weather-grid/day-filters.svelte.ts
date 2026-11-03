@@ -182,9 +182,7 @@ export class DayFilters<Row> {
     if (this.places.length > 1)
       list.push({
         id: 'place',
-        label: this.on.has('place')
-          ? locationName(this.place)
-          : 'Location',
+        label: this.on.has('place') ? locationName(this.place) : 'Location',
         matches: (row) => reader.location(row) === this.place,
         available: true,
         setting: true,
@@ -215,7 +213,9 @@ export class DayFilters<Row> {
               : [setting.param];
           return params.some((param) => {
             const color = of(row, param);
-            return !!color && color !== 'outside' && color.index === setting.index;
+            return (
+              !!color && color !== 'outside' && color.index === setting.index
+            );
           });
         },
         available: true,

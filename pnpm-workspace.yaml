@@ -20,4 +20,4 @@ minimumReleaseAgeExclude:
   - pdfjs-dist@6.5.438
 
 trustPolicyExclude:
-    - "better-auth"
+  - 'better-auth'

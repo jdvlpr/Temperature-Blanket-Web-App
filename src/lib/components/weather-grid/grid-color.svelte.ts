@@ -35,8 +35,7 @@ export function gridColor(
   const color = getColorInfo({ param, value });
   if (typeof color.index === 'number') return color as SwatchColor;
   // A value with a gauge but in none of its ranges, so no yarn
-  if (value !== null && typeof color.gaugeLength === 'number')
-    return 'outside';
+  if (value !== null && typeof color.gaugeLength === 'number') return 'outside';
   return null;
 }
 

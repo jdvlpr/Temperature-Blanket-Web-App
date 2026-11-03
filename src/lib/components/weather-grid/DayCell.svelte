@@ -79,7 +79,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     {/if}
     {#if labelFor}
-      <label for={labelFor} class="cursor-pointer text-sm whitespace-nowrap tabular-nums"
+      <label
+        for={labelFor}
+        class="cursor-pointer text-sm whitespace-nowrap tabular-nums"
         >{date}</label
       >
     {:else}

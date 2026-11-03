@@ -226,8 +226,10 @@ fills from each day's neighbors whether shown or not. -->
       edited: (row) => editedRows.has(row),
       color: {
         of: (row, param) =>
-          colorOf(param as EditableParam, valueAt(row, param as EditableParam)) ??
-          null,
+          colorOf(
+            param as EditableParam,
+            valueAt(row, param as EditableParam),
+          ) ?? null,
         params: columns,
       },
     }),
@@ -365,8 +367,7 @@ fills from each day's neighbors whether shown or not. -->
   // Scrolling (only the rows in view are drawn)
   // ***************
 
-  let gridView: ReturnType<typeof WeatherGrid<number>> | undefined =
-    $state();
+  let gridView: ReturnType<typeof WeatherGrid<number>> | undefined = $state();
   let grid: HTMLDivElement | undefined = $state();
 
   // Rows: the value and the line under it (what it was), and "Color 3"
@@ -704,9 +705,7 @@ fills from each day's neighbors whether shown or not. -->
     const everywhere = selectedCount === 1;
     // The days to fill: every one shown, or those selected
     const targets = new Set(
-      everywhere
-        ? view
-        : view.slice(selection.rows[0], selection.rows[1] + 1),
+      everywhere ? view : view.slice(selection.rows[0], selection.rows[1] + 1),
     );
     const [left, right] = everywhere
       ? [0, columns.length - 1]
@@ -1099,7 +1098,7 @@ fills from each day's neighbors whether shown or not. -->
         aria-selected={selected}
         class={[
           CELL,
-          'scroll-mt-10 scroll-ml-40 cursor-cell',
+          'cursor-cell scroll-mt-10 scroll-ml-40',
           changed && !selected && CELL_TINT.changed,
           selected && CELL_TINT.selected,
           isCursor && 'outline-primary-500 outline-2 -outline-offset-2',

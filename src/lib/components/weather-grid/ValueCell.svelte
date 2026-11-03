@@ -84,7 +84,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if typing && children}
     {@render children()}
   {:else}
-    <span class={['truncate', changed && 'font-semibold', faint && 'opacity-50']}>
+    <span
+      class={['truncate', changed && 'font-semibold', faint && 'opacity-50']}
+    >
       {#if text === ''}
         <span aria-label="missing">–</span>
       {:else}

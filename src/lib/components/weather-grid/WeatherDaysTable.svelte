@@ -30,7 +30,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import type { WeatherParam } from '#lib/types/gauge-types.js';
-  import { dateToISO8601String, getIsRecentDate } from '#lib/utils/date-utils.js';
+  import {
+    dateToISO8601String,
+    getIsRecentDate,
+  } from '#lib/utils/date-utils.js';
   import { openEditWeather } from '#lib/utils/open-edit-weather.js';
   import { openProgress } from '#lib/utils/open-progress.js';
   import { convertTime } from '#lib/utils/unit-utils.svelte.js';
@@ -46,7 +49,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { untrack } from 'svelte';
   import DayCell from './DayCell.svelte';
   import DayFilterSetting from './DayFilterSetting.svelte';
-  import { DayFilters, locationName, type ColorSetting } from './day-filters.svelte.js';
+  import {
+    DayFilters,
+    locationName,
+    type ColorSetting,
+  } from './day-filters.svelte.js';
   import { gridColor, hasGauge, showColors } from './grid-color.svelte.js';
   import { CELL, TINT, type GridColumn } from './grid-styles.js';
   import GridToolbar from './GridToolbar.svelte';
@@ -88,9 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** A value as a number (minutes of daytime, the moon's phase), null when missing */
   const numberAt = (row: Row, param: WeatherParam['id']): number | null =>
     (weather.getWeatherValue({ dayIndex: row.index, param }) as
-      | number
-      | null
-      | undefined) ?? null;
+      number | null | undefined) ?? null;
 
   const textAt = (row: Row, param: WeatherParam['id']) => {
     const value = numberAt(row, param);
@@ -110,7 +115,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       date: (row) => row.date,
       location: (row) => row.location,
       missing: (row) =>
-        params.some((param) => param !== 'moon' && numberAt(row, param) === null),
+        params.some(
+          (param) => param !== 'moon' && numberAt(row, param) === null,
+        ),
       ...(progress.madeThrough && {
         made: (row: Row) => madeOf(row)?.made ?? null,
       }),
@@ -171,14 +178,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function editAt(row: Row, param: WeatherParam['id']) {
     openEditWeather({
-      day: { date: row.date, location: row.location, param: param as EditableParam },
+      day: {
+        date: row.date,
+        location: row.location,
+        param: param as EditableParam,
+      },
     });
   }
 
   const editable = (param: WeatherParam['id']) => !byWeek && param !== 'moon';
 </script>
 
-<div class={['flex flex-col gap-3 text-left', scroll === 'box' && 'px-2 pb-2 sm:px-4']}>
+<div
+  class={[
+    'flex flex-col gap-3 text-left',
+    scroll === 'box' && 'px-2 pb-2 sm:px-4',
+  ]}
+>
   <GridToolbar
     {chips}
     ontoggle={filters.toggle}
@@ -262,7 +278,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() => editAt(row, param)}
           ></button>
         {/if}
-        <div class="pointer-events-none relative h-full [&_button]:pointer-events-auto">
+        <div
+          class="pointer-events-none relative h-full [&_button]:pointer-events-auto"
+        >
           <ValueCell
             {text}
             color={showColors.value && hasGauge(param)

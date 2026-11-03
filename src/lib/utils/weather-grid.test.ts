@@ -24,7 +24,12 @@ const rows: Row[] = [
 ];
 
 const filters: GridFilter<Row>[] = [
-  { id: 'missing', label: 'Missing', matches: (r) => r.high === null, counted: true },
+  {
+    id: 'missing',
+    label: 'Missing',
+    matches: (r) => r.high === null,
+    counted: true,
+  },
   { id: 'made', label: 'Made', matches: (r) => r.made, counted: true },
   { id: 'never', label: 'Never', matches: () => false, counted: true },
   {
@@ -153,9 +158,11 @@ describe('sorting', () => {
       { id: 'b', v: 1 },
       { id: 'c', v: 2 },
     ];
-    expect(
-      sortRows(list, (r) => r.v, 'descending').map((r) => r.id),
-    ).toEqual(['a', 'c', 'b']);
+    expect(sortRows(list, (r) => r.v, 'descending').map((r) => r.id)).toEqual([
+      'a',
+      'c',
+      'b',
+    ]);
     expect(sortRows(list, null, 'ascending')).toEqual(list);
   });
 

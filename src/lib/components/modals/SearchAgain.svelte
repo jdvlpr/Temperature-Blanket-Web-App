@@ -471,8 +471,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
         UNIT_LABELS.temperature[units],
       ),
       matches: (row) =>
-        row.temperature !== null &&
-        row.temperature >= biggerTemperature - 1e-9,
+        row.temperature !== null && row.temperature >= biggerTemperature - 1e-9,
       available: rows.some((r) => r.temperature !== null),
       setting: true,
     },

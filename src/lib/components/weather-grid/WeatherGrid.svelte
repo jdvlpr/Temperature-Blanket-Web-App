@@ -32,13 +32,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { HTMLAttributes } from 'svelte/elements';
   import type { SortDirection } from '#lib/utils/weather-grid.js';
   import { VirtualRows } from './virtual-rows.svelte.js';
-  import {
-    SwatchDetails,
-    setSwatchDetails,
-  } from './grid-color.svelte.js';
+  import { SwatchDetails, setSwatchDetails } from './grid-color.svelte.js';
   import SwatchDetailsPopover from './SwatchDetailsPopover.svelte';
   import type { GridColumn } from './grid-styles.js';
-
 
   let {
     rows,
@@ -187,8 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const viewTop = window.scrollY + topBar + headerHeight;
       const at = top + rowTop;
       if (align === 'nearest') {
-        if (at < viewTop)
-          window.scrollTo({ top: at - topBar - headerHeight });
+        if (at < viewTop) window.scrollTo({ top: at - topBar - headerHeight });
         else if (at + rowHeight > window.scrollY + window.innerHeight)
           window.scrollTo({ top: at + rowHeight - window.innerHeight });
       } else
@@ -292,7 +287,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:this={header}
     role="rowgroup"
     class={[
-      'bg-surface-100-900 border-surface-200-800 shrink-0 overflow-hidden border-b text-sm [scrollbar-gutter:stable]',
+      'bg-surface-100-900 border-surface-200-800 shrink-0 [scrollbar-gutter:stable] overflow-hidden border-b text-sm',
       scroll === 'window' ? 'sticky top-(--top-bar-height,0px) z-20' : '',
     ]}
   >

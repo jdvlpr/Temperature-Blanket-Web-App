@@ -86,8 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const daytime = (row: Row) =>
     (weather.getWeatherValue({ dayIndex: row.index, param: 'dayt' }) as
-      | number
-      | null) ?? null;
+      number | null) ?? null;
 
   // The stitch columns, by where the daytime goes
   const stitchColumns: (GridColumn & { side: 'left' | 'center' | 'right' })[] =
@@ -97,8 +96,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       switch (position) {
         case 'right':
           return [
-            { id: 'left', side: 'left', label: 'Night stitches', unit: night.slice(1, -1) },
-            { id: 'right', side: 'right', label: 'Daytime stitches', unit: day.slice(1, -1) },
+            {
+              id: 'left',
+              side: 'left',
+              label: 'Night stitches',
+              unit: night.slice(1, -1),
+            },
+            {
+              id: 'right',
+              side: 'right',
+              label: 'Daytime stitches',
+              unit: day.slice(1, -1),
+            },
           ];
         case 'center':
           return [
@@ -110,12 +119,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
           return [
             { id: 'left', side: 'left', label: 'Daytime', unit: 'left side' },
             { id: 'center', side: 'center', label: 'Night', unit: 'center' },
-            { id: 'right', side: 'right', label: 'Daytime', unit: 'right side' },
+            {
+              id: 'right',
+              side: 'right',
+              label: 'Daytime',
+              unit: 'right side',
+            },
           ];
         default:
           return [
-            { id: 'left', side: 'left', label: 'Daytime stitches', unit: day.slice(1, -1) },
-            { id: 'right', side: 'right', label: 'Night stitches', unit: night.slice(1, -1) },
+            {
+              id: 'left',
+              side: 'left',
+              label: 'Daytime stitches',
+              unit: day.slice(1, -1),
+            },
+            {
+              id: 'right',
+              side: 'right',
+              label: 'Night stitches',
+              unit: night.slice(1, -1),
+            },
           ];
       }
     });
