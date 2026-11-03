@@ -37,6 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title?: string;
   } = $props();
 
+  // A value in none of its gauge's ranges
+  const OUTSIDE_STRIPES =
+    'repeating-linear-gradient(45deg, transparent 0 2px, rgb(128 128 128 / 0.6) 2px 4px)';
+
   const details = getSwatchDetails();
   const changed = $derived(was !== undefined && colorChanges(color, was));
   const shown = $derived(color && color !== 'outside' ? color : null);
@@ -45,11 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet fill(c: SwatchColor)}
   {#if c === 'outside' || !c}
-    <span
-      class="block flex-1"
-      style:background-image="repeating-linear-gradient(45deg, transparent 0
-      2px, rgb(128 128 128 / 0.6) 2px 4px)"
-    ></span>
+    <span class="block flex-1" style:background-image={OUTSIDE_STRIPES}></span>
   {:else}
     <span class="block flex-1" style:background-color={c.hex}></span>
   {/if}
