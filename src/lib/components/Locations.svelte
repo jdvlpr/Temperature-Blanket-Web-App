@@ -34,17 +34,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
-  // The words before a link to its gallery page, when its weather is from one
-  const LOADED_LABELS: Record<LoadedFrom, string> = {
-    saved: 'Loaded saved project',
-    'saved-custom': 'Loaded saved project with custom weather',
-    link: 'Loaded project from link',
-    gallery: 'Loaded project from',
+  // Whether the weather showing is the one the project loaded with (a saved
+  // project's, or its gallery page's): a search clears it, and a link never
+  // holds weather
+  const weatherLoaded = $derived(
+    weather.wasLoadedFromStorage && !!weather.data.length,
+  );
+
+  // The words before a link to its gallery page, when it's from one
+  const loadedLabel = (from: LoadedFrom, withWeather: boolean): string => {
+    switch (from) {
+      case 'saved':
+        return withWeather
+          ? 'Loaded saved project and weather data'
+          : 'Loaded saved project';
+      case 'saved-custom':
+        return withWeather
+          ? 'Loaded saved project and custom weather data'
+          : 'Loaded saved project';
+      case 'link':
+        return 'Loaded project';
+      case 'gallery':
+        return withWeather
+          ? 'Loaded project and weather data from'
+          : 'Loaded project from';
+    }
   };
 
   const validLoadedProject = $derived(
-    (weather.wasLoadedFromStorage && !!weather.data.length) ||
-      project.status.wasLoaded,
+    weatherLoaded || project.status.wasLoaded,
   );
 </script>
 
@@ -53,9 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   weather may have changed since, apart from the places below; centered,
   like the card's buttons, while the fields stay left-aligned -->
   {#if loading || validLoadedProject || weatherDays.settledEarly.length}
-    <div
-      class="border-surface-300 dark:border-surface-600 mb-4 flex flex-col items-center gap-1 border-b pb-4 text-center"
-    >
+    <div class="mb-2 flex flex-col items-center gap-1 pb-4 text-center">
       {#if loading}
         <p class="h-auto animate-pulse text-sm">Loading project...</p>
       {:else if validLoadedProject}
@@ -64,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <CircleCheckBigIcon class="icon-sm text-success-900-100" />
           <span data-testid="loaded-from"
-            >{LOADED_LABELS[project.status.loadedFrom ?? 'saved']}
+            >{loadedLabel(project.status.loadedFrom ?? 'saved', weatherLoaded)}
             {#if project.status.loadedFrom === 'gallery'}
               {#if project.status.galleryPostId}
                 <a

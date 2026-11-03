@@ -85,10 +85,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div
-  class="bg-surface-100 dark:bg-surface-900 flex flex-col p-4 text-left"
->
-  <h1 class="text-2xl font-bold">{@render heading()}</h1>
+<div class="bg-surface-100 dark:bg-surface-900 flex flex-col p-4 text-left">
+  <h1 class="h4 text-surface-700-300">{@render heading()}</h1>
   {#if subtitle}
     <p>{@render subtitle()}</p>
   {/if}
