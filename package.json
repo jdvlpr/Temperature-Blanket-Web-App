@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "dev:accounts": "PUBLIC_ACCOUNTS_ENABLED=true SYNC_ENABLED=true vite dev",
+    "dev:accounts": "PUBLIC_ACCOUNTS_ENABLED=true SYNC_ENABLED=true PUBLIC_SITE_CHANNEL=beta vite dev",
     "build": "vite build && pagefind --site .svelte-kit/cloudflare --output-subdir pagefind",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
