@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   The filters that are on, as chips that each remove theirs, shown while the
   filter panel is closed. `onremove` runs after any chip's, since that chip
-  goes away (e.g. to focus the Filters button).
+  goes away (e.g. to focus the Filters button). Centered, or with `start` at
+  the left edge, under a Filters button there.
 -->
 <script module lang="ts">
   import { getBrands } from '#lib/data/yarns/colorways.svelte.js';
@@ -41,16 +42,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let {
     chips,
     disabled = false,
+    start = false,
     onremove,
   }: {
     chips: { label: string; remove: () => void }[];
     disabled?: boolean;
+    /** At the left edge, under a Filters button there, not centered */
+    start?: boolean;
     onremove?: () => void;
   } = $props();
 </script>
 
 {#if chips.length}
-  <ul class="flex flex-wrap justify-center gap-2" aria-label="Filters on">
+  <ul
+    class={['flex flex-wrap gap-2', start ? 'justify-start' : 'justify-center']}
+    aria-label="Filters on"
+  >
     {#each chips as chip (chip.label)}
       <li>
         <button

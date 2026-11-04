@@ -17,9 +17,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Above every weather table, the same as the site's other lists: Filters (a
   panel of the table's filters (chipsOf), each with how many days it alone
   matches and, when on, its setting below it; while closed, the ones on as
-  removable chips, FilterChips) and View (GridViewMenu), then the table's own
-  (`children`, e.g. Go to a date). Then "Showing 12 of 365 days", and with
-  `pick`, Select Shown / Clear Shown / Invert.
+  removable chips, FilterChips, starting right below it), View
+  (GridViewMenu), and the table's own (`children`, e.g. Go to a date) at the
+  end, first on phones. Then "Showing 12 of 365 days", and with `pick`,
+  Select Shown / Clear Shown / Invert.
 -->
 <script lang="ts">
   import FiltersButton from '#lib/components/buttons/FiltersButton.svelte';
@@ -74,18 +75,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-3 text-left">
-  <div class="flex flex-wrap items-center gap-2">
-    {#if chips.length}
-      <FiltersButton
-        bind:this={filtersButton}
-        bind:open
-        count={on.length}
-        controls={panelId}
-      />
-    {/if}
-    <GridViewMenu {values} />
+  <!-- Filters at the left edge, its chips starting right below it; the
+    table's own (Go to) is first on phones, so it never comes between
+    Filters and its panel or chips -->
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      {#if chips.length}
+        <FiltersButton
+          bind:this={filtersButton}
+          bind:open
+          count={on.length}
+          controls={panelId}
+        />
+      {/if}
+      <GridViewMenu {values} />
+    </div>
     {#if children}
-      <div class="ml-auto flex flex-wrap items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2 max-md:order-first">
         {@render children()}
       </div>
     {/if}
@@ -144,6 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           remove: () => ontoggle(chip.id, false),
         }))}
         onremove={() => filtersButton?.focus()}
+        start
       />
     {/if}
   {/if}
