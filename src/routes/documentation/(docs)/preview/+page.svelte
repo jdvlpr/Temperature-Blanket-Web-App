@@ -103,8 +103,8 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="create-a-preview" class="text-2xl font-bold">Choose a Pattern</h2>
   <p>
-    Choose a <span class="font-bold">Pattern</span> above the preview. With weekly
-    weather, each "day" below is a week.
+    Choose a <span class="font-bold">Pattern</span> in the toolbar above the preview.
+    With weekly weather, each "day" below is a week.
   </p>
   <dl class="flex flex-col gap-2">
     {#each patterns as { name, about } (name)}
@@ -115,8 +115,8 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     {/each}
   </dl>
   <p>
-    Press <span class="font-bold">Information</span> above a preview for more about
-    its pattern and what's in this one.
+    Press <span class="font-bold">Information</span> in the settings below a preview
+    for more about its pattern and what's in this one.
   </p>
   <DocsShot
     src="preview/rows"
@@ -179,8 +179,9 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     <ul class="ml-6 list-disc space-y-1">
       <li>
         Set it in <span class="font-bold">Progress</span>: the Progress button
-        above the preview (once it's set, its menu's Edit Progress…), the Project menu, or a day's circle in the weather
-        table all open it. ‹ and › move it a day; tap the date to pick any day.
+        above the preview (once it's set, its menu's Edit Progress…), the
+        Project menu, or a day's circle in the weather table all open it. ‹ and
+        › move it a day; tap the date to pick any day.
       </li>
       <li>
         Once it's set, <span class="font-bold">Progress</span> ›

@@ -146,8 +146,9 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     You've <a href="/documentation/weather#edit-weather-data" class="link"
       >edited or imported weather</a
     >, so they're locked to keep your changes. Press
-    <span class="font-bold">Reload Weather Data</span> to start over with the weather
-    source, or open a new project.
+    <span class="font-bold">Get Weather Data</span>, then
+    <span class="font-bold">Reload Weather Data</span>, to start over with the
+    weather source, or open a new project.
   </p>
 </section>
 

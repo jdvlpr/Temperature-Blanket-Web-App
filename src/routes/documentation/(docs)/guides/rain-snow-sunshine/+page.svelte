@@ -131,7 +131,7 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
   <h3 class="text-lg font-bold">The gauge I want isn't there</h3>
   <p>
     A gauge shows only when the weather has what it needs. Try the other weather
-    source in <span class="font-bold">Weather Source</span>.
+    source: press <span class="font-bold">Source</span> in the Weather step's toolbar.
   </p>
   <h3 class="text-lg font-bold">"Error: Mixed Parameters"</h3>
   <p>

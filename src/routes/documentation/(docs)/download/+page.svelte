@@ -26,7 +26,9 @@ single page's (OLD_ANCHORS). -->
   Take your project with you: a PDF to print, the weather as a spreadsheet, or a
   picture of the preview. Press <span class="font-bold">Project</span> at the
   top of the Project Planner, then <span class="font-bold">Download</span>, and
-  choose one. The same downloads are under the weather table and the preview.
+  choose one. The weather table's toolbar has its own
+  <span class="font-bold">Download</span> too, and the preview's
+  <span class="font-bold">Share</span> menu downloads its picture.
 </p>
 
 <section class="flex flex-col gap-3">

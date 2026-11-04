@@ -256,6 +256,9 @@ export const GUIDES: DocsPage[] = [
       'csv',
       'track',
       'checklist',
+      'progress',
+      'where am i',
+      'rows made',
       'download',
       'image',
     ],
@@ -424,6 +427,32 @@ export const docsHref = (page: Pick<DocsPage, 'kind' | 'slug'>) =>
   page.kind === 'reference'
     ? `/documentation/${page.slug}`
     : `/documentation/${page.kind === 'guide' ? 'guides' : 'basics'}/${page.slug}`;
+
+/** A card picture's size: made by scripts/docs-screenshots.ts (CARDS) at the
+ * size share pictures are best at */
+export const DOCS_CARD_SIZE = { width: 1200, height: 630 };
+
+/** A page's card picture, light and dark: its own `image` (Basics, the
+ * same in both), else the shot of the site made for it */
+export const docsCardImage = (page: Pick<DocsPage, 'slug' | 'image'>) =>
+  page.image
+    ? { light: page.image.src, dark: page.image.src, ...pick(page.image) }
+    : {
+        light: `/images/docs/cards/${page.slug}-light.jpg`,
+        dark: `/images/docs/cards/${page.slug}-dark.jpg`,
+        ...DOCS_CARD_SIZE,
+      };
+
+/** The picture shown when a page is shared (og:image): its card's, light */
+export const docsShareImage = (page: Pick<DocsPage, 'slug' | 'image'>) => {
+  const { light, width, height } = docsCardImage(page);
+  return { src: light, width, height };
+};
+
+const pick = ({ width, height }: { width: number; height: number }) => ({
+  width,
+  height,
+});
 
 /** The page at a path, ignoring a trailing slash */
 export const docsPageAt = (pathname: string) => {

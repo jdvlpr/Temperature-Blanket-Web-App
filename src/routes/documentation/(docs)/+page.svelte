@@ -36,6 +36,7 @@ Back doesn't return to it. -->
     KIND_HEADINGS,
     OLD_ANCHORS,
     REFERENCE,
+    docsCardImage,
     docsHref,
   } from '#lib/docs/docs-index.js';
   import { onMount } from 'svelte';
@@ -96,13 +97,32 @@ Back doesn't return to it. -->
       <p class="opacity-80">{intro}</p>
       <ul class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {#each pages as page (page.slug)}
+          {@const image = docsCardImage(page)}
           <li class="flex">
             <a
               href={docsHref(page)}
-              class={[CARD_BOX, CARD_HOVER, 'flex w-full flex-col gap-1 px-3']}
+              class={[
+                CARD_BOX,
+                CARD_HOVER,
+                'flex w-full flex-col gap-1 overflow-hidden p-0!',
+              ]}
             >
-              <span class="font-bold">{page.title}</span>
-              <span class="text-sm opacity-80">{page.summary}</span>
+              <!-- Light and dark, like DocsShot: only the shown one loads -->
+              {#each [{ theme: 'light', show: 'dark:hidden' }, { theme: 'dark', show: 'hidden dark:block' }] as { theme, show } (theme)}
+                <img
+                  src={theme === 'light' ? image.light : image.dark}
+                  alt=""
+                  width={image.width}
+                  height={image.height}
+                  loading="lazy"
+                  class={[
+                    'border-surface-200-800 aspect-[40/21] w-full border-b object-cover object-top',
+                    show,
+                  ]}
+                />
+              {/each}
+              <span class="px-3 pt-1 font-bold">{page.title}</span>
+              <span class="px-3 pb-3 text-sm opacity-80">{page.summary}</span>
             </a>
           </li>
         {/each}

@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <a
         href="/whats-new"
-        class="btn hover:preset-tonal-surface mb-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 w-fit max-lg:mt-2"
         ><ArrowLeftIcon /> What's New</a
       >
       <Card>

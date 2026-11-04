@@ -45,7 +45,7 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
     <li>
       Press colorways to add them, in order. They line up in the strip at the
       bottom. To find a color, type it in
-      <span class="font-bold">Search by Color</span>, like "sage" or #9CAF88.
+      <span class="font-bold">Search by Color</span>, like "salmon" or #9CAF88.
     </li>
     <li>Press <span class="font-bold">Save</span>.</li>
   </ol>

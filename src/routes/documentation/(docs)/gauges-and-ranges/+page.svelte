@@ -42,9 +42,9 @@ RangesMenu, range-format. Section ids are the old single page's
   <p>
     Every project has a <span class="font-bold">Temperature Gauge</span>. Add
     more to use other weather in the same blanket, like a rain stripe between
-    temperature rows. The buttons above the colors switch between gauges; one
-    with a <span class="font-bold">+</span> isn't in your project yet, and pressing
-    it asks to add it.
+    temperature rows. The buttons above the colors switch between gauges; to add
+    one, press <span class="font-bold">+</span> (Add Gauge) after them and choose
+    it.
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -66,8 +66,8 @@ RangesMenu, range-format. Section ids are the old single page's
     A gauge shows up only when the weather has what it needs. To remove one
     (except temperature), open it, press the
     <span class="font-bold">⋮</span> beside its name and choose
-    <span class="font-bold">Delete</span>. Which gauge a row or square uses is
-    set in the
+    <span class="font-bold">Delete</span> (like Delete Rain Gauge). Which gauge
+    a row or square uses is set in the
     <a href="/documentation/preview" class="link">preview</a>.
   </p>
 </section>
@@ -99,9 +99,10 @@ RangesMenu, range-format. Section ids are the old single page's
       <span class="font-bold">after</span>, or remove it.
     </li>
     <li>
-      <span class="font-bold">Number of colors:</span> the menu above the gauge, up
-      to 99. With your own colors, new ones are added at the end and extra ones are
-      taken off the end. With a gradient, the gradient is remade in that many colors.
+      <span class="font-bold">Number of colors:</span> the menu in the toolbar above
+      the colors, beside Get Colors, up to 99. With your own colors, new ones are
+      added at the end and extra ones are taken off the end. With a gradient, the
+      gradient is remade in that many colors.
     </li>
   </ul>
   <p>

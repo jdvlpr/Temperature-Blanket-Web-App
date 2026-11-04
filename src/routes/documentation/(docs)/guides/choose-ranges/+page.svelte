@@ -18,6 +18,7 @@ repeat…, and how can I make them not overlap?"). Ranges menu labels are
 RangesMenu's; Gauges & Ranges has every option. -->
 
 <script lang="ts">
+  import DocsClip from '#lib/components/docs/DocsClip.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedReference from '#lib/components/docs/RelatedReference.svelte';
 </script>
@@ -96,8 +97,8 @@ RangesMenu's; Gauges & Ranges has every option. -->
     Fit the Ranges to the Yarn You Have
   </h2>
   <p>
-    Have 9 colors? Choose <span class="font-bold">9 Colors</span> in the menu below
-    the gauge. Then change any range by hand:
+    Have 9 colors? Choose <span class="font-bold">9 Colors</span> in the toolbar at
+    the top of the gauge, beside Get Colors. Then change any range by hand:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>Press a range's number.</li>
@@ -105,6 +106,11 @@ RangesMenu's; Gauges & Ranges has every option. -->
       Type the new number, and press <span class="font-bold">Save</span>.
     </li>
   </ol>
+  <DocsClip
+    src="choose-ranges/change-a-range"
+    alt="In the Temperature Gauge, the pointer presses the third color's To number, 20°. It opens for typing, 21 is typed, and Save is pressed. The range is now 23° → 21° with fewer days in it, and the next range starts at 21° with more."
+    caption="Changing where one range ends."
+  />
   <p>
     With <span class="font-bold">Linked ranges</span> on (in the Ranges menu),
     the next range moves with it, so no days are left out. The Ranges button now

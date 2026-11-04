@@ -16,6 +16,7 @@ Short, silent, looping clips that show a step in a guide (`/documentation/guides
 
 1. **Plan it like a guide step:** one task, 8–16 s, starting from where the reader is (e.g. the Weather step's table) and ending on the result (a toast, a changed value). Before writing alt text, check the real labels in the component's markup.
 2. **Add an entry to `CLIPS`:**
+
    ```ts
    {
      name: '<guide-slug>/<what-it-shows>',
@@ -23,6 +24,7 @@ Short, silent, looping clips that show a step in a guide (`/documentation/guides
      play: async (page) => { /* what's recorded */ },
    },
    ```
+
    Reuse the helpers in the script:
    - `planner(page, section, project?)` — the planner with London 2025's weather, at a step
    - `weatherTable(page)` — the Weather step with the table's first rows in view
@@ -33,8 +35,15 @@ Short, silent, looping clips that show a step in a guide (`/documentation/guides
    - `moveTo(page, locator, ms)` — an eased, visible cursor move
    - `clickOn(page, locator, ms)` — move there, check again where the target is, then press with a visible ring
    - `page.keyboard.type(text, { delay: 180 })` — typing slow enough to read
+   - `keepAt(page, locator, top)` — scroll until something stays put at `top` px (the page often scrolls back once)
+   - `visit(page, path)` — any page, without the analytics question
+   - `signIn(page)` — a new account signed in with an emailed code (needs the dev server, or `wrangler pages dev` on an accounts build); then `saveProject(page)` saves the planner's project to it
+   - `dismissToasts(page)` — clears toasts off the frame
+
+   Keep targets in the 800×720 window: `clickOn` doesn't scroll, so a row below the fold (like the Project panel's Share group) gets a click on nothing. Prefer a control already in view (the preview's own Share menu).
 
    Put pauses (`page.waitForTimeout`) after each action, so a reader can follow it. `record()` already holds 1 s on the first frame and 1.8 s on the last.
+
 3. **Record it against the dev server** (usually running; see memory) or a preview build:
    ```bash
    node scripts/docs-screenshots.ts --base https://t-macbook-pro.tail54df88.ts.net:5173 --only <guide-slug>/<what-it-shows>
@@ -47,11 +56,13 @@ Short, silent, looping clips that show a step in a guide (`/documentation/guides
    - no stray toasts or menus
 
    For a closer look at one moment: `ffmpeg -v error -y -ss <seconds> -i static/images/docs/<name>-light.mp4 -frames:v 1 -vf scale=800:-1 <scratchpad>/frame.png`.
+
 5. **Use it on the page:** import `DocsClip`, put it after the steps it shows, and give it:
    - `alt` text describing the motion in order (what's pressed, what's typed, what changes, how it ends)
    - a short `caption`
 
    Make sure the alt text matches what the sheet shows, not what you meant to record.
+
 6. **Run the checks** for what changed: `npx prettier --check`, `npx eslint` on the touched files, and `pnpm check` if a page or component changed.
 
 ## Pitfalls already met

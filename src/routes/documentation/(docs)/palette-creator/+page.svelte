@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 PaletteStatusButton, PaletteTitle, autosave). -->
 
 <script lang="ts">
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 </script>
 
@@ -45,6 +46,11 @@ PaletteStatusButton, PaletteTitle, autosave). -->
     <a href="/documentation/colors-and-yarn" class="link">Colors & Yarn</a> for each
     of these.
   </p>
+  <DocsShot
+    src="palette-creator/palette"
+    alt="The Yarn Palette Creator with six Stylecraft Special DK colorways: a strip of their colors above the toolbar of Get Colors, 6 Colors, Sort and View, then a list of Aster 1003, Lemon 1020, Walnut 1054, Turquoise 1068, Sunshine 1114 and Peony 1127, each with its handle and ⋮."
+    caption="A palette of six yarn colors."
+  />
   <p>
     Choosing a palette from <span class="font-bold">My Palettes</span> or the
     <span class="font-bold">Palette Gallery</span> copies its colors into this
@@ -56,7 +62,7 @@ PaletteStatusButton, PaletteTitle, autosave). -->
     <span class="font-bold">Undo</span> and <span class="font-bold">Redo</span>
     are at the top (<kbd class="kbd">⌘ Cmd</kbd>/<kbd class="kbd">Ctrl</kbd> +
     <kbd class="kbd">z</kbd>, and with <kbd class="kbd">Shift</kbd> to redo). To rename
-    the palette, press the pencil beside its name.
+    the palette, press its name at the top, type a new one, and press Enter.
   </p>
 </section>
 

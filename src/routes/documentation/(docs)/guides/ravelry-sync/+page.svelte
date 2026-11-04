@@ -98,7 +98,12 @@ them. -->
         <span class="font-bold">Status</span>, and the start and finish dates.
       </li>
       <li>
-        <span class="font-bold">Progress</span>: how far along you are.
+        <span class="font-bold">Progress</span>: how far along you are. If
+        you've set the project's
+        <a
+          href="/documentation/guides/print-and-track#keep-your-place"
+          class="link">Progress</a
+        >, it's filled in from that (and the status too, once it's finished).
       </li>
       <li>Notes and <span class="font-bold">Yarns</span>.</li>
       <li>

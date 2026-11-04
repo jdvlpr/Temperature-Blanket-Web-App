@@ -19,6 +19,7 @@ post (which links here). The old anchor about-the-project-planner lands
 here. -->
 
 <script lang="ts">
+  import DocsClip from '#lib/components/docs/DocsClip.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedReference from '#lib/components/docs/RelatedReference.svelte';
   import { MAXIMUM_DAYS_PER_LOCATION } from '#lib/constants/location-constants.js';
@@ -29,6 +30,12 @@ here. -->
   your colors and ranges, a preview, then saving and printing the pattern. Each
   step links to the full details if you want them.
 </p>
+
+<DocsClip
+  src="plan-a-blanket/four-steps"
+  alt="On the Location step, London is typed in the place search and London, England, United Kingdom is chosen from the list, with the dates left at One Year from January 1, 2025. Get Weather Data is pressed and Searching for Weather Data shows, then the Weather step: the year's highs and lows, its chart and the table. Colors in the bar at the bottom shows the Temperature Gauge's colors and ranges, and Preview shows the year as rows."
+  caption="The four steps, from a place to a preview."
+/>
 
 <section class="flex flex-col gap-3">
   <h2 id="what-you-need" class="text-2xl font-bold">What You Need</h2>
@@ -88,15 +95,17 @@ here. -->
   <h2 id="get-the-weather" class="text-2xl font-bold">2. Get the Weather</h2>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Press <span class="font-bold">Search</span>. It takes a few seconds.
+      Press <span class="font-bold">Get Weather Data</span>. It takes a few
+      seconds, then the planner moves on to the
+      <span class="font-bold">Weather</span> step.
     </li>
     <li>
-      Look it over: the <span class="font-bold">Summary</span> has your hottest
-      and coldest days, the <span class="font-bold">Chart</span> shows the whole
-      year, and the <span class="font-bold">Table</span> lists every day.
+      Look it over: the summary at the top has your hottest and coldest days,
+      the chart shows the whole year, and the table below it lists every day.
     </li>
     <li>
-      Prefer °F and inches? Press <span class="font-bold">Units</span> above the weather.
+      Prefer °F and inches? Press <span class="font-bold">Units</span> in the toolbar
+      above the weather.
     </li>
   </ol>
   <p>
@@ -109,13 +118,15 @@ here. -->
 <section class="flex flex-col gap-3">
   <h2 id="choose-colors" class="text-2xl font-bold">3. Choose Your Colors</h2>
   <p>
-    Below the weather is the <span class="font-bold">Temperature Gauge</span>,
-    your blanket's key: a list of colors, each standing for a range of
-    temperatures. It starts with colors to try; make them yours:
+    On the <span class="font-bold">Colors</span> step is the
+    <span class="font-bold">Temperature Gauge</span>, your blanket's key: a list
+    of colors, each standing for a range of temperatures. It starts with colors
+    to try; make them yours:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Choose how many colors you want in the menu below the gauge (like
+      Choose how many colors you want in the toolbar at the top of the gauge,
+      beside <span class="font-bold">Get Colors</span> (like
       <span class="font-bold">12 Colors</span>). More colors means smaller
       ranges, and a more detailed blanket.
     </li>
@@ -174,7 +185,8 @@ here. -->
   <h2 id="preview" class="text-2xl font-bold">5. Preview Your Blanket</h2>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Choose a <span class="font-bold">Pattern</span> above the preview.
+      On the <span class="font-bold">Preview</span> step, choose a
+      <span class="font-bold">Pattern</span> in the toolbar above the preview.
       <span class="font-bold">Rows</span> is the classic: one row a day.
     </li>
     <li>
@@ -202,7 +214,10 @@ here. -->
       Press <span class="font-bold">Project</span> at the top, then
       <span class="font-bold">Save Project</span>.
     </li>
-    <li>To give it a name, press the pencil beside its name at the top.</li>
+    <li>
+      To give it a name, press its name at the top of the page, type a new one,
+      and press Enter.
+    </li>
   </ol>
   <p>
     From then on, your changes save by themselves. Your project is in
@@ -241,7 +256,7 @@ here. -->
   </h2>
   <h3 class="text-lg font-bold">My place isn't in the list</h3>
   <p>Choose a town nearby. The weather is for an area around a place anyway.</p>
-  <h3 class="text-lg font-bold">Search can't be pressed</h3>
+  <h3 class="text-lg font-bold">Get Weather Data can't be pressed</h3>
   <p>
     Choose your place from the list (typing it isn't enough), and check for a
     message under the dates. See

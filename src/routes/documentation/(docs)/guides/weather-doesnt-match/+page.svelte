@@ -61,7 +61,7 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   </h2>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Press <span class="font-bold">Weather Source</span> above the weather.
+      Press <span class="font-bold">Source</span> in the toolbar above the weather.
     </li>
     <li>
       Choose <span class="font-bold">Meteostat</span> for measurements from real
@@ -256,8 +256,9 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   <h3 class="text-lg font-bold">I can't change the place or dates any more</h3>
   <p>
     They're locked so your weather isn't replaced by accident. Press
-    <span class="font-bold">Reload Weather Data</span> to go back to the weather source
-    (your changes are lost), or start a new project.
+    <span class="font-bold">Get Weather Data</span>, then
+    <span class="font-bold">Reload Weather Data</span>, to go back to the
+    weather source (your changes are lost), or start a new project.
   </p>
   <h3 class="text-lg font-bold">
     Someone opened my link and saw other weather

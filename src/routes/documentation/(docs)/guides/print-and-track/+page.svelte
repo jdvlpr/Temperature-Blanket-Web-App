@@ -19,6 +19,7 @@ own (only Ravelry's Progress), so tracking is on paper or in a
 spreadsheet. -->
 
 <script lang="ts">
+  import DocsClip from '#lib/components/docs/DocsClip.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedReference from '#lib/components/docs/RelatedReference.svelte';
 </script>
@@ -61,10 +62,35 @@ spreadsheet. -->
 
 <section class="flex flex-col gap-3">
   <h2 id="keep-your-place" class="text-2xl font-bold">Keep Your Place</h2>
+  <p>The planner can keep your place for you, saved with the project:</p>
+  <ol class="ml-6 list-decimal space-y-1">
+    <li>
+      On the <span class="font-bold">Preview</span> step, press
+      <span class="font-bold">Progress</span> in the toolbar.
+    </li>
+    <li>
+      Choose the last day you've made with ‹ and › (or tap the day to pick it
+      from a calendar), and press <span class="font-bold">Save</span>. Below it,
+      it says how much is made, like 62% made · 226 of 365 days.
+    </li>
+    <li>
+      From then on, the button is a <span class="font-bold">Progress</span>
+      menu:
+      <span class="font-bold">Edit Progress…</span> to move on, and
+      <span class="font-bold">Show my progress</span> to fade the days not made yet
+      in the preview.
+    </li>
+  </ol>
+  <DocsClip
+    src="print-and-track/progress"
+    alt="On the Preview step, the pointer presses Progress. The Progress dialog opens at Not started; March 28, 2025 is picked, then › moves it on two days to March 30, with how much is made below it. Save closes it, and Progress is now a menu with Edit Progress… and Show my progress. Show my progress is turned on, and the rows after March fade to gray."
+    caption="Setting your progress, and showing it in the preview."
+  />
   <p>
-    The site doesn't keep track of which rows you've made, so pick what suits
-    you:
+    You can also set it from a day: press a day's circle in the weather table,
+    then <span class="font-bold">Set Progress to</span> that day.
   </p>
+  <p>Or keep track outside the site:</p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
       <span class="font-bold">On paper:</span> cross off each day in the PDF's weather
@@ -72,14 +98,16 @@ spreadsheet. -->
     </li>
     <li>
       <span class="font-bold">In a spreadsheet:</span> press
-      <span class="font-bold">Download</span> under the weather table, then
+      <span class="font-bold">Download</span> in the toolbar above the weather
+      table, then
       <span class="font-bold">Download CSV</span>, open it in Excel, Numbers or
       Google Sheets, and add a column to tick off.
     </li>
     <li>
       <span class="font-bold">In Google Sheets directly:</span> choose
-      <span class="font-bold">Google Sheet</span> in the Download menu. It makes a
-      spreadsheet in your Google Drive with the weather and your colors and ranges.
+      <span class="font-bold">Google Sheet</span> in the Project menu's Download.
+      It makes a spreadsheet in your Google Drive with the weather and your colors
+      and ranges.
     </li>
     {#if __ACCOUNTS_ENABLED__}
       <li>

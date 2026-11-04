@@ -20,6 +20,7 @@ server/ravelry/sync.ts for when changes come back). Publishing, stars and
 Ravelry need accounts, so show only in builds with them. -->
 
 <script lang="ts">
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 </script>
 
@@ -61,6 +62,11 @@ Ravelry need accounts, so show only in builds with them. -->
     </li>
     <li><span class="font-bold">Copy Link</span> to the gallery page.</li>
   </ul>
+  <DocsShot
+    src="explore/gallery"
+    alt="The Gallery's Projects: a search box, Sort: Popular, past month, View and Filters, then cards of temperature blankets from around the world, each with its picture, place and dates, when it was published and how many views it has, a ⋮ and a star."
+    caption="The Gallery."
+  />
 </section>
 
 {#if __ACCOUNTS_ENABLED__}
@@ -86,15 +92,20 @@ Ravelry need accounts, so show only in builds with them. -->
       <li>
         <span class="font-bold">Publish to Gallery…:</span> choose whether to
         show your name or be <span class="font-bold">Anonymous</span>, then
-        <span class="font-bold">Save</span>. A project must be saved to your
+        <span class="font-bold">Publish</span>. A project must be saved to your
         account first.
       </li>
       <li>
-        Once published: <span class="font-bold">View Gallery Page</span>,
-        <span class="font-bold">Edit Gallery Page…</span> and
+        Once published: <span class="font-bold">View Gallery Page</span> and
+        <span class="font-bold">Edit Gallery Page…</span>, which also has
         <span class="font-bold">Unpublish…</span>.
       </li>
     </ul>
+    <DocsShot
+      src="publish-and-share/publish-dialog"
+      alt="The Publish to Gallery dialog: the project's preview beside its name, London, England, United Kingdom from 1/1/2025 to 12/31/2025, with a pencil to rename it; By Robin Ellis · in your gallery, with Anonymous unchecked; Connect Ravelry in your Account to post there too; then Publishes it, as it is now, to the public Project Gallery, and Publish."
+      caption="Publishing a project."
+    />
     <h3 id="gallery-page-rules" class="text-lg font-bold">
       How gallery pages work
     </h3>

@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 Gallery, which has its own page, and the Globe (opened from the Gallery). -->
 
 <script lang="ts">
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
 </script>
 
@@ -50,6 +51,11 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
       has its shop link and copies its name or hex code.
     </li>
   </ul>
+  <DocsShot
+    src="explore/colorway-finder"
+    alt="Find Yarn by Color with #9caf88, a sage green, in Search by Color: Showing 100 of 1,047 close matches, sorted by Best match, starting with Mint from Katia Merino Classic and Aloe Heather from Knit Picks Wool of the Andes Worsted at 98% match, then Sage Green, Celadon and Pistachio Bundt Cake at 97%."
+    caption="Yarn close to a sage green, best match first."
+  />
   <p>
     The colors are close, not exact: see <a
       href="/documentation/colors-and-yarn#yarn"
@@ -62,9 +68,9 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
   <h2 id="weather-forecast" class="text-2xl font-bold">Weather Forecast</h2>
   <p>
     <a href="/weather" class="link">Weather Forecast</a> shows the coming days
-    for any place: an hourly and a daily forecast. Add places to
-    <span class="font-bold">Locations</span> to switch between them, and change
-    the units in <span class="font-bold">Settings</span>.
+    for any place: an hourly and a daily forecast. The gear at the top opens
+    <span class="font-bold">Locations & Settings</span>: add places to switch
+    between them, and change the units.
   </p>
   <p>
     It's for looking ahead. A temperature blanket uses past weather, which comes

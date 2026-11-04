@@ -58,8 +58,9 @@ show only in builds with accounts. -->
     {/if}
   </ul>
   <p>
-    To name it, press the pencil beside its name above the Project Planner. A
-    project without a name is called by its place and dates.
+    To name it, press its name at the top of the Project Planner, type a new
+    one, and press Enter (or use the pencil in the Project menu). A project
+    without a name is called by its place and dates.
   </p>
   <p>
     Browsers can clear what sites have saved, especially on phones and in
@@ -82,6 +83,15 @@ show only in builds with accounts. -->
       <span class="font-bold">Download:</span> the PDF, preview image, Google
       Sheet or weather data.
       <a href="/documentation/download" class="link">Download</a>.
+    </li>
+    <li>
+      <span class="font-bold">Progress:</span> how far you've made it, once it's
+      set.
+      <a href="/documentation/preview#progress" class="link">Progress</a>.
+    </li>
+    <li>
+      <span class="font-bold">Weather Data:</span> Check for Updates, Edit Weather
+      Data, Weather Source, Units and Grouping, the same as the Weather step's toolbar.
     </li>
     <li>
       <span class="font-bold">Share:</span>
@@ -127,7 +137,8 @@ show only in builds with accounts. -->
     <li>
       Its ⋮ menu has <span class="font-bold">Edit in Project Planner</span>,
       <span class="font-bold">Duplicate</span>, sharing, and
-      <span class="font-bold">Move to Trash</span>. The pencil renames it.
+      <span class="font-bold">Move to Trash</span>. To rename it, open it and
+      change its name at the top.
     </li>
     <li>
       Search, sort (<span class="font-bold">Recent</span> or

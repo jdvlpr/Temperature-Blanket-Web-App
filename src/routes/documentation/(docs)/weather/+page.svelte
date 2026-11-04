@@ -134,8 +134,8 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="weather-sources" class="text-2xl font-bold">Weather Sources</h2>
   <p>
-    Press <span class="font-bold">Weather Source</span> above the weather to
-    choose where it comes from, then get the weather data again. The button
+    Press <span class="font-bold">Source</span> in the toolbar above the weather
+    to choose where it comes from, then get the weather data again. The button
     shows the source in use, or <span class="font-bold">Custom</span> once you've
     edited or imported weather.
   </p>
@@ -320,6 +320,7 @@ HELP_TOPICS). -->
     </li>
     <li>
       To start over with the source's weather, press
+      <span class="font-bold">Get Weather Data</span> on the Location step, then
       <span class="font-bold">Reload Weather Data</span>. It asks first, because
       your changes are replaced.
     </li>

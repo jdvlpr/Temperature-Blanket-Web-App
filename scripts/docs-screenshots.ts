@@ -29,6 +29,15 @@
 // Chrome has none), and ffmpeg (on the PATH) makes them a video. Each clip
 // also leaves a sheet of a frame a second in .svelte-kit/docs-clips/, to
 // check it by. How to add one: .claude/skills/docs-clips/SKILL.md.
+//
+// And each Guides & Help card's picture (CARDS), which is also its page's
+// share picture: static/images/docs/cards/<slug>-light.jpg and -dark.jpg,
+// 1200×630. A page without one is named at the end of the run.
+//
+// A few (the Publish dialog and clip) sign in a new account with an emailed
+// code, so they need a server with EMAIL_SIGN_IN and ENABLE_DEV_ROUTES: the
+// dev server (`pnpm dev:accounts`), or `wrangler pages dev` on an accounts
+// build. Their names say which: --only publish-and-share/publish-dialog.
 
 import {
   chromium,
@@ -42,6 +51,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { GUIDES, REFERENCE } from '../src/lib/docs/docs-index.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name: string) => {
@@ -65,6 +75,8 @@ type Shot = {
   trim?: boolean;
   /** A taller window, so bars and toasts at the bottom stay below the shot */
   height?: number;
+  /** Only the part of the target in the window (for long pages and lists) */
+  inView?: boolean;
 };
 
 /** The planner with the project's weather loaded, at one of its sections */
@@ -115,8 +127,128 @@ async function trimmed(panel: Locator) {
   return { ...box, height: Math.min(box.height, bottom - box.y + 16) };
 }
 
+/** A target's box, cut to what's in the window */
+async function inView(page: Page, target: Locator) {
+  const box = await target.boundingBox();
+  const size = page.viewportSize();
+  if (!box || !size) return box;
+  const top = Math.max(box.y, 0);
+  return {
+    x: box.x,
+    y: top,
+    width: box.width,
+    height: Math.min(box.y + box.height, size.height) - top,
+  };
+}
+
 const menu = (page: Page) => page.getByRole('menu').last();
 const dialog = (page: Page) => page.getByRole('dialog').last();
+
+/** Scrolls until `target` stays `top` px from the window's top: changing
+ * step, or the chart laid out late, can scroll the page back */
+async function keepAt(page: Page, target: Locator, top = 72) {
+  for (let tries = 0, still = 0; still < 3 && tries < 30; tries++) {
+    const at = await target.evaluate(
+      (node) => node.getBoundingClientRect().top,
+    );
+    if (Math.abs(at - top) < 2) still++;
+    else {
+      still = 0;
+      await page.evaluate((y) => scrollTo(0, scrollY + y), at - top);
+    }
+    await page.waitForTimeout(300);
+  }
+  await settle(page);
+}
+
+/** Toasts (like "Saved") off the shot */
+async function dismissToasts(page: Page) {
+  for (const toast of await page
+    .getByRole('button', { name: 'Dismiss toast' })
+    .all())
+    await toast.click().catch(() => {});
+}
+
+/** Signs in a new account with an emailed code, as a made-up maker. Needs
+ * a server with EMAIL_SIGN_IN and ENABLE_DEV_ROUTES (the dev outbox): the
+ * dev server, or `wrangler pages dev` on an accounts build */
+async function signIn(page: Page) {
+  const email = `docs-${Date.now()}@example.test`;
+  await page.goto(new URL('/auth/sign-in', base).href);
+  await page.getByRole('button', { name: 'Use email instead' }).click();
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('button', { name: 'Email me a code' }).click();
+  await page.getByText(`We sent a code to ${email}`).waitFor();
+  let code: string | undefined;
+  for (let i = 0; i < 40 && !code; i++) {
+    const response = await page.request.get(
+      new URL(`/api/dev/outbox?to=${encodeURIComponent(email)}`, base).href,
+    );
+    const messages: { text: string }[] = await response.json();
+    code = messages[0]?.text.match(/\b(\d{6})\b/)?.[1];
+    if (!code) await page.waitForTimeout(500);
+  }
+  if (!code) throw new Error(`No sign-in code came for ${email}`);
+  await page.getByLabel('Code').fill(code);
+  const welcome = page.getByRole('dialog', { name: 'Welcome!' });
+  const name = welcome.getByLabel('Your display name');
+  await name.fill('Robin Ellis');
+  await name.press('Enter');
+  await welcome.waitFor({ state: 'detached' });
+  // Then any later step of the welcome: Not now
+  const later = page.getByRole('button', { name: 'Not now' });
+  if (
+    await later.waitFor({ timeout: 3000 }).then(
+      () => true,
+      () => false,
+    )
+  )
+    await later.click();
+}
+
+/** The planner's project saved (to the account, when signed in) */
+async function saveProject(page: Page) {
+  await page.keyboard.press('ControlOrMeta+s');
+  // Its Saved toast
+  await page.getByRole('button', { name: 'Dismiss toast' }).first().waitFor();
+  await dismissToasts(page);
+}
+
+/** A page of the site, without the analytics question */
+async function visit(page: Page, path: string) {
+  await page.addInitScript(() =>
+    localStorage.setItem('disable_toast_analytics', 'true'),
+  );
+  await page.goto(new URL(path, base).href);
+}
+
+/** A palette of real yarn in the Yarn Palette Creator */
+async function yarnPalette(page: Page) {
+  await visit(page, '/yarn');
+  await page.waitForLoadState('networkidle');
+  await settle(page);
+  // Again if pressed before the page was ready for it
+  const choose = page.getByRole('menuitem', { name: /Choose Colorways/ });
+  for (let i = 0; i < 5 && !(await choose.isVisible()); i++) {
+    await page.getByRole('button', { name: /Get Colors/ }).click();
+    await choose.waitFor({ timeout: 2000 }).catch(() => {});
+  }
+  await choose.click();
+  const picker = dialog(page);
+  await picker.getByRole('combobox').first().click();
+  await page.keyboard.type('Special DK');
+  await page
+    .getByRole('option', { name: /Special DK/ })
+    .first()
+    .click();
+  await settle(page);
+  const cards = picker.locator('button[aria-pressed]');
+  for (const i of [2, 9, 16, 23, 30, 37]) await cards.nth(i).click();
+  await picker.getByRole('button', { name: 'Save', exact: true }).click();
+  await picker.waitFor({ state: 'detached' });
+  await page.mouse.move(0, 0);
+  await settle(page);
+}
 
 const SHOTS: Shot[] = [
   {
@@ -260,6 +392,67 @@ const SHOTS: Shot[] = [
     open: async (page) => {
       await planner(page, 'weather-data');
       await page.keyboard.press('.');
+      await settle(page);
+      return dialog(page);
+    },
+    trim: true,
+  },
+  {
+    name: 'palette-creator/palette',
+    open: async (page) => {
+      await yarnPalette(page);
+      return page.locator('main');
+    },
+    trim: true,
+  },
+  {
+    name: 'explore/colorway-finder',
+    open: async (page) => {
+      await visit(page, '/yarn-colorway-finder');
+      await page.waitForLoadState('networkidle');
+      await settle(page);
+      await page
+        .getByPlaceholder(/e\.g\., pink/)
+        .pressSequentially('#9caf88', { delay: 80 });
+      await page.waitForTimeout(1200);
+      await settle(page);
+      return page.locator('main');
+    },
+    inView: true,
+    height: 1100,
+  },
+  {
+    name: 'explore/gallery',
+    open: async (page) => {
+      await visit(page, '/gallery');
+      // Its cards' pictures, not the placeholders before them
+      await page.locator('main a img').first().waitFor({ timeout: 30_000 });
+      await page.waitForTimeout(2500);
+      await settle(page);
+      return page.locator('main');
+    },
+    inView: true,
+    height: 1100,
+  },
+  {
+    name: 'publish-and-share/publish-dialog',
+    open: async (page) => {
+      await signIn(page);
+      await planner(page, 'preview');
+      await saveProject(page);
+      await page.keyboard.press('.');
+      await dialog(page)
+        .getByRole('button', { name: /^Publish to Gallery/ })
+        .click();
+      await dialog(page).getByText('Anonymous').waitFor();
+      // Showing the maker's name, as most pages do
+      await dialog(page)
+        .getByRole('checkbox', { name: /Anonymous/ })
+        .click();
+      // Without the focus ring the click leaves
+      await page.evaluate(() =>
+        (document.activeElement as HTMLElement | null)?.blur(),
+      );
       await settle(page);
       return dialog(page);
     },
@@ -646,7 +839,301 @@ const CLIPS: Clip[] = [
       await page.waitForTimeout(1600);
     },
   },
+  {
+    name: 'choose-ranges/change-a-range',
+    open: async (page) => {
+      const section = await planner(page, 'gauges');
+      await keepAt(page, section.locator('.range-to').nth(1), 260);
+    },
+    play: async (page) => {
+      const section = page.locator('#page-section-gauges');
+      await clickOn(page, section.locator('.range-to').nth(2), 800);
+      await page.waitForTimeout(600);
+      await page.keyboard.press('ControlOrMeta+a');
+      await page.keyboard.type('21', { delay: 220 });
+      await page.waitForTimeout(600);
+      await clickOn(
+        page,
+        section.getByRole('button', { name: 'Save range for color 3' }),
+        700,
+      );
+      await page.waitForTimeout(1800);
+    },
+  },
+  {
+    name: 'print-and-track/progress',
+    open: async (page) => {
+      const section = await planner(page, 'preview');
+      await keepAt(page, section.getByTestId('progress-button'), 72);
+    },
+    play: async (page) => {
+      const section = page.locator('#page-section-preview');
+      await clickOn(page, section.getByTestId('progress-button'), 800);
+      const editor = page.getByTestId('progress-editor');
+      await editor.waitFor();
+      await page.waitForTimeout(900);
+      // The day opens the date picker, which a recording can't show: the
+      // day is picked as it would be there
+      await clickOn(page, editor.getByText('Tap to pick a day'), 700);
+      await editor.locator('input[type="date"]').fill('2025-03-28');
+      await page.keyboard.press('Escape').catch(() => {});
+      await page.waitForTimeout(900);
+      const next = editor.getByTitle('On a day');
+      await clickOn(page, next, 600);
+      await page.waitForTimeout(400);
+      await clickOn(page, next, 300);
+      await page.waitForTimeout(800);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Save', exact: true }),
+        700,
+      );
+      await page.waitForTimeout(900);
+      await clickOn(page, section.getByTestId('progress-menu'), 700);
+      await page.waitForTimeout(500);
+      await clickOn(
+        page,
+        menu(page).getByRole('menuitemcheckbox', { name: /Show my progress/ }),
+        600,
+      );
+      await page.waitForTimeout(700);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(1200);
+    },
+  },
+  {
+    name: 'plan-a-blanket/four-steps',
+    open: async (page) => {
+      await visit(page, '/');
+      await page.getByPlaceholder('Enter a place').waitFor();
+      await settle(page);
+    },
+    play: async (page) => {
+      await clickOn(page, page.getByPlaceholder('Enter a place'), 700);
+      await page.keyboard.type('London', { delay: 160 });
+      const result = page
+        .locator('.autocomplete > div')
+        .filter({ hasText: /England/ })
+        .first();
+      await result.waitFor();
+      await page.waitForTimeout(500);
+      await clickOn(page, result, 600);
+      await page.waitForTimeout(800);
+      await clickOn(page, page.locator('#location-action-button'), 700);
+      await page
+        .getByRole('button', { name: /^Source:/ })
+        .waitFor({ timeout: 60_000 });
+      await dismissToasts(page);
+      await page.waitForTimeout(1600);
+      const step = (name: string) =>
+        page.locator('#bottom-section-nav button').filter({ hasText: name });
+      await clickOn(page, step('Colors'), 700);
+      await page.waitForTimeout(1800);
+      await clickOn(page, step('Preview'), 700);
+      await page.waitForTimeout(1600);
+    },
+  },
+  {
+    name: 'publish-and-share/publish',
+    open: async (page) => {
+      await page
+        .context()
+        .grantPermissions(['clipboard-read', 'clipboard-write'], {
+          origin: new URL(base).origin,
+        });
+      await signIn(page);
+      await planner(page, 'preview');
+      await saveProject(page);
+      await keepAt(
+        page,
+        page.locator('#page-section-preview').getByRole('button', {
+          name: /^Share/,
+        }),
+        120,
+      );
+    },
+    play: async (page) => {
+      const section = page.locator('#page-section-preview');
+      const share = section.getByRole('button', { name: /^Share/ });
+      await clickOn(page, share, 800);
+      await page.waitForTimeout(700);
+      await clickOn(
+        page,
+        menu(page).getByRole('menuitem', { name: /^Copy Link/ }),
+        700,
+      );
+      await page.waitForTimeout(1800);
+      await dismissToasts(page);
+      await clickOn(page, share, 700);
+      await page.waitForTimeout(600);
+      await clickOn(
+        page,
+        menu(page).getByRole('menuitem', { name: /^Publish to Gallery/ }),
+        700,
+      );
+      await dialog(page).getByText('Anonymous').waitFor();
+      await page.waitForTimeout(1200);
+      const anonymous = dialog(page).getByRole('checkbox', {
+        name: /Anonymous/,
+      });
+      await clickOn(page, anonymous, 700);
+      await page.waitForTimeout(1200);
+      // Up to Publish: posting to the gallery needs the real site
+      await moveTo(
+        page,
+        dialog(page).getByRole('button', { name: 'Publish', exact: true }),
+        800,
+      );
+      await page.waitForTimeout(600);
+    },
+  },
 ];
+
+// ***************
+// Cards
+// ***************
+
+/** A Guides & Help card's picture, also its page's share picture: a frame
+ * of the page's most telling part, from a shot's `open` or its own */
+type Card = {
+  slug: string;
+  open: (page: Page) => Promise<Locator>;
+};
+
+/** The card's frame in CSS pixels; saved at twice that, 1200×630, the size
+ * share pictures (og:image) are best at */
+const CARD = { width: 600, height: 315 };
+/** Wider parts are framed at most this wide, so their text stays readable */
+const CARD_MAX_WIDTH = 900;
+
+const shot = (name: string) => {
+  const found = SHOTS.find((s) => s.name === name);
+  if (!found) throw new Error(`No shot ${name} for a card`);
+  return found.open;
+};
+
+const CARDS: Card[] = [
+  {
+    slug: 'plan-a-blanket',
+    open: async (page) =>
+      (await planner(page, 'preview')).locator('#preview-svg-image'),
+  },
+  {
+    slug: 'weather-doesnt-match',
+    open: async (page) => {
+      await editWeather(page, '2025-01-03', 'High');
+      return dialog(page);
+    },
+  },
+  { slug: 'choose-ranges', open: async (page) => planner(page, 'gauges') },
+  { slug: 'match-your-yarn', open: shot('match-your-yarn/choose-colorways') },
+  {
+    slug: 'knit-along-all-year',
+    open: shot('knit-along-all-year/future-days'),
+  },
+  { slug: 'move-or-back-up', open: shot('library-and-account/project-menu') },
+  { slug: 'publish-and-share', open: shot('explore/gallery') },
+  {
+    slug: 'ravelry-sync',
+    open: async (page) => {
+      // A gallery project's page, as a Ravelry project links to
+      await visit(page, '/gallery');
+      await page.locator('main a img').first().waitFor({ timeout: 30_000 });
+      await page.locator('main a:has(img)').first().click();
+      await page.waitForURL(/\/gallery\/\d+/);
+      await page.locator('main img').first().waitFor();
+      await page.waitForTimeout(2000);
+      await settle(page);
+      return page.locator('main');
+    },
+  },
+  { slug: 'print-and-track', open: shot('download/pdf-options') },
+  { slug: 'rain-snow-sunshine', open: shot('rain-snow-sunshine/rain-gauge') },
+  { slug: 'location-and-dates', open: shot('location-and-dates/location') },
+  { slug: 'weather', open: async (page) => planner(page, 'weather-data') },
+  { slug: 'gauges-and-ranges', open: shot('gauges-and-ranges/ranges-menu') },
+  { slug: 'colors-and-yarn', open: shot('colors-and-yarn/get-colors') },
+  { slug: 'preview', open: async (page) => planner(page, 'preview') },
+  {
+    slug: 'download',
+    open: async (page) => {
+      const section = await planner(page, 'weather-data');
+      await section
+        .getByRole('button', { name: /^Download/ })
+        .first()
+        .click();
+      await settle(page);
+      return menu(page);
+    },
+  },
+  { slug: 'palette-creator', open: shot('palette-creator/palette') },
+  { slug: 'library-and-account', open: shot('library-and-account/card-menu') },
+  {
+    slug: 'gallery-and-ravelry',
+    open: async (page) => {
+      await visit(page, '/gallery/palettes');
+      await page.waitForTimeout(4000);
+      await settle(page);
+      return page.locator('main');
+    },
+  },
+  { slug: 'explore', open: shot('explore/colorway-finder') },
+  { slug: 'credits', open: shot('weather/weather-source') },
+];
+
+/** Takes one card's picture in one theme */
+async function card(context: BrowserContext, entry: Card, theme: string) {
+  const page = await context.newPage();
+  const target = await entry.open(page).catch(async (error) => {
+    const failed = join(root, '.svelte-kit/docs-screenshot-failed.png');
+    await page.screenshot({ path: failed, fullPage: true });
+    console.error(`cards/${entry.slug} failed; the page is in ${failed}`);
+    throw error;
+  });
+  await page.mouse.move(0, 0);
+  await settle(page);
+  const box = await target.boundingBox();
+  if (!box) throw new Error(`cards/${entry.slug}: nothing to frame`);
+  // From its top, centered on it, as wide as it is (within limits)
+  const width = Math.min(Math.max(box.width + 32, CARD.width), CARD_MAX_WIDTH);
+  const height = (width * CARD.height) / CARD.width;
+  const viewport = page.viewportSize()!;
+  // Wider than the frame: from its left edge, where its content starts
+  const x = Math.min(
+    Math.max(
+      box.width + 32 > width ? box.x - 16 : box.x + box.width / 2 - width / 2,
+      0,
+    ),
+    viewport.width - width,
+  );
+  const y = Math.max(box.y - 16, 0);
+  const png = join(root, `.svelte-kit/docs-card-${theme}.png`);
+  await page.screenshot({
+    path: png,
+    clip: { x, y, width, height },
+    animations: 'disabled',
+  });
+  const out = join(
+    root,
+    'static/images/docs/cards',
+    `${entry.slug}-${theme}.jpg`,
+  );
+  await mkdir(dirname(out), { recursive: true });
+  await run('ffmpeg', [
+    '-y',
+    '-loglevel',
+    'error',
+    '-i',
+    png,
+    '-vf',
+    `scale=${CARD.width * 2}:${CARD.height * 2}:flags=lanczos`,
+    '-q:v',
+    '3',
+    out,
+  ]);
+  await rm(png);
+  await page.close();
+}
 
 const run = promisify(execFile);
 
@@ -819,8 +1306,10 @@ async function main() {
       await mkdir(dirname(file), { recursive: true });
       const box = shot.trim
         ? await trimmed(target)
-        : await target.boundingBox();
-      if (shot.trim && box)
+        : shot.inView
+          ? await inView(page, target)
+          : await target.boundingBox();
+      if ((shot.trim || shot.inView) && box)
         await page.screenshot({
           path: file,
           clip: box,
@@ -836,6 +1325,26 @@ async function main() {
       await context.close();
     }
   }
+  for (const entry of CARDS) {
+    if (only && `cards/${entry.slug}` !== only) continue;
+    for (const theme of ['light', 'dark'] as const) {
+      const context = await browser.newContext({
+        baseURL: base,
+        ignoreHTTPSErrors: true,
+        viewport: { width: 1280, height: 1400 },
+        colorScheme: theme,
+        reducedMotion: 'reduce',
+        deviceScaleFactor: 2,
+      });
+      await context.addInitScript(hideBetaBanner);
+      await card(context, entry, theme);
+      console.log(`cards/${entry.slug}-${theme}.jpg`);
+      await context.close();
+    }
+  }
+  const carded = new Set(CARDS.map((entry) => entry.slug));
+  for (const { slug } of [...GUIDES, ...REFERENCE])
+    if (!carded.has(slug)) console.warn(`No card picture for ${slug}`);
   // The screencast is at twice the size only with the scale forced
   const clipBrowser = await chromium.launch({
     args: ['--force-device-scale-factor=2'],

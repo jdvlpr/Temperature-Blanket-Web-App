@@ -35,6 +35,7 @@ Only the page's content (data-pagefind-body) goes into the search index. -->
     DOCS_TITLE,
     KIND_HEADINGS,
     docsHref,
+    docsShareImage,
     docsPageAt,
   } from '#lib/docs/docs-index.js';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
@@ -42,6 +43,7 @@ Only the page's content (data-pagefind-body) goes into the search index. -->
   let { children } = $props();
 
   const current = $derived(docsPageAt(page.url.pathname));
+  const share = $derived(current && docsShareImage(current));
   const index = $derived(current ? DOCS_PAGES.indexOf(current) : -1);
   const previous = $derived(index > 0 ? DOCS_PAGES[index - 1] : undefined);
   const next = $derived(
@@ -69,10 +71,10 @@ Only the page's content (data-pagefind-body) goes into the search index. -->
     content="{PUBLIC_BASE_URL}{current ? docsHref(current) : '/documentation'}"
   />
   <meta property="og:type" content="website" />
-  {#if current?.image}
-    <meta property="og:image" content="{PUBLIC_BASE_URL}{current.image.src}" />
-    <meta property="og:image:width" content={String(current.image.width)} />
-    <meta property="og:image:height" content={String(current.image.height)} />
+  {#if share}
+    <meta property="og:image" content="{PUBLIC_BASE_URL}{share.src}" />
+    <meta property="og:image:width" content={String(share.width)} />
+    <meta property="og:image:height" content={String(share.height)} />
   {/if}
 </svelte:head>
 

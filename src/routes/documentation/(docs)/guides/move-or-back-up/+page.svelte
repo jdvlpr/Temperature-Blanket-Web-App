@@ -114,7 +114,7 @@ can't be imported back. Account parts show only in builds with accounts. -->
     <li>Copy its link, and send it to yourself (by email or a message).</li>
     <li>Open the link on the other device.</li>
     <li>
-      Press <span class="font-bold">Search</span> for the weather, then
+      Press <span class="font-bold">Get Weather Data</span>, then
       <span class="font-bold">Project</span>,
       <span class="font-bold">Save Project</span>.
     </li>

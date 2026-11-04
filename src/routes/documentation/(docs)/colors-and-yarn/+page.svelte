@@ -99,7 +99,7 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
   </ol>
   <p>
     To change one color, press its swatch in the gauge. Type a color (a name
-    like "sage" or a hex code like #9CAF88), pick it from a photo, or choose a
+    like "salmon" or a hex code like #9CAF88), pick it from a photo, or choose a
     yarn colorway below; then <span class="font-bold">Save</span>.
   </p>
   <p>

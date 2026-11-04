@@ -20,6 +20,7 @@ Copy Link shows only in builds with accounts. The old anchor
 share-to-gallery lands here. -->
 
 <script lang="ts">
+  import DocsClip from '#lib/components/docs/DocsClip.svelte';
   import RelatedReference from '#lib/components/docs/RelatedReference.svelte';
 </script>
 
@@ -72,11 +73,17 @@ share-to-gallery lands here. -->
         <span class="font-bold">Publish to Gallery…</span>
       </li>
       <li>
-        Choose whether to show your name, or check
-        <span class="font-bold">Anonymous</span>, then press
-        <span class="font-bold">Save</span>.
+        Uncheck <span class="font-bold">Anonymous</span> to show your name on
+        the page (it's checked the first time, then remembers your last choice),
+        then press
+        <span class="font-bold">Publish</span>.
       </li>
     </ol>
+    <DocsClip
+      src="publish-and-share/publish"
+      alt="On the Preview step, the pointer opens Share: Download Image, Copy Link and, under Gallery Page, Publish to Gallery…. Copy Link is pressed, and the message says Link copied. Share is opened again and Publish to Gallery… pressed. The Publish to Gallery dialog shows the project's preview and name with Anonymous checked; Anonymous is unchecked, and it says By Robin Ellis · in your gallery. The pointer rests on Publish."
+      caption="Copy Link, then Publish to Gallery."
+    />
     <p>
       To publish a palette, do the same from the
       <span class="font-bold">Palette</span> menu in the Yarn Palette Creator. Publishing
@@ -114,6 +121,7 @@ share-to-gallery lands here. -->
     <h2 id="unpublish" class="text-2xl font-bold">Unpublish</h2>
     <p>
       Under <span class="font-bold">Share</span>, press
+      <span class="font-bold">Edit Gallery Page…</span>, then
       <span class="font-bold">Unpublish…</span>, and confirm. The page is
       removed from the gallery; your project stays in My Library. Moving the
       project to the Trash hides its page too, and restoring it brings the page

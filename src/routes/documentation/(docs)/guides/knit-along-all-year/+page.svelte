@@ -40,13 +40,14 @@ them, asking before changing saved ones
       whenever you start).
     </li>
     <li>
-      Press <span class="font-bold">Search</span>. Beside the number of days it
-      says how many are still to come: their weather comes in as they pass.
+      Press <span class="font-bold">Get Weather Data</span>. Beside the number
+      of days it says how many are still to come: their weather comes in as they
+      pass.
     </li>
     <li>
       Press <span class="font-bold">Project</span>, then
-      <span class="font-bold">Save Project</span>, and give it a name with the
-      pencil.
+      <span class="font-bold">Save Project</span>, and give it a name: press its
+      name at the top and type.
     </li>
   </ol>
   <DocsShot
@@ -160,12 +161,15 @@ them, asking before changing saved ones
       >Saved weather</a
     >.
   </p>
-  <h3 class="text-lg font-bold">I edited a day, and now Search is gone</h3>
+  <h3 class="text-lg font-bold">
+    I edited a day, and now Check for Updates is gone
+  </h3>
   <p>
-    Edited weather is kept as yours, so it isn't looked up again, and the button
-    says <span class="font-bold">Reload Weather Data</span> instead, which replaces
-    your edits. For a project still in progress, it's best not to edit the weather
-    until the year is done.
+    Edited weather is kept as yours, so it isn't looked up again: the button
+    says <span class="font-bold">Get Weather Data</span> instead, and asks
+    first, since <span class="font-bold">Reload Weather Data</span> replaces your
+    edits. For a project still in progress, it's best not to edit the weather until
+    the year is done.
   </p>
 </section>
 
