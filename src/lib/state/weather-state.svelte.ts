@@ -38,7 +38,7 @@ import {
   millimetersToInches,
 } from '#lib/utils/unit-utils.svelte.js';
 import { getWeatherTargets } from '#lib/utils/weather-utils.svelte.js';
-import * as SunCalc from 'suncalc';
+import { daylightHours } from '#lib/utils/daylight-utils.js';
 
 const defaultWeatherSource = (): WeatherSourceOptions => ({
   name: 'Open-Meteo',
@@ -734,29 +734,10 @@ export const getDayTime = ({
   lat: number;
   lng: number;
 }): { metric: number | null; imperial: number | null } => {
-  const times = SunCalc.getTimes(date, lat, lng);
-  if (
-    times.sunset instanceof Date &&
-    !isNaN(times.sunset.getTime()) &&
-    times.sunrise instanceof Date &&
-    !isNaN(times.sunrise.getTime())
-  ) {
-    const daytime = parseFloat(
-      (
-        (times.sunset.getTime() - times.sunrise.getTime()) /
-        1000 /
-        60 /
-        60
-      ).toFixed(6),
-    );
-    return {
-      metric: hoursToMinutes(daytime, 4),
-      imperial: displayNumber(daytime, 4),
-    }; // Convert metric to minutes because of Weather chart scale
-  } else {
-    return {
-      metric: null,
-      imperial: null,
-    };
-  }
+  const daytime = daylightHours(date, lat, lng);
+  if (daytime === null) return { metric: null, imperial: null };
+  return {
+    metric: hoursToMinutes(daytime, 4),
+    imperial: displayNumber(daytime, 4),
+  }; // Convert metric to minutes because of Weather chart scale
 };

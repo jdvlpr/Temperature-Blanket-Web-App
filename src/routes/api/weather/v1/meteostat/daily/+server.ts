@@ -23,21 +23,18 @@ import { NO_DATA_SRTM3 } from '#lib/constants/location-constants.js';
 import type { WeatherDay } from '#lib/types/weather-types.js';
 import { dateToISO8601String, stringToDate } from '#lib/utils/date-utils.js';
 import {
-  displayNumber,
   getAvgOfThree,
   getMaxOfThree,
   getMinOfThree,
 } from '#lib/utils/number-utils.js';
 import {
   celsiusToFahrenheit,
-  hoursToMinutes,
   millimetersToInches,
 } from '#lib/utils/unit-utils.svelte.js';
-import { getMoonPhase } from '#lib/state/weather-state.svelte.js';
+import { getDayTime, getMoonPhase } from '#lib/state/weather-state.svelte.js';
 import { cachedJSON } from '#lib/features/cache/edge-cache.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import * as SunCalc from 'suncalc';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h — short enough to avoid stale past/future-day nulling near date boundaries
@@ -206,31 +203,11 @@ async function fetchAndProcessDailyWeather(
     // dayData.tsun = day.tsun; // The daily sunshine total in minutes (m) (unused)
     // End of meteostat data
 
-    const times = SunCalc.getTimes(dayDate, location.lat, location.lng);
-    // dayData.sunrise = times.sunrise;
-    // dayData.sunset = times.sunset;
-    if (
-      times.sunset instanceof Date &&
-      !isNaN(times.sunset.getTime()) &&
-      times.sunrise instanceof Date &&
-      !isNaN(times.sunrise.getTime())
-    ) {
-      const daytime = parseFloat(
-        (
-          (times.sunset.getTime() - times.sunrise.getTime()) /
-          1000 /
-          60 /
-          60
-        ).toFixed(6),
-      );
-      // Convert metric to minutes because of Weather chart scale
-      dayData.dayt = {
-        metric: hoursToMinutes(daytime, 4),
-        imperial: displayNumber(daytime, 4),
-      };
-    } else {
-      dayData.dayt = { metric: null, imperial: null };
-    }
+    dayData.dayt = getDayTime({
+      date: dayDate,
+      lat: Number(location.lat),
+      lng: Number(location.lng),
+    });
 
     dayData.moon = getMoonPhase(dayDate);
 
