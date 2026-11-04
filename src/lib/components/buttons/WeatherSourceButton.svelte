@@ -23,6 +23,8 @@
 >
   <CloudCogIcon />
   <span class="text-left whitespace-pre-wrap"
-    >Source: {weather.isUserEdited ? 'Custom' : weather.source.name}
+    >Source<span class="max-lg:hidden"
+      >: {weather.isUserEdited ? 'Custom' : weather.source.name}</span
+    >
   </span>
 </button>

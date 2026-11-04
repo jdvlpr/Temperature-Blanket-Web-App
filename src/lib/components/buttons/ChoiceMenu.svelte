@@ -64,7 +64,11 @@ You should have received a copy of the GNU General Public License along with Tem
 <Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={triggerClass}>
     <Icon aria-hidden="true" />
-    <span>{label}: {current?.short ?? current?.label ?? ''}</span>
+    <span
+      >{label}<span class="max-lg:hidden"
+        >: {current?.short ?? current?.label ?? ''}</span
+      ></span
+    >
     <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
   <Portal>
