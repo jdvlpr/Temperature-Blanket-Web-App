@@ -1298,6 +1298,12 @@ async function main() {
       () => '{}',
     ),
   );
+  // Kept after each one, so a run that stops partway keeps what it made
+  const saveSizes = () =>
+    writeFile(
+      join(root, 'src/lib/docs/docs-shots.json'),
+      `${JSON.stringify(sizes, null, 2)}\n`,
+    );
   for (const shot of SHOTS) {
     if (only && shot.name !== only) continue;
     for (const theme of ['light', 'dark'] as const) {
@@ -1343,6 +1349,7 @@ async function main() {
           height: Math.round(box.height),
         };
       console.log(`${shot.name}-${theme}.png`);
+      await saveSizes();
       await context.close();
     }
   }
@@ -1383,13 +1390,10 @@ async function main() {
       await context.addInitScript(hideBetaBanner);
       sizes[clip.name] = await record(context, clip, theme);
       console.log(`${clip.name}-${theme}.mp4`);
+      await saveSizes();
       await context.close();
     }
   }
-  await writeFile(
-    join(root, 'src/lib/docs/docs-shots.json'),
-    `${JSON.stringify(sizes, null, 2)}\n`,
-  );
   await clipBrowser.close();
   await browser.close();
 }

@@ -5,7 +5,7 @@
   },
   "location-and-dates/location": {
     "width": 768,
-    "height": 601
+    "height": 583
   },
   "weather/weather-source": {
     "width": 640,
@@ -16,44 +16,44 @@
     "height": 463
   },
   "download/pdf-options": {
-    "width": 448,
-    "height": 938
+    "width": 1280,
+    "height": 1274
   },
   "library-and-account/project-menu": {
     "width": 448,
-    "height": 1061
+    "height": 1397
   },
   "preview/rows": {
-    "width": 941,
-    "height": 1145
+    "width": 936,
+    "height": 1139
   },
   "library-and-account/card-menu": {
     "width": 241,
     "height": 247
   },
   "gauges-and-ranges/edit-range": {
-    "width": 975,
+    "width": 970,
     "height": 1192
   },
   "choose-ranges/days-in-ranges": {
-    "width": 975,
+    "width": 970,
     "height": 1192
   },
   "match-your-yarn/choose-colorways": {
-    "width": 1269,
+    "width": 1280,
     "height": 1288
   },
   "knit-along-all-year/future-days": {
     "width": 768,
-    "height": 601
+    "height": 583
   },
   "rain-snow-sunshine/rain-gauge": {
-    "width": 975,
+    "width": 970,
     "height": 712
   },
   "version-7/site-menu": {
     "width": 278,
-    "height": 466
+    "height": 1312
   },
   "weather-doesnt-match/change-one-day": {
     "width": 800,
