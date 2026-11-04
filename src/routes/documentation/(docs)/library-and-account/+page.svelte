@@ -28,7 +28,7 @@ show only in builds with accounts. -->
 
 <p>
   Everything you make is kept in My Library. Without an account, it's saved in
-  this browser on this device.{#if __ACCOUNTS_ENABLED__}
+  this browser on this device. {#if __ACCOUNTS_ENABLED__}
     Signed in, it's also saved to your account, and on every device where you
     sign in.{/if}
 </p>
@@ -120,7 +120,7 @@ show only in builds with accounts. -->
   </p>
   <DocsShot
     src="library-and-account/project-menu"
-    alt="The Project menu: the project's name with Save Project; Download; Share with Copy Link and Sign In to Publish; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
+    alt="The Project menu: the project's name with Save Project; Download; Progress, not started; Weather Data with Check for Updates, Edit Weather Data…, Weather Source, Units and Grouping; Share with Copy Link and Sign In to Publish; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
     caption="The Project menu, before the project is saved."
   />
 </section>

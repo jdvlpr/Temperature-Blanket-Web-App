@@ -31,7 +31,7 @@ share-to-gallery lands here. -->
 
 <section class="flex flex-col gap-3">
   <h2 id="share-a-link" class="text-2xl font-bold">Share a Link</h2>
-  <p>The quickest way, for one person or a group.</p>
+  <p>The quickest way.</p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       In the Project Planner, press <span class="font-bold">Project</span> (in

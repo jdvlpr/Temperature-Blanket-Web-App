@@ -196,7 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <DocsShot
               src="version-7/site-menu"
-              alt="The site menu: Create and My Library at the top; Explore with Gallery, Yarn Colorways and Weather Forecast; then Supporters, and small links to the Blog, Guides & Help, What's New, Contact, Privacy, Data Sources & Credits, API and GitHub."
+              alt="The site menu: Create and My Library at the top; Explore with Gallery, Yarn Colorways and Weather Forecast; then Supporters, and small links to Guides & Help, What's New, Contact, Preferences, Data Sources & Credits, Privacy, API and GitHub."
               caption="The new site menu."
             />
 

@@ -73,7 +73,7 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
   </p>
   <DocsShot
     src="colors-and-yarn/get-colors"
-    alt="The Get Colors menu: My Palettes, Palette Gallery, Preset Gradients, Choose Colorways, From an Image, Random, and Paste Colors or Code, each with a short description."
+    alt="The Get Colors menu: Choose Colorways, From an Image and Random; then My Palettes, Palette Gallery and Preset Gradients; then Paste Colors or Code, each with a short description."
     caption="The Get Colors menu in the Project Planner."
   />
 </section>

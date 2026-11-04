@@ -1282,10 +1282,12 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   return CLIP_VIEWPORT;
 }
 
-/** Shots and clips show the site as launched: without the beta's banner */
+/** Shots and clips show the site as launched: without the beta's banner or
+ * the sidebar's About the Beta */
 function hideBetaBanner() {
   const style = document.createElement('style');
-  style.textContent = 'aside[aria-label="Beta"] { display: none !important; }';
+  style.textContent =
+    'aside[aria-label="Beta"], a[href="/beta"] { display: none !important; }';
   document.addEventListener('DOMContentLoaded', () =>
     document.head.append(style),
   );

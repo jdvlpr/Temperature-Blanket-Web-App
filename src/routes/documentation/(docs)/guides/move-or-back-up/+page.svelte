@@ -89,7 +89,7 @@ can't be imported back. Account parts show only in builds with accounts. -->
   </p>
   <DocsShot
     src="library-and-account/project-menu"
-    alt="The Project menu: the project's name with Save Project; Download; Share with Copy Link and Sign In to Publish; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
+    alt="The Project menu: the project's name with Save Project; Download; Progress, not started; Weather Data with Check for Updates, Edit Weather Data…, Weather Source, Units and Grouping; Share with Copy Link and Sign In to Publish; Palettes with the Temperature Gauge; Project with New Project, Open… and Duplicate; and links to Getting Started, Keyboard Shortcuts, Guides & Help and Contact."
     caption="Copy Link is under Share in the Project menu."
   />
   <h3 id="edited-weather" class="text-lg font-bold">

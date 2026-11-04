@@ -86,7 +86,7 @@ here. -->
   </p>
   <DocsShot
     src="location-and-dates/location"
-    alt="The top of the Project Planner: London, England, United Kingdom chosen in the search box, From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days with Details beside it; Add another location; and the Check for Updates button."
+    alt="The Location step of a loaded project: London, England, United Kingdom chosen in the search box, From 2025-01-01 and To 2025-12-31 with Duration set to Custom; 365 Days with Details beside it; Add another location; and the Check for Updates button."
     caption="A place and a year of dates."
   />
 </section>
@@ -140,7 +140,7 @@ here. -->
   </ol>
   <DocsShot
     src="colors-and-yarn/get-colors"
-    alt="The Get Colors menu: My Palettes, Palette Gallery, Preset Gradients, Choose Colorways, From an Image, Random, and Paste Colors or Code, each with a short description."
+    alt="The Get Colors menu: Choose Colorways, From an Image and Random; then My Palettes, Palette Gallery and Preset Gradients; then Paste Colors or Code, each with a short description."
     caption="Get Colors."
   />
   <p>

@@ -52,7 +52,7 @@ them, asking before changing saved ones
   </ol>
   <DocsShot
     src="knit-along-all-year/future-days"
-    alt="London from January 1 to December 31 of this year, 365 Days, with how many are still to come. Below it, Add Location, then Get Weather Data."
+    alt="London from January 1 to December 31 of this year: 365 Days, and how many are still to come. Below it, Add another location, then Check for Updates."
     caption="A year that's still going."
   />
 </section>
