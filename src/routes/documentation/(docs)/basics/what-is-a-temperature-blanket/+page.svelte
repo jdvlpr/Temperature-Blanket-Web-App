@@ -18,22 +18,7 @@ seen one (Basics; once a blog post, and where /info/what-is-a-temperature-blanke
 goes) -->
 
 <script lang="ts">
-  import { getColorsFromInput, getTextColor } from '#lib/utils/color-utils.js';
-
-  const colorsCode = `palette:ca2c29a4435b46203cea9d5deec06697b2dc5ea1de3271c51838971a2d46yarn:hobbii-amigo`;
-  const colors = getColorsFromInput({ string: colorsCode }) || [];
-  const ranges = [
-    [96, 76],
-    [76, 71],
-    [71, 66],
-    [66, 62],
-    [62, 57],
-    [57, 49],
-    [49, 42],
-    [42, 38],
-    [38, 35],
-    [35, 4],
-  ];
+  import DocsShot from '#lib/components/docs/DocsShot.svelte';
 
   const patterns = [
     { src: 'chevron', name: 'Chevron' },
@@ -84,33 +69,11 @@ goes) -->
     it's up to you. Each color is given a range of temperatures, and together
     they make a temperature gauge.
   </p>
-  <div class="flex max-w-sm flex-col gap-2">
-    <p class="text-sm">An example of a temperature gauge:</p>
-    <div class="rounded-container flex flex-col overflow-hidden shadow-md">
-      {#each colors as color, i (i)}
-        {@const hex = color.hex ?? '#000000'}
-        <div
-          style="background:{hex}; color:{getTextColor(hex)}"
-          class="flex w-full items-center justify-around py-2"
-        >
-          <div class="flex flex-col">
-            <p class="text-xs">{color.brandName} - {color.yarnName}</p>
-            <p>{color.name}</p>
-          </div>
-          <div class="flex gap-2">
-            <div class="flex flex-col">
-              <p class="text-xs">From</p>
-              <p>{ranges[i][0]}°</p>
-            </div>
-            <div class="flex flex-col">
-              <p class="text-xs">To</p>
-              <p>{ranges[i][1]}°</p>
-            </div>
-          </div>
-        </div>
-      {/each}
-    </div>
-  </div>
+  <DocsShot
+    src="what-is-a-temperature-blanket/gauge"
+    alt="A temperature gauge of ten Hobbii Amigo yarns, each with its range of temperatures: Christmas Red for 34° to 25°, then reds, orange and yellow down to 16°, and blues for the coldest days, ending with Navy Blue for 7° to −5°"
+    caption="An example of a temperature gauge"
+  />
 </section>
 
 <section class="flex flex-col gap-3">
@@ -118,7 +81,8 @@ goes) -->
   <p>
     People either look up the weather of days gone by, or track the temperature
     as the days go. Each day is then made in the yarn for its temperature. For
-    example, with the gauge above, a day of 36° would be a row of Royal Blue.
+    example, with the gauge above, a day in Royal Blue's range would be a row of
+    Royal Blue.
   </p>
 </section>
 

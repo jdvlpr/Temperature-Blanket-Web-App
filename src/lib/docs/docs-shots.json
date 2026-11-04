@@ -110,5 +110,9 @@
   "publish-and-share/publish": {
     "width": 800,
     "height": 720
+  },
+  "what-is-a-temperature-blanket/gauge": {
+    "width": 970,
+    "height": 940
   }
 }

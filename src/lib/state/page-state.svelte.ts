@@ -511,10 +511,11 @@ export const defaultYarn = {
   },
 };
 
-// Go to a section
+// Go to a section. With `slideUp`, it starts half a screen below where it
+// ends and slides up from there, however long the section is.
 export const goToProjectSection = async (
   index: number,
-  animateFromBottom: boolean = false,
+  slideUp: boolean = false,
 ) => {
   if (index === 0) {
     if (typeof document.documentElement !== 'undefined')
@@ -524,29 +525,32 @@ export const goToProjectSection = async (
 
   setSections(index);
 
-  if (animateFromBottom) {
-    await tick();
-    // scroll to bottom
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'instant',
-    });
-    await delay(50);
-  }
-
   const activeSection = pageSections.items.find(
     (section) => section.active === true && section.index === index,
   );
 
-  var topBanner = document
+  const topBanner = document
     .getElementById('top-banner')
     ?.getBoundingClientRect() ?? { height: 0 };
 
   const topBannerHeight = topBanner.height;
   const sectionScrollTop = activeSection?.scrollTop;
-  const currentScrollTop = document.documentElement.scrollTop;
+  const returnToSaved =
+    sectionScrollTop !== 0 &&
+    sectionScrollTop !== undefined &&
+    document.documentElement.scrollTop !== sectionScrollTop;
+  const target = returnToSaved ? sectionScrollTop : topBannerHeight;
 
-  if (sectionScrollTop !== 0 && currentScrollTop !== sectionScrollTop) {
+  if (slideUp) {
+    await tick();
+    window.scrollTo({
+      top: target + window.innerHeight / 2,
+      behavior: 'instant',
+    });
+    await delay(50);
+  }
+
+  if (returnToSaved) {
     await tick();
     // Scroll to previous position of section
     document.documentElement.scrollTo({

@@ -252,6 +252,57 @@ async function yarnPalette(page: Page) {
 
 const SHOTS: Shot[] = [
   {
+    // What a gauge is, for people who've never seen one: real yarn, each
+    // color with its range, without the days in each
+    name: 'what-is-a-temperature-blanket/gauge',
+    open: async (page) => {
+      await planner(page, 'gauges');
+      await page.getByRole('button', { name: /Get Colors/ }).click();
+      await page.getByRole('menuitem', { name: /Choose Colorways/ }).click();
+      const picker = dialog(page);
+      await picker.getByRole('combobox').first().click();
+      await page.keyboard.type('Amigo');
+      await page
+        .getByRole('option', { name: /^Amigo\b(?!\s*(Chunky|XL))/ })
+        .first()
+        .click();
+      await settle(page);
+      // Warm to cold, as the gauge goes
+      for (const name of [
+        'Christmas Red',
+        'Marsala',
+        'Bordeaux',
+        'Bright Orange',
+        'Egg Yolk',
+        'Sky Blue',
+        'Cornflower',
+        'Cobalt Blue',
+        'Royal Blue',
+        'Navy Blue',
+      ])
+        await picker
+          .locator('button[aria-pressed]')
+          .filter({ hasText: new RegExp(`\\b${name}\\b`) })
+          .first()
+          .click();
+      await picker.getByRole('button', { name: 'Save', exact: true }).click();
+      await picker.waitFor({ state: 'detached' });
+      await page.getByRole('button', { name: /^View/ }).click();
+      await menu(page)
+        .getByRole('menuitemcheckbox', { name: /Days in ranges/ })
+        .click();
+      await page.keyboard.press('Escape');
+      // Without View's focus ring
+      await page.evaluate(() =>
+        (document.activeElement as HTMLElement)?.blur(),
+      );
+      await page.mouse.move(0, 0);
+      await settle(page);
+      return page.locator('#gauge-panel');
+    },
+    trim: true,
+  },
+  {
     name: 'gauges-and-ranges/edit-range',
     open: async (page) => {
       const section = await planner(page, 'gauges');
