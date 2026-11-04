@@ -155,7 +155,7 @@ export const GUIDES: DocsPage[] = [
     slug: 'match-your-yarn',
     title: 'Match Your Own Yarn, or a Photo',
     summary:
-      'Use yarn you already have or can buy, or take the colors from a photo you love.',
+      'Use yarn you already have or can buy, or take the colors from a picture.',
     keywords: [
       'stash',
       'my yarn',

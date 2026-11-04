@@ -357,10 +357,14 @@ declare global {
 const value = (page: Page, date: string, param: string) =>
   page.getByRole('button', { name: `Edit ${date}, ${param}:` });
 
-/** The Weather step with the table's first rows in view */
-async function weatherTable(page: Page) {
+/** The Weather step with the table's first rows in view, or with `at` (in
+ * the step) just under the top bar */
+async function weatherTable(
+  page: Page,
+  at: (section: Locator) => Locator = (section) => section.getByRole('table'),
+) {
   const section = await planner(page, 'weather-data');
-  const table = section.getByRole('table');
+  const table = at(section);
   // Again until it stays: the step and the chart, laid out late, can move it
   for (let tries = 0, still = 0; still < 3 && tries < 30; tries++) {
     const top = await table.evaluate(
@@ -437,6 +441,209 @@ const CLIPS: Clip[] = [
         900,
       );
       await page.waitForTimeout(600);
+    },
+  },
+  {
+    name: 'weather/check-for-updates',
+    open: async (page) => {
+      await planner(page, 'location');
+      // Saved, so its weather is kept and the button checks for updates
+      await page.keyboard.press('ControlOrMeta+s');
+      const button = page.locator('#location-action-button');
+      await button.filter({ hasText: 'Check for Updates' }).waitFor();
+      // The source has since refined some days: a few highs by enough to
+      // change color, a few by a little
+      await page.route(
+        'https://archive-api.open-meteo.com/**',
+        async (route) => {
+          const response = await route.fetch();
+          const data = await response.json();
+          const highs: number[] = data.daily.temperature_2m_max;
+          const by = (i: number, d: number) =>
+            (highs[i] = Math.round((highs[i] + d) * 10) / 10);
+          for (const i of [2, 3, 4, 5, 6]) by(i, 4);
+          for (const i of [9, 10, 11]) by(i, 0.3);
+          await route.fulfill({ response, json: data });
+        },
+      );
+      // Without its Saved toast
+      await page
+        .getByRole('button', { name: 'Dismiss toast' })
+        .first()
+        .waitFor();
+      for (const toast of await page
+        .getByRole('button', { name: 'Dismiss toast' })
+        .all())
+        await toast.click();
+      await button.scrollIntoViewIfNeeded();
+      await settle(page);
+    },
+    play: async (page) => {
+      await clickOn(page, page.locator('#location-action-button'), 700);
+      await dialog(page).getByText('Update Past Days').waitFor();
+      await page.waitForTimeout(1100);
+      await clickOn(
+        page,
+        dialog(page)
+          .locator('label')
+          .filter({ hasText: 'Update Past Days' })
+          .locator('input + div'),
+        700,
+      );
+      await page.waitForTimeout(600);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', {
+          name: /Choose which days to update/,
+        }),
+        700,
+      );
+      await page.waitForTimeout(800);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: /^Filters/ }),
+        700,
+      );
+      await page.waitForTimeout(400);
+      await clickOn(
+        page,
+        dialog(page).getByRole('checkbox', { name: /^New color/ }),
+        600,
+      );
+      await page.waitForTimeout(1200);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Back', exact: true }),
+        700,
+      );
+      await page.waitForTimeout(500);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: /^Update \d+ Days?$/ }),
+        700,
+      );
+      await page.waitForTimeout(600);
+    },
+  },
+  {
+    name: 'weather/table-filters',
+    open: (page) =>
+      weatherTable(page, (section) =>
+        section.getByRole('button', { name: /^Filters/ }),
+      ),
+    play: async (page) => {
+      const section = page.locator('#page-section-weather-data');
+      await clickOn(
+        page,
+        section.getByRole('button', { name: /^Filters/ }),
+        900,
+      );
+      await page.waitForTimeout(500);
+      await clickOn(
+        page,
+        section.getByRole('checkbox', { name: /^Color/ }),
+        700,
+      );
+      await page.waitForTimeout(700);
+      await clickOn(
+        page,
+        section.getByRole('radio', { name: /^Color 3/ }),
+        800,
+      );
+      await page.waitForTimeout(1200);
+      await clickOn(
+        page,
+        section.getByRole('button', { name: /^Filters/ }),
+        800,
+      );
+      await page.waitForTimeout(600);
+      await clickOn(page, section.getByRole('button', { name: /^View/ }), 800);
+      await page.waitForTimeout(400);
+      await clickOn(
+        page,
+        menu(page).getByRole('menuitemcheckbox', { name: /Show Colors/ }),
+        700,
+      );
+      await page.waitForTimeout(500);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(900);
+      await clickOn(
+        page,
+        section.getByRole('button', { name: /: color details$/ }).first(),
+        900,
+      );
+      await page.waitForTimeout(1400);
+    },
+  },
+  {
+    name: 'weather/import-csv',
+    open: (page) =>
+      weatherTable(page, (section) =>
+        section.getByRole('group', { name: 'Weather Data' }),
+      ),
+    play: async (page) => {
+      const section = page.locator('#page-section-weather-data');
+      await clickOn(
+        page,
+        section.getByRole('button', { name: 'Edit', exact: true }),
+        900,
+      );
+      await dialog(page).getByRole('grid').waitFor();
+      await page.waitForTimeout(700);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Import File' }),
+        800,
+      );
+      await page.waitForTimeout(600);
+      const chooser = page.waitForEvent('filechooser');
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Browse Files' }),
+        800,
+      );
+      await (
+        await chooser
+      ).setFiles(join(root, 'scripts/docs-fixtures/my-readings.csv'));
+      await page.waitForFunction(() =>
+        /Read \d+ days?/.test(document.body.innerText),
+      );
+      await page.waitForTimeout(1400);
+      // Folded away, so the grid's changed values show
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Import File' }),
+        700,
+      );
+      await page.waitForTimeout(1800);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Apply', exact: true }),
+        900,
+      );
+      await page.waitForTimeout(600);
+    },
+  },
+  {
+    name: 'weather/grouping',
+    open: (page) =>
+      weatherTable(page, (section) =>
+        section.getByRole('group', { name: 'Weather Data' }),
+      ),
+    play: async (page) => {
+      const section = page.locator('#page-section-weather-data');
+      await clickOn(
+        page,
+        section.getByRole('button', { name: /Grouping/ }),
+        900,
+      );
+      await page.waitForTimeout(600);
+      await clickOn(
+        page,
+        menu(page).getByRole('menuitemradio', { name: /Weekly/ }),
+        700,
+      );
+      await page.waitForTimeout(1600);
     },
   },
 ];
@@ -567,6 +774,15 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   return CLIP_VIEWPORT;
 }
 
+/** Shots and clips show the site as launched: without the beta's banner */
+function hideBetaBanner() {
+  const style = document.createElement('style');
+  style.textContent = 'aside[aria-label="Beta"] { display: none !important; }';
+  document.addEventListener('DOMContentLoaded', () =>
+    document.head.append(style),
+  );
+}
+
 async function main() {
   const browser = await chromium.launch();
   const sizes: Record<string, { width: number; height: number }> = JSON.parse(
@@ -586,6 +802,7 @@ async function main() {
         // Sharp on high-density screens; the sizes kept are CSS pixels
         deviceScaleFactor: 2,
       });
+      await context.addInitScript(hideBetaBanner);
       const page = await context.newPage();
       const target = await shot.open(page).catch(async (error) => {
         // Where it stopped, to see why
@@ -633,6 +850,7 @@ async function main() {
         colorScheme: theme,
         deviceScaleFactor: 2,
       });
+      await context.addInitScript(hideBetaBanner);
       sizes[clip.name] = await record(context, clip, theme);
       console.log(`${clip.name}-${theme}.mp4`);
       await context.close();

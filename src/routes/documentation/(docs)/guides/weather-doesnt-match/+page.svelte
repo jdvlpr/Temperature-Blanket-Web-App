@@ -160,9 +160,8 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     </li>
   </ul>
   <p>
-    You can also open the editor from <span class="font-bold">Edit</span> ›
-    <span class="font-bold">Edit Weather Data</span> above the weather. Every
-    part of it is in
+    You can also open the editor with <span class="font-bold">Edit</span> above
+    the weather. Every part of it is in
     <a href="/documentation/weather#edit-weather-data" class="link"
       >Edit the Weather</a
     >.
@@ -175,30 +174,11 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   </h2>
   <p>
     If you've kept a log, from your own thermometer or a weather station nearby,
-    bring it all in at once:
-  </p>
-  <ol class="ml-6 list-decimal space-y-1">
-    <li>
-      Press <span class="font-bold">Download</span> at the top of the Weather
-      step, then <span class="font-bold">Download CSV</span>.
-    </li>
-    <li>
-      Open the file in Excel, Numbers or Google Sheets. Put your readings in
-      place of the ones there, keeping the dates and the column headings, and
-      save it as CSV.
-    </li>
-    <li>
-      Press <span class="font-bold">Edit</span>, then
-      <span class="font-bold">Import File</span>, and choose your file. The
-      values it changes are marked; check them, then press
-      <span class="font-bold">Apply</span>.
-    </li>
-  </ol>
-  <p>
-    What the file needs is in
-    <a
-      href="/documentation/weather#import-weather-data-file-requirements"
-      class="link">CSV File Requirements</a
+    bring it all in at once: download your project's weather as a CSV file, put
+    your readings in place of the ones there, and import it. How, step by step,
+    is in
+    <a href="/documentation/weather#import-weather-data" class="link"
+      >Import Your Own Weather</a
     >.
   </p>
 </section>
@@ -257,8 +237,8 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
   <p>
     With <span class="font-bold">Grouping</span> set to
     <span class="font-bold">Weekly</span>, the table shows weeks, which can't be
-    changed. Press <span class="font-bold">Edit</span> ›
-    <span class="font-bold">Edit Weather Data</span> instead: it always shows days.
+    changed. Press <span class="font-bold">Edit</span> above the weather instead:
+    Edit Weather Data always shows days.
   </p>
   <h3 class="text-lg font-bold">Apply is greyed out</h3>
   <p>

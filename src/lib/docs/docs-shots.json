@@ -62,5 +62,21 @@
   "weather-doesnt-match/change-several-days": {
     "width": 800,
     "height": 720
+  },
+  "weather/grouping": {
+    "width": 800,
+    "height": 720
+  },
+  "weather/check-for-updates": {
+    "width": 800,
+    "height": 720
+  },
+  "weather/table-filters": {
+    "width": 800,
+    "height": 720
+  },
+  "weather/import-csv": {
+    "width": 800,
+    "height": 720
   }
 }

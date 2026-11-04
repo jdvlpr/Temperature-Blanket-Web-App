@@ -23,6 +23,7 @@ HELP_TOPICS). -->
   import MixedSnow from '#lib/components/docs/help/MixedSnow.svelte';
   import ProjectIncludes from '#lib/components/docs/help/ProjectIncludes.svelte';
   import SavedWeatherDays from '#lib/components/docs/help/SavedWeatherDays.svelte';
+  import DocsClip from '#lib/components/docs/DocsClip.svelte';
   import DocsShot from '#lib/components/docs/DocsShot.svelte';
   import RelatedGuides from '#lib/components/docs/RelatedGuides.svelte';
   import {
@@ -65,51 +66,65 @@ HELP_TOPICS). -->
     For a saved project, the main button on the Location step says
     <span class="font-bold">Add 14 New Days</span> (with however many are
     waiting) while a project is still going, or
-    <span class="font-bold">Check for Updates</span> when there are none; the Project
-    menu offers Check for Updates too. It gets every day again. When no saved day
-    is different, the new days are just added.
+    <span class="font-bold">Check for Updates</span> when there are none; the
+    Project menu offers Check for Updates too. It gets every day again. When no
+    saved day is different, the new days are just added. When some are,
+    <span class="font-bold">Update Weather Data</span> opens, and nothing
+    changes until you press its save button, which says what it will do (like
+    <span class="font-bold">Update 5 Days</span> or
+    <span class="font-bold">Keep As Is</span>).
   </p>
-  <p>
-    If any saved day is different now, <span class="font-bold"
-      >Update Weather Data</span
-    >
-    opens, so nothing is saved without your say. New days come first (on to start).
-    Weather sources correct readings as stations report in, which is normal, so how
-    much space the changed days take depends on your blanket: when none of them changes
-    color, it's a short note with
-    <span class="font-bold">Review changes</span>; when some do,
-    <span class="font-bold">Update Past Days</span> (off to start) says how many days
-    in the project would change color, and which source has newer values. Turn everything
-    off to change nothing; the new days are still offered later.
-  </p>
-  <p>
-    <span class="font-bold">View All Changes</span> (or Review changes) shows
-    every changed day, the new value over the saved one and how much it changed.
-    Filters narrow the list (<span class="font-bold">New color</span>,
-    <span class="font-bold">Now settled</span>,
-    <span class="font-bold">Was missing</span>,
-    <span class="font-bold">Now missing</span>, temperatures or rain and snow
-    that changed by at least an amount, <span class="font-bold">Kept</span>, a
-    date range), and
-    <span class="font-bold">Select Shown</span>,
-    <span class="font-bold">Clear Shown</span> and
-    <span class="font-bold">Invert</span> pick the days shown.
-    <span class="font-bold">Show Colors</span> adds each value's color, and both colors
-    where it changes ("Color 2 → 3"). Nothing changes until you save; Cancel leaves
-    everything as it was.
-  </p>
-  <p>
-    Days you don't update keep their saved values, and you won't be asked about
-    them again unless their values change again. They're marked in the weather
-    table: tap the mark to see both values and use the new ones. The next time
-    you check, View All Changes' <span class="font-bold">Kept</span> filter shows
-    them too. Your project's gallery page can be updated right after, too.
-  </p>
-  <p>
-    Updating days doesn't change Auto ranges. When your weather no longer
-    matches them, the gauge says so, with
-    <span class="font-bold">Update Ranges</span>.
-  </p>
+  <DocsClip
+    src="weather/check-for-updates"
+    alt="On the Location step, the pointer presses Check for Updates. Update Weather Data opens: Update Past Days says 5 days in the project would change color, and Open-Meteo has newer values for 8 days. Its switch is turned on, and Choose which days to update opens All Changes, each changed value over the saved one struck through, like 7.4 over 3.4, +4. Filters › New color shows 5 of the 8 days. Back, then Update 8 Days: the dialog closes and the message says Updated 8 days."
+    caption="Checking a saved project for updates."
+  />
+  <ul class="ml-6 list-disc space-y-1">
+    <li>
+      <span class="font-bold">Add 14 new days:</span> on to start. Turned off, the
+      days are offered again next time.
+    </li>
+    <li>
+      <span class="font-bold">Update Past Days:</span> off to start. Weather
+      sources correct past days as stations report in, which is normal. It says
+      how many days in your project would change color, and which source has
+      newer values. When none would, it's just a short note with
+      <span class="font-bold">Review changes</span>.
+    </li>
+    <li>
+      <span class="font-bold">Choose which days to update</span> (or Review
+      changes) opens <span class="font-bold">All Changes</span>: every changed
+      day, the new value over the saved one and how much it changed. Filters
+      narrow the list (<span class="font-bold">New color</span>,
+      <span class="font-bold">Now settled</span>,
+      <span class="font-bold">Was missing</span>,
+      <span class="font-bold">Now missing</span>, temperatures or rain and snow
+      that changed by at least an amount, <span class="font-bold">Kept</span>,
+      dates), and <span class="font-bold">Select Shown</span>,
+      <span class="font-bold">Clear Shown</span> and
+      <span class="font-bold">Invert</span> pick the days shown. With
+      <span class="font-bold">Show Colors</span> a changed color shows both ("Color
+      2 → 3").
+    </li>
+    <li>
+      <span class="font-bold">Days you've made</span> (with your
+      <a href="/documentation/preview#progress" class="link">progress</a> set) stay
+      as they are, so your blanket keeps matching; you can still pick them in All
+      Changes.
+    </li>
+    <li>
+      <span class="font-bold">Kept days:</span> days you don't update keep their saved
+      values, and you won't be asked about them again unless they change again. They're
+      marked in the weather table: tap the mark to see both values and use the new
+      ones.
+    </li>
+    <li>
+      <span class="font-bold">Auto ranges</span> don't change. When your weather
+      no longer matches them, the gauge says so, with
+      <span class="font-bold">Update Ranges</span>. If the project has a gallery
+      page, you can update it right after.
+    </li>
+  </ul>
   <h3 id="project-includes" class="text-lg font-bold">
     What a Project Includes
   </h3>
@@ -179,6 +194,11 @@ HELP_TOPICS). -->
     Choose <span class="font-bold">Grouping</span> above the weather.
   </p>
   <GroupingWeather />
+  <DocsClip
+    src="weather/grouping"
+    alt="Above the weather, the pointer opens Grouping: Daily and chooses Weekly. The chart redraws with one point a week, and a note says Weekly: starts Wed, Jan 1, 2025 · 53 weeks, which can make a shorter project."
+    caption="Grouping the weather by week."
+  />
   <p>
     Editing and importing always change days, whichever grouping the table
     shows.
@@ -216,6 +236,11 @@ HELP_TOPICS). -->
       and colors, and Show Colors is one setting for all of them.
     </li>
   </ul>
+  <DocsClip
+    src="weather/table-filters"
+    alt="Above the weather table, the pointer opens Filters, checks Color and picks color 3: the table shows 73 of 365 days. Filters closes, leaving a Color 3 chip. View › Show Colors puts a colored circle and its color number beside each value, and pressing the circle beside April 4's high shows Color 3 of 10."
+    caption="Showing the days in one color."
+  />
   <p>
     To switch between °C / mm and °F / in, use
     <span class="font-bold">Units</span> above the weather (or press
@@ -226,49 +251,58 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="edit-weather-data" class="text-2xl font-bold">Edit the Weather</h2>
   <p>
-    If a day looks wrong, change it. Press
-    <span class="font-bold">Edit</span> ›
-    <span class="font-bold">Edit Weather Data</span>
-    at the top of the Weather step (or press a value in the table to start on it).
-    Every day's weather opens in a grid, like a spreadsheet, with the same filters
-    as the table (and <span class="font-bold">Edited</span>, for the values
-    you've changed). With Show Colors on, each value's color is beside it, and
-    the selected value's yarn is named above the grid as you type. A changed
-    value shows what it was, crossed out, under it.
+    Press <span class="font-bold">Edit</span> at the top of the Weather step, or
+    press a value in the table to start on it.
+    <span class="font-bold">Edit Weather Data</span> opens every day's weather
+    in a grid, like a spreadsheet. For step-by-step help, see
+    <a
+      href="/documentation/guides/weather-doesnt-match#fix-a-few-days"
+      class="link">Fix a Few Days</a
+    >.
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Change a value:</span> select it and type, then
-      press <kbd class="kbd">Enter</kbd>. Enter, Tab and the arrow keys move.
-      Daylight is hours:minutes, like 08:12. Leave a value empty for missing.
+      <span class="font-bold">Typing:</span> type over a value and press
+      <kbd class="kbd">Enter</kbd>; Enter, Tab and the arrow keys move. Daylight
+      is hours:minutes, like 08:12. Leave a value empty for missing. The moon
+      phase can't be edited.
     </li>
     <li>
-      <span class="font-bold">Change many:</span> select them with Shift or by
-      dragging, then type a value beside
-      <span class="font-bold">Set</span>, or a number to
-      <span class="font-bold">Add</span> to each (negative to take away).
+      <span class="font-bold">Set</span> and
+      <span class="font-bold">Add:</span> for the selected values (drag, or
+      Shift-press), give them all one value, or add a number to each (negative
+      takes away).
       <kbd class="kbd">Delete</kbd> clears them.
     </li>
     <li>
-      <span class="font-bold">Paste from a spreadsheet:</span> copy cells in Excel,
-      Numbers or Google Sheets and paste them on the first cell they go in. If the
-      rows you copy start with dates, each goes to its day.
+      <span class="font-bold">Paste:</span> cells copied from Excel, Numbers or Google
+      Sheets go from the cell you paste on. Rows that start with dates go to their
+      days.
     </li>
     <li>
-      <span class="font-bold">Missing days:</span>
-      <span class="font-bold">Find Missing</span> goes to the next empty value;
-      <span class="font-bold">Fill In Missing</span> fills the selected ones (or all
-      of them, with one value selected) from the days on either side. They show only
-      while some values are missing.
+      <span class="font-bold">Find Missing</span> and
+      <span class="font-bold">Fill In Missing:</span> go to the next empty value,
+      or fill the selected ones (all of them, with one value selected) from the days
+      on either side. They show only while some values are missing.
+    </li>
+    <li>
+      <span class="font-bold">Filters:</span> the same as the table's, plus
+      <span class="font-bold">Edited</span>, for the values you've changed.
+    </li>
+    <li>
+      <span class="font-bold">Show Colors:</span> each value's color beside it, and
+      the selected value's yarn named above the grid as you type. A changed value
+      shows what it was, crossed out.
+    </li>
+    <li>
+      <span class="font-bold">Apply:</span> nothing changes in your project
+      until you press it. Until then, Undo and Redo in the editor work on your
+      changes,
+      <span class="font-bold">Revert</span> puts the selected values back, and closing
+      asks before leaving them. Once applied, Undo above the project takes them back
+      in one step.
     </li>
   </ul>
-  <p>
-    Changed values are marked. Nothing changes in your project until you press
-    <span class="font-bold">Apply</span>: until then, Undo and Redo in the
-    editor work on your changes, <span class="font-bold">Revert</span> puts the selected
-    values back, and closing asks before leaving them. Once applied, Undo above the
-    project takes them back in one step. The moon phase can't be edited.
-  </p>
   <h3 class="text-lg font-bold">Once you've edited the weather</h3>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -320,6 +354,11 @@ HELP_TOPICS). -->
       <span class="font-bold">Apply</span>.
     </li>
   </ol>
+  <DocsClip
+    src="weather/import-csv"
+    alt="On the Weather step, the pointer presses Edit, and Edit Weather Data opens. Import File shows a box to select or drag a CSV file; a file is chosen with Browse Files, and it says Read 7 days. Import File is pressed again to fold the box away: the first days' highs show their new values over the old ones struck through, with the changes, and 7 values changed on 7 days. Apply is pressed: the source shows Custom, and the message says Weather data changed on 7 days."
+    caption="Importing a CSV file of your own readings."
+  />
   <p>
     Rows that can't be read are left out, and listed. You can also skip the
     file: copy the cells in your spreadsheet and paste them into Edit Weather
