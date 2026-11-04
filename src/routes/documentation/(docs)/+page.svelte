@@ -91,7 +91,7 @@ Back doesn't return to it. -->
   </section>
 
   <!-- Not id="basics": /documentation#basics is an old anchor (OLD_ANCHORS) -->
-  {#each [{ id: 'blanket-basics', heading: KIND_HEADINGS.basics, intro: 'Reference ', pages: BASICS }, { id: 'guides', heading: KIND_HEADINGS.guide, intro: 'Step by step, for the things people most often want to do.', pages: GUIDES }, { id: 'reference', heading: KIND_HEADINGS.reference, intro: 'Every part of the site, and what each option does.', pages: REFERENCE }] as { id, heading, intro, pages } (id)}
+  {#each [{ id: 'blanket-basics', heading: KIND_HEADINGS.basics, intro: 'Information about temperature blankets and yarn weights', pages: BASICS }, { id: 'guides', heading: KIND_HEADINGS.guide, intro: 'Step by step, for the things people most often want to do.', pages: GUIDES }, { id: 'reference', heading: KIND_HEADINGS.reference, intro: 'Every part of the site, and what each option does.', pages: REFERENCE }] as { id, heading, intro, pages } (id)}
     <section {id} class="flex flex-col gap-3" data-pagefind-ignore>
       <h2 class="text-2xl font-bold">{heading}</h2>
       <p class="opacity-80">{intro}</p>
