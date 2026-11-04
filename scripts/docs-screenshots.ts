@@ -381,7 +381,12 @@ const SHOTS: Shot[] = [
         .first()
         .click();
       await page.getByRole('button', { name: /^PDF/ }).click();
-      await page.getByRole('button', { name: /^Customize/ }).click();
+      await dialog(page).getByText('Page Size').waitFor();
+      // Its pages, drawn after it opens
+      await dialog(page)
+        .getByAltText(/^Page 1 of/)
+        .waitFor({ timeout: 30_000 });
+      await page.waitForTimeout(800);
       await settle(page);
       return dialog(page);
     },
@@ -998,6 +1003,8 @@ const CLIPS: Clip[] = [
 type Card = {
   slug: string;
   open: (page: Page) => Promise<Locator>;
+  /** Frames the middle of a tall target, not its top */
+  middle?: boolean;
 };
 
 /** The card's frame in CSS pixels; saved at twice that, 1200×630, the size
@@ -1053,7 +1060,18 @@ const CARDS: Card[] = [
   { slug: 'weather', open: async (page) => planner(page, 'weather-data') },
   { slug: 'gauges-and-ranges', open: shot('gauges-and-ranges/ranges-menu') },
   { slug: 'colors-and-yarn', open: shot('colors-and-yarn/get-colors') },
-  { slug: 'preview', open: async (page) => planner(page, 'preview') },
+  {
+    slug: 'preview',
+    // Another pattern than Plan a Blanket's rows
+    open: async (page) => {
+      const section = await planner(page, 'preview');
+      await section.getByTitle('Preview 12-Point Star Layout').click();
+      await settle(page);
+      await page.waitForTimeout(800);
+      return section.locator('#preview-svg-image');
+    },
+    middle: true,
+  },
   {
     slug: 'download',
     open: async (page) => {
@@ -1106,7 +1124,10 @@ async function card(context: BrowserContext, entry: Card, theme: string) {
     ),
     viewport.width - width,
   );
-  const y = Math.max(box.y - 16, 0);
+  const y = Math.max(
+    entry.middle ? box.y + box.height / 2 - height / 2 : box.y - 16,
+    0,
+  );
   const png = join(root, `.svelte-kit/docs-card-${theme}.png`);
   await page.screenshot({
     path: png,
