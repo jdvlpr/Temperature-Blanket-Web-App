@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   /** A color the palette's strip asked to go to: its gauge's list shows it */
   const colorRequest: { gaugeId: string | null; index: number } = $state({
     gaugeId: null,
@@ -30,6 +29,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
+  import {
+    autoUpdate,
+    computePosition,
+    flip as flipPlacement,
+    offset,
+    shift,
+  } from '@floating-ui/dom';
   import ColorSwatch from '#lib/components/ColorSwatch.svelte';
   import RangeArrow from '#lib/components/RangeArrow.svelte';
   import RangeUnit from '#lib/components/RangeUnit.svelte';
@@ -465,6 +471,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setTimeout(() => viewport.removeEventListener('resize', reveal), 1000);
   }
 
+  // ✕ and Save float just under the number being edited (above it when
+  // there's no room), over whatever is there, so editing never moves the
+  // row. In the top layer (a popover), since a row is a size container
+  // that would clip anything fixed inside it; still inside the range in the
+  // page, so tabbing and pressing them count as in it.
+  function floatUnderField(bar: HTMLElement) {
+    const anchor = bar.parentElement;
+    if (!anchor) return;
+    bar.showPopover?.();
+    const stop = autoUpdate(anchor, bar, async () => {
+      const { x, y } = await computePosition(anchor, bar, {
+        strategy: 'fixed',
+        placement: 'bottom',
+        middleware: [offset(4), flipPlacement(), shift({ padding: 8 })],
+      });
+      Object.assign(bar.style, { left: `${x}px`, top: `${y}px` });
+    });
+    return () => {
+      stop();
+      if (bar.isConnected && bar.matches(':popover-open')) bar.hidePopover();
+    };
+  }
+
   function focusRange(index: number, edge: 'from' | 'to') {
     tick().then(() =>
       listElement
@@ -495,8 +524,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
     });
   });
-
-  let periods = $derived(pluralize(weather.grouping, 2));
 
   // The gauge's range options aren't reactive state, but they only change
   // along with its ranges (a save here, the Ranges menu, undo), so they're
@@ -843,14 +870,20 @@ and glows on undo or redo. -->
 
 <!-- e.g. "105 → 92"; what each range includes is said once, above the list -->
 <!-- `column` pads the numbers so they line up down a list -->
+<!-- While it's being edited, the button stays (unseen, with the saved number)
+to keep its room, and the field sits right over it: nothing beside it moves -->
 {#snippet rangeValue(
   index: number,
   r: GaugeRange,
   edge: 'from' | 'to',
   column: boolean,
 )}
+  {@const isEditingThis = editing?.index === index && editing?.edge === edge}
+  {@const shown = isEditingThis
+    ? ((gauge.ranges?.[index] as GaugeRange | undefined)?.[edge] ?? r[edge])
+    : r[edge]}
   <span
-    class="flex {edge === 'from' ? 'justify-end' : ''}"
+    class="relative flex {edge === 'from' ? 'justify-end' : ''}"
     style:width={column ? `calc(${rangeChars[edge]}ch + 1rem)` : undefined}
   >
     <button
@@ -861,6 +894,7 @@ and glows on undo or redo. -->
       )
         ? changedText
         : ''}"
+      class:invisible={isEditingThis}
       title="Edit {edge === 'from' ? 'From' : 'To'}"
       aria-label="Color {index + 1} {edge} {r[edge]} {unitLabel}{movedValue(
         index,
@@ -876,46 +910,54 @@ and glows on undo or redo. -->
     >
       <!-- One inline run, so the unit can sit up by the number -->
       <span
-        >{r[edge]}<RangeUnit
+        >{shown}<RangeUnit
           label={unitLabel}
           type={gauge.unit?.type}
           {filled}
         /></span
       >
     </button>
+    {#if isEditingThis}
+      {@render rangeInput(index, edge, column)}
+    {/if}
   </span>
 {/snippet}
 
-<!-- The number being edited, in its own field like the search fields: the
-number (its unit is only in its label, to leave the number room) and ✕ to
-cancel, then Save -->
-{#snippet rangeInput(index: number, edge: 'from' | 'to')}
+<!-- The number being edited: just the number (its unit is only in its
+label, to leave the number room), as wide as the number was, or a little
+wider for a short one. In the list it grows away from the arrow (into the
+room beside the yarn); in a card, From is at the card's edge, so it grows
+over the arrow instead and isn't cut off. ✕ to cancel and Save
+float under it. -->
+{#snippet rangeInput(index: number, edge: 'from' | 'to', column: boolean)}
   {#if editing}
-    <span class="flex flex-wrap items-center gap-1.5">
-      <!-- On the surface, even in a card filled with its color -->
+    <span
+      class="absolute inset-y-0 {edge === 'from' && column
+        ? 'right-0'
+        : 'left-0'} flex w-full min-w-[calc(5ch+1rem)]"
+    >
+      <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
+      from zooming in. No up and down buttons, to leave the number room:
+      the arrow keys still step it. On the surface, even in a card filled
+      with its color. -->
+      <input
+        type="number"
+        step="any"
+        class="input bg-surface-50-950 text-surface-950-50 h-full w-full [appearance:textfield] px-2 tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        aria-label="Color {index + 1} {edge}{unitLabel ? `, ${unitLabel}` : ''}"
+        bind:value={editing[edge]}
+        {@attach (el) => {
+          el.focus();
+          el.select();
+          keepAboveKeyboard(el);
+        }}
+      />
+      <!-- Pressing ✕ or Save keeps the focus in the number, so the keyboard stays up -->
       <span
-        class={[
-          FIELD_GROUP,
-          'bg-surface-50-950 text-surface-950-50 w-fit grid-cols-[minmax(0,1fr)_auto]',
-        ]}
+        popover="manual"
+        class="card bg-surface-50-950 text-surface-950-50 border-surface-200-800 fixed [inset:auto] top-0 left-0 m-0 flex w-max gap-1 overflow-visible border p-1 shadow-xl"
+        {@attach floatUnderField}
       >
-        <!-- type="number" keeps the minus key on phones; 16px text keeps iOS
-      from zooming in. Room for the up and down buttons a computer shows. -->
-        <input
-          type="number"
-          step="any"
-          class="input w-[calc(7ch+1.25rem)] px-2 tabular-nums @max-[13rem]:w-[calc(6ch+1.25rem)] @max-[13rem]:px-1.5"
-          aria-label="Color {index + 1} {edge}{unitLabel
-            ? `, ${unitLabel}`
-            : ''}"
-          bind:value={editing[edge]}
-          {@attach (el) => {
-            el.focus();
-            el.select();
-            keepAboveKeyboard(el);
-          }}
-        />
-        <!-- Pressing it, or Save, keeps the focus in the number, so the keyboard stays up -->
         <button
           type="button"
           class="btn hover:preset-tonal-surface"
@@ -926,19 +968,19 @@ cancel, then Save -->
         >
           <XIcon aria-hidden="true" />
         </button>
+        <!-- Filled, like Save elsewhere -->
+        <button
+          type="button"
+          class="btn preset-filled-primary-500 px-3"
+          title="Save Range"
+          aria-label="Save range for color {index + 1}"
+          onmousedown={(e) => e.preventDefault()}
+          onclick={() => saveRange({ refocus: true })}
+        >
+          <CheckIcon aria-hidden="true" />
+          Save
+        </button>
       </span>
-      <!-- Filled, like Save elsewhere: right after the number, or under it in a narrow card -->
-      <button
-        type="button"
-        class="btn preset-filled-primary-500 px-3 @max-[13rem]:w-full"
-        title="Save Range"
-        aria-label="Save range for color {index + 1}"
-        onmousedown={(e) => e.preventDefault()}
-        onclick={() => saveRange({ refocus: true })}
-      >
-        <CheckIcon aria-hidden="true" />
-        Save
-      </button>
     </span>
   {/if}
 {/snippet}
@@ -952,7 +994,8 @@ cancel, then Save -->
       {@const isEditing = editing?.index === index}
       <!-- From and To are each a button, just around the number. In the
       list, each sits in a slot as wide as the widest, so they line up.
-      Tapping one turns just it into a field, with Save right after it.
+      Tapping one turns just it into a field, in its place, with ✕ and
+      Save floating under it, so the row doesn't move.
       Only Save (or Enter, from the keyboard) keeps it; ✕, Escape, or
       tapping or tabbing anywhere else (the other number too) puts it back;
       scrolling doesn't. -->
@@ -987,17 +1030,9 @@ cancel, then Save -->
           ? cancelOnOutsidePress(() => cancelRange({ refocus: false }))
           : null}
       >
-        {#if isEditing && editing?.edge === 'from'}
-          {@render rangeInput(index, 'from')}
-        {:else}
-          {@render rangeValue(index, r, 'from', column)}
-        {/if}
+        {@render rangeValue(index, r, 'from', column)}
         <RangeArrow silent class="mx-0.5" />
-        {#if isEditing && editing?.edge === 'to'}
-          {@render rangeInput(index, 'to')}
-        {:else}
-          {@render rangeValue(index, r, 'to', column)}
-        {/if}
+        {@render rangeValue(index, r, 'to', column)}
       </span>
     {/if}
   {/if}
