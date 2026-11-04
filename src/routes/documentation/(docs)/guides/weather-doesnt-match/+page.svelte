@@ -29,19 +29,19 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
 </script>
 
 <p>
-  Your thermometer says 18°, the Project Planner says 16°. Neither is wrong:
-  they're measuring different things. Here's why, and how to use the numbers you
-  trust.
+  Your thermometer or a different weather source might say 18°, while the
+  Project Planner says 16°. Neither is necessarily wrong. Here's why, and how to
+  use numbers you trust.
 </p>
 
 <section class="flex flex-col gap-3">
   <h2 id="why" class="text-2xl font-bold">Why It's Different</h2>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">It's for an area, not your garden.</span> Weather services
-      work out the weather over an area of several kilometers, or use the stations
-      nearest to it. Hills, water, towns and a sunny wall all change what your own
-      thermometer reads.
+      <span class="font-bold">It's from a different area.</span> Weather services
+      work out the weather over an area of several kilometers, or they use stations
+      which might be in a different part of your city. Hills, water, shade, or a sunny
+      spot all change what a thermometer reads.
     </li>
     <li>
       <span class="font-bold">The newest days aren't settled.</span> Services can
@@ -49,7 +49,7 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
       look.
     </li>
     <li>
-      <span class="font-bold">Past days get corrected.</span> Now and then a service
+      <span class="font-bold">Past days get corrected.</span> Sometimes a service
       improves its data, and older days change a little.
     </li>
   </ul>

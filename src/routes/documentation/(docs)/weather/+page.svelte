@@ -50,13 +50,9 @@ HELP_TOPICS). -->
 <section class="flex flex-col gap-3">
   <h2 id="get-weather-data" class="text-2xl font-bold">Get the Weather</h2>
   <p>
-    Press <span class="font-bold">Search</span> under your locations. The button is
-    ready once every location has a place chosen from the list and dates that work.
-    Press it again after changing a place, the dates or the weather source: it gets
-    every day for them.
-  </p>
-  <p>
-    For each day you get the high, average and low temperature, rain, snow,
+    Press <span class="font-bold">Get Weather Data</span> under your locations. The
+    button is ready once every location has a place chosen from the list and dates
+    that work. For each day you get the high, average and low temperature, rain, snow,
     daylight (sunrise to sunset) and the phase of the moon.
   </p>
 </section>
@@ -198,8 +194,8 @@ HELP_TOPICS). -->
       date of the hottest and coldest day.
     </li>
     <li>
-      <span class="font-bold">Chart:</span> every day's weather, with a key
-      under it. To hide or show a value (<span class="font-bold">High</span>,
+      <span class="font-bold">Chart:</span> every day's weather. To hide or show
+      a value (<span class="font-bold">High</span>,
       <span class="font-bold">Rain</span>,
       <span class="font-bold">Moon Phase</span>…) in the chart, the summary and
       the table, use <span class="font-bold">View</span> ›

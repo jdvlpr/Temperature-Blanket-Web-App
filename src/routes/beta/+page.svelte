@@ -47,16 +47,16 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
       <div class="flex flex-col gap-2">
         <h2 class="h2 text-gradient mt-2 max-lg:hidden">About the Beta</h2>
         <p>
-          This is the next version of the site, here early so it can be tried
-          before it replaces <a href={mainSite} class="link">{mainName}</a>.
-          Once it does, this beta site closes.
+          This is the next version of the site, released early so it can be
+          tried before it replaces <a href={mainSite} class="link">{mainName}</a
+          >. Once it does, this beta site closes.
         </p>
       </div>
 
       <section class="flex flex-col gap-2" aria-labelledby="beta-expect">
         <h3 id="beta-expect" class="h4">What to Expect</h3>
         <ul class="list-disc space-y-2 pl-6">
-          <li>Things may change or break while it's tested.</li>
+          <li>Things may change or break.</li>
           <li>
             Projects saved here stay in this browser, on this site. They don't
             show on {mainName}, and its projects don't show here unless you
@@ -65,7 +65,7 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
               once this version is there.{/if}
           </li>
           <li>
-            Gallery pages{#if __ACCOUNTS_ENABLED__}
+            Gallery pages {#if __ACCOUNTS_ENABLED__}
               and Ravelry posts{/if} made here are real and public, and they stay.
             Their links point to {mainName}.
           </li>
@@ -104,7 +104,7 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
         <h3 id="beta-feedback" class="h4">Send Feedback</h3>
         <p>
           Something broken, confusing or missing? Say what you did and what
-          happened. A screenshot helps.
+          happened. A screenshot helps. Thanks for your feedback!
         </p>
         {#if email}
           <a

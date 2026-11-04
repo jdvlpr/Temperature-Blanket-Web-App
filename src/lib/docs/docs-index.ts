@@ -38,7 +38,7 @@ export const DOCS_TITLE = 'Guides & Help';
 
 /** Each kind's heading: the index's sections, the contents, the breadcrumb */
 export const KIND_HEADINGS: Record<DocsKind, string> = {
-  basics: 'Temperature Blanket Basics',
+  basics: 'Basics',
   guide: 'Guides',
   reference: 'Reference',
 };

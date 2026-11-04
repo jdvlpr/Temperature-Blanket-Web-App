@@ -53,8 +53,7 @@ Back doesn't return to it. -->
   <header class={[PAGE_TEXT, 'flex flex-col gap-4']}>
     <h1 class="h2 text-gradient" data-pagefind-meta="title">{DOCS_TITLE}</h1>
     <p class="text-lg opacity-80">
-      Step-by-step guides for planning a temperature blanket, and help with
-      every part of the site.
+      Step-by-step guides, and help with the site.
     </p>
     <div data-pagefind-ignore>
       <DocsSearch />
@@ -62,7 +61,7 @@ Back doesn't return to it. -->
   </header>
 
   <section id="getting-started" class={[PAGE_TEXT, 'flex flex-col gap-3']}>
-    <h2 class="text-2xl font-bold">Getting Started</h2>
+    <h2 class="text-2xl font-bold">Quick Start</h2>
     <p>
       The <a href="/" class="link">Project Planner</a> turns the weather of a place
       and dates into a pattern, one row or square for each day, colored by its weather.
@@ -75,7 +74,7 @@ Back doesn't return to it. -->
         one stands for.
       </li>
       <li>See your blanket in the preview.</li>
-      <li>Save your project, and download the pattern.</li>
+      <li>Save your project, and download the data.</li>
     </ol>
     <p>
       You don't need an account. Without one, projects are saved in this

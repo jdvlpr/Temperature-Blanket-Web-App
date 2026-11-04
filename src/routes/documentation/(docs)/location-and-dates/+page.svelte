@@ -28,7 +28,7 @@ Section ids are the old single page's (OLD_ANCHORS). -->
 <p>
   Every project starts with a place and the dates your blanket covers. They're
   at the top of the Project Planner. Once they're set, press
-  <span class="font-bold">Search</span> to
+  <span class="font-bold">Get Weather Data</span> to
   <a href="/documentation/weather#get-weather-data" class="link"
     >get the weather</a
   >.
