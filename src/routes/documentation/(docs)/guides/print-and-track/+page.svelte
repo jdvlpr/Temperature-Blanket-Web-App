@@ -39,9 +39,8 @@ spreadsheet. -->
     </li>
     <li>
       Under <span class="font-bold">Include</span>, check the weather you want
-      under <span class="font-bold">Weather data</span> (High, Average and Low
-      Temperature to start with): it's a table of every day, each value in the
-      color of its yarn.
+      under <span class="font-bold">Weather data</span> (High, Average and Low Temperature
+      to start with): it's a table of every day, each value in the color of its yarn.
     </li>
     <li>
       Under <span class="font-bold">Look</span>, choose
@@ -173,8 +172,8 @@ spreadsheet. -->
   <h3 class="text-lg font-bold">The PDF is very long</h3>
   <p>
     The weather table has a row for every day. Turn off weather you don't need,
-    or uncheck every value under <span class="font-bold">Weather data</span> and
-    print the colors and ranges only.
+    or uncheck every value under <span class="font-bold">Weather data</span> and print
+    the colors and ranges only.
   </p>
 </section>
 
