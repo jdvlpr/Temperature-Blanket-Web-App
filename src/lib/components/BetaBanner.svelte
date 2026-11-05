@@ -20,7 +20,7 @@ is one, where its tradeoffs are, and where to send feedback, until dismissed
 <script lang="ts">
   import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
   import { resolve } from '$app/paths';
-  import { FlaskConicalIcon } from '@lucide/svelte';
+  import { FlaskConicalIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   onMount(() => {
     if (isThumbnailFrame()) return;
@@ -32,19 +32,29 @@ is one, where its tradeoffs are, and where to send feedback, until dismissed
   aria-label="Beta"
 >
   <FlaskConicalIcon class="icon-sm shrink-0" aria-hidden="true" />
-  <div class="flex min-w-0 flex-1 flex-wrap items-center justify-between">
+  <div
+    class="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-2 gap-y-1"
+  >
     <p>
       <span class="font-bold">Beta</span><span class="max-sm:hidden"
-        >: you're using a preview of the next version</span
+        >: you're viewing a preview of the next version</span
       >
     </p>
-    <div class="flex flex-wrap items-center gap-4">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
       <a href={resolve('/beta')} class="anchor whitespace-nowrap"
         >About <span class="max-sm:hidden">the beta</span></a
       >
 
       <a href="{resolve('/beta')}#feedback" class="anchor whitespace-nowrap"
         >Send feedback</a
+      >
+      <a
+        href="https://temperature-blanket.com"
+        class="anchor flex items-center gap-1 whitespace-nowrap"
+        >Exit Beta <ExternalLinkIcon
+          class="icon-sm shrink-0"
+          aria-hidden="true"
+        /></a
       >
     </div>
   </div>
