@@ -13,9 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- One line above each page of the beta (in place of WhatsNewBanner): that it
-is one, where its tradeoffs are, and where to send feedback, until dismissed
-(Local Storage beta_note_dismissed). About the Beta stays in the sidebar. -->
+<!-- A strip across the top of each page of the beta, above the top bar (in place
+of WhatsNewBanner): that it is one, where its tradeoffs are, where to send
+feedback and the way back to the main site. It can't be dismissed. Its id,
+top-banner, is what the planner's steps scroll past (page-state). -->
 
 <script lang="ts">
   import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
@@ -28,30 +29,30 @@ is one, where its tradeoffs are, and where to send feedback, until dismissed
 </script>
 
 <aside
-  class="bg-surface-100-900 rounded-container mb-2 flex items-center gap-2 py-2 pr-4 pl-4 text-sm max-lg:m-2"
+  class="bg-secondary-100-900 flex w-full items-center justify-center gap-2 px-4 py-2 text-sm [view-transition-name:top-banner]"
+  id="top-banner"
   aria-label="Beta"
 >
   <FlaskConicalIcon class="icon-sm shrink-0" aria-hidden="true" />
   <div
-    class="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-2 gap-y-1"
+    class="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1"
   >
-    <p>
-      <span class="font-bold">Beta</span><span class="max-sm:hidden"
-        >: you're viewing a preview of the next version</span
-      >
+    <p class="font-bold">
+      Beta <span class="max-sm:hidden">Preview</span>
     </p>
     <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-      <a href={resolve('/beta')} class="anchor whitespace-nowrap"
+      <a href={resolve('/beta')} class="link whitespace-nowrap"
         >About <span class="max-sm:hidden">the beta</span></a
       >
 
-      <a href="{resolve('/beta')}#feedback" class="anchor whitespace-nowrap"
+      <a href="{resolve('/beta')}#feedback" class="link whitespace-nowrap"
         >Send feedback</a
       >
       <a
         href="https://temperature-blanket.com"
-        class="anchor flex items-center gap-1 whitespace-nowrap"
-        >Exit Beta <ExternalLinkIcon
+        target="_blank"
+        class="link flex items-center gap-1 whitespace-nowrap"
+        >Switch to standard version <ExternalLinkIcon
           class="icon-sm shrink-0"
           aria-hidden="true"
         /></a

@@ -129,6 +129,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   style:--sidebar-width="{sidebarWidth}px"
   style:--top-bar-height="{topBarHeight}px"
 >
+  <!-- Above the top bar, the window's full width, scrolling away with the page -->
+  {#if __SITE_BETA__}
+    <BetaBanner />
+  {/if}
   <div
     class="bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]"
     data-sticky-bar
@@ -250,9 +254,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <!-- Clear of the sidebar: with PAGE's gutter, 1.5rem -->
       <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
-        {#if __SITE_BETA__}
-          <BetaBanner />
-        {:else}
+        {#if !__SITE_BETA__}
           <WhatsNewBanner />
         {/if}
         {@render main?.()}
