@@ -35,7 +35,7 @@ top-banner, is what the planner's steps scroll past (page-state). -->
   aria-label="Beta"
 >
   <div
-    class="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1"
+    class="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 max-md:justify-start md:justify-center"
   >
     <p class="flex items-center gap-1 font-bold">
       <FlaskConicalIcon
