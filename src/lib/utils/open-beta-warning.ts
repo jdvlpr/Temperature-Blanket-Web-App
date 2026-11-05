@@ -17,6 +17,8 @@
 // visit, from AppShell: once a tab (Session Storage; and once a page load,
 // since each page mounts its own AppShell), and never while another dialog is
 // open. A dialog the page opens on load (an old project's notice) replaces it.
+// The Allow Analytics toast waits for it (afterBetaWarning): drawn over every
+// dialog, it would cover the warning's bottom, and its Continue button.
 
 import BetaWarning from '#lib/components/modals/BetaWarning.svelte';
 import { dialog } from '#lib/state/page-state.svelte.js';
@@ -28,6 +30,22 @@ import {
 } from '#lib/utils/beta-warning.js';
 
 let checked = false;
+/** The warning is about to show, or showing */
+let pending = false;
+let waiting: (() => void)[] = [];
+
+function done() {
+  pending = false;
+  const run = waiting;
+  waiting = [];
+  run.forEach((fn) => fn());
+}
+
+/** Runs `run` now, or once the beta's warning has closed if it's showing */
+export function afterBetaWarning(run: () => void) {
+  if (pending) waiting.push(run);
+  else run();
+}
 
 export function openBetaWarning(pathname: string) {
   if (!__SITE_BETA__ || checked) return;
@@ -40,10 +58,11 @@ export function openBetaWarning(pathname: string) {
   } catch {
     // Storage blocked: show it
   }
+  pending = true;
   // After the first page's effects: opened in the same pass as the dialog's
   // first, it would be marked open without ever showing
   setTimeout(() => {
-    if (dialog.opened) return;
+    if (dialog.opened) return done();
     try {
       sessionStorage.setItem(BETA_WARNING_SHOWN_KEY, '1');
     } catch {
@@ -51,7 +70,7 @@ export function openBetaWarning(pathname: string) {
     }
     dialog.trigger({
       type: 'component',
-      component: { ref: BetaWarning },
+      component: { ref: BetaWarning, props: { onclose: done } },
       options: { title: 'This is a Beta Version', size: 'small' },
     });
   });

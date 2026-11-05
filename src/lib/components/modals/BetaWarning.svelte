@@ -31,6 +31,16 @@ page on the main site. -->
   import { persistedState } from '#lib/storage/preferences.svelte.js';
   import { BETA_WARNING_KEY, mainSitePath } from '#lib/utils/beta-warning.js';
   import { ExternalLinkIcon } from '@lucide/svelte';
+  import { onDestroy } from 'svelte';
+
+  interface Props {
+    /** Closed (or replaced by another dialog) */
+    onclose?: () => void;
+  }
+
+  let { onclose }: Props = $props();
+
+  onDestroy(() => onclose?.());
 
   const mainSite = MAIN_SITE_ORIGIN ?? 'https://temperature-blanket.com';
   const mainName = new URL(mainSite).host;
