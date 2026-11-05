@@ -20,6 +20,7 @@ page on the main site. -->
 
 <script lang="ts">
   import { page } from '$app/state';
+  import BetaWhatsNew from '#lib/components/BetaWhatsNew.svelte';
   import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
   import {
     BTN_PRIMARY,
@@ -43,6 +44,10 @@ page on the main site. -->
     This is a preview of the next version of the site. Things may change or
     break, so please don’t use it for critical projects yet.
   </p>
+  <div class="flex flex-col gap-1">
+    <p class="font-bold">What’s new</p>
+    <BetaWhatsNew />
+  </div>
   <p>
     Projects saved here stay on this beta site. They don’t show on {mainName}.
   </p>

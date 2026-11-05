@@ -15,18 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- One line above each page, once, for people who used the site before
 version 7: what's new, until it's dismissed or What's New is opened (see
-$lib/storage/whats-new). With accounts on it points to the version 7 release post,
-else to What's New. -->
+$lib/storage/whats-new). It points to the version 7 release post. -->
 
 <script lang="ts">
   import { page } from '$app/state';
   import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
-  import { SparklesIcon, XIcon } from '@lucide/svelte';
+  import { XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
-  const href = __ACCOUNTS_ENABLED__ ? VERSION_7_POST_HREF : '/whats-new';
+  const href = VERSION_7_POST_HREF;
 
   // Only after loading: the server can't know whether it's been seen
   let mounted = $state(false);

@@ -53,7 +53,7 @@
   },
   "version-7/site-menu": {
     "width": 278,
-    "height": 1312
+    "height": 267
   },
   "weather-doesnt-match/change-one-day": {
     "width": 800,
@@ -114,5 +114,13 @@
   "what-is-a-temperature-blanket/gauge": {
     "width": 970,
     "height": 940
+  },
+  "match-your-yarn/colors-from-photo": {
+    "width": 800,
+    "height": 720
+  },
+  "palette-creator/palette-image": {
+    "width": 1100,
+    "height": 720
   }
 }

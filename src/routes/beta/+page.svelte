@@ -19,6 +19,8 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
 <script lang="ts">
   import { PUBLIC_BASE_DOMAIN_NAME } from '$app/env/public';
   import AppShell from '#lib/components/AppShell.svelte';
+  import BetaWhatsNew from '#lib/components/BetaWhatsNew.svelte';
+  import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import { MAIN_SITE_ORIGIN } from '#lib/constants/site.js';
   import { ExternalLinkIcon, MailIcon } from '@lucide/svelte';
@@ -43,7 +45,7 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
 
 <AppShell pageName="About the Beta">
   {#snippet main()}
-    <main class={[PAGE, PAGE_TEXT, 'my-2 flex flex-col gap-6']}>
+    <main class={[PAGE, PAGE_TEXT, 'mt-2 mb-8 flex flex-col gap-6']}>
       <div class="flex flex-col gap-2">
         <h2 class="h2 text-gradient mt-2 max-lg:hidden">About the Beta</h2>
         <p>
@@ -52,6 +54,14 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
           >. Once it does, this beta site closes.
         </p>
       </div>
+
+      <section class="flex flex-col gap-2" aria-labelledby="beta-new">
+        <h3 id="beta-new" class="h4">What’s New</h3>
+        <BetaWhatsNew />
+        <a href={VERSION_7_POST_HREF} class="link w-fit"
+          >Read more about Version 7</a
+        >
+      </section>
 
       <section class="flex flex-col gap-2" aria-labelledby="beta-expect">
         <h3 id="beta-expect" class="h4">What to Expect</h3>
@@ -73,12 +83,6 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
             Project links copied here open only on this beta site until this
             version reaches {mainName}.
           </li>
-          {#if __ACCOUNTS_ENABLED__}
-            <li>
-              Before this beta site closes, you can bring projects saved here
-              without an account back to {mainName}.
-            </li>
-          {/if}
         </ul>
       </section>
 
@@ -116,7 +120,7 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
       </section>
 
       <a href={mainSite} class="btn preset-tonal w-fit">
-        Go to {mainName}
+        Switch back to {mainName}
         <ExternalLinkIcon class="icon-sm" />
       </a>
     </main>

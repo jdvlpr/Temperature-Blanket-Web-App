@@ -14,8 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- What's New: one chapter for each major version, newest first. A chapter
-with a release post starts with its card (ReleaseCard) and the x.0.0 notes
-as What's in N.0; then come that version's other changes by month. Changes from
+with a release post starts with its card (ReleaseCard), which stands in for
+its x.0.0 notes (not shown, so the months stay in order; the card keeps the
+x.0.0 id for old links); then come that version's other changes by month. Changes from
 before version 3 are under Earlier. Each change keeps its version as its id
 (/whats-new#5.2.35), and each chapter is #v<major>. Once /blog and
 /changelog: both redirect here (the root _redirects). -->
@@ -41,14 +42,17 @@ before version 3 are under Earlier. Each change keeps its version as its id
     id: string;
     heading: string;
     release?: Release;
-    /** The x.0.0 change, shown in the release card */
-    first?: Item;
     months: { label: string; items: Item[] }[];
   };
 
   const EARLIEST_CHAPTER = 3;
 
-  const chapters: Chapter[] = [];
+  const chapters: Chapter[] = RELEASES.map((release) => ({
+    id: `v${release.major}`,
+    heading: `Version ${release.major}`,
+    release,
+    months: [],
+  }));
   for (const { year, months } of entries) {
     for (const { month, items } of months) {
       for (const item of items) {
@@ -60,15 +64,16 @@ before version 3 are under Earlier. Each change keeps its version as its id
           chapter = {
             id,
             heading: key ? `Version ${key}` : 'Earlier',
-            release: RELEASES.find((r) => r.major === key),
             months: [],
           };
-          chapters.push(chapter);
+          // In version order, newest first, with Earlier last
+          const at = chapters.findIndex(
+            (c) => c.id === 'earlier' || (key && Number(c.id.slice(1)) < key),
+          );
+          chapters.splice(at === -1 ? chapters.length : at, 0, chapter);
         }
-        if (chapter.release && item.version === `${key}.0.0`) {
-          chapter.first = item;
-          continue;
-        }
+        // The release post tells it
+        if (chapter.release && item.version === `${key}.0.0`) continue;
         const label = `${month} ${year}`;
         const sameMonth = chapter.months.find((m) => m.label === label);
         if (sameMonth) sameMonth.items.push(item);
@@ -111,7 +116,8 @@ before version 3 are under Earlier. Each change keeps its version as its id
       <header class="flex flex-col gap-3" bind:this={container}>
         <h1 class="h2 text-gradient mt-2">What's New</h1>
         <p class="text-surface-700-300 text-sm">
-          Each version's release post, then its changes. To see every change,
+          Each version's release post, then its later changes. To see every
+          change,
           <a
             href="{PUBLIC_GITHUB_LINK}/commits/main/"
             class="link"
@@ -130,16 +136,14 @@ before version 3 are under Earlier. Each change keeps its version as its id
         </nav>
       </header>
 
-      {#each chapters as { id, heading, release, first, months } (id)}
+      {#each chapters as { id, heading, release, months } (id)}
         <section {id} class="flex scroll-mt-24 flex-col gap-4">
           {#if release}
+            <!-- Where links to its x.0.0 notes land -->
+            <span id="{release.major}.0.0" class="scroll-mt-24"></span>
             <ReleaseCard {release} />
           {:else}
             <h2 class="h3">{heading}</h2>
-          {/if}
-          {#if first}
-            <h3 class="text-xl font-bold">What's in {release?.major}.0</h3>
-            <ChangelogItem version={first.version} notes={first.notes} />
           {/if}
           {#each months as { label, items } (label)}
             <h3 class="text-xl font-bold">{label}</h3>

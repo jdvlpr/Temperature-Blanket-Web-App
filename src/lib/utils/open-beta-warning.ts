@@ -52,7 +52,7 @@ export function openBetaWarning(pathname: string) {
     dialog.trigger({
       type: 'component',
       component: { ref: BetaWarning },
-      options: { title: 'This Is a Beta Version', size: 'small' },
+      options: { title: 'This is a Beta Version', size: 'small' },
     });
   });
 }

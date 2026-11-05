@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The release post introducing version 7 (What's New). Its date is a
-// placeholder until launch: then set it here. Its address has no date in it,
-// so nothing else changes.
+// The release post introducing version 7 (What's New), in every build: its
+// account parts show only with accounts on. Its address has no date in it.
 
 export const VERSION_7_POST = {
-  date: '2026-11-01',
+  date: '2026-11-05',
   slug: 'version-7',
-  title: 'Version 7: Accounts, My Library & a New Look',
+  title: 'Version 7: Accounts, My Library & More',
   image: '/images/blog-images/2026-11-01-version-7/featured-image.jpg',
 } as const;
 

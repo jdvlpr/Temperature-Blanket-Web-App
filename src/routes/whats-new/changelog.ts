@@ -15,20 +15,11 @@
 
 import { PUBLIC_GITHUB_LINK } from '$app/env/public';
 import { ICONS } from '#lib/constants/icon-constants.js';
-import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
 import type { ChangelogItemGroup } from '#lib/types/page-types.js';
 import {
   CloudCogIcon,
-  FileTextIcon,
-  MoveRightIcon,
-  FolderHeartIcon,
-  PaletteIcon,
-  ShieldCheckIcon,
-  SmartphoneIcon,
-  UserRoundIcon,
   CogIcon,
   EarthIcon,
-  GlobeIcon,
   ImageIcon,
   LandmarkIcon,
   MoonStarIcon,
@@ -46,67 +37,6 @@ export const entries: ChangelogItemGroup[] = [
       {
         month: 'October',
         items: [
-          {
-            notes: [
-              // Accounts open with this release when they're switched on
-              ...(__ACCOUNTS_ENABLED__
-                ? [
-                    {
-                      IconComponent: UserRoundIcon,
-                      text: `Sign in with Google to keep your projects, yarn palettes and preferences in an account and open them on any device. They sync by themselves, and the first time you sign in you can choose which projects and palettes already in your browser to add. Your account starts with a made-up display name, so your real name is never shown unless you choose it. Accounts are optional. Read all about it in the <a href="${VERSION_7_POST_HREF}" class="link">Version 7 release post</a>.`,
-                      title: 'Accounts',
-                    },
-                    {
-                      IconComponent: GlobeIcon,
-                      text: `Publish a project or yarn palette to the gallery from its menu in My Library, or the Project or Palette menu. Each one has a single gallery page that updates when you change it, shows your display name or stays anonymous, and follows it into the Trash and back. Pages that show your name are collected on Your Gallery. You can also link your Ravelry account and post a project to Ravelry, photos and yarns included. Star other people's projects and palettes to find them again under Starred in My Library; only you see your stars.`,
-                      title: 'Gallery Pages & Ravelry',
-                    },
-                  ]
-                : []),
-              {
-                IconComponent: FolderHeartIcon,
-                instructions: 'Find it at the top of the site menu',
-                text: `The new <a href="/my-projects" class="link">My Library</a> lists your saved projects and yarn palettes, as cards or a list, with filters. You can name your projects, and deleted projects and palettes go to a Trash for 30 days, so they can be put back. Once a project is saved, your changes save by themselves; <span class="italic">Save</span> is now in the top bar, and the Project menu has everything else.`,
-                title: 'My Library, Saved Palettes & Auto-Save',
-              },
-              {
-                IconComponent: PaletteIcon,
-                text: `Save yarn palettes to use again later, copy a palette's link in one click, and save a palette as an image with a choice of layouts. Paste Colors reads lists of hex codes forgivingly, Get Colors From an Image has been rebuilt around markers on the photo, and palettes can be sorted from warm to cool. The Yarn Palette Creator has a Palette menu, like the Project menu, to export or share a palette, start a project with it, or open a recent one. Get Colors offers My Palettes, the Palette Gallery and Preset Gradients (formerly Schemes), and in the Project Planner, the Project menu exports and saves each gauge's palette.`,
-                title: 'Yarn Palette Tools',
-              },
-              {
-                IconComponent: CogIcon,
-                text: `Preferences have their own page, opened from the person icon in the top bar, with previews of each theme. You can choose a default yarn, which is picked first wherever no yarn is chosen yet, and turn off motion touches with Reduce Motion.`,
-                title: 'Preferences',
-              },
-              {
-                IconComponent: MoveRightIcon,
-                text: `Ranges are written the same way everywhere (Project Planner, gallery, palette images, PDFs and Google Sheets): From → To, with which ends each range includes said once above them. <span class="font-bold">Changed:</span> if a day fits two overlapping ranges, it now takes the first range's color (the highest on the gauge), as the documentation says, instead of the last one's, so some previews with overlapping ranges may change. Day counts still include every day in each range. Fixed: with Low to High and Neither, a range included its To number.`,
-                title: 'Ranges',
-              },
-              {
-                IconComponent: FileTextIcon,
-                text: `The PDF has been redesigned to match the site: each gauge's colors as a list or a grid of cards, with numbered round swatches, yarn names that are never cut off, and an option to fill each color in. A new summary page shows the project and its preview, and each gauge's page starts with its palette at a glance. Choose US Letter or A4 paper, and the PDF remembers your choices. Accented letters in yarn and place names now print correctly.`,
-                title: 'New PDF Design',
-              },
-              {
-                IconComponent: SmartphoneIcon,
-                text: `On phones, dialogs now open as sheets from the bottom of the screen. Drag one down to close it. The header fits better on small screens, too.`,
-                title: 'Easier on Phones',
-              },
-              {
-                IconComponent: ImageIcon,
-                text: `A project's name, if you've given it one, now shows in the <a href="/gallery" class="link">Project Gallery</a> above its locations and dates. The gallery now opens sorted by Popular, the most viewed in the past month (or day, week or year), and Popular works together with search and the yarn and pattern filters. Visits to project pages now count toward Popular, and each card shows how many times it's been viewed.`,
-                title: 'Project Gallery',
-              },
-              {
-                IconComponent: ShieldCheckIcon,
-                text: `The <a href="/privacy" class="link">Privacy Policy</a> has been rewritten to be clearer. Fonts are now served from this site, and videos only load from YouTube when you choose to play one.`,
-                title: 'Privacy',
-              },
-            ],
-            version: '7.0.0',
-          },
           {
             notes: [
               {

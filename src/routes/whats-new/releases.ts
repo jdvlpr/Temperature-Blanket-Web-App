@@ -32,21 +32,17 @@ export type Release = {
 };
 
 export const RELEASES: Release[] = [
-  // The version 7 post is about accounts: only in builds with them
-  ...(__ACCOUNTS_ENABLED__
-    ? [
-        {
-          major: 7,
-          slug: VERSION_7_POST.slug,
-          title: VERSION_7_POST.title,
-          date: VERSION_7_POST.date as TISO8601DateString,
-          summary:
-            'Optional accounts that keep your projects on every device, a new My Library, posting projects to Ravelry, gallery pages you can update, and simpler navigation and range editing.',
-          image: VERSION_7_POST.image,
-          imageAlt: 'Temperature blanket stripes with a cloud and a check mark',
-        },
-      ]
-    : []),
+  {
+    major: 7,
+    slug: VERSION_7_POST.slug,
+    title: VERSION_7_POST.title,
+    date: VERSION_7_POST.date as TISO8601DateString,
+    summary: __ACCOUNTS_ENABLED__
+      ? 'Optional accounts that keep your projects on every device, a new My Library, posting projects to Ravelry, gallery pages you can update, weather you can check for updates, and new ways to get and share colors.'
+      : 'A new My Library, simpler navigation and range editing, weather you can check for updates, a new PDF, and new ways to get and share colors.',
+    image: VERSION_7_POST.image,
+    imageAlt: 'Temperature blanket stripes with a cloud and a check mark',
+  },
   {
     major: 6,
     slug: 'version-6',

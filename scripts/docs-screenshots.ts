@@ -77,6 +77,8 @@ type Shot = {
   height?: number;
   /** Only the part of the target in the window (for long pages and lists) */
   inView?: boolean;
+  /** Only the target's top, ending a little below this part of it */
+  until?: (target: Locator) => Locator;
 };
 
 /** The planner with the project's weather loaded, at one of its sections */
@@ -125,6 +127,17 @@ async function trimmed(panel: Locator) {
     ),
   );
   return { ...box, height: Math.min(box.height, bottom - box.y + 16) };
+}
+
+/** A target's box, ending a little below `end` */
+async function until(target: Locator, end: Locator) {
+  const box = await target.boundingBox();
+  const last = await end.boundingBox();
+  if (!box || !last) return box;
+  return {
+    ...box,
+    height: Math.min(box.height, last.y + last.height - box.y + 12),
+  };
 }
 
 /** A target's box, cut to what's in the window */
@@ -364,6 +377,8 @@ const SHOTS: Shot[] = [
       await planner(page, 'location');
       return page.getByRole('navigation', { name: 'Site' });
     },
+    // Create, My Library and Explore; not the small links below
+    until: (nav) => nav.getByRole('link', { name: 'Weather Forecast' }),
   },
   {
     name: 'preview/rows',
@@ -526,6 +541,8 @@ type Clip = {
   open: (page: Page) => Promise<void>;
   /** What's recorded, after a moment on the first frame */
   play: (page: Page) => Promise<void>;
+  /** A wider window, for what lays out differently on large screens */
+  viewport?: { width: number; height: number };
 };
 
 /** The window a clip is recorded in: about the width of a guide's text */
@@ -572,7 +589,15 @@ function drawCursor() {
 async function moveTo(page: Page, target: Locator, ms = 600) {
   const box = await target.boundingBox();
   if (!box) throw new Error(`Nothing to move to: ${target}`);
-  const to = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await moveToPoint(
+    page,
+    { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+    ms,
+  );
+}
+
+/** As moveTo, to a point in the window */
+async function moveToPoint(page: Page, to: { x: number; y: number }, ms = 600) {
   const from = await page.evaluate(() => window.__clipMouse ?? { x: 0, y: 0 });
   const steps = Math.max(1, Math.round(ms / 16));
   for (let i = 1; i <= steps; i++) {
@@ -643,7 +668,127 @@ const cell = (page: Page, row: number, column: number) =>
     .getByRole('gridcell')
     .nth(column);
 
+/** A point in `target`, as fractions of its width and height */
+async function pointIn(target: Locator, x: number, y: number) {
+  const box = await target.boundingBox();
+  if (!box) throw new Error(`Nothing to point at: ${target}`);
+  return { x: box.x + box.width * x, y: box.y + box.height * y };
+}
+
+/** Moves to a native select and chooses an option: its own list never
+ * shows in a recording */
+async function chooseIn(page: Page, select: Locator, label: string) {
+  await moveTo(page, select, 700);
+  await page.waitForTimeout(300);
+  await select.selectOption({ label });
+}
+
 const CLIPS: Clip[] = [
+  {
+    name: 'match-your-yarn/colors-from-photo',
+    open: async (page) => {
+      await visit(page, '/yarn');
+      await page.waitForLoadState('networkidle');
+      await settle(page);
+      const fromImage = page.getByRole('menuitem', { name: /From an Image/ });
+      for (let i = 0; i < 5 && !(await fromImage.isVisible()); i++) {
+        await page.getByRole('button', { name: /Get Colors/ }).click();
+        await fromImage.waitFor({ timeout: 2000 }).catch(() => {});
+      }
+      await fromImage.click();
+      await dialog(page)
+        .getByRole('button', { name: /Your Photo/ })
+        .waitFor();
+      await page.mouse.move(0, 0);
+      await settle(page);
+    },
+    play: async (page) => {
+      const [chooser] = await Promise.all([
+        page.waitForEvent('filechooser'),
+        clickOn(
+          page,
+          dialog(page).getByRole('button', { name: /Your Photo/ }),
+          800,
+        ),
+      ]);
+      await chooser.setFiles(join(root, 'scripts/fixtures/sea-and-forest.jpg'));
+      const photo = dialog(page).getByRole('group', {
+        name: 'Photo with color markers',
+      });
+      await photo.waitFor();
+      await page.waitForTimeout(1600);
+      // A color of the sea, where none is picked yet
+      await moveToPoint(page, await pointIn(photo, 0.3, 0.52), 800);
+      await page.mouse.down();
+      await page.waitForTimeout(120);
+      await page.mouse.up();
+      await page.waitForTimeout(1300);
+      // Matched to real yarn
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: /^Yarn/ }),
+        800,
+      );
+      await page.waitForTimeout(500);
+      await clickOn(
+        page,
+        // Its popover is outside the dialog, so not found by role
+        page.locator('input[placeholder*=" Yarns ("]'),
+        600,
+      );
+      await page.waitForTimeout(500);
+      await page.keyboard.type('Special DK', { delay: 120 });
+      await page.waitForTimeout(400);
+      await clickOn(
+        page,
+        page
+          .locator('[data-scope="combobox"][data-part="item"]')
+          .filter({ hasText: 'Special DK' })
+          .first(),
+        600,
+      );
+      await page.waitForTimeout(800);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(1500);
+      await clickOn(
+        page,
+        dialog(page).getByRole('button', { name: 'Save', exact: true }),
+        800,
+      );
+      await page.waitForTimeout(800);
+    },
+  },
+  {
+    name: 'palette-creator/palette-image',
+    // The image beside its choices, all in view
+    viewport: { width: 1100, height: 720 },
+    open: async (page) => {
+      await yarnPalette(page);
+      await dismissToasts(page);
+      await page.mouse.move(0, 0);
+      await settle(page);
+    },
+    play: async (page) => {
+      await clickOn(page, page.getByRole('button', { name: /^Palette/ }), 800);
+      await page.waitForTimeout(600);
+      await clickOn(
+        page,
+        page.getByText('Image, color codes or yarn names'),
+        700,
+      );
+      await page.waitForTimeout(700);
+      await clickOn(page, page.getByText('Download a PNG image'), 700);
+      const image = dialog(page);
+      await image.getByRole('img', { name: 'Palette preview' }).waitFor();
+      await page.waitForTimeout(1500);
+      await chooseIn(page, image.getByLabel('Layout'), 'Grid');
+      await page.waitForTimeout(1300);
+      await chooseIn(page, image.getByLabel('Shape'), 'Square');
+      await page.waitForTimeout(1300);
+      await clickOn(page, image.getByText('Dark', { exact: true }), 700);
+      await page.waitForTimeout(1300);
+    },
+  },
   {
     name: 'weather-doesnt-match/change-one-day',
     open: weatherTable,
@@ -1211,6 +1356,7 @@ const run = promisify(execFile);
 
 /** Records one clip in one theme; returns its size in CSS pixels */
 async function record(context: BrowserContext, clip: Clip, theme: string) {
+  const viewport = clip.viewport ?? CLIP_VIEWPORT;
   const page = await context.newPage();
   await clip.open(page).catch(async (error) => {
     const failed = join(root, '.svelte-kit/docs-screenshot-failed.png');
@@ -1221,8 +1367,8 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   await page.evaluate(drawCursor);
   // The cursor starts a little in from the bottom right
   const start = {
-    x: CLIP_VIEWPORT.width * 0.8,
-    y: CLIP_VIEWPORT.height * 0.85,
+    x: viewport.width * 0.8,
+    y: viewport.height * 0.85,
   };
   await page.mouse.move(start.x, start.y);
   await page.evaluate((at) => (window.__clipMouse = at), start);
@@ -1238,8 +1384,8 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   });
   await cdp.send('Page.startScreencast', {
     format: 'png',
-    maxWidth: CLIP_VIEWPORT.width * 2,
-    maxHeight: CLIP_VIEWPORT.height * 2,
+    maxWidth: viewport.width * 2,
+    maxHeight: viewport.height * 2,
   });
   await page.waitForTimeout(1000);
   await clip.play(page).catch(async (error) => {
@@ -1330,12 +1476,14 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   ]);
   await rm(dir, { recursive: true });
   await page.close();
-  return CLIP_VIEWPORT;
+  return viewport;
 }
 
 /** Shots and clips show the site as launched: without the beta's banner or
  * the sidebar's About the Beta */
 function hideBetaBanner() {
+  // Nor its warning on the first page (beta-warning.ts)
+  localStorage.setItem('beta_warning_dismissed', 'true');
   const style = document.createElement('style');
   style.textContent =
     'aside[aria-label="Beta"], a[href="/beta"] { display: none !important; }';
@@ -1384,12 +1532,14 @@ async function main() {
         `${shot.name}-${theme}.png`,
       );
       await mkdir(dirname(file), { recursive: true });
-      const box = shot.trim
-        ? await trimmed(target)
-        : shot.inView
-          ? await inView(page, target)
-          : await target.boundingBox();
-      if ((shot.trim || shot.inView) && box)
+      const box = shot.until
+        ? await until(target, shot.until(target))
+        : shot.trim
+          ? await trimmed(target)
+          : shot.inView
+            ? await inView(page, target)
+            : await target.boundingBox();
+      if ((shot.until || shot.trim || shot.inView) && box)
         await page.screenshot({
           path: file,
           clip: box,
@@ -1436,7 +1586,7 @@ async function main() {
       const context = await clipBrowser.newContext({
         baseURL: base,
         ignoreHTTPSErrors: true,
-        viewport: CLIP_VIEWPORT,
+        viewport: clip.viewport ?? CLIP_VIEWPORT,
         colorScheme: theme,
         deviceScaleFactor: 2,
       });
