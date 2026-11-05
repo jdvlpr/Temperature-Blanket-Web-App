@@ -15,6 +15,8 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        // Set by `define` in vite.config.ts
+        __BETA_INVITE_PERCENT__: 'readonly',
       },
     },
   },

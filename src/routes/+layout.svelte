@@ -31,8 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import { ICONS } from '$lib/constants/icon-constants';
-  import { RssIcon, SquarePlayIcon } from '@lucide/svelte';
+  import BetaInviteBanner from '$lib/components/BetaInviteBanner.svelte';
 
   interface Props {
     children?: Snippet;
@@ -181,20 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<!-- <div
-  class="flex w-full flex-col [view-transition-name:top-banner]"
-  id="top-banner"
->
-  <div class="bg-secondary-100-900 w-full p-2 text-center">
-    <a
-      href="/blog/2026-07-09-version-6"
-      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
-    >
-      <RssIcon />
-      News | Version 6: Improved Sun Position Accuracy
-    </a>
-  </div>
-</div> -->
+<BetaInviteBanner />
 
 {@render children?.()}
 

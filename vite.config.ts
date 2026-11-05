@@ -44,6 +44,13 @@ export default defineConfig(({ mode }) => {
         'top-level-await': true,
       },
     },
+    define: {
+      // Share of visitors (0–100) shown the beta invite banner; see
+      // src/lib/utils/beta-invite.ts. Unset means off.
+      __BETA_INVITE_PERCENT__: JSON.stringify(
+        Number(env.PUBLIC_BETA_INVITE_PERCENT) || 0,
+      ),
+    },
     plugins: [tailwindcss(), sveltekit()],
     test: {
       include: [
