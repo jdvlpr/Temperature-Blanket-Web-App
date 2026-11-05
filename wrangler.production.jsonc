@@ -1,0 +1,41 @@
+// temperature-blanket.com (v6, `main`) as a Cloudflare Worker, replacing the
+// Pages project `temperature-blanket-web-app`. Workers Builds runs `pnpm build`,
+// then `npx wrangler deploy --config wrangler.production.jsonc`.
+//
+// The name is deliberately not `temperature-blanket`: that Worker is the v7 beta
+// at next.temperature-blanket.com (release/v7), and deploying main under it
+// would replace the beta.
+//
+// How the build picks Pages or Workers (adapter-cloudflare 7, `config` in
+// svelte.config.js points it here):
+// - Pages CI sets CF_PAGES, so the Pages project keeps getting a Pages build
+//   (with _routes.json from the adapter's `routes` option) until cutover.
+// - Everywhere else (Workers Builds, local `pnpm build`), the build is for this
+//   Worker: .svelte-kit/cloudflare/_worker.js plus static assets, with an
+//   .assetsignore. Static assets (prerendered pages, /_app/*, /images/*, …)
+//   are served before the Worker runs, so like Pages' routes.exclude they don't
+//   count as Worker requests on the free plan; only server routes (/api/*,
+//   /gallery/[id], 404s) invoke the Worker.
+//
+// Where settings live:
+// - Build time (every PUBLIC_* and SECRET_* the app reads, via $env/static/*):
+//   the Worker's Settings › Build › Variables and secrets. This file is read only
+//   at deploy, and main has no runtime vars, bindings or secrets.
+// - Domain: none here yet. temperature-blanket.com stays on Pages until it's
+//   moved to this Worker in the dashboard (or by adding a `routes` entry with
+//   `"custom_domain": true`).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "temperature-blanket-v6",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  // Same as the beta Worker; the local runtime rejects later dates
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".svelte-kit/cloudflare",
+  },
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+}

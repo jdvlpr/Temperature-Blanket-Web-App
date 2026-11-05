@@ -19,6 +19,11 @@ const config = {
     // See https://kit.svelte.dev/docs/adapters for more information about adapters.
     // adapter: adapter()
     adapter: adapter({
+      // Builds for the Worker in wrangler.production.jsonc, except on Cloudflare
+      // Pages CI (CF_PAGES), which still gets a Pages build until cutover.
+      config: 'wrangler.production.jsonc',
+      // Pages only: ignored when building for Workers, where static assets are
+      // served before the Worker anyway.
       // See below for an explanation of these options
       // Routes in exclude will not trigger cloudflare functions.
       // The free plan has a limit of 100,000 combined workers and page function requests,

@@ -40,7 +40,7 @@ pnpm dev
 
 ### ✅ Testing
 
-First build the app (to generate cloudflare \_routes.json file)
+First build the app (for the Cloudflare Worker in `wrangler.production.jsonc`; Cloudflare Pages CI builds for Pages instead)
 
 ```bash
 pnpm build
