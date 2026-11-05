@@ -83,15 +83,13 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
       </section>
 
       <section class="flex flex-col gap-2" aria-labelledby="beta-bring">
-        <h3 id="beta-bring" class="h4">Bring Your Projects</h3>
+        <h3 id="beta-bring" class="h4">Import Your Projects</h3>
         <p>
-          In the browser that has your projects, open Bring My Projects on {mainName}.
-          It opens this site and copies the projects saved in that browser here.
-          They stay on {mainName} too, and projects already here are left as they
-          are.
+          Using the browser that has your projects, click the button below to
+          open the import page on {mainName}.
         </p>
         <a href="{mainSite}/bring-to-beta" class="btn preset-tonal w-fit">
-          Bring My Projects
+          Import My Projects
           <ExternalLinkIcon class="icon-sm" />
         </a>
       </section>

@@ -33,11 +33,14 @@ top-banner, is what the planner's steps scroll past (page-state). -->
   id="top-banner"
   aria-label="Beta"
 >
-  <FlaskConicalIcon class="icon-sm shrink-0" aria-hidden="true" />
   <div
     class="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1"
   >
-    <p class="font-bold">
+    <p class="flex items-center gap-1 font-bold">
+      <FlaskConicalIcon
+        class="icon-sm relative -top-[1px] shrink-0"
+        aria-hidden="true"
+      />
       Beta <span class="max-sm:hidden">Preview</span>
     </p>
     <div class="flex flex-wrap items-center gap-x-4 gap-y-1">

@@ -16,14 +16,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import AppNavigation from '#lib/components/AppNavigation.svelte';
   import AccountButton from '#lib/components/account/AccountButton.svelte';
+  import { page } from '$app/state';
   import {
     drawerState,
     showNavigationSideBar,
   } from '#lib/state/page-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { motion } from '#lib/utils/feedback.svelte.js';
+  import { openBetaWarning } from '#lib/utils/open-beta-warning.js';
   import { MenuIcon, PanelLeftClose, PanelLeftOpen } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
@@ -39,6 +42,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
+
+  // The beta's warning, on the first page of a visit
+  onMount(() => openBetaWarning(page.url.pathname));
 
   // The sidebar's least width (AppNavigation's min-w) until it's measured,
   // so the server's page puts the logo where it will be
