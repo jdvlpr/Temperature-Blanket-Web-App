@@ -267,7 +267,7 @@ choice's icon beside it, and what it's for below -->
 <div class="flex flex-col lg:h-[calc(92svh-4.5rem)]">
   <div class="flex min-h-0 flex-1 flex-col gap-4 px-2 pb-2 sm:px-4 lg:flex-row">
     <section
-      class="bg-surface-100 dark:bg-surface-900 rounded-container relative min-h-0 min-w-0 flex-1 overflow-y-auto p-4 shadow-inner max-lg:h-[45svh]"
+      class="bg-surface-100 dark:bg-surface-900 rounded-container relative min-h-0 min-w-0 shrink-0 overflow-y-auto p-4 shadow-inner max-lg:h-[45svh] lg:flex-1"
       aria-label="Preview"
       aria-busy={updating}
     >
