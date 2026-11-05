@@ -226,12 +226,19 @@
             {:else}
               <div class="min-w-48 flex-1 text-base">{@html t.message}</div>
             {/if}
-            {#if t.action || !t.hideDismiss}
+            {#if t.action || t.actions?.length || !t.hideDismiss}
               <div class="toast-actions {cToastActions}">
                 {#if t.action}<button
                     class={buttonAction}
                     onclick={() => onAction(i)}>{@html t.action.label}</button
                   >{/if}
+                {#each t.actions ?? [] as action (action.label)}<button
+                    class="btn btn-sm preset-tonal hover:preset-filled"
+                    onclick={() => {
+                      action.response();
+                      toast.close(t.id);
+                    }}>{action.label}</button
+                  >{/each}
                 {#if !t.hideDismiss}<button
                     class={buttonDismiss}
                     aria-label="Dismiss toast"

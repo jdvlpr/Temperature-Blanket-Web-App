@@ -21,6 +21,7 @@ top-banner, is what the planner's steps scroll past (page-state). -->
 <script lang="ts">
   import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
   import { resolve } from '$app/paths';
+  import { openBetaFeedback } from '#lib/utils/open-beta-feedback.js';
   import { FlaskConicalIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   onMount(() => {
@@ -48,8 +49,10 @@ top-banner, is what the planner's steps scroll past (page-state). -->
         >About <span class="max-sm:hidden">the beta</span></a
       >
 
-      <a href="{resolve('/beta')}#feedback" class="link whitespace-nowrap"
-        >Send feedback</a
+      <button
+        type="button"
+        class="link whitespace-nowrap"
+        onclick={() => openBetaFeedback()}>Send feedback</button
       >
       <a
         href="https://temperature-blanket.com"

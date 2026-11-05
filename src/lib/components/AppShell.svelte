@@ -43,8 +43,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
 
-  // The beta's warning, on the first page of a visit
-  onMount(() => openBetaWarning(page.url.pathname));
+  // The beta's warning, on the first page of a visit, and its one question
+  // after a few minutes (utils/beta-feedback-toast.ts)
+  onMount(() => {
+    openBetaWarning(page.url.pathname);
+    if (__SITE_BETA__)
+      void import('#lib/utils/beta-feedback-toast.js').then((module) =>
+        module.startBetaFeedbackToast(),
+      );
+  });
 
   // The sidebar's least width (AppNavigation's min-w) until it's measured,
   // so the server's page puts the logo where it will be

@@ -23,7 +23,12 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
   import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import { MAIN_SITE_ORIGIN } from '#lib/constants/site.js';
-  import { ExternalLinkIcon, MailIcon } from '@lucide/svelte';
+  import { openBetaFeedback } from '#lib/utils/open-beta-feedback.js';
+  import {
+    ExternalLinkIcon,
+    MailIcon,
+    MessageSquareIcon,
+  } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   const mainSite = MAIN_SITE_ORIGIN ?? 'https://temperature-blanket.com';
@@ -105,18 +110,35 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
       >
         <h3 id="beta-feedback" class="h4">Send Feedback</h3>
         <p>
-          Something broken, confusing or missing? Say what you did and what
-          happened. A screenshot helps. Thanks for your feedback!
+          Something broken, confusing or missing? Or is it working well? Tell us
+          what you did and what happened. It’s how we’ll know when this version
+          is ready for {mainName}. Thanks for your feedback!
         </p>
-        {#if email}
-          <a
-            href="mailto:{email}?subject={encodeURIComponent('Beta feedback')}"
-            class="btn hover:preset-tonal-surface w-fit"
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="btn preset-filled-primary-500 w-fit"
+            onclick={() => openBetaFeedback()}
           >
-            <MailIcon />
-            {email}
-          </a>
-        {/if}
+            <MessageSquareIcon />
+            Send Feedback
+          </button>
+          {#if email}
+            <a
+              href="mailto:{email}?subject={encodeURIComponent(
+                'Beta feedback',
+              )}"
+              class="btn hover:preset-tonal-surface w-fit"
+            >
+              <MailIcon />
+              Email {email}
+            </a>
+          {/if}
+        </div>
+        <p class="text-sm opacity-80">
+          A screenshot helps with things that look wrong: email it, with what
+          you see.
+        </p>
       </section>
 
       <a href={mainSite} class="btn preset-tonal w-fit">

@@ -12,7 +12,9 @@
 //   The beta also sets PUBLIC_SITE_CHANNEL=beta and PUBLIC_ACCOUNTS_ENABLED=true.
 // - Runtime, not secret: `vars` below (a deploy replaces what's in the dashboard).
 // - Runtime secrets (BETTER_AUTH_SECRET, GOOGLE_CLIENT_SECRET,
-//   RAVELRY_CLIENT_SECRET): `wrangler secret put <NAME> --config wrangler.production.jsonc`.
+//   RAVELRY_CLIENT_SECRET, TURNSTILE_SECRET_KEY for guests' beta feedback with
+//   PUBLIC_TURNSTILE_SITE_KEY at build time, BETA_FEEDBACK_OWNERS: the emails
+//   that may read it on /beta/feedback): `wrangler secret put <NAME> --config wrangler.production.jsonc`.
 //   Deploys keep them.
 //
 // The adapter builds for Workers in Workers Builds (WORKERS_CI), writing the

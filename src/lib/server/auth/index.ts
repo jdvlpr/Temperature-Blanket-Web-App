@@ -393,3 +393,22 @@ export async function requireAccount(
   if (!session) return json({ message: 'Not signed in' }, { status: 401 });
   return { auth, user: session.user };
 }
+
+/**
+ * The signed-in user, for a route anyone may use: null when signed out, or
+ * when accounts are off or unavailable here.
+ */
+export async function optionalAccount(
+  event: RequestEvent,
+): Promise<{ id: string; email: string; emailVerified: boolean } | null> {
+  const auth = authFor(getPlatform());
+  if (auth instanceof Response) return null;
+  try {
+    const session = await auth.api.getSession({
+      headers: event.request.headers,
+    });
+    return session?.user ?? null;
+  } catch {
+    return null;
+  }
+}

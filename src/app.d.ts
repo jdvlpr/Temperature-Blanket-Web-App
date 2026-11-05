@@ -37,6 +37,8 @@ declare global {
         GALLERY_PUBLISH_ENABLED?: string;
         // Checks guests' gallery submissions (/api/project); without it, they're refused
         TURNSTILE_SECRET_KEY?: string;
+        // The beta's feedback readers (/beta/feedback): account emails, comma-separated; a secret
+        BETA_FEEDBACK_OWNERS?: string;
       };
       ctx?: { waitUntil(promise: Promise<unknown>): void };
       caches?: CacheStorage;

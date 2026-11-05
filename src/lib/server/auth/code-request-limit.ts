@@ -103,6 +103,22 @@ export async function allowIpCodeRequest(
   return (await countRequest(db, key, CODE_REQUEST_WINDOW_MS, now)) <= limit;
 }
 
+/**
+ * Counts a request of some other kind (`scope`, e.g. "feedback") from this IP
+ * address and returns whether it's allowed: at most `limit` an hour. The IP
+ * is kept only as a hash, as for codes.
+ */
+export async function allowIpRequest(
+  db: D1Database,
+  scope: string,
+  ip: string,
+  limit: number,
+  now = Date.now(),
+): Promise<boolean> {
+  const key = `${scope}-ip:${await sha256(ip)}`;
+  return (await countRequest(db, key, CODE_REQUEST_WINDOW_MS, now)) <= limit;
+}
+
 const emailDayKey = (now: number) =>
   `email-day:${new Date(now).toISOString().slice(0, 10)}`;
 

@@ -255,6 +255,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
+      {#if __SITE_BETA__}
+        <div class="flex flex-col gap-2">
+          <p class="text-xl font-bold">Beta Feedback</p>
+          <p>
+            When you use Send Feedback on this beta site, what you write is
+            stored with Cloudflare so it can be read by this site’s owner, with
+            what you chose (what it’s about, whether this version is ready), the
+            email address you give, if any, or your account if you’re signed in,
+            and what the form lists before you send it: the page’s path (not its
+            link, which can hold your project), the site’s version, your
+            browser, screen size and language, whether analytics is on, and
+            errors from that visit. Errors are kept only in your browser until
+            you send feedback. Your IP address is not stored with it; a count of
+            recent feedback from each IP address is kept for about a day to
+            prevent abuse. Signed out, Cloudflare Turnstile checks that you’re
+            not a robot first.
+          </p>
+        </div>
+      {/if}
+
       <div class="flex flex-col gap-2">
         <p class="text-xl font-bold">Project Gallery</p>
         <p>

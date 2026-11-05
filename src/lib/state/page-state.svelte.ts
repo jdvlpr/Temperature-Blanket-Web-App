@@ -338,6 +338,11 @@ export interface ToastSettings {
     /** The function triggered when the button is pressed. */
     response: () => void;
   };
+  /** Several buttons, after `action`: each runs its response and closes the toast */
+  actions?: {
+    label: string;
+    response: () => void;
+  }[];
   /** Hide dismiss button */
   hideDismiss?: boolean;
   /** Remain visible on Hover */
