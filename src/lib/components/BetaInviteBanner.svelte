@@ -28,7 +28,7 @@ known only in the browser: it appears after mount, never on the server. -->
     shouldShowBetaInvite,
     type BetaInvite,
   } from '$lib/utils/beta-invite';
-  import { FlaskConicalIcon, XIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   const percent = clampPercent(__BETA_INVITE_PERCENT__);
@@ -61,10 +61,10 @@ known only in the browser: it appears after mount, never on the server. -->
       href={BETA_ORIGIN}
       target="_blank"
       rel="noopener"
-      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
+      class="btn preset-filled-secondary-400-600 my-2 whitespace-pre-wrap"
     >
-      <FlaskConicalIcon />
-      Try the next version — now in beta
+      Try the next beta version
+      <ExternalLinkIcon class="relative -top-[1px] size-5" />
     </a>
     <!-- eslint-enable svelte/no-navigation-without-resolve -->
     <button
