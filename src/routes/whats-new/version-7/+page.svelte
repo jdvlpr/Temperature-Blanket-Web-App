@@ -38,24 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   // The header and social previews share one picture
   const featuredImage = VERSION_7_POST.image;
-
-  // Where things moved: what to look for, and where it is now
-  const moved = [
-    ['Your saved projects', 'My Library, or Project menu › Open… (⌘/Ctrl+O)'],
-    ['A new project or palette', 'Create, in the site menu'],
-    ...(__ACCOUNTS_ENABLED__
-      ? [['Send to Gallery', 'Project or Palette menu › Share']]
-      : []),
-    ['Downloads (PDF, CSV, image)', 'Project or Palette menu › Download'],
-    ['Searching for the weather again', 'Location step › Check for Updates'],
-    ['The Globe', 'Gallery › View Globe'],
-    ...(__ACCOUNTS_ENABLED__
-      ? [
-          ['Your display name', 'Person icon › Account'],
-          ['Connect Ravelry', 'Person icon › Account'],
-        ]
-      : [['Preferences', 'Person icon › Preferences']]),
-  ];
 </script>
 
 <svelte:head>
@@ -180,11 +162,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 here or on Ravelry, and they show on its gallery page too. Palettes
                 can't be posted to Ravelry (yet).
               </p>
-              <!-- If linking existing Ravelry projects ships before launch:
-              <p>
-                Already have the project on Ravelry? Link it instead of starting a
-                new one.
-              </p> -->
               <!-- Shot needed (owner's real data): a gallery page of a project
               posted to Ravelry, showing its Ravelry photos (two or three) under
               the preview, at desktop width, light and dark, captured as

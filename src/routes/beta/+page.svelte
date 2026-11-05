@@ -70,7 +70,7 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
           <li>
             Projects saved here stay in this browser, on this site. They don't
             show on {mainName}, and its projects don't show here unless you
-            bring them (below).{#if __ACCOUNTS_ENABLED__}
+            bring them (below). {#if __ACCOUNTS_ENABLED__}
               Sign in to keep them in your account, on every device and on {mainName}
               once this version is there.{/if}
           </li>
