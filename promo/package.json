@@ -1,0 +1,23 @@
+{
+  "name": "temperature-blanket-promo",
+  "private": true,
+  "description": "Motion-designed promo video for the v7 beta (Remotion). Separate from the app.",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "still": "remotion still src/index.ts",
+    "render": "remotion render src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.537",
+    "@remotion/google-fonts": "4.0.537",
+    "@remotion/paths": "4.0.537",
+    "react": "19.1.10",
+    "react-dom": "19.1.10",
+    "remotion": "4.0.537"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.17",
+    "typescript": "5.9.3"
+  }
+}

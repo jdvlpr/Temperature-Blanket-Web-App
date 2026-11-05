@@ -1,0 +1,7 @@
+node_modules/
+out/
+footage/
+music/
+public/music.mp3
+.DS_Store
+public/footage/

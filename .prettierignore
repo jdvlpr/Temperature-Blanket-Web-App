@@ -1,0 +1,3 @@
+# The promo video's generated data (scripts/promo/export-promo-data.spec.ts)
+promo/src/data/
+promo/package-lock.json
