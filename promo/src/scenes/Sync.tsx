@@ -118,7 +118,7 @@ export const Sync: React.FC<{ cue?: Cue }> = ({ cue = steadyCue }) => {
                     marginTop: 12,
                   }}
                 >
-                  Minneapolis 2025
+                  My Town 2025
                 </div>
               </div>
             </AppChrome>

@@ -131,7 +131,7 @@ export const KineticCaption: React.FC<{
   );
 };
 
-/** A small label in the body font, e.g. "Minneapolis · 2025 · daily highs" */
+/** A small label in the body font, e.g. "My Town · 2025 · daily highs" */
 export const Eyebrow: React.FC<{
   children: React.ReactNode;
   start: number;

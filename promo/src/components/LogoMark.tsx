@@ -2,9 +2,15 @@ import React from 'react';
 import { LOGO_STRIPES } from '../brand';
 
 // AppLogo's mark: four stripes with a slot from the top into a circle cut out
-export const LogoMark: React.FC<{ size: number; stripes?: string[] }> = ({
+export const LogoMark: React.FC<{
+  size: number;
+  stripes?: string[];
+  /** CSS drop-shadow; the default suits dark backgrounds */
+  shadow?: string;
+}> = ({
   size,
   stripes = LOGO_STRIPES,
+  shadow = 'drop-shadow(0 18px 40px rgba(0,0,0,0.45))',
 }) => {
   return (
     <svg
@@ -13,7 +19,7 @@ export const LogoMark: React.FC<{ size: number; stripes?: string[] }> = ({
       viewBox="0 0 32 32"
       style={{
         display: 'block',
-        filter: 'drop-shadow(0 18px 40px rgba(0,0,0,0.45))',
+        filter: shadow,
       }}
     >
       <defs>

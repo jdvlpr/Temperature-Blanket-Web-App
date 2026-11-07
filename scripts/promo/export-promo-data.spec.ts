@@ -55,7 +55,7 @@ const HERO_PALETTE = [
 
 const HERO = {
   label: 'Minneapolis, Minnesota, United States',
-  short: 'Minneapolis',
+  short: 'My Town',
   lat: 44.97997,
   lng: -93.26384,
   timezone: 'America/Chicago',
@@ -202,8 +202,8 @@ async function weatherFor(
   return days;
 }
 
-function photoPalette() {
-  const image = join(process.cwd(), 'scripts/fixtures/sea-and-forest.jpg');
+function photoPalette(file = 'sea-and-forest.jpg', count = 8) {
+  const image = join(process.cwd(), 'scripts/fixtures', file);
   const [w, h] = execFileSync('ffprobe', [
     '-v',
     'error',
@@ -246,7 +246,7 @@ function photoPalette() {
     labs: new Float32Array(colors.flatMap((c) => hexToOklab(c.hex))),
   });
   const picked = engine.autoPalette({
-    count: 8,
+    count,
     style: 'vivid',
     fixed: new Float32Array(0),
     exact: false,
@@ -373,4 +373,22 @@ it('exports the promo blankets', { timeout: 120_000 }, async () => {
     console.log(`${city.short}: ${b.days.length} days`);
   }
   writeFileSync(join(OUT, 'wall.json'), JSON.stringify(wall));
+});
+
+// The Reel's October photo (promo/src/reel/MapleStill.tsx, rendered to
+// scripts/fixtures/maple.png): the same engine, 10 colors for the hero's 10
+// ranges. Weather-free: the hero's Auto ranges don't depend on its colors, so
+// the Reel uses hero.json's day colors with this palette.
+//   npx remotion still src/index.ts ReelMaple ../scripts/fixtures/maple.png  (from promo/)
+//   pnpm vitest run --config scripts/promo/vitest.config.ts -t "reel palette"
+it('exports the reel palette', () => {
+  const palette = photoPalette('maple.png', 10);
+  writeFileSync(
+    join(OUT, 'maple.json'),
+    JSON.stringify({ image: 'maple.png', palette }, null, 1),
+  );
+  console.log(
+    'maple palette:',
+    palette.map((c) => `${c.name} ${c.hex}`).join(', '),
+  );
 });

@@ -14,6 +14,10 @@ import { Sync } from './scenes/Sync';
 import { Ravelry } from './scenes/Ravelry';
 import { Pdf } from './scenes/Pdf';
 import { AndMore } from './scenes/AndMore';
+import { Reel } from './reel/Reel';
+import { MapleStill } from './reel/MapleStill';
+import { RH, RW } from './reel/theme';
+import { TOTAL as REEL_TOTAL } from './reel/timing';
 
 const scene = (id: string, component: React.FC, frames: number) => (
   <Composition
@@ -29,6 +33,33 @@ const scene = (id: string, component: React.FC, frames: number) => (
 
 export const Root: React.FC = () => (
   <>
+    {/* The Instagram Reel (src/reel/): 1080×1920 */}
+    <Composition
+      id="Reel"
+      component={Reel}
+      durationInFrames={REEL_TOTAL}
+      fps={FPS}
+      width={RW}
+      height={RH}
+      defaultProps={{ showBeats: false, audio: true }}
+    />
+    <Composition
+      id="ReelDebug"
+      component={Reel}
+      durationInFrames={REEL_TOTAL}
+      fps={FPS}
+      width={RW}
+      height={RH}
+      defaultProps={{ showBeats: true, audio: true }}
+    />
+    <Composition
+      id="ReelMaple"
+      component={MapleStill}
+      durationInFrames={1}
+      fps={FPS}
+      width={800}
+      height={800}
+    />
     <Composition
       id="Animatic45"
       component={Main45}
