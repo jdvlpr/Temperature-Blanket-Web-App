@@ -53,12 +53,12 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { GUIDES, REFERENCE } from '../src/lib/docs/docs-index.ts';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+export const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name: string) => {
   const i = process.argv.indexOf(`--${name}`);
   return i === -1 ? undefined : process.argv[i + 1];
 };
-const base = arg('base') ?? 'https://localhost:4173';
+export const base = arg('base') ?? 'https://localhost:4173';
 const only = arg('only');
 
 // London (GeoNames 2643743), all of 2025, from Open-Meteo (s=1, without
@@ -82,7 +82,7 @@ type Shot = {
 };
 
 /** The planner with the project's weather loaded, at one of its sections */
-async function planner(
+export async function planner(
   page: Page,
   section: 'location' | 'weather-data' | 'gauges' | 'preview',
   project = PROJECT,
@@ -93,7 +93,7 @@ async function planner(
   );
   await page.goto(new URL(project, base).href);
   await page.getByRole('button', { name: /^Get Weather Data/ }).click();
-  await page.getByRole('button', { name: /^Source:/ }).waitFor();
+  await page.getByRole('button', { name: /^Source\b/ }).waitFor();
   const key = { location: '1', 'weather-data': '2', gauges: '3', preview: '4' };
   await page.keyboard.press(key[section]);
   // Without toasts (like "Units set to") over the shot
@@ -110,7 +110,7 @@ async function planner(
 }
 
 /** Lets menus, charts and fonts finish moving */
-async function settle(page: Page) {
+export async function settle(page: Page) {
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(600);
 }
@@ -154,12 +154,12 @@ async function inView(page: Page, target: Locator) {
   };
 }
 
-const menu = (page: Page) => page.getByRole('menu').last();
-const dialog = (page: Page) => page.getByRole('dialog').last();
+export const menu = (page: Page) => page.getByRole('menu').last();
+export const dialog = (page: Page) => page.getByRole('dialog').last();
 
 /** Scrolls until `target` stays `top` px from the window's top: changing
  * step, or the chart laid out late, can scroll the page back */
-async function keepAt(page: Page, target: Locator, top = 72) {
+export async function keepAt(page: Page, target: Locator, top = 72) {
   for (let tries = 0, still = 0; still < 3 && tries < 30; tries++) {
     const at = await target.evaluate(
       (node) => node.getBoundingClientRect().top,
@@ -175,7 +175,7 @@ async function keepAt(page: Page, target: Locator, top = 72) {
 }
 
 /** Toasts (like "Saved") off the shot */
-async function dismissToasts(page: Page) {
+export async function dismissToasts(page: Page) {
   for (const toast of await page
     .getByRole('button', { name: 'Dismiss toast' })
     .all())
@@ -185,7 +185,7 @@ async function dismissToasts(page: Page) {
 /** Signs in a new account with an emailed code, as a made-up maker. Needs
  * a server with EMAIL_SIGN_IN and ENABLE_DEV_ROUTES (the dev outbox): the
  * dev server, or `wrangler pages dev` on an accounts build */
-async function signIn(page: Page) {
+export async function signIn(page: Page) {
   const email = `docs-${Date.now()}@example.test`;
   await page.goto(new URL('/auth/sign-in', base).href);
   await page.getByRole('button', { name: 'Use email instead' }).click();
@@ -220,7 +220,7 @@ async function signIn(page: Page) {
 }
 
 /** The planner's project saved (to the account, when signed in) */
-async function saveProject(page: Page) {
+export async function saveProject(page: Page) {
   await page.keyboard.press('ControlOrMeta+s');
   // Its Saved toast
   await page.getByRole('button', { name: 'Dismiss toast' }).first().waitFor();
@@ -228,7 +228,7 @@ async function saveProject(page: Page) {
 }
 
 /** A page of the site, without the analytics question */
-async function visit(page: Page, path: string) {
+export async function visit(page: Page, path: string) {
   await page.addInitScript(() =>
     localStorage.setItem('disable_toast_analytics', 'true'),
   );
@@ -236,7 +236,7 @@ async function visit(page: Page, path: string) {
 }
 
 /** A palette of real yarn in the Yarn Palette Creator */
-async function yarnPalette(page: Page) {
+export async function yarnPalette(page: Page) {
   await visit(page, '/yarn');
   await page.waitForLoadState('networkidle');
   await settle(page);
@@ -414,7 +414,7 @@ const SHOTS: Shot[] = [
     name: 'weather/weather-source',
     open: async (page) => {
       await planner(page, 'weather-data');
-      await page.getByRole('button', { name: /^Source:/ }).click();
+      await page.getByRole('button', { name: /^Source\b/ }).click();
       await settle(page);
       return dialog(page);
     },
@@ -535,7 +535,7 @@ const SHOTS: Shot[] = [
 // Clips
 // ***************
 
-type Clip = {
+export type Clip = {
   name: string;
   /** Opens what the clip starts on (not recorded) */
   open: (page: Page) => Promise<void>;
@@ -549,7 +549,7 @@ type Clip = {
 const CLIP_VIEWPORT = { width: 800, height: 720 };
 
 /** A cursor for the clips (big enough to follow at a guide's width), following the mouse and showing its presses; its tip is at the mouse */
-function drawCursor() {
+export function drawCursor() {
   const cursor = document.createElement('div');
   cursor.innerHTML =
     '<svg width="38" height="38" viewBox="0 0 24 24"><path d="M4 2v17l4.5-4.2 3.1 6.7 2.8-1.3-3-6.5 6.1-.3z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>';
@@ -586,7 +586,7 @@ function drawCursor() {
 }
 
 /** Moves the mouse to the middle of something, at a pace you can follow */
-async function moveTo(page: Page, target: Locator, ms = 600) {
+export async function moveTo(page: Page, target: Locator, ms = 600) {
   const box = await target.boundingBox();
   if (!box) throw new Error(`Nothing to move to: ${target}`);
   await moveToPoint(
@@ -597,7 +597,11 @@ async function moveTo(page: Page, target: Locator, ms = 600) {
 }
 
 /** As moveTo, to a point in the window */
-async function moveToPoint(page: Page, to: { x: number; y: number }, ms = 600) {
+export async function moveToPoint(
+  page: Page,
+  to: { x: number; y: number },
+  ms = 600,
+) {
   const from = await page.evaluate(() => window.__clipMouse ?? { x: 0, y: 0 });
   const steps = Math.max(1, Math.round(ms / 16));
   for (let i = 1; i <= steps; i++) {
@@ -612,7 +616,7 @@ async function moveToPoint(page: Page, to: { x: number; y: number }, ms = 600) {
   await page.evaluate((at) => (window.__clipMouse = at), to);
 }
 
-async function clickOn(page: Page, target: Locator, ms?: number) {
+export async function clickOn(page: Page, target: Locator, ms?: number) {
   await moveTo(page, target, ms);
   await page.waitForTimeout(150);
   // If it moved on the way (a late layout), go on to where it is now
@@ -628,12 +632,12 @@ declare global {
   }
 }
 
-const value = (page: Page, date: string, param: string) =>
+export const value = (page: Page, date: string, param: string) =>
   page.getByRole('button', { name: `Edit ${date}, ${param}:` });
 
 /** The Weather step with the table's first rows in view, or with `at` (in
  * the step) just under the top bar */
-async function weatherTable(
+export async function weatherTable(
   page: Page,
   at: (section: Locator) => Locator = (section) => section.getByRole('table'),
 ) {
@@ -655,7 +659,7 @@ async function weatherTable(
 }
 
 /** Edit Weather Data, opened on a day's value */
-async function editWeather(page: Page, date: string, param: string) {
+export async function editWeather(page: Page, date: string, param: string) {
   await weatherTable(page);
   await value(page, date, param).click();
   await dialog(page).getByRole('grid').waitFor();
@@ -669,7 +673,7 @@ const cell = (page: Page, row: number, column: number) =>
     .nth(column);
 
 /** A point in `target`, as fractions of its width and height */
-async function pointIn(target: Locator, x: number, y: number) {
+export async function pointIn(target: Locator, x: number, y: number) {
   const box = await target.boundingBox();
   if (!box) throw new Error(`Nothing to point at: ${target}`);
   return { x: box.x + box.width * x, y: box.y + box.height * y };
@@ -677,7 +681,7 @@ async function pointIn(target: Locator, x: number, y: number) {
 
 /** Moves to a native select and chooses an option: its own list never
  * shows in a recording */
-async function chooseIn(page: Page, select: Locator, label: string) {
+export async function chooseIn(page: Page, select: Locator, label: string) {
   await moveTo(page, select, 700);
   await page.waitForTimeout(300);
   await select.selectOption({ label });
@@ -1122,7 +1126,7 @@ const CLIPS: Clip[] = [
       await page.waitForTimeout(800);
       await clickOn(page, page.locator('#location-action-button'), 700);
       await page
-        .getByRole('button', { name: /^Source:/ })
+        .getByRole('button', { name: /^Source\b/ })
         .waitFor({ timeout: 60_000 });
       await dismissToasts(page);
       await page.waitForTimeout(1600);
@@ -1354,9 +1358,40 @@ async function card(context: BrowserContext, entry: Card, theme: string) {
 
 const run = promisify(execFile);
 
+/** Where and how `record` saves a clip (the docs' defaults; the promo video
+ * (scripts/promo-video.ts) records with its own) */
+export type RecordOptions = {
+  /** The video's path without its extension */
+  out?: string;
+  /** Seconds on the first frame before `play` starts */
+  lead?: number;
+  /** Seconds the end stays */
+  hold?: number;
+  /** The first frame as `<out>.jpg`, for DocsClip's poster */
+  poster?: boolean;
+  /** Where the sheet of a frame a second goes */
+  sheet?: string;
+  /** Only this part of the window (CSS pixels), as it is once `open` is done */
+  crop?: (
+    page: Page,
+  ) => Promise<{ x: number; y: number; width: number; height: number } | null>;
+};
+
 /** Records one clip in one theme; returns its size in CSS pixels */
-async function record(context: BrowserContext, clip: Clip, theme: string) {
+export async function record(
+  context: BrowserContext,
+  clip: Clip,
+  theme: string,
+  options: RecordOptions = {},
+) {
   const viewport = clip.viewport ?? CLIP_VIEWPORT;
+  const {
+    out = join(root, 'static/images/docs', `${clip.name}-${theme}`),
+    lead = 1,
+    hold = 1.8,
+    poster = true,
+    sheet = join(root, '.svelte-kit/docs-clips', `${clip.name}-${theme}.png`),
+  } = options;
   const page = await context.newPage();
   await clip.open(page).catch(async (error) => {
     const failed = join(root, '.svelte-kit/docs-screenshot-failed.png');
@@ -1364,6 +1399,9 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
     console.error(`${clip.name} failed; the page is in ${failed}`);
     throw error;
   });
+  const area = options.crop && (await options.crop(page));
+  if (options.crop && !area)
+    throw new Error(`${clip.name}: nothing to crop to`);
   await page.evaluate(drawCursor);
   // The cursor starts a little in from the bottom right
   const start = {
@@ -1387,7 +1425,7 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
     maxWidth: viewport.width * 2,
     maxHeight: viewport.height * 2,
   });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(lead * 1000);
   await clip.play(page).catch(async (error) => {
     const failed = join(root, '.svelte-kit/docs-screenshot-failed.png');
     await page.screenshot({ path: failed });
@@ -1395,7 +1433,7 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
     throw error;
   });
   // The end stays a moment before it starts again
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(hold * 1000);
   const end = Date.now() / 1000;
   await cdp.send('Page.stopScreencast');
   if (frames.length < 2) throw new Error(`${clip.name}: no frames recorded`);
@@ -1417,8 +1455,11 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   );
   await writeFile(join(dir, 'frames.txt'), list.join('\n'));
 
-  const out = join(root, 'static/images/docs', `${clip.name}-${theme}`);
   await mkdir(dirname(out), { recursive: true });
+  // Frames are at twice the CSS size
+  const crop = area
+    ? `crop=${Math.round(area.width) * 2}:${Math.round(area.height) * 2}:${Math.round(area.x) * 2}:${Math.round(area.y) * 2},`
+    : '';
   await run('ffmpeg', [
     '-y',
     '-loglevel',
@@ -1430,7 +1471,7 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
     '-i',
     join(dir, 'frames.txt'),
     '-vf',
-    'fps=30,scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p',
+    `${crop}fps=30,scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p`,
     '-c:v',
     'libx264',
     '-preset',
@@ -1445,22 +1486,19 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
     `${out}.mp4`,
   ]);
   // The poster, for whoever has motion reduced: the first frame
-  await run('ffmpeg', [
-    '-y',
-    '-loglevel',
-    'error',
-    '-i',
-    join(dir, '00000.png'),
-    '-q:v',
-    '3',
-    `${out}.jpg`,
-  ]);
+  if (poster)
+    await run('ffmpeg', [
+      '-y',
+      '-loglevel',
+      'error',
+      '-i',
+      join(dir, '00000.png'),
+      ...(crop ? ['-vf', crop.slice(0, -1)] : []),
+      '-q:v',
+      '3',
+      `${out}.jpg`,
+    ]);
   // A sheet of a frame a second, to check the clip without playing it
-  const sheet = join(
-    root,
-    '.svelte-kit/docs-clips',
-    `${clip.name}-${theme}.png`,
-  );
   await mkdir(dirname(sheet), { recursive: true });
   await run('ffmpeg', [
     '-y',
@@ -1476,12 +1514,14 @@ async function record(context: BrowserContext, clip: Clip, theme: string) {
   ]);
   await rm(dir, { recursive: true });
   await page.close();
-  return viewport;
+  return area
+    ? { width: Math.round(area.width), height: Math.round(area.height) }
+    : viewport;
 }
 
 /** Shots and clips show the site as launched: without the beta's banner or
  * the sidebar's About the Beta */
-function hideBetaBanner() {
+export function hideBetaBanner() {
   // Nor its warning on the first page (beta-warning.ts)
   localStorage.setItem('beta_warning_dismissed', 'true');
   const style = document.createElement('style');
@@ -1601,4 +1641,5 @@ async function main() {
   await browser.close();
 }
 
-await main();
+// Only when run, not when its helpers are imported (scripts/promo-video.ts)
+if (import.meta.main) await main();

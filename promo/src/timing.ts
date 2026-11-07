@@ -1,6 +1,7 @@
 // Every cut and cue in the animatic, in beats of the music (src/data/beats.json).
-// Beat 0 is the music's first note, a downbeat, right at the start of the
-// video (MUSIC_START_FRAME); a bar is 4 beats. Change a
+// Beats are the detected grid moved by `shift` (−0.5, chosen by ear: the
+// cuts land half a beat before the detected beats, so beat 0 is just before
+// the video starts); a bar is 4 beats. Change a
 // scene's length here (in beats) and everything after it moves with it.
 import beatsData from './data/beats.json';
 import { FPS } from './brand';

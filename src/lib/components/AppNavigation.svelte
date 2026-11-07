@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {
           href: '/',
           label: 'Project',
-          description: 'Plan a blanket from weather data',
+          description: 'Plan a whole project from weather data',
           yarn: false,
         },
         {

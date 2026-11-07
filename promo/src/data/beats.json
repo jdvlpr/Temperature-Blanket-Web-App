@@ -1,6 +1,6 @@
 {
-  "//": "From scripts/beats.py (beat 0 = the first note, a downbeat; 4 beats a bar). shift moves every cut by that many beats if the grid sounds off: the other candidate phase is -0.5 (+0.5 would cut the end card's URL hold below 3 s).",
-  "shift": 0,
+  "//": "From scripts/beats.py (beats[0] = the first note; 4 beats a bar). shift moves every cut by that many beats: -0.5, chosen by ear on 2026-11-06, puts the cuts half a beat before the detected grid (0 is the other phase; +0.5 would cut the end card's URL hold below 3 s).",
+  "shift": -0.5,
   "beats": [
     0.8824, 1.533, 2.1678, 2.7872, 3.4095, 4.0277, 4.6495, 5.2676, 5.8837,
     6.5104, 7.1432, 7.7853, 8.4211, 9.0472, 9.6677, 10.3024, 10.9222, 11.5739,
