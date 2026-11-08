@@ -33,6 +33,23 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'November',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                tag: 'yarn',
+                text: `39 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=kelbourne_woolens-germantown&v=6.6.0" class="link">Kelbourne Woolens - Germantown</a>',
+              },
+            ],
+            version: '6.6.0',
+          },
+        ],
+      },
+      {
         month: 'October',
         items: [
           {
