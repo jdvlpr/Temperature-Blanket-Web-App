@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import AppNavigation from '#lib/components/AppNavigation.svelte';
   import AccountButton from '#lib/components/account/AccountButton.svelte';
-  import { page } from '$app/state';
   import {
     drawerState,
     showNavigationSideBar,
@@ -24,6 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { motion } from '#lib/utils/feedback.svelte.js';
   import { openBetaWarning } from '#lib/utils/open-beta-warning.js';
+  import { dev } from '$app/env';
+  import { page } from '$app/state';
   import { MenuIcon, PanelLeftClose, PanelLeftOpen } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
@@ -31,8 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
   import BetaBanner from './BetaBanner.svelte';
-  import WhatsNewBanner from './WhatsNewBanner.svelte';
   import { weatherChart } from './WeatherChart.svelte';
+  import WhatsNewBanner from './WhatsNewBanner.svelte';
 
   interface Props {
     pageName?: string;
@@ -143,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   style:--top-bar-height="{topBarHeight}px"
 >
   <!-- Above the top bar, the window's full width, scrolling away with the page -->
-  {#if __SITE_BETA__}
+  {#if __SITE_BETA__ && !dev}
     <BetaBanner />
   {/if}
   <div
