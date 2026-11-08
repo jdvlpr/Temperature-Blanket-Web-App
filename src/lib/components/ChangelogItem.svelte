@@ -15,10 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { ChevronsRightIcon } from '@lucide/svelte';
+  import {
+    CHANGELOG_TAGS,
+    changelogHref,
+  } from '#lib/constants/changelog-tags.js';
+  import type { ChangelogItemNote } from '#lib/types/page-types.js';
 
   interface Props {
-    version?: any;
-    notes: any;
+    version?: string | null;
+    notes: ChangelogItemNote[];
   }
 
   let { version = null, notes }: Props = $props();
@@ -40,30 +45,51 @@ that follow the card's (its radius less its padding) -->
     {/if}
   </div>
   <div class="flex flex-wrap gap-2">
-    {#each notes as { icon, text, title, instructions, IconComponent }}
+    {#each notes as { icon, text, title, instructions, IconComponent, tag }, i (i)}
+      {@const chip = CHANGELOG_TAGS.find((t) => t.tag === tag)?.chip}
       <div
         class="bg-surface-50 dark:bg-surface-950 flex-auto rounded-[max(0px,calc(var(--radius-container)-var(--spacing)*4))] p-4"
       >
         <p class="flex items-center gap-2 text-base sm:gap-4">
           {#if icon}
-            <span class="shrink-0">{@html icon}</span>
+            <span class="shrink-0">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -- the site's own markup, from changelog.ts -->
+              {@html icon}
+            </span>
           {:else if IconComponent}
             <span class="shrink-0"><IconComponent /></span>
           {/if}
 
           <span class="flex flex-col">
-            {#if title}
-              <span class="flex items-center gap-2 font-bold"
-                >{@html title}</span
-              >
-            {/if}
+            <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              {#if title}
+                <span class="flex items-center gap-2 font-bold">
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the site's own markup, from changelog.ts -->
+                  {@html title}
+                </span>
+              {/if}
+              {#if chip}
+                <!-- Shows only this kind of change -->
+                <a
+                  href={changelogHref(tag)}
+                  class="badge preset-filled-surface-100-900 hover:preset-filled-surface-200-800 text-xs"
+                  >{chip}</a
+                >
+              {/if}
+            </span>
             {#if text}
-              <span>{@html text}</span>
+              <span>
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the site's own markup, from changelog.ts -->
+                {@html text}
+              </span>
             {/if}
             {#if instructions}
               <span class="pt-2 text-sm">
                 <ChevronsRightIcon class="icon-sm relative -top-[1px] inline" />
-                <span>{@html instructions}</span>
+                <span>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the site's own markup, from changelog.ts -->
+                  {@html instructions}
+                </span>
               </span>
             {/if}
           </span>

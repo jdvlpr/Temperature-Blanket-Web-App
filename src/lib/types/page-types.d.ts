@@ -30,11 +30,15 @@ export interface ChangelogItem {
   version?: string;
 }
 
+/** A changelog note's kind (see #lib/constants/changelog-tags.ts) */
+export type ChangelogTag = 'release' | 'feature' | 'yarn' | 'fix';
+
 export interface ChangelogItemNote {
   icon?: string;
   IconComponent?: Component;
   /** Provide instructions to the user */
   instructions?: string;
+  tag: ChangelogTag;
   text: string;
   title: string;
 }

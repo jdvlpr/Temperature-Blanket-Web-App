@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { PUBLIC_GITHUB_LINK } from '$app/env/public';
 import { ICONS } from '#lib/constants/icon-constants.js';
 import type { ChangelogItemGroup } from '#lib/types/page-types.js';
 import {
@@ -23,7 +22,6 @@ import {
   ImageIcon,
   LandmarkIcon,
   MoonStarIcon,
-  RocketIcon,
   SquarePlayIcon,
   SquareTerminalIcon,
   SwatchBookIcon,
@@ -41,24 +39,28 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `91 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=lana_grossa-cool_wool_big&v=6.5.0" class="link">Lana Grossa - Cool Wool Big</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `114 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=lana_grossa-cool_wool&v=6.5.0" class="link">Lana Grossa - Cool Wool</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `25 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=lana_grossa-summer_softness&v=6.5.0" class="link">Lana Grossa - Summer Softness</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `34 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=drops-belle&v=6.5.0" class="link">DROPS - Belle</a>',
@@ -70,24 +72,28 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `30 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-cotton_fair_worsted&v=6.4.0" class="link">Premier - Cotton Fair Worsted</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `104 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=holst-supersoft&v=6.4.0" class="link">Holst - Supersoft</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `66 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=knitting_for_olive-heavy_merino&v=6.4.0" class="link">Knitting for Olive - Heavy Merino</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `82 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=drops-snow&v=6.4.0" class="link">DROPS - Snow</a>',
@@ -106,11 +112,13 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'Try it in the Preview tab of the Project Planner',
+                tag: 'feature',
                 text: `Each hexagon represents one day. Choose the number of columns and how the rows fit together, add extra hexagons at the beginning or between months, add a border around each hexagon, and customize the hexagon design to use a different weather value for each round.`,
                 title: 'New Preview Layout: Hexagons',
               },
               {
                 IconComponent: SwatchBookIcon,
+                tag: 'feature',
                 text: `When you pick a yarn colorway for a preview's accent or border color, the yarn brand and colorway are now saved with your project. They're listed on a new Additional Colors page in the PDF (you can leave it out when downloading) and on project pages in the <a href="/gallery" class="link">Project Gallery</a>.`,
                 title: 'Yarn Details for Accent & Border Colors',
               },
@@ -121,11 +129,13 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: EarthIcon,
+                tag: 'feature',
                 text: `The <a href="/globe" class="link">Globe</a> now shows detailed NASA satellite imagery you can zoom much closer into. Project markers lie flat on the map, grow as you zoom in, and never overlap, so they're easier to tap. A searchable list shows the places in view, and on phones it's a panel you can swipe up from the bottom of the screen.`,
                 title: 'Globe Improvements',
               },
               {
                 IconComponent: LandmarkIcon,
+                tag: 'feature',
                 text: `Project pages in the <a href="/gallery" class="link">Project Gallery</a> have a new "See nearby projects" button that opens the project's location on the Globe. Project details now open from an "About" button.`,
                 title: 'Project Gallery Updates',
               },
@@ -141,12 +151,14 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `84 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=dharma-acid_dyes&v=6.2.0" class="link">Dharma - Acid Dyes</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `168 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=dharma-fiber_reactive_procion_dyes&v=6.2.0" class="link">Dharma - Fiber Reactive Procion Dyes</a>',
@@ -158,30 +170,35 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `43 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=ferner_wolle-merino_160&v=6.1.0" class="link">Ferner Wolle - Merino 160</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `115 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=handy_hands-lizbeth_size_40&v=6.1.0" class="link">Handy Hands - Lizbeth Size 40</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `22 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=knit_picks-comfy_fingering&v=6.1.0" class="link">Knit Picks - Comfy Fingering</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `45 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-basix_chenille_brights&v=6.1.0" class="link">Premier - Basix Chenille Brights</a>',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `90 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=wendy-supreme_dk&v=6.1.0" class="link">Wendy - Supreme DK</a>',
@@ -193,28 +210,12 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: CogIcon,
+                tag: 'fix',
                 text: `Fixed an issue where sorting colors wasn't saving, and improved performance by only loading yarn colorway data when necessary.`,
                 title: 'Bug fixes & performance improvements',
               },
             ],
             version: '6.0.14',
-          },
-        ],
-      },
-      {
-        month: 'July',
-        items: [
-          {
-            notes: [
-              {
-                IconComponent: RocketIcon,
-                instructions:
-                  "<a href='/whats-new/version-6' class='link'>Learn more and read the update announcement.</a>",
-                text: `There is a breaking change in that the Daytime calculations are more accurate, which may result in different Daytime and Nighttime stitch counts for some projects.`,
-                title: 'Version 6',
-              },
-            ],
-            version: '6.0.0',
           },
         ],
       },
@@ -227,6 +228,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'Try it in the Preview tab of the Project Planner',
+                tag: 'feature',
                 text: `Each of the 12 points represents a month, and each chevron row within a point represents one of your project's days, radiating outward from the center.`,
                 title: 'New Preview Layout: 12-Point Star',
               },
@@ -237,16 +239,19 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `10 colorways`,
                 title: 'Added Colorways: Bernat - Blanket',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `16 colorways`,
                 title: 'Added New Yarn: Herrschners - Worsted 8 Heathers',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `8 colorways`,
                 title: 'Added New Yarn: Herrschners - Worsted 8 Wildflowers',
               },
@@ -257,6 +262,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `78 colorways`,
                 title: 'Added New Yarn: Círculo - Anne',
               },
@@ -267,6 +273,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `19 colorways`,
                 title: 'Added New Yarn: Loops & Threads - Sweet Snuggles Lite',
               },
@@ -282,21 +289,25 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `14 colorways`,
                 title: 'Added New Yarn: Loops & Threads - Luxe Merino',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `20 colorways`,
                 title: 'Added New Yarn: Loops & Threads - Superwash Merino',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `80 colorways`,
                 title: 'Added New Yarn: Scheepjes - Metropolis',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `10 colorways`,
                 title: 'Added Colorways: Cascade Yarns - 220 Superwash Merino',
               },
@@ -312,6 +323,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `16 colorways`,
                 title: 'Added Colorways: Premier - Basix Worsted',
               },
@@ -322,11 +334,13 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `35 colorways`,
                 title: 'Added New Yarn: Alize - Softy Plus',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `30 colorways`,
                 title: 'Added New Yarn: Knit Picks - Animation',
               },
@@ -337,11 +351,13 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `24 colorways`,
                 title: 'Added New Yarn: Stylecraft - Highland Heathers DK',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `39 colorways`,
                 title: 'Added New Yarn: Stylecraft - Life DK',
               },
@@ -352,21 +368,25 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `41 colorways`,
                 title: 'Added New Yarn: Rosários 4 - Be Cool',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `5 colorways added`,
                 title: 'Added Colorways: Stylecraft - Naturals Bamboo + Cotton',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `5 colorways added`,
                 title: 'Added Colorways: Stylecraft - Special DK',
               },
               {
                 icon: ICONS.wrench,
+                tag: 'yarn',
                 text: `Colorway names now include the Stylecraft shade value. For example, "White" is now "White 1001"`,
                 title: 'Updated colorway names for Stylecraft yarns',
               },
@@ -374,6 +394,7 @@ export const entries: ChangelogItemGroup[] = [
                 IconComponent: SquareTerminalIcon,
                 instructions:
                   "<a href='/api/yarn-colorways' class='link'>Read the API Docs</a>",
+                tag: 'feature',
                 text: 'Introduced v3 of the Yarn Colorways API, adding <span class="code px-1">name</span> and <span class="code px-1">exactName</span> parameters for filtering colorways by name with partial or exact matching.',
                 title: 'Yarn Colorways API v3',
               },
@@ -389,6 +410,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `17 colorways added`,
                 title: 'Added Colorways: Lion Brand - 24/7 Cotton',
               },
@@ -399,6 +421,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `54 colorways`,
                 title: 'Added New Yarn: Emu - Classic DK',
               },
@@ -409,6 +432,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `44 colorways`,
                 title: 'Added New Yarn: Melissa - Lana Mediana',
               },
@@ -419,6 +443,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `30 colorways`,
                 title: 'Added New Yarn: Loops & Threads - Demi Purl',
               },
@@ -434,6 +459,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: EarthIcon,
+                tag: 'feature',
                 text: `Explore a 3D map of user-created temperature blanket projects from around the world on the new <a href="/globe" class="link">Globe</a> page.`,
                 title: 'New Feature - Project Globe',
               },
@@ -446,6 +472,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'In the Project Menu or in the Weather tab, select the Download/Export button, then Create Google Sheet.',
+                tag: 'feature',
                 text: `Save your weather data, ranges, and colors in a Google Sheet.`,
                 title: 'New Feature - Create Google Sheet',
               },
@@ -462,6 +489,7 @@ export const entries: ChangelogItemGroup[] = [
               {
                 icon: ICONS.wrench,
                 instructions: `For more information, and to see if your project was affected or not, see this post: <a href="https://www.facebook.com/share/p/1AUDsPmA7w/" target="_blank" class="link">Technical Update: Future Date Issue</a>.`,
+                tag: 'fix',
                 text: `For some projects with future dates, one day was incorrect or missing. This update fixes the issue.`,
                 title: 'Future Date Issue',
               },
@@ -472,6 +500,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `21 colorways`,
                 title: 'Added New Yarn: Hobbii - Daily Stitch Mega',
               },
@@ -484,6 +513,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation/preview#assigning-seasons" class="link">Learn more in the documentation</a>.',
+                tag: 'feature',
                 text: `Assign different weather parameters for different seasons when previewing your project's colors.`,
                 title:
                   'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
@@ -505,11 +535,13 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `31 colorways`,
                 title: 'Added New Yarn: Euroroma - Ecoamigurumi',
               },
               {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: `50 colorways`,
                 title: 'Added New Yarn: Hobby Store - Aran AcryCot',
               },
@@ -525,6 +557,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: SquarePlayIcon,
+                tag: 'feature',
                 text: `<a href="https://www.youtube.com/watch?v=7NRLrpZb0Lo" target="_blank" class="link">Click here to watch</a>`,
                 title: 'New Video: Plan a Temperature Blanket the Easy Way',
               },
@@ -540,6 +573,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: WrenchIcon,
+                tag: 'yarn',
                 text: `There was an error with the Sage Green colorway from Scheepjes - Catona (it was the same color as the Kiwi colorway). This update fixes the Sage Green colorway so that it is no longer the same color as the Kiwi colorway.`,
                 title: 'Modified Colorway: Sage Green (Scheepjes - Catona)',
                 instructions:
@@ -559,6 +593,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'Try it in the Preview tab of the Project Planner',
+                tag: 'feature',
                 text: `Each round in a hexagon represents one day`,
                 title: 'Added New Preview Layout: Hexagon Rounds',
               },
@@ -571,6 +606,7 @@ export const entries: ChangelogItemGroup[] = [
                 IconComponent: ImageIcon,
                 instructions:
                   'When editing a palette in the <a href="/" class="link">Project Planner</a> or with the <a href="/yarn" class="link">Yarn Palette Creator</a>, select the Export/Import tool, then choose Image.',
+                tag: 'feature',
                 text: `Export your yarn palette as a PNG image to share on social media, or save it for future reference.`,
                 title: 'New Feature: Save Yarn Palette as Image',
               },
@@ -588,6 +624,7 @@ export const entries: ChangelogItemGroup[] = [
               {
                 IconComponent: CloudCogIcon,
                 instructions: `To see the new settings, press the Weather Source button in the Project Planner. If you notice any issues or have feedback about the new model settings, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
+                tag: 'feature',
                 text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation/weather#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',
                 title:
                   'New Weather Source Settings <span class="badge bg-tertiary-50-950 ml-2">Beta</span>',
@@ -601,6 +638,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'Try it out in the Preview tab of the Project Planner',
+                tag: 'feature',
                 text: `Each round in a square represents one day`,
                 title: 'Added New Preview Layout: Square Rounds',
               },
@@ -611,6 +649,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: MoonStarIcon,
+                tag: 'feature',
                 text: 'Add colors for phases of the moon into your preview designs.',
                 title: 'Added Feature: Moon Phase Gauge',
               },
@@ -621,6 +660,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: `The fix introduced in v5.2.33 didn't completely solve the issue of dates shifting; some locations were still experiencing the issue. This update addresses the issue by using Universal Time Coordinated (UTC) throughout the application when converting dates, with added fixes to keep the v5.2.33 functionality in the cases where that update solved the problem.`,
                 instructions: `If you notice any issues regarding weather data, please <a href="/contact/forms/2025-03-weather-data" target="_blank" class="link">let me know</a>.`,
                 title: 'Fixed Weather Data Dates Issue #2',
@@ -632,6 +672,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: `An issue for some locations (I believe it was introduced in v5.2.2) caused weather data dates to be off by one in the weather table and/or the preview image. I believe the issue was caused by how dates were converted throughout the application between ISO 8601 strings ('YYYY-MM-DD') and Date objects in Universal Time Coordinated (UTC). This update addresses the issue by converting ISO 8601 dates to Date objects using the local timezone instead of UTC.`,
                 instructions: `If you notice any issues regarding weather data, please <a href="/contact/forms/2025-03-weather-data" target="_blank" class="link">let me know</a>.`,
                 title: 'Fixed Weather Data Dates Issue',
@@ -649,6 +690,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: `An issue was introduced in v5.0.0 where weather data from Meteostat was slightly different than previous versions. This happened because the location's elevation was not being included in the weather data request. This update fixes the issue by including the location's elevation in the weather request, so weather data from Meteostat should be the same as before the v5.0.0 update.`,
                 title: 'Fixed Meteostat Weather Data Issue',
               },
@@ -659,23 +701,12 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.design,
+                tag: 'feature',
                 text: 'Option to add borders around each square for the Squares and Calendar preview layouts',
                 title: 'Added Feature: Border Around Squares',
               },
             ],
             version: '5.2.0',
-          },
-          {
-            notes: [
-              {
-                IconComponent: RocketIcon,
-                instructions:
-                  "<a href='/whats-new/version-5' class='link'>Learn more and read the update announcement.</a>",
-                text: `Updated design, new features, and rewritten with Svelte 5 and Skeleton 3`,
-                title: 'Version 5 Release',
-              },
-            ],
-            version: '5.0.0',
           },
         ],
       },
@@ -687,6 +718,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: `The Daytime Rows preview image was inaccurately representing the number of daytime and night stitches in each row. This update uses the actual daytime and night stitches values to generate the preview image, ensuring that it accurately reflects the values in the stitches table. Consequently, the apparent line between the daytime and night sections in the preview image may appear more jagged (less of a smooth curve). However, it provides a more precise representation of the final project's appearance. Only the Daytime Rows preview image in the Project Planner is affected by this update; preview images on Project Gallery pages created before this update remain unchanged.`,
                 title: 'Fixed Daytime Rows Preview Image',
               },
@@ -717,6 +749,7 @@ export const entries: ChangelogItemGroup[] = [
       >`,
                 instructions:
                   "<a href='/documentation/basics/yarn-weights' class='link'>See the Yarn Weights chart</a>",
+                tag: 'yarn',
                 text: `Yarns include weight information. When selecting or searching for a yarn colorway, you can filter results by yarn weight.`,
                 title: 'Added Yarn Weights',
               },
@@ -728,23 +761,12 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'feature',
                 text: `Project locations can now include future dates even when the weather source is Open-Meteo. Previously this was possible only when the weather source was Meteostat.`,
                 title: 'Allow Future Dates in Open-Meteo Weather Data',
               },
             ],
             version: '4.0.5',
-          },
-          {
-            notes: [
-              {
-                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>`,
-                instructions:
-                  "<a href='/whats-new/open-source' class='link'>Read the release post</a>",
-                text: `Collaborate and contribute to this web app in the <a href=${PUBLIC_GITHUB_LINK} class="link" target="_blank">GitHub repository</a>`,
-                title: 'Open Source!',
-              },
-            ],
-            version: '4.0.0',
           },
         ],
       },
@@ -758,6 +780,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="m20.893 13.393-1.135-1.135a2.252 2.252 0 0 1-.421-.585l-1.08-2.16a.414.414 0 0 0-.663-.107.827.827 0 0 1-.812.21l-1.273-.363a.89.89 0 0 0-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 0 1-1.81 1.025 1.055 1.055 0 0 1-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 0 1-1.383-2.46l.007-.042a2.25 2.25 0 0 1 .29-.787l.09-.15a2.25 2.25 0 0 1 2.37-1.048l1.178.236a1.125 1.125 0 0 0 1.302-.795l.208-.73a1.125 1.125 0 0 0-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 0 1-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 0 1-1.458-1.137l1.411-2.353a2.25 2.25 0 0 0 .286-.76m11.928 9.869A9 9 0 0 0 8.965 3.525m11.928 9.868A9 9 0 1 1 8.965 3.525" />
       </svg>`,
+                tag: 'feature',
                 text: `Use more than 100 locations per project (increased from 50).`,
                 title: 'More Locations Per Project',
               },
@@ -766,6 +789,7 @@ export const entries: ChangelogItemGroup[] = [
         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
       </svg>
       `,
+                tag: 'feature',
                 text: `Get just one day of weather data per location (changed from a minimum of two days per location). This opens up new project options, for example using a location's weather data if you traveled there only one day.`,
                 title: 'One-day Locations',
               },
@@ -782,6 +806,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.design,
+                tag: 'feature',
                 text: "Rearranged items the navigation sidebar, simplified the page footer, added analytics cookie confirmation, added Getting Started guide, and added <a href='/privacy' class='link'>Privacy</a> and <a href='/contact' class='link'>Contact</a> pages.",
                 title: 'Modified Design',
               },
@@ -798,6 +823,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: 'When getting weather data from Meteostat, some requests would include an invalid elevation parameter. The issue has been fixed by removing the invalid elevation parameter from the request.',
                 title: 'Repaired Weather Data Request',
               },
@@ -812,6 +838,7 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   "For projects with missing or recent weather data, see the Weather section for more information. You can also read the explanation in the <a href='/documentation#common-questions' class='link'>FAQs</a>.",
+                tag: 'feature',
                 text: 'New alert visuals and revised text clarify that recent weather data can change as weather sources get the latest information.',
                 title: 'Added Note for Recent Weather Data',
               },
@@ -824,6 +851,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'In the palette creator, in the Random colorways tool, tap or hover over a colorway to view the lock button.',
+                tag: 'feature',
                 text: 'When generating random colorways, lock the ones you like and generate new ones for the rest.',
                 title: 'Added Feature: Lock Colorways',
               },
@@ -836,6 +864,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.wrench,
                 instructions:
                   'You can change this by customizing ranges in the Colors section and by changing layout options in the Preview sections.',
+                tag: 'feature',
                 text: 'New projects now use the daily high instead of the daily average temperature by default.',
                 title: 'Default High Temperatures',
               },
@@ -861,6 +890,7 @@ export const entries: ChangelogItemGroup[] = [
                   </svg>`,
                 instructions:
                   "<a href='/api/yarn-colorways' class='link'>Yarn Colorways API</a>",
+                tag: 'feature',
                 text: 'Developers can use the API to find yarn by color in their apps.',
                 title: 'New - Yarn Colorways API',
               },
@@ -873,6 +903,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.design,
                 instructions:
                   'Tap or hover over a color palette to see or edit details.',
+                tag: 'feature',
                 text: 'View or edit colors directly from the palette preview.',
                 title: 'Interactive Color Palettes',
               },
@@ -890,6 +921,7 @@ export const entries: ChangelogItemGroup[] = [
                   >`,
                 instructions:
                   "<a href='/gallery/palettes' class='link'>View the Yarn Palette Gallery</a>.",
+                tag: 'feature',
                 text: 'Browse user-created yarn colorway combinations.',
                 title: 'Yarn Palette Gallery',
               },
@@ -900,23 +932,12 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: '',
                 title: 'Fixed Issue with Daytime Data not Displaying',
               },
             ],
             version: '3.0.1',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.design,
-                instructions:
-                  "<a href='/whats-new/version-3' class='link'>Read the release post about Version 3</a>",
-                text: 'New sidebar navigation, unified design across all pages, and improved performance.',
-                title: 'Updated Site Design',
-              },
-            ],
-            version: '3.0.0',
           },
         ],
       },
@@ -934,6 +955,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 256 256"><path fill="currentColor" d="M144 204a16 16 0 1 1-16-16a16 16 0 0 1 16 16Zm73-124l15.52-15.51a12 12 0 0 0-17-17L200 63l-15.51-15.49a12 12 0 0 0-17 17L183 80l-15.49 15.51a12 12 0 0 0 17 17L200 97l15.51 15.52a12 12 0 0 0 17-17Zm-41.9 75.3a80 80 0 0 0-94.13 0a12 12 0 1 0 14.13 19.4a56 56 0 0 1 65.87 0a12 12 0 0 0 14.13-19.4ZM131.71 68h.3a12 12 0 0 0 .28-24H128A176.27 176.27 0 0 0 16.39 83.91a12 12 0 1 0 15.23 18.55A152.24 152.24 0 0 1 128 68h3.71Zm-.12 48a12 12 0 0 0 .82-24H128a126.66 126.66 0 0 0-79.45 27.64a12 12 0 0 0 14.9 18.81A102.89 102.89 0 0 1 128 116c1.2 0 2.41 0 3.59.06Z"/></svg>`,
                 instructions:
                   "Install or add the page to your homescreen as a <a class='link' href='https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DDesktop#:~:text=On%20your%20computer%2C%20open%20Chrome,instructions%20to%20install%20the%20PWA' target='_blank' rel='noopener noreferrer'>Progressive Web App</a>.",
+                tag: 'feature',
                 text: 'Use the Yarn Palette Creator and Yarn Colorway Finder even without internet connection.',
                 title: 'Added Offline Features',
               },
@@ -946,6 +968,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.wrench,
                 instructions:
                   'Go to the Colors tab and press the Configure Ranges button, or select the range from the color list.',
+                tag: 'feature',
                 text: 'One place for setting up and editing all color ranges. Instantly see how changing one range affects the others near it, without having to open a new modal for each color.',
                 title: 'Range Configuration',
               },
@@ -959,6 +982,7 @@ export const entries: ChangelogItemGroup[] = [
                               >`,
                 instructions:
                   'Adjust the settings in the Colors tab by pressing the Configure Ranges button, under Generate Ranges select Automatic, then select from the Balance Focus modes.',
+                tag: 'feature',
                 text: 'Automatically generate ranges containing similar number of days. On by default for new projects. Only applies to Temperature Gauges.',
                 title: 'New Smart Ranges',
               },
@@ -976,6 +1000,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13.5v8H3v-8h8M12 2l5.5 9h-11L12 2m5.5 11c2.5 0 4.5 2 4.5 4.5S20 22 17.5 22S13 20 13 17.5s2-4.5 4.5-4.5Z"/></svg>`,
                 instructions:
                   'Use the Theme Switcher at the top of the page or in the menu to change the look and feel of the page.',
+                tag: 'feature',
                 text: '',
                 title: 'New Themes!',
               },
@@ -985,11 +1010,13 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   '<a href="/yarn-colorway-finder" class="link">Open the Yarn Colorway Finder</a>',
+                tag: 'feature',
                 text: 'Search for yarn colorways by HTML color name or hex code.',
                 title: 'Yarn Colorway Finder',
               },
               {
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0"/><path d="m10 16.5l2-3l2 3m-2-3v-2l3-1m-6 0l3 1"/><circle cx="12" cy="7.5" r=".5" fill="currentColor"/></g></svg>`,
+                tag: 'feature',
                 text: '',
                 title: 'Improved Website Accessibility',
               },
@@ -1010,6 +1037,7 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   '<a href="/weather" class="link">See the Weather Forecast page</a>',
+                tag: 'feature',
                 text: 'Hourly and daily temperature and precipitation data from <a href="https://open-meteo.com" class="link">Open-Meteo</a>.',
                 title: 'New Weather Forecast Page',
               },
@@ -1025,6 +1053,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: 'Fixed issue with the Weather Source setting unexpectedly changing when using Undo or Redo.',
                 title: 'Error Correction',
               },
@@ -1038,6 +1067,7 @@ export const entries: ChangelogItemGroup[] = [
         <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5" />
       </svg>
       `,
+                tag: 'feature',
                 text: "Previous version numbers didn't always follow the SemVer format, causing problems with some features.",
                 title: 'Updated Versioning System',
               },
@@ -1050,6 +1080,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
       </svg>`,
+                tag: 'feature',
                 text: 'Changed the default weather source from <a href="https://meteostat.net" class="link">Meteostat</a> to <a href="https://open-meteo.com" class="link">Open-Meteo</a>.',
                 title: 'Weather Sources',
               },
@@ -1070,6 +1101,7 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   'In the Colors tab or on the Yarn Palette Creator page, press the Image Palette button to get colors from an image.',
+                tag: 'feature',
                 text: 'Get yarn colors from an image.',
                 title: 'Image Palette',
               },
@@ -1091,6 +1123,7 @@ export const entries: ChangelogItemGroup[] = [
       `,
                 instructions:
                   'When you save a project, it will automatically be saved to your browser so you can find it later.',
+                tag: 'feature',
                 text: '',
                 title: 'Save Projects to Your Browser',
               },
@@ -1100,6 +1133,7 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   'Select a value from the weather data table to edit it.',
+                tag: 'feature',
                 text: '',
                 title: 'Edit Weather Data',
               },
@@ -1109,6 +1143,7 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   'In the Weather tab, press the Import Weather Data button to upload a CSV file.',
+                tag: 'feature',
                 text: '',
                 title: 'Import Weather Data',
               },
@@ -1128,6 +1163,7 @@ export const entries: ChangelogItemGroup[] = [
         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
       </svg>`,
                 instructions: 'In the Weather tab, select Weekly.',
+                tag: 'feature',
                 text: 'Grouping weather by weeks makes for a shorter project.',
                 title: 'Weekly Weather Data',
               },
@@ -1142,6 +1178,7 @@ export const entries: ChangelogItemGroup[] = [
       </svg>`,
                 instructions:
                   'In the Colors tab, press the Configure Ranges button, then press Advanced Controls.',
+                tag: 'feature',
                 text: 'Change how gauge ranges are calculated',
                 title: 'Range Calculation Methods',
               },
@@ -1162,6 +1199,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'feature',
                 text: 'Switched to using <a href="https://svelte.dev" class="link">Svelte</a> instead of vanilla Javascript.',
                 title: 'Improved Website Performance',
               },
@@ -1181,6 +1219,7 @@ export const entries: ChangelogItemGroup[] = [
           </svg>`,
                 instructions:
                   'In the Preview tab, press the Share to Gallery button to add your project to the gallery.',
+                tag: 'feature',
                 text: 'Created the <a href="/gallery" class="link">project gallery</a> to showcase user-created projects.',
                 title: 'Project Gallery',
               },
@@ -1196,6 +1235,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                tag: 'fix',
                 text: '',
                 title: 'Fixed Unit Conversion Issues',
               },
@@ -1209,6 +1249,7 @@ export const entries: ChangelogItemGroup[] = [
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                               </svg>
                               `,
+                tag: 'feature',
                 text: 'After a year of adding features, bug-fixing, and fixing issues, version one is stable and ready for use.',
                 title: 'First Stable Version',
               },
@@ -1226,6 +1267,7 @@ export const entries: ChangelogItemGroup[] = [
                 icon: ICONS.wrench,
                 instructions:
                   'If you open a project created before January 22nd, 2022, you’ll need to update your project by entering missing information and re-saving it.',
+                tag: 'feature',
                 text: 'In order to improve the accuracy and functionality of the site both now and in the future, this update unfortunately includes breaking changes to previously saved projects. I apologize for any inconvenience, and will try to limit the amount of these kinds of changes in the future.',
                 title: 'Save Project in URL',
               },
@@ -1246,6 +1288,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M9.967 8.193L5 13h3v6h4v-6h3L9.967 8.193zM18 1H2C.9 1 0 1.9 0 3v12c0 1.1.9 2 2 2h4v-2H2V6h16v9h-4v2h4c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zM2.5 4.25a.75.75 0 1 1 0-1.5a.75.75 0 0 1 0 1.5zm2 0a.75.75 0 1 1 0-1.5a.75.75 0 0 1 0 1.5zM18 4H6V3h12.019L18 4z"/></svg>`,
+                tag: 'feature',
                 text: 'Temperature-blanket.com is open to the public.',
                 title: 'Public Beta Access',
               },

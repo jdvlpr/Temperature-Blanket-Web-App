@@ -227,10 +227,19 @@ test.describe('My Projects', () => {
     await title.click();
     await title.fill('Not saved');
     await title.press('Enter');
+    // Escape once the dialog is ready: it takes focus once it handles keys,
+    // a moment after it shows
+    confirm = page.getByRole('dialog', { name: 'Save this project?' });
+    await expect(confirm).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => !!document.activeElement?.closest('[role="dialog"]'),
+        ),
+      )
+      .toBe(true);
     await page.keyboard.press('Escape');
-    await expect(
-      page.getByRole('dialog', { name: 'Save this project?' }),
-    ).toBeHidden();
+    await expect(confirm).toBeHidden();
     await expect(title).toHaveValue(defaultName);
     await expect(page.getByTestId('unsaved-dot')).toBeVisible();
 

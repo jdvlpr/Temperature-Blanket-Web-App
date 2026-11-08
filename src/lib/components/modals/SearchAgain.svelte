@@ -235,7 +235,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
           : 'No colors in the project would change.',
       madeColorCount &&
         `${madeColorCount} ${madeColorCount === 1 ? 'day you’ve made stays' : 'days you’ve made stay'} as ${madeColorCount === 1 ? 'it is' : 'they are'}.`,
-      `${sources} has newer values for ${savedDays}. Weather sources occasionally correct data. This is normal.`,
+      `${sources} has newer values for ${savedDays}. Weather sources occasionally correct data.`,
     ]
       .filter(Boolean)
       .map((line) => `<span class="mt-1 block first:mt-0">${line}</span>`)

@@ -13,16 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- What's New: one chapter for each major version, newest first. A chapter
-with a release post starts with its card (ReleaseCard), which stands in for
-its x.0.0 notes (not shown, so the months stay in order; the card keeps the
-x.0.0 id for old links); then come that version's other changes by month. Changes from
-before version 3 are under Earlier. Each change keeps its version as its id
-(/whats-new#5.2.35), and each chapter is #v<major>. Once /blog and
+<!-- What's New: every change by month, newest first. Each major version's
+release post is one of them (built from releases.ts, dated by the post), linking
+to the post. Each change keeps its version as its id (/whats-new#5.2.35), and a
+release post's item is also #v<major>, where the posts link back. Once /blog and
 /changelog: both redirect here (the root _redirects). -->
 
 <script lang="ts">
   import { browser } from '$app/env';
+  import { page } from '$app/state';
   import {
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_BASE_URL,
@@ -32,55 +31,105 @@ before version 3 are under Earlier. Each change keeps its version as its id
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';
   import ChangelogItem from '#lib/components/ChangelogItem.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
+  import {
+    CHANGELOG_TAG_PARAM,
+    CHANGELOG_TAGS,
+    changelogHref,
+    changelogTagOf,
+  } from '#lib/constants/changelog-tags.js';
   import type { ChangelogItem as Item } from '#lib/types/page-types.js';
+  import { RocketIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import ReleaseCard from './ReleaseCard.svelte';
   import { entries } from './changelog';
-  import { RELEASES, type Release } from './releases.js';
+  import { RELEASES } from './releases.js';
 
-  type Chapter = {
-    id: string;
-    heading: string;
-    release?: Release;
-    months: { label: string; items: Item[] }[];
+  const MONTHS = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  type Month = { label: string; order: number; items: Item[] };
+
+  /** Newer versions first */
+  const byVersion = (a?: string, b?: string) => {
+    const pa = (a ?? '').split('.').map(Number);
+    const pb = (b ?? '').split('.').map(Number);
+    for (let i = 0; i < 3; i++)
+      if ((pa[i] || 0) !== (pb[i] || 0)) return (pb[i] || 0) - (pa[i] || 0);
+    return 0;
   };
 
-  const EARLIEST_CHAPTER = 3;
-
-  const chapters: Chapter[] = RELEASES.map((release) => ({
-    id: `v${release.major}`,
-    heading: `Version ${release.major}`,
-    release,
-    months: [],
-  }));
-  for (const { year, months } of entries) {
-    for (const { month, items } of months) {
-      for (const item of items) {
-        const major = Number(item.version?.split('.')[0]);
-        const key = major >= EARLIEST_CHAPTER ? major : null;
-        const id = key ? `v${key}` : 'earlier';
-        let chapter = chapters.find((c) => c.id === id);
-        if (!chapter) {
-          chapter = {
-            id,
-            heading: key ? `Version ${key}` : 'Earlier',
-            months: [],
-          };
-          // In version order, newest first, with Earlier last
-          const at = chapters.findIndex(
-            (c) => c.id === 'earlier' || (key && Number(c.id.slice(1)) < key),
-          );
-          chapters.splice(at === -1 ? chapters.length : at, 0, chapter);
-        }
-        // The release post tells it
-        if (chapter.release && item.version === `${key}.0.0`) continue;
-        const label = `${month} ${year}`;
-        const sameMonth = chapter.months.find((m) => m.label === label);
-        if (sameMonth) sameMonth.items.push(item);
-        else chapter.months.push({ label, items: [item] });
-      }
+  const months: Month[] = [];
+  const monthOf = (year: number, month: string) => {
+    const label = `${month} ${year}`;
+    let found = months.find((m) => m.label === label);
+    if (!found) {
+      found = { label, order: year * 12 + MONTHS.indexOf(month), items: [] };
+      months.push(found);
     }
+    return found;
+  };
+  for (const { year, months: yearMonths } of entries)
+    for (const { month, items } of yearMonths)
+      monthOf(year, month).items.push(...items);
+
+  const releaseVersions = new Set(RELEASES.map((r) => `${r.major}.0.0`));
+  for (const release of RELEASES) {
+    const [year, month] = release.date.split('-').map(Number);
+    const version = `${release.major}.0.0`;
+    const { items } = monthOf(year, MONTHS[month - 1]);
+    const item: Item = {
+      version,
+      notes: [
+        {
+          IconComponent: RocketIcon,
+          tag: 'release',
+          title: release.title,
+          text: release.summary,
+          instructions: `<a href="/whats-new/${release.slug}" class="link">Read the release post</a>`,
+        },
+      ],
+    };
+    const at = items.findIndex(
+      (other) => byVersion(version, other.version) < 0,
+    );
+    items.splice(at === -1 ? items.length : at, 0, item);
   }
+  months.sort((a, b) => b.order - a.order);
+
+  // The page is prerendered, so the address is read only in the browser
+  const show = $derived(
+    browser
+      ? changelogTagOf(page.url.searchParams.get(CHANGELOG_TAG_PARAM))
+      : undefined,
+  );
+
+  // Only notes of the kind shown, without versions or months left empty
+  const shown = $derived(
+    show
+      ? months
+          .map((month) => ({
+            ...month,
+            items: month.items
+              .map((item) => ({
+                ...item,
+                notes: item.notes.filter((note) => note.tag === show),
+              }))
+              .filter((item) => item.notes.length),
+          }))
+          .filter((month) => month.items.length)
+      : months,
+  );
 
   let container: HTMLElement | undefined = $state();
   let showScrollToTopButton = $state(false);
@@ -99,12 +148,12 @@ before version 3 are under Earlier. Each change keeps its version as its id
   <title>What's New</title>
   <meta
     name="description"
-    content="Release posts and every change to {PUBLIC_BASE_DOMAIN_NAME}, version by version."
+    content="Every change to {PUBLIC_BASE_DOMAIN_NAME}, month by month, with each version's release post."
   />
   <meta property="og:title" content="What's New" />
   <meta
     property="og:description"
-    content="Release posts and every change to {PUBLIC_BASE_DOMAIN_NAME}, version by version."
+    content="Every change to {PUBLIC_BASE_DOMAIN_NAME}, month by month, with each version's release post."
   />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/whats-new" />
   <meta property="og:type" content="website" />
@@ -116,8 +165,7 @@ before version 3 are under Earlier. Each change keeps its version as its id
       <header class="flex flex-col gap-3" bind:this={container}>
         <h1 class="h2 text-gradient mt-2">What's New</h1>
         <p class="text-surface-700-300 text-sm">
-          Each version's release post, then its later changes. To see every
-          change,
+          Changes to the site, newest first. To see every change,
           <a
             href="{PUBLIC_GITHUB_LINK}/commits/main/"
             class="link"
@@ -125,34 +173,46 @@ before version 3 are under Earlier. Each change keeps its version as its id
           >.
         </p>
         <nav
-          aria-label="Versions"
-          class="flex flex-wrap items-center gap-1 text-sm"
+          aria-label="Kinds of change"
+          class="w-fit max-w-full overflow-x-auto"
         >
-          <span class="mr-1 opacity-80">Jump to</span>
-          {#each chapters as { id, heading } (id)}
-            <a href="#{id}" class="btn btn-sm preset-tonal-surface">{heading}</a
-            >
-          {/each}
+          <ul
+            class="bg-surface-100 dark:bg-surface-900 rounded-container flex gap-1 p-1"
+          >
+            {#each [{ tag: undefined, label: 'All' }, ...CHANGELOG_TAGS] as { tag, label } (label)}
+              {@const current = show === tag}
+              <li class="flex">
+                <a
+                  href={changelogHref(tag)}
+                  data-sveltekit-noscroll
+                  data-sveltekit-replacestate
+                  aria-current={current ? 'page' : undefined}
+                  class={[
+                    'btn btn-sm justify-center',
+                    current
+                      ? 'preset-filled-surface-50-950 shadow-sm'
+                      : 'hover:preset-tonal-surface',
+                  ]}>{label}</a
+                >
+              </li>
+            {/each}
+          </ul>
         </nav>
       </header>
 
-      {#each chapters as { id, heading, release, months } (id)}
-        <section {id} class="flex scroll-mt-24 flex-col gap-4">
-          {#if release}
-            <!-- Where links to its x.0.0 notes land -->
-            <span id="{release.major}.0.0" class="scroll-mt-24"></span>
-            <ReleaseCard {release} />
-          {:else}
-            <h2 class="h3">{heading}</h2>
-          {/if}
-          {#each months as { label, items } (label)}
-            <h3 class="text-xl font-bold">{label}</h3>
-            <div class="flex w-full flex-col gap-4">
-              {#each items as { version, notes }, i (i)}
-                <ChangelogItem {version} {notes} />
-              {/each}
-            </div>
-          {/each}
+      {#each shown as { label, items } (label)}
+        <section class="flex flex-col gap-4">
+          <h2 class="text-xl font-bold">{label}</h2>
+          <div class="flex w-full flex-col gap-4">
+            {#each items as { version, notes }, i (i)}
+              {#if version && releaseVersions.has(version)}
+                <!-- Where the release posts link back to -->
+                <span id="v{version.split('.')[0]}" class="-mb-4 scroll-mt-24"
+                ></span>
+              {/if}
+              <ChangelogItem {version} {notes} />
+            {/each}
+          </div>
         </section>
       {/each}
     </main>
