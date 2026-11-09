@@ -395,7 +395,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`{
       "meta": {
-          "limit": 50, // the maxmimum number of results
+          "limit": 50, // the maximum number of results
           "offset": 0, // the starting index of the results
           "total": 6743 // the total number of results
       },
