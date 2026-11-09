@@ -219,7 +219,7 @@ export async function createPdf({
   const title = name || locations.projectTitle || 'Temperature Blanket';
   doc.setProperties({
     title,
-    subject: 'Temperature blanket pattern',
+    subject: 'Temperature blanket project',
     creator: PUBLIC_BASE_DOMAIN_NAME,
   });
   doc.setLanguage('en-US');

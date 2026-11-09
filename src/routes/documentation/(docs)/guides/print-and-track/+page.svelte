@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Print the Pattern and Track Your Progress: PdfOptions, the CSV and
+<!-- Print Your Project and Track Your Progress: PdfOptions, the CSV and
 Google Sheet downloads, the preview PNG. The site has no row tracker of its
 own (only Ravelry's Progress), so tracking is on paper or in a
 spreadsheet. -->
@@ -25,12 +25,13 @@ spreadsheet. -->
 </script>
 
 <p>
-  Take your pattern off the screen: a PDF to print and mark as you go, or a
-  spreadsheet to tick off. Plus how to work out how much of each yarn to buy.
+  Take your project off the screen: a PDF of your colors, ranges and every day's
+  weather to print and mark as you go, or a spreadsheet to tick off. Plus how to
+  work out how much of each yarn to buy.
 </p>
 
 <section class="flex flex-col gap-3">
-  <h2 id="print" class="text-2xl font-bold">Print the Pattern</h2>
+  <h2 id="print" class="text-2xl font-bold">Print Your Project</h2>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       Press <span class="font-bold">Project</span>, then

@@ -244,9 +244,9 @@ export const GUIDES: DocsPage[] = [
   {
     kind: 'guide',
     slug: 'print-and-track',
-    title: 'Print the Pattern and Track Your Progress',
+    title: 'Print Your Project and Track Your Progress',
     summary:
-      'Download the pattern as a PDF or spreadsheet, and keep your place as you work.',
+      "Download your colors, ranges and every day's weather as a PDF or spreadsheet, and keep your place as you work.",
     keywords: [
       'print',
       'pdf',
@@ -266,9 +266,9 @@ export const GUIDES: DocsPage[] = [
   {
     kind: 'guide',
     slug: 'rain-snow-sunshine',
-    title: 'Rain, Snow and Sunshine Blankets',
+    title: 'Rain, Snow and Sunshine Projects',
     summary:
-      'Blankets for rain, snow or daylight instead of temperature, and how their ranges work.',
+      'Projects for rain, snow or daylight instead of temperature, and how their ranges work.',
     keywords: [
       'rain',
       'snow',

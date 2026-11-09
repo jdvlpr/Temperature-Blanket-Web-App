@@ -245,7 +245,7 @@ here. -->
   <p>
     The PDF has your colors and ranges, and every day's weather in its color.
     <a href="/documentation/guides/print-and-track" class="link"
-      >Printing the pattern and keeping your place</a
+      >Printing and keeping your place</a
     >.
   </p>
 </section>

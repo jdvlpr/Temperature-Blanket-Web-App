@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Rain, Snow and Sunshine Blankets: the other gauges (state/gauges/*), every
+<!-- Rain, Snow and Sunshine Projects: the other gauges (state/gauges/*), every
 preview's "Color Each Row Using the Day's" (any added gauge's weather), rain
 and snow ranges that stop at 0 (a range ending at 0 includes it), snow
 measured by source (MixedSnow), daylight in minutes (metric) or hours
@@ -25,8 +25,8 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
 </script>
 
 <p>
-  A temperature blanket doesn't have to be about temperature. Track the rainy
-  days, a snowy winter, or the days getting longer and shorter, on their own or
+  Your project doesn't have to be about temperature. Track the rainy days, a
+  snowy winter, or the days getting longer and shorter, on their own or
   alongside temperature.
 </p>
 
@@ -58,7 +58,7 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
     2. Use It in the Preview
   </h2>
   <p>
-    A gauge only colors your blanket once the preview uses it. Below the
+    A gauge only colors your project once the preview uses it. Below the
     preview:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
@@ -83,7 +83,7 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
   <ul class="ml-6 list-disc space-y-1">
     <li>
       Most days have no rain or snow at all, so one color does most of the work.
-      Choose it carefully: it's the background of your blanket.
+      Choose it carefully: it's the background of your project.
     </li>
     <li>
       Ranges never go below 0, and the last one includes 0, so dry days have a
@@ -142,7 +142,7 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
       >More about this error</a
     >.
   </p>
-  <h3 class="text-lg font-bold">My blanket is nearly all one color</h3>
+  <h3 class="text-lg font-bold">My project is nearly all one color</h3>
   <p>
     That's a dry place, or a dry year. Make the 0 range a color you love, or add
     more small ranges at the low end.
