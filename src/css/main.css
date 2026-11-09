@@ -652,6 +652,26 @@ theme's, but never so round (a pill) that the corners cut into the text */
   border-radius: min(var(--radius-base), calc(var(--radius-container) / 2));
 }
 
+/* Inline code on any element (a span in a sentence, a changelog note's
+HTML): Skeleton 5 styles only the <code> element and dropped its `code`
+class, so this gives the class the same look. Blocks use `pre`. */
+@utility code {
+  &:not(pre &) {
+    background-color: color-mix(
+      in oklab,
+      light-dark(var(--color-brand-light), var(--color-brand-dark)) 25%,
+      transparent
+    );
+    color: var(--color-surface-950-50);
+    border-radius: var(--radius-base);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    padding-inline: --spacing(1.5);
+    padding-block: --spacing(0.75);
+  }
+}
+
 /* For buttons on a color: a tint of their text's color, which is black or
 white for contrast, shows on any color where a surface tint looks muddy */
 @utility hover-on-color {
