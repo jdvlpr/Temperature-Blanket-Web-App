@@ -172,13 +172,8 @@ release post's item is also #v<major>, where the posts link back. Once /blog and
             target="_blank">visit the GitHub repository</a
           >.
         </p>
-        <nav
-          aria-label="Kinds of change"
-          class="w-fit max-w-full overflow-x-auto"
-        >
-          <ul
-            class="bg-surface-100 dark:bg-surface-900 rounded-container flex gap-1 p-1"
-          >
+        <nav aria-label="Kinds of change">
+          <ul class="flex flex-wrap gap-2">
             {#each [{ tag: undefined, label: 'All' }, ...CHANGELOG_TAGS] as { tag, label } (label)}
               {@const current = show === tag}
               <li class="flex">
@@ -188,10 +183,8 @@ release post's item is also #v<major>, where the posts link back. Once /blog and
                   data-sveltekit-replacestate
                   aria-current={current ? 'page' : undefined}
                   class={[
-                    'btn btn-sm justify-center',
-                    current
-                      ? 'preset-filled-surface-50-950 shadow-sm'
-                      : 'hover:preset-tonal-surface',
+                    'btn btn-sm',
+                    current ? 'preset-filled' : 'preset-tonal',
                   ]}>{label}</a
                 >
               </li>

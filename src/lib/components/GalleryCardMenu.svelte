@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { paletteCopyHref, projectCopyHref } from '#lib/utils/open-copy.js';
   import {
     LinkIcon,
-    NotebookPenIcon,
+    ThermometerSunIcon,
     PencilIcon,
     SwatchBookIcon,
     UserRoundIcon,
@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {
                   value: 'open-copy',
                   label: 'Open a Copy',
-                  icon: project ? NotebookPenIcon : SwatchBookIcon,
+                  icon: project ? ThermometerSunIcon : SwatchBookIcon,
                   href: openHref,
                   // The planner reads the project from the URL it starts with
                   reload: !!project,

@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ArrowLeftIcon,
     EarthIcon,
     ExternalLinkIcon,
-    NotebookPenIcon,
+    ThermometerSunIcon,
     SwatchBookIcon,
   } from '@lucide/svelte';
   import {
@@ -331,7 +331,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               open={projectURL && openHref
                 ? {
                     href: openHref,
-                    icon: NotebookPenIcon,
+                    icon: ThermometerSunIcon,
                     target: locations.allValid ? '_blank' : '_self',
                     title:
                       'Open a copy in the Project Planner. This gallery page won’t change.',

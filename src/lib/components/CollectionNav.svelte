@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Projects | Yarn Palettes, between two pages that list the same kind of
-  things (My Library, the Gallery, an owner's gallery page). It looks like a
-  segmented control, but each side is a link to its own page, marked as the
-  current page when it's this one. A count, when given, follows each label.
+  things (My Library, the Gallery, an owner's gallery page). Two pill links,
+  each to its own page, the current one filled. A count, when given, follows
+  each label.
   It sits in the page at the top on every screen size.
 -->
 <script lang="ts">
@@ -58,10 +58,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ]);
 </script>
 
-<nav class="w-full max-w-md" aria-label={label}>
-  <ul
-    class="bg-surface-100 dark:bg-surface-900 rounded-container grid grid-cols-2 gap-1 p-1"
-  >
+<nav aria-label={label}>
+  <ul class="flex flex-wrap gap-2">
     {#each items as { key, href, icon: Icon, text, count } (key)}
       {@const isCurrent = key === current}
       <li class="flex">
@@ -70,12 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {href}
           data-sveltekit-preload-data="hover"
           aria-current={isCurrent ? 'page' : undefined}
-          class={[
-            'btn w-full justify-center gap-1',
-            isCurrent
-              ? 'preset-filled-surface-50-950 shadow-sm'
-              : 'hover:preset-tonal-surface',
-          ]}
+          class={['btn gap-1', isCurrent ? 'preset-filled' : 'preset-tonal']}
         >
           <Icon aria-hidden="true" />
           <span class="flex items-center gap-1">
@@ -87,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span
                 class={[
                   'rounded-full px-1.5 text-xs tabular-nums',
-                  isCurrent ? 'bg-surface-200-800' : 'bg-surface-200-800/60',
+                  isCurrent ? 'bg-surface-50-950/20' : 'bg-surface-200-800/60',
                 ]}
                 aria-hidden="true">{count}</span
               >

@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type StoredProjectIndexItem,
   } from '#lib/storage/projects.svelte.js';
   import type { SyncLabel } from '#lib/sync/status.svelte.js';
-  import { CopyIcon, NotebookPenIcon, Trash2Icon } from '@lucide/svelte';
+  import { CopyIcon, ThermometerSunIcon, Trash2Icon } from '@lucide/svelte';
 
   type Props = {
     item: StoredProjectIndexItem;
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       value: 'edit',
       label: 'Edit in Project Planner',
-      icon: NotebookPenIcon,
+      icon: ThermometerSunIcon,
       href,
       reload: true,
     },

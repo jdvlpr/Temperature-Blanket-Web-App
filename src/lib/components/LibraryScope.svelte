@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Mine | Starred on a My Library page, under Projects | Palettes: what's
-  saved, or gallery pages starred to find again. A segmented control like
-  CollectionNav, each side a link (`?show=starred`), with a count when known.
+  saved, or gallery pages starred to find again. Pill links like CollectionNav,
+  only smaller, each side a link (`?show=starred`), with a count when known.
   Always in the page, at the top. In a dialog (Get Colors' My Palettes), with
   `onselect` instead of addresses, each side is a button.
 -->
@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span
       class={[
         'rounded-full px-1.5 text-xs tabular-nums',
-        current ? 'bg-surface-200-800' : 'bg-surface-200-800/60',
+        current ? 'bg-surface-50-950/20' : 'bg-surface-200-800/60',
       ]}
       aria-hidden="true">{count}</span
     >
@@ -87,16 +87,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <!-- At the page's left edge; centered in a dialog -->
-<nav class={['w-full max-w-xs', onselect && 'mx-auto px-2']} aria-label={label}>
-  <ul
-    class="bg-surface-100 dark:bg-surface-900 rounded-container grid grid-cols-2 gap-1 p-1"
-  >
+<nav class={[onselect && 'px-2']} aria-label={label}>
+  <ul class={['flex flex-wrap gap-2', onselect && 'justify-center']}>
     {#each items as { key, href, starred: side, icon, text, count, current } (key)}
       {@const classes = [
-        'btn btn-sm w-full justify-center gap-1',
-        current
-          ? 'preset-filled-surface-50-950 shadow-sm'
-          : 'hover:preset-tonal-surface',
+        'btn btn-sm gap-1',
+        current ? 'preset-filled' : 'preset-tonal',
       ]}
       <li class="flex">
         {#if onselect}
