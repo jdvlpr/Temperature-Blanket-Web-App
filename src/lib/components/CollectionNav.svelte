@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   It sits in the page at the top on every screen size.
 -->
 <script lang="ts">
-  import { NotebookPenIcon, SwatchBookIcon } from '@lucide/svelte';
+  import { ThermometerSunIcon, SwatchBookIcon } from '@lucide/svelte';
 
   let {
     current,
@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       key: 'projects',
       href: projectsHref,
-      icon: NotebookPenIcon,
+      icon: ThermometerSunIcon,
       text: 'Projects',
       count: projectsCount,
     },
