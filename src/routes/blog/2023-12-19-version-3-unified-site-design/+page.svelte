@@ -96,11 +96,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 pages will automatically be redirected to their new addresses.
               </p>
               <p>For example, an old project url like this:</p>
-              <p class="code ml-4 w-fit whitespace-pre-wrap">
+              <p
+                class="pre rounded-tile ml-4 w-fit max-w-full font-mono break-all"
+              >
                 www.temperature-blanket.com/info/project/123/my-saved-project
               </p>
               <p>is now:</p>
-              <p class="code ml-4 w-fit whitespace-pre-wrap">
+              <p
+                class="pre rounded-tile ml-4 w-fit max-w-full font-mono break-all"
+              >
                 temperature-blanket.com/gallery/123
               </p>
               <p>

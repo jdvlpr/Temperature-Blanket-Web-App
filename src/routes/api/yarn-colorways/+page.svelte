@@ -368,14 +368,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Making a Request</h3>
             <p>This is the base URL for all endpoints:</p>
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               https://yarn-colorways.p.rapidapi.com/{selectedVersion.value}
             </p>
 
             <p>Include the following headers:</p>
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
-              "X-RapidAPI-Key": 'your-rapidapi-key', <br />"X-RapidAPI-Host":
-              "yarn-colorways.p.rapidapi.com"
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
+              {`"X-RapidAPI-Key": "your-rapidapi-key"
+"X-RapidAPI-Host": "yarn-colorways.p.rapidapi.com"`}
             </p>
             <p>
               All requests should use the <span class="code px-2">GET</span> method.
@@ -401,7 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="link">/colorways</a
               > endpoint.
             </p>
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`{
       "meta": {
           "limit": 50, // the maxmimum number of results
@@ -582,7 +582,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Examples</p>
 
-            <p class="code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`// get colorways matching an HTML hex code without the # hash 
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f 
 
@@ -890,7 +890,7 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
 
             <p class="font-bold">Example</p>
 
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`// get all colorways 
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways
 
@@ -1030,7 +1030,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?nam
 
             <p class="font-bold">Example</p>
 
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`// get all brands 
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/brands`}
             </p>
@@ -1140,7 +1140,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/brands`}
 
             <p class="font-bold">Example</p>
 
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`// get all yarns 
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns
 
@@ -1262,7 +1262,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=b
 
             <p class="font-bold">Example</p>
 
-            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
+            <p class="pre rounded-tile w-fit max-w-full font-mono break-all">
               {`// get all yarn weights 
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/weights`}
             </p>

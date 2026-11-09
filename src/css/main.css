@@ -237,3 +237,9 @@ th div {
 .lucide {
   flex-shrink: 0;
 }
+
+/* Corners for a block that can hold several lines of text: as round as the
+theme's, but never so round (a pill) that the corners cut into the text */
+@utility rounded-tile {
+  border-radius: min(var(--radius-base), calc(var(--radius-container) / 2));
+}
