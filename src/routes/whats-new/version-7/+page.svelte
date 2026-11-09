@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <ul class="ml-6 list-disc space-y-1">
               <li>
-                <span class="font-bold">New:</span>
+                <span class="font-bold">Added:</span>
                 {#if __ACCOUNTS_ENABLED__}optional accounts, so your projects
                   and palettes are on every device; My Library; posting projects
                   to Ravelry; gallery pages you can update; stars;{:else}My
@@ -183,9 +183,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Weather you can keep up to date
             </h3>
             <p>
-              A saved project now keeps its weather: opening it never searches
-              again by itself, so your colors stay as you planned them. When you
-              want newer weather, press
+              A saved project now keeps its weather. Opening it never looks the
+              weather up again by itself, so your colors stay the way you
+              planned them. When you want newer weather, press
               <span class="italic">Check for Updates</span> on the Location step.
               New days are added, and if the weather source has since refined any
               past days, you see how many would change color and choose whether to
@@ -219,9 +219,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span class="italic">Get Colors › From an Image</span> has been
               rebuilt. Tap your photo where you want a color, draw a line across
               it to take the colors along it, or let
-              <span class="italic">Auto</span> pick the colors that best capture it.
-              Choose a yarn, and each color is matched to its closest colorway. Your
-              photo stays on your device: it's never uploaded.
+              <span class="italic">Auto</span> pick colors for you. Choose a yarn,
+              and each color is matched to its closest colorway. Your photo stays
+              on your device and is never uploaded.
             </p>
             <DocsClip
               src="match-your-yarn/colors-from-photo"
@@ -242,7 +242,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               caption="Choosing how a palette image looks."
             />
 
-            <h3 id="a-new-pdf" class="font-bold">A new PDF</h3>
+            <h3 id="a-new-pdf" class="font-bold">A redesigned PDF</h3>
             <p>
               The PDF has been redesigned to match the site, and you choose what
               goes in it.
@@ -421,8 +421,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <h2 id="feedback" class="text-2xl font-bold">Feedback</h2>
             <p>
-              Thank you to everyone who uses the site and shares ideas; many of
-              these changes came from you. If you have feedback or run into any
+              Thank you to everyone who uses the site and shares ideas. Many of
+              these changes came from you! If you have feedback or run into any
               issues, please let me know through the
               <a href="/contact" class="link">contact page</a>. Thank you!
             </p>

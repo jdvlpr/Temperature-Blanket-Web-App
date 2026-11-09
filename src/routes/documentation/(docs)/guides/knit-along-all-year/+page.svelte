@@ -27,8 +27,8 @@ them, asking before changing saved ones
 
 <p>
   Many people make a temperature blanket over a year, one row each day or a few
-  each week, as the weather happens. Here's how to set up one project and keep
-  using it all year.
+  each week, as the weather happens. This guide shows how to set up one project
+  and keep coming back to it all year.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -41,13 +41,13 @@ them, asking before changing saved ones
     </li>
     <li>
       Press <span class="font-bold">Get Weather Data</span>. Beside the number
-      of days it says how many are still to come: their weather comes in as they
-      pass.
+      of days, it says how many are still to come. Their weather is added as
+      they pass.
     </li>
     <li>
       Press <span class="font-bold">Project</span>, then
-      <span class="font-bold">Save Project</span>, and give it a name: press its
-      name at the top and type.
+      <span class="font-bold">Save Project</span>. To name it, press its name at
+      the top and type a new one.
     </li>
   </ol>
   <DocsShot
@@ -63,14 +63,14 @@ them, asking before changing saved ones
   </h2>
   <p>
     Auto ranges are made from the weather you have so far, and remade as more
-    comes in. In March, your ranges would only cover winter, and change every
-    time you look, so rows you've already made could end up a different color.
-    Set ranges that won't move instead:
+    comes in. So in March, your ranges would only cover winter and would keep
+    changing, which means rows you've already made could end up a different
+    color. It's better to set ranges that won't move:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
-      Think of the hottest and coldest days your place usually has in a year.
-      Last year's project is a good guide: try it with last year's dates.
+      Think of the hottest and coldest days your place usually has in a year. A
+      good way to find them is to try the project with last year's dates.
     </li>
     <li>
       Press <span class="font-bold">Ranges</span>, then
@@ -110,8 +110,8 @@ them, asking before changing saved ones
   </ol>
   {#if __ACCOUNTS_ENABLED__}
     <p>
-      Signed in, your project is on every device: plan on the computer, and
-      check today's color on your phone.
+      When you're signed in, your project is on all your devices, so you can
+      plan on your computer and check today's color on your phone.
     </p>
   {/if}
 </section>
@@ -124,8 +124,8 @@ them, asking before changing saved ones
     Weather services can take up to a week to finish the newest days, so
     yesterday's numbers might still change. If you can, work about
     {OPEN_METEO_DELAY_DAYS} days behind. Your saved days stay as they are unless you
-    choose otherwise, but keep a record of what you've made too: download the PDF
-    each month or so.
+    choose otherwise, but it's still a good idea to keep your own record. Downloading
+    the PDF every month or so works well.
     <a href="/documentation/guides/print-and-track" class="link"
       >Printing and keeping your place</a
     >.
@@ -145,8 +145,8 @@ them, asking before changing saved ones
   <p>
     Saved days don't change by themselves, so check whether the ranges moved
     (use Manual steps, above). If you used Check for Updates and chose a day's
-    new values, that day changed on purpose: its old values aren't kept. A
-    blanket doesn't need to match to the decimal.
+    new values, that day changed on purpose: its old values aren't kept. Don't
+    worry, a blanket doesn't need to match to the decimal.
     <a href="/documentation/guides/weather-doesnt-match" class="link"
       >When the weather changes</a
     >.
@@ -165,11 +165,11 @@ them, asking before changing saved ones
     I edited a day, and now Check for Updates is gone
   </h3>
   <p>
-    Edited weather is kept as yours, so it isn't looked up again: the button
-    says <span class="font-bold">Get Weather Data</span> instead, and asks
-    first, since <span class="font-bold">Reload Weather Data</span> replaces your
-    edits. For a project still in progress, it's best not to edit the weather until
-    the year is done.
+    Once you edit the weather, it's treated as yours and isn't looked up again.
+    The button says <span class="font-bold">Get Weather Data</span> instead, and
+    it asks first, since <span class="font-bold">Reload Weather Data</span> replaces
+    your edits. For a project still in progress, it's best not to edit the weather
+    until the year is done.
   </p>
 </section>
 

@@ -128,8 +128,8 @@ are the old single page's (OLD_ANCHORS, HELP_TOPICS). -->
       Tap the photo to add colors (<span class="font-bold">Pick Colors</span>),
       or
       <span class="font-bold">Draw a Line</span> across it to take the colors
-      along it. <span class="font-bold">Auto</span> picks the colors that best capture
-      the photo.
+      along it. <span class="font-bold">Auto</span> picks colors from the photo for
+      you.
     </li>
     <li>
       To use yarn, choose one under <span class="font-bold">Yarn</span>: each

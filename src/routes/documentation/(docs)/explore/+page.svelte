@@ -22,8 +22,8 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
 </script>
 
 <p>
-  Beyond planning a blanket, the site has tools to find yarn, look at the
-  weather ahead, and see blankets from around the world. They're under
+  Besides the Project Planner, the site has tools for finding yarn, checking the
+  forecast, and seeing blankets from around the world. They're under
   <span class="font-bold">Explore</span> in the site menu, with the
   <a href="/documentation/gallery-and-ravelry" class="link">Gallery</a>.
 </p>
@@ -73,8 +73,9 @@ Gallery, which has its own page, and the Globe (opened from the Gallery). -->
     between them, and change the units.
   </p>
   <p>
-    It's for looking ahead. A temperature blanket uses past weather, which comes
-    from the <a href="/documentation/weather" class="link">Project Planner</a>.
+    It's for looking ahead. A temperature blanket uses past weather, which you
+    get in the <a href="/documentation/weather" class="link">Project Planner</a
+    >.
   </p>
 </section>
 

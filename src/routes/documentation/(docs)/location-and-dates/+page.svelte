@@ -39,8 +39,8 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   <ol class="ml-6 list-decimal space-y-1">
     <li>Type a city, region or landmark in the search box.</li>
     <li>
-      Choose your place from the list that appears. Typing a name isn't enough:
-      until you choose from the list, the box says
+      Choose your place from the list that appears. Typing a name isn't enough,
+      and until you choose one from the list, the box says
       <span class="font-bold">Choose a result</span>.
     </li>
   </ol>
@@ -54,8 +54,8 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     again, press ✕ in the search box.
   </p>
   <p>
-    Small places aren't always listed. If yours isn't, choose a town nearby: the
-    weather comes from an area around a place anyway.
+    Small places aren't always listed. If yours isn't, choose a nearby town. The
+    weather covers an area around a place anyway.
   </p>
   <DocsShot
     src="location-and-dates/location"
@@ -81,8 +81,8 @@ Section ids are the old single page's (OLD_ANCHORS). -->
   </ul>
   <p>
     The number of days shows under the dates. Weather is only there for days
-    that have passed, up to yesterday. A year that's still going is fine: the
-    days still to come are left out for now, and come in when you press
+    that have passed, up to yesterday. A year that isn't over yet is fine. Days
+    that haven't happened yet are left out for now, and are added when you press
     <span class="font-bold">Get Weather Data</span> later.
     <a href="/documentation/guides/knit-along-all-year" class="link"
       >Making a blanket for this year</a
@@ -95,13 +95,12 @@ Section ids are the old single page's (OLD_ANCHORS). -->
     More Than One Place
   </h2>
   <p>
-    A blanket can follow you around: a trip, the places you've lived, or the
-    same day in different years. Once a place and its dates are chosen, press <span
-      class="font-bold">Add another location</span
-    >
+    A blanket can cover more than one place, like a trip, the places you've
+    lived, or the same day in different years. Once a place and its dates are
+    chosen, press <span class="font-bold">Add another location</span>
     (under the dates) for another place with its own dates, up to {MAXIMUM_LOCATIONS}
-    of them. The weather of each comes one after the other, in order, and the total
-    number of days shows below.
+    of them. Their weather is put together in order, one location after another, and
+    the total number of days shows below.
   </p>
   <p>
     To remove one, press <span class="font-bold">Remove</span> beside its number of

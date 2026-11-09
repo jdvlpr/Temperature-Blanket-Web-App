@@ -85,7 +85,7 @@ show only in builds with accounts. -->
       <a href="/documentation/download" class="link">Download</a>.
     </li>
     <li>
-      <span class="font-bold">Progress:</span> how far you've made it, once it's
+      <span class="font-bold">Progress:</span> how far along you are, once it's
       set.
       <a href="/documentation/preview#progress" class="link">Progress</a>.
     </li>
@@ -282,8 +282,8 @@ show only in builds with accounts. -->
         <span class="font-bold">Add to Account</span>.
       </li>
       <li>
-        Nothing is lost when two devices change the same project: the one that
-        couldn't be saved becomes a copy, "(copy from this device…)". If a
+        If two devices change the same project, nothing is lost. The changes
+        that couldn't be saved become a copy, "(copy from this device…)". If a
         project changed in another tab or on another device, the Project menu
         says so and offers <span class="font-bold">Duplicate</span> or
         <span class="font-bold">Reload the Latest</span>.

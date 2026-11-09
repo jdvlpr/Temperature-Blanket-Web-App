@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </ul>
   <p>
     The averages shown above the weather chart can be a little different for
-    daily and weekly weather. That's expected: they're worked out from days in
-    one case and from weeks in the other.
+    daily and weekly weather. That's expected, since one is worked out from days
+    and the other from weeks.
   </p>
 </div>

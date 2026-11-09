@@ -25,8 +25,8 @@ they don't cover: the Globe's imagery (globe-imagery.ts) and random photos
 </script>
 
 <p>
-  Temperature Blanket is built on open data and open-source work. Thank you to
-  everyone behind it.
+  This site wouldn't be possible without open data and open-source software.
+  Thank you to everyone who makes them!
 </p>
 
 <section class="flex flex-col gap-3">

@@ -27,8 +27,8 @@ can't be imported back. Account parts show only in builds with accounts. -->
 <p>
   Without an account, your projects and palettes are saved in this browser, on
   this device. Browsers sometimes clear what sites have saved, especially on
-  phones and in private windows. Here's how to keep a copy, and how to move a
-  project to another device.
+  phones and in private windows. This guide covers how to keep a copy and how to
+  move a project to another device.
 </p>
 
 {#if __ACCOUNTS_ENABLED__}
@@ -74,12 +74,12 @@ can't be imported back. Account parts show only in builds with accounts. -->
       <span class="font-bold">Copy Link</span>.
     </li>
     <li>
-      Paste it somewhere safe: an email to yourself, a note, or a document of
-      all your projects.
+      Paste it somewhere safe, like an email to yourself, a note, or a document
+      with all your projects.
     </li>
     <li>
-      Copy it again after big changes: a link is the project as it was when you
-      copied it.
+      Copy it again after big changes, since a link only has the project as it
+      was when you copied it.
     </li>
   </ol>
   <p>
@@ -96,10 +96,11 @@ can't be imported back. Account parts show only in builds with accounts. -->
     If you edited or imported weather
   </h3>
   <p>
-    A link doesn't hold weather: it's looked up again when the link is opened.
-    Keep your weather too: press <span class="font-bold">Download</span> at the
-    top of the Weather step, then <span class="font-bold">Download CSV</span>.
-    To restore it, open the link, then press
+    A link doesn't include weather. It's looked up again when the link is
+    opened. Keep your weather too: press <span class="font-bold">Download</span>
+    at the top of the Weather step, then
+    <span class="font-bold">Download CSV</span>. To restore it, open the link,
+    then press
     <span class="font-bold">Edit</span>, then
     <span class="font-bold">Import File</span>, choose the file, and press
     <span class="font-bold">Apply</span>.
@@ -133,7 +134,7 @@ can't be imported back. Account parts show only in builds with accounts. -->
     <p>
       On the Account page, <span class="font-bold">Download my data</span> saves your
       account, synced projects and gallery pages as a file. It's a record of what's
-      kept about you, not a backup to load again: the site can't open it. Your account
+      kept about you, not a backup, and the site can't open it again. Your account
       already keeps your synced projects safe.
     </p>
   </section>
@@ -166,7 +167,10 @@ can't be imported back. Account parts show only in builds with accounts. -->
     </li>
     <li>Check the Trash.</li>
     {#if __ACCOUNTS_ENABLED__}
-      <li>Signed in? Sign in again: what you'd synced comes back.</li>
+      <li>
+        If you were signed in, sign in again and what you'd synced will come
+        back.
+      </li>
     {/if}
   </ul>
   <p>Open the links you've kept, and save them again.</p>
@@ -175,9 +179,9 @@ can't be imported back. Account parts show only in builds with accounts. -->
       There's a project called "(copy from this device…)"
     </h3>
     <p>
-      The same project was changed on two devices at once. Nothing is lost: the
-      changes that couldn't be saved became a copy. Keep the one you want, and
-      move the other to the Trash.
+      The same project was changed on two devices at once. Don't worry, nothing
+      is lost. The changes that couldn't be saved were kept as a copy. Keep the
+      one you want, and move the other to the Trash.
     </p>
   {/if}
 </section>

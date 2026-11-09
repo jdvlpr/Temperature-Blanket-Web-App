@@ -25,8 +25,8 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
 </script>
 
 <p>
-  Start from the yarn: a stash you want to use up, a brand you love, or a photo
-  whose colors you want in your blanket.
+  You can start with yarn instead of colors, whether it's a stash you want to
+  use up, a brand you love, or a photo with colors you'd like in your blanket.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -56,8 +56,8 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
     caption="Choose Colorways."
   />
   <p>
-    Yarn missing? <a href="/yarn-search-request" class="link"
-      >Ask for it to be added</a
+    If your yarn isn't listed, <a href="/yarn-search-request" class="link"
+      >ask for it to be added</a
     >.
   </p>
 </section>
@@ -66,7 +66,9 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
   <h2 id="yarn-you-have" class="text-2xl font-bold">
     Match Yarn You Already Have
   </h2>
-  <p>Don't know a skein's colorway name? Match it by eye, with a photo:</p>
+  <p>
+    If you don't know a skein's colorway name, you can match it with a photo:
+  </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>Take a photo of your yarn in daylight, without a filter.</li>
     <li>In the gauge, press the swatch of the color it should replace.</li>
@@ -89,7 +91,10 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
   <h2 id="colors-from-a-photo" class="text-2xl font-bold">
     Take the Colors From a Photo
   </h2>
-  <p>A sunset, a garden, a favorite painting:</p>
+  <p>
+    You can take colors from any photo, like a sunset, a garden or a favorite
+    painting:
+  </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       Press <span class="font-bold">Get Colors</span>, then
@@ -115,9 +120,9 @@ Colorway Finder's photo picker, and the collections' "Only <yarn>" filter
 <section class="flex flex-col gap-3">
   <h2 id="colors-first" class="text-2xl font-bold">Colors First, Yarn Later</h2>
   <p>
-    Already chose colors that aren't yarn? A color without one says
+    If you've already chosen colors that aren't yarn, each one shows
     <span class="font-bold">Find matching yarn</span> under its name. Press it to
-    see colorways closest to it, best match first.
+    see the closest colorways, best match first.
   </p>
   <p>
     Or plan a palette before you have a place or dates, in the

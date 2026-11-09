@@ -69,9 +69,10 @@ PaletteStatusButton, PaletteTitle, autosave). -->
 <section class="flex flex-col gap-3">
   <h2 id="save-a-palette" class="text-2xl font-bold">Saving</h2>
   <p>
-    A new palette isn't saved, so trying things out doesn't fill your library.
-    Press <span class="font-bold">Save Palette</span> to keep it in My Library. From
-    then on, changes save automatically a moment after you stop.
+    A new palette isn't saved until you save it, so trying things out won't
+    clutter your library. Press <span class="font-bold">Save Palette</span> to keep
+    it in My Library. From then on, changes save automatically a moment after you
+    stop.
   </p>
   <p>
     The <span class="font-bold">Palette</span> button at the top shows where

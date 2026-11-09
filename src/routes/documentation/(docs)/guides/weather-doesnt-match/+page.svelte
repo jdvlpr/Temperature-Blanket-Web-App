@@ -29,9 +29,10 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
 </script>
 
 <p>
-  Your thermometer or a different weather source might say 18°, while the
-  Project Planner says 16°. Neither is necessarily wrong. Here's why, and how to
-  use numbers you trust.
+  Your thermometer might say 18° while the Project Planner says 16°. That
+  doesn't mean either one is wrong: weather services look at a wider area than
+  your backyard, and they keep refining recent days. Below are a few ways to use
+  numbers you trust.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -153,7 +154,7 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
       the missing ones or a few weeks.
     </li>
     <li>
-      <span class="font-bold">Changed your mind?</span> The arrows at the top of
+      <span class="font-bold">Undoing changes:</span> the arrows at the top of
       the editor undo and redo, and <span class="font-bold">Revert</span> puts the
       selected values back as they were. Once you've applied, Undo at the top of the
       page takes back all of it in one step.
@@ -173,10 +174,10 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     Use Your Own Readings for Every Day
   </h2>
   <p>
-    If you've kept a log, from your own thermometer or a weather station nearby,
-    bring it all in at once: download your project's weather as a CSV file, put
-    your readings in place of the ones there, and import it. How, step by step,
-    is in
+    If you've kept a log from your own thermometer or a nearby weather station,
+    you can bring it all in at once. Download your project's weather as a CSV
+    file, put your readings in place of the ones there, and import it. The steps
+    are in
     <a href="/documentation/weather#import-weather-data" class="link"
       >Import Your Own Weather</a
     >.
@@ -196,14 +197,15 @@ replaces it. So keeping weather fixed means importing it (Custom). -->
     with, too.
   </p>
   <p>
-    A link doesn't carry the weather, though: whoever opens it gets the weather
-    fresh.
+    A link doesn't include the weather, though. Whoever opens it gets the
+    weather looked up again.
   </p>
   {#if __ACCOUNTS_ENABLED__}
     <p>
-      The easiest way to share your weather is your project's gallery page:
-      <span class="font-bold">Open a Copy</span> there opens it with the weather it
-      was published with.
+      The easiest way to share your weather is through your project's gallery
+      page.
+      <span class="font-bold">Open a Copy</span> there opens the project with the
+      weather it was published with.
     </p>
   {/if}
   <p>To send someone your weather exactly as it is, without a gallery page:</p>

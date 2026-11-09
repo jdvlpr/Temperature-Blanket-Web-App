@@ -35,8 +35,8 @@ and on Data Sources & Credits -->
       Buying through a link with a cart <ShoppingCartIcon
         class="icon-sm relative -top-px inline"
         aria-label="shopping cart"
-      /> supports the developer at no extra cost to you. Missing a yarn? Anyone can
-      ask for it with the
+      /> supports the developer at no extra cost to you. If a yarn is missing, anyone
+      can ask for it with the
       <!-- In a new tab, so nothing open in a dialog is left behind -->
       <a href="/yarn-search-request" target="_blank" class="link"
         >yarn request form<span class="sr-only"> (opens in a new tab)</span></a

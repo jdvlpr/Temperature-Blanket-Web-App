@@ -32,9 +32,9 @@ RangesMenu, range-format. Section ids are the old single page's
 </script>
 
 <p>
-  A gauge is your blanket's key: a list of yarn colors, each with a range of
-  weather. A day's weather falls in one range, and that range's color is the
-  color of the day's row or square.
+  A gauge is the key to your blanket. It's a list of yarn colors, each with a
+  range of weather. A day's weather falls in one range, and that range's color
+  is the color of the day's row or square.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -199,11 +199,10 @@ RangesMenu, range-format. Section ids are the old single page's
     Each Range Includes
   </h2>
   <p>
-    Ranges share their ends: 30 → 20 is followed by 20 → 10. So when a day is
-    exactly 20°, which range is it in? <span class="font-bold"
-      >Each range includes</span
-    >, in the Ranges menu, decides. A sentence above your ranges says which you
-    chose.
+    Ranges share their ends, so 30 → 20 is followed by 20 → 10. When a day is
+    exactly 20°, the <span class="font-bold">Each range includes</span> setting in
+    the Ranges menu decides which range it goes in. A sentence above your ranges says
+    which you chose.
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>

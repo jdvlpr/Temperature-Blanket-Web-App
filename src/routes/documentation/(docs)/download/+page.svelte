@@ -23,10 +23,10 @@ single page's (OLD_ANCHORS). -->
 </script>
 
 <p>
-  Take your project with you: a PDF to print, the weather as a spreadsheet, or a
-  picture of the preview. Press <span class="font-bold">Project</span> at the
-  top of the Project Planner, then <span class="font-bold">Download</span>, and
-  choose one. The weather table's toolbar has its own
+  You can download a PDF to print, the weather as a spreadsheet, or a picture of
+  the preview. Press <span class="font-bold">Project</span> at the top of the
+  Project Planner, then <span class="font-bold">Download</span>, and choose one.
+  The weather table's toolbar has its own
   <span class="font-bold">Download</span> too, and the preview's
   <span class="font-bold">Share</span> menu downloads its picture.
 </p>
@@ -36,8 +36,8 @@ single page's (OLD_ANCHORS). -->
     PDF
   </h2>
   <p>
-    Your pattern, ready to print. Its pages show on the left, and change as you
-    choose what goes in it under <span class="font-bold">Include</span>:
+    This is your project, ready to print. Its pages show on the left and update
+    as you choose what goes in it under <span class="font-bold">Include</span>:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -54,7 +54,7 @@ single page's (OLD_ANCHORS). -->
       and low temperatures to start with.
     </li>
   </ul>
-  <p>And how it looks, under <span class="font-bold">Look</span>:</p>
+  <p>Choose how it looks under <span class="font-bold">Look</span>:</p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
       <span class="font-bold">Colors:</span> a

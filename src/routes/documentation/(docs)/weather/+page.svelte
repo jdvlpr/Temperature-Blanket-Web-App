@@ -41,11 +41,11 @@ HELP_TOPICS). -->
 </script>
 
 <p>
-  The weather is the heart of a temperature blanket. Once you've chosen a
+  Once you've chosen a
   <a href="/documentation/location-and-dates" class="link">place and dates</a>,
-  the Project Planner gets the weather of every day from a weather service. You
-  can look through it, group it into weeks, fix days that look wrong, or bring
-  in weather of your own.
+  the Project Planner gets every day's weather from a weather service. This page
+  covers how to look through it, group it by week, fix days that look wrong, and
+  bring in your own.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -81,14 +81,14 @@ HELP_TOPICS). -->
   />
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      <span class="font-bold">Add 14 new days:</span> on to start. Turned off, the
-      days are offered again next time.
+      <span class="font-bold">Add 14 new days:</span> on to start. If you turn it
+      off, the new days are offered again next time.
     </li>
     <li>
       <span class="font-bold">Update Past Days:</span> off to start. Weather
-      sources correct past days as stations report in, which is normal. It says
+      sources often correct past days as more station reports come in. It says
       how many days in your project would change color, and which source has
-      newer values. When none would, it's just a short note with
+      newer values. If none would, you'll just see a short note with
       <span class="font-bold">Review changes</span>.
     </li>
     <li>
@@ -109,8 +109,8 @@ HELP_TOPICS). -->
     <li>
       <span class="font-bold">Days you've made</span> (with your
       <a href="/documentation/preview#progress" class="link">progress</a> set) stay
-      as they are, so your blanket keeps matching; you can still pick them in All
-      Changes.
+      as they are, so your project keeps matching your blanket. You can still pick
+      them in All Changes if you want to.
     </li>
     <li>
       <span class="font-bold">Kept days:</span> days you don't update keep their saved
@@ -141,8 +141,8 @@ HELP_TOPICS). -->
   </p>
   <h3 class="text-lg font-bold">Open-Meteo</h3>
   <p>
-    The default. Weather for anywhere in the world, worked out from weather
-    models and observations, going back to 1940. Choose a model:
+    This is the default. It has weather for anywhere in the world going back to
+    1940, worked out from weather models and observations. Choose a model:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     {#each models as { value, title, timespan, resolution, isDefault } (value)}
@@ -161,7 +161,7 @@ HELP_TOPICS). -->
   </ul>
   <h3 class="text-lg font-bold">Meteostat</h3>
   <p>
-    Measurements from real weather stations near your place, combined.
+    Meteostat combines measurements from real weather stations near your place.
     <span class="font-bold">Fill Missing Data</span> (on by default) fills days the
     stations missed with model data. Meteostat's snow is the depth of snow on the
     ground, not how much fell.
@@ -174,8 +174,8 @@ HELP_TOPICS). -->
     weather for your place and dates, and tells you it did.
   </p>
   <p>
-    Weather from any source can change: services correct past days and upgrade
-    their models. See
+    Weather from any source can change, since services correct past days and
+    upgrade their models. See
     <a href="/documentation/credits" class="link">Data Sources & Credits</a> for the
     licenses.
   </p>
@@ -361,9 +361,8 @@ HELP_TOPICS). -->
     caption="Importing a CSV file of your own readings."
   />
   <p>
-    Rows that can't be read are left out, and listed. You can also skip the
-    file: copy the cells in your spreadsheet and paste them into Edit Weather
-    Data.
+    Rows that can't be read are left out, and listed. You can also skip the file
+    and paste the cells from your spreadsheet straight into Edit Weather Data.
   </p>
   <h3 id="import-weather-data-file-requirements" class="text-lg font-bold">
     CSV File Requirements
@@ -419,9 +418,9 @@ HELP_TOPICS). -->
     >.
   </p>
   <p>
-    Something still looks wrong? Press <span class="font-bold"
+    If something still looks wrong, press <span class="font-bold"
       >Weather Data Feedback</span
-    > under the table to tell me about it.
+    > under the table to let me know.
   </p>
   <h3 id="mixed-snow-parameters" class="text-lg font-bold">
     Error: Mixed Parameters

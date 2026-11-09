@@ -96,8 +96,9 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
 
 <p>
   The preview shows what your blanket could look like, with your weather and
-  your colors. It's a picture to plan with, not a pattern: a real blanket won't
-  look exactly like it, and how you crochet or knit each part is up to you.
+  your colors. It's a picture to help you plan, not a pattern. A real blanket
+  won't look exactly like it, and how you crochet or knit each part is up to
+  you.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -178,10 +179,10 @@ page's (OLD_ANCHORS, HELP_TOPICS). -->
     </p>
     <ul class="ml-6 list-disc space-y-1">
       <li>
-        Set it in <span class="font-bold">Progress</span>: the Progress button
-        above the preview (once it's set, its menu's Edit Progress…), the
-        Project menu, or a day's circle in the weather table all open it. ‹ and
-        › move it a day; tap the date to pick any day.
+        You can set it from the Progress button above the preview (once it's
+        set, use Edit Progress… in its menu), from the Project menu, or by
+        pressing a day's circle in the weather table. ‹ and › move it a day; tap
+        the date to pick any day.
       </li>
       <li>
         Once it's set, <span class="font-bold">Progress</span> ›

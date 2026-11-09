@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
   <p>
     To fix it, choose <span class="font-bold">Open-Meteo</span> as the weather source
-    for every location. You can keep the mix if you like; just know the snow numbers
-    don't mean the same thing for every location.
+    for every location. You can keep the mix if you like, but the snow numbers won't
+    mean the same thing for every location.
   </p>
 </div>

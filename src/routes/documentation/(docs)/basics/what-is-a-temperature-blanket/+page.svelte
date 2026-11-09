@@ -30,7 +30,7 @@ goes) -->
 
 <p>
   A temperature blanket is a crocheted or knitted project that uses weather data
-  to make a beautiful, creative and cozy work of art. Using different colors of
+  to make a beautiful, creative and cozy work of art! Using different colors of
   yarn, it shows how the temperature of a place changes over time. Each row or
   section stands for one day, so every temperature blanket is unique.
 </p>

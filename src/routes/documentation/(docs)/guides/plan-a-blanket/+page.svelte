@@ -26,9 +26,9 @@ here. -->
 </script>
 
 <p>
-  This guide goes through one whole project: a place and dates, the weather,
-  your colors and ranges, a preview, then saving and printing the pattern. Each
-  step links to the full details if you want them.
+  This guide walks through a whole project, from choosing a place and dates to
+  getting the weather, picking your colors and ranges, previewing it, and saving
+  and printing the project. Each step links to more detail if you want it.
 </p>
 
 <DocsClip
@@ -41,21 +41,21 @@ here. -->
   <h2 id="what-you-need" class="text-2xl font-bold">What You Need</h2>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      A project you'll finish. A year of rows is a big commitment, so a scarf,
-      shawl or socks, or a shorter stretch of days, are good choices too. The
-      planner works the same for any of them.
+      A project you're likely to finish. A year of rows is a big commitment, so
+      a scarf, shawl, socks or a shorter stretch of days are good choices too.
+      The planner works the same way for all of them.
     </li>
     <li>
       The place your blanket is about, like your town, and its dates: a year, a
       trip, or any stretch up to {MAXIMUM_DAYS_PER_LOCATION} days.
     </li>
     <li>
-      Yarn in mind, or not yet: you can choose colors first and match them to
-      yarn later.
+      Yarn, if you've picked it. If not, you can choose colors first and match
+      them to yarn later.
     </li>
     <li>
-      Nothing else. You don't need an account{#if __ACCOUNTS_ENABLED__}, though
-        signing in keeps your project on every device{/if}.
+      That's it! You don't need an account{#if __ACCOUNTS_ENABLED__}, though
+        signing in keeps your project on all your devices{/if}.
     </li>
   </ul>
 </section>
@@ -78,8 +78,8 @@ here. -->
     </li>
   </ol>
   <p>
-    Making a blanket for this year, as it happens? Choose the whole year anyway:
-    the days still to come are filled in later.
+    If you're making a blanket for this year as it happens, choose the whole
+    year anyway. The days that haven't happened yet get filled in as they pass.
     <a href="/documentation/guides/knit-along-all-year" class="link"
       >Crocheting or knitting along all year</a
     >.
@@ -104,12 +104,13 @@ here. -->
       the chart shows the whole year, and the table below it lists every day.
     </li>
     <li>
-      Prefer °F and inches? Press <span class="font-bold">Units</span> in the toolbar
-      above the weather.
+      To switch to °F and inches, press <span class="font-bold">Units</span> in the
+      toolbar above the weather.
     </li>
   </ol>
   <p>
-    Weekly instead of daily rows? Choose <span class="font-bold">Grouping</span
+    For one row a week instead of one a day, choose <span class="font-bold"
+      >Grouping</span
     >, then <span class="font-bold">Weekly</span>. See
     <a href="/documentation/weather" class="link">Weather</a>.
   </p>
@@ -118,10 +119,10 @@ here. -->
 <section class="flex flex-col gap-3">
   <h2 id="choose-colors" class="text-2xl font-bold">3. Choose Your Colors</h2>
   <p>
-    On the <span class="font-bold">Colors</span> step is the
-    <span class="font-bold">Temperature Gauge</span>, your blanket's key: a list
-    of colors, each standing for a range of temperatures. It starts with colors
-    to try; make them yours:
+    The <span class="font-bold">Colors</span> step shows the
+    <span class="font-bold">Temperature Gauge</span>. It's the key to your
+    blanket: a list of colors, each standing for a range of temperatures. It
+    starts with some colors to try, which you can change:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
@@ -153,8 +154,8 @@ here. -->
 <section class="flex flex-col gap-3">
   <h2 id="set-ranges" class="text-2xl font-bold">4. Set the Ranges</h2>
   <p>
-    Each color's range is beside it, like 30 → 25. They're made from your
-    weather to start with, so every day has a color. To change them:
+    Each color's range is shown beside it, like 30 → 25. To start with, the
+    ranges are based on your weather, so every day gets a color. To change them:
   </p>
   <ul class="ml-6 list-disc space-y-1">
     <li>
@@ -187,7 +188,8 @@ here. -->
     <li>
       On the <span class="font-bold">Preview</span> step, choose a
       <span class="font-bold">Pattern</span> in the toolbar above the preview.
-      <span class="font-bold">Rows</span> is the classic: one row a day.
+      <span class="font-bold">Rows</span> is the classic pattern, with one row for
+      each day.
     </li>
     <li>
       Set it up in the settings below it, like the number of stitches in a row,
@@ -220,7 +222,7 @@ here. -->
     </li>
   </ol>
   <p>
-    From then on, your changes save by themselves. Your project is in
+    After that, your changes save automatically. Your project is in
     <span class="font-bold">My Library</span>, in this browser{#if __ACCOUNTS_ENABLED__},
       and in your account when you're signed in{/if}.
     <a href="/documentation/guides/move-or-back-up" class="link"
@@ -230,7 +232,7 @@ here. -->
 </section>
 
 <section class="flex flex-col gap-3">
-  <h2 id="download" class="text-2xl font-bold">7. Download the Pattern</h2>
+  <h2 id="download" class="text-2xl font-bold">7. Download Your Project</h2>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       Press <span class="font-bold">Project</span>, then
@@ -255,7 +257,7 @@ here. -->
     If Something Goes Wrong
   </h2>
   <h3 class="text-lg font-bold">My place isn't in the list</h3>
-  <p>Choose a town nearby. The weather is for an area around a place anyway.</p>
+  <p>Choose a nearby town. The weather covers an area around a place anyway.</p>
   <h3 class="text-lg font-bold">Get Weather Data can't be pressed</h3>
   <p>
     Choose your place from the list (typing it isn't enough), and check for a

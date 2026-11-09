@@ -24,21 +24,21 @@ RangesMenu's; Gauges & Ranges has every option. -->
 </script>
 
 <p>
-  Ranges decide which color each day gets. Here's how to read them, and how to
-  shape them around the yarn you have.
+  Ranges decide which color each day gets. This guide explains how to read them
+  and how to set them up for the yarn you have.
 </p>
 
 <section class="flex flex-col gap-3">
   <h2 id="how-ranges-work" class="text-2xl font-bold">How Ranges Work</h2>
   <p>
     Each color in the gauge has a range beside it, From → To. With 30 → 25, a
-    day that's 27° gets that color. Which temperature counts, the day's high,
-    average or low, is chosen in the preview's settings.
+    day that's 27° gets that color. You choose whether the day's high, average
+    or low temperature is used in the preview's settings.
   </p>
   <p>
-    The numbers repeat on purpose: 30 → 25, then 25 → 20. By default a range
-    includes its first number but not its last, so 25° goes in 25 → 20, never in
-    both. A sentence above the ranges says how yours work.
+    The numbers repeat on purpose (30 → 25, then 25 → 20). By default, a range
+    includes its first number but not its last, so 25° goes in 25 → 20 and never
+    in both. A sentence above the ranges says how yours work.
   </p>
 </section>
 
@@ -47,8 +47,9 @@ RangesMenu's; Gauges & Ranges has every option. -->
     Use Every Color About Equally
   </h2>
   <p>
-    Good for buying the same amount of each yarn. Most days are mild, so with
-    equal-sized ranges the middle colors get used far more than the ends.
+    This is handy if you want to buy the same amount of each yarn. Most days are
+    mild, so with equal-sized ranges, the middle colors get used much more than
+    the ones at the ends.
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>Press <span class="font-bold">Ranges</span> above the colors.</li>
@@ -59,8 +60,8 @@ RangesMenu's; Gauges & Ranges has every option. -->
     </li>
   </ol>
   <p>
-    To check, look beside each color: it shows its number of days and its share
-    of the blanket (<span class="font-bold">Days in ranges</span>, in
+    To check, look beside each color for its number of days and its share of the
+    blanket (<span class="font-bold">Days in ranges</span>, in
     <span class="font-bold">View</span>).
   </p>
   <DocsShot
@@ -74,7 +75,10 @@ RangesMenu's; Gauges & Ranges has every option. -->
   <h2 id="round-steps" class="text-2xl font-bold">
     Round Steps, Like Every 5°
   </h2>
-  <p>Easy to read off a thermometer, and the same from year to year.</p>
+  <p>
+    Round steps are easy to read off a thermometer, and they stay the same from
+    year to year.
+  </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       Press <span class="font-bold">Ranges</span>, then
@@ -97,8 +101,9 @@ RangesMenu's; Gauges & Ranges has every option. -->
     Fit the Ranges to the Yarn You Have
   </h2>
   <p>
-    Have 9 colors? Choose <span class="font-bold">9 Colors</span> in the toolbar at
-    the top of the gauge, beside Get Colors. Then change any range by hand:
+    If you have 9 colors of yarn, choose <span class="font-bold">9 Colors</span> in
+    the toolbar at the top of the gauge, beside Get Colors. Then change any range
+    by hand:
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>Press a range's number.</li>
@@ -136,9 +141,10 @@ RangesMenu's; Gauges & Ranges has every option. -->
     </li>
   </ol>
   <p>
-    Mind the gaps: a day of 9.5° fits neither 0 → 9 nor 10 → 19. Use decimals to
-    cover them, like 0 → 9.99 and 10 → 19.99. To check, add up the days beside
-    the colors: they should come to the days in your project.
+    Watch out for gaps. A day of 9.5° doesn't fit in 0 → 9 or 10 → 19. Use
+    decimals to cover them, like 0 → 9.99 and 10 → 19.99. To check, add up the
+    days beside the colors. They should add up to the number of days in your
+    project.
   </p>
 </section>
 

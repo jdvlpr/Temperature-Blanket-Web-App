@@ -31,7 +31,7 @@ share-to-gallery lands here. -->
 
 <section class="flex flex-col gap-3">
   <h2 id="share-a-link" class="text-2xl font-bold">Share a Link</h2>
-  <p>The quickest way.</p>
+  <p>This is the quickest way.</p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       In the Project Planner, press <span class="font-bold">Project</span> (in
@@ -45,8 +45,8 @@ share-to-gallery lands here. -->
   </ol>
   <p>
     Whoever opens it gets their own copy, to change as they like. Yours stays as
-    it is. Weather you've edited or imported isn't included: they get the
-    weather source's.
+    it is. Weather you've edited or imported isn't included, so they'll see the
+    weather from the weather source.
   </p>
 </section>
 
@@ -114,7 +114,7 @@ share-to-gallery lands here. -->
       </li>
       <li>Press <span class="font-bold">Save</span>.</li>
     </ol>
-    <p>It's the same page: its link and its views stay.</p>
+    <p>It's still the same page, so its link and views stay.</p>
   </section>
 
   <section class="flex flex-col gap-3">

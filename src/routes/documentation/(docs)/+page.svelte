@@ -65,7 +65,8 @@ Back doesn't return to it. -->
     <h2 class="text-2xl font-bold">Quick Start</h2>
     <p>
       The <a href="/" class="link">Project Planner</a> turns the weather of a place
-      and dates into a pattern, one row or square for each day, colored by its weather.
+      and dates into a project, with one row or square for each day, colored by its
+      weather.
     </p>
     <ol class="ml-6 list-decimal space-y-1">
       <li>Choose a place and the dates your blanket covers.</li>
@@ -91,7 +92,7 @@ Back doesn't return to it. -->
   </section>
 
   <!-- Not id="basics": /documentation#basics is an old anchor (OLD_ANCHORS) -->
-  {#each [{ id: 'blanket-basics', heading: KIND_HEADINGS.basics, intro: 'Information about temperature blankets and yarn weights', pages: BASICS }, { id: 'guides', heading: KIND_HEADINGS.guide, intro: 'Step by step, for the things people most often want to do.', pages: GUIDES }, { id: 'reference', heading: KIND_HEADINGS.reference, intro: 'Every part of the site, and what each option does.', pages: REFERENCE }] as { id, heading, intro, pages } (id)}
+  {#each [{ id: 'blanket-basics', heading: KIND_HEADINGS.basics, intro: 'Information about temperature blankets and yarn weights', pages: BASICS }, { id: 'guides', heading: KIND_HEADINGS.guide, intro: 'Step-by-step help for the things people most often want to do.', pages: GUIDES }, { id: 'reference', heading: KIND_HEADINGS.reference, intro: 'Every part of the site, and what each option does.', pages: REFERENCE }] as { id, heading, intro, pages } (id)}
     <section {id} class="flex flex-col gap-3" data-pagefind-ignore>
       <h2 class="text-2xl font-bold">{heading}</h2>
       <p class="opacity-80">{intro}</p>
@@ -183,10 +184,11 @@ Back doesn't return to it. -->
         Can I make a blanket of one date over many years?
       </h3>
       <p>
-        Technically, yes: add one location per year, each set to that single day
-        with a Custom duration. But the Project Planner isn't made for this.
-        Every year is its own weather search, which uses far more requests than
-        a blanket of one stretch of days, so it isn't recommended or supported.
+        Technically, yes. You can add one location per year, each set to that
+        single day with a Custom duration. But the Project Planner isn't built
+        for this, since every year is its own weather search, which uses far
+        more requests than a blanket of one stretch of days, so it isn't
+        recommended or supported.
       </p>
     </div>
 
@@ -225,7 +227,8 @@ Back doesn't return to it. -->
   </section>
 
   <p class="opacity-80" data-pagefind-ignore>
-    What changed lately? See <a href="/whats-new" class="link">What's New</a>,
-    every version's release post and changes.
+    To see what's changed lately, check <a href="/whats-new" class="link"
+      >What's New</a
+    > for every version's release post and changes.
   </p>
 </div>

@@ -100,7 +100,7 @@ export const GUIDES: DocsPage[] = [
     slug: 'plan-a-blanket',
     title: 'Plan a Blanket, Start to Finish',
     summary:
-      'Every step of a temperature blanket project, from choosing a place to printing the pattern.',
+      'Every step of a temperature blanket project, from choosing a place to printing the project.',
     keywords: [
       'start',
       'beginner',
@@ -174,7 +174,7 @@ export const GUIDES: DocsPage[] = [
     slug: 'knit-along-all-year',
     title: 'Crochet or Knit Along All Year',
     summary:
-      'A blanket for this year, one row a day: keep the same project as the weather comes in.',
+      'Making a blanket for this year, one row a day, and keeping the same project going as the weather comes in.',
     keywords: [
       'this year',
       'daily',
@@ -228,8 +228,7 @@ export const GUIDES: DocsPage[] = [
     kind: 'guide',
     slug: 'ravelry-sync',
     title: 'Keep Your Ravelry Project in Sync',
-    summary:
-      'Post a project to Ravelry, and what updates there and here, and when.',
+    summary: 'Posting a project to Ravelry, and how changes sync both ways.',
     keywords: [
       'ravelry',
       'notes',
@@ -313,8 +312,7 @@ export const REFERENCE: DocsPage[] = [
     kind: 'reference',
     slug: 'gauges-and-ranges',
     title: 'Gauges & Ranges',
-    summary:
-      'Gauges, their ranges, and every option in the Ranges menu, explained.',
+    summary: 'Gauges, their ranges, and every option in the Ranges menu.',
     keywords: [
       'gauge',
       'ranges',
@@ -373,7 +371,7 @@ export const REFERENCE: DocsPage[] = [
     slug: 'palette-creator',
     title: 'Yarn Palette Creator',
     summary:
-      'Making yarn palettes on their own: from colorways, gradients or a photo.',
+      'Making yarn palettes on their own, from colorways, gradients or a photo.',
     keywords: ['palette', 'creator', 'gradients', 'photo', 'colors', 'yarn'],
   },
   {
@@ -409,7 +407,7 @@ export const REFERENCE: DocsPage[] = [
     kind: 'reference',
     slug: 'explore',
     title: 'Explore',
-    summary: 'The Yarn Colorway Finder, the Globe and the Weather page.',
+    summary: 'The Yarn Colorway Finder, the Weather Forecast and the Globe.',
     keywords: ['finder', 'globe', 'map', 'forecast', 'weather page', 'search'],
   },
   {

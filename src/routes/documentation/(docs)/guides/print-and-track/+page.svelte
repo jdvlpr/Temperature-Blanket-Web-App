@@ -25,9 +25,9 @@ spreadsheet. -->
 </script>
 
 <p>
-  Take your project off the screen: a PDF of your colors, ranges and every day's
-  weather to print and mark as you go, or a spreadsheet to tick off. Plus how to
-  work out how much of each yarn to buy.
+  You can download a PDF of your colors, ranges and every day's weather to print
+  and mark off as you go, or a spreadsheet to tick off. This guide also covers
+  how to figure out how much of each yarn to buy.
 </p>
 
 <section class="flex flex-col gap-3">
@@ -63,7 +63,9 @@ spreadsheet. -->
 
 <section class="flex flex-col gap-3">
   <h2 id="keep-your-place" class="text-2xl font-bold">Keep Your Place</h2>
-  <p>The planner can keep your place for you, saved with the project:</p>
+  <p>
+    The planner can keep track of where you are, and saves it with the project:
+  </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
       On the <span class="font-bold">Preview</span> step, press
@@ -121,7 +123,8 @@ spreadsheet. -->
     {/if}
   </ul>
   <p>
-    Making it as the year goes? Download a new PDF each month for the new days.
+    If you're making it as the year goes, download a new PDF each month to get
+    the new days.
     <a href="/documentation/guides/knit-along-all-year" class="link"
       >Crocheting or knitting along all year</a
     >.
@@ -151,8 +154,8 @@ spreadsheet. -->
   <h2 id="share-a-picture" class="text-2xl font-bold">Share a Picture</h2>
   <p>
     <span class="font-bold">Download Image</span>, in the preview's
-    <span class="font-bold">Share</span> menu, saves it as a picture: for social media,
-    a Ravelry project page, or to keep beside you as you work.
+    <span class="font-bold">Share</span> menu, saves the preview as a picture. It's
+    handy for social media, a Ravelry project page, or keeping beside you as you work.
   </p>
 </section>
 

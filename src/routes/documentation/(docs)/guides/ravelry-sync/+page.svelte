@@ -25,8 +25,9 @@ them. -->
 
 {#if __ACCOUNTS_ENABLED__}
   <p>
-    Post your project to your Ravelry notebook, with its preview, its yarns and
-    a link back to its gallery page. Then keep both up to date as you work.
+    You can post your project to your Ravelry notebook with its preview, its
+    yarns and a link back to its gallery page, then keep both up to date as you
+    work.
   </p>
 
   <section class="flex flex-col gap-3">

@@ -25,14 +25,14 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
 </script>
 
 <p>
-  Your project doesn't have to be about temperature. Track the rainy days, a
+  A project doesn't have to be about temperature. You can track rainy days, a
   snowy winter, or the days getting longer and shorter, on their own or
-  alongside temperature.
+  alongside the temperature.
 </p>
 
 <section class="flex flex-col gap-3">
   <h2 id="add-a-gauge" class="text-2xl font-bold">1. Add a Gauge</h2>
-  <p>Each kind of weather has its own gauge: its own colors and ranges.</p>
+  <p>Each kind of weather has its own gauge, with its own colors and ranges.</p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>Get the weather for your place and dates, as usual.</li>
     <li>
@@ -82,8 +82,8 @@ measured by source (MixedSnow), daylight in minutes (metric) or hours
   <h2 id="rain-and-snow" class="text-2xl font-bold">Rain and Snow</h2>
   <ul class="ml-6 list-disc space-y-1">
     <li>
-      Most days have no rain or snow at all, so one color does most of the work.
-      Choose it carefully: it's the background of your project.
+      Most days have no rain or snow at all, so one color ends up in most of
+      your project. Choose it carefully, since it'll be the background.
     </li>
     <li>
       Ranges never go below 0, and the last one includes 0, so dry days have a

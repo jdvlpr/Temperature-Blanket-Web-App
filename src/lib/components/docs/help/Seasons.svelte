@@ -20,9 +20,9 @@ extras color, and the first season that includes a day wins
 
 <div class="flex flex-col gap-2">
   <p>
-    Seasons color each row by different weather at different times of year: say,
-    high temperatures in spring and summer, and low temperatures in fall and
-    winter.
+    Seasons let you color each row by different weather at different times of
+    year, like high temperatures in spring and summer and low temperatures in
+    fall and winter.
   </p>
   <ol class="ml-6 list-decimal space-y-1">
     <li>
@@ -41,7 +41,8 @@ extras color, and the first season that includes a day wins
     the first one it's in: spring, then summer, fall, winter.
   </p>
   <p>
-    Seasons are new (in beta). If something doesn't work as you expect, please
+    Seasons are still in beta. If something doesn't work the way you expect,
+    please
     <a href="/contact" class="link">let me know</a>.
   </p>
 </div>
