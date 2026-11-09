@@ -20,9 +20,11 @@ export const ROW_FOCUS =
   'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500';
 
 // A palette or project as a card, wherever they're listed: a raised box. Its
-// colors or picture take rounded-*-nested corners, so they follow the box's,
-// less its padding. CARD_HOVER steps it darker, when it opens something (and
-// its buttons' hovers a step further, card-hover in main.css).
+// colors take rounded-*-nested corners, so they follow the box's, less its
+// padding; a picture takes them where it reaches the box's (cardCorners,
+// measured, since its size varies; the box needs data-card). CARD_HOVER steps
+// it darker, when it opens something (and its buttons' hovers a step further,
+// card-hover in main.css).
 export const CARD_BOX =
   'bg-surface-100 dark:bg-surface-900 rounded-container card-border p-2';
 export const CARD_HOVER =

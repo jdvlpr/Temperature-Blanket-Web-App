@@ -19,7 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     grid: 'w-full max-w-[130px] sm:max-w-[210px] md:max-w-[215px] aspect-[4/5]',
     list: 'h-28 w-24 shrink-0 sm:h-32 sm:w-32',
   };
-  /** The picture itself in each layout: whole, at its own shape, square-cornered */
+  /** The picture itself in each layout: whole, at its own shape; its corners
+  follow the card's where it reaches them (cardCorners), else square */
   export const imageClasses = {
     grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
     // The whole picture, in a box beside the name
@@ -41,6 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import GalleryCardByline from '#lib/components/GalleryCardByline.svelte';
   import { CARD_BOX, CARD_HOVER } from '#lib/constants/class-constants.js';
+  import { cardCorners } from '#lib/utils/card-corners.js';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -106,6 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/snippet}
 
 <div
+  data-card
   class={[
     CARD_BOX,
     CARD_HOVER,
@@ -132,7 +135,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tabindex={nameOutside ? -1 : undefined}
   >
     {#if image}
-      <img src={image} alt="" class={imageClasses[layout]} loading="lazy" />
+      <img
+        src={image}
+        alt=""
+        class={imageClasses[layout]}
+        loading="lazy"
+        {@attach cardCorners}
+      />
     {:else}
       {@render cover?.()}
     {/if}

@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import { getThumbnail } from '#lib/storage/thumbnails.js';
+  import { cardCorners } from '#lib/utils/card-corners.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import { extraColorsFromProjectHref } from '#lib/utils/extra-colors-utils.js';
   import type { Attachment } from 'svelte/attachments';
@@ -44,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     /** The colors' height, when it has no picture */
     stripHeight?: string;
     /** `nested` on a card, so its colors and placeholder follow the card's
-    corners; `small` in a row */
+    corners, and its picture too where it reaches them; `small` in a row */
     corners?: 'small' | 'nested';
   }
 
@@ -106,7 +107,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if image}
-  <img src={image} alt="" class={imageClass} loading="lazy" {@attach watch} />
+  <img
+    src={image}
+    alt=""
+    class={imageClass}
+    loading="lazy"
+    {@attach watch}
+    {@attach corners === 'nested' && cardCorners}
+  />
 {:else if !pictureSettled}
   <div
     class="placeholder animate-pulse {placeholderCorners} {coverClass}"
