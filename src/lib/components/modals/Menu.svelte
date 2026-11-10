@@ -630,12 +630,13 @@ the same color) says it's waiting here -->
     class={[SMALL_LINKS, 'border-surface-200-800 border-t pt-4']}
     aria-label="Help"
   >
-    <button
+    <!-- Video is not up to date -->
+    <!-- <button
       type="button"
       class={SMALL_LINK}
       onclick={() => open(GettingStarted, 'Getting Started')}
       >Getting Started</button
-    >
+    > -->
     <button
       type="button"
       class={SMALL_LINK}

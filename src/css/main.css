@@ -69,9 +69,14 @@
 
   /* Room for the scrollbar on every page, so a page doesn't shift sideways
   between pages that scroll and ones that don't, or as a dialog stops the
-  page scrolling. Only where scrollbars take room (not overlay ones). */
-  html {
-    scrollbar-gutter: stable;
+  page scrolling. Only where scrollbars take room (not overlay ones), and
+  only from sm up: below it dialogs are full-screen sheets, and a kept gutter
+  left them short of the right edge (uneven sides), while the shift they hide
+  can't be seen. */
+  @media (width >= 40rem) {
+    html {
+      scrollbar-gutter: stable;
+    }
   }
 }
 

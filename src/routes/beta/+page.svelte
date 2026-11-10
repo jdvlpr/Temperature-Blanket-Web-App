@@ -128,10 +128,12 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
               href="mailto:{email}?subject={encodeURIComponent(
                 'Beta feedback',
               )}"
-              class="btn hover:preset-tonal-surface w-fit"
+              class="btn hover:preset-tonal-surface w-fit max-w-full text-left whitespace-normal"
             >
               <MailIcon />
-              Email {email}
+              <!-- Wraps on a phone, the address breaking anywhere if need be -->
+              <span class="min-w-0 [overflow-wrap:anywhere]">Email {email}</span
+              >
             </a>
           {/if}
         </div>
@@ -141,7 +143,10 @@ anyone saves their work on it. Only in the beta's build (+page.ts). -->
         </p>
       </section>
 
-      <a href={mainSite} class="btn preset-tonal w-fit">
+      <a
+        href={mainSite}
+        class="btn preset-tonal w-fit max-w-full text-left whitespace-normal"
+      >
         Switch back to {mainName}
         <ExternalLinkIcon class="icon-sm" />
       </a>
