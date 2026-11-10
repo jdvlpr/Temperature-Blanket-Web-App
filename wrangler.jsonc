@@ -1,15 +1,23 @@
-// Local development and test configuration only.
+// Local development and test configuration only; the deployed Worker is
+// wrangler.production.jsonc.
 //
-// This file has no `pages_build_output_dir`, so Cloudflare Pages ignores it for
-// deployed builds: production and preview bindings are still set in the Pages
-// dashboard. It gives `pnpm dev` (through the adapter's platformProxy),
-// `wrangler pages dev` and `wrangler d1 migrations apply --local` the same
-// local D1 database and R2 bucket, stored under .wrangler/state.
+// It gives `pnpm dev` and `pnpm preview` (through the adapter's platformProxy),
+// `wrangler dev` (pnpm test:e2e:cloudflare) and `wrangler d1 migrations apply --local`
+// the same local D1 database and R2 bucket, stored under .wrangler/state.
+// `main` and `assets` match production's, so `pnpm build` makes the same Worker
+// build here (the adapter builds for Pages only without them).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   // Not the deployed Worker's name (temperature-blanket, wrangler.production.jsonc),
-  // so a deploy that picks up this file by mistake is refused
+  // so a deploy that picks up this file by mistake can't replace the site
   "name": "temperature-blanket-local",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".svelte-kit/cloudflare",
+  },
+  "workers_dev": false,
+  "preview_urls": false,
   // Pinned because the local runtime rejects today's date
   "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
@@ -30,8 +38,8 @@
     // Production leaves this unset: Google is then the only sign-in and no email is sent,
     // so it needs GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET and no EMAIL_SENDER/RESEND_*.
     "EMAIL_SIGN_IN": "true",
-    // Accounts, with local-only values. Production sets these in the Pages dashboard,
-    // with BETTER_AUTH_SECRET as an encrypted secret.
+    // Accounts, with local-only values. Production sets these in
+    // wrangler.production.jsonc, with BETTER_AUTH_SECRET as a Worker secret.
     "ACCOUNTS_ENABLED": "true",
     "BETTER_AUTH_SECRET": "local-development-secret-do-not-use-in-production",
     "AUTH_ALLOWED_HOSTS": "localhost:5173,localhost:4173,localhost:8788,*.ts.net:5173",
@@ -42,11 +50,11 @@
     // Cloudflare's always-pass Turnstile test secret, for guests' gallery
     // submissions (/api/project). Pair it with the test site key
     // PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA in .env. Production
-    // sets its real secret as an encrypted secret in the Pages dashboard.
+    // sets its real secret as a Worker secret.
     "TURNSTILE_SECRET_KEY": "1x0000000000000000000000000000000AA",
     // Publishing to the gallery from accounts stays off here, since
     // PUBLIC_WORDPRESS_BASE_URL may be the live gallery. To test it, point .env at
     // the Local WordPress site (plugin dev/README.md) and pass
-    // --binding GALLERY_PUBLISH_ENABLED=true to wrangler pages dev.
+    // --var GALLERY_PUBLISH_ENABLED:true to wrangler dev.
   },
 }

@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // Project sync in the browser, with two browser contexts as two devices, under
-// `wrangler pages dev`. Projects are written straight into IndexedDB (as the
+// `wrangler dev`. Projects are written straight into IndexedDB (as the
 // Project Planner saves them) so the tests don't depend on live weather data.
 // The merge and conflict rules are unit-tested in src/lib/sync/engine.test.ts.
 

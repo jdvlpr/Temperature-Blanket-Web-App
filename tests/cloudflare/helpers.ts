@@ -138,7 +138,7 @@ export const addFromBrowser = (page: Page) =>
   });
 
 /**
- * Runs SQL against the local D1 database that wrangler pages dev uses. Retried:
+ * Runs SQL against the local D1 database that wrangler dev uses. Retried:
  * the database file can be briefly busy while the dev server writes to it.
  */
 export function localD1(sql: string): Record<string, unknown>[] {

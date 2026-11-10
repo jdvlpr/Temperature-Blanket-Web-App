@@ -1,6 +1,6 @@
-# Cloudflare Pages redirects. /blog/* and /documentation/* are static
-# (routes.exclude in vite.config.ts), so redirects for them can't live in
-# hooks.server.ts. The blog was split in 2026: evergreen posts went to
+# Cloudflare redirects, applied before the Worker runs. /blog/* and
+# /documentation/* are static (prerendered files are served without the Worker),
+# so redirects for them can't live in hooks.server.ts. The blog was split in 2026: evergreen posts went to
 # Guides & Help, release posts and the changelog to What's New.
 /blog/what-is-a-temperature-blanket /documentation/basics/what-is-a-temperature-blanket 301
 /blog/what-is-a-temperature-blanket/ /documentation/basics/what-is-a-temperature-blanket 301

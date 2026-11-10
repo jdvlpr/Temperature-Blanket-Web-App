@@ -15,7 +15,6 @@
 
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
-import routes from '../../.svelte-kit/cloudflare/_routes.json';
 import fs from 'node:fs';
 
 type ApiResponse<T> = { data: T[]; meta: unknown };
@@ -125,13 +124,6 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('id');
     expect(data.data[0]).toHaveProperty('name');
     expect(data.data[0]).toHaveProperty('yarns');
-  });
-
-  // Once I made a mistake and included "api/*" in the excluded routes list in svelte.config.js,
-  // which prevented the Yarn Colorways API from working.
-  // This checks to make sure "api/*" is not in that list.
-  test('"api/*" is not in the excluded routes list', () => {
-    expect(routes.exclude).not.toContain('/api/*');
   });
 
   // v2 endpoint tests

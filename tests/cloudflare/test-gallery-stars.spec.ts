@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Stars under `wrangler pages dev`: private bookmarks of gallery pages, kept in
+// Stars under `wrangler dev`: private bookmarks of gallery pages, kept in
 // D1. WordPress isn't running here, so the gallery's two reads stand in for it
 // in the browser: Popular's IDs and the posts by ID (the gallery and Starred).
 

@@ -36,7 +36,7 @@
 //
 // A few (the Publish dialog and clip) sign in a new account with an emailed
 // code, so they need a server with EMAIL_SIGN_IN and ENABLE_DEV_ROUTES: the
-// dev server (`pnpm dev:accounts`), or `wrangler pages dev` on an accounts
+// dev server (`pnpm dev:accounts`), or `wrangler dev` on an accounts
 // build. Their names say which: --only publish-and-share/publish-dialog.
 
 import {
@@ -184,7 +184,7 @@ export async function dismissToasts(page: Page) {
 
 /** Signs in a new account with an emailed code, as a made-up maker. Needs
  * a server with EMAIL_SIGN_IN and ENABLE_DEV_ROUTES (the dev outbox): the
- * dev server, or `wrangler pages dev` on an accounts build */
+ * dev server, or `wrangler dev` on an accounts build */
 export async function signIn(page: Page) {
   const email = `docs-${Date.now()}@example.test`;
   await page.goto(new URL('/auth/sign-in', base).href);

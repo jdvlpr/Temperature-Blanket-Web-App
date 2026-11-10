@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The /api/sync routes under `wrangler pages dev`, against real local D1 and R2.
+// The /api/sync routes under `wrangler dev`, against real local D1 and R2.
 // The browser side is covered by test-sync.spec.ts.
 
 import {

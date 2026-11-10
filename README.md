@@ -40,7 +40,7 @@ pnpm dev
 
 #### Local Cloudflare bindings (accounts)
 
-`wrangler.jsonc` gives local development a D1 database (`DB`) and an R2 bucket (`PROJECTS`), stored under `.wrangler/state`. It's never deployed: `pnpm dev`, `pnpm preview` and `wrangler pages dev` use it, and its Worker name (`temperature-blanket-local`) matches no deployed Worker. The beta at next.temperature-blanket.com is the `temperature-blanket` Worker, configured by `wrangler.production.jsonc` (its header says where build variables, runtime vars and secrets live); temperature-blanket.com is still the Pages project until launch.
+`wrangler.jsonc` gives local development a D1 database (`DB`) and an R2 bucket (`PROJECTS`), stored under `.wrangler/state`. It's never deployed: `pnpm dev`, `pnpm preview` and `wrangler dev` use it, and its Worker name (`temperature-blanket-local`) matches no deployed Worker. Its `main` and `assets` match production's, so `pnpm build` makes a Workers build locally too. The beta at next.temperature-blanket.com is the `temperature-blanket` Worker, configured by `wrangler.production.jsonc` (its header says where build variables, runtime vars and secrets live).
 
 Apply database migrations (from `migrations/`) to the local database:
 
@@ -89,7 +89,7 @@ pnpm db:migrate:local
 
 ### ✅ Testing
 
-First build the app (to generate cloudflare \_routes.json file)
+First build the app
 
 ```bash
 pnpm build
@@ -113,7 +113,7 @@ End-to-end tests (for pages and ui flows)
 pnpm test:e2e
 ```
 
-End-to-end tests against the Cloudflare build under `wrangler pages dev`, which honors `_routes.json` and provides the local D1 and R2 bindings (also checks every static route is prerendered)
+End-to-end tests against the Cloudflare build under `wrangler dev`, which serves it as the deployed Worker does (static files and `_redirects` before the Worker) with the local D1 and R2 bindings (also checks every prerendered page is served and no file stands in for an API route)
 
 ```bash
 pnpm test:e2e:cloudflare

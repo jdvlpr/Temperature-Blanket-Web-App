@@ -103,62 +103,12 @@ export default defineConfig(({ mode }) => {
         // adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
         // If your environment is not supported or you settled on a specific environment, switch out the adapter.
         // See https://kit.svelte.dev/docs/adapters for more information about adapters.
-        // adapter: adapter()
-        adapter: adapter({
-          // See below for an explanation of these options
-          // Routes in exclude will not trigger cloudflare functions.
-          // The free plan has a limit of 100,000 combined workers and page function requests,
-          // so excluding routes helps to keep the number of requests within that limit.
-          // Keep API routes out of this list. Also, a maximum of 100 items on this list,
-          // so it's a good idea to use /* when you can.
-          routes: {
-            include: ['/*'],
-            exclude: [
-              '/_app/*',
-              // Guides & Help search, written by Pagefind after the build
-              '/pagefind/*',
-              '/.DS_Store',
-              '/.dev-tools/*',
-              '/apple-icon-180.png',
-              '/apple-touch-icon-precomposed.png',
-              '/apple-touch-icon.png',
-              '/favicon.ico',
-              '/favicon.png',
-              '/fonts/*',
-              '/images/*',
-              '/manifest.json',
-              '/robots.txt',
-              '/service-worker.js',
-              '/',
-              '/account',
-              '/api',
-              '/api/yarn-colorways',
-              '/auth/*',
-              // Gone: kept static so the root _redirects can send them on
-              '/blog',
-              '/blog/*',
-              '/changelog',
-              '/contact',
-              '/contact/*',
-              '/documentation',
-              '/documentation/*',
-              '/gallery',
-              '/gallery/palettes',
-              '/globe',
-              '/my-palettes',
-              '/my-projects',
-              '/privacy',
-              '/supporters',
-              '/weather',
-              '/whats-new',
-              '/whats-new/*',
-              '/yarn',
-              '/yarn-colorway-finder',
-              '/yarn-search-request',
-              '/yarn-search-request/*',
-            ],
-          },
-        }),
+        // Built for Workers: wrangler.jsonc (local) and wrangler.production.jsonc
+        // (deployed) both have `main` and `assets`. A request matching the root
+        // _redirects or a file in the build (static files, prerendered pages) is
+        // answered without running the Worker; everything else, the API included, runs it.
+        // Never put a file at a path the Worker should answer (tests/cloudflare/test-routes.spec.ts).
+        adapter: adapter(),
         prerender: { entries: ['*'] },
         version: { name: pkg.version },
       }),

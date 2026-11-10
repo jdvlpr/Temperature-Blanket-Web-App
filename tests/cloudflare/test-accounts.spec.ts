@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Accounts under `wrangler pages dev` (pnpm test:e2e:cloudflare), built with
+// Accounts under `wrangler dev` (pnpm test:e2e:cloudflare), built with
 // PUBLIC_ACCOUNTS_ENABLED=true. Sign-in codes are read from the dev email outbox.
 
 import {

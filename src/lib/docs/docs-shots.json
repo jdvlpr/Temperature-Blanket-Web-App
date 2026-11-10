@@ -16,31 +16,31 @@
     "height": 463
   },
   "download/pdf-options": {
-    "width": 1280,
+    "width": 1269,
     "height": 1274
   },
   "library-and-account/project-menu": {
     "width": 448,
-    "height": 1397
+    "height": 1371
   },
   "preview/rows": {
-    "width": 936,
-    "height": 1139
+    "width": 925,
+    "height": 1125
   },
   "library-and-account/card-menu": {
     "width": 241,
     "height": 247
   },
   "gauges-and-ranges/edit-range": {
-    "width": 970,
+    "width": 959,
     "height": 1192
   },
   "choose-ranges/days-in-ranges": {
-    "width": 970,
+    "width": 959,
     "height": 1192
   },
   "match-your-yarn/choose-colorways": {
-    "width": 1280,
+    "width": 1269,
     "height": 1288
   },
   "knit-along-all-year/future-days": {
@@ -48,7 +48,7 @@
     "height": 583
   },
   "rain-snow-sunshine/rain-gauge": {
-    "width": 970,
+    "width": 959,
     "height": 712
   },
   "version-7/site-menu": {
@@ -80,11 +80,11 @@
     "height": 720
   },
   "explore/colorway-finder": {
-    "width": 986,
+    "width": 975,
     "height": 1036
   },
   "explore/gallery": {
-    "width": 986,
+    "width": 975,
     "height": 1036
   },
   "palette-creator/palette": {
@@ -93,7 +93,7 @@
   },
   "publish-and-share/publish-dialog": {
     "width": 448,
-    "height": 428
+    "height": 453
   },
   "print-and-track/progress": {
     "width": 800,
@@ -112,7 +112,7 @@
     "height": 720
   },
   "what-is-a-temperature-blanket/gauge": {
-    "width": 970,
+    "width": 959,
     "height": 940
   },
   "match-your-yarn/colors-from-photo": {

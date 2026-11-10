@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Gallery pages from accounts under `wrangler pages dev`, with publishing from
-// accounts switched off (GALLERY_PUBLISH_ENABLED unset), as on Pages previews.
+// Gallery pages from accounts under `wrangler dev`, with publishing from
+// accounts switched off (GALLERY_PUBLISH_ENABLED false).
 // These tests never reach WordPress: publishing itself is tested against the
 // Local WordPress site (see the plugin's dev/README.md), and the server's side
 // of publishing and updating in place by src/lib/server/gallery/index.test.ts.

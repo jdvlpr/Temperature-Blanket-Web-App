@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Only meaningful under `wrangler pages dev` (pnpm test:e2e:cloudflare), which provides
+// Only meaningful under `wrangler dev` (pnpm test:e2e:cloudflare), which provides
 // the local D1 and R2 bindings and the dev-only vars from wrangler.jsonc.
 
 import { expect, test } from '@playwright/test';

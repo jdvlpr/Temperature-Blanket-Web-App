@@ -13,89 +13,72 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Only meaningful under `wrangler pages dev` (pnpm test:e2e:cloudflare), which honors _routes.json.
-// Every page route excluded from the Worker must exist as a prerendered file, or it 404s in production.
+// Only meaningful under `wrangler dev` (pnpm test:e2e:cloudflare), which serves the
+// build as the deployed Worker does: a request matching the root _redirects or a
+// file in the build is answered without running the Worker; everything else runs it.
 
 import { expect, test } from '@playwright/test';
-import { existsSync, readdirSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 const BUILD_DIR = '.svelte-kit/cloudflare';
 
-// Excluded so they never reach the Worker in production, but only exist in `pnpm dev`.
-const DEV_ONLY_ROUTES = ['/.dev-tools/*'];
-
-// Gone: excluded only so the root _redirects can send them on, so there are
-// no files; each is checked to redirect instead. A path under it to try.
-const REDIRECT_ONLY_ROUTES: Record<string, string> = {
-  '/blog/*': '/blog/some-old-post',
-};
+// Gone, with no files: the root _redirects sends each on. A path under it to try.
+const REDIRECTED = ['/blog/some-old-post', '/changelog'];
 
 // Read inside the tests, not at collection time: Playwright collects tests before
 // the webServer command rebuilds, so a module-level read could see a stale build.
-function excludedRoutes() {
-  const { exclude } = JSON.parse(
-    readFileSync(join(BUILD_DIR, '_routes.json'), 'utf8'),
-  ) as { exclude: string[] };
-  // Static files like /favicon.ico or /.DS_Store aren't pages; skip them.
-  const isFile = (route: string) => /\.[^/]+$/.test(route);
-  return {
-    pages: exclude.filter((route) => !route.endsWith('/*') && !isFile(route)),
-    wildcards: exclude.filter(
-      (route) =>
-        route.endsWith('/*') &&
-        !DEV_ONLY_ROUTES.includes(route) &&
-        !(route in REDIRECT_ONLY_ROUTES),
-    ),
-  };
-}
-
-function htmlFilesIn(dir: string): string[] {
+function filesIn(dir: string): string[] {
   if (!existsSync(dir)) return [];
-  return readdirSync(dir, { recursive: true, encoding: 'utf8' }).filter(
-    (file) => file.endsWith('.html'),
+  return readdirSync(dir, { recursive: true, encoding: 'utf8' }).map((file) =>
+    file.split('\\').join('/'),
   );
 }
 
-test.describe('Cloudflare routing (_routes.json)', () => {
-  test('every static page route is prerendered', async ({ request }) => {
-    const { pages } = excludedRoutes();
+/** Every prerendered page's address: about.html → /about, a/index.html → /a. */
+function prerenderedPages(): string[] {
+  return filesIn(BUILD_DIR)
+    .filter(
+      (file) =>
+        file.endsWith('.html') &&
+        file !== '404.html' &&
+        !file.startsWith('_app/') &&
+        !file.startsWith('pagefind/'),
+    )
+    .map(
+      (file) =>
+        '/' + file.replace(/(^|\/)index\.html$/, '').replace(/\.html$/, ''),
+    );
+}
+
+test.describe('Cloudflare routing (Worker static assets)', () => {
+  test('every prerendered page is served', async ({ request }) => {
+    const pages = prerenderedPages();
     expect(pages.length).toBeGreaterThan(0);
-    for (const route of pages) {
-      const response = await request.get(route);
-      expect.soft(response.status(), route).toBe(200);
+    for (const path of pages) {
+      const response = await request.get(path);
+      expect.soft(response.status(), path).toBe(200);
       expect
-        .soft(response.headers()['content-type'] ?? '', route)
+        .soft(response.headers()['content-type'] ?? '', path)
         .toContain('text/html');
     }
   });
 
-  test('every static wildcard route has prerendered files', async ({
-    request,
-  }) => {
-    const { wildcards } = excludedRoutes();
-    for (const route of wildcards) {
-      const prefix = route.slice(0, -2);
-      const dir = join(BUILD_DIR, prefix);
-      expect
-        .soft(
-          existsSync(dir) && readdirSync(dir).length > 0,
-          `${route} has no files in the build`,
-        )
-        .toBe(true);
-      for (const file of htmlFilesIn(dir)) {
-        const path = `${prefix}/${file.replace(/(\/index)?\.html$/, '')}`;
-        const response = await request.get(path);
-        expect.soft(response.status(), path).toBe(200);
-      }
-    }
-  });
-
-  test('routes kept only for redirects redirect', async ({ request }) => {
-    for (const path of Object.values(REDIRECT_ONLY_ROUTES)) {
+  test('gone routes redirect', async ({ request }) => {
+    for (const path of REDIRECTED) {
       const response = await request.get(path, { maxRedirects: 0 });
       expect.soft(response.status(), path).toBe(301);
     }
+  });
+
+  // A file under /api would be served in place of the Worker's answer. Only
+  // the API's own docs pages (prerendered) may be there.
+  test('no file in the build stands in for an API route', () => {
+    const dir = join(BUILD_DIR, 'api');
+    const notPages = filesIn(dir).filter(
+      (file) => !file.endsWith('.html') && statSync(join(dir, file)).isFile(),
+    );
+    expect(notPages).toEqual([]);
   });
 
   test('API routes are served by the Worker', async ({ request }) => {
