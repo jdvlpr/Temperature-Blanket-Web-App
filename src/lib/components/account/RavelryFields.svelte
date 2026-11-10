@@ -981,7 +981,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </fieldset>
 
       <!-- What it is and where it's at -->
-      <div class="flex flex-col gap-4">
+      <div class="@container flex flex-col gap-4">
         {#if optionsError}
           <p class="text-error-700-300 text-sm" role="alert">{optionsError}</p>
         {:else if crafts.length || statuses.length}
@@ -1015,7 +1015,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
 
-        <div class="grid gap-4 min-[26rem]:grid-cols-2 sm:grid-cols-3">
+        <!-- Two across at most, by the form's own width (not the window's), like
+        Status and Craft: date fields keep a width of their own in some browsers
+        and ran into each other three across -->
+        <div class="grid gap-4 @sm:grid-cols-2">
           {@render dateField(
             'Started',
             CalendarPlusIcon,

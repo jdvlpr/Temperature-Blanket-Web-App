@@ -738,150 +738,170 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
   {:else}
     <!-- The project as its gallery card will show it -->
     <div
-      class="bg-surface-50 dark:bg-surface-950 rounded-container flex gap-4 p-4"
+      class="bg-surface-100 dark:bg-surface-900 rounded-container card-border flex flex-col gap-4 p-4"
       inert={busy}
     >
-      <div class="pointer-events-none w-24 shrink-0 sm:w-40" aria-hidden="true">
-        {#if previews.active}
-          <previews.active.previewComponent />
-        {/if}
-      </div>
-      <div class="flex min-w-0 flex-1 flex-col gap-2">
-        <RenameProject saveToName={view === 'form'} />
-        {#if view === 'form'}
-          <!-- Its name on the page, and the choice to leave it off, together;
-          then Ravelry, which needs the name -->
-          <p class="text-sm" id="gallery-owner-line">
-            {#if !showOwner}
-              No name; not in {@render yourGallery()}
-            {:else if ownerName}
-              By {ownerName} · in {@render yourGallery()}
-            {:else}
-              <span class="text-warning-700-300"
-                >Add a display name to be credited</span
-              >
-            {/if}
-          </p>
-          <AnonymousCheckbox
-            bind:checked={showOwner}
-            name={ownerName}
-            disabled={busy}
-            detail={false}
-            describedby="gallery-owner-line"
-          />
-          {#if madeNow !== null || page?.made != null}
-            <div class="-mx-4">
-              <ToggleSwitch
-                bare
-                label="Show my progress"
-                details={madeNow === null
-                  ? 'Your progress isn’t set'
-                  : `Shows “${progress.progress.finished ? 'Finished' : `${madeNow}% made`}” on its page`}
-                disabled={busy}
-                bind:checked={showProgress}
-              />
-            </div>
+      <div class="flex gap-4">
+        <div
+          class="pointer-events-none w-24 shrink-0 sm:w-40"
+          aria-hidden="true"
+        >
+          {#if previews.active}
+            <previews.active.previewComponent />
           {/if}
-          {#if ravelryReady}
-            {#if linked && showOwner && ravelryLink}
-              {#if confirmingUnlink}
-                <div
-                  class="flex flex-col gap-2"
-                  role="group"
-                  aria-label="Unlink"
-                >
-                  <p class="text-sm">
-                    Unlink from Ravelry? The project stays on Ravelry, but it’s
-                    no longer updated from here, and its photos leave its
-                    gallery page.
-                  </p>
-                  <div class="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      class={BTN_SECONDARY}
-                      onclick={keepLinked}
-                      disabled={unlinking}>Keep Linked</button
-                    >
-                    <button
-                      type="button"
-                      class={BTN_DANGER}
-                      onclick={unlink}
-                      disabled={unlinking}
-                      {@attach takeFocus}
-                      >{#if unlinking}<LoaderCircleIcon
-                          class="animate-spin"
-                        />{/if}Unlink</button
-                    >
-                  </div>
-                </div>
+        </div>
+        <div class="flex min-w-0 flex-1 flex-col gap-2">
+          <RenameProject saveToName={view === 'form'} />
+          {#if view === 'form'}
+            <!-- Its name on the page, and the choice to leave it off, together;
+          then Ravelry, which needs the name (progress is under the picture) -->
+            <p class="text-sm" id="gallery-owner-line">
+              {#if !showOwner}
+                No name; not in {@render yourGallery()}
+              {:else if ownerName}
+                By {ownerName} · in {@render yourGallery()}
               {:else}
-                <p class="flex flex-wrap items-center gap-x-1.5 text-sm">
-                  <span
-                    >On Ravelry{ravelryLink.photos.length
-                      ? ` · ${ravelryLink.photos.length} ${ravelryLink.photos.length === 1 ? 'photo' : 'photos'}`
-                      : ''}</span
-                  >
-                  <span aria-hidden="true">·</span>
-                  <!-- eslint-disable svelte/no-navigation-without-resolve -- Ravelry's site -->
-                  <a
-                    class="anchor"
-                    href={ravelryLink.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >View<ExternalLinkIcon
-                      class="icon-sm ml-0.5 inline"
-                      aria-hidden="true"
-                    /><span class="sr-only">
-                      on Ravelry (opens in a new tab)</span
-                    ></a
-                  >
-                  <!-- eslint-enable svelte/no-navigation-without-resolve -->
-                  <span aria-hidden="true">·</span>
-                  <button
-                    type="button"
-                    class="anchor"
-                    bind:this={unlinkButton}
-                    disabled={busy}
-                    onclick={() => (confirmingUnlink = true)}
-                    >Unlink<span class="sr-only"> from Ravelry</span>…</button
-                  >
-                </p>
+                <span class="text-warning-700-300"
+                  >Add a display name to be credited</span
+                >
               {/if}
-              {#if unlinkError}
-                <p class="text-error-700-300 text-sm" role="alert">
-                  {unlinkError}
-                </p>
-              {/if}
-            {:else if linked}
-              <p class="text-warning-700-300 text-xs">
-                It’s on Ravelry, which links to this page under your name.
-                Saving it as Anonymous unlinks it; the Ravelry project stays.
-              </p>
-            {:else if showOwner}
-              <label class="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  class="checkbox mt-0.5 shrink-0"
-                  bind:checked={alsoPost}
-                  disabled={busy}
-                  aria-describedby="also-post-detail"
-                />
-                <span class="flex flex-1 flex-col">
-                  <span>Also post to Ravelry</span>
-                  <span class="text-xs opacity-70" id="also-post-detail"
-                    >With its yarns and photos, linking to this page</span
-                  >
-                </span>
-              </label>
-            {/if}
-          {:else if item && inAccount(item) && ravelryLinks.status?.available && !ravelryLinks.connected && showOwner}
-            <p class="text-xs opacity-70">
-              <a class="anchor" href={resolve('/account')}>Connect Ravelry</a> in
-              your Account to post there too.
             </p>
+            <AnonymousCheckbox
+              bind:checked={showOwner}
+              name={ownerName}
+              disabled={busy}
+              detail={false}
+              describedby="gallery-owner-line"
+            />
+            {#if ravelryReady}
+              {#if linked && showOwner && ravelryLink}
+                {#if confirmingUnlink}
+                  <div
+                    class="flex flex-col gap-2"
+                    role="group"
+                    aria-label="Unlink"
+                  >
+                    <p class="text-sm">
+                      Unlink from Ravelry? The project stays on Ravelry, but
+                      it’s no longer updated from here, and its photos leave its
+                      gallery page.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class={BTN_SECONDARY}
+                        onclick={keepLinked}
+                        disabled={unlinking}>Keep Linked</button
+                      >
+                      <button
+                        type="button"
+                        class={BTN_DANGER}
+                        onclick={unlink}
+                        disabled={unlinking}
+                        {@attach takeFocus}
+                        >{#if unlinking}<LoaderCircleIcon
+                            class="animate-spin"
+                          />{/if}Unlink</button
+                      >
+                    </div>
+                  </div>
+                {:else}
+                  <p class="flex flex-wrap items-center gap-x-1.5 text-sm">
+                    <span
+                      >On Ravelry{ravelryLink.photos.length
+                        ? ` · ${ravelryLink.photos.length} ${ravelryLink.photos.length === 1 ? 'photo' : 'photos'}`
+                        : ''}</span
+                    >
+                    <span aria-hidden="true">·</span>
+                    <!-- eslint-disable svelte/no-navigation-without-resolve -- Ravelry's site -->
+                    <a
+                      class="anchor"
+                      href={ravelryLink.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >View<ExternalLinkIcon
+                        class="icon-sm ml-0.5 inline"
+                        aria-hidden="true"
+                      /><span class="sr-only">
+                        on Ravelry (opens in a new tab)</span
+                      ></a
+                    >
+                    <!-- eslint-enable svelte/no-navigation-without-resolve -->
+                    <span aria-hidden="true">·</span>
+                    <button
+                      type="button"
+                      class="anchor"
+                      bind:this={unlinkButton}
+                      disabled={busy}
+                      onclick={() => (confirmingUnlink = true)}
+                      >Unlink<span class="sr-only"> from Ravelry</span>…</button
+                    >
+                  </p>
+                {/if}
+                {#if unlinkError}
+                  <p class="text-error-700-300 text-sm" role="alert">
+                    {unlinkError}
+                  </p>
+                {/if}
+              {:else if linked}
+                <p class="text-warning-700-300 text-xs">
+                  It’s on Ravelry, which links to this page under your name.
+                  Saving it as Anonymous unlinks it; the Ravelry project stays.
+                </p>
+              {:else}
+                <!-- Shown either way; Ravelry links to the page under the name,
+              so it waits for Anonymous to be unticked -->
+                <label
+                  class={[
+                    'flex items-start gap-3',
+                    !showOwner && 'cursor-not-allowed',
+                  ]}
+                >
+                  <input
+                    type="checkbox"
+                    class="checkbox mt-0.5 shrink-0"
+                    checked={alsoPost && showOwner}
+                    onchange={(e) => (alsoPost = e.currentTarget.checked)}
+                    disabled={busy || !showOwner}
+                    aria-describedby="also-post-detail"
+                  />
+                  <span
+                    class={['flex flex-1 flex-col', !showOwner && 'opacity-50']}
+                  >
+                    <span>Also post to Ravelry</span>
+                    <span class="text-xs opacity-70" id="also-post-detail"
+                      >{showOwner
+                        ? 'With its yarns and photos, linking to this page'
+                        : 'Untick Anonymous to post: Ravelry links to this page under your name'}</span
+                    >
+                  </span>
+                </label>
+              {/if}
+            {:else if item && inAccount(item) && ravelryLinks.status?.available && !ravelryLinks.connected && showOwner}
+              <p class="text-xs opacity-70">
+                <a class="anchor" href={resolve('/account')}>Connect Ravelry</a> in
+                your Account to post there too.
+              </p>
+            {/if}
           {/if}
-        {/if}
+        </div>
       </div>
+      {#if view === 'form'}
+        <!-- Across the whole card, under the picture -->
+        {#if madeNow !== null || page?.made != null}
+          <div class="-mx-4">
+            <ToggleSwitch
+              bare
+              label="Show my progress"
+              details={madeNow === null
+                ? 'Your progress isn’t set'
+                : `Shows “${progress.progress.finished ? 'Finished' : `${madeNow}% made`}” on its page`}
+              disabled={busy}
+              bind:checked={showProgress}
+            />
+          </div>
+        {/if}
+      {/if}
     </div>
 
     {#if view === 'form'}
@@ -889,7 +909,9 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
         <p class="text-error-700-300 text-sm" role="alert">{ownerError}</p>
       {/if}
       {#if problem}
-        <p class="text-error-700-300 text-sm" role="alert">{problemText}</p>
+        <p class="text-error-700-300 text-sm" role="alert">
+          {problemText}
+        </p>
       {/if}
 
       {#if ravelryNotice}
