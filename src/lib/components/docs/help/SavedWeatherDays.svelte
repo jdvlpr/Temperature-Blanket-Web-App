@@ -28,8 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </li>
     <li>
       The newest days are early data at first, and weather sources can update
-      them for about a week. Once they've settled, Check for Updates lets you
-      check them.
+      them for about a week. The next time you add new days or Check for
+      Updates, any that changed are shown for you to choose.
     </li>
   </ul>
   <p>

@@ -22,8 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project, type LoadedFrom } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
-  import { weatherSearch } from '#lib/state/weather-search.svelte.js';
-  import { weatherDays } from '#lib/state/weather-days.svelte.js';
   import { stringToDate } from '#lib/utils/date-utils.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
@@ -88,10 +86,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div>
-  <!-- The card's header: where the project came from, and whether its
-  weather may have changed since, apart from the places below; centered,
-  like the card's buttons, while the fields stay left-aligned -->
-  {#if loading || validLoadedProject || weatherDays.settledEarly.length}
+  <!-- The card's header: where the project came from, apart from the places
+  below; centered, like the card's buttons, while the fields stay
+  left-aligned -->
+  {#if loading || validLoadedProject}
     <div class="mb-2 flex flex-col items-center gap-1 pb-4 text-center">
       {#if loading}
         <p class="h-auto animate-pulse text-sm">Loading project...</p>
@@ -117,24 +115,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 gallery page
               {/if}
             {/if}</span
-          >
-        </p>
-      {/if}
-
-      <!-- Days got while their values were early, which have settled since -->
-      {#if !loading && weatherDays.settledEarly.length}
-        {@const count = weatherDays.settledEarly.length}
-        <p
-          class="flex w-full flex-wrap items-center justify-center gap-x-1 text-sm"
-          data-testid="early-days-settled"
-        >
-          Your last {count === 1 ? 'day was' : `${count} days were`} early data, which
-          may have changed since.
-          <button
-            type="button"
-            class="anchor"
-            onclick={() => weatherSearch.start({ mode: 'again' })}
-            >Check for Updates</button
           >
         </p>
       {/if}

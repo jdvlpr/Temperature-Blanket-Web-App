@@ -26,8 +26,6 @@ import {
   fetchedThroughNow,
   lastDayWithValues,
   newDaysRange,
-  settledEarlyDays,
-  type DayKey,
   type DeclinedValues,
   type EarlyDays,
   type StoredWeatherDays,
@@ -93,12 +91,6 @@ class WeatherDays {
   canSearchAgain = $derived(
     !weather.isUserEdited && weather.rawData.length > 0 && this.current,
   );
-
-  /** Early days whose values have settled since, which a search may change */
-  settledEarly = $derived.by((): DayKey[] => {
-    if (!this.current || weather.isUserEdited) return [];
-    return settledEarlyDays(this.early, localToday(), sourceOf);
-  });
 
   /** Starts over: a new project, or one with no days yet */
   reset() {

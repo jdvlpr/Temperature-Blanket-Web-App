@@ -153,10 +153,10 @@ them, asking before changing saved ones
   </p>
   <h3 class="text-lg font-bold">Weather sources update recent days</h3>
   <p>
-    The newest days are early data. Once they've settled, the planner says so
-    and offers <span class="font-bold">Check for Updates</span>, which shows any
-    day that's different now and keeps your saved values unless you choose the
-    new ones.
+    The newest days are early data, and sources can update them for about a
+    week. The next time you press <span class="font-bold">Add New Days</span> or
+    <span class="font-bold">Check for Updates</span>, any day that's different
+    now is shown, and your saved values stay unless you choose the new ones.
     <a href="/documentation/weather#saved-weather-days" class="link"
       >Saved weather</a
     >.
