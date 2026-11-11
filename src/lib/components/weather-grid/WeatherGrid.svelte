@@ -157,6 +157,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   });
 
+  /** In a box, the rows' vertical scrollbar (0 when overlaid or not scrolling),
+   matched by the header's right padding so its columns line up. A kept
+   gutter would leave an empty strip when the days fit. */
+  let scrollbarWidth = $state(0);
+
+  $effect(() => {
+    if (scroll !== 'box' || !body) return;
+    const rows = body;
+    const measure = () => {
+      scrollbarWidth = rows.offsetWidth - rows.clientWidth;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(rows);
+    // The rows' height changes with filters
+    if (rows.firstElementChild) observer.observe(rows.firstElementChild);
+    return () => observer.disconnect();
+  });
+
   /** Brings a row into view: `center` it, or just enough to see it (`nearest`) */
   export async function scrollToRow(
     row: number,
@@ -289,9 +308,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:this={header}
     role="rowgroup"
     class={[
-      'bg-surface-100-900 border-surface-200-800 shrink-0 [scrollbar-gutter:stable] overflow-hidden border-b text-sm',
+      'bg-surface-100-900 border-surface-200-800 shrink-0 overflow-hidden border-b text-sm',
       scroll === 'window' ? 'sticky top-(--top-bar-height,0px) z-20' : '',
     ]}
+    style:padding-right={scroll === 'box' && scrollbarWidth
+      ? `${scrollbarWidth}px`
+      : undefined}
   >
     <div
       role="row"
@@ -357,14 +379,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (header && body) header.scrollLeft = body.scrollLeft;
       if (scroll === 'box' && body) virtual.offset = body.scrollTop;
     }}
-    class={[
-      '[scrollbar-gutter:stable]',
-      scroll === 'box' ? 'min-h-0 flex-1 overflow-auto' : 'overflow-x-auto',
-    ]}
+    class={scroll === 'box'
+      ? 'min-h-0 flex-1 overflow-auto'
+      : 'overflow-x-auto'}
   >
+    <!-- Clipped (not a scroller, so the day column still sticks): the last
+     row's icon buttons have tap areas taller than a row (btn-icon's ::after),
+     which would make the rows scroll up and down by a few pixels -->
     <div
       role="rowgroup"
-      class="relative w-full"
+      class="relative w-full overflow-clip"
       style:min-width={minWidth}
       style:height="{rows.length * rowHeight}px"
     >

@@ -203,7 +203,7 @@ device, restored everywhere (see $lib/storage/account-trash). -->
         <!-- As on My Library's list: its picture (a palette, its colors)
         beside its name and when it was deleted, what to do below -->
         <li
-          class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center gap-3 p-2"
+          class="bg-surface-50 dark:bg-surface-950 rounded-container card-border flex w-full items-center gap-3 p-2"
         >
           {#if entry.kind === 'project'}
             <ProjectPicture

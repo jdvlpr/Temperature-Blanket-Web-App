@@ -19,16 +19,16 @@
 export const ROW_FOCUS =
   'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500';
 
-// A palette or project as a card, wherever they're listed: a raised box. Its
-// colors take rounded-*-nested corners, so they follow the box's, less its
-// padding; a picture takes them where it reaches the box's (cardCorners,
-// measured, since its size varies; the box needs data-card). CARD_HOVER steps
-// it darker, when it opens something (and its buttons' hovers a step further,
-// card-hover in main.css).
+// A palette or project as a card, wherever they're listed: a box in the page's
+// own color, outlined by its border. Its colors take rounded-*-nested corners,
+// so they follow the box's, less its padding; a picture takes them where it
+// reaches the box's (cardCorners, measured, since its size varies; the box
+// needs data-card). CARD_HOVER steps it darker, when it opens something (its
+// buttons' usual hover, surface 200/800, is a step further still).
 export const CARD_BOX =
-  'bg-surface-100 dark:bg-surface-900 rounded-container card-border p-2';
+  'bg-surface-50 dark:bg-surface-950 rounded-container card-border p-2';
 export const CARD_HOVER =
-  'card-hover hover:bg-surface-200 dark:hover:bg-surface-800 transition-colors';
+  'hover:bg-surface-100 dark:hover:bg-surface-900 transition-colors';
 
 // For the list itself: its first row rounds its top corners and its last row
 // its bottom ones, like the list does, so a focused row's ring follows the
@@ -41,7 +41,7 @@ export const LIST_ENDS =
 // panel, an external-link icon opens a new tab, and none acts in place (or
 // goes to another page in this tab, as My Projects: it lists this project
 // too, which shouldn't be open in two tabs).
-export const PANEL_LIST = `bg-surface-100 dark:bg-surface-900 rounded-container card-border divide-surface-200-800 flex flex-col divide-y overflow-hidden ${LIST_ENDS}`;
+export const PANEL_LIST = `bg-surface-50 dark:bg-surface-950 rounded-container card-border divide-surface-200-800 flex flex-col divide-y overflow-hidden ${LIST_ENDS}`;
 export const PANEL_ROW = `hover:bg-surface-200-800 flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left transition-colors ${ROW_FOCUS}`;
 /** A PANEL_ROW that isn't a control (the open one, on the Open screens) */
 export const OPEN_NOW_ROW =
