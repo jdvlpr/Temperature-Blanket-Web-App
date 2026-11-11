@@ -1,15 +1,19 @@
-// The deployed site, as a Cloudflare Worker (Workers Builds runs
-// `pnpm build`, then `npx wrangler deploy --config wrangler.production.jsonc`).
+// The deployed site, temperature-blanket.com, as a Cloudflare Worker built from
+// main (Workers Builds runs `pnpm build`, then
+// `npx wrangler deploy --config wrangler.production.jsonc`). wrangler.jsonc stays
+// the local dev and test configuration.
 //
-// Until launch this Worker is the beta at next.temperature-blanket.com, built
-// from release/v7; at launch it builds main and takes temperature-blanket.com
-// (change `routes`, AUTH_ALLOWED_HOSTS stays). wrangler.jsonc stays the local
-// dev and test configuration.
+// It was the version 7 beta at next.temperature-blanket.com. For a few weeks
+// after launch it answers there too (the retired beta: RetiredBetaBanner, Move
+// My Projects to /from-beta, noindex); then that route goes and next.* gets an
+// "ended" redirect. Older versions stay on the Pages project
+// temperature-blanket-web-app as archive-vN branches (archive-vN.temperature-blanket.com).
 //
 // Where settings live:
 // - Build time (PUBLIC_*, SECRET_*, inlined by `pnpm build`): the Worker's
 //   Settings › Build › Variables and secrets, since this file is read only at deploy.
-//   The beta also sets PUBLIC_SITE_CHANNEL=beta and PUBLIC_ACCOUNTS_ENABLED=true.
+//   It sets PUBLIC_ACCOUNTS_ENABLED=true; PUBLIC_SITE_CHANNEL is unset (=beta
+//   only for a beta build).
 // - Runtime, not secret: `vars` below (a deploy replaces what's in the dashboard).
 // - Runtime secrets (BETTER_AUTH_SECRET, GOOGLE_CLIENT_SECRET,
 //   RAVELRY_CLIENT_SECRET, TURNSTILE_SECRET_KEY for guests' beta feedback with
@@ -31,6 +35,8 @@
     "directory": ".svelte-kit/cloudflare",
   },
   "routes": [
+    { "pattern": "temperature-blanket.com", "custom_domain": true },
+    // The retired beta, for a few weeks after launch
     { "pattern": "next.temperature-blanket.com", "custom_domain": true },
   ],
   "workers_dev": false,
@@ -49,8 +55,7 @@
     "ACCOUNTS_ENABLED": "true",
     "SYNC_ENABLED": "true",
     "GALLERY_PUBLISH_ENABLED": "true",
-    // The most accounts there may be (0 = closed to new ones); raise as the beta grows
-    "ACCOUNTS_SIGNUP_LIMIT": "300",
+    // ACCOUNTS_SIGNUP_LIMIT unset: no limit. A number caps accounts (0 closes sign-ups)
     "AUTH_ALLOWED_HOSTS": "next.temperature-blanket.com,temperature-blanket.com",
     "AUTH_PROTOCOL": "https",
     // Google is the only sign-in (EMAIL_SIGN_IN unset), so nothing is emailed
