@@ -26,46 +26,46 @@ import {
 
 // Legacy urls from previous versions of the app
 const legacyRedirects: Handle = async ({ event, resolve }) => {
-  let path = event.url.pathname;
+  const path = event.url.pathname;
 
   // Redirect Project Pages From Info Site
-  let regexPatternInfoProjectPage = /info\/project\/(\d+)\/.*?/;
-  let matchProjectInfoPage = path.match(regexPatternInfoProjectPage);
+  const regexPatternInfoProjectPage = /info\/project\/(\d+)\/.*?/;
+  const matchProjectInfoPage = path.match(regexPatternInfoProjectPage);
   if (matchProjectInfoPage) {
     // Construct the new string
-    let newPath = `/gallery/${matchProjectInfoPage[1]}`;
+    const newPath = `/gallery/${matchProjectInfoPage[1]}`;
     redirect(301, newPath);
   }
 
   // Redirect Project Pages
-  let regexPatternProjectPage = /project\/(\d+)\/.*?/;
-  let matchProjectPage = path.match(regexPatternProjectPage);
+  const regexPatternProjectPage = /project\/(\d+)\/.*?/;
+  const matchProjectPage = path.match(regexPatternProjectPage);
   if (matchProjectPage) {
     // Construct the new string
-    let newPath = `/gallery/${matchProjectPage[1]}`;
+    const newPath = `/gallery/${matchProjectPage[1]}`;
     redirect(301, newPath);
   }
 
   // Redirect What is a Temperature Blanket Info Page
-  let regexPatternWIATB = /info\/what-is-a-temperature-blanket.*?/;
-  let matchWIATB = path.match(regexPatternWIATB);
+  const regexPatternWIATB = /info\/what-is-a-temperature-blanket.*?/;
+  const matchWIATB = path.match(regexPatternWIATB);
   if (matchWIATB) {
     // Construct the new string
-    let newPath = `/documentation/basics/what-is-a-temperature-blanket`;
+    const newPath = `/documentation/basics/what-is-a-temperature-blanket`;
     redirect(301, newPath);
   }
 
   // Redirect all /info pages including slashes
   if (path.includes('/info/') && path.indexOf('/info/') === 0) {
     // Construct the new string
-    let newPath = path.replace('/info/', '/');
+    const newPath = path.replace('/info/', '/');
     redirect(301, newPath);
   }
 
   // Redirect all /info pages not including slashes
   if (path.includes('/info') && path.indexOf('/info') === 0) {
     // Construct the new string
-    let newPath = path.replace('/info', '/');
+    const newPath = path.replace('/info', '/');
     redirect(301, newPath);
   }
 
@@ -83,12 +83,12 @@ const legacyRedirects: Handle = async ({ event, resolve }) => {
 };
 
 const devRedirects: Handle = async ({ event, resolve }) => {
-  let path = event.url.pathname;
+  const path = event.url.pathname;
 
   // Redirect Dev Tools if not in dev
   if (path.startsWith('/.dev-tools/') && !dev) {
     // Construct the new string
-    let newPath = '/';
+    const newPath = '/';
     redirect(302, newPath);
   }
 

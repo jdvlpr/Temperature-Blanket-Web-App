@@ -5,14 +5,14 @@ import type { LocationType } from '#lib/types/location-types.js';
 
 // Mocking $lib modules
 vi.mock('#lib/constants/api-constants.js', async (importOriginal) => ({
-  ...(await importOriginal<any>()),
+  ...(await importOriginal<Record<string, unknown>>()),
   API_SERVICES: {
     openMeteo: { baseURL: 'https://archive-api.open-meteo.com/v1/archive' },
   },
 }));
 
 vi.mock('#lib/constants/weather-constants.js', async (importOriginal) => ({
-  ...(await importOriginal<any>()),
+  ...(await importOriginal<Record<string, unknown>>()),
   MOON_PHASE_NAMES: [
     'New Moon',
     'Waxing Crescent',
@@ -50,9 +50,9 @@ const {
     },
   },
   mockLocations: {
-    all: [] as any[],
+    all: [] as Record<string, unknown>[],
   },
-  mockAllGaugesAttributes: [] as any[],
+  mockAllGaugesAttributes: [] as Record<string, unknown>[],
   mockShowDaysInRange: {
     value: false,
   },
@@ -80,7 +80,7 @@ vi.mock('#lib/state/project-state.svelte.js', () => ({
 
 // Mock utils that are used within weather-state
 vi.mock('#lib/utils/unit-utils.svelte.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     celsiusToFahrenheit: (n: number | null) =>
@@ -92,7 +92,7 @@ vi.mock('#lib/utils/unit-utils.svelte.js', async (importOriginal) => {
 });
 
 vi.mock('#lib/utils/number-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     displayNumber: vi.fn((n: number) => Math.round(n * 100) / 100),
@@ -103,7 +103,7 @@ vi.mock('#lib/utils/number-utils.js', async (importOriginal) => {
 });
 
 vi.mock('#lib/utils/date-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     stringToDate: (s: string) => new Date(s + 'T00:00:00Z'),
@@ -119,7 +119,7 @@ vi.mock('#lib/utils/date-utils.js', async (importOriginal) => {
 });
 
 vi.mock('#lib/utils/color-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     getColorInfo: vi.fn(() => ({
@@ -179,7 +179,7 @@ describe('weather-state', () => {
       vi.mocked(SunCalc.getTimes).mockReturnValue({
         sunrise,
         sunset,
-      } as any);
+      } as never);
 
       const result = getDayTime({ date, lat: 0, lng: 0 });
       expect(result.metric).toBe(720);
@@ -190,7 +190,7 @@ describe('weather-state', () => {
       vi.mocked(SunCalc.getTimes).mockReturnValue({
         sunrise: 'invalid',
         sunset: 'invalid',
-      } as any);
+      } as never);
       const result = getDayTime({ date: new Date(), lat: 0, lng: 0 });
       expect(result.metric).toBeNull();
       expect(result.imperial).toBeNull();
@@ -203,11 +203,11 @@ describe('weather-state', () => {
         {
           tmax: { metric: 10, imperial: 50 },
           tavg: { metric: 5, imperial: 41 },
-        } as any,
+        } as never,
         {
           tmax: { metric: 20, imperial: 68 },
           tavg: { metric: 15, imperial: 59 },
-        } as any,
+        } as never,
       ];
       mockPreferences.value.units = 'metric';
     });
@@ -234,10 +234,10 @@ describe('weather-state', () => {
       weather.rawData = [
         {
           tmax: { metric: 10, imperial: 50 },
-        } as any,
+        } as never,
         {
-          tmax: undefined as any,
-        } as any,
+          tmax: undefined as never,
+        } as never,
       ];
 
       // average of tmax is (10+20)/2 = 15
@@ -245,17 +245,17 @@ describe('weather-state', () => {
       expect(weather.sum('tmax')).toBe(25);
 
       // Restore prototype getter after test
-      // @ts-ignore
+      // @ts-expect-error: removing a property the type requires, to test without it
       delete weather.params;
     });
 
     it('should treat 0 as 1', () => {
-      weather.rawData = [{ tmax: { metric: 0, imperial: 32 } } as any];
+      weather.rawData = [{ tmax: { metric: 0, imperial: 32 } } as never];
       expect(weather.sum('tmax')).toBe(1);
     });
 
     it('should use absolute values', () => {
-      weather.rawData = [{ tmax: { metric: -10, imperial: 14 } } as any];
+      weather.rawData = [{ tmax: { metric: -10, imperial: 14 } } as never];
       expect(weather.sum('tmax')).toBe(10);
     });
   });
@@ -269,14 +269,14 @@ describe('weather-state', () => {
           tmax: { metric: null },
           snow: { metric: null },
           prcp: { metric: null },
-        } as any,
+        } as never,
         {
           tavg: { metric: 10 },
           tmin: { metric: null },
           tmax: { metric: null },
           snow: { metric: null },
           prcp: { metric: null },
-        } as any,
+        } as never,
       ];
       expect(weather.missingDaysCount()).toBe(1);
     });
@@ -286,8 +286,8 @@ describe('weather-state', () => {
     const mockLocation: LocationType = {
       lat: '50',
       lng: '10',
-      from: '2023-01-01' as any,
-      to: '2023-01-02' as any,
+      from: '2023-01-01' as never,
+      to: '2023-01-02' as never,
       label: 'Test Location',
       index: 0,
       stations: null,
@@ -316,12 +316,12 @@ describe('weather-state', () => {
           },
         }),
       };
-      vi.mocked(fetch).mockResolvedValue(mockResponse as any);
+      vi.mocked(fetch).mockResolvedValue(mockResponse as never);
 
       vi.mocked(SunCalc.getTimes).mockReturnValue({
         sunrise: new Date('2023-01-01T06:00:00Z'),
         sunset: new Date('2023-01-01T18:00:00Z'),
-      } as any);
+      } as never);
 
       const data = await weather.getOpenMeteo({ location: mockLocation });
 
@@ -334,7 +334,7 @@ describe('weather-state', () => {
     it('should clamp future "to" date to yesterday', async () => {
       const futureLocation: LocationType = {
         ...mockLocation,
-        to: '2024-01-05' as any,
+        to: '2024-01-05' as never,
       };
 
       vi.mocked(fetch).mockResolvedValue({
@@ -348,7 +348,7 @@ describe('weather-state', () => {
             snowfall_sum: [0],
           },
         }),
-      } as any);
+      } as never);
 
       await weather.getOpenMeteo({ location: futureLocation });
 
@@ -360,11 +360,11 @@ describe('weather-state', () => {
       vi.mocked(fetch).mockResolvedValue({
         status: 503,
         ok: false,
-      } as any);
+      } as never);
 
       await expect(
         weather.getOpenMeteo({ location: mockLocation }),
-      ).rejects.toThrow('Service Temporarily Unavailable');
+      ).rejects.toThrow('Open-Meteo Is Busy');
     });
   });
 
@@ -392,7 +392,7 @@ describe('weather-state', () => {
     });
 
     it('should return undefined if locations.all is not available', () => {
-      mockLocations.all = undefined as any;
+      mockLocations.all = undefined as never;
       expect(weather.getWeatherSourceDetails()).toBeUndefined();
     });
   });
@@ -403,7 +403,7 @@ describe('weather-state', () => {
         {
           tmax: { metric: 20, imperial: 68 },
           moon: 4,
-        } as any,
+        } as never,
       ];
       mockPreferences.value.units = 'metric';
     });

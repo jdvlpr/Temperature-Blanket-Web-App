@@ -39,6 +39,10 @@ import {
 } from '#lib/utils/unit-utils.svelte.js';
 import { getWeatherTargets } from '#lib/utils/weather-utils.svelte.js';
 import { daylightHours } from '#lib/utils/daylight-utils.js';
+import {
+  fetchOpenMeteo,
+  type OpenMeteoAnswer,
+} from '#lib/utils/open-meteo-request.js';
 
 const defaultWeatherSource = (): WeatherSourceOptions => ({
   name: 'Open-Meteo',
@@ -228,38 +232,36 @@ class WeatherClass {
     dayt: (number | null)[] | undefined;
     moon: (MoonPhasesId | null)[] | undefined;
   } = $derived.by(() => {
-    let tmin, tavg, tmax, prcp, snow, dayt, moon;
-
     if (!this.data)
       return {
-        tmin,
-        tavg,
-        tmax,
-        prcp,
-        snow,
-        dayt,
-        moon,
+        tmin: undefined,
+        tavg: undefined,
+        tmax: undefined,
+        prcp: undefined,
+        snow: undefined,
+        dayt: undefined,
+        moon: undefined,
       };
 
-    tmin = this.data.map(
+    const tmin = this.data.map(
       (day) => day.tmin[preferences.value.units ?? 'metric'],
     );
-    tavg = this.data.map(
+    const tavg = this.data.map(
       (day) => day.tavg[preferences.value.units ?? 'metric'],
     );
-    tmax = this.data.map(
+    const tmax = this.data.map(
       (day) => day.tmax[preferences.value.units ?? 'metric'],
     );
-    prcp = this.data.map(
+    const prcp = this.data.map(
       (day) => day.prcp[preferences.value.units ?? 'metric'],
     );
-    snow = this.data.map(
+    const snow = this.data.map(
       (day) => day.snow[preferences.value.units ?? 'metric'],
     );
-    dayt = this.data.map(
+    const dayt = this.data.map(
       (day) => day.dayt[preferences.value.units ?? 'metric'],
     );
-    moon = this.data.map((day) => day.moon);
+    const moon = this.data.map((day) => day.moon);
 
     return {
       tmin,
@@ -457,8 +459,13 @@ class WeatherClass {
 
       // set the _to end date to yesterday, the last day which should be included in the request for weather data
       // We do this by creating a UTC date from the Local String, subtracting 1 day, then formatting back to ISO
-      const yesterday = new Date(todayStrToDate);
-      yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
+      const yesterday = new Date(
+        Date.UTC(
+          todayStrToDate.getUTCFullYear(),
+          todayStrToDate.getUTCMonth(),
+          todayStrToDate.getUTCDate() - 1,
+        ),
+      );
       _to = dateToISO8601String(yesterday);
     }
 
@@ -475,20 +482,15 @@ class WeatherClass {
     )
       url += `&models=${this.source.settings.openMeteo.model}`;
 
-    const response = await fetch(url, { signal: signal.value });
-
-    if (response.status === 503) {
-      // Service Temporarily Unavailable
-      throw new Error(
-        '<p class="font-bold text-xl my-4">Service Temporarily Unavailable</p><p class="mt-4">Please try again.</p>',
-      );
-    }
-
-    const data = await response.json();
+    // Busy (no answer within a minute, or 429/502/503/504) throws its own
+    // message, to try again in a few minutes
+    const answer = await fetchOpenMeteo(url, { signal: signal.value });
+    const response = answer.response;
+    const data = answer.data as OpenMeteoAnswer | null;
 
     if (data?.error === true) {
       // Example Reason: "Parameter 'start_date' is out of allowed range from 1959-01-01 to 2023-02-01"
-      if (data?.reason.includes('is out of allowed range')) {
+      if (data?.reason?.includes('is out of allowed range')) {
         // The end is never past yesterday here, so it's the start (before
         // 1940), or the newest days not in Open-Meteo's archive yet
         let content =
@@ -598,8 +600,13 @@ class WeatherClass {
       const todayStrToDate = stringToDate(todayStr);
 
       for (let index = 0; index < totalDaysInFuture; index += 1) {
-        const _date = new Date(todayStrToDate);
-        _date.setUTCDate(_date.getUTCDate() + index);
+        const _date = new Date(
+          Date.UTC(
+            todayStrToDate.getUTCFullYear(),
+            todayStrToDate.getUTCMonth(),
+            todayStrToDate.getUTCDate() + index,
+          ),
+        );
         const _dayTime = getDayTime({
           date: _date,
           lat: Number(location.lat),
