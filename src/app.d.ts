@@ -3,9 +3,6 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
-  /** PUBLIC_BETA_INVITE_PERCENT at build time, or 0 (see vite.config.ts) */
-  const __BETA_INVITE_PERCENT__: number;
-
   namespace App {
     // interface Error {}
     // interface Locals {}
