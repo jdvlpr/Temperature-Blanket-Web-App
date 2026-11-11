@@ -71,7 +71,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Menu positioning={menuPositioning('bottom-start')}>
   <Menu.Trigger class={menuTriggerClass}>
-    <current.icon aria-hidden="true" />
+    <!-- An if, not <current.icon>: the server draws the default (List), and a
+      dynamic component would hydrate the saved view's icon onto its shapes -->
+    {#if current.value === 'grid'}
+      <LayoutGridIcon aria-hidden="true" />
+    {:else}
+      <LayoutListIcon aria-hidden="true" />
+    {/if}
     <span class={{ 'max-sm:sr-only': compact }}>View</span>
     <ChevronDownIcon class="icon-sm" aria-hidden="true" />
   </Menu.Trigger>
