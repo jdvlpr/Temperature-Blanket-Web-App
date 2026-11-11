@@ -30,23 +30,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // The Project menu: a panel that slides in from the right
   const side = $derived(dialog.options.placement === 'side');
 
-  // The page's scrollbar is hidden while a dialog is open (the page is padded
-  // in its place), and comes back as soon as closing starts, narrowing the
-  // screen under the dialog as it fades out. Measured as a dialog opens,
-  // before the scrollbar goes, so that while closing it keeps the width it
-  // had and doesn't shift sideways.
+  // The page's scrollbar is hidden while a dialog is open. From sm up the
+  // page keeps its room (`scrollbar-gutter: stable` in main.css), so the
+  // screen's width never changes: the dialog keeps its place, and only the
+  // backdrop reaches over that room, open and closing alike, so it never
+  // jumps. Below sm the page is padded in the scrollbar's place instead, and
+  // the scrollbar comes back as soon as closing starts, narrowing the screen
+  // under the dialog as it fades out; there both reach under the scrollbar's
+  // place while closing, so the dialog doesn't shift sideways. Measured as a
+  // dialog opens, before the scrollbar goes.
   let scrollbarWidth = $state(0);
+  let stableGutter = $state(false);
   $effect.pre(() => {
-    if (dialog.opened)
-      scrollbarWidth = Math.max(
-        0,
-        window.innerWidth - document.documentElement.clientWidth,
-      );
+    if (!dialog.opened) return;
+    const root = document.documentElement;
+    scrollbarWidth = Math.max(0, window.innerWidth - root.clientWidth);
+    stableGutter = getComputedStyle(root).scrollbarGutter.startsWith('stable');
   });
-  /** Under the scrollbar's place while closing, for the backdrop and the dialog */
   const closingRight = $derived(
     !dialog.opened && scrollbarWidth ? `right: -${scrollbarWidth}px;` : '',
   );
+  const backdropRight = $derived(
+    stableGutter && scrollbarWidth
+      ? `right: -${scrollbarWidth}px;`
+      : closingRight,
+  );
+  const positionerRight = $derived(stableGutter ? '' : closingRight);
 
   // Below the sm breakpoint a dialog is a bottom sheet
   const phone = new MediaQuery('(max-width: 639.98px)');
@@ -441,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     in from the right (the site menu comes from the left) -->
     <Dialog.Backdrop
       class="bg-surface-950/35 fixed inset-0 z-60 dark:bg-black/55"
-      style="{closingRight}{backdropLook(
+      style="{backdropRight}{backdropLook(
         grabbable ? 1 - dragProgress : 1,
       )}; transition: {dragging || reduceMotion
         ? 'none'
@@ -458,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         'fixed inset-0 z-60 flex items-center justify-center',
         side ? 'items-stretch justify-end' : 'max-sm:items-end',
       ]}
-      style={`${closingRight}${
+      style={`${positionerRight}${
         visibleArea
           ? `top: ${visibleArea.top}px; bottom: auto; height: ${visibleArea.height}px`
           : ''
