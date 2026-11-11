@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-This file is committed per branch on purpose: branches differ (e.g. `main` has no accounts code; `release/v7` does), so keep it describing what exists on _this_ branch. Workspace-wide notes (sibling iOS app and WordPress plugin, issue tracking) live in the parent folder's CLAUDE.md.
+This file is committed per branch on purpose: branches differ (e.g. `main` has accounts and sync; the `archive-vN` branches, older versions, don't), so keep it describing what exists on _this_ branch. Workspace-wide notes (sibling iOS app and WordPress plugin, issue tracking) live in the parent folder's CLAUDE.md.
 
 ## Overview
 
