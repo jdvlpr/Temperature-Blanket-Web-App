@@ -31,8 +31,18 @@
 //      { type: 'tb-handoff-done', version: 1, imported, skipped }.
 //
 // Nothing is sent back but counts. Pure: the page does the storing.
+//
+// After launch it runs the other way: the beta's address answers with the main
+// site's build for a few weeks, and its Move My Projects (modals/MoveToMainSite)
+// opens <main site>/from-beta, which takes messages only from the beta's
+// address (BETA_ORIGIN). Only projects that aren't in an account are sent: those
+// that are have reached the account already, and copies of them would come back
+// as sync conflicts.
 
-import type { StoredProject } from '#lib/storage/projects.svelte.js';
+import type {
+  StoredProject,
+  StoredProjectIndexItem,
+} from '#lib/storage/projects.svelte.js';
 import { rehomeHref } from '#lib/sync/engine.js';
 import { PROJECT_ID_PATTERN } from '#lib/utils/project-id-utils.js';
 
@@ -135,4 +145,49 @@ export function planImport(
     });
   }
   return { save, skipped };
+}
+
+/** Whether a message is the receiving page saying it's ready for the projects */
+export const isReady = (data: unknown): data is HandoffReady =>
+  isRecord(data) &&
+  data.type === 'tb-handoff-ready' &&
+  data.version === HANDOFF_VERSION;
+
+/** The receiving page's counts once it has saved them, or null for other messages */
+export function readDone(
+  data: unknown,
+): { imported: number; skipped: number } | null {
+  if (!isRecord(data) || data.type !== 'tb-handoff-done') return null;
+  if (data.version !== HANDOFF_VERSION) return null;
+  const imported = Number(data.imported);
+  const skipped = Number(data.skipped);
+  if (!Number.isFinite(imported) || !Number.isFinite(skipped)) return null;
+  return { imported, skipped };
+}
+
+/** The message carrying the projects */
+export const projectsMessage = (projects: HandedProject[]) => ({
+  type: 'tb-handoff-projects' as const,
+  version: HANDOFF_VERSION,
+  projects,
+});
+
+/** The saved projects worth moving: those that aren't in an account */
+export const projectsToMove = (index: StoredProjectIndexItem[]) =>
+  index.filter((item) => !item.sync).map((item) => item.id);
+
+/**
+ * The saved projects with these IDs, read one by one; those that can't be
+ * read are left out
+ */
+export async function collectProjects(
+  ids: string[],
+  read: (id: string) => Promise<StoredProject | null>,
+): Promise<HandedProject[]> {
+  const projects: HandedProject[] = [];
+  for (const id of ids) {
+    const project = await read(id).catch(() => null);
+    if (project) projects.push({ id, project });
+  }
+  return projects;
 }

@@ -17,7 +17,14 @@
 // next.temperature-blanket.com) or the main site, PUBLIC_BASE_URL.
 
 import { PUBLIC_BASE_URL } from '$app/env/public';
-import { lastingOriginFor, originOf } from '#lib/utils/site-origin.js';
+import {
+  BETA_ORIGIN,
+  isRetiredBeta,
+  lastingOriginFor,
+  originOf,
+} from '#lib/utils/site-origin.js';
+
+export { BETA_ORIGIN };
 
 /** Whether this build is the beta */
 export const IS_BETA = __SITE_BETA__;
@@ -31,3 +38,11 @@ export const MAIN_SITE_ORIGIN = originOf(PUBLIC_BASE_URL);
  */
 export const lastingOrigin = (here: string = window.location.origin) =>
   lastingOriginFor(here, { beta: IS_BETA, main: MAIN_SITE_ORIGIN });
+
+/**
+ * Whether this page is the main site's build at the beta's address (after
+ * launch, for a few weeks): it says the beta is over and moves projects saved
+ * only in this browser to the main site. Browser only.
+ */
+export const onRetiredBeta = (here: string = window.location.origin) =>
+  isRetiredBeta(here, IS_BETA);

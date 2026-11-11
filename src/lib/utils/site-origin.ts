@@ -16,7 +16,12 @@
 // Which site a link that lasts points to. The beta (next.temperature-blanket.com)
 // closes after launch, so what it leaves behind (gallery pages' links, their
 // Copy Link, Ravelry notes) points to the main site, which has the same pages.
+// After launch the main site's build also answers at the beta's address for a
+// few weeks (the retired beta), and links made there point to the main site too.
 // Pure; `#lib/constants/site.ts` binds it to this build.
+
+/** The beta's address, during the beta and for a few weeks after launch */
+export const BETA_ORIGIN = 'https://next.temperature-blanket.com';
 
 /** A URL's origin ("https://temperature-blanket.com"), or null */
 export function originOf(url: string | null | undefined): string | null {
@@ -29,13 +34,20 @@ export function originOf(url: string | null | undefined): string | null {
   }
 }
 
-/** The origin for links that last: the main site in the beta, else this one */
+/**
+ * The origin for links that last: the main site in the beta's build or at the
+ * beta's address, else this one
+ */
 export function lastingOriginFor(
   here: string,
   { beta, main }: { beta: boolean; main: string | null },
 ): string {
-  return beta && main ? main : here;
+  return (beta || here === BETA_ORIGIN) && main ? main : here;
 }
+
+/** Whether this is the main site's build answering at the beta's address */
+export const isRetiredBeta = (here: string, beta: boolean) =>
+  !beta && here === BETA_ORIGIN;
 
 /** `url` (absolute) moved to `origin`, its path, query and hash kept */
 export function withOrigin(url: string, origin: string): string {

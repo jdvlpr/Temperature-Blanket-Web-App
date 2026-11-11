@@ -1,0 +1,8 @@
+# Cloudflare headers for static files (prerendered pages, /_app/*, images),
+# which are served without the Worker; hooks.server.ts sets the same for what
+# the Worker answers. The adapter adds its own rules for /_app/immutable/*.
+#
+# After launch the beta's address answers with the main site's build for a few
+# weeks: search engines list only the main site.
+https://next.temperature-blanket.com/*
+  X-Robots-Tag: noindex

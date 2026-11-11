@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import type { StoredProjectIndexItem } from '#lib/storage/projects.svelte.js';
 import {
   MAX_HANDOFF_PROJECTS,
+  collectProjects,
+  doneMessage,
+  isReady,
   isStoredProject,
   planImport,
+  projectsMessage,
+  projectsToMove,
+  readDone,
   readHandoff,
+  readyMessage,
 } from './beta-handoff';
 
 const v6Project = (id: string) => ({
@@ -100,5 +108,42 @@ describe('planImport', () => {
     );
     expect(save.map((p) => p.id)).toEqual(['2']);
     expect(skipped).toEqual(['1']);
+  });
+});
+
+describe('the sending side', () => {
+  it('knows the receiving page’s messages', () => {
+    expect(isReady(readyMessage())).toBe(true);
+    expect(isReady({ type: 'tb-handoff-ready', version: 2 })).toBe(false);
+    expect(readDone(doneMessage(3, 1))).toEqual({ imported: 3, skipped: 1 });
+    expect(readDone({ type: 'tb-handoff-done', version: 1 })).toBeNull();
+    expect(readDone(readyMessage())).toBeNull();
+  });
+
+  it('sends what the receiving page reads', () => {
+    const sent = projectsMessage([
+      { id: '1', project: v6Project('1') as never },
+    ]);
+    expect(readHandoff(sent)?.projects.map((p) => p.id)).toEqual(['1']);
+  });
+
+  it('moves only projects that aren’t in an account', () => {
+    const item = (id: string, synced: boolean) =>
+      ({
+        id,
+        meta: { date: '', href: '', title: '', isCustomWeatherData: false },
+        ...(synced && { sync: {} }),
+      }) as StoredProjectIndexItem;
+    expect(projectsToMove([item('1', false), item('2', true)])).toEqual(['1']);
+  });
+
+  it('leaves out projects that can’t be read', async () => {
+    const read = async (id: string) => {
+      if (id === 'gone') return null;
+      if (id === 'broken') throw new Error('unreadable');
+      return v6Project(id) as never;
+    };
+    const projects = await collectProjects(['1', 'gone', 'broken', '2'], read);
+    expect(projects.map((p) => p.id)).toEqual(['1', '2']);
   });
 });

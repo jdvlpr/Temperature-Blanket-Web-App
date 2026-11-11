@@ -16,6 +16,7 @@ import { redirect } from '@sveltejs/kit';
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { dev } from '$app/env';
+import { BETA_ORIGIN } from '#lib/utils/site-origin.js';
 import { THEMES, SKELETON_THEMES } from '#lib/constants/page-constants.js';
 import {
   sequence,
@@ -152,9 +153,10 @@ const themeCookies: Handle = async ({ event, resolve }) => {
 
 // The beta closes after launch: search engines list only the main site. Its
 // pages say so too (the root layout's robots meta), as prerendered ones never
-// come through here.
+// come through here. After launch the beta's address answers with this build
+// for a few weeks: the same (and the root _headers file, for prerendered pages).
 const betaNoIndex: Handle = async ({ event, resolve }) => {
-  if (!__SITE_BETA__) return resolve(event);
+  if (!__SITE_BETA__ && event.url.origin !== BETA_ORIGIN) return resolve(event);
   const response = await resolve(event);
   try {
     response.headers.set('X-Robots-Tag', 'noindex');

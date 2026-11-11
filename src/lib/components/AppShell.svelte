@@ -23,6 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { motion } from '#lib/utils/feedback.svelte.js';
   import { openBetaWarning } from '#lib/utils/open-beta-warning.js';
+  import { onRetiredBeta } from '#lib/constants/site.js';
+  import { isThumbnailFrame } from '#lib/storage/thumbnails.js';
   import { dev } from '$app/env';
   import { page } from '$app/state';
   import { MenuIcon, PanelLeftClose, PanelLeftOpen } from '@lucide/svelte';
@@ -32,6 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { TransitionConfig } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
   import BetaBanner from './BetaBanner.svelte';
+  import RetiredBetaBanner from './RetiredBetaBanner.svelte';
   import { weatherChart } from './WeatherChart.svelte';
   import WhatsNewBanner from './WhatsNewBanner.svelte';
 
@@ -46,7 +49,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // The beta's warning, on the first page of a visit, and its one question
   // after a few minutes (utils/beta-feedback-toast.ts)
+  // At the beta's address after launch (only known in the browser)
+  let retiredBeta = $state(false);
+
   onMount(() => {
+    retiredBeta = onRetiredBeta() && !isThumbnailFrame();
     openBetaWarning(page.url.pathname);
     if (__SITE_BETA__)
       void import('#lib/utils/beta-feedback-toast.js').then((module) =>
@@ -146,6 +153,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <!-- Above the top bar, the window's full width, scrolling away with the page -->
   {#if __SITE_BETA__ && !dev}
     <BetaBanner />
+  {:else if retiredBeta}
+    <RetiredBetaBanner />
   {/if}
   <div
     class="bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]"
@@ -268,7 +277,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <!-- Clear of the sidebar: with PAGE's gutter, 1.5rem -->
       <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
-        {#if !__SITE_BETA__}
+        {#if !__SITE_BETA__ && !retiredBeta}
           <WhatsNewBanner />
         {/if}
         {@render main?.()}

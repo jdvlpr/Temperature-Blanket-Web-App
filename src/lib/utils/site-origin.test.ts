@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { lastingOriginFor, originOf, withOrigin } from './site-origin';
+import {
+  BETA_ORIGIN,
+  isRetiredBeta,
+  lastingOriginFor,
+  originOf,
+  withOrigin,
+} from './site-origin';
 
 const MAIN = 'https://temperature-blanket.com';
 const BETA = 'https://next.temperature-blanket.com';
@@ -18,9 +24,28 @@ describe('lastingOriginFor', () => {
     expect(lastingOriginFor(BETA, { beta: true, main: MAIN })).toBe(MAIN);
   });
 
+  it('is the main site at the beta’s address after launch', () => {
+    expect(lastingOriginFor(BETA, { beta: false, main: MAIN })).toBe(MAIN);
+  });
+
   it('is this site otherwise, or when the main one isn’t known', () => {
-    expect(lastingOriginFor(BETA, { beta: false, main: MAIN })).toBe(BETA);
+    expect(lastingOriginFor(MAIN, { beta: false, main: MAIN })).toBe(MAIN);
+    expect(
+      lastingOriginFor('http://localhost:5173', { beta: false, main: MAIN }),
+    ).toBe('http://localhost:5173');
     expect(lastingOriginFor(BETA, { beta: true, main: null })).toBe(BETA);
+  });
+});
+
+describe('isRetiredBeta', () => {
+  it('is the main site’s build at the beta’s address', () => {
+    expect(BETA_ORIGIN).toBe(BETA);
+    expect(isRetiredBeta(BETA, false)).toBe(true);
+  });
+
+  it('isn’t the beta itself, or anywhere else', () => {
+    expect(isRetiredBeta(BETA, true)).toBe(false);
+    expect(isRetiredBeta(MAIN, false)).toBe(false);
   });
 });
 
