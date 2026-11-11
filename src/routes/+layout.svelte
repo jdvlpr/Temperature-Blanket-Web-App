@@ -31,8 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import { ICONS } from '$lib/constants/icon-constants';
-  import { RssIcon, SquarePlayIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -181,20 +180,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<!-- <div
+<div
   class="flex w-full flex-col [view-transition-name:top-banner]"
   id="top-banner"
 >
-  <div class="bg-secondary-100-900 w-full p-2 text-center">
+  <div
+    class="bg-secondary-950-50 text-surface-contrast-light dark:text-surface-contrast-dark w-full p-2 text-center"
+  >
+    This is an archived version of this web app.
     <a
-      href="/blog/2026-07-09-version-6"
-      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
+      href="https://temperature-blanket.com"
+      target="_blank"
+      class="btn preset-tonal-primary hover:preset-tonal-surface whitespace-pre-wrap"
     >
-      <RssIcon />
-      News | Version 6: Improved Sun Position Accuracy
+      Main Version
+      <ExternalLinkIcon />
     </a>
   </div>
-</div> -->
+</div>
 
 {@render children?.()}
 
