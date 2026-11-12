@@ -19,24 +19,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '#lib/components/WeatherItem.svelte';
   import WeatherNavigator from '#lib/components/WeatherNavigator.svelte';
   import HelpIcon from '#lib/components/buttons/HelpIcon.svelte';
-  import ChooseWeatherSource from '#lib/components/modals/ChooseWeatherSource.svelte';
-  import {
-    METEOSTAT_DELAY_DAYS,
-    OPEN_METEO_DELAY_DAYS,
-    UNIT_LABELS,
-  } from '#lib/constants/weather-constants.js';
+  import WeatherNotes, {
+    readWeatherNotes,
+  } from '#lib/components/modals/WeatherNotes.svelte';
+  import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
-  import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { convertTime } from '#lib/utils/unit-utils.svelte.js';
   import { displayNumber, getAverage } from '#lib/utils/number-utils.js';
-  import { isDateWithinLastSevenDays } from '#lib/utils/date-utils.js';
   import { pluralize } from '#lib/utils/string-utils.js';
-  import { CloudAlert, TriangleAlertIcon } from '@lucide/svelte';
-  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { noticeLabel } from '#lib/utils/weather-notes.js';
+  import { TriangleAlertIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import WeatherToolbar from '#lib/components/WeatherToolbar.svelte';
 
@@ -63,70 +59,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  function getMissingDataMerged(missingData: any[]) {
-    let _countsofTMinTAvgTMax = [...missingData];
-    _countsofTMinTAvgTMax.length = 3;
-    const areAllTempsTheSame = _countsofTMinTAvgTMax.every(
-      (item) => item.count === _countsofTMinTAvgTMax[0].count,
-    );
-    if (areAllTempsTheSame) {
-      return [
-        {
-          count: missingTmin.length,
-          label: 'low, average, and high',
-          type: 'temperature',
-        },
-        {
-          count: missingPrcp.length,
-          label: 'rain',
-          type: 'height',
-        },
-        {
-          count: missingSnow.length,
-          label: 'snow',
-          type: 'height',
-        },
-      ];
-    } else return missingData;
-  }
-
-  let missingTmin = $derived(
-    weather.params.tmin?.filter((n) => n === null) ?? [],
-  );
-  let missingTavg = $derived(
-    weather.params.tavg?.filter((n) => n === null) ?? [],
-  );
-  let missingTmax = $derived(
-    weather.params.tmax?.filter((n) => n === null) ?? [],
-  );
-  let missingPrcp = $derived(
-    weather.params.prcp?.filter((n) => n === null) ?? [],
-  );
-  let missingSnow = $derived(
-    weather.params.snow?.filter((n) => n === null) ?? [],
-  );
-  let missingData = $derived([
-    {
-      count: missingTmin.length,
-      label: 'low',
-      type: 'temperature',
-    },
-    {
-      count: missingTavg.length,
-      label: 'average',
-      type: 'temperature',
-    },
-    {
-      count: missingTmax.length,
-      label: 'high',
-      type: 'temperature',
-    },
-    { count: missingPrcp.length, label: 'rain', type: 'height' },
-    { count: missingSnow.length, label: 'snow', type: 'height' },
-  ]);
-  let isDataMissing = $derived(
-    !!missingTmin.length || !!missingTavg.length || !!missingTmax.length,
-  );
   let tMinDay = $derived(
     weather.data
       .map((day, index) => {
@@ -153,13 +85,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : curr,
       ) || null,
   );
-  let missingDataMerged = $derived(getMissingDataMerged(missingData));
+  const notes = $derived(readWeatherNotes());
 
-  let projectHasRecentWeatherData = $derived(
-    weather.data?.some((date) => {
-      return isDateWithinLastSevenDays(date?.date);
-    }),
-  );
+  function openNotes() {
+    dialog.trigger({
+      type: 'component',
+      component: { ref: WeatherNotes },
+      options: { title: 'About This Weather', size: 'small' },
+    });
+  }
 </script>
 
 <!-- Centered, like the rest of the planner; rows that scroll sideways are
@@ -199,64 +133,19 @@ centered as blocks so their first items never clip -->
     </p>
   {/if}
 
-  {#if projectHasRecentWeatherData}
-    <div class="w-fit max-w-(--breakpoint-sm) text-left text-sm">
-      <Popover>
-        <Popover.Trigger
-          class="btn hover:preset-tonal-surface text-warning-800-200 text-left text-sm whitespace-pre-wrap"
-        >
-          <TriangleAlertIcon />
-          <p>
-            Weather within the past {weather.source.name === 'Open-Meteo'
-              ? OPEN_METEO_DELAY_DAYS
-              : weather.source.name === 'Meteostat'
-                ? METEOSTAT_DELAY_DAYS
-                : 'few'} days may be revised as new data comes in.
-          </p>
-        </Popover.Trigger>
-        <Portal>
-          <Popover.Positioner>
-            <Popover.Content
-              class="card bg-surface-200-800 z-49 w-[90vw] max-w-screen-md p-4 shadow-xl"
-            >
-              {#snippet element(attributes)}
-                {#if !attributes.hidden}
-                  <div {...attributes} transition:safeSlide>
-                    <Popover.Description>
-                      Weather data comes from <a
-                        href="https://open-meteo.com/"
-                        target="_blank"
-                        class="link">Open-Meteo</a
-                      >
-                      or
-                      <a
-                        href="https://meteostat.net"
-                        target="_blank"
-                        class="link">Meteostat</a
-                      >, and for some locations their weather models may take up
-                      to a week to incorporate the latest information. Sometimes
-                      even older weather data is updated. Consider working at
-                      least {weather.source.name === 'Open-Meteo'
-                        ? OPEN_METEO_DELAY_DAYS
-                        : weather.source.name === 'Meteostat'
-                          ? METEOSTAT_DELAY_DAYS
-                          : 'a few'} days behind to account for possible changes.
-                      Sorry for any inconvenience.
-                    </Popover.Description>
-
-                    <Popover.Arrow
-                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
-                    >
-                      <Popover.ArrowTip />
-                    </Popover.Arrow>
-                  </div>
-                {/if}
-              {/snippet}
-            </Popover.Content>
-          </Popover.Positioner>
-        </Portal>
-      </Popover>
-    </div>
+  {#if notes.missing || notes.recentDates.length}
+    <button
+      type="button"
+      class="btn hover:preset-tonal-surface text-warning-800-200 h-auto max-w-full text-left text-sm whitespace-normal"
+      onclick={openNotes}
+    >
+      <TriangleAlertIcon />
+      {noticeLabel({
+        missing: notes.missing,
+        recent: notes.recentDates.length,
+        unit: notes.unit,
+      })}
+    </button>
   {/if}
 
   <div
@@ -412,94 +301,6 @@ centered as blocks so their first items never clip -->
     {/if}
   {:else}
     <div class="my-36"><Spinner /></div>
-  {/if}
-</div>
-
-<div class="flex w-full flex-col items-center gap-4">
-  {#if isDataMissing}
-    <div
-      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-start gap-2 text-left text-sm"
-    >
-      <Popover>
-        <Popover.Trigger
-          class="btn hover:preset-tonal-surface text-warning-800-200 text-left text-sm whitespace-pre-wrap"
-        >
-          <CloudAlert size="18" />
-          There's some missing data
-        </Popover.Trigger>
-        <Portal>
-          <Popover.Positioner>
-            <Popover.Content
-              class="card bg-surface-200-800 z-49 w-[90vw] max-w-screen-md p-4 shadow-xl"
-            >
-              {#snippet element(attributes)}
-                {#if !attributes.hidden}
-                  <div {...attributes} transition:safeSlide>
-                    <Popover.Description>
-                      {#each missingDataMerged as { count, type, label }}
-                        {#if count && count < weather.data?.length}
-                          {count}
-                          {pluralize(weather.grouping, count)} with missing {label}
-                          {pluralize(type, count)}.
-                        {:else if count && count === weather.data?.length}
-                          No days have {label}
-                          {type} data.
-                        {/if}
-                      {/each}
-                      <div class="mt-2 flex flex-col gap-2">
-                        <div>
-                          <p class="">
-                            If you want, here are some ways you can try to fix
-                            missing data:
-                          </p>
-                          <div class="ml-4 flex flex-col">
-                            <p>
-                              - Search for a different location or dates. Use
-                              only dates that are in the past.
-                            </p>
-                            <p>
-                              - Choose a different
-                              <button
-                                class="link"
-                                onclick={() => {
-                                  dialog.trigger({
-                                    type: 'component',
-                                    component: {
-                                      ref: ChooseWeatherSource,
-                                    },
-                                    options: {
-                                      title: 'Weather Source',
-                                      size: 'small',
-                                    },
-                                  });
-                                }}>Weather Source</button
-                              >.
-                            </p>
-                            <p>
-                              - Edit the table below to fill in missing values.
-                            </p>
-                          </div>
-                        </div>
-                        <p class="">
-                          You can also continue using the Project Planner, but
-                          some features may not be as useful—especially if
-                          there's a lot of missing weather data.
-                        </p>
-                      </div>
-                    </Popover.Description>
-                    <Popover.Arrow
-                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
-                    >
-                      <Popover.ArrowTip />
-                    </Popover.Arrow>
-                  </div>
-                {/if}
-              {/snippet}
-            </Popover.Content>
-          </Popover.Positioner>
-        </Portal>
-      </Popover>
-    </div>
   {/if}
 </div>
 

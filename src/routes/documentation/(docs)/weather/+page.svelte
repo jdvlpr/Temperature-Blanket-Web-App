@@ -393,19 +393,23 @@ HELP_TOPICS). -->
     <span class="font-bold">Service Temporarily Unavailable</span> means it's busy:
     try again shortly.
   </p>
-  <h3 class="text-lg font-bold">"There's some missing data"</h3>
+  <h3 class="text-lg font-bold">"Days missing values"</h3>
   <p>
-    Some days are missing a value, and it says which. Try another source or
-    model, a place nearby, or <a href="#edit-weather-data" class="link"
-      >fill them in yourself</a
-    >. You can keep going as it is, too.
+    Above the weather summary, a line says how many days are missing a value.
+    Press it to see which values, then <span class="font-bold"
+      >Fill In Missing</span
+    >
+    (<a href="#edit-weather-data" class="link">fill them in yourself</a>) or try
+    another source or model, or a place nearby. You can keep going as it is,
+    too.
   </p>
   <h3 class="text-lg font-bold">The newest days change</h3>
   <p>
     Weather services can take up to a week to settle the latest days. When your
-    project includes recent days, the Project Planner says so, and once they've
-    settled it suggests <a href="#saved-weather-days" class="link"
-      >Check for Updates</a
+    project includes recent days, the same line says so (press it for which
+    days), and once they've settled it suggests <a
+      href="#saved-weather-days"
+      class="link">Check for Updates</a
     >. Saved days never change on their own. To be safe, stay about
     {OPEN_METEO_DELAY_DAYS} days behind with Open-Meteo, or {METEOSTAT_DELAY_DAYS}
     with Meteostat.
