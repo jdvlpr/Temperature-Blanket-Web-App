@@ -76,6 +76,26 @@ jobs:
       - name: Run Unit Tests
         if: steps.tag.outputs.skip != 'true'
         run: pnpm test:unit
+        # src/env.ts requires these to be set; placeholders are enough for unit tests.
+        env:
+          PUBLIC_MICROSOFT_CLARITY_ID: ci
+          PUBLIC_BASE_URL: https://temperature-blanket.com
+          PUBLIC_SITE_TITLE: Temperature Blanket
+          PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK: https://example.com
+          PUBLIC_KOFI_LINK: https://example.com
+          PUBLIC_WORDPRESS_BASE_URL: https://example.com
+          PUBLIC_BASE_DOMAIN_NAME: temperature-blanket.com
+          PUBLIC_FACEBOOK_LINK: https://example.com
+          PUBLIC_GITHUB_LINK: https://example.com
+          SECRET_RAPID_API_PROXY_HEADER_KEY: ci
+          SECRET_METEOSTAT_API_KEY: ci
+          SECRET_METEOSTAT_DEV_API_KEY: ci
+          SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY: ci
+          SECRET_GEONAMES_USERNAME: ci
+          PUBLIC_GOOGLE_API_KEY: ci
+          PUBLIC_GOOGLE_CLIENT_ID: ci
+          PUBLIC_SUPPORTERS: ci
+          PUBLIC_COOLORS_LINK: https://example.com
 
       - name: Create Tag and Release
         if: steps.tag.outputs.skip != 'true'
