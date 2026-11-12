@@ -1,54 +1,89 @@
 name: Publish Release
 
+# Releases when the version in package.json changes: a push to main that
+# touches package.json tags v<version> and publishes its GitHub Release, unless
+# that tag already exists. A tag pushed by hand (v*) is released the same way,
+# and "Run workflow" checks the current version on demand.
+#
+# One workflow on purpose: a tag created with GITHUB_TOKEN doesn't trigger
+# other workflows, so tagging and releasing happen here together.
+
 on:
   push:
+    branches:
+      - main
+    paths:
+      - package.json
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
-    name: Create GitHub Release
+    name: Tag and Create GitHub Release
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Decide Tag
+        id: tag
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            TAG="$GITHUB_REF_NAME"
+            # A hand-pushed tag exists already; release it unless it has a release.
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              echo "$TAG already has a release; nothing to do."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            TAG="v$(node -p "require('./package.json').version")"
+            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+              echo "$TAG already released; nothing to do."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Tag: $TAG"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Install pnpm
+        if: steps.tag.outputs.skip != 'true'
         uses: pnpm/action-setup@v4
         with:
           version: 9
 
       - name: Setup Node.js
+        if: steps.tag.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'pnpm'
 
       - name: Install Dependencies
+        if: steps.tag.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
 
-      # - name: Copy Environment Variables
-      #   run: cp .env.example .env
-
-      # - name: Run Svelte Check
-      #   run: pnpm check
-
-      # - name: Run Linter
-      #   run: pnpm lint
-
       - name: Run Unit Tests
+        if: steps.tag.outputs.skip != 'true'
         run: pnpm test:unit
 
-      # - name: Build Application
-      #   run: pnpm build
-
-      - name: Create Release
+      - name: Create Tag and Release
+        if: steps.tag.outputs.skip != 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.tag.outputs.tag }}
           generate_release_notes: true
           draft: false
           prerelease: false
