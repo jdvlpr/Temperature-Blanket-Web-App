@@ -85,6 +85,7 @@ Server unit tests that need a database use `src/lib/server/test-d1.ts`, an in-me
 ## Testing conventions
 
 - Unit tests are colocated next to the code as `*.test.ts`.
+- Dates: a weather day is the instant of midnight UTC on its date, so build days with `Date.UTC`/`stringToDate`, read them with `getUTC*` and format them with `timeZone: 'UTC'`; "today" is the user's day (`localToday()`); real moments (saved, published) show in local time. `pnpm test:unit:tz` runs the unit tests at UTC−11 and UTC+14, where any mix fails; run it after date changes. A test that fakes the clock picks local noon (`new Date(2024, 0, 1, 12)`), not a `Z` time.
 - `tests/integration/` hits real dev-server routes (yarn colorway API).
 - Under `tests/cloudflare/`, give pages a test IP with `useTestIp()` (helpers.ts), never `setExtraHTTPHeaders`: Cloudflare refuses a `CF-Connecting-IP` header sent to its own sites, such as Turnstile's.
 - `tests/end-to-end/test-*.spec.ts` run against the preview build; `tests/cloudflare/` covers accounts, sync and gallery routes and only runs under `pnpm test:e2e:cloudflare`.

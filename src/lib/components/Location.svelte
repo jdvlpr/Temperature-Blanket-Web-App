@@ -26,11 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     LocationSuggestion,
   } from '#lib/types/location-types.js';
   import type { TISO8601DateString } from '#lib/types/weather-types.js';
-  import {
-    dateToISO8601String,
-    stringToDate,
-    yearFrom,
-  } from '#lib/utils/date-utils.js';
+  import { stringToDate, yearFrom } from '#lib/utils/date-utils.js';
+  import { addDays, localToday } from '#lib/utils/weather-days.js';
   import { displayGeoNamesErrorMessage } from '#lib/utils/error-utils.svelte.js';
   import {
     getSuggestions,
@@ -263,11 +260,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // Get's the date of yesterday to set the max date
+  // The user's yesterday, as the weather search stops there (not UTC's)
   function getYesterday() {
-    const yesterday = new Date(
-      new Date().setUTCDate(new Date().getUTCDate() - 1),
-    );
-    return dateToISO8601String(yesterday);
+    return addDays(localToday(), -1);
   }
 
   function getLastYear() {

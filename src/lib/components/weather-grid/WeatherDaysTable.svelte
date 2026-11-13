@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { openEditWeather } from '#lib/utils/open-edit-weather.js';
   import { openProgress } from '#lib/utils/open-progress.js';
   import { convertTime } from '#lib/utils/unit-utils.svelte.js';
-  import type { DayKey } from '#lib/utils/weather-days.js';
+  import { localToday, type DayKey } from '#lib/utils/weather-days.js';
   import type { EditableParam } from '#lib/utils/weather-edits.js';
   import {
     applyFilters,
@@ -167,7 +167,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // one as a blank box) and its picker opens there
   let picked = $state('');
   const goTo = $derived(picked || all[0]?.date || '');
-  const today = new Date().toISOString().slice(0, 10);
+  // The user's day, not UTC's (evenings west of UTC are already tomorrow there)
+  const today = localToday();
   const hasToday = $derived(!byWeek && all.some((row) => row.date === today));
 
   async function go(date: string) {

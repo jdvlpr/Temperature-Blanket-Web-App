@@ -346,13 +346,15 @@ export const getLocationsFromMeta = (
     // Before version 3.36.0, projects' location from and to dates were saved in the user's locale format,
     // which means different project's displayed other locale's formats, not always the user's locale formate.
     // So if possible, we convert non-user locale dates into the user's locale format.
+    // "2024-03-13" parses as UTC midnight; any other format ("3/13/2024") as
+    // local midnight, so it's shown in local time, or it's a day early east of UTC
+    const show = (date: string) =>
+      new Date(date).toLocaleDateString(undefined, {
+        timeZone: /^\d{4}-\d{2}-\d{2}$/.test(date) ? 'UTC' : undefined,
+      });
     if (isValidDate(from) && isValidDate(to)) {
-      from = new Date(from).toLocaleDateString(undefined, {
-        timeZone: 'UTC',
-      });
-      to = new Date(to).toLocaleDateString(undefined, {
-        timeZone: 'UTC',
-      });
+      from = show(from);
+      to = show(to);
     }
 
     return { label, from, to };

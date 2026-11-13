@@ -15,6 +15,7 @@
     "format": "prettier --plugin-search-dir . --write .",
     "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
     "test:unit": "vitest run src",
+    "test:unit:tz": "TZ=Pacific/Pago_Pago vitest run src && TZ=Pacific/Kiritimati vitest run src",
     "test:integration": "node scripts/test-integration.js",
     "test:e2e": "playwright test",
     "test:e2e:cloudflare": "playwright test --config playwright.cloudflare.config.ts",

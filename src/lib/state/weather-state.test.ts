@@ -107,10 +107,11 @@ vi.mock('#lib/utils/date-utils.js', async (importOriginal) => {
   return {
     ...actual,
     stringToDate: (s: string) => new Date(s + 'T00:00:00Z'),
+    // In UTC, like the real one (local getters put days a day early west of UTC)
     dateToISO8601String: (d: Date) => {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const year = d.getUTCFullYear();
+      const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     },
     numberOfDays: (d1: Date, d2: Date) =>
@@ -296,7 +297,8 @@ describe('weather-state', () => {
     beforeEach(() => {
       vi.stubGlobal('fetch', vi.fn());
       vi.useFakeTimers();
-      vi.setSystemTime(new Date('2024-01-01T12:00:00Z'));
+      // Noon here, so "today" is Jan 1 in every timezone (the code uses the local day)
+      vi.setSystemTime(new Date(2024, 0, 1, 12));
     });
 
     afterEach(() => {

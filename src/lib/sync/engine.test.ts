@@ -309,9 +309,15 @@ describe('syncAccount', () => {
     phone.edit('a', 'Phone');
     const report = await phone.sync(false);
     expect(report.copies).toHaveLength(1);
+    // The copy's date is the device's own day, so it depends on the timezone
+    // (the fake clock is just after 1970-01-01T00:00Z)
+    const day = new Date(1000).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
     expect(Object.values(phone.titles()).sort()).toEqual([
       'Laptop',
-      'Phone (copy from this device, Jan 1)',
+      `Phone (copy from this device, ${day})`,
     ]);
   });
 
