@@ -45,12 +45,12 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "tb-accounts",
-      "database_id": "046c07fe-dc2d-4428-836f-5cac43981f18",
+      "database_name": "tb-accounts-us",
+      "database_id": "8813aeb8-0d5a-45f3-969d-084a7c98dcdf",
       "migrations_dir": "migrations",
     },
   ],
-  "r2_buckets": [{ "binding": "PROJECTS", "bucket_name": "tb-projects" }],
+  "r2_buckets": [{ "binding": "PROJECTS", "bucket_name": "tb-projects-us" }],
   "vars": {
     "ACCOUNTS_ENABLED": "true",
     "SYNC_ENABLED": "true",
