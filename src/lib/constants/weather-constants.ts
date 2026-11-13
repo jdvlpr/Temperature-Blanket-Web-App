@@ -20,6 +20,15 @@ import type {
 
 export const OPEN_METEO_DELAY_DAYS = 6;
 
+/**
+ * From 7.0.1, Open-Meteo days run midnight to midnight where the place is;
+ * before, they followed the searcher's time zone. Weather got before this
+ * day (a location's `fetchedAt`) may differ a little for that reason alone,
+ * which Update Weather Data says. Set to 7.0.1's deploy day; later is safer
+ * than earlier (an extra note does no harm, a missing one blames the source).
+ */
+export const OPEN_METEO_LOCATION_DAYS_SINCE = '2026-11-20';
+
 export const METEOSTAT_DELAY_DAYS = 8;
 
 export const WEATHER_DATA_DECIMALS = 2;

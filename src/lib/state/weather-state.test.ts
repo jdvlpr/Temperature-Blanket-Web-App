@@ -333,6 +333,21 @@ describe('weather-state', () => {
       expect(data[0].tavg.metric).toBe(5);
     });
 
+    it('asks for days in the place’s time zone, not the searcher’s', async () => {
+      vi.mocked(fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({ daily: { time: [] } }),
+      } as never);
+
+      await weather.getOpenMeteo({ location: mockLocation }).catch(() => {});
+
+      const url = vi.mocked(fetch).mock.calls[0][0] as string;
+      expect(url).toContain('timezone=auto');
+      expect(url).not.toContain(
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+      );
+    });
+
     it('should clamp future "to" date to yesterday', async () => {
       const futureLocation: LocationType = {
         ...mockLocation,

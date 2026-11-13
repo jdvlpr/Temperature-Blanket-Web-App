@@ -31,7 +31,10 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
   import { progress } from '#lib/state/progress-state.svelte.js';
   import { shortDay } from '#lib/utils/project-progress.js';
   import SaveAndCloseButtons from '#lib/components/modals/SaveAndCloseButtons.svelte';
-  import { UNIT_LABELS } from '#lib/constants/weather-constants.js';
+  import {
+    OPEN_METEO_LOCATION_DAYS_SINCE,
+    UNIT_LABELS,
+  } from '#lib/constants/weather-constants.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { dialog, toast } from '#lib/state/page-state.svelte.js';
@@ -153,6 +156,23 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
       ),
     ].join(' and ') || weather.source.name;
   const sources = $derived(sourcesOf(changedLocations));
+  // Open-Meteo days saved before 7.0.1 followed the searcher's time zone, not
+  // the place's: that alone changes their values a little, so say so
+  const placeDays = $derived(
+    changedLocations.some((index) => {
+      const source = locations.all[index]?.source ?? weather.source.name;
+      const fetchedAt = result.fetchedAt[index];
+      return (
+        source === 'Open-Meteo' &&
+        (!fetchedAt || fetchedAt < OPEN_METEO_LOCATION_DAYS_SINCE)
+      );
+    }),
+  );
+  const whyChanged = $derived(
+    placeDays
+      ? 'Open-Meteo’s days now run midnight to midnight where the place is, so days saved before can differ a little.'
+      : 'Weather sources occasionally correct data.',
+  );
   const newSources = $derived(
     sourcesOf([...new Set(result.newDays.map((day) => day.location))]),
   );
@@ -235,7 +255,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
           : 'No colors in the project would change.',
       madeColorCount &&
         `${madeColorCount} ${madeColorCount === 1 ? 'day you’ve made stays' : 'days you’ve made stay'} as ${madeColorCount === 1 ? 'it is' : 'they are'}.`,
-      `${sources} has newer values for ${savedDays}. Weather sources occasionally correct data.`,
+      `${sources} has newer values for ${savedDays}. ${whyChanged}`,
     ]
       .filter(Boolean)
       .map((line) => `<span class="mt-1 block first:mt-0">${line}</span>`)
@@ -605,6 +625,7 @@ Changes, where they can be picked, with a note that the blanket won't match). Sa
       >
         <p class="text-sm">
           {sources} refined {savedDays}. No colors in the project change.
+          {#if placeDays}{whyChanged}{/if}
         </p>
         {@render notes()}
         <button

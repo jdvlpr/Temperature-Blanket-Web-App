@@ -473,8 +473,10 @@ class WeatherClass {
     url += `?latitude=${location.lat}&longitude=${location.lng}`;
     url += `&start_date=${from}`;
     url += `&end_date=${_to}`;
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
-    url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
+    // Days run midnight to midnight where the place is (`auto`), so a place's
+    // values are the same whoever searches; before 7.0.1 they followed the
+    // searcher's time zone (see OPEN_METEO_LOCATION_DAYS_SINCE)
+    url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=auto`;
 
     if (
       this.source?.settings &&
