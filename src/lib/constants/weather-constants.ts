@@ -27,7 +27,7 @@ export const OPEN_METEO_DELAY_DAYS = 6;
  * which Update Weather Data says. Set to 7.0.1's deploy day; later is safer
  * than earlier (an extra note does no harm, a missing one blames the source).
  */
-export const OPEN_METEO_LOCATION_DAYS_SINCE = '2026-11-20';
+export const OPEN_METEO_LOCATION_DAYS_SINCE = '2026-11-13';
 
 export const METEOSTAT_DELAY_DAYS = 8;
 
