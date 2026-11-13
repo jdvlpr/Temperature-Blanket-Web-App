@@ -123,6 +123,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             time = new Date(item.time).toLocaleString(
               window.navigator.language,
               {
+                // A day ("YYYY-MM-DD") parses as UTC midnight
+                timeZone: 'UTC',
                 weekday: 'short',
               },
             );

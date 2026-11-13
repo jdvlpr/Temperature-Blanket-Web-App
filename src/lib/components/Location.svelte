@@ -236,7 +236,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     unsetWeather?: boolean;
   }) {
     if (unsetWeather) weather.setRawData([]);
-    let setDate = new Date(year, month - 1, day, 1);
+    // In UTC, since it's read in UTC (local 01:00 is the day before from UTC+2)
+    let setDate = new Date(Date.UTC(year, month - 1, day));
     const _padFromMonth = String(setDate.getUTCMonth() + 1).padStart(2, '0');
     const _padFromDate = String(setDate.getUTCDate()).padStart(2, '0');
     const _from: TISO8601DateString =

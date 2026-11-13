@@ -549,6 +549,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {@const date = new Date(time).toLocaleString(
                       window.navigator.language,
                       {
+                        // A day ("YYYY-MM-DD") parses as UTC midnight
+                        timeZone: 'UTC',
                         weekday: 'short',
                       },
                     )}

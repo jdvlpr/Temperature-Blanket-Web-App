@@ -306,8 +306,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <p>
                 This version was introduced on {new Date(
                   '2026-04-09',
-                ).toLocaleDateString()}. Compared to the previous version, the
-                changes are:
+                ).toLocaleDateString(undefined, { timeZone: 'UTC' })}. Compared
+                to the previous version, the changes are:
               </p>
               <ul class="list-disc pl-8 text-sm">
                 <li>

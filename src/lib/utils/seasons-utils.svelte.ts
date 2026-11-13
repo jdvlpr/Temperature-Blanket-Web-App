@@ -35,11 +35,10 @@ function parseDateString(dateStr: string): { month: number; day: number } {
  */
 function toDayOfYear(month: number, day: number): number {
   // Use a leap year (2000) to ensure Feb 29 is valid
-  const date = new Date(2000, month - 1, day);
-  const start = new Date(2000, 0, 1);
-  return (
-    Math.floor((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  );
+  // In UTC: local dates cross daylight saving time, which makes a day 23 hours
+  const date = Date.UTC(2000, month - 1, day);
+  const start = Date.UTC(2000, 0, 1);
+  return Math.floor((date - start) / (1000 * 60 * 60 * 24)) + 1;
 }
 
 /**
@@ -50,8 +49,9 @@ export function isDateInRange(
   startDate: string,
   endDate: string,
 ): boolean {
-  const month = date.getMonth() + 1; // getMonth() returns 0-11
-  const day = date.getDate();
+  // Weather days are UTC midnight: read them in UTC, or west of UTC they're a day early
+  const month = date.getUTCMonth() + 1; // 0-11
+  const day = date.getUTCDate();
 
   const start = parseDateString(startDate);
   const end = parseDateString(endDate);
