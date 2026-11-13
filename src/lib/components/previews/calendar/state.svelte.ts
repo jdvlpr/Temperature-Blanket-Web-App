@@ -186,7 +186,9 @@ export class CalendarPreviewClass {
             (month.start - this.settings.weekStartCode)
           : month.start - this.settings.weekStartCode;
       let day = new Date(days[0].date);
-      let startDay = new Date(month.year, month.month, month.start + 1);
+      let startDay = new Date(
+        Date.UTC(month.year, month.month, month.start + 1),
+      );
       if (day.getUTCDate() > startDay.getUTCDate())
         start = day.getUTCDate() - 1 + start;
       let extra = max - days.length;

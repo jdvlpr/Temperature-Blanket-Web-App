@@ -257,8 +257,10 @@ export const weatherMonthsData = ({
     const date = n.date;
     const year = date.getUTCFullYear();
     const month = date.getUTCMonth();
-    const day = new Date(year, month, 1).getUTCDay();
-    const days = new Date(year, month + 1, 0).getUTCDate();
+    // Weather days are UTC midnight, so build these in UTC too: local dates
+    // read with getUTC* land a day early east of UTC.
+    const day = new Date(Date.UTC(year, month, 1)).getUTCDay();
+    const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     const id = `${year}${month}`;
 
     // Check if the id is already present in the Set
