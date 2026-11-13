@@ -43,6 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let scrollContainer: HTMLDivElement | undefined = $state();
   let projectsList = $state();
   let totalProjects: number | string | undefined = $state(0);
+  /** The latest request: answers to older ones (the sort or filters changed meanwhile) are dropped */
+  let request = 0;
 
   onMount(async () => {
     // The first visit, or the filters changed on the other tab
@@ -50,9 +52,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       !galleryState.projects.length ||
       galleryState.loadedFor !== galleryFilters.key
     )
-      await search();
+      search();
+    else loading = false;
 
-    loading = false;
     const scrollObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -153,12 +155,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function search() {
     {
+      const id = ++request;
       galleryState.projects = [];
       galleryState.displayedProjects = [];
       loading = true;
 
       try {
         let results = await fetchPage();
+        if (id !== request) return;
         noteSort(results);
 
         galleryState.gallery.pageInfo = results.pageInfo;
@@ -173,9 +177,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         galleryState.displayedProjects = getFilteredProjects();
         galleryState.loadedFor = galleryFilters.key;
       } catch (e) {
-        console.error('Search failed:', e);
+        if (id === request) console.error('Search failed:', e);
       } finally {
-        loading = false;
+        if (id === request) loading = false;
       }
     }
   }
@@ -220,7 +224,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <CollectionToolbar
         kind="project"
         searchLabel="Search Projects"
-        disabled={loading}
         bind:search={galleryState.search}
         bind:brandId={galleryState.filteredBrandId}
         bind:yarnId={galleryState.filteredYarnId}
@@ -317,9 +320,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn preset-filled-primary-500 m-auto my-4 flex"
           disabled={!hasNextPage}
           onclick={async () => {
+            const id = ++request;
             loading = true;
             try {
               let results = await fetchPage(endCursor);
+              if (id !== request) return;
               galleryState.gallery.pageInfo = results.pageInfo;
               galleryState.projects.push(
                 ...results.edges.flatMap((item) => item.node),
@@ -327,9 +332,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               galleryState.projects = galleryState.projects;
               galleryState.displayedProjects = getFilteredProjects();
             } catch (e) {
-              console.error('Could not load more projects', e);
+              if (id === request)
+                console.error('Could not load more projects', e);
             } finally {
-              loading = false;
+              if (id === request) loading = false;
             }
           }}
         >

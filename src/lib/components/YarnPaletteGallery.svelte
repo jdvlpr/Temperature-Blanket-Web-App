@@ -50,6 +50,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let scrollContainer: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
   let totalPalettes = $state<string | undefined>();
+  /** The latest request: answers to older ones (the sort or filters changed meanwhile) are dropped */
+  let request = 0;
 
   onMount(async () => {
     // The first visit, or the filters changed on the other tab
@@ -104,7 +106,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
-  async function fetchPage(after: string | null = null) {
+  /** Adds a page after `after`; false when a newer request came first */
+  async function fetchPage(id: number, after: string | null = null) {
     const results = await fetchPaletteGallery({
       first,
       after,
@@ -116,6 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         yarnId: yarnPaletteGalleryState.filteredYarnId,
       }),
     });
+    if (id !== request) return false;
     // The gallery can't sort by Popular yet (an older plugin): say Newest
     if (results.popularUnavailable) yarnPaletteGalleryState.orderBy = 'DESC';
     yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
@@ -124,20 +128,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
     // Which colors are yarns comes from the yarn data
     await ensureYarnData();
+    if (id !== request) return false;
     showPalettes();
+    return true;
   }
 
   async function search() {
+    const id = ++request;
     yarnPaletteGalleryState.projects = [];
     yarnPaletteGalleryState.palettes = [];
     loading = true;
     try {
-      await fetchPage();
-      yarnPaletteGalleryState.loadedFor = galleryFilters.key;
+      if (await fetchPage(id))
+        yarnPaletteGalleryState.loadedFor = galleryFilters.key;
     } catch (e) {
-      console.error('Search failed:', e);
+      if (id === request) console.error('Search failed:', e);
     } finally {
-      loading = false;
+      if (id === request) loading = false;
     }
   }
 
@@ -197,7 +204,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       <CollectionToolbar
         kind="palette"
-        disabled={loading}
         bind:search={yarnPaletteGalleryState.search}
         bind:brandId={yarnPaletteGalleryState.filteredBrandId}
         bind:yarnId={yarnPaletteGalleryState.filteredYarnId}
@@ -255,13 +261,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn preset-filled m-auto my-4 flex"
         disabled={!hasNextPage}
         onclick={async () => {
+          const id = ++request;
           loading = true;
           try {
-            await fetchPage(endCursor);
+            await fetchPage(id, endCursor);
           } catch (e) {
-            console.error('Could not load more palettes', e);
+            if (id === request)
+              console.error('Could not load more palettes', e);
           } finally {
-            loading = false;
+            if (id === request) loading = false;
           }
         }}
       >
