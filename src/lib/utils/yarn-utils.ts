@@ -17,6 +17,10 @@ import {
   getBrands,
   getColorwaysWithAffiliateLinks,
 } from '#lib/data/yarns/colorways.svelte.js';
+import {
+  currentYarnId,
+  LEGACY_YARN_IDS,
+} from '#lib/data/yarns/legacy-yarn-ids.js';
 import type { Color, Yarn } from '#lib/types/yarn-types.js';
 
 /**
@@ -44,8 +48,28 @@ export const getColorPropertiesFromYarnStringAndHex = ({
   return matchingColor || null;
 };
 
+export { LEGACY_YARN_IDS, currentYarnId };
+
+/** A `brandId-yarnId` string with its yarn id as it is now. */
+export const currentYarnKey = (key: string): string => {
+  const separator = key.indexOf('-');
+  if (separator === -1) return key;
+  const brandId = key.slice(0, separator);
+  return `${brandId}-${currentYarnId(brandId, key.slice(separator + 1))}`;
+};
+
+/** The same for a yarn id given without its brand (the API's `yarn=`). */
+export const currentYarnIdAnyBrand = (yarnId: string): string => {
+  for (const renames of Object.values(LEGACY_YARN_IDS))
+    if (renames[yarnId]) return renames[yarnId];
+  return yarnId;
+};
+
 /**
- * [stringToBrandAndYarnId description]
+ * Reads a `brandId-yarnId` string (the form links and palette codes use).
+ * Brand and yarn ids never hold a dash (`colorways.svelte.test.ts` checks),
+ * so the first dash is the separator; anything after it is the yarn id,
+ * which old strings may give with a dash (see `LEGACY_YARN_IDS`).
  *
  * @param   {string}  text  brandId-yarnId
  *
@@ -59,13 +83,11 @@ export const stringToBrandAndYarnDetails = (
   brandName?: string | null;
   yarnName?: string | null;
 } => {
-  if (!text.includes('-')) return { brandId: null, yarnId: null };
+  const separator = text.indexOf('-');
+  if (separator === -1) return { brandId: null, yarnId: null };
 
-  if (text.includes('worsted-8')) {
-    text = text.replace('worsted-8', 'worsted_8');
-  }
-
-  const [brandCode, yarnCode] = text.split('-');
+  const brandCode = text.slice(0, separator);
+  const yarnCode = currentYarnId(brandCode, text.slice(separator + 1));
 
   const brand = getBrands().find((brand) => brand.id === brandCode);
   const brandId = brand ? brand.id : null;

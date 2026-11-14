@@ -23,6 +23,7 @@ import type {
   Brand,
   Color,
 } from '#lib/types/yarn-types.js';
+import { currentYarnId } from '#lib/data/yarns/legacy-yarn-ids.js';
 import chroma from 'chroma-js';
 
 // The yarn brand dataset (~1.2MB) is heavy, so it's kept out of every
@@ -91,7 +92,8 @@ function getAffiliateYarns(): Map<string, AffiliateYarn> | null {
 
     let yarn: AffiliateYarn = {
       brand_id: affiliateYarn.b,
-      yarn_id: affiliateYarn.y,
+      // The list may still give a yarn's id from before a rename
+      yarn_id: currentYarnId(affiliateYarn.b, affiliateYarn.y),
       affiliate_variant_base_href,
     };
 

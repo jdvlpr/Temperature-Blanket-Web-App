@@ -17,7 +17,8 @@ import type { TISO8601DateString } from './weather-types';
 
 export interface Brand {
   name: string;
-  /** snake_case version of the name */
+  /** snake_case version of the name: lowercase letters, digits and
+   * underscores, never a dash (see `Yarn.id`) */
   id: string;
   yarns: Yarn[];
 }
@@ -42,7 +43,10 @@ export type YarnWeight =
 export interface Yarn {
   colorways: Colorway[];
   name: string;
-  /** snake_case version of the name */
+  /** snake_case version of the name: lowercase letters, digits and
+   * underscores, never a dash (links join `brandId-yarnId`; checked in
+   * `colorways.svelte.test.ts`). To rename one, add the old id to
+   * `LEGACY_YARN_IDS` in `yarn-utils.ts`. */
   id: Lowercase<string>;
   /** 
   Using https://www.ravelry.com/help/yarn/weights for the list of yarn weights.

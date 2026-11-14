@@ -3,7 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  id: 'luxe-merino',
+  id: 'luxe_merino',
   name: 'Luxe Merino',
   weightId: 'd',
 };

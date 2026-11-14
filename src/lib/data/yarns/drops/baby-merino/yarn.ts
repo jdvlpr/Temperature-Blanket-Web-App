@@ -4,6 +4,6 @@ import colorways from './colorways';
 export const yarn: Yarn = {
   colorways,
   name: 'Baby Merino',
-  id: 'baby-merino',
+  id: 'baby_merino',
   weightId: 's',
 };

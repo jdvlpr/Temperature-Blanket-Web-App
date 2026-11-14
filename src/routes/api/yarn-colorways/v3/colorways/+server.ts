@@ -27,6 +27,7 @@ import {
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
+import { currentYarnIdAnyBrand } from '#lib/utils/yarn-utils.js';
 
 export const GET: RequestHandler = async ({ url, request }) => {
   if (!dev) {
@@ -71,6 +72,8 @@ export const GET: RequestHandler = async ({ url, request }) => {
     let yarn = searchParams.get('yarn');
     if (!yarn) return error(400);
     yarn = decodeURIComponent(yarn).toLowerCase();
+    // Yarn ids from before a rename still find the yarn
+    yarn = yarn.split(',').map(currentYarnIdAnyBrand).join(',');
     if (yarn?.includes(',')) {
       const yarns = yarn.split(',');
 

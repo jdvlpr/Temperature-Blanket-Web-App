@@ -22,7 +22,11 @@ import {
   isYarnDataLoaded,
 } from './colorways.svelte';
 import { getColorName } from '#lib/utils/color-utils.js';
-import { getColorPropertiesFromYarnStringAndHex } from '#lib/utils/yarn-utils.js';
+import {
+  getColorPropertiesFromYarnStringAndHex,
+  LEGACY_YARN_IDS,
+  stringToBrandAndYarnDetails,
+} from '#lib/utils/yarn-utils.js';
 
 // Regression coverage for the B1 lazy-load split: `getBrands`/`getColorwaysWithAffiliateLinks`/
 // `getAllColorways` must start empty (nothing has warmed the module-level cache yet) and only
@@ -69,6 +73,33 @@ describe('colorways.svelte', () => {
     const brandsBefore = getBrands();
     await ensureYarnData();
     expect(getBrands()).toBe(brandsBefore); // unchanged reference, no reload
+  });
+
+  it('brand and yarn ids are lowercase letters, digits and underscores (never a dash)', () => {
+    // Links and palette codes join them as `brandId-yarnId` and split on the
+    // first dash. To rename an id, add the old one to LEGACY_YARN_IDS.
+    const badIds = getBrands().flatMap((brand) => [
+      ...(/^[a-z0-9_]+$/.test(brand.id) ? [] : [brand.id]),
+      ...brand.yarns
+        .filter((yarn) => !/^[a-z0-9_]+$/.test(yarn.id))
+        .map((yarn) => `${brand.id}-${yarn.id}`),
+    ]);
+    expect(badIds).toEqual([]);
+  });
+
+  it('old yarn ids still resolve to a real yarn of the same brand', () => {
+    for (const [brandId, renames] of Object.entries(LEGACY_YARN_IDS)) {
+      const brand = getBrands().find((brand) => brand.id === brandId);
+      expect(brand, brandId).toBeDefined();
+      for (const [oldId, newId] of Object.entries(renames)) {
+        expect(
+          brand!.yarns.some((yarn) => yarn.id === newId),
+          `${brandId}-${oldId} → ${newId}`,
+        ).toBe(true);
+        const details = stringToBrandAndYarnDetails(`${brandId}-${oldId}`);
+        expect(details.yarnId).toBe(newId);
+      }
+    }
   });
 
   it('getColorPropertiesFromYarnStringAndHex resolves a real colorway once warmed', () => {

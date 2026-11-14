@@ -24,6 +24,7 @@ import type { Color } from '#lib/types/yarn-types.js';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
+import { currentYarnIdAnyBrand } from '#lib/utils/yarn-utils.js';
 
 type MatchedColorway = Color & { delta: number; percentMatch: number };
 
@@ -76,6 +77,8 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
     let yarn = searchParams.get('yarn');
     if (!yarn) return error(400, "Parameter 'yarn' is empty");
     yarn = decodeURIComponent(yarn).toLowerCase();
+    // Yarn ids from before a rename still find the yarn
+    yarn = yarn.split(',').map(currentYarnIdAnyBrand).join(',');
     if (yarn?.includes(',')) {
       const yarns = yarn.split(',');
 

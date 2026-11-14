@@ -1,4 +1,5 @@
 import { defaultYarn } from '#lib/state/page-state.svelte.js';
+import { currentYarnKey } from '#lib/utils/yarn-utils.js';
 
 /**
  * How often each yarn's colors are saved, to suggest making one the default
@@ -29,7 +30,7 @@ export function suggestsDefault(
 ) {
   return (
     !!key &&
-    key !== currentDefault &&
+    key !== currentYarnKey(currentDefault) &&
     !state.declined.includes(key) &&
     (state.counts[key] ?? 0) >= SUGGEST_AFTER
   );
@@ -38,8 +39,17 @@ export function suggestsDefault(
 function readState(): YarnUsesState {
   try {
     const state = JSON.parse(localStorage.getItem(KEY) ?? 'null');
-    if (state && typeof state === 'object')
-      return { counts: {}, declined: [], ...state };
+    if (state && typeof state === 'object') {
+      // Keys from before a yarn id was renamed count as the yarn now
+      const counts: Record<string, number> = {};
+      for (const [key, count] of Object.entries(state.counts ?? {}))
+        counts[currentYarnKey(key)] =
+          (counts[currentYarnKey(key)] ?? 0) + Number(count);
+      const declined = [
+        ...new Set<string>((state.declined ?? []).map(currentYarnKey)),
+      ];
+      return { ...state, counts, declined };
+    }
   } catch {
     // Start over
   }

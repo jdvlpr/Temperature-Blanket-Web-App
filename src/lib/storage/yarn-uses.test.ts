@@ -33,6 +33,13 @@ describe('suggestsDefault', () => {
   it('needs a yarn', () => {
     expect(suggestsDefault(used(5), '', '')).toBe(false);
   });
+
+  it('knows a default saved with a yarn id from before a rename', () => {
+    const state = { counts: { 'drops-baby_merino': 5 }, declined: [] };
+    expect(
+      suggestsDefault(state, 'drops-baby_merino', 'drops-baby-merino'),
+    ).toBe(false);
+  });
 });
 
 describe('yarnKey', () => {

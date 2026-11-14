@@ -75,6 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import type { Color, YarnWeight } from '#lib/types/yarn-types.js';
   import { pluralize } from '#lib/utils/string-utils.js';
+  import { currentYarnId } from '#lib/utils/yarn-utils.js';
   import {
     ChevronDownIcon,
     CircleQuestionMarkIcon,
@@ -225,32 +226,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return href;
   }
 
+  /** Reads `f`: `brandId-yarnId`, `brandId` or `yarnId`. Ids never hold a
+   * dash, but yarn ids from before a rename may (`LEGACY_YARN_IDS`). */
   function getURLYarnParams(paramString: string) {
-    if (!paramString.includes('-')) {
-      // check if brandId exists
-      if (getBrands().find((brand) => brand.id === paramString))
-        yarnColorwayFinderState.selectedBrandId = paramString;
-      // check if yarnId exists
-      if (
-        getBrands()
-          .flatMap((brand) => brand.yarns)
-          .find((yarn) => yarn.id === paramString)
-      )
-        yarnColorwayFinderState.selectedYarnId = paramString;
+    const brands = getBrands();
+    const separator = paramString.indexOf('-');
+    const brandPart =
+      separator === -1 ? paramString : paramString.slice(0, separator);
+    const brand = brands.find((brand) => brand.id === brandPart);
+
+    if (brand) {
+      yarnColorwayFinderState.selectedBrandId = brand.id;
+      if (separator === -1) return;
+      const yarnId = currentYarnId(brand.id, paramString.slice(separator + 1));
+      if (brand.yarns.some((yarn) => yarn.id === yarnId))
+        yarnColorwayFinderState.selectedYarnId = yarnId;
       return;
     }
-    const [brandId, yarnId] = paramString.split('-');
 
-    // check if brandId exists
-    if (getBrands().find((brand) => brand.id === brandId))
-      yarnColorwayFinderState.selectedBrandId = brandId;
-    // check if yarnId exists
-    if (
-      getBrands()
-        .flatMap((brand) => brand.yarns)
-        .find((yarn) => yarn.id === yarnId)
-    )
-      yarnColorwayFinderState.selectedYarnId = yarnId;
+    // A yarn on its own
+    for (const brand of brands) {
+      const yarnId = currentYarnId(brand.id, paramString);
+      if (brand.yarns.some((yarn) => yarn.id === yarnId)) {
+        yarnColorwayFinderState.selectedYarnId = yarnId;
+        return;
+      }
+    }
   }
 
   /** The colorways that pass the filters and the name search, in catalog order */
