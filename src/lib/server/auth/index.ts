@@ -21,6 +21,11 @@ import { TURNSTILE_HEADER, verifyTurnstile } from '#lib/server/turnstile.js';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import {
+  bearerToken,
+  withBearerSession,
+  type AppSessionContext,
+} from './app-session';
 import { cleanUpExpired } from './cleanup';
 import {
   allowCodeRequest,
@@ -388,10 +393,40 @@ export async function requireAccount(
   const auth = authFor(getPlatform());
   if (auth instanceof Response) return auth;
   const session = await auth.api.getSession({
-    headers: event.request.headers,
+    // The iPhone app sends its session as a bearer token (see ./app-session)
+    headers: withBearerSession(event.request.headers),
   });
   if (!session) return json({ message: 'Not signed in' }, { status: 401 });
   return { auth, user: session.user };
+}
+
+/**
+ * What ./app-session needs of Better Auth, for the routes that sign the
+ * iPhone app in and out. A Response (404 or 503) when accounts aren't on.
+ */
+export async function appSessionContext(): Promise<
+  AppSessionContext | Response
+> {
+  const auth = authFor(getPlatform());
+  if (auth instanceof Response) return auth;
+  return (await auth.$context) as unknown as AppSessionContext;
+}
+
+/**
+ * The signed-in user of a browser's request, for the page that signs the
+ * iPhone app in: by cookie only, never a bearer token, so an app's session
+ * can't start another.
+ */
+export async function browserAccount(
+  event: RequestEvent,
+): Promise<{ id: string; email: string; name: string } | null | Response> {
+  const auth = authFor(getPlatform());
+  if (auth instanceof Response) return auth;
+  if (bearerToken(event.request.headers)) return null;
+  const session = await auth.api.getSession({
+    headers: event.request.headers,
+  });
+  return session?.user ?? null;
 }
 
 /**
@@ -405,7 +440,7 @@ export async function optionalAccount(
   if (auth instanceof Response) return null;
   try {
     const session = await auth.api.getSession({
-      headers: event.request.headers,
+      headers: withBearerSession(event.request.headers),
     });
     return session?.user ?? null;
   } catch {
