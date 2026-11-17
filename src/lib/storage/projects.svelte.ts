@@ -232,6 +232,7 @@ export class ProjectStorage {
       throw new Error('IndexedDB is not available');
     }
 
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a temporary URL
     const _id = id || new URL(project.url.href).searchParams.get('project');
     if (!_id) return null;
 
@@ -440,6 +441,7 @@ export class ProjectStorage {
     const stored = await this.getById(id);
     if (!stored) return null;
     const copyId = newProjectId();
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a temporary URL
     const href = new URL(stored.href);
     href.searchParams.set('project', copyId);
     const base = stored.name || stored.title;
@@ -448,6 +450,7 @@ export class ProjectStorage {
       localProject: {
         ...stored,
         href: href.href,
+        // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a temporary date
         createdAt: new Date().toISOString(),
         name: base
           ? `${base} (copy)`.slice(0, MAX_SAVED_PROJECT_NAME_LENGTH)
@@ -728,6 +731,7 @@ export class ProjectStorage {
   ): Promise<StoredProject | null> {
     const index = await this.getIndex();
     const indexItem = index.find((i) => {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a temporary URL
       const url = new URL(i.meta.href);
       return url.searchParams?.get('t') === timestamp;
     });
@@ -743,6 +747,7 @@ export class ProjectStorage {
 
     const href = project.onLoaded.href;
     if (!href) return;
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a temporary URL
     const pageURL = new URL(href);
     const id = pageURL.searchParams.get('project');
     if (!id) return;
@@ -808,6 +813,7 @@ export class ProjectStorage {
    * Creates a project object to store the current project in local storage.
    */
   private static project = (): StoredProject => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a temporary date
     const date = formatDateTime(new Date());
 
     const isCustomWeatherData = weather.isUserEdited || false;
