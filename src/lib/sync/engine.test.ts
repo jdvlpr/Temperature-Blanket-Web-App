@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   rehomeHref,
+  restoredSyncState,
   syncAccount,
   unchangedSince,
   type Seen,
@@ -445,6 +446,39 @@ describe('syncAccount', () => {
     expect((await phone.accountState('u1')).pendingDeletes).toEqual([]);
     expect((await laptop.sync()).removed).toEqual(['a']);
     expect(laptop.titles()).toEqual({ b: 'Kept' });
+  });
+
+  it('uploads a project restored from this device’s Trash, whether or not its deletion was sent', async () => {
+    for (const deletionSent of [true, false]) {
+      const { server, phone, laptop } = twoDevices();
+      phone.edit('a', 'Toronto 2026');
+      await phone.sync();
+      await laptop.sync();
+
+      // Moved to the Trash, which keeps the project as it was
+      const trashed = structuredClone(phone.projects.get('a')!);
+      await phone.delete('a');
+      if (deletionSent) {
+        await phone.sync();
+        expect(server.rows.get('a')?.deleted).toBe(true);
+      }
+
+      // Restored as ProjectStorage.restore does: the deletion waiting is called off
+      phone.projects.set('a', {
+        project: trashed.project,
+        sync: restoredSyncState(trashed.sync!),
+      });
+      await phone.setAccountState('u1', {
+        ...(await phone.accountState('u1')),
+        pendingDeletes: [],
+      });
+
+      await phone.sync();
+      expect(server.rows.get('a')?.deleted).toBe(false);
+      expect(phone.status('a')).toBe('synced');
+      await laptop.sync();
+      expect(laptop.titles()).toEqual({ a: 'Toronto 2026' });
+    }
   });
 
   it('lets an edit beat a deletion, whichever syncs first', async () => {

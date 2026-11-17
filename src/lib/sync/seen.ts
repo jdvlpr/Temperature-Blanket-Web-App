@@ -25,6 +25,17 @@ import type { LocalItem, ProjectSyncState } from './engine';
  */
 export type Seen = ProjectSyncState | 'absent';
 
+/**
+ * A project put back from this device's Trash: changed, so the next pass
+ * uploads it. Its last upload's fingerprint goes, or that pass would take it
+ * for one saved again unchanged and never send it over a deletion that has
+ * reached the server.
+ */
+export function restoredSyncState(sync: ProjectSyncState): ProjectSyncState {
+  const { contentHash: _, ...rest } = sync;
+  return { ...rest, dirty: true, error: null };
+}
+
 /** Whether a project is still as a pass saw it (for LocalStore implementations). */
 export function unchangedSince(current: LocalItem | undefined, seen: Seen) {
   if (seen === 'absent') return !current;

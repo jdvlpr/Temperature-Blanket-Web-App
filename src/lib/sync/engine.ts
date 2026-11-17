@@ -71,7 +71,7 @@ export type AccountSyncState = {
   importAsked?: boolean;
 };
 
-export { unchangedSince, type Seen } from './seen';
+export { restoredSyncState, unchangedSince, type Seen } from './seen';
 
 export interface LocalStore {
   list(): Promise<LocalItem[]>;

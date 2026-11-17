@@ -30,7 +30,7 @@ import type {
   LocalStore,
   ProjectSyncState,
 } from '#lib/sync/engine.js';
-import { unchangedSince } from '#lib/sync/seen.js';
+import { restoredSyncState, unchangedSince } from '#lib/sync/seen.js';
 import { del, get, set, update } from 'idb-keyval';
 import { removeThumbnail } from './thumbnails';
 import { trashCutoff } from './trash';
@@ -504,7 +504,7 @@ export class ProjectStorage {
     const sync = item.sync;
     if (sync) {
       if (sync.ownerUserId === this.syncOwner()) {
-        restored = { ...item, sync: { ...sync, dirty: true, error: null } };
+        restored = { ...item, sync: restoredSyncState(sync) };
         const state = await this.accountSyncState(sync.ownerUserId);
         if (state.pendingDeletes.some((p) => p.id === item.id))
           await this.setAccountSyncState(sync.ownerUserId, {
