@@ -22,7 +22,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** The picture itself in each layout: whole, at its own shape; its corners
   follow the card's where it reaches them (cardCorners), else square */
   export const imageClasses = {
-    grid: 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]',
+    // At most half again as tall as wide: a long, thin project shrinks (whole,
+    // at its own shape) instead of running down many screens
+    grid: 'max-h-[195px] max-w-[130px] sm:max-h-[315px] sm:max-w-[210px] md:max-h-[325px] md:max-w-[215px]',
     // The whole picture, in a box beside the name
     list: 'h-28 w-24 shrink-0 object-contain sm:h-32 sm:w-32',
     row: 'max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]',
