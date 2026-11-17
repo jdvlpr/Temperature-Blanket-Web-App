@@ -950,6 +950,26 @@ test.describe('Gallery pages from accounts', () => {
       page.getByRole('heading', { name: 'Grace Hopper’s Gallery' }),
     ).toBeVisible();
 
+    // The same for the iPhone app, as JSON
+    const owner = await request.get(`/api/gallery/by/${publicId}`);
+    expect(owner.status()).toBe(200);
+    expect(await owner.json()).toEqual({
+      name: 'Grace Hopper',
+      postIds: [postId],
+      paletteIds: [],
+    });
+    expect((await request.get('/api/gallery/by/AAAAAAAAAAAA')).status()).toBe(
+      404,
+    );
+    expect(
+      await (await request.get(`/api/gallery/page/${postId}`)).json(),
+    ).toEqual({
+      owner: { name: 'Grace Hopper', publicId },
+      made: null,
+      ravelry: null,
+    });
+    expect((await request.get('/api/gallery/page/nope')).status()).toBe(400);
+
     // Linked from My Projects
     await page.goto('/my-projects');
     await expect(page.getByTestId('gallery-owner-page')).toHaveAttribute(
@@ -962,5 +982,12 @@ test.describe('Gallery pages from accounts', () => {
       data: { showOwner: false },
     });
     expect((await request.get(`/gallery/by/${publicId}`)).status()).toBe(404);
+    expect((await request.get(`/api/gallery/by/${publicId}`)).status()).toBe(
+      404,
+    );
+    // Anonymous now: no name
+    expect(
+      await (await request.get(`/api/gallery/page/${postId}`)).json(),
+    ).toEqual({ owner: null, made: null, ravelry: null });
   });
 });
