@@ -141,10 +141,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       x = nextStitch.x;
       y = nextStitch.y;
       if (nextStitch.isEndOfRound) round += 1;
-      if (
-        stitch % continuousSquarePreview.settings.stitchesPerDay === 0 ||
-        stitch === 1
-      ) {
+      // Each day is stitchesPerDay stitches, the first one included
+      if (stitch % continuousSquarePreview.settings.stitchesPerDay === 0) {
         dayIndex += 1;
       }
     }

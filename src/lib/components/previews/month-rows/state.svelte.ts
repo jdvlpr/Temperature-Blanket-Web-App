@@ -145,11 +145,9 @@ export class MonthRowsPreviewClass {
         this.STITCH_SIZE,
   );
 
+  // rowsPerMonth already counts a row for each value
   height = $derived(
-    this.dimensionsHeight *
-      this.rowsPerMonth *
-      this.settings.selectedTargets.length *
-      this.STITCH_SIZE +
+    this.dimensionsHeight * this.rowsPerMonth * this.STITCH_SIZE +
       (this.dimensionsHeight + 1) *
         this.settings.borderStitches *
         this.STITCH_SIZE,
@@ -163,7 +161,8 @@ export class MonthRowsPreviewClass {
 
   details = $derived({ rowsPerMonth: this.rowsPerMonth });
 
-  totalRows = $derived(this.monthsInData?.length * this.rowsPerMonth);
+  // Days drawn, the same number in every month (short months end in extra rows)
+  totalDays = $derived(this.monthsInData?.length * this.daysInLongestMonth);
 
   // *******************
   // Extra (non-gauge) colors and their yarn details

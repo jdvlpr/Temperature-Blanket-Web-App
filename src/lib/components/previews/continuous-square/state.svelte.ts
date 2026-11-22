@@ -17,11 +17,6 @@ import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 
-function getNumberOfStitchesInRound(round: number): number {
-  if (round === 1) return 4;
-  return getEndOfRoundStitch(round) - getEndOfRoundStitch(round - 1);
-}
-
 function getEndOfRoundStitch(round: number): number {
   if (round <= 1) return round * 4;
   return 4 * round + getEndOfRoundStitch(round - 1);
@@ -105,24 +100,13 @@ export class ContinuousSquarePreviewClass {
     return round;
   });
 
-  initialTotalStitches = $derived(getEndOfRoundStitch(this.initialRounds));
-
-  initialCountOfAdditionalStitches = $derived(
-    this.initialTotalStitches - this.dayStitches + this.settings.stitchesPerDay,
-  );
-
-  rounds = $derived(
-    this.initialCountOfAdditionalStitches >
-      getNumberOfStitchesInRound(this.initialRounds)
-      ? this.initialRounds - 1
-      : this.initialRounds,
-  );
+  // The round the last day ends in: every day has all its stitches
+  rounds = $derived(this.initialRounds);
 
   totalStitches = $derived(getEndOfRoundStitch(this.rounds));
 
-  countOfAdditionalStitches = $derived(
-    this.totalStitches - this.dayStitches + this.settings.stitchesPerDay,
-  );
+  // Accent stitches that finish the last round
+  countOfAdditionalStitches = $derived(this.totalStitches - this.dayStitches);
 
   details = $derived({
     rounds: this.rounds,

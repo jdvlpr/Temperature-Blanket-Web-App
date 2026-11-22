@@ -58,12 +58,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         n.date.getUTCMonth() ===
           monthRowsPreview.monthsInData[monthIndex].month,
     );
+    // A row for each value, every day of the month
     for (
-      let rowIndex = 0;
-      rowIndex < monthRowsPreview.totalRows;
-      rowIndex += 1
+      let dayRowIndex = 0;
+      dayRowIndex < monthRowsPreview.totalDays;
+      dayRowIndex += 1
     ) {
-      if (rowIndex % monthRowsPreview.rowsPerMonth === 0 && rowIndex !== 0) {
+      if (
+        dayRowIndex % monthRowsPreview.daysInLongestMonth === 0 &&
+        dayRowIndex !== 0
+      ) {
         // New Month
         monthIndex += 1;
         daysInSquare = weather.rawData?.filter(
@@ -92,10 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 monthRowsPreview.STITCH_SIZE +
               monthRowsPreview.settings.borderStitches *
                 monthRowsPreview.STITCH_SIZE;
-            y -=
-              monthRowsPreview.rowsPerMonth *
-              monthRowsPreview.STITCH_SIZE *
-              monthRowsPreview.settings.selectedTargets.length;
+            y -= monthRowsPreview.rowsPerMonth * monthRowsPreview.STITCH_SIZE;
           }
         } else if (monthRowsPreview.settings.direction === 'top-to-bottom') {
           // Top to Bottom
@@ -178,10 +179,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         y += monthRowsPreview.STITCH_SIZE;
       }
 
-      if (rowIndex % monthRowsPreview.settings.selectedTargets.length === 0) {
-        if (day.length) dayIndex += 1;
-        dayInMonthCount += 1;
-      }
+      if (day.length) dayIndex += 1;
+      dayInMonthCount += 1;
     }
     width = monthRowsPreview.width;
     height = monthRowsPreview.height;
@@ -229,9 +228,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           monthRowsPreview.STITCH_SIZE +
           monthRowsPreview.settings.borderStitches *
             monthRowsPreview.STITCH_SIZE}
-        height={monthRowsPreview.rowsPerMonth *
-          monthRowsPreview.settings.selectedTargets.length *
-          monthRowsPreview.STITCH_SIZE +
+        height={monthRowsPreview.rowsPerMonth * monthRowsPreview.STITCH_SIZE +
           monthRowsPreview.settings.borderStitches *
             monthRowsPreview.STITCH_SIZE}
         stroke-width={monthRowsPreview.STITCH_SIZE *
