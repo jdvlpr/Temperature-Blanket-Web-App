@@ -39,6 +39,18 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                instructions: `If you're partway through a Continuous Square, look over your pattern: the number of rounds and accent stitches may change. Projects using the Month Rows preview keep the same colors in the same order; only the height of the preview image changes.`,
+                tag: 'fix',
+                text: `For the Continuous Square preview, the first day was only one stitch and the second was a stitch short. Now every day has the number of stitches you chose. For the Month Rows preview, with two or more weather values the picture drew each day's rows twice, so every month looked twice as tall as it really is. Now each day is one row per value.`,
+                title: 'Continuous Square and Month Rows Patterns Fixed',
+              },
+            ],
+            version: '7.0.3',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.wrench,
                 instructions: `If you're partway through one of these previews, look over your pattern: its shape or colors may change. Your saved dates, weather and progress stay as they are. If your project's place is in a different time zone from you, Check for Updates may find slightly different weather for days you've already saved. Your saved days stay as they are unless you choose to update them in that window.`,
                 tag: 'fix',
                 text: `Some patterns were a day off depending on where you live. In time zones ahead of UTC (most of Europe, Africa, Asia and Australia), Month Squares, Split Month Squares and Month Rows left out the last day of 31-day months, which shifted the colors of the months after it, and Calendar put days under the wrong weekday. In the Americas, Rows with season colors gave the first day of each season the season before's color. Picking a start date from Eastern Europe eastward chose the day before (January 1 became December 31). Go to Today and the Weather Forecast's days could also be a day off. And Open-Meteo weather days now run midnight to midnight where the place is, not where you are, so everyone gets the same weather for a place.`,
