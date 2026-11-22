@@ -22,8 +22,10 @@ import {
   madeThroughOf,
   nextDay,
   previousDay,
+  otherProgressOf,
   progressOf,
   projectDates,
+  storedProgressOf,
   type StoredProgress,
 } from '#lib/utils/project-progress.js';
 
@@ -36,6 +38,8 @@ import {
 class ProgressState {
   madeThrough = $state<TISO8601DateString | null>(null);
   show = $state(false);
+  /** What else the project's progress keeps (the iOS app's stitch counter): saved back untouched */
+  #other: Record<string, unknown> = {};
 
   /** The project's days, each once, in order */
   dates = $derived(projectDates(weather.rawData));
@@ -116,21 +120,19 @@ class ProgressState {
   reset() {
     this.madeThrough = null;
     this.show = false;
+    this.#other = {};
   }
 
   /** A saved project's, as it was kept */
   loaded(stored: Partial<StoredProgress> | null | undefined) {
     this.madeThrough = madeThroughOf(stored?.madeThrough);
     this.show = stored?.show === true;
+    this.#other = otherProgressOf(stored);
   }
 
   /** What's kept with the project; nothing until it's been set */
   toStored(): StoredProgress | undefined {
-    if (!this.madeThrough && !this.show) return undefined;
-    return {
-      madeThrough: this.madeThrough,
-      ...(this.show && { show: true }),
-    };
+    return storedProgressOf(this.madeThrough, this.show, this.#other);
   }
 }
 

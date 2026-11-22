@@ -3,10 +3,12 @@ import type { TISO8601DateString } from '#lib/types/weather-types.js';
 import {
   madeThroughOf,
   nextDay,
+  otherProgressOf,
   previousDay,
   progressOf,
   projectDates,
   shortDay,
+  storedProgressOf,
   unmadeIndexes,
 } from './project-progress.js';
 
@@ -132,4 +134,35 @@ describe('shortDay', () => {
     expect(shortDay(iso('2026-03-12'), 2026)).not.toMatch(/2026/));
   it('says another year', () =>
     expect(shortDay(iso('2025-03-12'), 2026)).toMatch(/2025/));
+});
+
+describe('storedProgressOf', () => {
+  it('keeps nothing when there is no progress', () => {
+    expect(storedProgressOf(null, false)).toBeUndefined();
+  });
+
+  it('passes other fields (the iOS stitch counter) through untouched', () => {
+    const counter = { on: true, step: 5, day: '2026-03-04', count: 40 };
+    const stored = { madeThrough: '2026-03-03', show: true, counter };
+    const other = otherProgressOf(stored);
+    expect(other).toEqual({ counter });
+    expect(storedProgressOf(iso('2026-03-05'), false, other)).toEqual({
+      madeThrough: '2026-03-05',
+      counter,
+    });
+  });
+
+  it('keeps other fields even before anything is made', () => {
+    const counter = { on: true, step: 1 };
+    expect(storedProgressOf(null, false, { counter })).toEqual({
+      madeThrough: null,
+      counter,
+    });
+  });
+
+  it('ignores progress that is not an object', () => {
+    expect(otherProgressOf(null)).toEqual({});
+    expect(otherProgressOf('2026-03-03')).toEqual({});
+    expect(otherProgressOf([1])).toEqual({});
+  });
 });

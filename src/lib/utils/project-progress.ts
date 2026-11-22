@@ -26,6 +26,8 @@ export type StoredProgress = {
   madeThrough: TISO8601DateString | null;
   /** Show Progress in the preview: days not made yet dimmed */
   show?: boolean;
+  /** Anything else kept here (the iOS app's stitch counter), passed through as it was */
+  [key: string]: unknown;
 };
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
@@ -35,6 +37,29 @@ export const madeThroughOf = (value: unknown): TISO8601DateString | null =>
   typeof value === 'string' && ISO.test(value)
     ? (value as TISO8601DateString)
     : null;
+
+/** What a project's kept progress holds besides `madeThrough` and `show`
+ * (the iOS app's stitch counter): kept as it was, so saving here doesn't drop it */
+export const otherProgressOf = (stored: unknown): Record<string, unknown> => {
+  const other: Record<string, unknown> = {};
+  if (!stored || typeof stored !== 'object' || Array.isArray(stored))
+    return other;
+  for (const [key, value] of Object.entries(stored)) {
+    if (key !== 'madeThrough' && key !== 'show') other[key] = value;
+  }
+  return other;
+};
+
+/** The progress to keep with a project; nothing when there's none */
+export const storedProgressOf = (
+  madeThrough: TISO8601DateString | null,
+  show: boolean,
+  other: Record<string, unknown> = {},
+): StoredProgress | undefined => {
+  if (!madeThrough && !show && Object.keys(other).length === 0)
+    return undefined;
+  return { ...other, madeThrough, ...(show && { show: true }) };
+};
 
 /** A day's date as YYYY-MM-DD, whether a Date or already a string */
 export const dayOf = (date: Date | string): TISO8601DateString =>
