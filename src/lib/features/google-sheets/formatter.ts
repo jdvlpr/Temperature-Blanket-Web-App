@@ -750,13 +750,57 @@ function createResizeRequests(
   ];
 }
 
-export function buildSpreadsheetData(options: ExportOptions): SpreadsheetData {
+// Under the weather grid (headers + 31 days = rows 0–32), after a blank row.
+// Below it, so no row the formatting, checkboxes and counts point at moves.
+const LINK_LABEL_ROW = 34;
+const LINK_ROW = LINK_LABEL_ROW + 1;
+
+function createProjectLinkRequests(
+  sheetId: number,
+  link: string,
+): gapi.client.sheets.Request[] {
+  return [
+    {
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: LINK_LABEL_ROW,
+          endRowIndex: LINK_LABEL_ROW + 1,
+          startColumnIndex: 0,
+          endColumnIndex: 1,
+        },
+        cell: { userEnteredFormat: { textFormat: { bold: true } } },
+        fields: 'userEnteredFormat.textFormat.bold',
+      },
+    },
+    {
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: LINK_ROW,
+          endRowIndex: LINK_ROW + 1,
+          startColumnIndex: 0,
+          endColumnIndex: 1,
+        },
+        cell: { userEnteredFormat: { textFormat: { link: { uri: link } } } },
+        fields: 'userEnteredFormat.textFormat.link',
+      },
+    },
+  ];
+}
+
+/** `projectLink`, when there is one, goes under the weather so the project can be opened again from the sheet */
+export function buildSpreadsheetData(
+  options: ExportOptions,
+  projectLink = '',
+): SpreadsheetData {
   const projectName =
     `Temperature Blanket: ${locations.projectFilename}` ||
     'Temperature Blanket';
   const sheets: gapi.client.sheets.Sheet[] = [];
   const requests: gapi.client.sheets.Request[] = [];
   const values: gapi.client.sheets.ValueRange[] = [];
+  const linkRequests: gapi.client.sheets.Request[] = [];
 
   const selectedTypes = getSelectedDataTypes(options);
   const colsPerMonth = selectedTypes.length + 2; // Day + data columns + Done
@@ -769,11 +813,25 @@ export function buildSpreadsheetData(options: ExportOptions): SpreadsheetData {
     properties: {
       sheetId: sheetIndex,
       title: 'Weather Data',
-      gridProperties: { columnCount: totalColumns, rowCount: 34 },
+      gridProperties: {
+        columnCount: totalColumns,
+        rowCount: projectLink ? LINK_ROW + 1 : 34,
+      },
     },
   });
   const grid = createWeatherGrid(weather.data, options);
   values.push({ range: "'Weather Data'!A1", values: grid });
+  if (projectLink) {
+    // The full address as text, so it can be copied even where a click can't open it
+    values.push({
+      range: `'Weather Data'!A${LINK_LABEL_ROW + 1}`,
+      values: [
+        ['Open this project in Temperature Blanket with this link:'],
+        [projectLink],
+      ],
+    });
+    linkRequests.push(...createProjectLinkRequests(sheetIndex, projectLink));
+  }
 
   requests.push(...createMergeRequests(sheetIndex, options));
   requests.push(...createCheckboxRequests(sheetIndex, options));
@@ -801,5 +859,5 @@ export function buildSpreadsheetData(options: ExportOptions): SpreadsheetData {
     sheetIndex++;
   }
 
-  return { title: projectName, sheets, requests, values };
+  return { title: projectName, sheets, requests, values, linkRequests };
 }

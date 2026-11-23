@@ -98,8 +98,9 @@ single page's (OLD_ANCHORS). -->
   <p>
     The weather and your gauges' colors and ranges, in a new spreadsheet in your
     Google Drive. Choose the weather and gauges to include, and whether to show
-    the number of days in each range. Google asks you to sign in; if nothing
-    appears, allow pop-ups for this site.
+    the number of days in each range. Under the weather is your project's link,
+    so you can open the project again from the sheet, even on another device.
+    Google asks you to sign in; if nothing appears, allow pop-ups for this site.
   </p>
 </section>
 

@@ -41,4 +41,6 @@ export interface SpreadsheetData {
   sheets: gapi.client.sheets.Sheet[];
   requests: gapi.client.sheets.Request[];
   values: gapi.client.sheets.ValueRange[];
+  /** Makes the project link clickable; sent on its own, since the sheet is fine without it */
+  linkRequests: gapi.client.sheets.Request[];
 }

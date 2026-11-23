@@ -17,6 +17,12 @@ import {
   PUBLIC_GOOGLE_CLIENT_ID,
 } from '$app/env/public';
 
+import { lastingOrigin } from '#lib/constants/site.js';
+import { locations } from '#lib/state/location-state.svelte.js';
+import { project } from '#lib/state/project-state.svelte.js';
+import { storedItem } from '#lib/storage/autosave.svelte.js';
+import { withProjectName } from '#lib/utils/project-name-link.js';
+import { withOrigin } from '#lib/utils/site-origin.js';
 import { buildSpreadsheetData } from './formatter';
 import type { ExportOptions } from './types';
 
@@ -201,6 +207,22 @@ export async function prepareGoogleExport(): Promise<void> {
 }
 
 /**
+ * The project's link, with its name, as Copy Link makes it: the sheet keeps
+ * it, so the project can be opened again from there if it's lost here
+ */
+async function projectLink(): Promise<string> {
+  const href = project.url.href;
+  if (!href.includes('?project=')) return '';
+  const item = await storedItem().catch(() => undefined);
+  const name = item ? (item.meta.name ?? '') : project.linkName;
+  return withProjectName(
+    withOrigin(href, lastingOrigin()),
+    name,
+    locations.projectTitle,
+  );
+}
+
+/**
  * Main export function - orchestrates the entire export process
  */
 export async function exportToGoogleSheet(
@@ -212,8 +234,10 @@ export async function exportToGoogleSheet(
   // Get access token (will prompt user for authorization)
   await getAccessToken();
 
-  // Build the spreadsheet data
-  const { title, sheets, requests, values } = buildSpreadsheetData(options);
+  // Build the spreadsheet data (the link after sign-in: nothing waits before its popup)
+  const link = await projectLink();
+  const { title, sheets, requests, values, linkRequests } =
+    buildSpreadsheetData(options, link);
 
   // Create the spreadsheet
   const spreadsheetId = await createSpreadsheet(title, sheets);
@@ -226,6 +250,15 @@ export async function exportToGoogleSheet(
   // Update cell values
   if (values.length > 0) {
     await updateValues(spreadsheetId, values);
+  }
+
+  // The link's text is already there; if it can't be made clickable, keep the sheet anyway
+  if (linkRequests.length > 0) {
+    try {
+      await applyBatchUpdate(spreadsheetId, linkRequests);
+    } catch (error) {
+      console.error('Could not make the project link clickable', error);
+    }
   }
 
   // Return the URL to the new spreadsheet
