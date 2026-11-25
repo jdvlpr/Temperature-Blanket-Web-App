@@ -30,7 +30,7 @@ const NO_STORE = { 'Cache-Control': 'no-store' };
 export const POST: RequestHandler = async (event) => {
   const { appleAppSession } = await import('#lib/server/auth/index.js');
   const body = await event.request.json().catch(() => null);
-  const result = await appleAppSession(body?.idToken, body?.nonce);
+  const result = await appleAppSession(event, body?.idToken, body?.nonce);
   if (result instanceof Response) {
     result.headers.set('Cache-Control', 'no-store');
     return result;

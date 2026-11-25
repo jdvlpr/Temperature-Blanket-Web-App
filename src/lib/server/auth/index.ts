@@ -438,6 +438,13 @@ export async function deleteAppAccount(
   });
 }
 
+function withoutCredentials(headers: Headers): Headers {
+  const copy = new Headers(headers);
+  copy.delete('cookie');
+  copy.delete('authorization');
+  return copy;
+}
+
 /**
  * Signs the iPhone app in with Sign in with Apple on the device: Better Auth
  * checks the ID token (Apple's keys, the app's bundle ID as audience, the
@@ -446,6 +453,7 @@ export async function deleteAppAccount(
  * dropped for one of the app's own. 404 when Apple isn't set up for the app.
  */
 export async function appleAppSession(
+  event: RequestEvent,
   idToken: unknown,
   nonce: unknown,
 ): Promise<AppSession | Response> {
@@ -471,8 +479,9 @@ export async function appleAppSession(
     try {
       signedIn = (await auth.api.signInSocial({
         body: { provider: 'apple', idToken: { token: idToken, nonce } },
-        // Never a browser's cookies: this is the app's sign-in alone
-        headers: new Headers(),
+        // The request's host (Better Auth works out its address from it), never
+        // a browser's cookies or a bearer token: this is the app's sign-in alone
+        headers: withoutCredentials(event.request.headers),
       })) as { token: string; user: { id: string } };
     } catch (e) {
       if (e instanceof APIError && e.body?.code === SIGN_UPS_PAUSED)
