@@ -187,7 +187,15 @@ export async function exchangeAppCode(
     return null;
   if ((await sha256Base64Url(verifier)) !== saved.challenge) return null;
 
-  const user = await context.internalAdapter.findUserById(saved.userId);
+  return createAppSession(context, saved.userId);
+}
+
+/** A new session of the app's own for a user (signed in another way, such as Apple on the device). */
+export async function createAppSession(
+  context: AppSessionContext,
+  userId: string,
+): Promise<AppSession | null> {
+  const user = await context.internalAdapter.findUserById(userId);
   if (!user) return null;
   const session = await context.internalAdapter.createSession(user.id);
   if (!session) return null;

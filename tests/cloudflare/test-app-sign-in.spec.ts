@@ -202,3 +202,13 @@ test('the app deletes its account, signing out everywhere', async ({
   ).toBe(401);
   expect((await browser.get('/api/sync/changes?since=0')).status()).toBe(401);
 });
+
+test('Sign in with Apple for the app is off until its bundle ID is set', async ({
+  baseURL,
+}) => {
+  const app = await playwrightRequest.newContext({ baseURL });
+  const response = await app.post('/api/account/app-apple-session', {
+    data: { idToken: 'a.b.c', nonce: 'n' },
+  });
+  expect(response.status()).toBe(404);
+});

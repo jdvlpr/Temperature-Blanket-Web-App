@@ -44,6 +44,14 @@ export type AuthConfig = {
   validateSchema: boolean;
   /** Sign in with Google, when configured */
   google?: { clientId: string; clientSecret: string };
+  /**
+   * Sign in with Apple, when configured: `web` on the website (its Services
+   * ID), `appBundleId` in the iPhone app (an ID token from the device)
+   */
+  apple?: {
+    web?: { clientId: string; clientSecret: string };
+    appBundleId?: string;
+  };
   /** Link a Ravelry account, when configured. Never a way to sign in */
   ravelry?: { clientId: string; clientSecret: string };
   /** Sign in with an emailed code (EMAIL_SIGN_IN); off in production, where Google is the only way in */
@@ -75,13 +83,42 @@ export function trustedOriginsFor(
   );
 }
 
+/** Where Apple's sign-in posts back from */
+export const APPLE_ORIGIN = 'https://appleid.apple.com';
+
+function socialProviders(config: AuthConfig) {
+  const { google, apple } = config;
+  if (!google && !apple) return undefined;
+  return {
+    ...(google && {
+      google: { ...google, prompt: 'select_account' as const },
+    }),
+    ...(apple && {
+      apple: {
+        // Without the website half only ID tokens from the app sign in: a
+        // web sign-in can't start with no secret
+        clientId: apple.web?.clientId ?? apple.appBundleId!,
+        clientSecret: apple.web?.clientSecret ?? '',
+        // Tokens from the website name the Services ID; from the app, its bundle ID
+        audience: [apple.web?.clientId, apple.appBundleId].filter(
+          (id): id is string => !!id,
+        ),
+      },
+    }),
+  };
+}
+
 export function buildAuthOptions(config: AuthConfig) {
   return {
     appName: 'Temperature Blanket',
     basePath: AUTH_BASE_PATH,
     // Never derived from the request's Host header alone: only these hosts are accepted
     baseURL: { allowedHosts: config.allowedHosts, protocol: config.protocol },
-    trustedOrigins: trustedOriginsFor(config.allowedHosts, config.protocol),
+    trustedOrigins: [
+      ...trustedOriginsFor(config.allowedHosts, config.protocol),
+      // Apple posts its sign-in back to the website as a form
+      ...(config.apple?.web ? [APPLE_ORIGIN] : []),
+    ],
     secret: config.secret,
     database: config.database,
     // No passwords: sign in with Google, or an emailed code where emailSignIn is on
@@ -131,9 +168,7 @@ export function buildAuthOptions(config: AuthConfig) {
         allowUnlinkingAll: config.emailSignIn,
       },
     },
-    socialProviders: config.google
-      ? { google: { ...config.google, prompt: 'select_account' as const } }
-      : undefined,
+    socialProviders: socialProviders(config),
     user: {
       // Needs a session less than freshAge old; the account page confirms with Google (or a new code) first
       deleteUser: {

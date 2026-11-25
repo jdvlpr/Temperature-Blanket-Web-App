@@ -24,7 +24,9 @@ import { APIError } from 'better-auth/api';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import {
   bearerToken,
+  createAppSession,
   withBearerSession,
+  type AppSession,
   type AppSessionContext,
 } from './app-session';
 import { cleanUpExpired } from './cleanup';
@@ -45,6 +47,7 @@ import {
   buildAuthOptions,
   MAX_DISPLAY_NAME_LENGTH,
   RAVELRY_PROVIDER_ID,
+  SIGN_UPS_PAUSED,
 } from './options';
 import { emailSignInOn, readAuthSettings } from './settings';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
@@ -432,6 +435,65 @@ export async function deleteAppAccount(
       }
       throw e;
     }
+  });
+}
+
+/**
+ * Signs the iPhone app in with Sign in with Apple on the device: Better Auth
+ * checks the ID token (Apple's keys, the app's bundle ID as audience, the
+ * nonce) and finds or makes the account (an existing account with the same
+ * verified email is signed in to). The browser-style session it makes is
+ * dropped for one of the app's own. 404 when Apple isn't set up for the app.
+ */
+export async function appleAppSession(
+  idToken: unknown,
+  nonce: unknown,
+): Promise<AppSession | Response> {
+  const platform = getPlatform();
+  const settings = readAuthSettings(platform?.env);
+  const auth = authFor(platform);
+  if (auth instanceof Response) return auth;
+  if (settings.status !== 'ready' || !settings.settings.apple?.appBundleId)
+    return json({ message: 'Not found' }, { status: 404 });
+  if (
+    typeof idToken !== 'string' ||
+    typeof nonce !== 'string' ||
+    !idToken ||
+    !nonce
+  )
+    return json(
+      { code: 'INVALID_REQUEST', message: 'Sign in with Apple again.' },
+      { status: 400 },
+    );
+
+  return requestPlatform.run(platform, async () => {
+    let signedIn: { token: string; user: { id: string } };
+    try {
+      signedIn = (await auth.api.signInSocial({
+        body: { provider: 'apple', idToken: { token: idToken, nonce } },
+        // Never a browser's cookies: this is the app's sign-in alone
+        headers: new Headers(),
+      })) as { token: string; user: { id: string } };
+    } catch (e) {
+      if (e instanceof APIError && e.body?.code === SIGN_UPS_PAUSED)
+        return json(
+          { code: SIGN_UPS_PAUSED, message: 'New sign-ups are paused' },
+          { status: 403 },
+        );
+      if (e instanceof APIError && e.statusCode < 500)
+        return json(
+          {
+            code: 'INVALID_TOKEN',
+            message: "Apple's sign-in couldn't be checked. Try again.",
+          },
+          { status: 401 },
+        );
+      throw e;
+    }
+    const context = (await auth.$context) as unknown as AppSessionContext;
+    await context.internalAdapter.deleteSession(signedIn.token);
+    const session = await createAppSession(context, signedIn.user.id);
+    return session ?? json({ message: 'Could not sign in' }, { status: 500 });
   });
 }
 

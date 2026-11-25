@@ -27,6 +27,15 @@ export type AuthEnv = EmailEnv & {
   /** Linking a Ravelry account (never a way to sign in), when both are set */
   RAVELRY_CLIENT_ID?: string;
   RAVELRY_CLIENT_SECRET?: string;
+  /**
+   * Sign in with Apple. On the website: the Services ID and a client secret
+   * (a JWT signed with Apple's key, good for at most 6 months; make one with
+   * scripts/apple-client-secret.ts). In the iPhone app: its bundle ID. Either
+   * half works without the other.
+   */
+  APPLE_CLIENT_ID?: string;
+  APPLE_CLIENT_SECRET?: string;
+  APPLE_APP_BUNDLE_ID?: string;
   /** "true" turns on emailed sign-in codes (local dev and e2e); production signs in with Google only */
   EMAIL_SIGN_IN?: string;
 };
@@ -42,6 +51,7 @@ export type AuthSettings =
         | 'allowedHosts'
         | 'protocol'
         | 'google'
+        | 'apple'
         | 'ravelry'
         | 'emailSignIn'
       >;
@@ -112,6 +122,15 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
         'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are needed when EMAIL_SIGN_IN is off',
     };
 
+  // Apple: on the website with its Services ID and secret, in the app with its bundle ID
+  const appleWeb =
+    env.APPLE_CLIENT_ID && env.APPLE_CLIENT_SECRET
+      ? { clientId: env.APPLE_CLIENT_ID, clientSecret: env.APPLE_CLIENT_SECRET }
+      : undefined;
+  const appleApp = env.APPLE_APP_BUNDLE_ID || undefined;
+  const apple =
+    appleWeb || appleApp ? { web: appleWeb, appBundleId: appleApp } : undefined;
+
   // Ravelry linking is on only when both its ID and secret are set
   const ravelry =
     env.RAVELRY_CLIENT_ID && env.RAVELRY_CLIENT_SECRET
@@ -123,6 +142,14 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
 
   return {
     status: 'ready',
-    settings: { secret, allowedHosts, protocol, google, ravelry, emailSignIn },
+    settings: {
+      secret,
+      allowedHosts,
+      protocol,
+      google,
+      apple,
+      ravelry,
+      emailSignIn,
+    },
   };
 }

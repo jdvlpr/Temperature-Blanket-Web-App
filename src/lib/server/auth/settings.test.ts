@@ -137,6 +137,25 @@ describe('emailChangedNotice', () => {
     expect(notice.text).not.toContain('newname');
   });
 
+  it('turns Apple on for the website with its ID and secret, and for the app with its bundle ID', () => {
+    const appleOf = (env: Record<string, string | undefined>) => {
+      const result = readAuthSettings({ ...ready, ...env });
+      return result.status === 'ready' ? result.settings.apple : 'not ready';
+    };
+    expect(appleOf({})).toBeUndefined();
+    expect(appleOf({ APPLE_CLIENT_ID: 'web.id' })).toBeUndefined();
+    expect(
+      appleOf({ APPLE_CLIENT_ID: 'web.id', APPLE_CLIENT_SECRET: 'jwt' }),
+    ).toEqual({
+      web: { clientId: 'web.id', clientSecret: 'jwt' },
+      appBundleId: undefined,
+    });
+    expect(appleOf({ APPLE_APP_BUNDLE_ID: 'app.id' })).toEqual({
+      web: undefined,
+      appBundleId: 'app.id',
+    });
+  });
+
   it('turns Ravelry linking on only when both its ID and secret are set', () => {
     const ravelryOf = (env: Record<string, string | undefined>) => {
       const result = readAuthSettings({ ...ready, ...env });

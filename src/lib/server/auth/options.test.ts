@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildAuthOptions, SIGN_UPS_PAUSED } from './options';
+import {
+  APPLE_ORIGIN,
+  buildAuthOptions,
+  SIGN_UPS_PAUSED,
+  type AuthConfig,
+} from './options';
 
 const config = (
   signUpsOpen?: () => Promise<boolean>,
@@ -87,5 +92,48 @@ describe('Ravelry', () => {
     expect(
       config(undefined, true, ravelry).account.accountLinking.trustedProviders,
     ).toEqual(['ravelry']);
+  });
+});
+
+describe('Sign in with Apple', () => {
+  const withApple = (apple: AuthConfig['apple']) =>
+    buildAuthOptions({
+      database: undefined,
+      secret: 'x'.repeat(32),
+      allowedHosts: ['localhost'],
+      protocol: 'http',
+      sendSignInCode: async () => undefined,
+      runInBackground: () => undefined,
+      validateSchema: false,
+      emailSignIn: true,
+      apple,
+    });
+
+  it('is off, and Apple not trusted, when not configured', () => {
+    const options = withApple(undefined);
+    expect(options.socialProviders).toBeUndefined();
+    expect(options.trustedOrigins).not.toContain(APPLE_ORIGIN);
+  });
+
+  it('takes ID tokens for the app alone, with no web secret', () => {
+    const options = withApple({ appBundleId: 'app.id' });
+    expect(options.socialProviders?.apple).toMatchObject({
+      clientId: 'app.id',
+      audience: ['app.id'],
+    });
+    expect(options.trustedOrigins).not.toContain(APPLE_ORIGIN);
+  });
+
+  it('accepts both audiences and Apple’s form post with the website half', () => {
+    const options = withApple({
+      web: { clientId: 'web.id', clientSecret: 'jwt' },
+      appBundleId: 'app.id',
+    });
+    expect(options.socialProviders?.apple).toMatchObject({
+      clientId: 'web.id',
+      clientSecret: 'jwt',
+      audience: ['web.id', 'app.id'],
+    });
+    expect(options.trustedOrigins).toContain(APPLE_ORIGIN);
   });
 });
