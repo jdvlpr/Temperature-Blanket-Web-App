@@ -20,6 +20,7 @@ import { getEmailSender, type EmailMessage } from '#lib/server/email/index.js';
 import { TURNSTILE_HEADER, verifyTurnstile } from '#lib/server/turnstile.js';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
+import { APIError } from 'better-auth/api';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import {
   bearerToken,
@@ -398,6 +399,40 @@ export async function requireAccount(
   });
   if (!session) return json({ message: 'Not signed in' }, { status: 401 });
   return { auth, user: session.user };
+}
+
+/**
+ * Deletes the iPhone app's account, as the account page's Delete account does
+ * (Better Auth's delete-user: the account's data, then the user and every
+ * session). The app's session must be under `freshAge` old, so the app signs
+ * in again first. Only for a bearer token: browsers use /api/auth/delete-user.
+ */
+export async function deleteAppAccount(
+  event: RequestEvent,
+): Promise<'deleted' | 'not-fresh' | Response> {
+  const platform = getPlatform();
+  const auth = authFor(platform);
+  if (auth instanceof Response) return auth;
+  if (!bearerToken(event.request.headers))
+    return json({ message: 'Not signed in' }, { status: 401 });
+
+  // deleteUserData reads the platform from here
+  return requestPlatform.run(platform, async () => {
+    try {
+      await auth.api.deleteUser({
+        headers: withBearerSession(event.request.headers),
+        body: {},
+      });
+      return 'deleted' as const;
+    } catch (e) {
+      if (e instanceof APIError) {
+        if (e.body?.code === 'SESSION_EXPIRED') return 'not-fresh' as const;
+        if (e.statusCode === 401)
+          return json({ message: 'Not signed in' }, { status: 401 });
+      }
+      throw e;
+    }
+  });
 }
 
 /**

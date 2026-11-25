@@ -166,3 +166,39 @@ test('signed out, the page goes to sign in and comes back', async ({
   // Not opened by the app
   expect((await visitor.get('/app-sign-in')).status()).toBe(400);
 });
+
+test('the app deletes its account, signing out everywhere', async ({
+  baseURL,
+}) => {
+  const email = uniqueEmail('app-delete');
+  const browser = await signedInBrowser(baseURL!, email);
+  const app = await playwrightRequest.newContext({ baseURL });
+  const verifier = secret();
+  const code = await codeFor(browser, challengeOf(verifier));
+  const session = await (
+    await app.post('/api/account/app-session', { data: { code, verifier } })
+  ).json();
+  const json = { 'Content-Type': 'application/json' };
+
+  // Only for the app's bearer session: a browser uses Better Auth's own
+  expect(
+    (await browser.delete('/api/account', { headers: json })).status(),
+  ).toBe(401);
+  expect((await app.delete('/api/account', { headers: json })).status()).toBe(
+    401,
+  );
+
+  // The session is minutes old, so it's fresh enough
+  const deleted = await app.delete('/api/account', {
+    headers: { ...json, Authorization: `Bearer ${session.token}` },
+  });
+  expect(deleted.status()).toBe(204);
+  expect(
+    (
+      await app.get('/api/account/app-session', {
+        headers: { Authorization: `Bearer ${session.token}` },
+      })
+    ).status(),
+  ).toBe(401);
+  expect((await browser.get('/api/sync/changes?since=0')).status()).toBe(401);
+});
