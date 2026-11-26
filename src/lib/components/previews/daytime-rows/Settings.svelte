@@ -149,10 +149,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="rsun-daytime-position"
       bind:value={daytimeRowsPreview.settings.daytimePosition}
     >
-      <option value={'left'}>← Left Side</option>
-      <option value={'right'}>→ Right Side</option>
-      <option value={'center'}>→← Center</option>
-      <option value={'sides'}>←→ Sides</option>
+      <option value="left">← Left Side</option>
+      <option value="right">→ Right Side</option>
+      <option value="center">→← Center</option>
+      <option value="sides">←→ Sides</option>
     </select>
   </label>
 

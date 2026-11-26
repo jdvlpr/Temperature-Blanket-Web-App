@@ -274,7 +274,7 @@ export async function saveNow() {
     const href = project.url.href;
     try {
       // As Save does: the address bar holds the saved project
-      // eslint-disable-next-line svelte/no-navigation-without-resolve
+
       goto(new URL(href), { shallow: true, replace: true, state: '' });
       // Where it is: one only in this browser stays there
       await ProjectStorage.save({ toAccount: false, waitToSync: true });
@@ -357,7 +357,6 @@ export async function saveOpenProject() {
     return (await ProjectStorage.getIndex()).find((i) => i.id === id) ?? null;
   }
 
-  // eslint-disable-next-line svelte/no-navigation-without-resolve
   goto(new URL(project.url.href), { shallow: true, replace: true, state: '' });
   try {
     const item = await ProjectStorage.save();
@@ -387,7 +386,7 @@ export async function saveCopy() {
   const name = (await ProjectStorage.getById(project.id))?.name;
   project.id = newProjectId();
   project.createdAt = new Date().toISOString();
-  // eslint-disable-next-line svelte/no-navigation-without-resolve
+
   goto(new URL(project.url.href), { shallow: true, replace: true, state: '' });
   let item = await ProjectStorage.save();
   // The copy says so, unnamed too (from its title), so the two don't look the

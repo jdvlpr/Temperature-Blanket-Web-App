@@ -223,7 +223,7 @@ export class DaytimeRowsPreviewClass {
 
     if (!startIndex || !lengthEndIndex) return; // format of hash was wrong, so stop processing
     // targets
-    let targetsStr = hash.substring(0, startIndex);
+    const targetsStr = hash.substring(0, startIndex);
     const targets = targetsStr.match(/.{1,4}/g);
     if (targets && targets.length >= 2) {
       this.settings.daytimeTarget = targets[0] as WeatherParam['id'];

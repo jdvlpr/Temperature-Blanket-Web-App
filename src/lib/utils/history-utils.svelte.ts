@@ -45,7 +45,7 @@ export const loadFromHistory = async ({
 }: {
   action: 'Undo' | 'Redo';
 }) => {
-  let oldHistoryState = project.history.current;
+  const oldHistoryState = project.history.current;
   let newHistoryState;
   if (action === 'Undo') {
     newHistoryState = project.history.previous;

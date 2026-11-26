@@ -213,7 +213,7 @@ export class MonthRowsPreviewClass {
   // Method for loading settings from a url hash string
   // *******************
   load(hash: string) {
-    let separatorIndex = [];
+    const separatorIndex = [];
 
     for (let i = 0; i < hash.length; i++) {
       if (
@@ -226,7 +226,7 @@ export class MonthRowsPreviewClass {
     if (!separatorIndex.length) return; // format of hash was wrong, so stop processing
 
     let position = 0;
-    let targets = hash.substring(position, separatorIndex[0]);
+    const targets = hash.substring(position, separatorIndex[0]);
     const parsedTargets = targets.match(/.{1,4}/g);
     if (parsedTargets)
       this.settings.selectedTargets = parsedTargets as WeatherParam['id'][];

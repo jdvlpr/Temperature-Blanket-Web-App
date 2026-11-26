@@ -170,21 +170,21 @@ export class LocationsState implements LocationsStateType {
       !this.all?.every((item) => item?.label && item?.from && item?.to)
     )
       return '';
-    let titles: string[] = [];
+    const titles: string[] = [];
     this.all.forEach((location) => {
       if (location?.from && location?.to) {
-        let from = stringToDate(location.from).toLocaleDateString(undefined, {
+        const from = stringToDate(location.from).toLocaleDateString(undefined, {
           timeZone: 'UTC',
         });
-        let to = stringToDate(location.to).toLocaleDateString(undefined, {
+        const to = stringToDate(location.to).toLocaleDateString(undefined, {
           timeZone: 'UTC',
         });
-        let title = `${location.label} from ${from} to ${to}`;
+        const title = `${location.label} from ${from} to ${to}`;
         titles.push(title);
       }
     });
     if (titles.length === 0) return '';
-    let title = titles.join('; ');
+    const title = titles.join('; ');
     return title;
   });
 

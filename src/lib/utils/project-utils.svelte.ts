@@ -209,7 +209,7 @@ export const sendToProjectGallery = async (
     const yarnURLDetails = colorsToYarnDetails({
       colors: gaugeColors,
     });
-    let yarnSearchUrl = `${lastingOrigin()}/yarn?s=${colorsCode}&f=${yarnURLDetails}`;
+    const yarnSearchUrl = `${lastingOrigin()}/yarn?s=${colorsCode}&f=${yarnURLDetails}`;
     yarnUrls.push(yarnSearchUrl);
     tables.push(getWPGauge(gauge));
   });
@@ -379,7 +379,7 @@ export const getTitleFromLocationsMeta = (locations: string | null): string =>
 // Temporariy diagnostics
 function getDebugData() {
   // previous
-  let previous_today = new Date();
+  const previous_today = new Date();
   previous_today.setHours(0, 0, 0, 0);
   // set the _to end date to yesterday, the last day which should be included in the request for weather data
   const previous_yesterday = new Date(

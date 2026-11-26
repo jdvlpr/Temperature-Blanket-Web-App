@@ -506,14 +506,16 @@ const getColorsFromProjectURL = (string: string): Color[] | false => {
         // It has extra settings
         let colorsString = text.substring(0, text.indexOf('!'));
         colorsString = colorsString.replace(/\(.*?\)/g, ''); // remove ranges (number,number)
-        let newColors = stringToColors({
+        const newColors = stringToColors({
           string: colorsString,
         });
-        let extraText = text.substring(text.indexOf('!') + 1);
+        const extraText = text.substring(text.indexOf('!') + 1);
 
         if (extraText.includes('!')) {
           // if has yarn details too
-          let yarnDetails = extraText.substring(extraText.lastIndexOf('!') + 1);
+          const yarnDetails = extraText.substring(
+            extraText.lastIndexOf('!') + 1,
+          );
 
           if (newColors) {
             const colorsWithYarnDetails = yarnDetailsToColors({
@@ -527,7 +529,7 @@ const getColorsFromProjectURL = (string: string): Color[] | false => {
         }
       } else {
         text = text.replace(/\(.*?\)/g, ''); // remove ranges (number,number)
-        let newColors = stringToColors({
+        const newColors = stringToColors({
           string: text,
         });
         if (newColors) colors = [...colors, ...newColors];
@@ -702,8 +704,8 @@ export const sortColorsByName = ({ colors }: { colors: Color[] }): Color[] => {
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .sort((a, b) => {
-      var textA = (a.name ?? '').toUpperCase();
-      var textB = (b.name ?? '').toUpperCase();
+      const textA = (a.name ?? '').toUpperCase();
+      const textB = (b.name ?? '').toUpperCase();
       return textA < textB ? -1 : textA > textB ? 1 : 0;
     });
   // Insert locked colors back into the sorted list based on their original index
@@ -728,8 +730,8 @@ export const sortColorsByNameZtoA = ({
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .sort((a, b) => {
-      var textA = (a.name ?? '').toUpperCase();
-      var textB = (b.name ?? '').toUpperCase();
+      const textA = (a.name ?? '').toUpperCase();
+      const textB = (b.name ?? '').toUpperCase();
       return textA > textB ? -1 : textA < textB ? 1 : 0;
     });
   // Insert locked colors back into the sorted list based on their original index
@@ -979,7 +981,7 @@ export const getPalettesFromProjects = ({
   minColors?: number;
 }): GalleryPalette[] => {
   if (!projects.length) return [];
-  let _palettes: GalleryPalette[] = [];
+  const _palettes: GalleryPalette[] = [];
   projects.forEach((project) => {
     const sharedPalette = project.__typename === 'Palette' ? project : null;
     const params = sharedPalette
@@ -994,7 +996,7 @@ export const getPalettesFromProjects = ({
       const isNotPresetScheme = allGaugesAttributes.every(
         (p) => !params?.[p.id]?.value?.includes('~'),
       );
-      let colors = getColorsFromInput({ string: yarn_url });
+      const colors = getColorsFromInput({ string: yarn_url });
       const someColorsAreYarn =
         colors &&
         colors.some(

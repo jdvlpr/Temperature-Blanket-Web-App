@@ -192,7 +192,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // path no route matches; load it as a page then, rather than showing a
       // sign-in error after signing in
       else
-        // eslint-disable-next-line svelte/no-navigation-without-resolve
         await goto(redirectTo).catch(() => (window.location.href = redirectTo));
     } catch (e) {
       errorMessage = accountErrorMessage(e);

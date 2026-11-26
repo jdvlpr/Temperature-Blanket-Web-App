@@ -180,7 +180,7 @@ export class ContinuousSquarePreviewClass {
 
     if (!startIndex || !lengthEndIndex) return; // format of hash was wrong, so stop processing
 
-    let target = hash.substring(0, startIndex) as WeatherParam['id'];
+    const target = hash.substring(0, startIndex) as WeatherParam['id'];
     this.settings.selectedTarget = target;
 
     // stitches per day

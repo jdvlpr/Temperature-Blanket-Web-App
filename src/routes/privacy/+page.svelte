@@ -112,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               label="Preference Cookies (Required)"
               disabled
               detailsTextSize="text-normal"
-              details={`<p>Your settings for the site theme are stored as cookies. Other settings, and projects you save, are stored in your browser's own storage and aren't sent to this site unless you add them to an account (signed in, some preferences are saved to it too), share a link or send a project to the Project Gallery.</p>`}
+              details="<p>Your settings for the site theme are stored as cookies. Other settings, and projects you save, are stored in your browser's own storage and aren't sent to this site unless you add them to an account (signed in, some preferences are saved to it too), share a link or send a project to the Project Gallery.</p>"
               checked={true}
             />
             {#if __ACCOUNTS_ENABLED__}
@@ -120,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 label="Sign-in Cookies (Required when signed in)"
                 disabled
                 detailsTextSize="text-normal"
-                details={`<p>When you sign in, a secure cookie keeps you signed in, and a second cookie tells the site you may be signed in so it only checks when needed. Both are removed when you sign out. See Accounts, below.</p>`}
+                details="<p>When you sign in, a secure cookie keeps you signed in, and a second cookie tells the site you may be signed in so it only checks when needed. Both are removed when you sign out. See Accounts, below.</p>"
                 checked={true}
               />
             {/if}

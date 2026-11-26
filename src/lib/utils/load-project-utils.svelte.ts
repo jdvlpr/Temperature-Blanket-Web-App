@@ -205,7 +205,7 @@ const parseLocationURLHash = async (hashString: string) => {
 
   let currentPosition = 0;
 
-  let _locations = locations.all;
+  const _locations = locations.all;
 
   // The number of locations is the number of separator characters present after the 'l=' key in the URL hash
   for (let i = 0; i < separatorIndices.length; i++) {

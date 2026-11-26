@@ -311,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
   {#if !dateOutOfSeasonsRanges}
     <div class="mx-auto my-2 w-fit">
-      <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
+      <ToggleSwitch bind:checked={viewGaugeInfo} label="Show Color Details" />
     </div>
   {/if}
 </div>

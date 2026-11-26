@@ -48,7 +48,7 @@ async function handleLegacyLocalStorageKeys() {
   // 'disable_toast_analytics' is now 'preferences.disableToastAnalytics'
   const disableToastAnalytics = localStorage.getItem('disable_toast_analytics');
   if (disableToastAnalytics === 'true' || disableToastAnalytics === 'false') {
-    let value = JSON.parse(disableToastAnalytics);
+    const value = JSON.parse(disableToastAnalytics);
     preferences.value.disableToastAnalytics = value;
     localStorage.removeItem('disable_toast_analytics');
   }

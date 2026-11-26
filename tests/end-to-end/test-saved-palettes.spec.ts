@@ -50,7 +50,7 @@ test.describe('Saved palettes', () => {
 
     // It survives a reload, and is edited and trashed on My Palettes
     await page.goto('/my-palettes');
-    let list = page.getByRole('list', { name: 'Saved palettes' });
+    const list = page.getByRole('list', { name: 'Saved palettes' });
     await expect(list.getByRole('listitem')).toHaveCount(1);
     await list.getByRole('button', { name: 'More for Test Sunset' }).click();
     await expect(

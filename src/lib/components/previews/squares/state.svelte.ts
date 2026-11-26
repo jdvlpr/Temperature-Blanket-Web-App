@@ -111,7 +111,7 @@ export class SquaresPreviewClass {
 
   monthSepparatorSquaresIndexes = $derived.by(() => {
     if (this.settings.squaresBetweenMonthsCount === 0) return [];
-    let squaresIndexes: number[] = [];
+    const squaresIndexes: number[] = [];
     let monthSepparatorIndexes = getMonthSepparatorIndexes();
     monthSepparatorIndexes = monthSepparatorIndexes.map(
       (n) => n + this.settings.squaresAtBeginning,
@@ -277,10 +277,10 @@ export class SquaresPreviewClass {
   // Method for loading settings from a url hash string
   // *******************
   load(hash: string) {
-    let startIndex = [],
-      endIndex = [];
-    let exclamationIndex: number[] = [];
-    const separatorIndex = [];
+    const startIndex: number[] = [];
+    const endIndex: number[] = [];
+    const exclamationIndex: number[] = [];
+    const separatorIndex: number[] = [];
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex.push(i);
       if (
@@ -354,7 +354,7 @@ export class SquaresPreviewClass {
       for (let i = 1; i < startIndex.length; i++) {
         let targetIdStr = hash.substring(startIndex[i] - 4, startIndex[i]);
         if (targetIdStr === 'time') targetIdStr = 'dayt'; // Bug fix in 1.67 (previous id was 'daytime' so it got cut off because it wasn't four characters long)
-        let targetId: WeatherParam['id'] = targetIdStr as WeatherParam['id'];
+        const targetId: WeatherParam['id'] = targetIdStr as WeatherParam['id'];
         const secondaryParamSeparatorIndex = separatorIndex.filter(
           (item) => item > startIndex[i] && item < endIndex[i],
         );
@@ -364,8 +364,9 @@ export class SquaresPreviewClass {
           positionIndex < secondaryParamSeparatorIndex.length + 1;
           positionIndex++
         ) {
-          let end = secondaryParamSeparatorIndex[positionIndex] || endIndex[i];
-          let value = hash.substring(start, end);
+          const end =
+            secondaryParamSeparatorIndex[positionIndex] || endIndex[i];
+          const value = hash.substring(start, end);
           start = end + 1;
           this.settings.secondaryTargets =
             setSecondaryTargets(
@@ -378,7 +379,7 @@ export class SquaresPreviewClass {
 
     // Stitches around each square (join stitches and join color)
     if (exclamationIndex.length > 1) {
-      let currentIndex = exclamationIndex[1] + 1;
+      const currentIndex = exclamationIndex[1] + 1;
 
       // look for the divider
       let dividerIndex = hash.indexOf(
@@ -402,7 +403,7 @@ export class SquaresPreviewClass {
 
         // Get the color
         // The characters are from the divider position 'till the end of the hash
-        let joinColor = chroma(
+        const joinColor = chroma(
           hash.substring(dividerIndex + 1),
         ).hex() as NonNullable<Color['hex']>;
         if (chroma.valid(joinColor)) {

@@ -180,7 +180,7 @@ export class MonthSquaresPreviewClass {
   // Method for loading settings from a url hash string
   // *******************
   load(hash: string) {
-    let startIndex = [],
+    const startIndex = [],
       endIndex = [];
     const separatorIndex = [];
     for (let i = 0; i < hash.length; i++) {

@@ -206,7 +206,6 @@ fills from each day's neighbors whether shown or not. -->
 
   const allRows = rows.map((_, index) => index);
   const editedRows = $derived(
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- read only
     new Set([...edits.keys()].map((key) => +key.split('|')[0])),
   );
   const keyOfRow = (row: number) =>

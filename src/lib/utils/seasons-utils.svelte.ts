@@ -201,7 +201,7 @@ export function setSeasonsByLocation(location: LocationType) {
       seasonsMatchDates(currentSeasons, preset.seasons),
     );
 
-    let firstLat = Number($state.snapshot(location.lat));
+    const firstLat = Number($state.snapshot(location.lat));
 
     // Auto-assign seasons preset based on the location's hemisphere
     if (isDefaultSeasons && typeof firstLat === 'number') {

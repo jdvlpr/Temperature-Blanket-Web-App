@@ -89,7 +89,7 @@ export const getSuggestions = (
   data: GeoNamesSearchResult[],
 ): LocationSuggestion[] => {
   return data.map((item) => {
-    let labelText = formatLocationLabel(item);
+    const labelText = formatLocationLabel(item);
 
     let icon = '';
     if (item.countryCode)

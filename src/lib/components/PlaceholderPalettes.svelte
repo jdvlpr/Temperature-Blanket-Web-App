@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   interface Props {
-    items?: Number;
-    maxWFull?: Boolean;
-    wFull?: Boolean;
+    items?: number;
+    maxWFull?: boolean;
+    wFull?: boolean;
     height?: string;
   }
 

@@ -50,11 +50,11 @@ export const upToDate = (local: string | number, remote: string | number) => {
     return true;
   }
   if (VPAT.test(localStr) && VPAT.test(remoteStr)) {
-    let lparts = localStr.split('.');
+    const lparts = localStr.split('.');
     while (lparts.length < 3) {
       lparts.push('0');
     }
-    let rparts = remoteStr.split('.');
+    const rparts = remoteStr.split('.');
     while (rparts.length < 3) {
       rparts.push('0');
     }

@@ -248,7 +248,7 @@ export class ImagePaletteState {
   toColors(): Color[] {
     return this.points.map((point) => {
       if (this.mode === 'exact' || !point.yarn) return { hex: point.sourceHex };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       const { id, locked, delta, sourceHex, ...color } =
         point.yarn as MatchedColor;
       return color;

@@ -170,7 +170,7 @@ export class RowsPreviewClass {
       sectionIndex < this.totalSections;
       sectionIndex++, dayIndex++
     ) {
-      let section = []; // Array to store stitches in the section
+      const section = []; // Array to store stitches in the section
       let sectionStitchesCount: number; // Count of stitches in the section
 
       // Check if the current section index is greater than or equal to the total number of days
@@ -251,11 +251,11 @@ export class RowsPreviewClass {
           let color: NonNullable<Color['hex']>;
 
           if (isWeatherSection) {
-            let param = activeTargets[paramIndex] as any;
+            const param = activeTargets[paramIndex] as any;
             if (param === EXTRAS_TARGET) {
               color = this.settings.extrasColor;
             } else {
-              let value = weather.getWeatherValue({ dayIndex, param });
+              const value = weather.getWeatherValue({ dayIndex, param });
               const colorInfo = getColorInfo({ param, value });
               color = (colorInfo.hex || '#cccccc') as NonNullable<Color['hex']>;
             }
@@ -429,7 +429,7 @@ export class RowsPreviewClass {
     if (startIndex === undefined || lengthEndIndex === undefined) return;
 
     // Extract the targets from the hash
-    let targetsStr = hash.substring(0, startIndex);
+    const targetsStr = hash.substring(0, startIndex);
 
     if (
       targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator) ||
@@ -497,7 +497,7 @@ export class RowsPreviewClass {
 
     // Extract the length target or stitches per row from the hash and update the settings
     if (exclamationIndex) {
-      let content = hash.substring(exclamationIndex + 1, lengthEndIndex);
+      const content = hash.substring(exclamationIndex + 1, lengthEndIndex);
       if (isNaN(+content))
         this.settings.lengthTarget = content as WeatherParam['id'];
       else if (!isNaN(+content)) {

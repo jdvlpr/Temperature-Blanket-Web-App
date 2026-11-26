@@ -200,7 +200,7 @@ function createConditionalFormattingRules(
       const to = range.to as number;
 
       // Construct formula based on range inclusion preferences and direction
-      let formula = '';
+      const formula = '';
       if (direction === 'high-to-low') {
         const opFrom = includeFrom ? '<=' : '<';
         const opTo = includeTo ? '>=' : '>';

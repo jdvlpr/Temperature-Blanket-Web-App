@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         stroke-width={monthSquaresPreview.STITCH_SIZE}
         {x}
         {y}
-        fill={'none'}
+        fill="none"
         data-isweather={isWeather}
         data-dayindex={dayIndex}
       />

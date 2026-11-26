@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         stroke-width={squareRoundsPreview.STITCH_SIZE}
         {x}
         {y}
-        fill={'none'}
+        fill="none"
         data-isweather={isWeather}
         data-dayindex={dayIndex}
       />
@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             squareRoundsPreview.STITCH_SIZE / 2}
           y={increment * squareRoundsPreview.STITCH_SIZE -
             squareRoundsPreview.STITCH_SIZE / 2}
-          fill={'none'}
+          fill="none"
         />
       {/each}
     {/if}

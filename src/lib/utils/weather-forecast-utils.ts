@@ -23,7 +23,7 @@ export const getWeatherCodeDetails = ({
   precipitation_probability?: number | null;
 }): { icon: string | null; description: string | null } => {
   const variant = is_day === 0 ? 'night' : '';
-  let details: { icon: string | null; description: string | null } = {
+  const details: { icon: string | null; description: string | null } = {
     icon: null,
     description: null,
   };

@@ -170,10 +170,10 @@ export class CalendarPreviewClass {
   );
 
   extraSquares = $derived.by(() => {
-    let data: number[] = [];
-    let max = this.squaresPerMonth;
+    const data: number[] = [];
+    const max = this.squaresPerMonth;
     this.months.forEach((month, index) => {
-      let days = [
+      const days = [
         ...weather.rawData.filter(
           (day) =>
             day.date.getUTCFullYear() === month.year &&
@@ -185,16 +185,16 @@ export class CalendarPreviewClass {
           ? calendarPreview.weekLength +
             (month.start - this.settings.weekStartCode)
           : month.start - this.settings.weekStartCode;
-      let day = new Date(days[0].date);
-      let startDay = new Date(
+      const day = new Date(days[0].date);
+      const startDay = new Date(
         Date.UTC(month.year, month.month, month.start + 1),
       );
       if (day.getUTCDate() > startDay.getUTCDate())
         start = day.getUTCDate() - 1 + start;
-      let extra = max - days.length;
+      const extra = max - days.length;
       for (let i = 0; i < extra; i += 1) {
         let value = i;
-        let fromEnd = max - extra + i;
+        const fromEnd = max - extra + i;
         if (i >= start) value = fromEnd; // from end
         if (start === 0 && i === 0) value = fromEnd; // The start of month is first of month, so go from end
         value += index * max;
@@ -331,10 +331,10 @@ export class CalendarPreviewClass {
   // Method for loading settings from a url hash string
   // *******************
   load(hash: string) {
-    let startIndex = [],
-      endIndex = [],
-      exclamationIndex = [];
-    const separatorIndex = [];
+    const startIndex: number[] = [];
+    const endIndex: number[] = [];
+    const exclamationIndex: number[] = [];
+    const separatorIndex: number[] = [];
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex.push(i);
       if (
@@ -380,7 +380,7 @@ export class CalendarPreviewClass {
       for (let i = 1; i < startIndex.length; i++) {
         let targetIdStr = hash.substring(startIndex[i] - 4, startIndex[i]);
         if (targetIdStr === 'time') targetIdStr = 'dayt'; // Bug fix in 1.67 (previous id was daytime so it got cut off)
-        let targetId: WeatherParam['id'] = targetIdStr as WeatherParam['id'];
+        const targetId: WeatherParam['id'] = targetIdStr as WeatherParam['id'];
         const secondaryParamSeparatorIndex = separatorIndex.filter(
           (item) => item > startIndex[i] && item < endIndex[i],
         );
@@ -390,11 +390,11 @@ export class CalendarPreviewClass {
           positionIndex < secondaryParamSeparatorIndex.length + 1;
           positionIndex++
         ) {
-          let end =
+          const end =
             typeof secondaryParamSeparatorIndex[positionIndex] === 'undefined'
               ? endIndex[i]
               : secondaryParamSeparatorIndex[positionIndex];
-          let value = hash.substring(start, end);
+          const value = hash.substring(start, end);
           start = end + 1;
           this.settings.secondaryTargets =
             setSecondaryTargets(
@@ -408,7 +408,7 @@ export class CalendarPreviewClass {
     // Stitches around each square (join stitches and join color)
     if (exclamationIndex.length) {
       // This is the first exclamation mark
-      let currentIndex = exclamationIndex[0] + 1;
+      const currentIndex = exclamationIndex[0] + 1;
 
       // look for the divider
       let dividerIndex = hash.indexOf(
@@ -432,7 +432,7 @@ export class CalendarPreviewClass {
 
         // Get the color
         // The characters are from the divider position 'till the end of the hash
-        let joinColor = chroma(
+        const joinColor = chroma(
           hash.substring(dividerIndex + 1),
         ).hex() as NonNullable<Color['hex']>;
         if (chroma.valid(joinColor)) {
