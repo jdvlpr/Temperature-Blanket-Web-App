@@ -51,6 +51,7 @@ export const getWeatherCodeDetails = ({
     // Fog and depositing rime fog
     case 45:
       details.description ??= 'Fog';
+    // falls through
     case 48:
       details.description ??= 'Depositing Rime Fog';
       details.icon = `<svg class="icon icon-FOGCLOUD${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-FOGCLOUD${variant}"></use></svg>`;
@@ -58,8 +59,10 @@ export const getWeatherCodeDetails = ({
     // Drizzle: Light, moderate, and dense intensity
     case 51:
       details.description ??= 'Light Drizzle';
+    // falls through
     case 53:
       details.description ??= 'Moderate Drizzle';
+    // falls through
     case 55:
       details.description ??= 'Dense Drizzle';
       details.icon = `<svg class="icon icon-DRIZZLE${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-DRIZZLE${variant}"></use></svg>`;
@@ -67,6 +70,7 @@ export const getWeatherCodeDetails = ({
     // Freezing Drizzle: Light and dense intensity
     case 56:
       details.description ??= 'Light Freezing Drizzle';
+    // falls through
     case 57:
       details.description ??= 'Dense Freezing Drizzle';
       details.icon = `<svg class="icon icon-FREEZING_DRIZZLE${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-FREEZING_DRIZZLE${variant}"></use></svg>`;
@@ -74,8 +78,10 @@ export const getWeatherCodeDetails = ({
     // Rain: Slight, moderate and heavy intensity
     case 61:
       details.description ??= 'Slight Rain';
+    // falls through
     case 63:
       details.description ??= 'Moderate Rain';
+    // falls through
     case 65:
       details.description ??= 'Heavy Rain';
       details.icon = `<svg class="icon icon-RAIN${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-RAIN${variant}"></use></svg>`;
@@ -83,6 +89,7 @@ export const getWeatherCodeDetails = ({
     // Freezing Rain: Light and heavy intensity
     case 66:
       details.description ??= 'Light Freezing Rain';
+    // falls through
     case 67:
       details.description ??= 'Heavy Freezing Rain';
       details.icon = `<svg class="icon icon-FREEZING_RAIN${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-FREEZING_RAIN${variant}"></use></svg>`;
@@ -90,8 +97,10 @@ export const getWeatherCodeDetails = ({
     // Snow fall: Slight, moderate, and heavy intensity
     case 71:
       details.description ??= 'Slight Snow Fall';
+    // falls through
     case 73:
       details.description ??= 'Moderate Snow Fall';
+    // falls through
     case 75:
       details.description ??= 'Heavy Snow Fall';
       details.icon = `<svg class="icon icon-SNOW${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-SNOW${variant}"></use></svg>`;
@@ -104,8 +113,10 @@ export const getWeatherCodeDetails = ({
     // Rain showers: Slight, moderate, and violent
     case 80:
       details.description ??= 'Slight Rain Showers';
+    // falls through
     case 81:
       details.description ??= 'Moderate Rain Showers';
+    // falls through
     case 82:
       details.description ??= 'Violent Rain Showers';
       details.icon = `<svg class="icon icon-drizzle_rain${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-drizzle_rain${variant}"></use></svg>`;
@@ -113,6 +124,7 @@ export const getWeatherCodeDetails = ({
     // Snow showers slight and heavy
     case 85:
       details.description ??= 'Slight Snow Showers';
+    // falls through
     case 86:
       details.description ??= 'Heavy Snow Showers';
       details.icon = `<svg class="icon icon-SNOW_SHOWERS${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-SNOW_SHOWERS${variant}"></use></svg>`;
@@ -125,6 +137,7 @@ export const getWeatherCodeDetails = ({
     // Thunderstorm with slight and heavy hail
     case 96:
       details.description ??= 'Thunderstorms';
+    // falls through
     case 99:
       details.description ??= 'Thunderstorms';
       details.icon = `<svg class="icon icon-thunderstorm_with_light_rain${variant} w-8 h-8" fill="currentColor"><use xlink:href="#icon-thunderstorm_with_light_rain${variant}"></use></svg>`;

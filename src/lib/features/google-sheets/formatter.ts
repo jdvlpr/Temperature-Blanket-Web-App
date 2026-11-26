@@ -741,9 +741,9 @@ export function buildSpreadsheetData(
   options: ExportOptions,
   projectLink = '',
 ): SpreadsheetData {
-  const projectName =
-    `Temperature Blanket: ${locations.projectFilename}` ||
-    'Temperature Blanket';
+  const projectName = locations.projectFilename
+    ? `Temperature Blanket: ${locations.projectFilename}`
+    : 'Temperature Blanket';
   const sheets: gapi.client.sheets.Sheet[] = [];
   const requests: gapi.client.sheets.Request[] = [];
   const values: gapi.client.sheets.ValueRange[] = [];

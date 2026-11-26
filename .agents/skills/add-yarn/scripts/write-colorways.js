@@ -44,7 +44,9 @@ const q = (s) => `'${String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
 let domain = 'TODO';
 try {
   domain = new URL(sourceHref).hostname.replace(/^www\./, '');
-} catch {}
+} catch {
+  // Not a full address: the domain stays TODO
+}
 
 const colorEntries = colors
   .map(

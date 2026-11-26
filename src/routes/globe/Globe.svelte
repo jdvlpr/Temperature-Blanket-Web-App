@@ -686,7 +686,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .renderer()
           .domElement.closest('.scene-container')?.parentElement;
         if (internalContainer) {
+          // The globe library owns this DOM; Svelte doesn't render inside it
+          // eslint-disable-next-line svelte/no-dom-manipulating
           globeContainer.innerHTML = '';
+          // eslint-disable-next-line svelte/no-dom-manipulating
           globeContainer.appendChild(internalContainer);
         }
 

@@ -22,11 +22,9 @@ export type LibrarySection = 'projects' | 'palettes';
 class Section<T extends string> {
   #value = $state<T>() as T;
   readonly #key: string;
-  readonly #options: readonly T[];
 
   constructor(key: string, options: readonly [T, ...T[]]) {
     this.#key = key;
-    this.#options = options;
     this.#value = options[0];
     // On the server, the first side
     if (typeof localStorage === 'undefined') return;

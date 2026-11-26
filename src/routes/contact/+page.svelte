@@ -30,10 +30,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     MessageCirclePlusIcon,
     UsersIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
 
   let email = $state('Loading...');
 
-  $effect(() => {
+  // Only in the browser, so the address isn't in the page's HTML for scrapers
+  onMount(() => {
     email = `hello@${PUBLIC_BASE_DOMAIN_NAME}`;
   });
 </script>

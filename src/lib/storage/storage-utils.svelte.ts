@@ -94,11 +94,7 @@ export async function initializeLocalStorage() {
     preferences.value.theme.headingStyle || 'classic';
   preferences.value.seasons = preferences.value.seasons || DEFAULT_SEASONS;
 
-  try {
-    await handleLegacyLocalStorageKeys();
-  } catch (e) {
-    throw e;
-  }
+  await handleLegacyLocalStorageKeys();
 
   // Note when synced preferences change, so they sync once someone signs in
   if (browser) trackPreferenceChanges();

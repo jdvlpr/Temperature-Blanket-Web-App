@@ -294,7 +294,7 @@ describe('color-utils', () => {
     it('should parse single hex color', () => {
       const result = getColorsFromInput({ string: '#ff0000' });
       expect(result).toHaveLength(1);
-      // @ts-expect-error
+      // @ts-expect-error -- result[0] may be undefined
       expect(result[0].hex).toBe('#ff0000');
     });
 
@@ -313,7 +313,7 @@ describe('color-utils', () => {
         string: 'https://coolors.co/ff0000-00ff00',
       });
       expect(result).toHaveLength(2);
-      // @ts-expect-error
+      // @ts-expect-error -- result[0] may be undefined
       expect(result[0].hex).toBe('#ff0000');
     });
 

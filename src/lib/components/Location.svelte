@@ -313,10 +313,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       case 9:
       case 11:
         return 30;
-      case 2:
+      case 2: {
         const isLeap = (_year % 4 == 0 && _year % 100 != 0) || _year % 400 == 0;
         if (isLeap) return 29;
         return 28;
+      }
       default:
         return 30;
     }

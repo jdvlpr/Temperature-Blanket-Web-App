@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/env';
-  import { THEMES } from '#lib/constants/page-constants.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import { preferences } from '#lib/storage/preferences.svelte.js';
   import { onDestroy, onMount, tick, type Snippet } from 'svelte';
@@ -27,9 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { actions }: Props = $props();
 
-  let theme = $state(
-    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)?.id),
-  );
+  // Follows the theme preference; the system's change listener can set it too
+  let theme = $derived(getTheme(preferences.value.theme.mode || 'system'));
 
   let activePreviewSelectId = $state(previews.activeId);
 
@@ -69,11 +67,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (previews.activeId !== activePreviewSelectId)
       activePreviewSelectId = previews.activeId;
-  });
-
-  // Update theme when user changes the theme mode
-  $effect(() => {
-    theme = getTheme(preferences.value.theme.mode || 'system');
   });
 </script>
 

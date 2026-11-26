@@ -262,7 +262,6 @@ export class TemperatureGauge implements GaugeAttributes {
     });
 
     this.ranges = ranges;
-    this.rangeOptions = this.rangeOptions;
     this.rangeOptions.mode = mode;
     this.rangeOptions.isCustomRanges = isCustomRanges;
     this.numberOfColors = this.colors.length;
