@@ -134,7 +134,8 @@ export class RowsPreviewClass {
 
   activeSelectedTargets = $derived(
     this.settings.useSeasonTargets
-      ? [...new Set(this.settings.seasonTargets.flat())]
+      ? // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
+        [...new Set(this.settings.seasonTargets.flat())]
       : this.settings.selectedTargets,
   );
 
@@ -521,6 +522,7 @@ export class RowsPreviewClass {
     const date = weather.data?.[dayIndex]?.date;
     if (!date) return [EXTRAS_TARGET];
 
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const dateObj = new Date(date);
     const season = getSeasonForDate(dateObj, preferences.value.seasons) as any;
 

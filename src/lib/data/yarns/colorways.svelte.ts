@@ -79,6 +79,7 @@ function getAffiliateYarns(): Map<string, AffiliateYarn> | null {
   const parsed = JSON.parse(PUBLIC_AFFILIATE_YARNS);
   if (!parsed) return null;
   const locationCode = getLocationCode();
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const map = new Map<string, AffiliateYarn>();
 
   parsed.forEach((affiliateYarn: AffiliateYarnCompressed) => {
@@ -140,6 +141,7 @@ function buildColorwaysWithAffiliateLinks(
         affiliateYarnsMap?.get(`${brand.id}-${yarn.id}`) || null;
 
       // Create a map of affiliate colors for O(1) lookup if colors exist
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       const affiliateColorsMap = new Map<string, string>();
       if (affiliateYarn?.colors) {
         affiliateYarn.colors.forEach((c) => {

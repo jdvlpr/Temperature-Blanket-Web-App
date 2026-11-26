@@ -68,8 +68,10 @@ export function mergeProjectTrash(
   account: AccountTrashList | null,
   pendingNow: Set<string>,
 ): { entries: ProjectTrashEntry[]; stale: string[] } {
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const entries = new Map<string, ProjectTrashEntry>();
   const stale: string[] = [];
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const onAccount = new Map(account?.items.map((t) => [t.id, t]));
 
   for (const trashed of local) {
@@ -146,6 +148,7 @@ export async function refreshAccountTrash(): Promise<void> {
 export async function loadProjectTrash(): Promise<ProjectTrashEntry[]> {
   const local = await ProjectStorage.getTrash();
   const owner = ProjectStorage.syncOwner();
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const pendingNow = owner ? await pendingDeletes(owner) : new Set<string>();
   // A list fetched for someone who has since signed out doesn't count
   const list =
@@ -157,6 +160,7 @@ export async function loadProjectTrash(): Promise<ProjectTrashEntry[]> {
 
 // A project from the account's Trash, downloaded once to show and to restore.
 // By revision: deleted again after changes elsewhere, it's a new download.
+// eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
 const downloads = new Map<string, Promise<StoredProject | null>>();
 
 /** A project in the account's Trash, as saved; null if it's gone. */

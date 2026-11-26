@@ -183,7 +183,9 @@ export const getMonthSepparatorIndexes = (): number[] => {
       return;
     }
     const date = {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       current: new Date(day.date),
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       previous: new Date(all[index - 1].date),
     };
     if (date.current.getUTCMonth() !== date.previous.getUTCMonth()) {
@@ -250,6 +252,7 @@ export const weatherMonthsData = ({
 }): WeatherMonthsDataType[] => {
   if (!weatherData) return [];
 
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const unique = new Set(); // Use a Set instead of an array for faster lookup
   const data: WeatherMonthsDataType[] = [];
 
@@ -259,7 +262,9 @@ export const weatherMonthsData = ({
     const month = date.getUTCMonth();
     // Weather days are UTC midnight, so build these in UTC too: local dates
     // read with getUTC* land a day early east of UTC.
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const day = new Date(Date.UTC(year, month, 1)).getUTCDay();
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     const id = `${year}${month}`;
 
@@ -325,6 +330,7 @@ export const getPossibleDimensions = ({
   const dimensionPairs = [...dimensions, ...opposite.reverse()];
 
   // Use a Set to filter out duplicates and convert back to an array
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const options = [...new Set(dimensionPairs.map((n) => n[0] + 'x' + n[1]))];
 
   return options;

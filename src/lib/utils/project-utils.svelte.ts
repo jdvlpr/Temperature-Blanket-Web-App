@@ -199,6 +199,7 @@ export const sendToProjectGallery = async (
       includePrefixes: false,
     });
     const names = [
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       ...new Set(
         gaugeColors
           .filter((n) => !!n?.brandName && !!n?.yarnName)
@@ -333,6 +334,7 @@ export const getLocationsFromMeta = (
 
   // Older project gallery items didn't always use the standard ISO 8601 date format, so we need to be able to check if it's a valid date.
   const isValidDate = (string: string): boolean => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     return !isNaN(new Date(string).getTime());
   };
 
@@ -349,6 +351,7 @@ export const getLocationsFromMeta = (
     // "2024-03-13" parses as UTC midnight; any other format ("3/13/2024") as
     // local midnight, so it's shown in local time, or it's a day early east of UTC
     const show = (date: string) =>
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       new Date(date).toLocaleDateString(undefined, {
         timeZone: /^\d{4}-\d{2}-\d{2}$/.test(date) ? 'UTC' : undefined,
       });
@@ -379,6 +382,7 @@ export const getTitleFromLocationsMeta = (locations: string | null): string =>
 // Temporariy diagnostics
 function getDebugData() {
   // previous
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const previous_today = new Date();
   previous_today.setHours(0, 0, 0, 0);
   // set the _to end date to yesterday, the last day which should be included in the request for weather data
@@ -390,6 +394,7 @@ function getDebugData() {
   // current
   const todayStr = getLocalISODateString();
   const todayStrToDate = stringToDate(todayStr);
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const yesterday = new Date(todayStrToDate);
   yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
   const new_TOStart = dateToISO8601String(yesterday);

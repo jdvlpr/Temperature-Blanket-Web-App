@@ -414,7 +414,8 @@ export const parseGaugeURLHash = (
   // If the current url doesn't have project and version parameters, add them
   const search = window.location.search.includes('project')
     ? window.location.search
-    : `?project=${new Date().getTime()}&v=${version}`;
+    : // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
+      `?project=${new Date().getTime()}&v=${version}`;
   const href = origin + search + '#&' + gauge.id + '=' + hashString;
 
   // Get the colors from the href string

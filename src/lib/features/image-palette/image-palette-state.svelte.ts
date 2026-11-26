@@ -268,6 +268,7 @@ export class ImagePaletteState {
 
   /** Apply reordering, deleting, and locking done in the palette component */
   syncFromColors(colors: Partial<PaletteColor>[]) {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const byId = new Map(this.points.map((point) => [point.id, point]));
     const points: PalettePoint[] = [];
     for (const color of colors) {
@@ -659,6 +660,7 @@ export class ImagePaletteState {
   sortBy(order: SortOrder) {
     this.sortOrder = order;
     if (order === 'custom') return;
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const byId = new Map(this.points.map((point) => [point.id, point]));
     this.points = (
       getSortedPalette({
@@ -671,6 +673,7 @@ export class ImagePaletteState {
   /** The other way round, keeping locked colors where they are: a sort
    * becomes that sort's other direction (Gradient cool to warm, and so on) */
   reverse() {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const byId = new Map(this.points.map((point) => [point.id, point]));
     this.points = reverseColors(this.paletteColors()).map((color) =>
       byId.get(color.pointId)!,
@@ -680,6 +683,7 @@ export class ImagePaletteState {
 
   /** Put the colors in a random order, keeping locked colors where they are */
   shuffle() {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const byId = new Map(this.points.map((point) => [point.id, point]));
     this.points = shuffleColors(this.paletteColors()).map((color) =>
       byId.get(color.pointId)!,
@@ -805,6 +809,7 @@ export class ImagePaletteState {
   #setPoints(points: PalettePoint[]) {
     this.points = points;
     if (this.line) {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       const ids = new Set(points.map((n) => n.id));
       const pointIds = this.line.pointIds.filter((id) => ids.has(id));
       // A line needs both its ends; without them it's just colors
@@ -839,6 +844,7 @@ export class ImagePaletteState {
     return findClosestColorway({
       hex,
       index: this.#index,
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       exclude: new Set(
         others.filter((n) => n.yarn).map((n) => colorwayKey(n.yarn!)),
       ),

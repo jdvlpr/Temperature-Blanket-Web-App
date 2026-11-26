@@ -398,6 +398,7 @@ export async function addToAccount(
   paletteIds: string[] = [],
 ) {
   if (paletteIds.length) await PaletteStorage.addToAccount(userId, paletteIds);
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const chosen = new Set(ids);
   await ProjectStorage.updateSyncStates((item) =>
     chosen.has(item.id) && !item.sync
@@ -450,6 +451,7 @@ export async function leaveAccount(userId: string, keep: boolean) {
 export async function downloadAccountProjects(): Promise<
   { id: string; rev: number; project: unknown }[]
 > {
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   const latest = new Map<string, number>();
   let since = 0;
   for (;;) {

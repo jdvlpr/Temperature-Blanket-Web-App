@@ -191,6 +191,7 @@ export class SquaresPreviewClass {
   });
 
   filterTargets = $derived([
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     ...new Set(
       getSquareSectionTargetIds(
         this.settings.squareSize * this.settings.squareSize,

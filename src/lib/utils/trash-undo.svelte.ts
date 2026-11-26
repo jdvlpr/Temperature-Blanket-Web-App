@@ -52,15 +52,19 @@ export class TrashUndos {
    * (null). Ones whose items are listed again (restored some other way) drop.
    */
   placed(listedIds: string[]): Map<string | null, TrashUndoEntry[]> {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const listed = new Set(listedIds);
     const open = this.entries.filter((entry) => !listed.has(entry.id));
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const byId = new Map(open.map((entry) => [entry.id, entry]));
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const spots = new Map<string | null, TrashUndoEntry[]>();
     const ordered = open
       .map((entry) => {
         // Past any neighbors that went too, to the next listed item
         let anchor = entry.beforeId;
         let depth = 0;
+        // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
         const seen = new Set<string>();
         while (anchor && byId.has(anchor) && !seen.has(anchor)) {
           seen.add(anchor);
@@ -85,6 +89,7 @@ export class TrashUndos {
  * View menu can switch while an undo shows.
  */
 export class TrashSlots {
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- elements measured on demand, not state
   #elements = new Map<string, HTMLElement>();
   #heights = $state<Record<string, { layout: string; height: number }>>({});
 

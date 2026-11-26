@@ -185,7 +185,9 @@ export class CalendarPreviewClass {
           ? calendarPreview.weekLength +
             (month.start - this.settings.weekStartCode)
           : month.start - this.settings.weekStartCode;
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       const day = new Date(days[0].date);
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       const startDay = new Date(
         Date.UTC(month.year, month.month, month.start + 1),
       );
@@ -216,6 +218,7 @@ export class CalendarPreviewClass {
     ),
   );
 
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
   filterTargets = $derived([...new Set(this.squareSectionParams)]);
 
   targets = $derived(

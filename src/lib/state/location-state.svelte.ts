@@ -59,6 +59,7 @@ export class LocationState extends LocationClass implements LocationStateType {
       browser && crypto && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     this.#today = browser ? dateToISO8601String(new Date()) : null; // caused a build error without the browser check...
   }
 

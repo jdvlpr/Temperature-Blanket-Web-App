@@ -270,6 +270,7 @@ export class PaletteStorage {
     if (!records.length) return;
     const cutoff = trashCutoff();
     await update<SavedPalette[]>(SAVED_PALETTES_KEY, (all = []) => {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       const byId = new Map(all.map((p) => [p.id, p]));
       for (const record of records) {
         const mine = byId.get(record.id);
@@ -355,6 +356,7 @@ export class PaletteStorage {
 
   /** Gives this browser's palettes to the account; they upload on the next sync */
   static async addToAccount(userId: string, ids: string[]) {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const chosen = new Set(ids);
     await update<SavedPalette[]>(SAVED_PALETTES_KEY, (all = []) =>
       all.map((p) =>

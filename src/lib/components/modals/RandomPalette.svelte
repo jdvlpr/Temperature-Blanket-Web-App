@@ -83,6 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const tempYarnColorways: Color[] = [];
 
       // Create a set of existing color hex values for faster lookup
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
       const existingColorways = new Set();
 
       const colorwaysLength = colorways.length;
