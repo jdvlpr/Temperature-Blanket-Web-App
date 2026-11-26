@@ -221,9 +221,8 @@ centered as blocks so their first items never clip -->
             ? '-'
             : displayNumber(
                 weather.params.prcp
-                  ?.filter((n) => n !== null)
-                  ?.reduce((partialSum: number, a: any) => partialSum + a, 0) ??
-                  0,
+                  ?.filter((n): n is number => n !== null)
+                  ?.reduce((partialSum, a) => partialSum + a, 0) ?? 0,
               )}
           units={UNIT_LABELS.height[preferences.value.units ?? 'metric']}
         />
@@ -248,11 +247,8 @@ centered as blocks so their first items never clip -->
                 )
               : displayNumber(
                   weather.params.snow
-                    ?.filter((n) => n !== null)
-                    ?.reduce(
-                      (partialSum: number, a: any) => partialSum + a,
-                      0,
-                    ) ?? 0,
+                    ?.filter((n): n is number => n !== null)
+                    ?.reduce((partialSum, a) => partialSum + a, 0) ?? 0,
                 )}
           units={UNIT_LABELS.height[preferences.value.units ?? 'metric']}
         >

@@ -41,8 +41,12 @@ type DialogOptions = {
   title?: string;
 };
 
+// Any component can be a dialog, with its own props
+export type DialogComponentRef = DialogComponent['ref'];
 type DialogComponent = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- any component
   ref: Component<any> | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- that component's props
   props: Record<string, any> | null;
 };
 
@@ -76,7 +80,8 @@ class DialogClass {
 
   body = $state<string | null>('');
 
-  response = $state<any>(null);
+  /** A confirm dialog's answer goes here */
+  response = $state<((confirmed: boolean) => void) | null>(null);
 
   /** A confirm dialog's button text (default Yes), and whether it's a
    * destructive one (red) */
@@ -142,10 +147,11 @@ class DialogClass {
     type: 'component' | 'confirm';
     title?: string | null;
     body?: string | null;
-    response?: any;
+    response?: (confirmed: boolean) => void;
     confirmText?: string;
     danger?: boolean;
-    component?: any;
+    component?: Pick<DialogComponent, 'ref'> &
+      Partial<Pick<DialogComponent, 'props'>>;
     options?: DialogOptions;
   }) => {
     // Opened from a returnable dialog (like the Project menu or Share): opens
@@ -189,7 +195,7 @@ class DialogClass {
     this.type = type;
 
     if (type === 'component') {
-      const { ref, props } = component;
+      const { ref = null, props = null } = component ?? {};
 
       // Set the the dialog component and props
       this.contentComponent = {
@@ -352,7 +358,7 @@ export interface ToastSettings {
   /** Category of the toast. */
   category?: 'success' | 'error' | 'warning' | 'info' | null;
   /** Custom Icon Component */
-  icon?: Component;
+  icon?: Component<{ class?: string }>;
   /** Callback function that fires on trigger and close. */
   callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
 }

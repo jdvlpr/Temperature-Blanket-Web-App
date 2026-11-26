@@ -24,6 +24,17 @@ import Settings from './Settings.svelte';
 // Special marker used to indicate an "extras" row for days outside all seasons
 const EXTRAS_TARGET = '__extras__';
 
+/** One stitch run drawn in the preview */
+interface RowsStitch {
+  width: number;
+  height: number;
+  color: NonNullable<Color['hex']>;
+  x: number;
+  y: number;
+  isWeatherSection: boolean;
+  dayIndex: number;
+}
+
 interface RowsPreviewSettings extends BasePreviewSettings {
   selectedTargets: WeatherParam['id'][];
   stitchesPerRow: number;
@@ -105,10 +116,15 @@ export class RowsPreviewClass {
       return this.settings.stitchesPerRow;
     if (this.settings.lengthTarget === 'custom')
       return this.settings.stitchesPerDay;
+    // A measurement in the chosen units: missing is NaN, none (null) is 0
+    const day = weather.data[dayIndex] as unknown as Record<
+      string,
+      Record<string, number | null> | undefined
+    >;
     let value = Math.abs(
-      (weather.data[dayIndex] as any)[this.settings.lengthTarget][
-        preferences.value.units as any
-      ],
+      Number(
+        day[this.settings.lengthTarget]?.[String(preferences.value.units)],
+      ),
     );
     if (isNaN(value)) value = this.settings.stitchesPerDay;
     if (value === 0) value = 1;
@@ -164,14 +180,14 @@ export class RowsPreviewClass {
     let currentVisualRowHeight = 0; // Track the max height of the current row being rendered
 
     // Loop through each section
-    const sections: any[] = [];
+    const sections: RowsStitch[][] = [];
 
     for (
       let sectionIndex = 0, dayIndex = 0;
       sectionIndex < this.totalSections;
       sectionIndex++, dayIndex++
     ) {
-      const section = []; // Array to store stitches in the section
+      const section: RowsStitch[] = []; // Array to store stitches in the section
       let sectionStitchesCount: number; // Count of stitches in the section
 
       // Check if the current section index is greater than or equal to the total number of days
@@ -252,10 +268,11 @@ export class RowsPreviewClass {
           let color: NonNullable<Color['hex']>;
 
           if (isWeatherSection) {
-            const param = activeTargets[paramIndex] as any;
-            if (param === EXTRAS_TARGET) {
+            const target = activeTargets[paramIndex];
+            if (target === EXTRAS_TARGET) {
               color = this.settings.extrasColor;
             } else {
+              const param = target as WeatherParam['id'];
               const value = weather.getWeatherValue({ dayIndex, param });
               const colorInfo = getColorInfo({ param, value });
               color = (colorInfo.hex || '#cccccc') as NonNullable<Color['hex']>;
@@ -306,7 +323,7 @@ export class RowsPreviewClass {
     if (!this.settings.useSeasonTargets) return false;
     for (let i = 0; i < weather.data.length; i++) {
       const date = weather.data?.[i]?.date;
-      const season = getSeasonForDate(date, preferences.value.seasons) as any;
+      const season = getSeasonForDate(date, preferences.value.seasons);
       if (!season) return true;
     }
     return false;
@@ -524,7 +541,7 @@ export class RowsPreviewClass {
 
     // eslint-disable-next-line svelte/prefer-svelte-reactivity -- not state: used once and dropped
     const dateObj = new Date(date);
-    const season = getSeasonForDate(dateObj, preferences.value.seasons) as any;
+    const season = getSeasonForDate(dateObj, preferences.value.seasons);
 
     if (!season) return [EXTRAS_TARGET];
 

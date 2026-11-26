@@ -120,12 +120,16 @@ function createWeatherGrid(
         for (const type of selectedTypes) {
           if (dayData) {
             if (type === 'moon') {
-              const moonId = (dayData as any).moon;
+              const moonId: unknown = dayData.moon;
               row.push(
                 typeof moonId === 'number' ? MOON_PHASE_NAMES[moonId] : null,
               );
             } else {
-              const val = (dayData as any)[type]?.[units];
+              const measurements = dayData as unknown as Record<
+                string,
+                Record<string, number | null> | undefined
+              >;
+              const val = measurements[type]?.[units];
               row.push(val ?? null);
             }
           } else {

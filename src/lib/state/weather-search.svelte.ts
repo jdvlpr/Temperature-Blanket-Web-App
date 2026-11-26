@@ -379,7 +379,7 @@ class WeatherSearch {
 
             if (data?.message) throw Error(data.message);
 
-            data = data.map((day: Record<string, any>) => {
+            data = data.map((day: { date: string }) => {
               return {
                 ...day,
                 date: new Date(day.date),

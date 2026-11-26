@@ -25,8 +25,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { ClassValue } from 'svelte/elements';
 
   interface Props {
-    onSave: any;
-    onClose: any;
+    onSave: () => void;
+    onClose: () => void;
     saveText?: string;
     disabled?: boolean;
     /** Destructive: red, with a trash can */

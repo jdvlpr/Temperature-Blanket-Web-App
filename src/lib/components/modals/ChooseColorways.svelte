@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Attachment } from 'svelte/attachments';
 
   interface Props {
-    updateGauge: any;
+    updateGauge: (update: { _colors: Color[] }) => void;
   }
 
   let { updateGauge }: Props = $props();

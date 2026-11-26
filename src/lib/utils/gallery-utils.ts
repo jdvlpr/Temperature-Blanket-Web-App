@@ -36,6 +36,7 @@ const NEWER_FIELDS = ['projectName', 'views'];
 export async function queryGallery(
   query: string,
   variables?: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GraphQL's JSON, read by each caller
 ): Promise<{ response: Response; result: any }> {
   const send = async (text: string) => {
     const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {

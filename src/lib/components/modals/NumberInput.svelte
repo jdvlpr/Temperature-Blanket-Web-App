@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   interface Props {
     value: number;
     title: string;
-    onOkay: any;
+    onOkay: (value: number) => void;
     min?: number;
     max: number;
     showSlider?: boolean;

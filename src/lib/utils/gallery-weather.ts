@@ -71,15 +71,20 @@ export function isCustomGalleryWeather(weatherSources: string | null) {
 
 const isValue = (value: unknown) => value === null || typeof value === 'number';
 
-const isStoredDay = (day: any) =>
-  typeof day === 'object' &&
-  day !== null &&
-  Number.isInteger(day.location) &&
-  typeof day.date === 'string' &&
-  !Number.isNaN(Date.parse(day.date)) &&
-  ['tavg', 'tmin', 'tmax', 'prcp', 'snow'].every(
-    (key) => isValue(day[key]?.metric) && isValue(day[key]?.imperial),
+const isStoredDay = (value: unknown) => {
+  if (typeof value !== 'object' || value === null) return false;
+  const day = value as Record<string, unknown>;
+  return (
+    Number.isInteger(day.location) &&
+    typeof day.date === 'string' &&
+    !Number.isNaN(Date.parse(day.date)) &&
+    ['tavg', 'tmin', 'tmax', 'prcp', 'snow'].every((key) => {
+      const measure = day[key] as
+        { metric?: unknown; imperial?: unknown } | null | undefined;
+      return isValue(measure?.metric) && isValue(measure?.imperial);
+    })
   );
+};
 
 /**
  * The page's weather days to load into a project with these locations, or

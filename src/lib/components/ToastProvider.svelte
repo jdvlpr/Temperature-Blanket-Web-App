@@ -197,7 +197,7 @@
             data-testid="toast"
           >
             {#if t.icon}
-              {@const CustomIcon = t.icon as any}
+              {@const CustomIcon = t.icon}
               <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CustomIcon class="inline" />
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->

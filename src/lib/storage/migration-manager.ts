@@ -64,14 +64,14 @@ export class MigrationManager {
           await ProjectStorage.save({ id, localProject: legacyProject });
         }
         migratedIds.push(id);
-      } catch (err: any) {
+      } catch (err) {
         // console.error(
         //   `Migration: Failed for project "${legacyProject.title}"`,
         //   err,
         // );
         failedProjects.push({
           title: legacyProject.title || 'Untitled',
-          error: err.message || 'Unknown error',
+          error: (err as { message?: string })?.message || 'Unknown error',
         });
       }
     }

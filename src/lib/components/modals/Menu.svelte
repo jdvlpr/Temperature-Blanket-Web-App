@@ -40,7 +40,11 @@ open in the panel, with a Back button to it. -->
   import SaveStatus from '#lib/components/SaveStatus.svelte';
   import { locations } from '#lib/state/location-state.svelte.js';
   import { gauges } from '#lib/state/gauges-state.svelte.js';
-  import { dialog, toast } from '#lib/state/page-state.svelte.js';
+  import {
+    dialog,
+    toast,
+    type DialogComponentRef,
+  } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { weatherDays } from '#lib/state/weather-days.svelte.js';
@@ -134,7 +138,7 @@ open in the panel, with a Back button to it. -->
 
   // Opens in the panel, in place of the menu, with Back to it; a returnable
   // screen opens what's chosen on it in its place too
-  const open = (ref: unknown, title: string, returnable = false) =>
+  const open = (ref: DialogComponentRef, title: string, returnable = false) =>
     dialog.trigger({
       type: 'component',
       component: { ref },

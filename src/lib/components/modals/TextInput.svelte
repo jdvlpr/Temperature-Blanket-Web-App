@@ -20,8 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   interface Props {
     value: string;
     title: string;
-    onOkay: any;
-    parent: any;
+    onOkay: (value: string) => void;
   }
 
   let { value = $bindable(), title, onOkay }: Props = $props();

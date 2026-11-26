@@ -17,7 +17,7 @@ export const exists = (variable: unknown) => {
   return (
     !!variable &&
     variable !== '' &&
-    (variable as any).length !== 0 &&
+    (variable as { length?: unknown }).length !== 0 &&
     typeof variable !== 'undefined' &&
     JSON.stringify(variable) !== '{}'
   );

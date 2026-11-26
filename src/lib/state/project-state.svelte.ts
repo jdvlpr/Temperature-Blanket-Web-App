@@ -18,6 +18,7 @@ import { gauges } from '#lib/state/gauges-state.svelte.js';
 import { locations } from '#lib/state/location-state.svelte.js';
 import { previews } from '#lib/state/preview-state.svelte.js';
 import { weather } from '#lib/state/weather-state.svelte.js';
+import type { StoredProject } from '#lib/storage/projects.svelte.js';
 import { preferences } from '#lib/storage/preferences.svelte.js';
 import { timestampFromLegacyProjectId } from '#lib/utils/project-id-utils.js';
 import { seasonsToUrlHash } from '#lib/utils/seasons-utils.svelte.js';
@@ -76,7 +77,7 @@ type ProjectStatusType = {
     code: 1 | null; // 1 = unable to save to local storage
     message: string;
   };
-  temporaryProjectsBackup: any[]; // A temporary backup of projects in case migration fails
+  temporaryProjectsBackup: StoredProject[]; // A temporary backup of projects in case migration fails
   temporaryUid: string;
   wasLoaded: boolean;
   /** Where the loaded project came from, for its Loaded line */

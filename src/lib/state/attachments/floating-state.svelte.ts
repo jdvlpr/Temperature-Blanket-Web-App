@@ -40,7 +40,8 @@ export class InteractivePopoverInstance {
   }
 
   reference() {
-    const attrs: Record<string, any> = {
+    // The attachment and event handlers to spread on the reference element
+    const attrs: Record<string | symbol, (arg: never) => void> = {
       [createAttachmentKey()]: (node: HTMLElement) => {
         this.referenceElement = node;
       },
@@ -159,7 +160,7 @@ export class InteractivePopoverInstance {
       },
     );
 
-    const { x, y, middlewareData, placement } = position as any;
+    const { x, y, middlewareData, placement } = position;
 
     Object.assign(this.floatingElement.style, {
       left: `${x}px`,
@@ -305,7 +306,7 @@ export class PopoverInstance {
       },
     );
 
-    const { x, y, middlewareData, placement } = position as any;
+    const { x, y, middlewareData, placement } = position;
 
     Object.assign(this.floatingElement.style, {
       left: `${x}px`,

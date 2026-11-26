@@ -107,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return [index + 1, dateStr, day.location, gaugeInfo];
     });
 
-    const data: any[][] = [
+    const data: unknown[][] = [
       ['Item Number', weatherGrouping, 'Location Index', ...labels],
       ..._weather,
     ];

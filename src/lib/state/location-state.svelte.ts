@@ -43,7 +43,8 @@ export class LocationClass implements LocationType {
   lat?: string = $state('');
   lng?: string = $state('');
   elevation?: number = $state();
-  stations?: null | any[] = $state();
+  /** Meteostat's station ids, when it's the source */
+  stations?: null | string[] = $state();
   source?: WeatherSource = $state();
   wasLoadedFromURL?: boolean = $state(false);
   wasLoadedFromStorage?: boolean = $state(false);

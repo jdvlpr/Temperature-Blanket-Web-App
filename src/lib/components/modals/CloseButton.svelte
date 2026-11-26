@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { XIcon } from '@lucide/svelte';
 
   type Props = {
-    onClose: any;
+    onClose: () => void;
     text?: string;
     size?: 'btn-sm' | '' | 'btn-lg';
   };

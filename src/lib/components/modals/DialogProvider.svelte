@@ -662,11 +662,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         saveText={dialog.confirmText ?? 'Yes'}
                         danger={dialog.danger}
                         onSave={() => {
-                          dialog.response(true);
+                          dialog.response?.(true);
                           dialog.close();
                         }}
                         onClose={() => {
-                          dialog.response(false);
+                          dialog.response?.(false);
                           dialog.close();
                         }}
                       />

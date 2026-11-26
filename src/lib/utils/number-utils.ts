@@ -159,6 +159,6 @@ export const pickRandomFromArray = <T>({ array }: { array: T[] }) => {
   return array[index];
 };
 
-export const getMiddleValueOfArray = (arr: any[]) => {
+export const getMiddleValueOfArray = <T>(arr: T[]): T => {
   return arr[Math.ceil((arr.length - 1) / 2)];
 };

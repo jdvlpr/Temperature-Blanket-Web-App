@@ -18,6 +18,8 @@ export function safeSlide(
   }: SlideParams = {},
 ): TransitionConfig {
   const style = getComputedStyle(node);
+  // Read by name, as `paddingTop` or `marginLeft`
+  const styleValues = style as unknown as Record<string, string>;
   const opacity = +style.opacity;
   const primary_property = axis === 'y' ? 'height' : 'width';
   const primary_property_value = parseFloat(style[primary_property]);
@@ -27,22 +29,22 @@ export function safeSlide(
     (e) => `${e[0].toUpperCase()}${e.slice(1)}`,
   );
   const padding_start_value = parseFloat(
-    style[`padding${capitalized_secondary_properties[0]}` as any],
+    styleValues[`padding${capitalized_secondary_properties[0]}`],
   );
   const padding_end_value = parseFloat(
-    style[`padding${capitalized_secondary_properties[1]}` as any],
+    styleValues[`padding${capitalized_secondary_properties[1]}`],
   );
   const margin_start_value = parseFloat(
-    style[`margin${capitalized_secondary_properties[0]}` as any],
+    styleValues[`margin${capitalized_secondary_properties[0]}`],
   );
   const margin_end_value = parseFloat(
-    style[`margin${capitalized_secondary_properties[1]}` as any],
+    styleValues[`margin${capitalized_secondary_properties[1]}`],
   );
   const border_width_start_value = parseFloat(
-    style[`border${capitalized_secondary_properties[0]}Width` as any],
+    styleValues[`border${capitalized_secondary_properties[0]}Width`],
   );
   const border_width_end_value = parseFloat(
-    style[`border${capitalized_secondary_properties[1]}Width` as any],
+    styleValues[`border${capitalized_secondary_properties[1]}Width`],
   );
 
   return {

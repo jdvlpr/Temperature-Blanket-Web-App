@@ -33,7 +33,7 @@ export interface LocationType {
   fclName?: string;
   flagIcon?: string;
   population?: number;
-  stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
+  stations?: null | string[]; // Meteostat's station ids, when it's the source
   source?: WeatherSource;
   wasLoadedFromURL?: boolean;
   wasLoadedFromStorage?: boolean;

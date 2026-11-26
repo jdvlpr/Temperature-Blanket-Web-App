@@ -102,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   let globeContainer: HTMLElement | undefined = $state();
   let resizeObserver: ResizeObserver | undefined = $state();
-  let handleCameraChange: ((...args: any[]) => void) | null = null;
+  let handleCameraChange: (() => void) | null = null;
   let stopWaitingForTiles: (() => void) | null = null;
 
   /**
@@ -155,14 +155,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // last call in a burst — without that trailing call the camera's final
   // resting position after a fly-to can land inside the throttle window and be
   // dropped, leaving the panel showing where the camera used to be.
-  function throttle<T extends (...args: any[]) => any>(
+  function throttle<T extends (...args: never[]) => unknown>(
     func: T,
     limit: number,
   ): (...args: Parameters<T>) => void {
     let inThrottle = false;
     let trailingArgs: Parameters<T> | null = null;
 
-    return function (this: any, ...args: Parameters<T>) {
+    return function (this: unknown, ...args: Parameters<T>) {
       if (inThrottle) {
         trailingArgs = args;
         return;
@@ -712,7 +712,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // globe-discs.ts for why this isn't three-globe's points layer
           // (its cylinders always stick up). Seeded by updatePointSet below.
           .customLayerData([])
-          .customLayerLabel(null as any) // Disable hover tooltips (null not in type def)
+          // Disable hover tooltips (null not in type def)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see above
+          .customLayerLabel(null as any)
           .customThreeObject((d: object) =>
             globeState.discs!.createDisc(
               (d as GlobeRegion).popular_color?.hex ?? '#ffcc00',

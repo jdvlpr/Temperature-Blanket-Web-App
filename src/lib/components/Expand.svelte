@@ -20,8 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isExpanded?: boolean;
     /** text to show regardless of whether expanded or collapsed. */
     label?: string;
-    iconLess?: any;
-    iconMore?: any;
+    /** Icon markup */
+    iconLess?: string;
+    iconMore?: string;
     disabled?: boolean;
   }
 

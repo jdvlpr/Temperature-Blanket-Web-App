@@ -23,16 +23,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { tick } from 'svelte';
 
   interface Props {
-    index?: any;
-    hex: any;
-    name: any;
-    brandId: any;
-    yarnId: any;
-    brandName: any;
-    yarnName: any;
-    variant_href: any;
-    affiliate_variant_href: any;
-    onChangeColor: any;
+    index?: number | null;
+    hex: Color['hex'];
+    name: Color['name'];
+    brandId: Color['brandId'];
+    yarnId: Color['yarnId'];
+    brandName: Color['brandName'];
+    yarnName: Color['yarnName'];
+    variant_href: Color['variant_href'];
+    affiliate_variant_href: Color['affiliate_variant_href'];
+    onChangeColor: (color: Color & { index?: number }) => void;
   }
 
   let {

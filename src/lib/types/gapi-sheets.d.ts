@@ -9,9 +9,10 @@ declare namespace gapi {
     }): Promise<void>;
     function getToken(): { access_token: string } | null;
     namespace sheets {
-      type Sheet = any;
-      type Request = any;
-      type ValueRange = any;
+      // Google's JSON shapes, built where they're sent
+      type Sheet = Record<string, unknown>;
+      type Request = Record<string, unknown>;
+      type ValueRange = Record<string, unknown>;
       namespace spreadsheets {
         function create(request: {
           resource: { properties: { title: string }; sheets: Sheet[] };
@@ -35,7 +36,7 @@ declare namespace google.accounts.oauth2 {
   interface TokenClientConfig {
     client_id: string;
     scope: string;
-    callback?: (response: any) => void;
+    callback?: (response: { access_token?: string; error?: string }) => void;
   }
 
   interface TokenClient {
