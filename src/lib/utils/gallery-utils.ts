@@ -220,7 +220,7 @@ const PROJECT_NODE_FIELDS = `
   date`;
 
 /** How far back Popular counts views by default, in days */
-export const POPULAR_DAYS = 30;
+export const POPULAR_DAYS = 7;
 
 type PopularIds = { ids: number[]; total: number; hasMore: boolean };
 

@@ -64,7 +64,7 @@ Ravelry need accounts, so show only in builds with them. -->
   </ul>
   <DocsShot
     src="explore/gallery"
-    alt="The Gallery's Projects: a search box, Sort: Popular, past month, View and Filters, then cards of temperature blankets from around the world, each with its picture, place and dates, when it was published and how many views it has, a ⋮ and a star."
+    alt="The Gallery's Projects: a search box, Sort: Popular, past week, View and Filters, then cards of temperature blankets from around the world, each with its picture, place and dates, when it was published and how many views it has, a ⋮ and a star."
     caption="The Gallery."
   />
 </section>
