@@ -51,7 +51,8 @@ vi.mock('#lib/storage/preferences.svelte.js', () => ({
 
 // Mock utils that are used in project-utils
 vi.mock('#lib/utils/color-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual =
+    await importOriginal<typeof import('#lib/utils/color-utils.js')>();
   return {
     ...actual,
     colorsToCode: vi.fn(() => 'code'),
@@ -60,17 +61,20 @@ vi.mock('#lib/utils/color-utils.js', async (importOriginal) => {
 });
 
 vi.mock('#lib/utils/unit-utils.svelte.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual =
+    await importOriginal<typeof import('#lib/utils/unit-utils.svelte.js')>();
   return { ...actual, convertTime: vi.fn((val) => val) };
 });
 
 vi.mock('#lib/utils/date-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual =
+    await importOriginal<typeof import('#lib/utils/date-utils.js')>();
   return { ...actual, dateToISO8601String: vi.fn(() => '2024-01-01') };
 });
 
 vi.mock('#lib/utils/weather-utils.svelte.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual =
+    await importOriginal<typeof import('#lib/utils/weather-utils.svelte.js')>();
   return {
     ...actual,
     getWeatherSourceDetails: vi.fn(() => []),

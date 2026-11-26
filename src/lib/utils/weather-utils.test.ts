@@ -6,7 +6,7 @@ import {
 } from './weather-utils.svelte';
 
 const { mockAllGaugesAttributes } = vi.hoisted(() => ({
-  mockAllGaugesAttributes: [] as any[],
+  mockAllGaugesAttributes: [] as unknown[],
 }));
 
 vi.mock('#lib/state/gauges-state.svelte.js', () => ({

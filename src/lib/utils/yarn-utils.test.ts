@@ -137,7 +137,7 @@ describe('yarn-utils', () => {
 
   describe('getColorways', () => {
     it('should return all colorways if no filters provided', () => {
-      const result = getColorways({} as any);
+      const result = getColorways({} as never);
       expect(result).toHaveLength(3);
     });
 

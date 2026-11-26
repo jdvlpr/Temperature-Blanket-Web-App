@@ -8,14 +8,14 @@ import {
 
 // Shared store for mock
 const vi_mockStore = {
-  data: new Map<string, any>(),
+  data: new Map<string, unknown>(),
 };
 
 vi.mock('idb-keyval', () => ({
   get: vi.fn((key: string) =>
     Promise.resolve(vi_mockStore.data.get(key) || null),
   ),
-  set: vi.fn((key: string, value: any) => {
+  set: vi.fn((key: string, value: unknown) => {
     vi_mockStore.data.set(key, value);
     return Promise.resolve();
   }),
@@ -23,7 +23,7 @@ vi.mock('idb-keyval', () => ({
     vi_mockStore.data.delete(key);
     return Promise.resolve();
   }),
-  update: vi.fn((key: string, updater: (old: any) => any) => {
+  update: vi.fn((key: string, updater: (old: unknown) => unknown) => {
     vi_mockStore.data.set(key, updater(vi_mockStore.data.get(key)));
     return Promise.resolve();
   }),
@@ -109,7 +109,7 @@ describe('ProjectStorage', () => {
       isCustomWeatherData: false,
       weatherData: [],
       weatherSource: { name: 'Meteostat' },
-    } as any;
+    } as never;
 
     await ProjectStorage.save({ id: '123', localProject: project });
 
@@ -129,7 +129,7 @@ describe('ProjectStorage', () => {
     const { get } = await import('idb-keyval');
     vi.mocked(get).mockResolvedValue(null);
 
-    const project = { title: 'Fail' } as any;
+    const project = { title: 'Fail' } as never;
     await expect(
       ProjectStorage.save({ id: 'fail', localProject: project }),
     ).rejects.toThrow(/Failed to verify/);
@@ -137,7 +137,7 @@ describe('ProjectStorage', () => {
 
   it('should retrieve by href', async () => {
     const href = 'http://localhost/?project=456';
-    const project = { title: 'By Href', href } as any;
+    const project = { title: 'By Href', href } as never;
 
     await ProjectStorage.save({ id: '456', localProject: project });
 
@@ -149,8 +149,14 @@ describe('ProjectStorage', () => {
   });
 
   it('should remove by id and href', async () => {
-    await ProjectStorage.save({ id: '1', localProject: { href: 'h1' } as any });
-    await ProjectStorage.save({ id: '2', localProject: { href: 'h2' } as any });
+    await ProjectStorage.save({
+      id: '1',
+      localProject: { href: 'h1' } as never,
+    });
+    await ProjectStorage.save({
+      id: '2',
+      localProject: { href: 'h2' } as never,
+    });
 
     await ProjectStorage.removeById('1');
     expect(await ProjectStorage.getById('1')).toBeNull();
@@ -164,11 +170,11 @@ describe('ProjectStorage', () => {
   it('should return projects for display reversed', async () => {
     await ProjectStorage.save({
       id: '1',
-      localProject: { title: 'First' } as any,
+      localProject: { title: 'First' } as never,
     });
     await ProjectStorage.save({
       id: '2',
-      localProject: { title: 'Second' } as any,
+      localProject: { title: 'Second' } as never,
     });
 
     const display = await ProjectStorage.getProjectsForDisplay();
@@ -179,7 +185,7 @@ describe('ProjectStorage', () => {
   it('lists the most recently changed projects first', () => {
     const synced = (id: string, updatedAt: number) => ({
       id,
-      meta: { title: id } as any,
+      meta: { title: id } as never,
       sync: {
         ownerUserId: 'u1',
         rev: 1,
@@ -189,7 +195,7 @@ describe('ProjectStorage', () => {
         error: null,
       },
     });
-    const guest = (id: string) => ({ id, meta: { title: id } as any });
+    const guest = (id: string) => ({ id, meta: { title: id } as never });
     const ids = sortByRecent([
       synced('edited-long-ago', 1_000),
       guest('1700000000000'),
@@ -205,7 +211,7 @@ describe('ProjectStorage', () => {
   });
 
   it('names a project, keeps the name when re-saved, and clears it', async () => {
-    const project = { title: 'Lisbon, 2025', href: 'h1' } as any;
+    const project = { title: 'Lisbon, 2025', href: 'h1' } as StoredProject;
     await ProjectStorage.save({ id: '1', localProject: project });
 
     await ProjectStorage.rename('1', '  Gift for Ana  ');
@@ -224,7 +230,10 @@ describe('ProjectStorage', () => {
   });
 
   it('caps long names', async () => {
-    await ProjectStorage.save({ id: '1', localProject: { href: 'h1' } as any });
+    await ProjectStorage.save({
+      id: '1',
+      localProject: { href: 'h1' } as never,
+    });
     await ProjectStorage.rename('1', 'x'.repeat(500));
     expect((await ProjectStorage.getById('1'))?.name).toHaveLength(
       MAX_SAVED_PROJECT_NAME_LENGTH,
@@ -235,7 +244,7 @@ describe('ProjectStorage', () => {
     for (const id of ['1', '2', '3'])
       await ProjectStorage.save({
         id,
-        localProject: { title: `P${id}`, href: `h${id}` } as any,
+        localProject: { title: `P${id}`, href: `h${id}` } as never,
       });
     const index = await ProjectStorage.getIndex();
     const item = index[1];
@@ -349,7 +358,7 @@ describe('ProjectStorage', () => {
           isCustomWeatherData: false,
           weatherData,
           weatherDays: kept,
-        } as any),
+        } as never),
       });
       openProject(UUID);
       vi_mockWeatherDays.loaded.mockClear();
@@ -391,7 +400,7 @@ describe('ProjectStorage', () => {
     const save = (id: string) =>
       ProjectStorage.save({
         id,
-        localProject: { title: `P${id}`, href: `h${id}` } as any,
+        localProject: { title: `P${id}`, href: `h${id}` } as never,
       });
 
     afterEach(() => {
@@ -426,7 +435,7 @@ describe('ProjectStorage', () => {
       await ProjectStorage.moveToTrash('1');
       await ProjectStorage.save({
         id: '1',
-        localProject: { title: 'Newer', href: 'h1' } as any,
+        localProject: { title: 'Newer', href: 'h1' } as never,
       });
 
       await ProjectStorage.restoreFromTrash('1');

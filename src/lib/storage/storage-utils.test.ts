@@ -4,10 +4,10 @@ import { ProjectStorage } from './projects.svelte';
 import * as storageUtils from './storage-utils.svelte';
 
 // Mock idb-keyval
-const idbStore = new Map<string, any>();
+const idbStore = new Map<string, unknown>();
 vi.mock('idb-keyval', () => ({
   get: vi.fn((key: string) => Promise.resolve(idbStore.get(key) || null)),
-  set: vi.fn((key: string, value: any) => {
+  set: vi.fn((key: string, value: unknown) => {
     idbStore.set(key, value);
     return Promise.resolve();
   }),
@@ -22,11 +22,11 @@ vi.mock('#lib/state/weather-state.svelte.js', () => ({
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
-    rawData: [] as any[],
+    rawData: [] as unknown[],
     currentIndex: 0,
     grouping: 'day',
     isFromLocalStorage: false,
-    setRawData(value: any[]) {
+    setRawData(value: unknown[]) {
       this.currentIndex = 0;
       this.rawData = value;
     },
@@ -153,7 +153,7 @@ describe('storage-utils integration', () => {
       weatherData: [{ date: '2024-01-01', temp: 10 }],
     };
 
-    vi.spyOn(ProjectStorage, 'getById').mockResolvedValue(projectData as any);
+    vi.spyOn(ProjectStorage, 'getById').mockResolvedValue(projectData as never);
 
     await ProjectStorage.load();
 

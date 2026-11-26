@@ -73,7 +73,8 @@ vi.mock('#lib/state/project-state.svelte.js', () => ({
 }));
 
 vi.mock('#lib/utils/number-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual =
+    await importOriginal<typeof import('#lib/utils/number-utils.js')>();
   return {
     ...actual,
     isValueInRange: vi.fn(
@@ -83,7 +84,8 @@ vi.mock('#lib/utils/number-utils.js', async (importOriginal) => {
 });
 
 vi.mock('#lib/utils/yarn-utils.js', async (importOriginal) => {
-  const actual = await importOriginal<any>();
+  const actual =
+    await importOriginal<typeof import('#lib/utils/yarn-utils.js')>();
   return {
     ...actual,
     getColorPropertiesFromYarnStringAndHex: vi.fn(({ yarnString }) => {
@@ -156,7 +158,7 @@ describe('color-utils', () => {
     });
 
     it('should return null or default if no range matches', () => {
-      const result = getColorInfo({ param: 'unknown' as any, value: 10 });
+      const result = getColorInfo({ param: 'unknown' as never, value: 10 });
       expect(result.hex).toBe('#ffffff'); // default in implementation
     });
 
@@ -179,7 +181,7 @@ describe('color-utils', () => {
           includeFromValue: true,
           includeToValue: false,
         },
-      } as any);
+      } as never);
       expect(getColorInfo({ param: 'tmax', value: 7 }).hex).toBe('#111111');
     });
   });
@@ -338,25 +340,25 @@ describe('color-utils', () => {
     ];
 
     it('sortColorsLightToDark', () => {
-      const sorted = sortColorsLightToDark({ colors: [...colors] as any });
+      const sorted = sortColorsLightToDark({ colors: [...colors] as never });
       expect(sorted[0].hex).toBe('#ffffff');
       expect(sorted[2].hex).toBe('#000000');
     });
 
     it('sortColorsDarktoLight', () => {
-      const sorted = sortColorsDarktoLight({ colors: [...colors] as any });
+      const sorted = sortColorsDarktoLight({ colors: [...colors] as never });
       expect(sorted[0].hex).toBe('#000000');
       expect(sorted[2].hex).toBe('#ffffff');
     });
 
     it('sortColorsByName', () => {
-      const sorted = sortColorsByName({ colors: [...colors] as any });
+      const sorted = sortColorsByName({ colors: [...colors] as never });
       expect(sorted[0].name).toBe('Black');
       expect(sorted[2].name).toBe('White');
     });
 
     it('sortColorsByNameZtoA', () => {
-      const sorted = sortColorsByNameZtoA({ colors: [...colors] as any });
+      const sorted = sortColorsByNameZtoA({ colors: [...colors] as never });
       expect(sorted[0].name).toBe('White');
       expect(sorted[2].name).toBe('Black');
     });

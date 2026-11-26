@@ -3,14 +3,14 @@ import { ProjectStorage, type StoredProject } from './projects.svelte';
 
 // Shared store for mock
 const vi_mockStore = {
-  data: new Map<string, any>(),
+  data: new Map<string, unknown>(),
 };
 
 vi.mock('idb-keyval', () => ({
   get: vi.fn((key: string) =>
     Promise.resolve(vi_mockStore.data.get(key) || null),
   ),
-  set: vi.fn((key: string, value: any) => {
+  set: vi.fn((key: string, value: unknown) => {
     vi_mockStore.data.set(key, value);
     return Promise.resolve();
   }),
@@ -18,7 +18,7 @@ vi.mock('idb-keyval', () => ({
     vi_mockStore.data.delete(key);
     return Promise.resolve();
   }),
-  update: vi.fn((key: string, updater: (old: any) => any) => {
+  update: vi.fn((key: string, updater: (old: unknown) => unknown) => {
     vi_mockStore.data.set(key, updater(vi_mockStore.data.get(key)));
     return Promise.resolve();
   }),

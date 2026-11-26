@@ -40,8 +40,9 @@ const {
     status: { saved: false },
   },
   mockPreviews: {
-    all: [{ id: 'rows' }, { id: 'clnr' }] as any[],
-    active: undefined as any,
+    all: [{ id: 'rows' }, { id: 'clnr' }] as unknown[],
+    active: undefined as
+      { id: string; extraColorDetails?: unknown } | undefined,
     load: vi.fn(),
   },
   mockWeather: {
@@ -50,20 +51,20 @@ const {
     setGrouping: vi.fn((g: string) => {
       mockWeather.grouping = g;
     }),
-    data: [] as any[],
+    data: [] as unknown[],
     source: { name: '', useSecondary: false },
   },
   mockPreferences: {
-    value: { units: 'imperial', seasons: [] as any[] },
+    value: { units: 'imperial', seasons: [] as unknown[] },
   },
   mockLocations: { allValid: true },
   mockToast: { trigger: vi.fn() },
   mockGauges: {
-    allGaugesAttributes: [] as any[],
+    allGaugesAttributes: [] as unknown[],
     gauges: {
       addById: vi.fn(),
       remove: vi.fn(),
-      allCreated: [] as any[],
+      allCreated: [] as unknown[],
       getSnapshot: vi.fn(),
     },
   },
@@ -169,7 +170,7 @@ describe('loadFromHistory - preview switching', () => {
     await loadFromHistory({ action: 'Undo' });
 
     expect(mockPreviews.load).not.toHaveBeenCalled();
-    expect(mockPreviews.active.extraColorDetails).toEqual({
+    expect(mockPreviews.active?.extraColorDetails).toEqual({
       accent: { hex: '#f0f3f3' },
       border: { hex: '#e8e3e2' },
     });
@@ -262,10 +263,10 @@ describe('describeGaugeChange', () => {
       mode: 'auto',
       isCustomRanges: false,
       ...change,
-    }) as any;
-  const red = { hex: '#ff0000', name: 'Ruby Red' } as any;
-  const green = { hex: '#00ff00', name: 'Moss' } as any;
-  const blue = { hex: '#0000ff' } as any;
+    }) as never;
+  const red = { hex: '#ff0000', name: 'Ruby Red' } as never;
+  const green = { hex: '#00ff00', name: 'Moss' } as never;
+  const blue = { hex: '#0000ff' } as never;
   const ranges = [
     { from: 30, to: 20 },
     { from: 20, to: 10 },

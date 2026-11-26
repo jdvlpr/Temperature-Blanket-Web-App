@@ -113,7 +113,7 @@ describe('number-utils', () => {
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
-      expect(displayNumber('not a number' as any)).toBe(0);
+      expect(displayNumber('not a number' as never)).toBe(0);
 
       // typeof NaN is 'number', so it checks logic internally.
       // displayNumber(NaN) -> parseFloat("NaN") -> NaN.
