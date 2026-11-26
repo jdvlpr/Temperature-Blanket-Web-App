@@ -86,7 +86,7 @@ vi.mock('#lib/utils/yarn-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
-    getColorPropertiesFromYarnStringAndHex: vi.fn(({ yarnString, hex }) => {
+    getColorPropertiesFromYarnStringAndHex: vi.fn(({ yarnString }) => {
       // Simple mock for testing yarnDetailsToColors
       if (yarnString === 'brand1-yarn1') {
         return {

@@ -32,8 +32,8 @@ export const runPreview = (callback: () => void) => {
   if (!window) return;
   $effect.root(() => {
     $effect(() => {
-      project.url.href;
-      weather.editCount; // values edited in place (Edit Weather Data, Undo)
+      void project.url.href;
+      void weather.editCount; // values edited in place (Edit Weather Data, Undo)
       if (!weather.data.length || !gauges.allCreated.length) return;
 
       debouncePreviewEffect(() => {

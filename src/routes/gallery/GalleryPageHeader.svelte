@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import GalleryPageEdit from '#lib/components/account/GalleryPageEdit.svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
-  import { GlobeIcon } from '@lucide/svelte';
   import type { Component, Snippet } from 'svelte';
 
   interface Props {

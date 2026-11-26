@@ -60,11 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SunIcon,
     UnfoldVerticalIcon,
   } from '@lucide/svelte';
-  import {
-    Menu,
-    Portal,
-    SegmentedControl,
-  } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import type { Component } from 'svelte';
   import { onMount } from 'svelte';
 

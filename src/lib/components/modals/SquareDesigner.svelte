@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="grid-template-columns:repeat({squareSize},minmax(1rem,{maxGridItemWidth}px));"
     >
       {#key _secondaryTargets}
-        {#each squares as { icon, label, targetId }, index (index)}
+        {#each squares as { icon, targetId }, index (index)}
           <button
             class="rounded-container flex aspect-square cursor-pointer flex-col items-center justify-center shadow-sm outline-hidden select-none"
             style="background-color: {colors[targetId]};color:{getTextColor(

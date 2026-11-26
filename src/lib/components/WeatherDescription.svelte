@@ -20,8 +20,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pluralize } from '#lib/utils/string-utils.js';
   import { onMount } from 'svelte';
 
-  let isAnyWeatherSourceDifferentFromDefault;
-
   let stations = $derived(
     locations.all
       ?.filter((location) => exists(location.stations))
@@ -36,10 +34,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
-      (n) => n.source === weather.source.name,
-    );
-
     if (weather.params.prcp && weather.params.prcp.every((n) => n === null))
       weather.table.showParameters.prcp = false;
     else weather.table.showParameters.prcp = true;

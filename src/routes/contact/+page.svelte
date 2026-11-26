@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_BASE_URL,
     PUBLIC_FACEBOOK_LINK,
     PUBLIC_GITHUB_LINK,
-    PUBLIC_SITE_TITLE,
   } from '$app/env/public';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TEXT } from '#lib/constants/class-constants.js';

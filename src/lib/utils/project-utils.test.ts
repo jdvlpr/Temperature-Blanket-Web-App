@@ -66,7 +66,7 @@ vi.mock('#lib/utils/unit-utils.svelte.js', async (importOriginal) => {
 
 vi.mock('#lib/utils/date-utils.js', async (importOriginal) => {
   const actual = await importOriginal<any>();
-  return { ...actual, dateToISO8601String: vi.fn((date) => '2024-01-01') };
+  return { ...actual, dateToISO8601String: vi.fn(() => '2024-01-01') };
 });
 
 vi.mock('#lib/utils/weather-utils.svelte.js', async (importOriginal) => {

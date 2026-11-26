@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
   import { flip } from 'svelte/animate';
   import { toast } from '#lib/state/page-state.svelte.js';
   import {
@@ -73,7 +72,7 @@
     'flex flex-wrap justify-between items-center pointer-events-auto';
   const cToastActions = 'ml-auto flex shrink-0 items-center gap-2';
 
-  let { cPosition, cAlign, animAxis } = $derived(getLocalPosition(position));
+  let { cPosition, cAlign } = $derived(getLocalPosition(position));
 
   function getLocalPosition(position: string) {
     // Local

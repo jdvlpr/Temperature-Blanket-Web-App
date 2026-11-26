@@ -54,7 +54,6 @@ import {
   SyncHttpError,
   type PaletteLocal,
   type PreferencesLocal,
-  type SyncReport,
 } from './engine';
 import { createHttpSyncServer, sha256 } from './http';
 import { sync } from './status.svelte';

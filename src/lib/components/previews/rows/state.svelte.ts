@@ -142,8 +142,8 @@ export class RowsPreviewClass {
 
   layout = $derived.by(() => {
     // Ensure reactivity to project changes
-    project.url.href;
-    weather.editCount; // values edited in place (Edit Weather Data, Undo)
+    void project.url.href;
+    void weather.editCount; // values edited in place (Edit Weather Data, Undo)
     // Early return if no data is available
     if (
       !window ||

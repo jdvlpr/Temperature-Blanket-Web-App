@@ -30,11 +30,23 @@ export default [
     },
   },
   {
+    // TypeScript already checks names, and knows the DOM's types
+    // (ScrollBehavior, TimerHandler) that this rule doesn't
+    files: ['**/*.ts', '**/*.svelte'],
+    rules: { 'no-undef': 'off' },
+  },
+  {
     rules: {
       // `const { id, ...rest } = item` is how a key is left out of a copy
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { ignoreRestSiblings: true },
+        {
+          ignoreRestSiblings: true,
+          // `_` marks something left unused on purpose (`{#each Array(n) as _, i}`)
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
       ],
     },
   },

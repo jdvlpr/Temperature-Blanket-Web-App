@@ -39,8 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let weekIndex = 0;
     let rowPadding = 0;
     let columnPadding = 0;
-    let x = 0,
-      y = 0; // Yes, these are necessary.
     const sections: CalendarSection[][] = [];
     for (
       let squareIndex = 0, column = 0, isWeatherSquare = true;

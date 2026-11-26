@@ -199,14 +199,6 @@ function createConditionalFormattingRules(
       const from = range.from as number;
       const to = range.to as number;
 
-      // Construct formula based on range inclusion preferences and direction
-      const formula = '';
-      if (direction === 'high-to-low') {
-        const opFrom = includeFrom ? '<=' : '<';
-        const opTo = includeTo ? '>=' : '>';
-        // Example: AND(val <= 39, val > 36)
-      }
-
       // Apply to each month's relevant columns
       for (let month = 0; month < 12; month++) {
         for (const typeIdx of typeIndices) {
@@ -334,9 +326,6 @@ function createCheckboxRequests(
 
   return requests;
 }
-
-// Import shared utility for consistent range checks
-import { isValueInRange } from '#lib/utils/range-utils.svelte.js';
 
 // Helper to get all column letters in 'Weather Data' that correspond to valid data
 function getWeatherDataColumnLetters(
@@ -499,48 +488,6 @@ function createGaugeLegendData(
   return rows;
 }
 
-function countDaysInRange(
-  gauge: (typeof gauges.allCreated)[0],
-  rangeIndex: number,
-): number {
-  if (!gauge.ranges) return 0;
-  const units = preferences.value.units as 'imperial' | 'metric';
-  const range = gauge.ranges[rangeIndex];
-  const targetId = gauge.targets?.[0]?.id;
-
-  if (
-    !targetId ||
-    !('from' in range) ||
-    range.from === undefined ||
-    range.to === undefined
-  )
-    return 0;
-
-  const includeFrom = gauge.rangeOptions?.includeFromValue ?? true;
-  const includeTo = gauge.rangeOptions?.includeToValue ?? false;
-  const direction = gauge.rangeOptions?.direction;
-
-  let count = 0;
-  for (const day of weather.data) {
-    const value = (day as any)[targetId]?.[units];
-
-    // Use shared utility to handle direction (high-to-low) correctly
-    if (
-      isValueInRange({
-        value,
-        range,
-        direction,
-        includeFromValue: includeFrom,
-        includeToValue: includeTo,
-        param: targetId,
-      })
-    ) {
-      count++;
-    }
-  }
-  return count;
-}
-
 // Helper to get applicable types count for layout calculations
 function getApplicableTypesCount(
   gauge: (typeof gauges.allCreated)[0],
@@ -565,7 +512,7 @@ function getApplicableTypesCount(
 function createLegendColorRequests(
   sheetId: number,
   gauge: (typeof gauges.allCreated)[0],
-  options: ExportOptions, // Added options to know about header rows
+  _options: ExportOptions,
 ): gapi.client.sheets.Request[] {
   if (!gauge.colors) return [];
   const requests: gapi.client.sheets.Request[] = [];

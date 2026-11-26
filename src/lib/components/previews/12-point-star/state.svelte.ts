@@ -328,7 +328,7 @@ export class TwelvePointStarPreviewClass {
         this.settings.additionalRoundsColor = chroma(
           additionalRoundsColor,
         ).hex() as NonNullable<Color['hex']>;
-      } catch (e) {
+      } catch {
         console.warn('Invalid color value in hash:', additionalRoundsColor);
       }
     }
@@ -353,7 +353,7 @@ export class TwelvePointStarPreviewClass {
         this.settings.borderColor = chroma(borderColor).hex() as NonNullable<
           Color['hex']
         >;
-      } catch (e) {
+      } catch {
         console.warn('Invalid border color value in hash:', borderColor);
       }
     }

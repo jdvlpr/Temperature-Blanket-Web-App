@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { beforeNavigate } from '$app/navigation';
   import AppShell from '#lib/components/AppShell.svelte';
   import { PAGE, PAGE_TOOL } from '#lib/constants/class-constants.js';
-  import Card from '#lib/components/Card.svelte';
   import Footer from '#lib/components/Footer.svelte';
   import Gauge from '#lib/components/Gauge.svelte';
   import GaugeCustomizer from '#lib/components/GaugeCustomizer.svelte';

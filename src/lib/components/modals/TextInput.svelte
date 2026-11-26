@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     parent: any;
   }
 
-  let { value = $bindable(), title, onOkay, parent }: Props = $props();
+  let { value = $bindable(), title, onOkay }: Props = $props();
 
   const id = 'text-input-daytime';
 

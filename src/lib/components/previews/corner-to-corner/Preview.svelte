@@ -103,8 +103,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   runPreview(() => {
     let row = 0,
-      x = 0,
-      y = 0,
       dayIndex = 0;
     const sections: CornerToCornerSection[][] = [];
     for (

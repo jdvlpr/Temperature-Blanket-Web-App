@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RavelryMark from '#lib/components/RavelryMark.svelte';
   import ViewCount from '#lib/components/ViewCount.svelte';
   import { pluralize } from '#lib/utils/string-utils.js';
-  import { GlobeIcon, RefreshCwIcon } from '@lucide/svelte';
+  import { RefreshCwIcon } from '@lucide/svelte';
 
   interface Props {
     /** When it was saved, e.g. "Saved Oct 3, 2026" (shown when not published) */

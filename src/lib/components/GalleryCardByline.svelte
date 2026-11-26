@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   viewed.
 -->
 <script lang="ts">
-  import { GlobeIcon } from '@lucide/svelte';
   import ViewCount from '#lib/components/ViewCount.svelte';
 
   interface Props {

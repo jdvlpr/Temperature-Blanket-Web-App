@@ -3,9 +3,6 @@
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Helper to convert strings to snake_case for IDs
 function toSnakeCase(str) {

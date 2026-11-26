@@ -20,7 +20,13 @@ const BACK = ['#a8402c', '#c4572f', '#b5482a'];
 const MID = ['#df7c3a', '#e8692a', '#d9772f'];
 const FRONT = ['#eba649', '#f3c56b', '#f0b453'];
 
-const cluster = (n: number, rx: number, ry: number, size: number, seed: number) =>
+const cluster = (
+  n: number,
+  rx: number,
+  ry: number,
+  size: number,
+  seed: number,
+) =>
   Array.from({ length: n }, (_, i) => {
     const a = rand(i, seed) * Math.PI * 2;
     const d = Math.sqrt(rand(i, seed + 1));
@@ -39,15 +45,18 @@ const FRONT_C = cluster(8, 210, 150, 72, 30);
 const hill = (y0: number, amp: number, freq: number, phase: number) => {
   let d = `M -60 ${GROUND.top + 40}`;
   for (let x = -60; x <= 1100; x += 20) {
-    const fall = x > 960 ? Math.pow((x - 960) / 140, 2) * (GROUND.top + 40 - y0) : 0;
+    const fall =
+      x > 960 ? Math.pow((x - 960) / 140, 2) * (GROUND.top + 40 - y0) : 0;
     d += ` L ${x} ${Math.min(GROUND.top + 40, y0 + Math.sin(x / freq + phase) * amp + fall).toFixed(1)}`;
   }
   return d + ` Z`;
 };
 
-
 /** The maple scene alone (also rendered on its own as the photo) */
-export const Maple: React.FC<{ f: number; still?: boolean }> = ({ f, still = false }) => {
+export const Maple: React.FC<{ f: number; still?: boolean }> = ({
+  f,
+  still = false,
+}) => {
   const scene = still ? 1 : tween(f, 0, bar(0.8));
   const sway = still ? 0 : Math.sin(f / 40) * 0.8;
   const grow = (i: number, layer: number) =>
@@ -78,17 +87,53 @@ export const Maple: React.FC<{ f: number; still?: boolean }> = ({ f, still = fal
         </Cut>
         <Cut depth={2}>
           {BACK_C.map((c) => (
-            <path key={c.k} d={scallop(c.x, c.y, c.r * grow(c.k, 0), c.r * 0.9 * grow(c.k, 0), 8, 0.16, c.k)} fill={BACK[c.k % 3]} />
+            <path
+              key={c.k}
+              d={scallop(
+                c.x,
+                c.y,
+                c.r * grow(c.k, 0),
+                c.r * 0.9 * grow(c.k, 0),
+                8,
+                0.16,
+                c.k,
+              )}
+              fill={BACK[c.k % 3]}
+            />
           ))}
         </Cut>
         <Cut depth={2}>
           {MID_C.map((c) => (
-            <path key={c.k} d={scallop(c.x - 10, c.y - 14, c.r * grow(c.k, 1), c.r * 0.88 * grow(c.k, 1), 7, 0.18, c.k + 3)} fill={MID[c.k % 3]} />
+            <path
+              key={c.k}
+              d={scallop(
+                c.x - 10,
+                c.y - 14,
+                c.r * grow(c.k, 1),
+                c.r * 0.88 * grow(c.k, 1),
+                7,
+                0.18,
+                c.k + 3,
+              )}
+              fill={MID[c.k % 3]}
+            />
           ))}
         </Cut>
         <Cut depth={3}>
           {FRONT_C.map((c) => (
-            <path key={c.k} d={scallop(c.x - 18, c.y - 28, c.r * grow(c.k, 2), c.r * 0.85 * grow(c.k, 2), 6, 0.2, c.k + 7)} fill={FRONT[c.k % 3]} />
+            <path
+              key={c.k}
+              d={scallop(
+                c.x - 18,
+                c.y - 28,
+                c.r * grow(c.k, 2),
+                c.r * 0.85 * grow(c.k, 2),
+                6,
+                0.2,
+                c.k + 7,
+              )}
+              fill={FRONT[c.k % 3]}
+            />
           ))}
         </Cut>
       </g>
@@ -96,7 +141,6 @@ export const Maple: React.FC<{ f: number; still?: boolean }> = ({ f, still = fal
   );
 };
 
-const N = PALETTE.length;
 const ballX = (k: number) => 150 + k * 82;
 /** Each color is picked on its own beat, from bar 3 */
 export const PICK_BARS = PALETTE.map((_, k) => 3 + k / 3);
@@ -109,19 +153,37 @@ const FLY_FRAMES = 24;
 /** The hop's share of the flight: the square lifts and rounds into a ball */
 const HOP = 0.32;
 /** Each ball winds into the hero ball after it has landed, the first ones first */
-const mergeAt = (k: number): [number, number] => [bar(7.5 + k * 0.03), bar(7.72 + k * 0.02)];
+const mergeAt = (k: number): [number, number] => [
+  bar(7.5 + k * 0.03),
+  bar(7.72 + k * 0.02),
+];
 
 // The app screen (Get Colors › From an Image), in the phone's app area
 const SHOT = { x: 16, y: 58, size: 240 };
 const SW = 42;
-const swatch = (k: number) => ({ x: 15 + (k % 5) * 50, y: 342 + Math.floor(k / 5) * 52 });
+const swatch = (k: number) => ({
+  x: 15 + (k % 5) * 50,
+  y: 342 + Math.floor(k / 5) * 52,
+});
 const ink = '#4a3a30';
 
 const PickScreen: React.FC<{ f: number }> = ({ f }) => (
   <g>
     <AppBar w={PHONE_SCREEN.w} title="From an Image" size={18} />
-    <svg x={SHOT.x} y={SHOT.y} width={SHOT.size} height={SHOT.size} viewBox={`${PHOTO.x} ${PHOTO.y} ${PHOTO.size} ${PHOTO.size}`}>
-      <rect x={PHOTO.x} y={PHOTO.y} width={PHOTO.size} height={PHOTO.size} fill="#f2e1c6" />
+    <svg
+      x={SHOT.x}
+      y={SHOT.y}
+      width={SHOT.size}
+      height={SHOT.size}
+      viewBox={`${PHOTO.x} ${PHOTO.y} ${PHOTO.size} ${PHOTO.size}`}
+    >
+      <rect
+        x={PHOTO.x}
+        y={PHOTO.y}
+        width={PHOTO.size}
+        height={PHOTO.size}
+        fill="#f2e1c6"
+      />
       <Maple f={0} still />
     </svg>
     {PALETTE.map((c, k) => {
@@ -129,10 +191,21 @@ const PickScreen: React.FC<{ f: number }> = ({ f }) => (
       if (s <= 0.01) return null;
       const x = SHOT.x + PICKS[k].x * SHOT.size;
       const y = SHOT.y + PICKS[k].y * SHOT.size;
-      const ring = interpolate(f, [bar(PICK_BARS[k]), bar(PICK_BARS[k]) + 14], [0, 1], clamp);
+      const ring = interpolate(
+        f,
+        [bar(PICK_BARS[k]), bar(PICK_BARS[k]) + 14],
+        [0, 1],
+        clamp,
+      );
       return (
         <g key={k} transform={`translate(${x} ${y})`}>
-          <circle r={9 + ring * 16} fill="none" stroke="#fff" strokeWidth={3} opacity={1 - ring} />
+          <circle
+            r={9 + ring * 16}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={3}
+            opacity={1 - ring}
+          />
           <g transform={`scale(${s})`}>
             <circle r={10} fill="#fff" />
             <circle r={7} fill={c} />
@@ -140,15 +213,29 @@ const PickScreen: React.FC<{ f: number }> = ({ f }) => (
         </g>
       );
     })}
-    <text x={16} y={326} fontFamily={FONT.body} fontWeight={600} fontSize={14} fill={ink} opacity={0.75}>
+    <text
+      x={16}
+      y={326}
+      fontFamily={FONT.body}
+      fontWeight={600}
+      fontSize={14}
+      fill={ink}
+      opacity={0.75}
+    >
       Stylecraft Special DK
     </text>
     {PALETTE.map((c, k) => {
       // The picked color travels from its dot to its swatch
       const t0 = bar(PICK_BARS[k]) + 3;
-      const t = interpolate(f, [t0, t0 + TO_SWATCH], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+      const t = interpolate(f, [t0, t0 + TO_SWATCH], [0, 1], {
+        ...clamp,
+        easing: Easing.inOut(Easing.cubic),
+      });
       if (t <= 0 || t >= 1) return null;
-      const from = { x: SHOT.x + PICKS[k].x * SHOT.size, y: SHOT.y + PICKS[k].y * SHOT.size };
+      const from = {
+        x: SHOT.x + PICKS[k].x * SHOT.size,
+        y: SHOT.y + PICKS[k].y * SHOT.size,
+      };
       const sw = swatch(k);
       const x = lerp(from.x, sw.x + SW / 2, t);
       const y = lerp(from.y, sw.y + SW / 2, t) - Math.sin(t * Math.PI) * 40;
@@ -165,10 +252,27 @@ const PickScreen: React.FC<{ f: number }> = ({ f }) => (
       const gone = f >= flyAt(k);
       return (
         <g key={k}>
-          <rect x={x} y={y} width={SW} height={SW} rx={10} fill="none" stroke="#d9cbb5" strokeWidth={2} strokeDasharray="5 5" />
+          <rect
+            x={x}
+            y={y}
+            width={SW}
+            height={SW}
+            rx={10}
+            fill="none"
+            stroke="#d9cbb5"
+            strokeWidth={2}
+            strokeDasharray="5 5"
+          />
           {!gone && s > 0.01 && (
             <g transform={`translate(${x + SW / 2} ${y + SW / 2}) scale(${s})`}>
-              <rect x={-SW / 2} y={-SW / 2} width={SW} height={SW} rx={10} fill={c} />
+              <rect
+                x={-SW / 2}
+                y={-SW / 2}
+                width={SW}
+                height={SW}
+                rx={10}
+                fill={c}
+              />
             </g>
           )}
         </g>
@@ -180,9 +284,18 @@ const PickScreen: React.FC<{ f: number }> = ({ f }) => (
 // The phone floats up as a camera, takes the photo on bar 2, becomes the
 // app's From an Image screen, and drifts away once the colors are out
 const phoneAt = (f: number) => {
-  const rise = interpolate(f, [bar(0.9), bar(1.7)], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.1)) });
-  const settle = interpolate(f, [bar(2.1), bar(2.9)], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
-  const away = interpolate(f, [bar(6.9), bar(7.6)], [0, 1], { ...clamp, easing: Easing.in(Easing.cubic) });
+  const rise = interpolate(f, [bar(0.9), bar(1.7)], [0, 1], {
+    ...clamp,
+    easing: Easing.out(Easing.back(1.1)),
+  });
+  const settle = interpolate(f, [bar(2.1), bar(2.9)], [0, 1], {
+    ...clamp,
+    easing: Easing.inOut(Easing.cubic),
+  });
+  const away = interpolate(f, [bar(6.9), bar(7.6)], [0, 1], {
+    ...clamp,
+    easing: Easing.in(Easing.cubic),
+  });
   const bob = Math.sin(f / 14) * 4 * (1 - settle * 0.6);
   return {
     px: 540,
@@ -194,7 +307,11 @@ const phoneAt = (f: number) => {
 /** A point in the app area at frame f, in the scene (the phone is upright by then) */
 const fromApp = (f: number, ax: number, ay: number) => {
   const { px, py, ps } = phoneAt(f);
-  return { x: px + ps * (ax - PHONE_SCREEN.w / 2), y: py + ps * (ay - 291 + 38), ps };
+  return {
+    x: px + ps * (ax - PHONE_SCREEN.w / 2),
+    y: py + ps * (ay - 291 + 38),
+    ps,
+  };
 };
 
 export const October: React.FC<{ f: number }> = ({ f }) => {
@@ -202,11 +319,18 @@ export const October: React.FC<{ f: number }> = ({ f }) => {
   const app = interpolate(f, [bar(2.15), bar(2.45)], [0, 1], clamp);
   const flash = interpolate(f - bar(2), [0, 2, 12], [0, 1, 0], clamp);
   return (
-    <svg style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }} width={1080} height={1920}>
+    <svg
+      style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}
+      width={1080}
+      height={1920}
+    >
       <Maple f={f} />
       <Cut depth={2}>
         {/* Scalloped along the top; its right end rounds down out of the way of the next scene */}
-        <path d={`${puff(-60, GROUND.top - 6, 1040, 150, 8, 1).split(' L 980 ')[0]} C 1060 ${GROUND.top - 6} 1110 ${GROUND.top + 40} 1130 ${GROUND.top + 150} L -60 ${GROUND.top + 150} Z`} fill="#e7b96a" />
+        <path
+          d={`${puff(-60, GROUND.top - 6, 1040, 150, 8, 1).split(' L 980 ')[0]} C 1060 ${GROUND.top - 6} 1110 ${GROUND.top + 40} 1130 ${GROUND.top + 150} L -60 ${GROUND.top + 150} Z`}
+          fill="#e7b96a"
+        />
       </Cut>
 
       {py < 1990 && (
@@ -228,11 +352,37 @@ export const October: React.FC<{ f: number }> = ({ f }) => {
                       [26, 556, 1, -1],
                       [246, 556, -1, -1],
                     ].map(([x, y, sx, sy], i) => (
-                      <path key={i} d={`M ${x} ${y + 38 * sy} L ${x} ${y} L ${x + 38 * sx} ${y}`} stroke="#fff" strokeWidth={5} fill="none" strokeLinecap="round" opacity={0.9} />
+                      <path
+                        key={i}
+                        d={`M ${x} ${y + 38 * sy} L ${x} ${y} L ${x + 38 * sx} ${y}`}
+                        stroke="#fff"
+                        strokeWidth={5}
+                        fill="none"
+                        strokeLinecap="round"
+                        opacity={0.9}
+                      />
                     ))}
-                    <circle cx={136} cy={516} r={30} fill="none" stroke="#fff" strokeWidth={5} />
-                    <circle cx={136} cy={516} r={22} fill="#fff" opacity={0.92} />
-                    <rect width={272} height={582} fill="#fff" opacity={flash} />
+                    <circle
+                      cx={136}
+                      cy={516}
+                      r={30}
+                      fill="none"
+                      stroke="#fff"
+                      strokeWidth={5}
+                    />
+                    <circle
+                      cx={136}
+                      cy={516}
+                      r={22}
+                      fill="#fff"
+                      opacity={0.92}
+                    />
+                    <rect
+                      width={272}
+                      height={582}
+                      fill="#fff"
+                      opacity={flash}
+                    />
                   </g>
                 }
               />
@@ -240,7 +390,13 @@ export const October: React.FC<{ f: number }> = ({ f }) => {
           )}
           {app > 0 && (
             <g opacity={app}>
-              <Phone x={px} y={py} scale={ps} rotate={rot} screen={<PickScreen f={f} />} />
+              <Phone
+                x={px}
+                y={py}
+                scale={ps}
+                rotate={rot}
+                screen={<PickScreen f={f} />}
+              />
             </g>
           )}
         </g>
@@ -254,7 +410,10 @@ export const October: React.FC<{ f: number }> = ({ f }) => {
         // Where it left the phone (the phone may drift away meanwhile)
         const from = fromApp(t0, sw.x + SW / 2, sw.y + SW / 2);
         const [mA, mB] = mergeAt(k);
-        const merge = interpolate(f, [mA, mB], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+        const merge = interpolate(f, [mA, mB], [0, 1], {
+          ...clamp,
+          easing: Easing.inOut(Easing.cubic),
+        });
         if (merge >= 1) return null;
         const t = interpolate(f, [t0, t0 + FLY_FRAMES], [0, 1], clamp);
         // Hop: lift and round into a ball. Drop: fall in an arc to its spot on the ground
@@ -264,25 +423,50 @@ export const October: React.FC<{ f: number }> = ({ f }) => {
         const lift = { x: from.x + (ballX(k) - from.x) * 0.12, y: from.y - 90 };
         const gx = ballX(k);
         const gy = GROUND.top - 26 + 2;
-        const fx = drop > 0 ? lerp(lift.x, gx, drop) : lerp(from.x, lift.x, hop);
-        const fy = drop > 0 ? lerp(lift.y, gy, drop) : lerp(from.y, lift.y, hop);
-        const r = drop > 0 ? lerp(h0 * 1.05, 26, drop) : lerp(h0, h0 * 1.05, hop);
+        const fx =
+          drop > 0 ? lerp(lift.x, gx, drop) : lerp(from.x, lift.x, hop);
+        const fy =
+          drop > 0 ? lerp(lift.y, gy, drop) : lerp(from.y, lift.y, hop);
+        const r =
+          drop > 0 ? lerp(h0 * 1.05, 26, drop) : lerp(h0, h0 * 1.05, hop);
         // A squash on landing
         const landed = t0 + FLY_FRAMES;
-        const squash = interpolate(f, [landed, landed + 3, landed + 12], [0, 1, 0], clamp) * 0.18;
+        const squash =
+          interpolate(f, [landed, landed + 3, landed + 12], [0, 1, 0], clamp) *
+          0.18;
         const bx = lerp(fx, BALL_START.x, merge);
-        const by = lerp(fy, BALL_START.y - 40, merge) - (t >= 1 && merge <= 0 ? lilt(f) * 8 : 0) - Math.sin(merge * Math.PI) * 60;
+        const by =
+          lerp(fy, BALL_START.y - 40, merge) -
+          (t >= 1 && merge <= 0 ? lilt(f) * 8 : 0) -
+          Math.sin(merge * Math.PI) * 60;
         const ball = interpolate(t, [HOP * 0.5, HOP * 1.2], [0, 1], clamp);
         const sx = (1 - merge * 0.6) * (1 + squash);
         const sy = (1 - merge * 0.6) * (1 - squash);
         return (
-          <g key={k} transform={`translate(${bx} ${by + r * squash}) scale(${sx} ${sy}) translate(${-bx} ${-by})`}>
+          <g
+            key={k}
+            transform={`translate(${bx} ${by + r * squash}) scale(${sx} ${sy}) translate(${-bx} ${-by})`}
+          >
             {ball < 1 && (
-              <rect x={bx - r} y={by - r} width={r * 2} height={r * 2} rx={lerp(10 * from.ps, r, hop)} fill={c} opacity={1 - ball} />
+              <rect
+                x={bx - r}
+                y={by - r}
+                width={r * 2}
+                height={r * 2}
+                rx={lerp(10 * from.ps, r, hop)}
+                fill={c}
+                opacity={1 - ball}
+              />
             )}
             {ball > 0 && (
               <g opacity={ball}>
-                <YarnBall x={bx} y={by} r={r} colors={[c]} spin={k * 40 + t * 300} />
+                <YarnBall
+                  x={bx}
+                  y={by}
+                  r={r}
+                  colors={[c]}
+                  spin={k * 40 + t * 300}
+                />
               </g>
             )}
           </g>

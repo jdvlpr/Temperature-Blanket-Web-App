@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showResetKey = $state(false);
   // Whether or not the clear input text button should appear
   let showReset = $derived.by(() => {
-    showResetKey;
+    void showResetKey;
     return (
       !searching && (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
     );

@@ -127,15 +127,9 @@ export const stringToDate = (
     | TISO8601DateStringPeriodSeparated
     | TISO8601DateStringSlashSeparated,
 ): Date => {
-  const [datePart, timePart] = str.split(' ');
+  const [datePart] = str.split(' ');
   const [year, month, day] = datePart.split(/[-./]/).map(Number);
 
-  let hours = 0,
-    minutes = 0,
-    seconds = 0;
-  if (timePart) {
-    [hours, minutes, seconds] = timePart.split(':').map(Number);
-  }
   // Create a date using UTC time (prevents local time shifting)
   const date = new Date(Date.UTC(year, month - 1, day));
 

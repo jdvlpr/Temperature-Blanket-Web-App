@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // If an initially empty weather parameter gets some user-created data, or if the user searches for a different location,
   // then add the available gauge to the options
   $effect(() => {
-    weather.data;
+    void weather.data;
     tick().then(() => {
       setupAvailableGauges();
     });

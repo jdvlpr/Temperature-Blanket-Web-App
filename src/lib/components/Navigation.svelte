@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Reactive Effect: Re-run when activeId changes
   $effect(() => {
     // Just referencing activeId makes this effect run when it changes
-    activeIndex;
+    void activeIndex;
     updateIndicator();
   });
 

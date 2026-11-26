@@ -113,7 +113,7 @@ export class TemperatureGauge implements GaugeAttributes {
 
   // All the high temperatures, without missing values
   #maxes = $derived.by(() => {
-    weather.params?.tmax;
+    void weather.params?.tmax;
     const tmaxes = weather.params.tmax;
     return tmaxes?.filter((n): n is number => n !== null) || [];
   });
@@ -222,17 +222,17 @@ export class TemperatureGauge implements GaugeAttributes {
   });
 
   #start = $derived.by(() => {
-    this.rangeOptions.mode;
-    this.rangeOptions?.direction;
-    this.rangeOptions?.manual.start;
+    void this.rangeOptions.mode;
+    void this.rangeOptions?.direction;
+    void this.rangeOptions?.manual.start;
     return getStart(this.rangeOptions);
   });
 
   #increment = $derived.by(() => {
-    this.rangeOptions.mode;
-    this.rangeOptions?.direction;
-    this.rangeOptions?.isCustomRanges;
-    this.rangeOptions.manual.increment;
+    void this.rangeOptions.mode;
+    void this.rangeOptions?.direction;
+    void this.rangeOptions?.isCustomRanges;
+    void this.rangeOptions.manual.increment;
     return getIncrement(this.rangeOptions, this.autoRangeOptions);
   });
 

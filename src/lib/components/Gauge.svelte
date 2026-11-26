@@ -49,15 +49,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronDownIcon,
     CircleCheckIcon,
     ClipboardPasteIcon,
-    DiamondPlusIcon,
     ImageIcon,
     ImportIcon,
     LandmarkIcon,
-    PaletteIcon,
-    PlusIcon,
-    SearchIcon,
     ShuffleIcon,
-    TextSearchIcon,
   } from '@lucide/svelte';
   import {
     menuContentClass,

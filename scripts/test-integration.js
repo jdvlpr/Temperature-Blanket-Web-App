@@ -67,7 +67,7 @@ async function waitForServer(url, timeout = 60000) {
       });
       console.log('\nServer is ready!');
       return true;
-    } catch (e) {
+    } catch {
       process.stdout.write('.');
       await new Promise((r) => setTimeout(r, 1000));
     }

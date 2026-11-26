@@ -80,9 +80,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { data }: { data: PageData } = $props();
 
-  let imageWidth = $state<number | undefined>();
-  let imageHeight = $state<number | undefined>();
-
   // Undefined while the gallery answers (on a move within the app), null when
   // there's no such project
   const streamedProject = streamed(() => data.project);
@@ -259,25 +256,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     return _gauges;
   }
-
-  const preloadImage = (src: string) => {
-    if (!browser) return;
-    return new Promise<void>((resolve) => {
-      let img = new Image();
-      img.onload = () => {
-        imageWidth = img.width;
-        imageHeight = img.height;
-        resolve();
-      };
-      img.src = src;
-    });
-  };
-
-  // This triggers after the project is loaded
-  // It sets to image width and height value for the og:image meta property in head
-  let preloadedImage = $derived(
-    preloadImage(project?.featuredImage?.node.mediaItemUrl),
-  );
 </script>
 
 <svelte:head>
@@ -300,12 +278,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     property="og:image"
     content={project?.featuredImage?.node.mediaItemUrl}
   />
-  {#key imageWidth}
-    <meta property="og:image:width" content={imageWidth?.toString()} />
-  {/key}
-  {#key imageHeight}
-    <meta property="og:image:height" content={imageHeight?.toString()} />
-  {/key}
 </svelte:head>
 
 <AppShell pageName="Project Gallery">

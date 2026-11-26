@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     reverseColors,
   } from '#lib/utils/color-utils.js';
   import { pickRandomFromArray } from '#lib/utils/number-utils.js';
-  import { getColorways, getFilteredYarns } from '#lib/utils/yarn-utils.js';
+  import { getColorways } from '#lib/utils/yarn-utils.js';
   import { ShuffleIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
@@ -125,11 +125,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       randomPalette = sortPalette(tempYarnColorways);
     }, 10);
   }
-  let filteredYarnsList = $derived(
-    getFilteredYarns({
-      selectedBrandId,
-    }),
-  );
   let colorways = $derived(
     getColorways({
       selectedBrandId,
@@ -139,11 +134,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   $effect(() => {
-    selectedBrandId;
-    selectedYarnId;
-    selectedYarnWeightId;
-    numberOfColors;
-    yarnDataReady;
+    void selectedBrandId;
+    void selectedYarnId;
+    void selectedYarnWeightId;
+    void numberOfColors;
+    void yarnDataReady;
     getRandomColors();
   });
 </script>

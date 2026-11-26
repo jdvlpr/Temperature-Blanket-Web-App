@@ -38,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let roundHeight = monthSquaresPreview.STITCH_SIZE;
     let dayIndex = 0;
     let roundInSquare = 1;
-    let isWeather = true;
     let daysInSquare = weather.rawData?.filter(
       (n) =>
         n.date.getUTCFullYear() ===
@@ -46,7 +45,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         n.date.getUTCMonth() ===
           monthSquaresPreview.weatherMonths[squareIndex].month,
     );
-    let dateInMonth = daysInSquare?.[0].date.getUTCDate();
     for (
       let roundsIndex = 0;
       roundsIndex < monthSquaresPreview.totalRounds;
@@ -66,7 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               monthSquaresPreview.weatherMonths[squareIndex].month,
         );
         roundInSquare = 1;
-        dateInMonth = daysInSquare[0].date.getUTCDate();
         roundWidth = monthSquaresPreview.STITCH_SIZE;
         roundHeight = monthSquaresPreview.STITCH_SIZE;
         if (squareIndex % monthSquaresPreview.dimensionsWidth === 0) {
@@ -109,7 +106,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         isWeather = true;
 
         dayIndex += 1;
-        dateInMonth += 1;
       } else {
         color = monthSquaresPreview.settings.additionalRoundsColor;
         isWeather = false;

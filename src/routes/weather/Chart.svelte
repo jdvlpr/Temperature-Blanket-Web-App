@@ -42,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   let dataSets: WeatherChartDataset[] = [];
-  let chart: Chart | undefined;
 
   onMount(() => {
     if (!data) return;
@@ -111,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (!ctx) return;
 
-    chart = new Chart(ctx, {
+    new Chart(ctx, {
       type: 'line',
       data: {
         labels: data.map((item) => {

@@ -41,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let roundHeight = squareRoundsPreview.STITCH_SIZE;
     let dayIndex = 0;
     let roundInSquare = 1;
-    let isWeather = true;
     let daysInSquare = squareRoundsPreview.weatherSquares[squareIndex];
 
     for (

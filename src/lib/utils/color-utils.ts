@@ -474,7 +474,7 @@ const getColorsFromProjectURL = (string: string): Color[] | false => {
   let url;
   try {
     url = new URL(string);
-  } catch (error) {
+  } catch {
     return false;
   }
 
@@ -549,7 +549,7 @@ const getColorsFromYarnSearchURL = (string: string): Color[] | false => {
   let url;
   try {
     url = new URL(string);
-  } catch (error) {
+  } catch {
     return false;
   }
 

@@ -27,7 +27,7 @@ export class MigrationManager {
     let parsed: StoredProject[];
     try {
       parsed = JSON.parse(legacyProjectsRaw);
-    } catch (e) {
+    } catch {
       // console.error('Migration: Invalid JSON in legacy projects', e);
       localStorage.removeItem(LEGACY_PROJECTS_KEY);
       return;

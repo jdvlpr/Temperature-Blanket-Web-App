@@ -70,7 +70,7 @@ export class HexagonRoundsPreviewClass {
       });
 
       $effect(() => {
-        weather.data.length;
+        void weather.data.length;
         // When weather data is loaded or changed, set the default layout border based on 365 or 366 days of weather data, if not the active preview
         untrack(() => {
           if (previews.activeId === this.id) return;
@@ -343,7 +343,7 @@ export class HexagonRoundsPreviewClass {
         this.settings.additionalRoundsColor = chroma(
           additionalRoundsColor,
         ).hex() as NonNullable<Color['hex']>;
-      } catch (e) {
+      } catch {
         console.warn('Invalid color value in hash:', additionalRoundsColor);
       }
     }

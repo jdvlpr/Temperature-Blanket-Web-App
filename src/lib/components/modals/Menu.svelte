@@ -107,7 +107,6 @@ open in the panel, with a Back button to it. -->
   import ProgressEditor from './ProgressEditor.svelte';
   import { openProjectScreen } from './open-project.js';
   import { openGaugePalette } from './gauge-palette.js';
-  import GettingStarted from './GettingStarted.svelte';
   import KeyboardShortcuts from './KeyboardShortcuts.svelte';
 
   const ROW = PANEL_ROW;

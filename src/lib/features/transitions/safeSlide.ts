@@ -50,7 +50,6 @@ export function safeSlide(
     duration,
     easing,
     css: (t) => {
-      const e = easing(t);
       // Safety check: ensure values are not NaN
       const safe_primary = isNaN(primary_property_value)
         ? 0

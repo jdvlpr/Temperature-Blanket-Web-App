@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
   $effect(() => {
-    weather.table.showParameters;
+    void weather.table.showParameters;
     weatherChart?.update();
   });
 </script>

@@ -104,9 +104,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class={['text-surface-700-300 line-clamp-2 text-xs', !summary && 'hidden']}
   >
     {colors.length}
-    {pluralize('color', colors.length)}{#if yarns.length}{' · '}{yarns.join(
-        ', ',
-      )}{/if}
+    {pluralize(
+      'color',
+      colors.length,
+    )}{#if yarns.length}{` · ${yarns.join(', ')}`}{/if}
   </span>
 {/snippet}
 

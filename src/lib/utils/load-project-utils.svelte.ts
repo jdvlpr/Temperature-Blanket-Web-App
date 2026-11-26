@@ -237,7 +237,7 @@ const parseLocationURLHash = async (hashString: string) => {
       .includes('!');
 
     // The location's from and to dates
-    let from, to;
+    let to;
 
     // The from date always follows the same format:
     // 8 characters after the separator character 'YYYYMMDD'
@@ -249,7 +249,7 @@ const parseLocationURLHash = async (hashString: string) => {
     // TODO: check to make sure the _from string is a valid date in the form of 'YYYYMMDD'
 
     // Insert hyphens into the date string ('YYYYMMDD' => 'YYYY-MM-DD')
-    from = `${_from.substring(0, 4)}-${_from.substring(4, 6)}-${_from.substring(6, 8)}`;
+    const from = `${_from.substring(0, 4)}-${_from.substring(4, 6)}-${_from.substring(6, 8)}`;
 
     let thisLocationStringLength = 0;
 

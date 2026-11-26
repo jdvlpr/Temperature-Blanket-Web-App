@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getProjectLinkURL(projectLink: string): URL | null {
     try {
       return new URL(projectLink);
-    } catch (error) {
+    } catch {
       return null;
     }
   }

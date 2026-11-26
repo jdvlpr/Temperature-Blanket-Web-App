@@ -37,7 +37,6 @@ export type AutoPaletteColor = {
  */
 export function createEngineCore() {
   let analysis: ImageAnalysis | null = null;
-  let pixels: Uint8ClampedArray | null = null;
   let candidates: Float32Array = new Float32Array(0);
 
   return {
@@ -50,7 +49,6 @@ export function createEngineCore() {
       width: number;
       height: number;
     }) {
-      pixels = data;
       analysis = analyzePixels({ data, width, height });
       return { distinctColors: analysis.weights.length };
     },

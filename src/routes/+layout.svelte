@@ -42,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import '@fontsource/be-vietnam-pro/700-italic.css';
   import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
-  import { ICONS } from '#lib/constants/icon-constants.js';
   import { IS_BETA } from '#lib/constants/site.js';
 
   interface Props {

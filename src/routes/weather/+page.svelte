@@ -235,14 +235,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update the weather chart when the sidebar is closed or opened
   $effect(() => {
-    showNavigationSideBar.value;
+    void showNavigationSideBar.value;
     forceUpdateShowChart();
   });
 
   $effect(() => {
-    weatherState.activeLocationID;
-    preferences.value.units;
-    weatherState.hour;
+    void weatherState.activeLocationID;
+    void preferences.value.units;
+    void weatherState.hour;
     getShareableURL({
       id: weatherState.activeLocationID,
       units: preferences.value.units,
@@ -500,7 +500,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div
                   class="relative mx-auto mt-4 flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4 md:gap-8"
                 >
-                  {#each hourlyForcastData as { isNow, time, apparent_temperature, cloudcover, is_day, temperature_2m, precipitation_probability, weathercode }}
+                  {#each hourlyForcastData as { isNow, time, is_day, temperature_2m, precipitation_probability, weathercode }}
                     {@const details = getWeatherCodeDetails({
                       weathercode,
                       is_day,
