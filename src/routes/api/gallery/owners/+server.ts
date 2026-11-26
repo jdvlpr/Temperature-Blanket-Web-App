@@ -18,7 +18,6 @@
 // their owner's name, as their gallery pages do. Public, like those pages;
 // empty without accounts.
 
-import { json } from '@sveltejs/kit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 import type { RequestHandler } from './$types';
 
@@ -42,7 +41,7 @@ export const GET: RequestHandler = async ({ url }) => {
     }
   }
   // A rename shows on cards within a few minutes
-  return json(
+  return Response.json(
     { owners },
     { headers: { 'Cache-Control': 'public, max-age=300' } },
   );

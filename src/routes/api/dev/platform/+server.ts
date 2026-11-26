@@ -16,7 +16,6 @@
 // Dev only: checks that the D1 and R2 bindings work, for the wrangler e2e run.
 
 import { requireDevRoutes, requireStorage } from '#lib/server/platform.js';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -46,5 +45,5 @@ export const GET: RequestHandler = async () => {
   const r2 = (await stored?.text()) === 'ok';
   await projects.delete(key);
 
-  return json({ d1: d1?.ok === 1, r2, migrationsApplied });
+  return Response.json({ d1: d1?.ok === 1, r2, migrationsApplied });
 };

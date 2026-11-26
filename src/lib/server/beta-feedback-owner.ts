@@ -16,7 +16,7 @@
 // The site's owner, for reading the beta's feedback: signed in with an
 // account whose verified email is in BETA_FEEDBACK_OWNERS.
 
-import { json, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import type { D1Database } from '@cloudflare/workers-types';
 import { optionalAccount } from '#lib/server/auth/index.js';
 import { isFeedbackOwner } from '#lib/server/beta-feedback.js';
@@ -31,12 +31,12 @@ export async function requireFeedbackOwner(
   const env = getPlatform()?.env;
   const user = await optionalAccount(event);
   if (!user)
-    return json(
+    return Response.json(
       { code: 'NOT_SIGNED_IN', message: 'Not signed in' },
       { status: 401, headers: PRIVATE },
     );
   if (!env?.DB || !isFeedbackOwner(user, env.BETA_FEEDBACK_OWNERS))
-    return json(
+    return Response.json(
       { code: 'NOT_OWNER', message: 'Only the site’s owner can read feedback' },
       { status: 403, headers: PRIVATE },
     );

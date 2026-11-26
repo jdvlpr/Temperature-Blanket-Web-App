@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 import { getPlatform } from '#lib/server/cloudflare.js';
 import { requireDevRoutes } from '#lib/server/platform.js';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -60,5 +59,5 @@ export const POST: RequestHandler = async (event) => {
       failed.push(post.postId);
     }
   }
-  return json({ hidden, failed });
+  return Response.json({ hidden, failed });
 };

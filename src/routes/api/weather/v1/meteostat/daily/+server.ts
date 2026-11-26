@@ -33,7 +33,7 @@ import {
 } from '#lib/utils/unit-utils.svelte.js';
 import { getDayTime, getMoonPhase } from '#lib/state/weather-state.svelte.js';
 import { cachedJSON } from '#lib/features/cache/edge-cache.js';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   for (const day of allData) day.location = location.index;
 
-  return json(allData);
+  return Response.json(allData);
 };
 
 async function fetchAndProcessDailyWeather(

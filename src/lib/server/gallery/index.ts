@@ -23,7 +23,7 @@ import { requireAccount } from '#lib/server/auth/index.js';
 import { PROJECT_ID_PATTERN } from '#lib/server/sync/store.js';
 import { cleanName } from '#lib/utils/string-utils.js';
 import type { D1Database } from '@cloudflare/workers-types';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import {
   countPalettesSince,
   postKind,
@@ -62,7 +62,10 @@ export function defaultGalleryApi(): GalleryApi {
 }
 
 export const galleryError = (status: number, code: string, message: string) =>
-  json({ code, message }, { status, headers: { 'Cache-Control': 'no-store' } });
+  Response.json(
+    { code, message },
+    { status, headers: { 'Cache-Control': 'no-store' } },
+  );
 
 export type GalleryContext = {
   db: D1Database;
@@ -224,7 +227,7 @@ export async function publishFromAccount(
     if (typeof response.id !== 'number') {
       // The plugin predates owner IDs: the page exists but can't be linked
       console.error('Gallery publish returned no post ID');
-      return json({ ...response, linked: false });
+      return Response.json({ ...response, linked: false });
     }
     // The project's name when it has one, as the gallery shows it
     const title =
@@ -253,9 +256,9 @@ export async function publishFromAccount(
         showOwner,
       });
 
-    return json({ ...response, linked: true });
+    return Response.json({ ...response, linked: true });
   }
-  return json(response);
+  return Response.json(response);
 }
 
 /** A Yarn Palette Creator link on this site (`origin`), or null. */
@@ -326,9 +329,9 @@ export async function publishPaletteFromAccount(
       link: yarnUrl,
       showOwner: input.showOwner === true,
     });
-    return json({ ...response, linked: true });
+    return Response.json({ ...response, linked: true });
   }
-  return json(response);
+  return Response.json(response);
 }
 
 /**
@@ -375,7 +378,7 @@ export async function renamePaletteFromAccount(
     );
 
   await renamePost(gallery.db, gallery.userId, postId, result.title);
-  return json(
+  return Response.json(
     { title: result.title },
     { headers: { 'Cache-Control': 'no-store' } },
   );
@@ -439,9 +442,9 @@ export async function updatePaletteFromAccount(
       link: yarnUrl,
       updatedAt: now,
     });
-    return json({ ...response, title: saved, linked: true });
+    return Response.json({ ...response, title: saved, linked: true });
   }
-  return json(response);
+  return Response.json(response);
 }
 
 /**

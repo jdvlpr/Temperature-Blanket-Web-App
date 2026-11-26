@@ -19,7 +19,7 @@
 import { getEmailSender } from '#lib/server/email/index.js';
 import { readDevOutbox } from '#lib/server/email/dev-outbox.js';
 import { requireDevRoutes, requireStorage } from '#lib/server/platform.js';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ url }) => {
   const { projects } = requireStorage(platform);
   const to = url.searchParams.get('to');
   if (!to) error(400, 'Missing ?to=');
-  return json(await readDevOutbox(projects, to));
+  return Response.json(await readDevOutbox(projects, to));
 };
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -49,5 +49,5 @@ export const POST: RequestHandler = async ({ request }) => {
     subject: body.subject,
     text: body.text,
   });
-  return json({ sent: true });
+  return Response.json({ sent: true });
 };

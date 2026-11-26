@@ -20,7 +20,6 @@
 //                   → 403 { code: 'SESSION_NOT_FRESH' } sign in again first
 //                   → 401                               not signed in
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -32,7 +31,7 @@ export const DELETE: RequestHandler = async (event) => {
   const result = await deleteAppAccount(event);
   if (result instanceof Response) return result;
   if (result === 'not-fresh')
-    return json(
+    return Response.json(
       {
         code: 'SESSION_NOT_FRESH',
         message: 'Sign in again to delete your account.',

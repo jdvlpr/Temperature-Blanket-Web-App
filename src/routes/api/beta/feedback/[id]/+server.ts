@@ -16,7 +16,6 @@
 // PATCH { status: 'new' | 'done' }: the owner marks one piece of the beta's
 // feedback done, or new again (/beta/feedback).
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -24,7 +23,8 @@ export const prerender = false;
 const PRIVATE = { 'Cache-Control': 'private, no-store' };
 
 export const PATCH: RequestHandler = async (event) => {
-  if (!__SITE_BETA__) return json({ message: 'Not found' }, { status: 404 });
+  if (!__SITE_BETA__)
+    return Response.json({ message: 'Not found' }, { status: 404 });
   const { requireFeedbackOwner } =
     await import('#lib/server/beta-feedback-owner.js');
   const owner = await requireFeedbackOwner(event);
@@ -33,14 +33,14 @@ export const PATCH: RequestHandler = async (event) => {
   const body = await event.request.json().catch(() => null);
   const status = body?.status;
   if (status !== 'new' && status !== 'done')
-    return json(
+    return Response.json(
       { code: 'INVALID_REQUEST', message: 'Invalid status' },
       { status: 400, headers: PRIVATE },
     );
 
   const { setFeedbackStatus } = await import('#lib/server/beta-feedback.js');
   if (!(await setFeedbackStatus(owner.db, event.params.id, status)))
-    return json(
+    return Response.json(
       { code: 'NOT_FOUND', message: 'No such feedback' },
       { status: 404, headers: PRIVATE },
     );

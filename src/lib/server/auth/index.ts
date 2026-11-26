@@ -18,7 +18,7 @@
 
 import { getEmailSender, type EmailMessage } from '#lib/server/email/index.js';
 import { TURNSTILE_HEADER, verifyTurnstile } from '#lib/server/turnstile.js';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
 import { APIError } from 'better-auth/api';
 import { AsyncLocalStorage } from 'node:async_hooks';
@@ -140,13 +140,16 @@ function authFor(platform: App.Platform | undefined): Auth | Response {
   const result = readAuthSettings(platform?.env);
 
   if (result.status === 'disabled')
-    return json({ message: 'Not found' }, { status: 404 });
+    return Response.json({ message: 'Not found' }, { status: 404 });
   if (result.status === 'misconfigured' || !platform?.env?.DB) {
     console.error(
       'Accounts are misconfigured:',
       result.status === 'misconfigured' ? result.reason : 'no DB binding',
     );
-    return json({ message: 'Accounts are not available' }, { status: 503 });
+    return Response.json(
+      { message: 'Accounts are not available' },
+      { status: 503 },
+    );
   }
 
   const key = JSON.stringify(result.settings);
@@ -221,14 +224,14 @@ export async function handleAuthRequest(
         });
         if (turnstile !== 'ok')
           return turnstile === 'rejected'
-            ? json(
+            ? Response.json(
                 {
                   code: 'TURNSTILE_REJECTED',
                   message: "We couldn't check that you're not a robot",
                 },
                 { status: 403 },
               )
-            : json(
+            : Response.json(
                 {
                   code: 'TURNSTILE_UNAVAILABLE',
                   message: "The check that you're not a robot isn't working",
@@ -252,7 +255,7 @@ export async function handleAuthRequest(
           ))) ||
         (typeof email === 'string' && !(await allowCodeRequest(db, email)))
       )
-        return json(
+        return Response.json(
           {
             code: 'TOO_MANY_REQUESTS',
             message: 'Too many codes requested',
@@ -271,7 +274,7 @@ export async function handleAuthRequest(
       ) {
         // No code for a new email: it couldn't create an account
         if (!(await hasAccount(db, body.email)))
-          return json({ success: true, signUpsPaused: true });
+          return Response.json({ success: true, signUpsPaused: true });
         signUpsPaused = true;
       }
 
@@ -279,7 +282,7 @@ export async function handleAuthRequest(
         emailIsCapped(env) &&
         !(await emailsLeftToday(db, dailyEmailLimit(env)))
       )
-        return json(
+        return Response.json(
           {
             code: 'EMAIL_LIMIT_REACHED',
             message: 'No more emails can be sent today',
@@ -291,13 +294,13 @@ export async function handleAuthRequest(
     // Provider tokens stay on the server: $lib/server/ravelry asks auth.api
     // for them directly, so these routes have no use from a browser
     if (TOKEN_ROUTES.has(event.url.pathname))
-      return json({ message: 'Not found' }, { status: 404 });
+      return Response.json({ message: 'Not found' }, { status: 404 });
 
     // A linked Ravelry account is for Ravelry's API only, never a way in
     if (isPost(event, '/api/auth/sign-in/social')) {
       const body = await jsonBody(event.request);
       if (body?.provider === RAVELRY_PROVIDER_ID)
-        return json(
+        return Response.json(
           {
             code: 'NOT_A_SIGN_IN_METHOD',
             message: 'Ravelry is not a sign-in method',
@@ -331,7 +334,7 @@ export async function handleAuthRequest(
           target.providerId !== RAVELRY_PROVIDER_ID &&
           !waysIn.length
         )
-          return json(
+          return Response.json(
             {
               code: 'FAILED_TO_UNLINK_LAST_ACCOUNT',
               message: 'You can’t unlink your last way to sign in',
@@ -347,7 +350,7 @@ export async function handleAuthRequest(
         typeof body?.name === 'string' &&
         cleanName(body.name, Infinity).length > MAX_DISPLAY_NAME_LENGTH
       )
-        return json(
+        return Response.json(
           { code: 'NAME_TOO_LONG', message: 'Display name is too long' },
           { status: 400 },
         );
@@ -372,7 +375,7 @@ export async function handleAuthRequest(
     if (signedIn) runInBackground(cleanUpExpired(db));
 
     if (signUpsPaused && response.ok)
-      return json({ ...(await response.json()), signUpsPaused: true });
+      return Response.json({ ...(await response.json()), signUpsPaused: true });
 
     if (emailChange && response.ok)
       runInBackground(
@@ -400,7 +403,8 @@ export async function requireAccount(
     // The iPhone app sends its session as a bearer token (see ./app-session)
     headers: withBearerSession(event.request.headers),
   });
-  if (!session) return json({ message: 'Not signed in' }, { status: 401 });
+  if (!session)
+    return Response.json({ message: 'Not signed in' }, { status: 401 });
   return { auth, user: session.user };
 }
 
@@ -417,7 +421,7 @@ export async function deleteAppAccount(
   const auth = authFor(platform);
   if (auth instanceof Response) return auth;
   if (!bearerToken(event.request.headers))
-    return json({ message: 'Not signed in' }, { status: 401 });
+    return Response.json({ message: 'Not signed in' }, { status: 401 });
 
   // deleteUserData reads the platform from here
   return requestPlatform.run(platform, async () => {
@@ -431,7 +435,7 @@ export async function deleteAppAccount(
       if (e instanceof APIError) {
         if (e.body?.code === 'SESSION_EXPIRED') return 'not-fresh' as const;
         if (e.statusCode === 401)
-          return json({ message: 'Not signed in' }, { status: 401 });
+          return Response.json({ message: 'Not signed in' }, { status: 401 });
       }
       throw e;
     }
@@ -462,14 +466,14 @@ export async function appleAppSession(
   const auth = authFor(platform);
   if (auth instanceof Response) return auth;
   if (settings.status !== 'ready' || !settings.settings.apple?.appBundleId)
-    return json({ message: 'Not found' }, { status: 404 });
+    return Response.json({ message: 'Not found' }, { status: 404 });
   if (
     typeof idToken !== 'string' ||
     typeof nonce !== 'string' ||
     !idToken ||
     !nonce
   )
-    return json(
+    return Response.json(
       { code: 'INVALID_REQUEST', message: 'Sign in with Apple again.' },
       { status: 400 },
     );
@@ -485,12 +489,12 @@ export async function appleAppSession(
       })) as { token: string; user: { id: string } };
     } catch (e) {
       if (e instanceof APIError && e.body?.code === SIGN_UPS_PAUSED)
-        return json(
+        return Response.json(
           { code: SIGN_UPS_PAUSED, message: 'New sign-ups are paused' },
           { status: 403 },
         );
       if (e instanceof APIError && e.statusCode < 500)
-        return json(
+        return Response.json(
           {
             code: 'INVALID_TOKEN',
             message: "Apple's sign-in couldn't be checked. Try again.",
@@ -502,7 +506,10 @@ export async function appleAppSession(
     const context = (await auth.$context) as unknown as AppSessionContext;
     await context.internalAdapter.deleteSession(signedIn.token);
     const session = await createAppSession(context, signedIn.user.id);
-    return session ?? json({ message: 'Could not sign in' }, { status: 500 });
+    return (
+      session ??
+      Response.json({ message: 'Could not sign in' }, { status: 500 })
+    );
   });
 }
 

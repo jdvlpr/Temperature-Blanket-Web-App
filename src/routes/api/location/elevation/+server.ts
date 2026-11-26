@@ -1,7 +1,7 @@
 import { SECRET_GEONAMES_USERNAME } from '$app/env/private';
 import { API_SERVICES } from '#lib/constants/api-constants.js';
 import { NO_DATA_SRTM3 } from '#lib/constants/location-constants.js';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
   const { searchParams } = url;
@@ -32,7 +32,8 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
   // srtm3 is a single number giving the elevation in meters.
   // Elevation never changes, so the browser keeps it
   const headers = { 'Cache-Control': 'public, max-age=31536000, immutable' };
-  if (data.srtm3 !== NO_DATA_SRTM3) return json(data.srtm3, { headers });
+  if (data.srtm3 !== NO_DATA_SRTM3)
+    return Response.json(data.srtm3, { headers });
 
-  return json(null, { headers });
+  return Response.json(null, { headers });
 };

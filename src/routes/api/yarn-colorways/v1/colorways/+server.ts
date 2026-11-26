@@ -24,7 +24,7 @@ import {
   sortColorsByName,
   sortColorsLightToDark,
 } from '#lib/utils/color-utils.js';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
 import { currentYarnIdAnyBrand } from '#lib/utils/yarn-utils.js';
@@ -172,7 +172,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
 
   if (colorways.length > limit) colorways.length = limit;
 
-  return json({
+  return Response.json({
     meta: {
       limit,
       offset,

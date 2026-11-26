@@ -1,6 +1,6 @@
 import { SECRET_GEONAMES_USERNAME } from '$app/env/private';
 import { API_SERVICES } from '#lib/constants/api-constants.js';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, fetch }) => {
   const { searchParams } = url;
@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
     error(404, 'no data found.');
   }
 
-  return json(data, {
+  return Response.json(data, {
     headers: { 'Cache-Control': 'public, max-age=2592000' },
   });
 };

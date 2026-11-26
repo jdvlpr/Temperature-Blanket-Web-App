@@ -1,7 +1,7 @@
 import { SECRET_GEONAMES_USERNAME } from '$app/env/private';
 import { API_SERVICES } from '#lib/constants/api-constants.js';
 import { cachedJSON } from '#lib/features/cache/edge-cache.js';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
 const CACHE_TTL_SECONDS = 60 * 60 * 4; // 4h
@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params, fetch, url }) => {
     searchGeonames(text, fetch),
   );
 
-  return json(data, {
+  return Response.json(data, {
     headers: { 'Cache-Control': 'public, max-age=86400' },
   });
 };

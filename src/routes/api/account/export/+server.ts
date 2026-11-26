@@ -17,7 +17,6 @@
 // preferences. The page adds synced projects.
 
 import type { D1Database } from '@cloudflare/workers-types';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -69,7 +68,7 @@ export const GET: RequestHandler = async (event) => {
     ravelry,
   };
 
-  return json(data, {
+  return Response.json(data, {
     headers: {
       'Content-Disposition':
         'attachment; filename="temperature-blanket-account.json"',

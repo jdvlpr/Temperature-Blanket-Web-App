@@ -21,7 +21,6 @@
 // page showing its owner (they name the owner's Ravelry account). Public, like
 // the page; each is null without accounts or when it can't be looked up.
 
-import { json } from '@sveltejs/kit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 import type { RequestHandler } from './$types';
 
@@ -30,7 +29,7 @@ export const prerender = false;
 export const GET: RequestHandler = async ({ params }) => {
   const id = Number(params.id);
   if (!Number.isSafeInteger(id) || id < 1)
-    return json({ message: 'Invalid gallery page' }, { status: 400 });
+    return Response.json({ message: 'Invalid gallery page' }, { status: 400 });
 
   const env = getPlatform()?.env;
   const answer: {
@@ -71,7 +70,7 @@ export const GET: RequestHandler = async ({ params }) => {
   }
 
   // A rename or new photos show within a minute
-  return json(answer, {
+  return Response.json(answer, {
     headers: { 'Cache-Control': 'public, max-age=60' },
   });
 };

@@ -17,7 +17,7 @@
 
 import { requireAccount } from '#lib/server/auth/index.js';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import { cleanUpIdleUser, cleanUpUserSync } from './store';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -30,7 +30,10 @@ export type SyncContext = {
 };
 
 export const syncError = (status: number, code: string, message: string) =>
-  json({ code, message }, { status, headers: { 'Cache-Control': 'no-store' } });
+  Response.json(
+    { code, message },
+    { status, headers: { 'Cache-Control': 'no-store' } },
+  );
 
 /**
  * The signed-in user's sync storage, or a Response: 404 with accounts off, 401 when

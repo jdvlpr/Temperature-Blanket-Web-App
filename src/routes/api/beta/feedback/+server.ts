@@ -19,7 +19,6 @@
 // an hour from one IP address.
 // GET ?status=new|done: the owner's list (BETA_FEEDBACK_OWNERS), for /beta/feedback.
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -27,7 +26,7 @@ export const prerender = false;
 const PRIVATE = { 'Cache-Control': 'private, no-store' };
 
 const failure = (status: number, code: string, message: string) =>
-  json({ code, message }, { status, headers: PRIVATE });
+  Response.json({ code, message }, { status, headers: PRIVATE });
 
 export const POST: RequestHandler = async (event) => {
   if (!__SITE_BETA__) return failure(404, 'NOT_FOUND', 'Not found');
@@ -81,7 +80,7 @@ export const POST: RequestHandler = async (event) => {
     );
 
   const id = await saveFeedback(db, parsed.feedback, user?.id ?? null);
-  return json({ id }, { status: 201, headers: PRIVATE });
+  return Response.json({ id }, { status: 201, headers: PRIVATE });
 };
 
 export const GET: RequestHandler = async (event) => {
@@ -97,5 +96,5 @@ export const GET: RequestHandler = async (event) => {
     owner.db,
     status === 'new' || status === 'done' ? status : undefined,
   );
-  return json({ feedback }, { headers: PRIVATE });
+  return Response.json({ feedback }, { headers: PRIVATE });
 };

@@ -19,7 +19,6 @@
 //   GET    (Bearer)           → { user }                      who it's signed in as
 //   DELETE (Bearer)           → 204                           signs the app out
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -36,14 +35,14 @@ export const POST: RequestHandler = async (event) => {
   const body = await event.request.json().catch(() => null);
   const session = await exchangeAppCode(context, body?.code, body?.verifier);
   if (!session)
-    return json(
+    return Response.json(
       {
         code: 'INVALID_CODE',
         message: 'This sign-in has expired. Try signing in again.',
       },
       { status: 400, headers: NO_STORE },
     );
-  return json(session, { headers: NO_STORE });
+  return Response.json(session, { headers: NO_STORE });
 };
 
 export const GET: RequestHandler = async (event) => {
@@ -51,7 +50,7 @@ export const GET: RequestHandler = async (event) => {
   const account = await requireAccount(event);
   if (account instanceof Response) return account;
   const { id, name, email } = account.user;
-  return json({ user: { id, name, email } }, { headers: NO_STORE });
+  return Response.json({ user: { id, name, email } }, { headers: NO_STORE });
 };
 
 export const DELETE: RequestHandler = async (event) => {
@@ -63,7 +62,7 @@ export const DELETE: RequestHandler = async (event) => {
   // Only the app's own session, and only a real one
   const bearer = bearerToken(event.request.headers);
   if (!bearer)
-    return json(
+    return Response.json(
       { message: 'Not signed in' },
       { status: 401, headers: NO_STORE },
     );

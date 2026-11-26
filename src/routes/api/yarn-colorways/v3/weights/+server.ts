@@ -17,7 +17,7 @@ import { dev } from '$app/env';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$app/env/private';
 import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
 import { brands } from '#lib/data/yarns/brands.js';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 export async function GET({ url, request }) {
   if (!dev) {
@@ -42,5 +42,5 @@ export async function GET({ url, request }) {
     return { ...weight, yarns };
   });
 
-  return json({ meta: { total: results.length }, data: results });
+  return Response.json({ meta: { total: results.length }, data: results });
 }

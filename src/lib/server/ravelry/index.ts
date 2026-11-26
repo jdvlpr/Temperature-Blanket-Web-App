@@ -18,7 +18,7 @@
 // and never sent to a browser. See ravelry-api-documentation.md.
 
 import type { D1Database } from '@cloudflare/workers-types';
-import { json, type RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import { requireAccount } from '#lib/server/auth/index.js';
 import { RAVELRY_PROVIDER_ID } from '#lib/server/auth/options.js';
 import { readAuthSettings } from '#lib/server/auth/settings.js';
@@ -43,7 +43,7 @@ export type RavelryContext = {
 
 /** A JSON error the client can tell apart by `code`. */
 export function ravelryError(status: number, code: string, message: string) {
-  return json({ code, message }, { status, headers: NO_STORE });
+  return Response.json({ code, message }, { status, headers: NO_STORE });
 }
 
 /** Whether Ravelry linking is configured (RAVELRY_CLIENT_ID and _SECRET). */

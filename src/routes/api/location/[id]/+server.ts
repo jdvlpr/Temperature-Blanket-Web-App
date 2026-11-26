@@ -1,6 +1,6 @@
 import { SECRET_GEONAMES_USERNAME } from '$app/env/private';
 import { API_SERVICES } from '#lib/constants/api-constants.js';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params, fetch }) => {
   const { id } = params;
@@ -25,7 +25,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
   if (!data) throw error(500, 'no data found.');
 
   // A place's details rarely change, so the browser keeps them for a month
-  return json(data, {
+  return Response.json(data, {
     headers: { 'Cache-Control': 'public, max-age=2592000' },
   });
 };

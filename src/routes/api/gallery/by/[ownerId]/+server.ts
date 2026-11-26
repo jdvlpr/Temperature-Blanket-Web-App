@@ -18,7 +18,6 @@
 // each page from the gallery). Public, like that page; 404 when there's no
 // such owner, or without accounts.
 
-import { json } from '@sveltejs/kit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 import type { RequestHandler } from './$types';
 
@@ -36,12 +35,12 @@ export const GET: RequestHandler = async ({ params }) => {
     !env.DB ||
     !PUBLIC_ID_PATTERN.test(params.ownerId)
   )
-    return json({ message: 'Not found' }, { status: 404 });
+    return Response.json({ message: 'Not found' }, { status: 404 });
 
   const owner = await ownerPage(env.DB, params.ownerId);
-  if (!owner) return json({ message: 'Not found' }, { status: 404 });
+  if (!owner) return Response.json({ message: 'Not found' }, { status: 404 });
 
-  return json(
+  return Response.json(
     {
       name: owner.name,
       postIds: owner.postIds.slice(0, MAX_PAGES),

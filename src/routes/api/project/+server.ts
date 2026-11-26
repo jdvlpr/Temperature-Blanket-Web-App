@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Anonymous gallery submissions used to come through here. Publishing needs an
 // account now (/api/account/gallery), so every gallery page has an owner who
 // can update or unpublish it. Older open tabs get a message they can show.
 export const POST: RequestHandler = () =>
-  json(
+  Response.json(
     {
       code: 'SIGN_IN_TO_PUBLISH',
       message: 'Sign in to publish to the gallery.',

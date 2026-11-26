@@ -16,7 +16,7 @@ import { dev } from '$app/env';
 
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$app/env/private';
 import { brands } from '#lib/data/yarns/brands.js';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 export async function GET({ url, request }) {
   if (!dev) {
@@ -48,7 +48,7 @@ export async function GET({ url, request }) {
     };
   });
 
-  return json({
+  return Response.json({
     meta: {
       total: results.length,
     },

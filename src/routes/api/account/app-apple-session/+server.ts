@@ -20,7 +20,6 @@
 //   POST { idToken, nonce } → { token, expiresAt, user }
 //                           → 401 INVALID_TOKEN, 403 SIGN_UPS_PAUSED
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -35,5 +34,5 @@ export const POST: RequestHandler = async (event) => {
     result.headers.set('Cache-Control', 'no-store');
     return result;
   }
-  return json(result, { headers: NO_STORE });
+  return Response.json(result, { headers: NO_STORE });
 };
