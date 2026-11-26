@@ -22,6 +22,7 @@ import {
 } from '#lib/data/yarns/colorways.svelte.js';
 import type { Color } from '#lib/types/yarn-types.js';
 import { error } from '@sveltejs/kit';
+import { readLimit } from '#lib/server/yarn-colorways-api.js';
 import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
 import { currentYarnIdAnyBrand } from '#lib/utils/yarn-utils.js';
@@ -146,7 +147,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
 
   const numberOfResults = filtered.length;
 
-  let offset = 0; // maximum 500
+  let offset = 0;
   if (searchParams.has('offset')) {
     offset = Number(searchParams.get('offset'));
     if (isNaN(offset)) return error(400, "Parameter 'offset' must be a number");
@@ -154,13 +155,7 @@ export const GET: RequestHandler = async ({ url, params, request }) => {
 
   filtered = filtered.slice(offset);
 
-  let limit = 50; // default number of results is 50, maximum is 500
-  if (searchParams.has('limit')) {
-    limit = Number(searchParams.get('limit'));
-    if (isNaN(limit)) return error(400, "Parameter 'limit' must be a number");
-    if (limit > 500)
-      return error(400, "Parameter 'limit' must be less than 501");
-  }
+  const limit = readLimit(searchParams);
   if (filtered.length > limit) filtered.length = limit;
 
   return Response.json({

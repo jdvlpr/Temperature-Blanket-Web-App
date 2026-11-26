@@ -274,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 target="_blank"
                 class="link">subscribe to one of the plans</a
               > to get a key for accessing the Yarn Colorways API. The free plan allows
-              up to 500 calls per month.
+              up to 50 calls per month.
             </p>
           </section>
 
@@ -541,7 +541,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td
                       >The maximum number of yarn colorways to include in the
                       results. Maximum is
-                      <span class="code px-2">500</span>.</td
+                      <span class="code px-2">250</span>.</td
                     >
                     <td>Number</td>
                     <td>No</td>
@@ -837,7 +837,7 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                     <td>limit</td>
                     <td
                       >The maximum number of yarn colorways to include in the
-                      results. Maximum is 500.</td
+                      results. Maximum is 250.</td
                     >
                     <td>Number</td>
                     <td>No</td>

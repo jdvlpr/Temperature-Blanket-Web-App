@@ -25,6 +25,7 @@ import {
   sortColorsLightToDark,
 } from '#lib/utils/color-utils.js';
 import { error } from '@sveltejs/kit';
+import { readLimit } from '#lib/server/yarn-colorways-api.js';
 import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
 import { currentYarnIdAnyBrand } from '#lib/utils/yarn-utils.js';
@@ -162,13 +163,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
   }
   colorways = colorways.slice(offset);
 
-  let limit = 50; // default number of results is 50, maximum 500
-  if (searchParams.has('limit')) {
-    limit = Number(searchParams.get('limit'));
-    if (isNaN(limit)) return error(400, "Parameter 'limit' must be a number");
-    if (limit > 500)
-      return error(400, "Parameter 'limit' must be less than 501");
-  }
+  const limit = readLimit(searchParams);
 
   if (colorways.length > limit) colorways.length = limit;
 
