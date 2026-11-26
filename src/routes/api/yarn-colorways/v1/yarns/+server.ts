@@ -39,7 +39,7 @@ export async function GET({ url, request }) {
     if (!brand) return error(400);
     brand = decodeURIComponent(brand).toLowerCase();
     if (brand.includes(',')) {
-      let _brands = brand.split(',');
+      const _brands = brand.split(',');
       results = results.filter(
         (item) =>
           _brands.includes(item.id) ||

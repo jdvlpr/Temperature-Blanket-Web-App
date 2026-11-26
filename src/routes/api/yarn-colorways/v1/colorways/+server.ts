@@ -51,7 +51,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
     if (!brand) return error(400);
     brand = decodeURIComponent(brand).toLowerCase();
     if (brand?.includes(',')) {
-      let brands = brand.split(',');
+      const brands = brand.split(',');
 
       colorways = colorways.filter(
         (colorway) =>
@@ -92,7 +92,7 @@ export const GET: RequestHandler = async ({ url, request }) => {
   }
 
   if (searchParams.has('weight')) {
-    let weight = searchParams.get('weight');
+    const weight = searchParams.get('weight');
     if (!weight) return error(400, "Parameter 'weight' is empty");
 
     const yarnWeightIds: string[] = ALL_YARN_WEIGHTS.map((n) => n.id);

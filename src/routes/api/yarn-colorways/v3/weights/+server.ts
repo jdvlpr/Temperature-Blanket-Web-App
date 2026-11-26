@@ -19,7 +19,7 @@ import { ALL_YARN_WEIGHTS } from '#lib/constants/color-constants.js';
 import { brands } from '#lib/data/yarns/brands.js';
 import { error } from '@sveltejs/kit';
 
-export async function GET({ url, request }) {
+export async function GET({ request }) {
   if (!dev) {
     const { headers } = request;
     if (!headers.has('X-RapidAPI-Proxy-Secret'))

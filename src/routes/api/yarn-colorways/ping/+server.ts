@@ -1,4 +1,4 @@
-export async function GET({ url, request }) {
+export async function GET() {
   return Response.json({
     message: 'OK',
   });

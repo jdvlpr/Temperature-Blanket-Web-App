@@ -439,7 +439,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2">/match/{`[color]`}</span>
+              <span class="code px-2">/match/[color]</span>
             </p>
 
             <p class="font-bold">Parameters</p>
