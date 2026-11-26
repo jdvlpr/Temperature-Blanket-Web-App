@@ -185,7 +185,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#key weather.currentIndex}
     <div class="weather-details">
       <div class="my-2 flex flex-wrap items-start justify-center gap-x-4">
-        {#each currentWeatherTargets as { id, label, icon, type }}
+        {#each currentWeatherTargets as { id, label, icon, type }, keyIndex (keyIndex)}
           {@const colorData = colorInfo(id, day)}
           {@const { name, hex, index, gaugeLength, brandName, yarnName } =
             colorData ?? {}}

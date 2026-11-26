@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="square-size"
           bind:value={squareSize}
         >
-          {#each Array(17) as _, i}
+          {#each Array(17) as _, i (i)}
             {#if i > 0}
               <option value={i}>
                 {i} x {i}
@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="primary-target"
           bind:value={primaryTarget}
         >
-          {#each targets as { id, label, icon }}
+          {#each targets as { id, label, icon }, keyIndex (keyIndex)}
             <option value={id}>{icon} {label} </option>
           {/each}
         </select>

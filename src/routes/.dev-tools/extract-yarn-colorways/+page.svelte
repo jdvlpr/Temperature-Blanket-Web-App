@@ -352,7 +352,7 @@
           {#if options.value.names?.length}
             <p>{options.value.names.length} Colorways</p>
             <div class="flex flex-wrap justify-start">
-              {#each options.value.names as { name, hex }, index}
+              {#each options.value.names as { name, hex }, index (index)}
                 <div
                   class="flex flex-col gap-1 p-2"
                   style="background:{hex};color:{getTextColor(

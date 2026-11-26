@@ -141,7 +141,7 @@
       <tbody
         class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
       >
-        {#each yarnChart as { name, wpi, ply, standard_name, icon }}
+        {#each yarnChart as { name, wpi, ply, standard_name, icon }, keyIndex (keyIndex)}
           <tr
             id={name}
             class={[

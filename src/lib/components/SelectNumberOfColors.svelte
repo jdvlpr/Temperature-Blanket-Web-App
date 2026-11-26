@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       title="Choose Number of Colors"
       {onchange}
     >
-      {#each Array(max + 1) as _, i}
+      {#each Array(max + 1) as _, i (i)}
         {#if i > start}
           <option value={i}>
             {i}

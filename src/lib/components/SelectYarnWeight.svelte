@@ -85,7 +85,7 @@
       {onchange}
     >
       <option value="">All</option>
-      {#each yarnWeights as { name, id, numberOfYarns }}
+      {#each yarnWeights as { name, id, numberOfYarns }, keyIndex (keyIndex)}
         <option value={id}
           >{name} ({numberOfYarns} {pluralize('yarn', numberOfYarns)})</option
         >

@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col items-center gap-4">
     <div class="grid w-full grid-cols-1 gap-4 rounded-none md:grid-cols-2">
       {#if SUPPORTERS?.gold?.length}
-        {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc, date }}
+        {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc, date }, keyIndex (keyIndex)}
           {@const monthAndYear = new Date(date).toLocaleString('default', {
             month: 'long',
             year: 'numeric',
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       {#if SUPPORTERS?.silver?.length}
-        {#each SUPPORTERS.silver as { name, href, linkText, date }}
+        {#each SUPPORTERS.silver as { name, href, linkText, date }, keyIndex (keyIndex)}
           {@const monthAndYear = new Date(date).toLocaleString('default', {
             month: 'long',
             year: 'numeric',
@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       {#if SUPPORTERS?.bronze?.length}
-        {#each SUPPORTERS?.bronze as { name, date }}
+        {#each SUPPORTERS?.bronze as { name, date }, keyIndex (keyIndex)}
           {@const monthAndYear = new Date(date).toLocaleString('default', {
             month: 'long',
             year: 'numeric',

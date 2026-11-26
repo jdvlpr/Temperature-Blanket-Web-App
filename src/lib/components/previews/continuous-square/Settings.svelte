@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="cosq-param"
       bind:value={continuousSquarePreview.settings.selectedTarget}
     >
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label} </option>
       {/each}
     </select>

@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="mrws-dimensions"
       bind:value={monthRowsPreview.settings.dimensions}
     >
-      {#each monthRowsPreview.possibleDimensions as value}
+      {#each monthRowsPreview.possibleDimensions as value, keyIndex (keyIndex)}
         {@const [width, height] = value.split('x')}
         <option {value}
           >{width}

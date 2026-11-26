@@ -75,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit min-w-[210px]"
       bind:value={calendarPreview.settings.dimensions}
     >
-      {#each calendarPreview.possibleDimensions as value}
+      {#each calendarPreview.possibleDimensions as value, keyIndex (keyIndex)}
         {@const [width, height] = value.split('x')}
         <option {value}
           >{width}
@@ -102,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             calendarPreview.settings.weekStartCode;
       }}
     >
-      {#each DAYS_OF_THE_WEEK as { value, label }}
+      {#each DAYS_OF_THE_WEEK as { value, label }, keyIndex (keyIndex)}
         <option {value}>{label}</option>
       {/each}
     </select>
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit min-w-[110px]"
       bind:value={calendarPreview.settings.joinStitches}
     >
-      {#each Array(11) as _, i}
+      {#each Array(11) as _, i (i)}
         <option value={i}>
           {#if i === 0}
             None

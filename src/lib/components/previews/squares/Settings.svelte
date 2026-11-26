@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit min-w-[120px]"
       bind:value={squaresPreview.settings.columns}
     >
-      {#each Array(300) as _, i}
+      {#each Array(300) as _, i (i)}
         {@const number = i + 1}
         <option value={number}>
           {number}
@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit min-w-[60px]"
       bind:value={squaresPreview.settings.squaresAtBeginning}
     >
-      {#each Array(51) as _, i}
+      {#each Array(51) as _, i (i)}
         <option value={i}>
           {i}
         </option>
@@ -127,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit min-w-[60px]"
       bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
     >
-      {#each Array(51) as _, i}
+      {#each Array(51) as _, i (i)}
         <option value={i}>
           {i}
         </option>
@@ -209,7 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit min-w-[110px]"
       bind:value={squaresPreview.settings.joinStitches}
     >
-      {#each Array(11) as _, i}
+      {#each Array(11) as _, i (i)}
         <option value={i}>
           {#if i === 0}
             None

@@ -178,9 +178,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }}
   >
     {#if hexagonRoundsPreview.borderHexagons.length}
-      {#each Array(hexagonRoundsPreview.settings.layoutBorder) as _, i}
+      {#each Array(hexagonRoundsPreview.settings.layoutBorder) as _, i (i)}
         {@const reverseI = hexagonRoundsPreview.settings.layoutBorder - 1 - i}
-        {#each hexagonRoundsPreview.borderHexagons as { size, x, y }}
+        {#each hexagonRoundsPreview.borderHexagons as { size, x, y }, keyIndex (keyIndex)}
           {@const roundSize =
             size +
             (reverseI + 1) * hexagonRoundsPreview.STITCH_SIZE +
@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/each}
       {/each}
     {/if}
-    {#each hexagonRoundsPreview.sections as { size, color, x, y, isWeather, dayIndex }}
+    {#each hexagonRoundsPreview.sections as { size, color, x, y, isWeather, dayIndex }, keyIndex (keyIndex)}
       <polygon
         points={getHexagonPoints(x, y, size)}
         stroke={color}

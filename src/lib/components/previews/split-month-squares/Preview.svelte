@@ -199,8 +199,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(splitMonthSquaresPreview.targets);
     }}
   >
-    {#each splitMonthSquaresPreview.sections as { sides, isWeather, dayIndex }}
-      {#each sides as { color, points }}
+    {#each splitMonthSquaresPreview.sections as { sides, isWeather, dayIndex }, keyIndex (keyIndex)}
+      {#each sides as { color, points }, keyIndex (keyIndex)}
         <polyline
           {points}
           stroke={color}

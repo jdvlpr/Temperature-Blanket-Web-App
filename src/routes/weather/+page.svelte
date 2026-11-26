@@ -503,7 +503,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div
                   class="relative mx-auto mt-4 flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4 md:gap-8"
                 >
-                  {#each hourlyForcastData as { isNow, time, is_day, temperature_2m, precipitation_probability, weathercode }}
+                  {#each hourlyForcastData as { isNow, time, is_day, temperature_2m, precipitation_probability, weathercode }, keyIndex (keyIndex)}
                     {@const details = getWeatherCodeDetails({
                       weathercode,
                       is_day,
@@ -549,7 +549,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div
                   class="relative mx-auto mt-4 flex w-full flex-col items-start justify-center gap-2"
                 >
-                  {#each dailyWeatherData as { time, temperature_2m_max, temperature_2m_min, precipitation_probability_max, weathercode }, index}
+                  {#each dailyWeatherData as { time, temperature_2m_max, temperature_2m_min, precipitation_probability_max, weathercode }, index (index)}
                     {@const date = new Date(time).toLocaleString(
                       window.navigator.language,
                       {

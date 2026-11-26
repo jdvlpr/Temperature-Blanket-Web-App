@@ -75,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="smsq-dimensions"
       bind:value={splitMonthSquaresPreview.settings.dimensions}
     >
-      {#each splitMonthSquaresPreview.possibleDimensions as value}
+      {#each splitMonthSquaresPreview.possibleDimensions as value, keyIndex (keyIndex)}
         {@const [width, height] = value.split('x')}
         <option {value}
           >{width}
@@ -148,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="smsq-left-params"
       bind:value={splitMonthSquaresPreview.settings.leftTarget}
     >
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label}</option>
       {/each}
     </select>
@@ -165,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="smsq-right-params"
       bind:value={splitMonthSquaresPreview.settings.rightTarget}
     >
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label}</option>
       {/each}
     </select>

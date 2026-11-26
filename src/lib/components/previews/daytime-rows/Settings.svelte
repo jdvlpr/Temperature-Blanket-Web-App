@@ -167,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="rsun-left-params"
       bind:value={daytimeRowsPreview.settings.daytimeTarget}
     >
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label}</option>
       {/each}
     </select>
@@ -184,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="rsun-right-params"
       bind:value={daytimeRowsPreview.settings.nightTarget}
     >
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label}</option>
       {/each}
     </select>

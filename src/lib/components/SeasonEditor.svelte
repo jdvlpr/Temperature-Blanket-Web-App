@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="w-full">
     <p class="mb-2 text-sm font-medium">Select a preset to apply</p>
     <div class="flex flex-col gap-2">
-      {#each presetsList as preset}
+      {#each presetsList as preset, keyIndex (keyIndex)}
         {@const selected = isPresetSelected(preset)}
         <button
           class={[
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   );
                 }}
               >
-                {#each MONTHS as { name, value }}
+                {#each MONTHS as { name, value }, keyIndex (keyIndex)}
                   <option {value}>{name}</option>
                 {/each}
               </select>
@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   );
                 }}
               >
-                {#each Array.from({ length: getDaysInMonth(startParsed.month) }, (_, i) => i + 1) as day}
+                {#each Array.from({ length: getDaysInMonth(startParsed.month) }, (_, i) => i + 1) as day, keyIndex (keyIndex)}
                   <option value={day}>{day}</option>
                 {/each}
               </select>
@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   );
                 }}
               >
-                {#each MONTHS as { name, value }}
+                {#each MONTHS as { name, value }, keyIndex (keyIndex)}
                   <option {value}>{name}</option>
                 {/each}
               </select>
@@ -217,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   );
                 }}
               >
-                {#each Array.from({ length: getDaysInMonth(endParsed.month) }, (_, i) => i + 1) as day}
+                {#each Array.from({ length: getDaysInMonth(endParsed.month) }, (_, i) => i + 1) as day, keyIndex (keyIndex)}
                   <option value={day}>{day}</option>
                 {/each}
               </select>

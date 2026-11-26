@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if previews.active && previews.active.settings.useSeasonTargets}
     <div class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
-      {#each seasons as season, seasonIndex}
+      {#each seasons as season, seasonIndex (seasonIndex)}
         <div class="flex max-w-sm flex-col items-start gap-2">
           <button
             class="btn hover:preset-tonal-surface w-fit gap-1 font-bold whitespace-pre-wrap"
@@ -163,7 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:value={rowsPreview.settings.lengthTarget}
     >
       <option value="none">Entire Row Length</option>
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label}</option>
       {/each}
       <option value="custom">Custom Length</option>

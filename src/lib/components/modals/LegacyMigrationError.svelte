@@ -158,7 +158,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >, and include the ID.
   </p>
   <div class="flex flex-col gap-6">
-    {#each projects as project}
+    {#each projects as project, keyIndex (keyIndex)}
       <div class="card bg-surface-100-900 flex flex-col gap-2 p-2">
         <div class="">
           <h3 class="text-lg font-semibold">{project.title}</h3>

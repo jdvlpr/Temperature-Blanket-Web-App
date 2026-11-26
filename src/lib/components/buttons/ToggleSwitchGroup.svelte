@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="rounded-container bg-surface-200 dark:bg-surface-800 p-4 text-left">
   <div class="mb-1 text-xs">{groupLabel}</div>
   <div class="flex flex-col gap-2">
-    {#each targets as { id, label, icon }}
+    {#each targets as { id, label, icon }, keyIndex (keyIndex)}
       {@const containsId = value.includes(id)}
       <ToggleSwitch
         label={`${icon} ${label}`}

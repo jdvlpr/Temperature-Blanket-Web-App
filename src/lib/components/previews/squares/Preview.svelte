@@ -194,12 +194,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }}
   >
-    {#each squaresPreview.sections as square}
+    {#each squaresPreview.sections as square, keyIndex (keyIndex)}
       <g
         data-isweathersquare={square[0].isWeatherSquare}
         data-dayindex={square[0].dayIndex}
       >
-        {#each square as { color, x, y }}
+        {#each square as { color, x, y }, keyIndex (keyIndex)}
           <rect
             width={squaresPreview.SQUARE_SECTION_SIZE}
             height={squaresPreview.SQUARE_SECTION_SIZE}

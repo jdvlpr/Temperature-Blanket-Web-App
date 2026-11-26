@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(continuousSquarePreview.targets);
     }}
   >
-    {#each continuousSquarePreview.sections as { color, x, y, isExtraStitch, dayIndex }}
+    {#each continuousSquarePreview.sections as { color, x, y, isExtraStitch, dayIndex }, keyIndex (keyIndex)}
       <rect
         width={continuousSquarePreview.STITCH_SIZE * 3.6}
         height={continuousSquarePreview.STITCH_SIZE * 3.6}

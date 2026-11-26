@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(monthSquaresPreview.targets);
     }}
   >
-    {#each monthSquaresPreview.sections as { width, height, color, x, y, isWeather, dayIndex }}
+    {#each monthSquaresPreview.sections as { width, height, color, x, y, isWeather, dayIndex }, keyIndex (keyIndex)}
       <rect
         {width}
         {height}

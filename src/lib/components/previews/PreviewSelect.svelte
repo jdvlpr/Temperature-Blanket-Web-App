@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             });
           }}
         >
-          {#each previews.all as { name, id }}
+          {#each previews.all as { name, id }, keyIndex (keyIndex)}
             {#if id === 'twsr'}
               <option value={id}>{name}</option>
             {:else}
@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class="relative mx-auto my-2 flex w-fit max-w-full snap-x overflow-auto pb-3"
   >
-    {#each previews.all as { img, name, id }}
+    {#each previews.all as { img, name, id }, keyIndex (keyIndex)}
       {#if img}
         {#key theme}
           <button

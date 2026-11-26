@@ -207,12 +207,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }}
   >
-    {#each calendarPreview.sections as square}
+    {#each calendarPreview.sections as square, keyIndex (keyIndex)}
       <g
         data-isweathersquare={square[0].isWeatherSquare}
         data-dayindex={square[0].dayIndex}
       >
-        {#each square as { color, x, y }}
+        {#each square as { color, x, y }, keyIndex (keyIndex)}
           <rect
             width={calendarPreview.squareSectionSize}
             height={calendarPreview.squareSectionSize}

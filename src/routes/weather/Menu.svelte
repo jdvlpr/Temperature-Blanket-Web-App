@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Locations
       </h3>
       <div class="flex flex-col gap-2">
-        {#each savedWeatherLocations as { id, data, label }}
+        {#each savedWeatherLocations as { id, data, label }, keyIndex (keyIndex)}
           <div
             role="button"
             tabindex="0"

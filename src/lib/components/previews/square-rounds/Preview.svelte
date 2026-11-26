@@ -151,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(squareRoundsPreview.targets);
     }}
   >
-    {#each squareRoundsPreview.sections as { width, height, color, x, y, isWeather, dayIndex }}
+    {#each squareRoundsPreview.sections as { width, height, color, x, y, isWeather, dayIndex }, keyIndex (keyIndex)}
       <rect
         {width}
         {height}

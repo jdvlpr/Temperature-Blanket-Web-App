@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4 pt-2">
-  {#each shortcuts as { group, items, details }}
+  {#each shortcuts as { group, items, details }, keyIndex (keyIndex)}
     <p class="mt-2 text-xl font-bold">{group}</p>
     <p class="mb-2 italic">{details}</p>
     <table
@@ -36,12 +36,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </tr>
       </thead>
       <tbody class="divide-surface-300 dark:divide-surface-600 divide-y">
-        {#each items as { keys, description }}
+        {#each items as { keys, description }, keyIndex (keyIndex)}
           <tr>
             <td
               class="flex flex-col items-start justify-start gap-0 px-2 py-0 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2"
             >
-              {#each keys as keys, index}
+              {#each keys as keys, index (index)}
                 {#if index > 0}<span class="-my-2">or</span>{/if}
                 {@const shortcut =
                   typeof keys === 'object' ? keys.join(' + ') : keys}

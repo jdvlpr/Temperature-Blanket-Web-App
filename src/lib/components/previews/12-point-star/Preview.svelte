@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
 
     <!-- Day chevron sections -->
-    {#each twelvePointStarPreview.sections as { points, color, isWeather, dayIndex }}
+    {#each twelvePointStarPreview.sections as { points, color, isWeather, dayIndex }, keyIndex (keyIndex)}
       <polygon
         {points}
         fill={color}

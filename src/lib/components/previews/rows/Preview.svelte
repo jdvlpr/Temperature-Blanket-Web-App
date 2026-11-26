@@ -53,10 +53,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }}
   >
-    {#each rowsPreview.sections as section}
+    {#each rowsPreview.sections as section, keyIndex (keyIndex)}
       {@const isWeather = section[0].isWeatherSection}
       <g data-isweathersection={isWeather} data-dayindex={section[0].dayIndex}>
-        {#each section as { width, height, color, x, y }}
+        {#each section as { width, height, color, x, y }, keyIndex (keyIndex)}
           <rect {width} {height} fill={color} {x} {y} />
         {/each}
       </g>

@@ -500,7 +500,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 setDates({});
               }}
             >
-              {#each years as year}
+              {#each years as year, keyIndex (keyIndex)}
                 <option value={year}>{year}</option>
               {/each}
             </select>
@@ -518,7 +518,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 setDates({});
               }}
             >
-              {#each MONTHS as { value, shortName }}
+              {#each MONTHS as { value, shortName }, keyIndex (keyIndex)}
                 <option {value}>{shortName}</option>
               {/each}
             </select>
@@ -534,7 +534,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               disabled={weather.isUserEdited || project.status.loading}
               onchange={() => setDates({})}
             >
-              {#each Array(days) as _, i}
+              {#each Array(days) as _, i (i)}
                 <option value={i + 1}>{i + 1}</option>
               {/each}
             </select>

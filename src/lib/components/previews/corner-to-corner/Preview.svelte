@@ -170,9 +170,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(cornerToCornerPreview.targets);
     }}
   >
-    {#each cornerToCornerPreview.sections as section}
+    {#each cornerToCornerPreview.sections as section, keyIndex (keyIndex)}
       <g data-dayindex={section[0].dayIndex}>
-        {#each section as { x, y, width, height, color }}
+        {#each section as { x, y, width, height, color }, keyIndex (keyIndex)}
           <rect {x} {y} {width} {height} fill={color} />
         {/each}
       </g>

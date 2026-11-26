@@ -480,7 +480,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="mt-4 flex flex-col gap-4 px-2 pb-4">
                 {#if gauges?.length}
                   {#key gauges}
-                    {#each gauges as { colors, ranges, id, rangeOptions, unit }, gaugeIndex}
+                    {#each gauges as { colors, ranges, id, rangeOptions, unit }, gaugeIndex (gaugeIndex)}
                       {@const attributes = allGaugesAttributes.find(
                         (item) => item.id === id,
                       )}

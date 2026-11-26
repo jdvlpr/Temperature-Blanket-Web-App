@@ -159,9 +159,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(daytimeRowsPreview.targets);
     }}
   >
-    {#each daytimeRowsPreview.sections as day, i}
+    {#each daytimeRowsPreview.sections as day, i (i)}
       <g data-dayindex={i}>
-        {#each day as { color, height, x, y, width }}
+        {#each day as { color, height, x, y, width }, keyIndex (keyIndex)}
           <rect {width} {height} fill={color} {x} {y} />
         {/each}
       </g>

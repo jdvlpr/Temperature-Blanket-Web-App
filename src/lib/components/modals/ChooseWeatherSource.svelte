@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="flex flex-col gap-2">
       <p class="font-bold">Choose a Model</p>
 
-      {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
+      {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }, keyIndex (keyIndex)}
         <div
           class={[
             'rounded-container flex flex-col gap-1 border p-2',

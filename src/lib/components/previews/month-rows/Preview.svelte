@@ -210,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(monthRowsPreview.targets);
     }}
   >
-    {#each monthRowsPreview.months as { width, height, color, x, y, isWeather, dayIndex }}
+    {#each monthRowsPreview.months as { width, height, color, x, y, isWeather, dayIndex }, keyIndex (keyIndex)}
       <rect
         {width}
         {height}
@@ -222,7 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/each}
 
-    {#each monthRowsPreview.borders as { x, y }}
+    {#each monthRowsPreview.borders as { x, y }, keyIndex (keyIndex)}
       <rect
         width={monthRowsPreview.settings.stitchesPerRow *
           monthRowsPreview.STITCH_SIZE +

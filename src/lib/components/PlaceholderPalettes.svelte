@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class:!max-w-full={maxWFull}
   class:!w-full={wFull}
 >
-  {#each Array(items) as _, _index}
+  {#each Array(items) as _, _index (_index)}
     <div
       class="placeholder rounded-container w-full animate-pulse"
       style="height:{height}"

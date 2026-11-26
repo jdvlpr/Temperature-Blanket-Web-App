@@ -96,9 +96,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails(chevronsPreview.targets);
   }}
 >
-  {#each chevronsPreview.sections as section}
+  {#each chevronsPreview.sections as section, keyIndex (keyIndex)}
     <g data-dayindex={section[0].dayIndex}>
-      {#each section as { color, p }}
+      {#each section as { color, p }, keyIndex (keyIndex)}
         <polyline
           points={p}
           fill="none"

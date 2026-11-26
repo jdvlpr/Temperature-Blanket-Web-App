@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select w-fit"
       bind:value={cornerToCornerPreview.settings.selectedTarget}
     >
-      {#each targets as { id, label, icon }}
+      {#each targets as { id, label, icon }, keyIndex (keyIndex)}
         <option value={id}>{icon} {label} </option>
       {/each}
     </select>
@@ -67,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="select w-fit min-w-[100px]"
         bind:value={cornerToCornerPreview.settings.dimensions}
       >
-        {#each cornerToCornerPreview.dimensionsOptions as value}
+        {#each cornerToCornerPreview.dimensionsOptions as value, keyIndex (keyIndex)}
           <option {value}>{value}</option>
         {/each}
       </select>
