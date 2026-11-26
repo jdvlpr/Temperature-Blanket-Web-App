@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/env';
+import { escapeHtml } from '#lib/utils/string-utils.js';
 import { CHARACTERS_FOR_URL_HASH } from '#lib/constants/page-constants.js';
 import {
   DAYS_OF_THE_WEEK,
@@ -318,12 +319,13 @@ const parseLocationURLHash = async (hashString: string) => {
 
       let icon = '';
       if (data.countryCode)
-        icon = `<span class="fflag fflag-${data.countryCode.toUpperCase()} shrink-0"></span>`;
+        icon = `<span class="fflag fflag-${escapeHtml(data.countryCode.toUpperCase())} shrink-0"></span>`;
 
       _locations[i].flagIcon = icon;
 
       // Set the location's result (used for displaying the location with country flag icon in various places)
-      const result = `${icon} ${labelText}`;
+      // Shown as HTML, so GeoNames' text is escaped
+      const result = `${icon} ${escapeHtml(labelText)}`;
       _locations[i].result = result;
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);

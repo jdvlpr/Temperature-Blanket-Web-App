@@ -315,6 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {projectName}
                 {:else if project}
                   <!-- Escaped by getTitleFromLocationsMeta -->
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- escaped in getTitleFromLocationsMeta -->
                   {@html projectTitle}
                 {:else if project === undefined}
                   <span
@@ -328,6 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#snippet subtitle()}
                 {#if project && projectName}
                   <!-- Escaped by getTitleFromLocationsMeta -->
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- escaped in getTitleFromLocationsMeta -->
                   {@html projectTitle}
                 {/if}
               {/snippet}

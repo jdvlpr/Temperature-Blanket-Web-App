@@ -173,6 +173,7 @@
             <td class=""
               ><div class="flex flex-wrap items-center justify-between gap-2">
                 {standard_name}
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own icons -->
                 {@html icon}
               </div>
             </td>

@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import { escapeHtml } from '#lib/utils/string-utils.js';
   import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { version } from '$app/env';
@@ -182,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         copy: true,
       });
       toast.trigger({
-        message: `Created a copy of ${label}`,
+        message: `Created a copy of ${escapeHtml(label)}`,
         category: 'success',
       });
     }, 'Unable to copy the palette');

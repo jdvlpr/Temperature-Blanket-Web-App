@@ -151,6 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           so all four still fit (the labels still name them) -->
           <span data-nav-content class="flex flex-col items-center">
             <span>
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own icons -->
               {@html icon}
             </span><span class="text-xs whitespace-nowrap max-[300px]:sr-only"
               >{title}</span

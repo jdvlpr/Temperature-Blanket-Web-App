@@ -125,6 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="my-4 flex flex-col items-start gap-2">
       {#each locations.all as location}
         <p class="flex flex-wrap items-center gap-x-1">
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -- built with GeoNames' text escaped -->
           <span class="font-bold">{@html location.result}</span>
           <span>
             {location.from

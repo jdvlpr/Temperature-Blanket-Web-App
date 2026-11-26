@@ -333,7 +333,7 @@ export interface ToastSettings {
   timeout?: number;
   /** Generate a custom action button UI. */
   action?: {
-    /** The button label. Supports HTML. */
+    /** The button label (text) */
     label: string;
     /** The function triggered when the button is pressed. */
     response: () => void;

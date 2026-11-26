@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { beforeNavigate } from '$app/navigation';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$app/env/public';
   import AppShell from '#lib/components/AppShell.svelte';
+  import { escapeHtml } from '#lib/utils/string-utils.js';
   import Gauges from '#lib/components/Gauges.svelte';
   import Locations from '#lib/components/Locations.svelte';
   import Navigation from '#lib/components/Navigation.svelte';
@@ -176,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const trashed = takeJustTrashed();
     if (!trashed) return;
     toast.trigger({
-      message: `Moved ${trashed.label} to the Trash`,
+      message: `Moved ${escapeHtml(trashed.label)} to the Trash`,
       category: 'success',
       action: {
         label: 'Undo',

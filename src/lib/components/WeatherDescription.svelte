@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations } from '#lib/state/location-state.svelte.js';
   import { weather } from '#lib/state/weather-state.svelte.js';
   import { exists } from '#lib/utils/other-utils.js';
-  import { pluralize } from '#lib/utils/string-utils.js';
+  import { escapeHtml, pluralize } from '#lib/utils/string-utils.js';
   import { onMount } from 'svelte';
 
   let stations = $derived(
@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (!location.stations) return [];
         return location.stations.map(
           (station) =>
-            `<a href="https://meteostat.net/en/station/${station}?t=${location.from}/${location.to}" target="_blank" rel="noreferrer" class="link">#${station}</a>`,
+            `<a href="https://meteostat.net/en/station/${escapeHtml(station)}?t=${escapeHtml(`${location.from}/${location.to}`)}" target="_blank" rel="noreferrer" class="link">#${escapeHtml(station)}</a>`,
         );
       })
       ?.flat(),
@@ -64,6 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ])}`
       : ''}
     using {pluralize({ singular: 'this', plural: 'these' }, stations?.length)}
+    <!-- eslint-disable svelte/no-at-html-tags -- the station links are escaped where they're made -->
     {pluralize(
       {
         singular: 'weather station',
@@ -72,6 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       stations?.length,
     )}: {@html stations?.join(', ')}. Stations are sometimes located in areas
     around—not directly in—your location. The accuracy of the results will vary.
+    <!-- eslint-enable svelte/no-at-html-tags -->
   {/if}
 
   {#if locations.all?.some((n) => n.source === 'Open-Meteo')}

@@ -49,6 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     !disabled && 'cursor-pointer',
   ]}
 >
+  <!-- eslint-disable svelte/no-at-html-tags -- callers pass the app's own text, with any names escaped -->
   <div class="flex flex-col items-start">
     <span class={['flex items-center gap-2', hasDetails && 'font-bold']}
       >{@html label}</span
@@ -59,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
     {/if}
   </div>
+  <!-- eslint-enable svelte/no-at-html-tags -->
   <div class="relative inline-flex items-start gap-2">
     <input
       id="{uid}-checkbox"

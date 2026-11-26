@@ -200,36 +200,42 @@
               {@const CustomIcon = t.icon as any}
               <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CustomIcon class="inline" />
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->
                 {@html t.message}
               </div>
             {:else if t.category === 'success'}
               <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CircleCheckIcon class="inline" />
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->
                 {@html t.message}
               </div>
             {:else if t.category === 'error'}
               <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <CircleAlertIcon class="inline" />
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->
                 {@html t.message}
               </div>
             {:else if t.category === 'warning'}
               <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <TriangleAlertIcon class="inline shrink-0" />
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->
                 {@html t.message}
               </div>
             {:else if t.category === 'info'}
               <div class="flex min-w-48 flex-1 items-center gap-4 text-base">
                 <InfoIcon class="inline" />
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->
                 {@html t.message}
               </div>
             {:else}
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages, with any names escaped -->
               <div class="min-w-48 flex-1 text-base">{@html t.message}</div>
             {/if}
             {#if t.action || t.actions?.length || !t.hideDismiss}
               <div class="toast-actions {cToastActions}">
                 {#if t.action}<button
                     class={buttonAction}
-                    onclick={() => onAction(i)}>{@html t.action.label}</button
+                    onclick={() => onAction(i)}>{t.action.label}</button
                   >{/if}
                 {#each t.actions ?? [] as action (action.label)}<button
                     class="btn btn-sm preset-tonal hover:preset-filled"

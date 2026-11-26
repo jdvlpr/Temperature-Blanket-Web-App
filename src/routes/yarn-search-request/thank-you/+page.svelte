@@ -44,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class={[PAGE, PAGE_TEXT, 'mt-4 mb-2 flex flex-col items-start gap-4']}
     >
       <h2 class="h2 text-gradient flex flex-wrap items-center gap-2">
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own icon -->
         <span class="text-success-700-300">{@html ICONS.checkCircle}</span> Success!
       </h2>
       <p class="">Your yarn search request has been received, thank you!</p>

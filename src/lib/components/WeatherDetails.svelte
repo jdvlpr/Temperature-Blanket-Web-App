@@ -178,6 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <p class="my-2 text-lg font-bold">
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- built with GeoNames' text escaped -->
     {@html day?.result}
   </p>
 

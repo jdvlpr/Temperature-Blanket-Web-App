@@ -67,6 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="mx-auto inline-flex w-full flex-col items-center px-4 text-center">
   <label for="number-input" class={['label', hideLabel && 'sr-only']}>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- callers pass the app's own titles -->
     <span class="label-text">{@html title}</span>
   </label>
 

@@ -221,6 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               disabled={sourceName !== 'Open-Meteo'}
               bind:group={openMeteoModel}
             />
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own model descriptions -->
             {@html title}
           </label>
           <div class="ml-4 flex flex-col gap-1 text-sm">
@@ -234,6 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p class="">
               <InfoIcon class="icon-sm relative -top-[2px] mr-1 inline" />
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own model descriptions -->
               {@html details}
             </p>
           </div>

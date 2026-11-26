@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { escapeHtml } from '#lib/utils/string-utils.js';
 import type {
   GeoNamesSearchResult,
   LocationSuggestion,
@@ -93,7 +94,7 @@ export const getSuggestions = (
 
     let icon = '';
     if (item.countryCode)
-      icon = `<span class="fflag fflag-${item.countryCode.toUpperCase()} shrink-0"></span>`;
+      icon = `<span class="fflag fflag-${escapeHtml(item.countryCode.toUpperCase())} shrink-0"></span>`;
 
     const featureName = formatFeatureName(item.fclName ?? '');
 
@@ -104,7 +105,8 @@ export const getSuggestions = (
       label: labelText,
       lng: item.lng,
       lat: item.lat,
-      result: `${icon} ${labelText}`,
+      // Shown as HTML, so GeoNames' text is escaped
+      result: `${icon} ${escapeHtml(labelText)}`,
       fclName: featureName,
       flagIcon: icon,
       population: item.population,

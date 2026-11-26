@@ -110,6 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <CloudOffIcon class="text-surface-600-400 size-10" />
                   <!-- The message has its own heading -->
                   <Dialog.Title class="sr-only">No Weather Data</Dialog.Title>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own error messages -->
                   <div role="alert">{@html weatherSearch.error}</div>
                   <p class="text-sm">Your project hasn't changed.</p>
                   <button

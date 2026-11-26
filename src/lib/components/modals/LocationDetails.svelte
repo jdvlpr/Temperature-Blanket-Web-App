@@ -12,6 +12,7 @@
   <div class="flex flex-col">
     <h4 class="h4">
       {#if location.flagIcon}
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's flag markup -->
         {@html location.flagIcon}
       {/if}
       {location.label}
@@ -23,7 +24,7 @@
         <MapPinnedIcon class="icon-sm relative -top-[1px] mr-1 inline" /> Location
         Type:
         <p class="badge bg-surface-100-900 text-base">
-          {@html location.fclName}
+          {location.fclName}
         </p>
       </div>
     {/if}

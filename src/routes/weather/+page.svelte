@@ -436,6 +436,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/if}
                 </div>
                 <p class="font-bold md:text-xl">
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's icons and descriptions; places built with GeoNames' text escaped -->
                   {@html weatherState.weatherLocations.find(
                     (item) => item.id === weatherState.activeLocationID,
                   )?.result ?? ''}
@@ -445,6 +446,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {currentTime}
                 </p>
                 <div class="flex items-center justify-center gap-0">
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's icons and descriptions; places built with GeoNames' text escaped -->
                   {@html getWeatherCodeDetails({
                     weathercode: weatherData.current_weather.weathercode,
                     is_day: weatherData.current_weather.is_day,
@@ -452,6 +454,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       (item) => item.isNow === true,
                     )?.precipitation_probability,
                   }).description}
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's icons and descriptions; places built with GeoNames' text escaped -->
                   {@html getWeatherCodeDetails({
                     weathercode: weatherData.current_weather.weathercode,
                     is_day: weatherData.current_weather.is_day,
@@ -528,6 +531,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         class="flex flex-col items-center justify-between"
                         title={details.description}
                       >
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's icons and descriptions; places built with GeoNames' text escaped -->
                         {@html details.icon}
                       </div>
                       <p>
@@ -575,6 +579,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           class="flex items-center justify-between gap-1"
                           title={details.description}
                         >
+                          <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's icons and descriptions; places built with GeoNames' text escaped -->
                           {@html details.icon}
                         </div>
                       </div>

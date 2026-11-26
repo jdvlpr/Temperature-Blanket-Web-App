@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     FIELD_ICON,
   } from '#lib/constants/class-constants.js';
   import CopyIcon from '#lib/components/CopyIcon.svelte';
+  import { escapeHtml } from '#lib/utils/string-utils.js';
   import { copyToClipboard } from '#lib/utils/clipboard-utils.js';
   import { Flash } from '#lib/utils/feedback.svelte.js';
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
@@ -428,7 +429,7 @@ choice's icon beside it, and what it's for below -->
         <ToggleSwitch
           bare
           label="Title"
-          details={title}
+          details={escapeHtml(title)}
           bind:checked={settings.title}
           onchange={remember}
         />

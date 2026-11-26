@@ -39,12 +39,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onclick={() => (isExpanded = !isExpanded)}
   {disabled}
 >
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- label and icons are the app's own markup -->
   {@html label}
   {#if isExpanded}
     {#if iconLess}
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -- label and icons are the app's own markup -->
       {@html iconLess}
     {/if}
   {:else if iconMore}
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- label and icons are the app's own markup -->
     {@html iconMore}
   {/if}
   {#if !iconMore && !iconLess}

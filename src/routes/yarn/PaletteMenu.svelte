@@ -28,6 +28,7 @@ open in the panel, with a Back button to it. -->
     type GalleryPage,
   } from '#lib/accounts/gallery.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
+  import { escapeHtml } from '#lib/utils/string-utils.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import PanelGroup from '#lib/components/PanelGroup.svelte';
   import SaveStatus from '#lib/components/SaveStatus.svelte';
@@ -252,7 +253,7 @@ open in the panel, with a Back button to it. -->
       yarnPageState.startNew();
       dialog.close();
       toast.trigger({
-        message: `Moved ${label} to the Trash`,
+        message: `Moved ${escapeHtml(label)} to the Trash`,
         category: 'success',
         action: {
           label: 'Undo',

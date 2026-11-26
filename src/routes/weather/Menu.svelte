@@ -86,19 +86,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="flex flex-1 basis-1/2 flex-col items-start justify-start text-left sm:flex-wrap"
             >
               <p class="font-bold">
-                {@html (label ?? '').slice(
+                {(label ?? '').slice(
                   0,
                   (label ?? '').split(',', 2).join(',').length,
                 )}
               </p>
               <div class="flex flex-wrap items-center justify-center gap-x-1">
                 <p>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own weather icons and descriptions -->
                   {@html getWeatherCodeDetails({
                     weathercode: data?.current_weather.weathercode ?? null,
                     is_day: data?.current_weather.is_day ?? null,
                   }).description}
                 </p>
                 <p>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own weather icons and descriptions -->
                   {@html getWeatherCodeDetails({
                     weathercode: data?.current_weather.weathercode ?? null,
                     is_day: data?.current_weather.is_day ?? null,

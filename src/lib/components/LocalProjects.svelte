@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { TrashSlots, TrashUndos } from '#lib/utils/trash-undo.svelte.js';
+  import { escapeHtml } from '#lib/utils/string-utils.js';
   import TrashUndo from '#lib/components/TrashUndo.svelte';
   import { browser } from '$app/env';
   import { resolve } from '$app/paths';
@@ -132,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     await run(async () => {
       if (!(await ProjectStorage.duplicate(item.id))) throw new Error();
       toast.trigger({
-        message: `Created a copy of ${labelFor(item)}`,
+        message: `Created a copy of ${escapeHtml(labelFor(item))}`,
         category: 'success',
       });
     }, 'Unable to copy the project');

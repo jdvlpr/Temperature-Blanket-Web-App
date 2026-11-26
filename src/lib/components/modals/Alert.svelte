@@ -22,5 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-2">
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -- the app's own messages -->
   <div class="inline-block w-full text-center">{@html message}</div>
 </div>

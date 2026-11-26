@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="mx-auto inline-flex w-full flex-col items-center justify-center px-4 pt-4 text-center"
 >
   <div>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- callers pass the app's own titles -->
     <label for={id} class="my-2"><h3>{@html title}</h3></label>
     <p class="my-2 text-sm">Hours:Minutes</p>
 
