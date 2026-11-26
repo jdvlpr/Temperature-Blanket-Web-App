@@ -46,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gallerySection,
     librarySection,
   } from '#lib/storage/library-section.svelte.js';
+  import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
   import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
 
@@ -55,6 +56,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ['/gallery', '/gallery/palettes'].includes(pathname),
   );
   const whatsNewPage = $derived(pathname.startsWith('/whats-new'));
+  // Reading what's new counts as seeing it
+  $effect(() => {
+    if (pathname === '/whats-new' || pathname === VERSION_7_POST_HREF)
+      whatsNew.markSeen();
+  });
   const docs = $derived(pathname.startsWith('/documentation'));
   const create = $derived(['/', '/yarn'].includes(pathname));
 

@@ -13,9 +13,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- A strip across the top of each page of the beta, above the top bar (in place
-of WhatsNewBanner): that it is one, where its tradeoffs are, where to send
-feedback and the way back to the main site. It can't be dismissed. Its id,
+<!-- A strip across the top of each page of the beta, above the top bar: that it
+is one, where its tradeoffs are, where to send feedback and the way back to the
+main site. It can't be dismissed. Its id,
 top-banner, is what the planner's steps scroll past (page-state). -->
 
 <script lang="ts">

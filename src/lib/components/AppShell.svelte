@@ -36,7 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import BetaBanner from './BetaBanner.svelte';
   import RetiredBetaBanner from './RetiredBetaBanner.svelte';
   import { weatherChart } from './WeatherChart.svelte';
-  import WhatsNewBanner from './WhatsNewBanner.svelte';
 
   interface Props {
     pageName?: string;
@@ -277,9 +276,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <!-- Clear of the sidebar: with PAGE's gutter, 1.5rem -->
       <div class="lg:my-2 lg:mr-2 lg:ml-4 xl:mr-0">
-        {#if !__SITE_BETA__ && !retiredBeta}
-          <WhatsNewBanner />
-        {/if}
         {@render main?.()}
         {@render footer?.()}
       </div>
