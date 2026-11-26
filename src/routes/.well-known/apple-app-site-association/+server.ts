@@ -19,7 +19,6 @@
 // `WebAddress`; keep the two lists the same. Answered by the Worker, not a
 // static file, so it's always JSON and never redirected.
 
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const prerender = false;
@@ -48,7 +47,7 @@ const components = [
 ];
 
 export const GET: RequestHandler = () =>
-  json(
+  Response.json(
     { applinks: { details: [{ appIDs: [APP_ID], components }] } },
     { headers: { 'cache-control': 'public, max-age=3600' } },
   );
