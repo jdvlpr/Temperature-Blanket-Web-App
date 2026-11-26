@@ -33,12 +33,13 @@ describe('readLimit', () => {
     expect(DEFAULT_LIMIT).toBe(50);
     expect(MAX_LIMIT).toBe(250);
     expect(limitOf('')).toBe(50);
+    expect(limitOf('limit=0')).toBe(0); // just the total, as before
     expect(limitOf('limit=1')).toBe(1);
     expect(limitOf('limit=250')).toBe(250);
   });
 
   it('turns away anything else with a 400', () => {
-    for (const bad of ['251', '500', '0', '-5', '2.5', 'abc', 'Infinity'])
+    for (const bad of ['251', '500', '-5', '2.5', 'abc', 'Infinity'])
       expect(statusOf(`limit=${bad}`)).toBe(400);
   });
 });

@@ -22,15 +22,16 @@ import { error } from '@sveltejs/kit';
 export const DEFAULT_LIMIT = 50;
 export const MAX_LIMIT = 250;
 
-/** The `limit` asked for, or the default; a 400 when it isn't 1–250 */
+/** The `limit` asked for, or the default; a 400 when it isn't 0–250 (0
+ * gives just the total) */
 export function readLimit(searchParams: URLSearchParams): number {
   if (!searchParams.has('limit')) return DEFAULT_LIMIT;
   const limit = Number(searchParams.get('limit'));
   if (isNaN(limit)) error(400, "Parameter 'limit' must be a number");
-  if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT)
+  if (!Number.isInteger(limit) || limit < 0 || limit > MAX_LIMIT)
     error(
       400,
-      `Parameter 'limit' must be a whole number from 1 to ${MAX_LIMIT}`,
+      `Parameter 'limit' must be a whole number from 0 to ${MAX_LIMIT}`,
     );
   return limit;
 }
