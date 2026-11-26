@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let dayIndex = 0;
     let value: number | null;
     let color: Color['hex'];
-    let isExtraStitch = false;
+    let isExtraStitch: boolean;
     const sections: ContinuousSquareSection[] = [];
 
     for (

@@ -46,11 +46,9 @@ export const pluralize = (
  */
 export const decodeEntity = (inputStr: string): string => {
   if (!browser) return inputStr;
-  let textarea: HTMLTextAreaElement | null = document.createElement('textarea');
+  const textarea = document.createElement('textarea');
   textarea.innerHTML = inputStr;
-  const value = textarea.value;
-  textarea = null;
-  return value;
+  return textarea.value;
 };
 
 export const stripHTMLTags = (str: string): string =>

@@ -277,7 +277,7 @@ export const stringToColors = ({
   string = string.replace(/[^a-zA-Z0-9,-\s]/g, ''); // remove all other characters except allowed numbers, commas, hyphen and space
   if (string.includes(',')) string = string.replace(/[,]/g, ' '); // replace all commas with spaces
   if (string.includes('-')) string = string.replace(/[-]/g, ' '); // replace all hyphens with spaces
-  let _colors: string[] = [];
+  let _colors: string[];
   if (string.includes(' ')) _colors = string.split(' ');
   else if (chroma.valid(string))
     _colors = [string]; // string is only one valid color
@@ -629,7 +629,7 @@ export const getGenericColorName = ({
   showGenericName?: boolean;
   showNamedHexCodes?: boolean;
 }): string | null => {
-  let name: string | null = null;
+  let name: string | null;
   if (chroma(color).name().includes('#')) name = chroma(color).name();
   else
     name = `${chroma(color).hex()} (${capitalizeFirstLetter(chroma(color).name())})`;

@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   runPreview(() => {
     const sections: DaytimeRowsSection[][] = [];
-    let weatherParams: WeatherParam['id'][] = [];
+    let weatherParams: WeatherParam['id'][];
     const weatherData = weather.data;
     if (!weatherData) return;
 

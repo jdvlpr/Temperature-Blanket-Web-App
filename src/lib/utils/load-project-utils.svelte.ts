@@ -251,7 +251,7 @@ const parseLocationURLHash = async (hashString: string) => {
     // Insert hyphens into the date string ('YYYYMMDD' => 'YYYY-MM-DD')
     const from = `${_from.substring(0, 4)}-${_from.substring(4, 6)}-${_from.substring(6, 8)}`;
 
-    let thisLocationStringLength = 0;
+    let thisLocationStringLength: number;
 
     if (isDurationOneYear) {
       // This short format for year duration was added in version 1.730

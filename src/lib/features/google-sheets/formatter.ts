@@ -208,7 +208,7 @@ function createConditionalFormattingRules(
           const colLetter = getColumnLetter(colIndex); // Helper we need to add
           const startCell = `${colLetter}3`; // Data starts at row 3 (index 2)
 
-          let conditionFormula = '';
+          let conditionFormula: string;
           if (direction === 'high-to-low') {
             const lowCheck = includeTo
               ? `${startCell}>=${to}`
@@ -437,8 +437,8 @@ function createGaugeLegendData(
           const refFrom = `$A${rowIdx}`;
           const refTo = `$B${rowIdx}`;
 
-          let criteriaLower = '';
-          let criteriaUpper = '';
+          let criteriaLower: string;
+          let criteriaUpper: string;
 
           if (direction === 'high-to-low') {
             // From 39 To 36. Include From(Yes), Include To(No) -> >36 AND <=39

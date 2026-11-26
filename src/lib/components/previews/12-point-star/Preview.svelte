@@ -113,8 +113,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         );
 
         let color: NonNullable<Color['hex']>;
-        let isWeather = false;
-        let dayIndex = 0;
+        let isWeather: boolean;
+        let dayIndex: number;
 
         const dayIdxInMonth = Math.floor(row / numTargets);
         const paramIdx = row % numTargets;

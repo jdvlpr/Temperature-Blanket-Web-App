@@ -168,10 +168,9 @@ class ProjectClass {
     // Add units hash
     hash += preferences.value.units === 'metric' ? '&u=m' : '&u=i';
 
-    let href = '';
     const base = browser ? window.location.origin + '/' : '';
     const query = `?project=${this.id}&v=${version}`;
-    href = !locations.allValid ? base : base + query + '#' + hash;
+    const href = !locations.allValid ? base : base + query + '#' + hash;
 
     return {
       hash,

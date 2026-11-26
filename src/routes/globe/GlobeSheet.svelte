@@ -43,7 +43,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     snap = $bindable(),
     heights,
     label,
+    // Written back to the parent through bind:, not read here
+    // eslint-disable-next-line no-useless-assignment
     liveHeight = $bindable(),
+    // eslint-disable-next-line no-useless-assignment
     dragging = $bindable(),
     children,
   }: Props = $props();

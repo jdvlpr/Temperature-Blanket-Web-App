@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let dayIndex = 0;
     // let extraInMonthIndex = 0;
     let dayInMonthCount = 1;
-    let isWeather = true;
+    let isWeather: boolean;
     let daysInSquare = weather.rawData?.filter(
       (n) =>
         n.date.getUTCFullYear() ===

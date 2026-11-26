@@ -296,7 +296,6 @@ export const getFactors = ({ length }: { length: number }): number[] => {
 
 export const getPossibleDimensions = ({
   factors,
-  currentDimensions,
 }: {
   factors: number[];
   currentDimensions?: string;
@@ -320,9 +319,6 @@ export const getPossibleDimensions = ({
   ) {
     // There's only one month
     const value = dimensions.map((n) => n[0] + 'x' + n[1])[0];
-    if (value !== currentDimensions) {
-      currentDimensions = value;
-    }
     return [value];
   }
 
@@ -330,10 +326,6 @@ export const getPossibleDimensions = ({
 
   // Use a Set to filter out duplicates and convert back to an array
   const options = [...new Set(dimensionPairs.map((n) => n[0] + 'x' + n[1]))];
-
-  if (!currentDimensions || !options.includes(currentDimensions)) {
-    currentDimensions = options[Math.ceil(options.length / 2) - 1];
-  }
 
   return options;
 };

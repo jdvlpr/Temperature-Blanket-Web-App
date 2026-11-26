@@ -51,10 +51,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let y = splitMonthSquaresPreview.squareSize / 2;
     let roundWidth = splitMonthSquaresPreview.STITCH_SIZE;
     let roundHeight = splitMonthSquaresPreview.STITCH_SIZE;
-    let points = getPoints({ x, y, roundWidth, roundHeight });
+    let points: ReturnType<typeof getPoints>;
     let dayIndex = 0;
     let roundInSquare = 1;
-    let isWeather = true;
+    let isWeather: boolean;
     let daysInSquare = weather.rawData?.filter(
       (n) =>
         n.date.getUTCFullYear() ===

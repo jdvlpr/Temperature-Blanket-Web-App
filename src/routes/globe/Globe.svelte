@@ -552,7 +552,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     const { lat, lng, altitude } = globeState.globe.pointOfView();
     const step = 12 * Math.min(1, altitude);
-    let next: { lat: number; lng: number; altitude: number } | null = null;
+    let next: { lat: number; lng: number; altitude: number } | null;
 
     switch (event.key) {
       case 'ArrowLeft':

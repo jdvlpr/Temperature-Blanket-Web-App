@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let columnPadding = 0;
     const sections: CalendarSection[][] = [];
     for (
-      let squareIndex = 0, column = 0, isWeatherSquare = true;
+      let squareIndex = 0, column = 0, isWeatherSquare: boolean;
       squareIndex < total;
       squareIndex++, column++
     ) {

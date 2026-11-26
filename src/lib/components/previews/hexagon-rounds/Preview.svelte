@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let roundSize = hexagonRoundsPreview.STITCH_SIZE / 1.68;
     let dayIndex = 0;
     let roundInSquare = 1;
-    let isWeather = true;
+    let isWeather: boolean;
     let daysInSquare = hexagonRoundsPreview.weatherHexagons[squareIndex];
     let rowIndex = 0;
     let hexagonsInRow = hexagonRoundsPreview.settings.columns;

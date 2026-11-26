@@ -305,7 +305,7 @@ class WeatherSearch {
     const stopIfCancelled = () => {
       if (signal.aborted) throw new AbortedError();
     };
-    let tempAllData: WeatherDay[][] = [];
+    const tempAllData: WeatherDay[][] = [];
 
     for (
       let thisLocation = 0;
@@ -431,7 +431,6 @@ class WeatherSearch {
     }
     const allData = tempAllData.flat();
     allData.sort((a, b) => +a.date - +b.date); // Sort by date, regardless of location
-    tempAllData = [];
     return allData;
   }
 }
