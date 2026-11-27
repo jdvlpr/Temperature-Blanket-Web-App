@@ -257,7 +257,9 @@ export const unlinkAccount = (id: string) =>
 export function providerErrorMessage(error: string): string {
   if (error === 'account_not_linked')
     return 'An account with this email already exists, but this sign-in isn’t linked to it.';
-  if (error === 'access_denied') return 'Sign-in was canceled.';
+  // Google's, then Apple's
+  if (error === 'access_denied' || error === 'user_cancelled_authorize')
+    return 'Sign-in was canceled.';
   if (error === 'SIGN_UPS_PAUSED') return SIGN_UPS_PAUSED_MESSAGE;
   return 'That didn’t work. Try again.';
 }

@@ -561,6 +561,25 @@ async function currentUserId(page: Page): Promise<string> {
     .id;
 }
 
+test('Apple’s form post back to the callback gets past the CSRF check', async ({
+  request,
+}) => {
+  const post = (origin: string) =>
+    request.post('/api/auth/callback/apple', {
+      headers: { Origin: origin },
+      form: { state: 'x', code: 'y' },
+      maxRedirects: 0,
+    });
+  const refused = 'Cross-site POST form submissions are forbidden';
+  // Any other site is still refused
+  const other = await post('https://evil.example');
+  expect(other.status()).toBe(403);
+  expect(await other.text()).toContain(refused);
+  // Apple reaches Better Auth (which answers for itself)
+  const apple = await post('https://appleid.apple.com');
+  expect(await apple.text()).not.toContain(refused);
+});
+
 test.describe('Accounts: Google', () => {
   test('Google is offered when configured, and starts at Google', async ({
     page,

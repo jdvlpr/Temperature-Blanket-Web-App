@@ -261,7 +261,13 @@ async function authFor(
     const built = buildAuth(platform, result.settings);
     const entry = { key, built, expiresAt: Infinity };
     cached = entry;
-    built.then(({ expiresAt }) => (entry.expiresAt = expiresAt));
+    // A failed build is dropped, so the next request tries again
+    built.then(
+      ({ expiresAt }) => (entry.expiresAt = expiresAt),
+      () => {
+        if (cached === entry) cached = undefined;
+      },
+    );
   }
   return (await cached.built).auth;
 }
