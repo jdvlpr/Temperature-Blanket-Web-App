@@ -57,9 +57,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col gap-2">
         <p class="text-xl font-bold">Who is responsible for data collection?</p>
         <p>
-          The developer of temperature-blanket.com is responsible for and has
-          access to the data collected by this site. The developer can be
-          contacted at info@temperature-blanket.com.
+          Thomas M., the developer of temperature-blanket.com, is responsible
+          for and has access to the data collected by this site. The developer
+          can be contacted at info@temperature-blanket.com.
         </p>
       </div>
 
