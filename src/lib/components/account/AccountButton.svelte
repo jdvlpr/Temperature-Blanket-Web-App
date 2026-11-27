@@ -28,6 +28,7 @@ AppShell can measure it (data-account-label) -->
   import { page } from '$app/state';
   import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
   import { account, loadAccountSummary } from '#lib/accounts/summary.svelte.js';
+  import { ownerReports } from '#lib/accounts/owner-reports.svelte.js';
   import AccountAvatar from '#lib/components/account/AccountAvatar.svelte';
   import AddToAccountButton from '#lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '#lib/components/sync/SyncStatus.svelte';
@@ -36,6 +37,7 @@ AppShell can measure it (data-account-label) -->
   import { sync } from '#lib/sync/status.svelte.js';
   import {
     CircleUserRoundIcon,
+    FlagIcon,
     LogOutIcon,
     SlidersHorizontalIcon,
     UserRoundCogIcon,
@@ -73,6 +75,12 @@ AppShell can measure it (data-account-label) -->
   onMount(() => {
     if (__ACCOUNTS_ENABLED__) loadAccountSummary();
   });
+  // The site owner's new gallery reports (only ever asked on their devices)
+  $effect(() => {
+    if (account.summary?.id) void ownerReports.check();
+  });
+  let newReports = $derived(ownerReports.newCount ?? 0);
+  let onReportsPage = $derived(page.url.pathname === '/gallery/reports');
 
   async function signOut() {
     const userId = account.summary?.id;
@@ -131,9 +139,22 @@ AppShell can measure it (data-account-label) -->
     <Popover.Trigger
       class={[BUTTON, (open || current) && 'preset-tonal-secondary']}
       aria-label="Account"
-      title="Account: {summary.name || summary.email}"
+      title="Account: {summary.name || summary.email}{newReports
+        ? ` · ${newReports} new gallery ${newReports === 1 ? 'report' : 'reports'}`
+        : ''}"
       data-testid="account-button"
     >
+      {#if newReports}
+        <span
+          class="badge-icon preset-filled-error-500 absolute -top-0.5 -right-0.5 z-10 size-5 text-xs"
+          aria-hidden="true">{newReports > 9 ? '9+' : newReports}</span
+        >
+        <span class="sr-only"
+          >{newReports} new gallery {newReports === 1
+            ? 'report'
+            : 'reports'}</span
+        >
+      {/if}
       <AccountAvatar
         {summary}
         class="aspect-square size-8 max-w-none text-xs {showLabel
@@ -182,6 +203,21 @@ AppShell can measure it (data-account-label) -->
                     >
                       <UserRoundCogIcon class="shrink-0 opacity-70" />
                       <span class="font-bold">Account settings</span>
+                    </a>
+                  {/if}
+                  {#if ownerReports.newCount !== null && !onReportsPage}
+                    <a
+                      href={resolve('/gallery/reports')}
+                      class={ROW}
+                      onclick={() => (open = false)}
+                    >
+                      <FlagIcon class="shrink-0 opacity-70" />
+                      <span class="font-bold">Gallery reports</span>
+                      {#if newReports}
+                        <span class="badge preset-filled-error-500 ml-auto"
+                          >{newReports} new</span
+                        >
+                      {/if}
                     </a>
                   {/if}
                   {#if !onPreferencesPage}

@@ -31,6 +31,7 @@ thumbnails for colors and headings
   import ToggleSwitch from '#lib/components/buttons/ToggleSwitch.svelte';
   import SegmentsScroller from '#lib/components/SegmentsScroller.svelte';
   import SelectYarn from '#lib/components/SelectYarn.svelte';
+  import BlockedPeople from './BlockedPeople.svelte';
   import {
     HEADING_STYLE,
     ROUNDNESS,
@@ -396,6 +397,10 @@ site does -->
           />
         </div>
       </section>
+
+      {#if __ACCOUNTS_ENABLED__}
+        <BlockedPeople />
+      {/if}
 
       <div class="flex justify-center">
         <button class="btn hover:preset-tonal-surface" onclick={resetAll}>

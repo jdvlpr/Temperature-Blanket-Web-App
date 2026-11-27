@@ -474,6 +474,22 @@ export async function publishingStopped(
   return row?.bannedAt != null;
 }
 
+/**
+ * Whether a page was published from an account, so its publisher can be
+ * blocked. Pages from guest publishing (before it needed an account) have no
+ * publisher: they can be reported, not blocked. Says nothing about who.
+ */
+export async function postHasPublisher(
+  db: D1Database,
+  postId: number,
+): Promise<boolean> {
+  const row = await db
+    .prepare(`select 1 as "found" from "galleryPost" where "postId" = ?`)
+    .bind(postId)
+    .first();
+  return row !== null;
+}
+
 export type GalleryOwner = { name: string; publicId: string };
 
 // Owners with an owner page and a name to show

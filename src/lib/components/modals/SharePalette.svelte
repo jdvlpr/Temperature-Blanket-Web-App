@@ -34,6 +34,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
+  import GalleryTermsCheckbox from '#lib/components/account/GalleryTermsCheckbox.svelte';
   import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
   import DialogFooter from '#lib/components/modals/DialogFooter.svelte';
   import {
@@ -108,6 +109,9 @@ From the gallery page itself (`onsaved`), Done closes it. -->
   // Include a new page on the account's public gallery, starting from the last choice
   let showOwner = $state(untrack(() => update?.showOwner ?? false));
   let serverName = $state<string | null>(null);
+  /** The account's first page: the Gallery terms are agreed to first */
+  let needsTerms = $state(false);
+  let agreed = $state(false);
   let ownerName = $derived((serverName ?? account.summary?.name ?? '').trim());
   let doneHeading = $state<HTMLElement>();
 
@@ -116,6 +120,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
     if (!gallery) return;
     showOwner =
       update?.showOwner ?? chosenShowOwner ?? gallery.settings.showOwnerDefault;
+    needsTerms = gallery.settings.termsAccepted === false;
     if (typeof gallery.name === 'string') serverName = gallery.name;
   });
 
@@ -219,6 +224,7 @@ From the gallery page itself (`onsaved`), Done closes it. -->
         title,
         yarnUrl: yarnUrl(),
         showOwner,
+        acceptTerms: agreed,
       });
       if (result.status === 'shared') {
         postId = result.postId;
@@ -358,6 +364,9 @@ From the gallery page itself (`onsaved`), Done closes it. -->
           disabled={busy}
         />
       {/if}
+      {#if needsTerms && !target}
+        <GalleryTermsCheckbox bind:checked={agreed} disabled={busy} />
+      {/if}
       {#if errorMessage}
         <p class="text-error-700-300" role="alert">{errorMessage}</p>
       {/if}
@@ -380,7 +389,10 @@ From the gallery page itself (`onsaved`), Done closes it. -->
         <button
           type="submit"
           class={BTN_PRIMARY}
-          disabled={busy || nothingChanged || !cleanName(name, MAX_NAME_LENGTH)}
+          disabled={busy ||
+            nothingChanged ||
+            !cleanName(name, MAX_NAME_LENGTH) ||
+            (needsTerms && !target && !agreed)}
           aria-describedby={nothingChanged ? 'palette-up-to-date' : undefined}
         >
           {#if busy}<LoaderCircleIcon

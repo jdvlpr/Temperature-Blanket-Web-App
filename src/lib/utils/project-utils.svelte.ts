@@ -173,8 +173,11 @@ export const sendToProjectGallery = async (
     showOwner = false,
     name = '',
     postId,
+    acceptTerms = false,
     onStep,
   }: {
+    /** Agreed to the Gallery terms (asked before the account's first page) */
+    acceptTerms?: boolean;
     /** A new page: include it on the owner's public gallery, with their name (an update keeps the page's choice) */
     showOwner?: boolean;
     /** The name the project was given, shown in the gallery instead of its location title */
@@ -257,7 +260,11 @@ export const sendToProjectGallery = async (
     const { publishFromAccount, GALLERY_PAGES_CHANGED } =
       await import('#lib/accounts/gallery.js');
     onStep?.('sending');
-    const result = await publishFromAccount(body, { showOwner, postId });
+    const result = await publishFromAccount(body, {
+      showOwner,
+      postId,
+      acceptTerms,
+    });
     if (result.status === 'error')
       return { status: 'error', message: text(result.message) };
     if (result.status !== 'answered') {

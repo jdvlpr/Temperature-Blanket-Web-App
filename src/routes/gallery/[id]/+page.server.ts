@@ -21,6 +21,7 @@ import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
 import type { GalleryOwner } from '#lib/server/gallery/store.js';
 import type { PageServerLoad } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
+import { getBlockable } from '#lib/server/gallery/blockable.js';
 
 export const load: PageServerLoad = async (event) => {
   const project = getProject(event).then(
@@ -30,8 +31,14 @@ export const load: PageServerLoad = async (event) => {
       return null;
     },
   );
-  const [owner, made] = await Promise.all([getOwner(event), getMade(event)]);
+  const [owner, made, blockable] = await Promise.all([
+    getOwner(event),
+    getMade(event),
+    getBlockable(Number(event.params.id)),
+  ]);
   return {
+    // Published from an account, so Block This Person… is offered
+    blockable,
     // Streamed on a move within the app, so the page shows at once; whole on
     // a full load, for its title and link preview
     project: event.isDataRequest ? project : await project,

@@ -205,6 +205,8 @@ with them. -->
             bind:owner
             date={galleryPalette?.date}
             views={galleryPalette?.views}
+            title={name}
+            blockable={data.blockable}
             open={palette
               ? {
                   href: palette.href,

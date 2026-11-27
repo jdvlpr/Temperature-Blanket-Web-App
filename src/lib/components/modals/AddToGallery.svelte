@@ -28,6 +28,7 @@ its weather, when that isn't kept with it). -->
   import { resolve } from '$app/paths';
   import RenameProject from '#lib/components/RenameProject.svelte';
   import Spinner from '#lib/components/Spinner.svelte';
+  import GalleryTermsCheckbox from '#lib/components/account/GalleryTermsCheckbox.svelte';
   import AnonymousCheckbox from '#lib/components/account/AnonymousCheckbox.svelte';
   import UnpublishConfirm from '#lib/components/account/UnpublishConfirm.svelte';
   import RavelryFields, {
@@ -183,6 +184,9 @@ its weather, when that isn't kept with it). -->
   // Its name on the page, starting from the last choice for a new page and
   // the page's own for an update
   let showOwner = $state(false);
+  /** The account's first page: the Gallery terms are agreed to first */
+  let needsTerms = $state(false);
+  let agreed = $state(false);
   let serverName = $state<string | null>(null);
   // Where "your gallery" links (null until a page shows the name)
   let publicId = $state<string | null>(null);
@@ -252,6 +256,7 @@ its weather, when that isn't kept with it). -->
       return;
     }
     showOwner = gallery.settings.showOwnerDefault;
+    needsTerms = gallery.settings.termsAccepted === false;
     if (request?.action === 'add' && request.showOwner !== undefined)
       showOwner = request.showOwner;
     // Its newest page (older versions came from before pages were updated)
@@ -413,6 +418,7 @@ its weather, when that isn't kept with it). -->
       !busy &&
       !!previews.active?.svg &&
       !nothingChanged &&
+      (!needsTerms || !!page || agreed) &&
       (!ravelryOn || ravelryCanSave),
   );
 
@@ -514,6 +520,7 @@ its weather, when that isn't kept with it). -->
           showOwner,
           name: savedName,
           postId: page?.postId,
+          acceptTerms: agreed,
           onStep: (next) => (step = next),
         });
         step = null;
@@ -773,6 +780,9 @@ in the Project menu's side panel, its width, so nothing scrolls sideways -->
               detail={false}
               describedby="gallery-owner-line"
             />
+            {#if needsTerms && !page}
+              <GalleryTermsCheckbox bind:checked={agreed} disabled={busy} />
+            {/if}
             {#if ravelryReady}
               {#if linked && showOwner && ravelryLink}
                 {#if confirmingUnlink}

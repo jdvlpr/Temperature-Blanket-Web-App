@@ -45,9 +45,15 @@ export type GallerySettings = {
 
 const PATH = '/api/account/gallery';
 
-/** The settings, and the owner page's ID once a page has been included */
+/**
+ * The settings, the owner page's ID once a page has been included, whether
+ * the account agreed to the Gallery terms (asked at the first publish) and
+ * whether the site's owner stopped it publishing
+ */
 export type GalleryOwnerSettings = GallerySettings & {
   publicId: string | null;
+  termsAccepted?: boolean;
+  publishingStopped?: boolean;
 };
 
 /** The account's gallery pages and settings, or null when they aren't available. */
@@ -161,10 +167,16 @@ export type AccountPublishResult =
  */
 export async function publishFromAccount(
   body: string,
-  { showOwner = false, postId }: { showOwner?: boolean; postId?: number } = {},
+  {
+    showOwner = false,
+    postId,
+    acceptTerms = false,
+  }: { showOwner?: boolean; postId?: number; acceptTerms?: boolean } = {},
 ): Promise<AccountPublishResult> {
   return sendPage(
-    postId ? `${PATH}/${postId}` : `${PATH}?showOwner=${showOwner}`,
+    postId
+      ? `${PATH}/${postId}`
+      : `${PATH}?showOwner=${showOwner}${acceptTerms ? '&acceptTerms=true' : ''}`,
     postId ? 'PUT' : 'POST',
     body,
   );
@@ -222,6 +234,8 @@ export async function sharePalette(palette: {
   yarnUrl: string;
   /** Include it on the account's public gallery, with its name */
   showOwner: boolean;
+  /** Agreed to the Gallery terms (the first publish) */
+  acceptTerms?: boolean;
 }): Promise<SharePaletteResult> {
   let response: Response;
   try {

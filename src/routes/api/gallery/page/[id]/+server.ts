@@ -20,6 +20,8 @@
 // that; `ravelry` its Ravelry project's link, kept photos and notes, only on a
 // page showing its owner (they name the owner's Ravelry account). Public, like
 // the page; each is null without accounts or when it can't be looked up.
+// `blockable`: published from an account, so its publisher can be blocked
+// (pages from guest publishing can only be reported). Palette pages ask too.
 
 import { getPlatform } from '#lib/server/cloudflare.js';
 import type { RequestHandler } from './$types';
@@ -40,11 +42,13 @@ export const GET: RequestHandler = async ({ params }) => {
         typeof import('#lib/server/ravelry/store.js').photosForGalleryPost
       >
     >;
-  } = { owner: null, made: null, ravelry: null };
+    blockable: boolean;
+  } = { owner: null, made: null, ravelry: null, blockable: false };
 
   if (env?.ACCOUNTS_ENABLED === 'true' && env.DB) {
-    const { ownerForPost, madeForPost } =
+    const { ownerForPost, madeForPost, postHasPublisher } =
       await import('#lib/server/gallery/store.js');
+    answer.blockable = await postHasPublisher(env.DB, id).catch(() => false);
     const [owner, made] = await Promise.all([
       ownerForPost(env.DB, id).catch((e) => {
         console.error('Could not look up gallery page owner', e);

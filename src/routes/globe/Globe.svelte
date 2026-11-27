@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ZoomOutIcon,
   } from '@lucide/svelte';
   import { onDestroy, onMount, tick, untrack } from 'svelte';
+  import { galleryBlocks } from '#lib/accounts/gallery-blocks.svelte.js';
   import { MediaQuery } from 'svelte/reactivity';
   import { globeState } from './globe-state.svelte';
   import GlobePlacesPanel from './GlobePlacesPanel.svelte';
@@ -652,7 +653,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         );
         if (!res.ok) throw new Error('Failed to load globe data');
         const json = await res.json();
-        globeState.data = json.data || [];
+        // Without the pages of people this person blocked (once a load)
+        await galleryBlocks.ensure();
+        globeState.data = ((json.data || []) as GlobeRegion[])
+          .map((region) => ({
+            ...region,
+            projects: region.projects.filter(
+              (project) => !galleryBlocks.hides(project.id),
+            ),
+          }))
+          .filter((region) => region.projects.length);
         globeState.updatedAt = json.updated_at || '';
         globeState.hasLabels = hasLabels(globeState.data as GlobeRegion[]);
         globeState.error = '';

@@ -34,6 +34,8 @@ class GalleryStarsState {
   #stars = new SvelteMap<number, GalleryStar>();
   /** The account's own gallery pages, which can't be starred */
   #own = new SvelteSet<number>();
+  /** Pages of people the account blocked, loaded with the stars (gallery-blocks.svelte.ts) */
+  blocked = new SvelteSet<number>();
   /** Stars being saved, so a second tap waits for the first */
   #saving = new SvelteSet<number>();
   #loading: Promise<void> | null = null;
@@ -77,9 +79,10 @@ class GalleryStarsState {
         this.#lastLoad = Date.now();
         const response = await fetch(ENDPOINT);
         if (!response.ok) throw new Error(`${response.status}`);
-        const { stars, own } = (await response.json()) as {
+        const { stars, own, blocked } = (await response.json()) as {
           stars: GalleryStar[];
           own: number[];
+          blocked?: number[];
         };
         // Signed out or into another account meanwhile
         if (account.summary?.id !== userId) return;
@@ -87,6 +90,7 @@ class GalleryStarsState {
         for (const star of stars) this.#stars.set(star.postId, star);
         this.#own.clear();
         for (const postId of own) this.#own.add(postId);
+        this.setBlocked(blocked ?? []);
         this.#userId = userId;
         this.failed = false;
       } catch (e) {
@@ -97,6 +101,12 @@ class GalleryStarsState {
         this.#loading = null;
       }
     })());
+
+  /** The pages of people the account blocked, as the server last said */
+  setBlocked(postIds: number[]) {
+    this.blocked.clear();
+    for (const postId of postIds) this.blocked.add(postId);
+  }
 
   #onFocus = () => {
     if (document.visibilityState === 'hidden') return;
@@ -114,6 +124,7 @@ class GalleryStarsState {
       // Another account's stars never show, even for a moment
       this.#stars.clear();
       this.#own.clear();
+      this.blocked.clear();
       this.#userId = null;
       this.failed = false;
       void this.load();

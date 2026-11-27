@@ -28,6 +28,7 @@ import {
 import { yarnLinksOf } from '#lib/utils/gallery-link-utils.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { getBlockable } from '#lib/server/gallery/blockable.js';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
 export const prerender = false;
@@ -57,6 +58,8 @@ export const load: PageServerLoad = async (event) => {
   );
   const rest = {
     owner: await getOwner(event, id),
+    // Published from an account, so Block This Person… is offered
+    blockable: await getBlockable(id),
     // Streamed, so the page never waits for them: the project it came from,
     // the projects with these colors (checked in the browser, where colorway
     // names load), and other palette pages with them

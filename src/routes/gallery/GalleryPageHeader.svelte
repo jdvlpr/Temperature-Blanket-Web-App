@@ -18,13 +18,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   line under it, then "Published <date>" and under that "By <name> · 1.2K
   views" (the order gallery cards use too),
   then Open a Copy and, for its owner, Edit Gallery Page (the dialog its
-  card's ⋮ in My Library opens).
+  card's ⋮ in My Library opens). Someone else's page has a ⋮: Report Page…
+  and, when it was published from an account, Block This Person…; once
+  they're blocked, a line says so with Unblock (shown in the browser, as the
+  page may be cached).
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
   import ViewCount from '#lib/components/ViewCount.svelte';
   import GalleryStarButton from '#lib/components/GalleryStarButton.svelte';
   import GalleryPageEdit from '#lib/components/account/GalleryPageEdit.svelte';
+  import { galleryBlocks } from '#lib/accounts/gallery-blocks.svelte.js';
+  import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import MoreMenu, {
+    type MoreMenuItem,
+  } from '#lib/components/buttons/MoreMenu.svelte';
+  import {
+    confirmBlock,
+    openReportPage,
+    unblock,
+  } from '#lib/utils/gallery-report.js';
+  import { FlagIcon, UserRoundXIcon } from '@lucide/svelte';
+  import { onMount } from 'svelte';
   import type { GalleryOwner } from '#lib/server/gallery/store.js';
   import type { Component, Snippet } from 'svelte';
 
@@ -39,6 +55,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modified?: string | null;
     /** Its views, all time, as the gallery gives them (none shows nothing) */
     views?: number | null;
+    /** Its name as text, for Report and Block */
+    title?: string;
+    /** Published from an account, so its publisher can be blocked */
+    blockable?: boolean;
     /** The page's name (h1) */
     heading: Snippet;
     /** A line under the name */
@@ -61,6 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     date,
     modified,
     views,
+    title = '',
+    blockable = false,
     heading,
     subtitle,
     details,
@@ -76,6 +98,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ? new Date(value).toLocaleDateString(undefined, { dateStyle: 'medium' })
       : '';
   let sharedOn = $derived(dayOf(date));
+
+  onMount(() => void galleryBlocks.ensure());
+  let own = $derived(
+    __ACCOUNTS_ENABLED__ && !!account.summary?.id && galleryStars.isOwn(postId),
+  );
+  let blocked = $derived(__ACCOUNTS_ENABLED__ && galleryBlocks.hides(postId));
+  let menu = $state<HTMLElement>();
+  const menuButton = () => menu?.querySelector('button') ?? null;
+  let moreItems = $derived<MoreMenuItem[]>([
+    {
+      value: 'report',
+      label: 'Report Page…',
+      icon: FlagIcon,
+      onselect: () =>
+        openReportPage(
+          { postId, kind, title, blockable: blockable && !blocked },
+          menuButton,
+        ),
+    },
+    ...(blockable && !blocked
+      ? [
+          {
+            value: 'block',
+            label: 'Block This Person…',
+            icon: UserRoundXIcon,
+            onselect: () => confirmBlock({ postId, kind, title }, menuButton),
+          },
+        ]
+      : []),
+  ]);
   // Only when it's a later day than it was published on
   let updatedOn = $derived(
     modified && date && modified.slice(0, 10) > date.slice(0, 10)
@@ -140,5 +192,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if __ACCOUNTS_ENABLED__}
       <GalleryPageEdit {postId} {kind} />
     {/if}
+    <!-- Report and Block: only a page that's there, and not one's own -->
+    {#if __ACCOUNTS_ENABLED__ && sharedOn && !own}
+      <div bind:this={menu} class="ml-auto">
+        <MoreMenu items={moreItems} label="More for this page" />
+      </div>
+    {/if}
   </div>
+  {#if blocked}
+    <p
+      class="preset-tonal-surface rounded-container mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 p-2 text-sm"
+      data-testid="gallery-blocked"
+    >
+      <span>You blocked this person</span>
+      <span aria-hidden="true">·</span>
+      <button
+        type="button"
+        class="btn btn-sm hover:preset-tonal-surface"
+        onclick={() => unblock(postId)}>Unblock</button
+      >
+    </p>
+  {/if}
 </div>

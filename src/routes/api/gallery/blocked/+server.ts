@@ -14,9 +14,10 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // POST { blockedPostIds?: number[] }: the gallery pages this person blocked,
-// as { postIds }, for leaving them out of the gallery, the globe and Popular
+// as { postIds, via }, for leaving them out of the gallery, the globe and Popular
 // (which come straight from WordPress). Signed in, from the account's blocks;
-// a guest sends the pages they blocked from (kept on their device). Never says
+// a guest sends the pages they blocked from (kept on their device), and `via`
+// says which of those hides each page, for Unblock. Never says
 // who published a page. Private: every person's answer is their own.
 
 import type { RequestHandler } from './$types';
@@ -42,10 +43,13 @@ export const POST: RequestHandler = async (event) => {
   const user = await optionalAccount(event);
   if (!user && !guestPostIds.length)
     return Response.json({ postIds: [] }, { headers: PRIVATE });
-  const { hiddenPostIds } = await import('#lib/server/gallery/blocks.js');
-  const postIds = await hiddenPostIds(env.DB, {
-    userId: user?.id,
-    guestPostIds,
-  });
-  return Response.json({ postIds }, { headers: PRIVATE });
+  const { hiddenPostIds, guestBlocked } =
+    await import('#lib/server/gallery/blocks.js');
+  const [postIds, guest] = await Promise.all([
+    hiddenPostIds(env.DB, { userId: user?.id, guestPostIds }),
+    guestBlocked(env.DB, guestPostIds, user?.id),
+  ]);
+  // For a guest's Unblock: which of their pages hides each one
+  const via = Object.fromEntries(guest);
+  return Response.json({ postIds, via }, { headers: PRIVATE });
 };

@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
+  import { galleryBlocks } from '#lib/accounts/gallery-blocks.svelte.js';
   import {
     galleryFilters,
     yarnPaletteGalleryState,
@@ -52,6 +53,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let totalPalettes = $state<string | undefined>();
   /** The latest request: answers to older ones (the sort or filters changed meanwhile) are dropped */
   let request = 0;
+
+  // Leaves out the pages of people this person blocked
+  onMount(() => void galleryBlocks.ensure());
 
   onMount(async () => {
     // The first visit, or the filters changed on the other tab
@@ -229,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ></CollectionToolbar>
     </div>
     <div class={grid ? gridClass : listClass}>
-      {#each yarnPaletteGalleryState.palettes as palette, i (i)}
+      {#each yarnPaletteGalleryState.palettes.filter((p) => !galleryBlocks.hides(p.page.id)) as palette, i (i)}
         <GalleryPaletteCard
           {palette}
           author={galleryOwners.nameOf(palette.page.id)}

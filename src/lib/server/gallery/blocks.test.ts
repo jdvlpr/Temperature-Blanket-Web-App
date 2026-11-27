@@ -2,6 +2,7 @@ import { createTestD1 } from '#lib/server/test-d1.js';
 import { describe, expect, it } from 'vitest';
 import {
   blockFromPost,
+  guestBlocked,
   hiddenPostIds,
   listBlocks,
   mergeBlocks,
@@ -84,6 +85,11 @@ describe('gallery blocks', () => {
         .concat([5])
         .sort(),
     );
+    expect([...(await guestBlocked(d1, [4, 5])).entries()].sort()).toEqual([
+      [3, 4],
+      [4, 4],
+      [5, 5],
+    ]);
     expect(await mergeBlocks(d1, 'viewer', [4, 5, 7, 999])).toBe(2);
     expect((await hiddenPostIds(d1, { userId: 'viewer' })).sort()).toEqual([
       3, 4, 5,

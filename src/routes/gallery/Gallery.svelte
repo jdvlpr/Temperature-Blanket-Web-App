@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { masonry } from '#lib/state/attachments/masonry.js';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
+  import { galleryBlocks } from '#lib/accounts/gallery-blocks.svelte.js';
   import {
     galleryFilters,
     galleryState,
@@ -45,6 +46,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let totalProjects: number | string | undefined = $state(0);
   /** The latest request: answers to older ones (the sort or filters changed meanwhile) are dropped */
   let request = 0;
+
+  // Leaves out the pages of people this person blocked
+  onMount(() => void galleryBlocks.ensure());
 
   onMount(async () => {
     // The first visit, or the filters changed on the other tab
@@ -258,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : 'grid grid-cols-1 items-start md:grid-cols-2'}"
         {@attach galleryState.layout === 'grid' ? masonry : undefined}
       >
-        {#each galleryState.displayedProjects as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
+        {#each galleryBlocks.without(galleryState.displayedProjects) as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
           <GalleryProjectCard
             href={resolve('/gallery/[id]', { id: String(databaseId) })}
             image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||

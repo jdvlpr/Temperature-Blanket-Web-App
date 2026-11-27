@@ -300,6 +300,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               date={project?.date}
               modified={project?.modified}
               views={project?.views}
+              title={projectTitleNoHTML}
+              blockable={data.blockable}
               open={projectURL && openHref
                 ? {
                     href: openHref,

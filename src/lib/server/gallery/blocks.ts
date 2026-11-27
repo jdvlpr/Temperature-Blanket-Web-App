@@ -187,6 +187,22 @@ export async function hiddenPostIds(
       .all<{ postId: number }>();
     for (const row of results) hidden.add(row.postId);
   }
+  for (const postId of (await guestBlocked(db, guestPostIds, userId)).keys())
+    hidden.add(postId);
+  return [...hidden].slice(0, HIDDEN_LIMIT);
+}
+
+/**
+ * The live pages a guest's blocks hide, each with the page it was blocked from
+ * (so Unblock on any of them takes the right one off the guest's list). Not
+ * the signed-in person's own pages (`userId`).
+ */
+export async function guestBlocked(
+  db: D1Database,
+  guestPostIds: number[],
+  userId?: string,
+): Promise<Map<number, number>> {
+  const hidden = new Map<number, number>();
   const ids = [...new Set(guestPostIds)].slice(0, BLOCK_LIMIT);
   // Under D1's 100 bound parameters per statement
   for (let i = 0; i < ids.length; i += 90) {
@@ -194,19 +210,21 @@ export async function hiddenPostIds(
     const { results } = await db
       .prepare(
         `with "b" as (
-           select "userId" as "blockedUserId",
+           select "userId" as "blockedUserId", "postId" as "via",
              case when "showOwner" = 1 then 'named' else 'anonymous' end as "scope"
            from "galleryPost" where "postId" in (${some.map(() => '?').join(', ')})
              ${userId ? `and "userId" != ?` : ''}
          )
-         select distinct p."postId" from "galleryPost" p
+         select p."postId", min(b."via") as "via" from "galleryPost" p
          join "b" on ${MATCHES}
          where p."hiddenAt" is null
+         group by p."postId"
          limit ${HIDDEN_LIMIT}`,
       )
       .bind(...some, ...(userId ? [userId] : []))
-      .all<{ postId: number }>();
-    for (const row of results) hidden.add(row.postId);
+      .all<{ postId: number; via: number }>();
+    for (const row of results)
+      if (!hidden.has(row.postId)) hidden.set(row.postId, row.via);
   }
-  return [...hidden].slice(0, HIDDEN_LIMIT);
+  return hidden;
 }

@@ -278,6 +278,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-current={pathname === '/privacy' ? 'page' : undefined}>Privacy</a
       >
       <a
+        href="/terms"
+        class={['py-1', SMALL_LINK, pathname === '/terms' && SMALL_CURRENT]}
+        aria-current={pathname === '/terms' ? 'page' : undefined}>Terms</a
+      >
+      <a
         href="/api/yarn-colorways"
         class={[
           'py-1',
