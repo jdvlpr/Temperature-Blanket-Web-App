@@ -44,8 +44,7 @@ Settings › About. Short on purpose. -->
       <h2 class="h2 text-gradient mt-2 max-lg:hidden">Gallery Terms</h2>
       <p>
         The Gallery is where people share their temperature blanket projects and
-        yarn palettes. Publishing a page to it, on this website or in the iPhone
-        app, means you agree to these terms.
+        yarn palettes. Publishing a page to it means you agree to these terms.
       </p>
 
       <section class="flex flex-col gap-2" aria-labelledby="terms-rules">
