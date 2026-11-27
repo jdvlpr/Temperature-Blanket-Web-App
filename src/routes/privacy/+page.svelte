@@ -166,17 +166,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ul class="list-disc space-y-1 pl-6">
             <li>
               <span class="font-bold">Your email address</span>, from the Google
-              account you sign in with, to identify your account. This site
-              doesn’t send you email, and it is not used for newsletters or
-              marketing.
+              or Apple account you sign in with, to identify your account. With
+              Apple’s Hide My Email, it’s a private relay address from Apple
+              instead of your own. This site doesn’t send you email, and it is
+              not used for newsletters or marketing.
             </li>
             <li>
               <span class="font-bold">A display name and profile picture</span>.
               You sign in with Google, which shares your name, email address and
-              profile picture link; you can change the name. Your picture is
-              loaded from Google’s servers. The sign-in tokens Google provides
-              are stored encrypted and aren’t used to access your Google
-              account.
+              profile picture link, or with Apple, which shares an ID for your
+              account, your email address and, the first time only, your name.
+              Your account starts with a made-up name, which you can change. A
+              Google picture is loaded from Google’s servers. The sign-in tokens
+              Google and Apple provide are stored encrypted and aren’t used to
+              access your Google or Apple account; Apple’s is used only to
+              remove this site from your Apple ID when you delete your account.
             </li>
             <li>
               <span class="font-bold">Sign-in sessions</span>: for each device
@@ -234,7 +238,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="link"
               rel="noreferrer noopener"
               target="_blank">privacy policy</a
-            > applies to that sign-in. Your data is not sold or shared with anyone
+            >
+            applies to signing in with Google, and Apple’s
+            <a
+              href="https://www.apple.com/legal/privacy/"
+              class="link"
+              rel="noreferrer noopener"
+              target="_blank">privacy policy</a
+            > to signing in with Apple. Your data is not sold or shared with anyone
             else.
           </p>
 
@@ -439,17 +450,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </li>
         </ul>
         <p>
-          Giving personal data is optional. A Google account is needed only to
-          create an account; everything else works without one. No decisions
-          about you are made by automated means, and no profiles are built for
-          advertising.
+          Giving personal data is optional. A Google or Apple account is needed
+          only to create an account; everything else works without one. No
+          decisions about you are made by automated means, and no profiles are
+          built for advertising.
         </p>
       </div>
 
       <div class="flex flex-col gap-2">
         <p class="text-xl font-bold">Transfers outside the EU and UK</p>
         <p>
-          Some of the services above, including Cloudflare, Google and
+          Some of the services above, including Cloudflare, Google, Apple and
           Microsoft, are based in the United States or may process data there.
           These transfers rely on the EU–U.S. Data Privacy Framework (and its UK
           extension) where the provider is certified, or otherwise on the
@@ -483,8 +494,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-xl font-bold">Age and security</p>
         <p>
           Accounts are for people aged 16 and over. This site uses encrypted
-          connections (HTTPS), has no passwords to leak (you sign in with
-          Google), and limits repeated sign-in attempts.
+          connections (HTTPS), has no passwords to leak (you sign in with Google
+          or Apple), and limits repeated sign-in attempts.
         </p>
       </div>
 
@@ -498,7 +509,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="link">GitHub</a
           >.
         </p>
-        <p class="italic">Last updated October 15, 2026</p>
+        <p class="italic">Last updated November 27, 2026</p>
       </div>
     </main>
   {/snippet}

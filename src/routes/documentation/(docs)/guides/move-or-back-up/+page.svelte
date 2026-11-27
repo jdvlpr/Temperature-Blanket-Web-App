@@ -41,7 +41,7 @@ can't be imported back. Account parts show only in builds with accounts. -->
     <ol class="ml-6 list-decimal space-y-1">
       <li>
         Press <span class="font-bold">Sign In</span> at the top of the page, and continue
-        with Google.
+        with Google or Apple.
       </li>
       <li>
         Projects saved before you signed in stay in this browser. Open each one,

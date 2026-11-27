@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Which sign-in methods are on (Google, emailed codes), for the sign-in and account pages.
+// Which sign-in methods are on (Google, Apple, emailed codes), for the sign-in and account pages.
 
 import { readAuthSettings } from '#lib/server/auth/settings.js';
 import type { RequestHandler } from './$types';
@@ -29,6 +29,8 @@ export const GET: RequestHandler = async () => {
   return Response.json(
     {
       google: Boolean(result.settings.google),
+      // On the website only with its Services ID; the app's half signs in on the device
+      apple: Boolean(result.settings.apple?.web),
       email: result.settings.emailSignIn,
     },
     // Only changes with the deployment's settings

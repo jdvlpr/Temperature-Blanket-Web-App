@@ -266,7 +266,7 @@ show only in builds with accounts. -->
       An account is free and optional. Press <span class="font-bold"
         >Sign In</span
       >
-      at the top of the page and continue with Google. There's no password.
+      at the top of the page and continue with Google or Apple. There's no password.
     </p>
     <h3 id="sync" class="text-lg font-bold">Syncing</h3>
     <ul class="ml-6 list-disc space-y-1">

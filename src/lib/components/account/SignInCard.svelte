@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Sign in with Google, or an emailed code where that's on (not in
+<!-- Sign in with Google or Apple, or an emailed code where that's on (not in
      production). Used by /auth/sign-in and by the account page when signed out. -->
 <script lang="ts">
   import { goto } from '$app/navigation';
@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSignInOptions,
     providerErrorMessage,
     sendSignInCode,
+    SIGN_IN_PROVIDERS,
     signInWithCode,
     signInWithProvider,
     type AccountUser,
@@ -41,6 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, tick } from 'svelte';
   import Turnstile from '#lib/components/Turnstile.svelte';
   import CodeInput from './CodeInput.svelte';
+  import AppleIcon from './AppleIcon.svelte';
   import EmailText from './EmailText.svelte';
   import GoogleIcon from './GoogleIcon.svelte';
 
@@ -69,14 +71,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let ready = $state(false);
   let providers: Record<SignInProvider | 'email', boolean> = $state({
     google: false,
+    apple: false,
     email: false,
   });
   let providersLoaded = $state(false);
-  // With Google on, the email form waits behind "Use email instead": Google
-  // sign-ins don't use up the daily email limit
+  // Signing the iPhone app in (/app-sign-in): the app has its own Sign in
+  // with Apple button, on the device, so Apple isn't offered here
+  let forApp = $derived(redirectTo.startsWith('/app-sign-in'));
+  let socialProviders = $derived(
+    SIGN_IN_PROVIDERS.filter(
+      (p) => providers[p.id] && !(p.id === 'apple' && forApp),
+    ),
+  );
+  // With Google or Apple on, the email form waits behind "Use email
+  // instead": their sign-ins don't use up the daily email limit
   let showEmail = $state(false);
   let emailOpen = $derived(
-    providersLoaded && providers.email && (!providers.google || showEmail),
+    providersLoaded &&
+      providers.email &&
+      (!socialProviders.length || showEmail),
   );
   let emailInput = $state<HTMLInputElement>();
   let turnstile = $state<Turnstile>();
@@ -159,9 +172,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (
         e instanceof AccountError &&
         e.code === 'EMAIL_LIMIT_REACHED' &&
-        providers.google
+        socialProviders.length
       )
-        errorMessage += ' Or continue with Google.';
+        errorMessage += ` Or continue with ${socialProviders.map((p) => p.name).join(' or ')}.`;
       return false;
     } finally {
       busy = false;
@@ -221,6 +234,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => continueWith('google')}
           disabled={busy}><GoogleIcon /> Continue with Google</button
         >
+      {/if}
+      {#if providers.apple && !forApp}
+        <!-- Apple's style: black in light mode, white in dark, its logo and
+             wording, the same size as Google's -->
+        <button
+          type="button"
+          class="btn h-12 w-full bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+          onclick={() => continueWith('apple')}
+          disabled={busy}><AppleIcon /> Continue with Apple</button
+        >
+      {/if}
+      {#if socialProviders.length}
         {#if emailOpen}
           <div
             class="flex items-center gap-3 text-sm opacity-70"
@@ -233,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {/if}
       {#if !providersLoaded}
-        <!-- Until it's known whether Google is on, so the form doesn't show, then hide -->
+        <!-- Until it's known whether Google or Apple is on, so the form doesn't show, then hide -->
         <div class="h-12" aria-hidden="true"></div>
       {:else if !emailOpen}
         {#if errorMessage}

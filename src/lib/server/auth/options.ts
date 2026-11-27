@@ -121,7 +121,7 @@ export function buildAuthOptions(config: AuthConfig) {
     ],
     secret: config.secret,
     database: config.database,
-    // No passwords: sign in with Google, or an emailed code where emailSignIn is on
+    // No passwords: sign in with Google or Apple, or an emailed code where emailSignIn is on
     emailAndPassword: { enabled: false },
     // The email OTP plugin's password reset routes email codes too; with no
     // passwords they're only a way to spend the daily email limit
@@ -153,8 +153,9 @@ export function buildAuthOptions(config: AuthConfig) {
       backgroundTasks: { handler: config.runInBackground },
     },
     account: {
-      // Google's tokens aren't needed after sign-in; Ravelry's are, for calls
-      // to its API from the server only. Neither is kept readable
+      // Google's tokens aren't needed after sign-in. Apple's refresh token is,
+      // to revoke the sign-in when the account is deleted; Ravelry's, for
+      // calls to its API from the server only. None is kept readable
       encryptOAuthTokens: true,
       accountLinking: {
         enabled: true,
@@ -162,7 +163,9 @@ export function buildAuthOptions(config: AuthConfig) {
         // only while signed in, and Ravelry can't sign in (no email, and
         // handleAuthRequest refuses it)
         trustedProviders: config.ravelry ? [RAVELRY_PROVIDER_ID] : [],
-        // Linking happens while signed in, so a Google account with another address is fine
+        // Linking happens while signed in, so a Google or Apple account with
+        // another address (Hide My Email) is fine. Signing in with a verified
+        // email that has an account signs in to it
         allowDifferentEmails: true,
         // Only with emailed codes is there still a way in after unlinking the last provider
         allowUnlinkingAll: config.emailSignIn,
@@ -170,7 +173,8 @@ export function buildAuthOptions(config: AuthConfig) {
     },
     socialProviders: socialProviders(config),
     user: {
-      // Needs a session less than freshAge old; the account page confirms with Google (or a new code) first
+      // Needs a session less than freshAge old; the account page confirms
+      // with Google or Apple (or a new code) first
       deleteUser: {
         enabled: true,
         // Before the user row goes, so a failure here leaves nothing orphaned
@@ -179,19 +183,19 @@ export function buildAuthOptions(config: AuthConfig) {
         },
       },
     },
-    // Display names (typed, or from Google) are stored cleaned, like project
+    // Display names (typed, or from Google or Apple) are stored cleaned, like project
     // and palette names
     databaseHooks: {
       user: {
         create: {
-          // Every new account comes through here, by code or by Google
+          // Every new account comes through here, by code, Google or Apple
           before: async (user) => {
             if (config.signUpsOpen && !(await config.signUpsOpen()))
               throw new APIError('FORBIDDEN', {
                 code: SIGN_UPS_PAUSED,
                 message: 'New sign-ups are paused',
               });
-            // A made-up name to start, not the one from Google: nobody's
+            // A made-up name to start, not the one from Google or Apple: nobody's
             // real name shows on a gallery page unless they put it there
             return { data: { ...user, name: randomCraftName() } };
           },

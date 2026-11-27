@@ -33,11 +33,11 @@ declare global {
         // Linking a Ravelry account (never a way to sign in); secrets in .dev.vars / the dashboard
         RAVELRY_CLIENT_ID?: string;
         RAVELRY_CLIENT_SECRET?: string;
-        // Sign in with Apple: the iPhone app's bundle ID; the website's Services ID and secret;
-        // the Team ID and Sign in with Apple key (.p8 text, a secret) that revoke it on Delete Account
+        // Sign in with Apple: the iPhone app's bundle ID; the website's Services ID;
+        // the Team ID and Sign in with Apple key (.p8 text, a secret) that sign the
+        // website's client secret and revoke sign-ins on Delete Account
         APPLE_APP_BUNDLE_ID?: string;
         APPLE_CLIENT_ID?: string;
-        APPLE_CLIENT_SECRET?: string;
         APPLE_TEAM_ID?: string;
         APPLE_KEY_ID?: string;
         APPLE_PRIVATE_KEY?: string;

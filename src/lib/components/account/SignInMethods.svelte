@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sendSignInCode,
     signInWithCode,
     signInWithProvider,
+    SIGN_IN_PROVIDERS,
     unlinkAccount,
     type LinkedAccount,
     type SignInProvider,
@@ -33,16 +34,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';
   import { onMount } from 'svelte';
+  import AppleIcon from './AppleIcon.svelte';
   import GoogleIcon from './GoogleIcon.svelte';
 
   let { email }: { email: string } = $props();
 
-  const PROVIDERS: { id: SignInProvider; name: string }[] = [
-    { id: 'google', name: 'Google' },
-  ];
+  const ICONS = { google: GoogleIcon, apple: AppleIcon };
+  const RAVELRY = 'ravelry';
 
   let available: Record<SignInProvider | 'email', boolean> = $state({
     google: false,
+    apple: false,
     email: false,
   });
   let linked: LinkedAccount[] = $state([]);
@@ -52,12 +54,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Set while waiting for a code to confirm an unlink
   let reconfirming: { id: SignInProvider; name: string } | null = $state(null);
   let code = $state('');
-  // Confirming with Google when it's linked (no email used), until a code is
-  // asked for instead
-  let withGoogle = $state(false);
+  // Confirming with a linked provider (no email used), until a code is asked
+  // for instead
+  let confirmWith: { id: SignInProvider; name: string } | null = $state(null);
 
   const isLinked = (provider: SignInProvider) =>
     linked.some((account) => account.providerId === provider);
+  // Another way in stays after unlinking: email codes, or another linked
+  // sign-in (Ravelry isn't one), as the server checks
+  const canUnlink = (provider: SignInProvider) =>
+    available.email ||
+    linked.some((a) => a.providerId !== provider && a.providerId !== RAVELRY);
 
   onMount(async () => {
     // A failed link returns here with ?error=
@@ -68,7 +75,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       errorMessage = providerErrorMessage(error);
     try {
       available = await getSignInOptions();
-      if (available.google) linked = await listLinkedAccounts();
+      if (available.google || available.apple)
+        linked = await listLinkedAccounts();
     } catch (e) {
       errorMessage = accountErrorMessage(e);
     } finally {
@@ -99,8 +107,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (needsFreshSession(e)) {
         // More than 10 minutes since sign-in: confirm it's you first
         reconfirming = provider;
-        withGoogle = available.google && isLinked('google');
-        if (!withGoogle) await sendCode();
+        confirmWith =
+          SIGN_IN_PROVIDERS.find((p) => available[p.id] && isLinked(p.id)) ??
+          null;
+        if (!confirmWith) await sendCode();
       } else {
         errorMessage = accountErrorMessage(e);
       }
@@ -115,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       await sendSignInCode(email);
       code = '';
-      withGoogle = false;
+      confirmWith = null;
     } catch (e) {
       errorMessage = accountErrorMessage(e);
       reconfirming = null;
@@ -124,13 +134,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  // Signing in with Google again makes a fresh session; back on the account
-  // page, unlinking works without a code
-  async function confirmWithGoogle() {
+  // Signing in with the provider again makes a fresh session; back on the
+  // account page, unlinking works without a code
+  async function confirmWithProvider(provider: SignInProvider) {
     busy = true;
     errorMessage = '';
     try {
-      await signInWithProvider('google', '/account', '/account');
+      await signInWithProvider(provider, '/account', '/account');
     } catch (e) {
       errorMessage = accountErrorMessage(e);
       busy = false;
@@ -171,20 +181,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <LoaderCircleIcon class="animate-spin" />
     </div>
   {:else}
-    {#each PROVIDERS.filter((p) => available[p.id]) as provider (provider.id)}
+    {#each SIGN_IN_PROVIDERS.filter((p) => available[p.id]) as provider (provider.id)}
+      {@const Icon = ICONS[provider.id]}
       <div
         class="flex min-h-14 items-center gap-3 px-4 py-3"
         data-testid={`provider-${provider.id}`}
       >
-        <GoogleIcon />
+        <Icon />
         <div class="min-w-0 flex-1">
           <p class="font-bold">{provider.name}</p>
           <p class="text-sm opacity-70">
             {#if isLinked(provider.id)}Linked{:else}Sign in with one tap{/if}
           </p>
         </div>
-        {#if isLinked(provider.id) && !available.email}
-          <!-- Without email codes it's the only way in, so it can't be unlinked -->
+        {#if isLinked(provider.id) && !canUnlink(provider.id)}
+          <!-- The only way in, so it can't be unlinked -->
           <span class="flex shrink-0 items-center gap-1 text-sm opacity-80"
             ><CheckIcon /> Always on</span
           >
@@ -208,18 +219,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/each}
   {/if}
-  {#if reconfirming && withGoogle}
+  {#if reconfirming && confirmWith}
+    {@const Icon = ICONS[confirmWith.id]}
     <div class="flex flex-col gap-3 px-4 py-3" in:safeSlide>
       <p>
-        To unlink {reconfirming.name}, confirm it’s you with Google, then choose
-        Unlink again.
+        To unlink {reconfirming.name}, confirm it’s you with {confirmWith.name},
+        then choose Unlink again.
       </p>
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
           class="btn preset-outlined-surface-300-700 hover:preset-tonal-surface max-sm:w-full"
-          onclick={confirmWithGoogle}
-          disabled={busy}><GoogleIcon /> Confirm with Google</button
+          onclick={() => confirmWith && confirmWithProvider(confirmWith.id)}
+          disabled={busy}><Icon /> Confirm with {confirmWith.name}</button
         >
         <button
           type="button"

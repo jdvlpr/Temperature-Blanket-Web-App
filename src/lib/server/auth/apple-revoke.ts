@@ -16,7 +16,11 @@
 // Deleting an account that signs in with Apple takes the app off the person's
 // Apple ID (App Store guideline 5.1.1(v)). The iPhone app confirms the delete
 // with Apple's sheet and sends the one-time authorization code it got; this
-// trades the code for a refresh token and revokes it.
+// trades the code for a refresh token and revokes it. A website sign-in left a
+// refresh token on the account row, which is revoked as it is.
+//
+// The same key signs the website's client secret for Sign in with Apple (see
+// ./settings), with the Services ID in place of the bundle ID.
 
 const APPLE = 'https://appleid.apple.com';
 
@@ -29,22 +33,31 @@ export type AppleRevokeEnv = {
   APPLE_PRIVATE_KEY?: string;
 };
 
-export type AppleRevokeSettings = {
-  clientId: string;
-  teamId: string;
-  keyId: string;
-  privateKey: string;
-};
+/** The Sign in with Apple key: the team, the key's ID, and the .p8 text */
+export type AppleKey = { teamId: string; keyId: string; privateKey: string };
 
+/** The key, with the client it speaks for (the bundle ID, or the Services ID) */
+export type AppleRevokeSettings = AppleKey & { clientId: string };
+
+/** The key, when all three of its values are set */
+export function readAppleKey(
+  env: AppleRevokeEnv | undefined,
+): AppleKey | undefined {
+  const teamId = env?.APPLE_TEAM_ID?.trim();
+  const keyId = env?.APPLE_KEY_ID?.trim();
+  const privateKey = env?.APPLE_PRIVATE_KEY?.trim();
+  if (!teamId || !keyId || !privateKey) return undefined;
+  return { teamId, keyId, privateKey };
+}
+
+/** For the iPhone app's codes: its bundle ID and the key */
 export function readAppleRevokeSettings(
   env: AppleRevokeEnv | undefined,
 ): AppleRevokeSettings | undefined {
   const clientId = env?.APPLE_APP_BUNDLE_ID?.trim();
-  const teamId = env?.APPLE_TEAM_ID?.trim();
-  const keyId = env?.APPLE_KEY_ID?.trim();
-  const privateKey = env?.APPLE_PRIVATE_KEY?.trim();
-  if (!clientId || !teamId || !keyId || !privateKey) return undefined;
-  return { clientId, teamId, keyId, privateKey };
+  const key = readAppleKey(env);
+  if (!clientId || !key) return undefined;
+  return { clientId, ...key };
 }
 
 const base64url = (bytes: Uint8Array) =>
@@ -68,21 +81,25 @@ function pkcs8(pem: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
+/** The longest a client secret may last, by Apple's rules: 6 months */
+export const APPLE_SECRET_MAX_SECONDS = 15_777_000;
+
 /**
- * The client secret Apple's token endpoints want: a short-lived ES256 JWT
- * signed with the Sign in with Apple key. WebCrypto's ECDSA signature is
- * already the r‖s form JWTs use.
+ * The client secret Apple's token endpoints want: an ES256 JWT signed with the
+ * Sign in with Apple key, for `lifetimeSeconds` (5 minutes unless asked).
+ * WebCrypto's ECDSA signature is already the r‖s form JWTs use.
  */
 export async function appleClientSecret(
   settings: AppleRevokeSettings,
   now = Date.now(),
+  lifetimeSeconds = 300,
 ): Promise<string> {
   const iat = Math.floor(now / 1000);
   const header = encodeJSON({ alg: 'ES256', kid: settings.keyId });
   const payload = encodeJSON({
     iss: settings.teamId,
     iat,
-    exp: iat + 300,
+    exp: iat + Math.min(lifetimeSeconds, APPLE_SECRET_MAX_SECONDS),
     aud: APPLE,
     sub: settings.clientId,
   });
@@ -131,15 +148,35 @@ export async function revokeAppleAuthorization(
   };
   const token = tokens.refresh_token ?? tokens.access_token;
   if (!token) throw new Error('Apple gave no token to revoke');
+  await revokeAppleToken(
+    settings,
+    token,
+    tokens.refresh_token ? 'refresh_token' : 'access_token',
+    fetcher,
+    clientSecret,
+  );
+}
 
+/**
+ * Revokes a token Apple gave `settings.clientId` (for a website sign-in, the
+ * Services ID), which takes the app off the person's Apple ID. Throws when
+ * Apple refuses.
+ */
+export async function revokeAppleToken(
+  settings: AppleRevokeSettings,
+  token: string,
+  tokenType: 'refresh_token' | 'access_token',
+  fetcher: typeof fetch = fetch,
+  clientSecret?: string,
+): Promise<void> {
   const revokeResponse = await fetcher(`${APPLE}/auth/revoke`, {
     method: 'POST',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       client_id: settings.clientId,
-      client_secret: clientSecret,
+      client_secret: clientSecret ?? (await appleClientSecret(settings)),
       token,
-      token_type_hint: tokens.refresh_token ? 'refresh_token' : 'access_token',
+      token_type_hint: tokenType,
     }),
   });
   if (!revokeResponse.ok)

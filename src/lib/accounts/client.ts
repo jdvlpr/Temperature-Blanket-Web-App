@@ -164,9 +164,15 @@ export const confirmEmailChange = (newEmail: string, newEmailCode: string) =>
 export const deleteAccount = () =>
   call<{ success: boolean }>('/delete-user', {});
 
-export type SignInProvider = 'google';
+export type SignInProvider = 'google' | 'apple';
 
-/** Which sign-in methods are on: Google, and emailed codes (off in production). */
+/** Sign-in providers in the order they're offered, with their names */
+export const SIGN_IN_PROVIDERS: { id: SignInProvider; name: string }[] = [
+  { id: 'google', name: 'Google' },
+  { id: 'apple', name: 'Apple' },
+];
+
+/** Which sign-in methods are on: Google, Apple, and emailed codes (off in production). */
 export async function getSignInOptions(): Promise<
   Record<SignInProvider | 'email', boolean>
 > {
@@ -176,7 +182,7 @@ export async function getSignInOptions(): Promise<
   } catch {
     // Fall through: offer what production offers
   }
-  return { google: true, email: false };
+  return { google: true, apple: false, email: false };
 }
 
 /**
@@ -213,22 +219,30 @@ export type LinkedAccount = { id: string; providerId: string };
 export const listLinkedAccounts = () => call<LinkedAccount[]>('/list-accounts');
 
 /**
- * How the signed-in account can confirm it's you: with Google (Google sign-in
- * is on and linked), and/or with an emailed code (where codes are on).
+ * How the signed-in account can confirm it's you: with each provider that's
+ * on and linked (in offered order), and/or with an emailed code (where codes
+ * are on).
  */
 export async function reconfirmOptions(): Promise<{
-  google: boolean;
+  providers: SignInProvider[];
   email: boolean;
 }> {
   const options = await getSignInOptions();
+  const available = SIGN_IN_PROVIDERS.map((p) => p.id).filter(
+    (id) => options[id],
+  );
   try {
-    const google =
-      options.google &&
-      (await listLinkedAccounts()).some((a) => a.providerId === 'google');
-    // Without email codes, Google is the only way an account signs in
-    return { google: google || !options.email, email: options.email };
+    const linked = await listLinkedAccounts();
+    const providers = available.filter((id) =>
+      linked.some((a) => a.providerId === id),
+    );
+    // Without email codes, a provider is the only way an account signs in
+    return {
+      providers: providers.length || options.email ? providers : available,
+      email: options.email,
+    };
   } catch {
-    return { google: !options.email, email: options.email };
+    return { providers: options.email ? [] : available, email: options.email };
   }
 }
 
@@ -242,7 +256,7 @@ export const unlinkAccount = (id: string) =>
 /** A message for the ?error= that a failed provider sign-in or link returns with. */
 export function providerErrorMessage(error: string): string {
   if (error === 'account_not_linked')
-    return 'An account with this email already exists, but it isn’t linked to this Google account.';
+    return 'An account with this email already exists, but this sign-in isn’t linked to it.';
   if (error === 'access_denied') return 'Sign-in was canceled.';
   if (error === 'SIGN_UPS_PAUSED') return SIGN_UPS_PAUSED_MESSAGE;
   return 'That didn’t work. Try again.';

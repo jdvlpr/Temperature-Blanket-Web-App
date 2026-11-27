@@ -111,6 +111,9 @@ export default defineConfig(({ mode }) => {
         adapter: adapter(),
         prerender: { entries: ['*'] },
         version: { name: pkg.version },
+        // Sign in with Apple posts its answer back as a form from Apple's site
+        // (to /api/auth/callback/apple); this check runs before hooks.server.ts
+        csrf: { trustedOrigins: ['https://appleid.apple.com'] },
       }),
     ],
     test: {

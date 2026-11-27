@@ -15,9 +15,12 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  APPLE_SECRET_MAX_SECONDS,
   appleClientSecret,
+  readAppleKey,
   readAppleRevokeSettings,
   revokeAppleAuthorization,
+  revokeAppleToken,
   type AppleRevokeSettings,
 } from './apple-revoke';
 
@@ -70,6 +73,20 @@ describe('readAppleRevokeSettings', () => {
     ).toBeUndefined();
     expect(readAppleRevokeSettings(undefined)).toBeUndefined();
   });
+
+  it('shares the key with the website, which needs no bundle ID', () => {
+    const key = {
+      APPLE_TEAM_ID: 'b',
+      APPLE_KEY_ID: 'c',
+      APPLE_PRIVATE_KEY: 'd',
+    };
+    expect(readAppleKey(key)).toEqual({
+      teamId: 'b',
+      keyId: 'c',
+      privateKey: 'd',
+    });
+    expect(readAppleKey({ ...key, APPLE_PRIVATE_KEY: ' ' })).toBeUndefined();
+  });
 });
 
 describe('appleClientSecret', () => {
@@ -97,6 +114,20 @@ describe('appleClientSecret', () => {
       new TextEncoder().encode(`${header}.${payload}`),
     );
     expect(valid).toBe(true);
+  });
+
+  it('lasts as long as asked, up to Apple’s 6 months', async () => {
+    const { settings } = await settingsWithKey();
+    const now = Date.UTC(2026, 10, 27);
+    const expOf = async (seconds: number) => {
+      const jwt = await appleClientSecret(settings, now, seconds);
+      const payload = JSON.parse(
+        new TextDecoder().decode(fromBase64url(jwt.split('.')[1])),
+      );
+      return payload.exp - payload.iat;
+    };
+    expect(await expOf(30 * 24 * 60 * 60)).toBe(30 * 24 * 60 * 60);
+    expect(await expOf(365 * 24 * 60 * 60)).toBe(APPLE_SECRET_MAX_SECONDS);
   });
 
   it('takes a key pasted with literal \\n', async () => {
@@ -139,6 +170,43 @@ describe('revokeAppleAuthorization', () => {
       )) as unknown as typeof fetch;
     await expect(
       revokeAppleAuthorization(settings, 'old-code', fetcher),
+    ).rejects.toThrow(/400/);
+  });
+});
+
+describe('revokeAppleToken', () => {
+  it('revokes a stored refresh token for the client it was issued to', async () => {
+    const { settings } = await settingsWithKey();
+    const calls: { url: string; body: URLSearchParams }[] = [];
+    const fetcher = (async (url: string, init?: RequestInit) => {
+      calls.push({ url, body: init?.body as URLSearchParams });
+      return new Response(null, { status: 200 });
+    }) as typeof fetch;
+    await revokeAppleToken(
+      { ...settings, clientId: 'com.example.web' },
+      'stored-refresh',
+      'refresh_token',
+      fetcher,
+    );
+    expect(calls.map((c) => c.url)).toEqual([
+      'https://appleid.apple.com/auth/revoke',
+    ]);
+    expect(calls[0].body.get('client_id')).toBe('com.example.web');
+    expect(calls[0].body.get('token')).toBe('stored-refresh');
+    expect(calls[0].body.get('token_type_hint')).toBe('refresh_token');
+    expect(calls[0].body.get('client_secret')).toMatch(
+      /^[\w-]+\.[\w-]+\.[\w-]+$/,
+    );
+  });
+
+  it('throws when Apple refuses', async () => {
+    const { settings } = await settingsWithKey();
+    const fetcher = (async () =>
+      new Response('invalid_client', {
+        status: 400,
+      })) as unknown as typeof fetch;
+    await expect(
+      revokeAppleToken(settings, 't', 'refresh_token', fetcher),
     ).rejects.toThrow(/400/);
   });
 });

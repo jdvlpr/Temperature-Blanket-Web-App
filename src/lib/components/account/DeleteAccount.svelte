@@ -23,12 +23,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sendSignInCode,
     signInWithCode,
     signInWithProvider,
+    SIGN_IN_PROVIDERS,
+    type SignInProvider,
   } from '#lib/accounts/client.js';
   import { safeSlide } from '#lib/features/transitions/safeSlide.js';
   import { LoaderCircleIcon, Trash2Icon } from '@lucide/svelte';
   import CodeInput from './CodeInput.svelte';
+  import AppleIcon from './AppleIcon.svelte';
   import EmailText from './EmailText.svelte';
   import GoogleIcon from './GoogleIcon.svelte';
+
+  const ICONS = { google: GoogleIcon, apple: AppleIcon };
 
   let {
     email,
@@ -47,9 +52,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let code = $state('');
   let busy = $state(false);
   let errorMessage = $state('');
-  // Confirming it's you: with Google when it's linked (no email used), until
-  // a code is asked for instead
-  let withGoogle = $state(false);
+  // Confirming it's you: with each linked provider (no email used), until a
+  // code is asked for instead
+  let confirmWith: { id: SignInProvider; name: string }[] = $state([]);
   // Whether "Email me a code instead" is offered (emailed codes are off in production)
   let emailCodes = $state(false);
 
@@ -73,8 +78,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } catch (e) {
       if (needsFreshSession(e)) {
         // More than 10 minutes since sign-in: confirm it's you first
-        ({ google: withGoogle, email: emailCodes } = await reconfirmOptions());
-        if (withGoogle) step = 'reconfirm';
+        const options = await reconfirmOptions();
+        emailCodes = options.email;
+        confirmWith = SIGN_IN_PROVIDERS.filter((p) =>
+          options.providers.includes(p.id),
+        );
+        if (confirmWith.length) step = 'reconfirm';
         else await sendCode();
       } else {
         errorMessage = accountErrorMessage(e);
@@ -90,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       await sendSignInCode(email);
       code = '';
-      withGoogle = false;
+      confirmWith = [];
       step = 'reconfirm';
     } catch (e) {
       errorMessage = accountErrorMessage(e);
@@ -99,13 +108,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  // Signing in with Google again makes a fresh session; back on the account
-  // page, deleting works without a code
-  async function confirmWithGoogle() {
+  // Signing in with the provider again makes a fresh session; back on the
+  // account page, deleting works without a code
+  async function confirmWithProvider(provider: SignInProvider) {
     busy = true;
     errorMessage = '';
     try {
-      await signInWithProvider('google', '/account', '/account');
+      await signInWithProvider(provider, '/account', '/account');
     } catch (e) {
       errorMessage = accountErrorMessage(e);
       busy = false;
@@ -190,19 +199,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
       </div>
     </div>
-  {:else if withGoogle}
+  {:else if confirmWith.length}
     <div class="flex flex-col gap-3" in:safeSlide>
       <p>
-        To delete your account, confirm it’s you with Google, then choose Delete
-        account again.
+        To delete your account, confirm it’s you with {confirmWith
+          .map((p) => p.name)
+          .join(' or ')}, then choose Delete account again.
       </p>
       <div class="flex flex-wrap gap-2">
-        <button
-          type="button"
-          class="btn preset-outlined-surface-300-700 hover:preset-tonal-surface max-sm:w-full"
-          onclick={confirmWithGoogle}
-          disabled={busy}><GoogleIcon /> Confirm with Google</button
-        >
+        {#each confirmWith as provider (provider.id)}
+          {@const Icon = ICONS[provider.id]}
+          <button
+            type="button"
+            class="btn preset-outlined-surface-300-700 hover:preset-tonal-surface max-sm:w-full"
+            onclick={() => confirmWithProvider(provider.id)}
+            disabled={busy}><Icon /> Confirm with {provider.name}</button
+          >
+        {/each}
         <button
           type="button"
           class="btn preset-tonal-surface max-sm:w-full"

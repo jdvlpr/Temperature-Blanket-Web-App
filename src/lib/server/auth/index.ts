@@ -18,9 +18,11 @@
 
 import { getEmailSender, type EmailMessage } from '#lib/server/email/index.js';
 import { TURNSTILE_HEADER, verifyTurnstile } from '#lib/server/turnstile.js';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
 import { APIError } from 'better-auth/api';
+import { decryptOAuthToken } from 'better-auth/oauth2';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import {
   bearerToken,
@@ -49,15 +51,22 @@ import {
   RAVELRY_PROVIDER_ID,
   SIGN_UPS_PAUSED,
 } from './options';
-import { emailSignInOn, readAuthSettings } from './settings';
 import {
+  emailSignInOn,
+  readAuthSettings,
+  type AppleSettings,
+} from './settings';
+import {
+  appleClientSecret,
   readAppleRevokeSettings,
   revokeAppleAuthorization,
+  revokeAppleToken,
+  type AppleRevokeSettings,
 } from './apple-revoke';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
-type Auth = ReturnType<typeof createAuth>;
+type Auth = ReturnType<typeof betterAuth<ReturnType<typeof buildAuthOptions>>>;
 
 // The current request's platform, for work Better Auth starts on its own
 // (sending codes, background tasks) from an instance shared across requests.
@@ -96,16 +105,59 @@ async function sendEmail(
   await getEmailSender(platform).send(message);
 }
 
+type ReadySettings = Extract<
+  ReturnType<typeof readAuthSettings>,
+  { status: 'ready' }
+>['settings'];
+
+/** The website's Sign in with Apple client: the Services ID and its key */
+const appleWebClient = (
+  apple: AppleSettings | undefined,
+): AppleRevokeSettings | undefined =>
+  apple?.web && { clientId: apple.web.clientId, ...apple.web.key };
+
+/**
+ * Takes the website off the person's Apple ID when their account goes: a
+ * website sign-in left Apple's refresh token (encrypted) on the account row,
+ * issued to the Services ID. Nothing to do for an app-only Apple sign-in.
+ */
+async function revokeWebAppleSignIn(
+  db: D1Database,
+  auth: Auth,
+  client: AppleRevokeSettings,
+  userId: string,
+) {
+  const row = await db
+    .prepare(
+      'select "refreshToken" from "account" where "userId" = ? and "providerId" = \'apple\' and "refreshToken" is not null',
+    )
+    .bind(userId)
+    .first<{ refreshToken: string }>();
+  if (!row) return;
+  const context = (await auth.$context) as unknown as Parameters<
+    typeof decryptOAuthToken
+  >[1];
+  const token = await decryptOAuthToken(row.refreshToken, context);
+  await revokeAppleToken(client, token, 'refresh_token');
+}
+
 function createAuth(
   platform: App.Platform,
-  settings: Extract<
-    ReturnType<typeof readAuthSettings>,
-    { status: 'ready' }
-  >['settings'],
+  settings: ReadySettings,
+  /** The website's Apple client secret, signed for this instance; without it the website half is off */
+  appleSecret: string | undefined,
 ) {
-  return betterAuth(
+  const appleWeb = appleWebClient(settings.apple);
+  const auth: Auth = betterAuth(
     buildAuthOptions({
       ...settings,
+      apple: settings.apple && {
+        appBundleId: settings.apple.appBundleId,
+        web:
+          appleWeb && appleSecret
+            ? { clientId: appleWeb.clientId, clientSecret: appleSecret }
+            : undefined,
+      },
       database: platform.env!.DB!,
       sendSignInCode: (email, code, purpose) =>
         sendEmail(
@@ -121,6 +173,15 @@ function createAuth(
           await releaseGalleryPosts(env.DB, defaultGalleryApi(), userId);
         }
         if (env?.PROJECTS) await deleteUserProjectData(env.PROJECTS, userId);
+        // The account goes either way, so a refusal from Apple is only logged
+        if (env?.DB && appleWeb)
+          await revokeWebAppleSignIn(env.DB, auth, appleWeb, userId).catch(
+            (e) =>
+              console.error(
+                "Couldn't revoke the website's Sign in with Apple on delete",
+                e,
+              ),
+          );
       },
       signUpsOpen: async () => {
         const env = requestPlatform.getStore()?.env;
@@ -134,13 +195,51 @@ function createAuth(
       validateSchema: platform.env?.ENABLE_DEV_ROUTES === 'true',
     }),
   );
+  return auth;
 }
 
-// One instance per isolate: creating it is too costly to repeat on every request
-let cached: { key: string; auth: Auth } | undefined;
+const DAY_MS = 24 * 60 * 60 * 1000;
+/** How long the website's Apple client secret lasts; the instance is rebuilt a day before */
+const APPLE_SECRET_DAYS = 30;
+/** After a failed signing, how soon to try again */
+const APPLE_RETRY_MS = 10 * 60 * 1000;
+
+/**
+ * Builds the instance, first signing the website's Apple client secret when
+ * it's set up. A key that won't sign leaves Apple off on the website, not
+ * accounts as a whole.
+ */
+async function buildAuth(platform: App.Platform, settings: ReadySettings) {
+  const now = Date.now();
+  const appleWeb = appleWebClient(settings.apple);
+  let appleSecret: string | undefined;
+  let expiresAt = Infinity;
+  if (appleWeb) {
+    try {
+      appleSecret = await appleClientSecret(
+        appleWeb,
+        now,
+        (APPLE_SECRET_DAYS * DAY_MS) / 1000,
+      );
+      expiresAt = now + (APPLE_SECRET_DAYS - 1) * DAY_MS;
+    } catch (e) {
+      console.error("Couldn't sign the Sign in with Apple client secret", e);
+      expiresAt = now + APPLE_RETRY_MS;
+    }
+  }
+  return { auth: createAuth(platform, settings, appleSecret), expiresAt };
+}
+
+// One instance per isolate: creating it is too costly to repeat on every
+// request. A promise, so requests arriving together share one build
+let cached:
+  | { key: string; built: ReturnType<typeof buildAuth>; expiresAt: number }
+  | undefined;
 
 /** The shared auth instance, or a 404 (accounts off) or 503 (misconfigured) Response. */
-function authFor(platform: App.Platform | undefined): Auth | Response {
+async function authFor(
+  platform: App.Platform | undefined,
+): Promise<Auth | Response> {
   const result = readAuthSettings(platform?.env);
 
   if (result.status === 'disabled')
@@ -156,10 +255,15 @@ function authFor(platform: App.Platform | undefined): Auth | Response {
     );
   }
 
+  // The settings alone, never the signed secret, so the key stays the same
   const key = JSON.stringify(result.settings);
-  if (cached?.key !== key)
-    cached = { key, auth: createAuth(platform, result.settings) };
-  return cached.auth;
+  if (cached?.key !== key || Date.now() >= cached.expiresAt) {
+    const built = buildAuth(platform, result.settings);
+    const entry = { key, built, expiresAt: Infinity };
+    cached = entry;
+    built.then(({ expiresAt }) => (entry.expiresAt = expiresAt));
+  }
+  return (await cached.built).auth;
 }
 
 async function jsonBody(request: Request) {
@@ -183,7 +287,7 @@ export async function handleAuthRequest(
   event: RequestEvent,
 ): Promise<Response> {
   const platform = getPlatform();
-  const auth = authFor(platform);
+  const auth = await authFor(platform);
   if (auth instanceof Response) return auth;
   const db = platform!.env!.DB!;
 
@@ -401,7 +505,7 @@ export async function requireAccount(
 ): Promise<
   { auth: Auth; user: { id: string; email: string; name: string } } | Response
 > {
-  const auth = authFor(getPlatform());
+  const auth = await authFor(getPlatform());
   if (auth instanceof Response) return auth;
   const session = await auth.api.getSession({
     // The iPhone app sends its session as a bearer token (see ./app-session)
@@ -423,7 +527,7 @@ export async function deleteAppAccount(
   appleAuthorizationCode?: unknown,
 ): Promise<'deleted' | 'not-fresh' | Response> {
   const platform = getPlatform();
-  const auth = authFor(platform);
+  const auth = await authFor(platform);
   if (auth instanceof Response) return auth;
   if (!bearerToken(event.request.headers))
     return Response.json({ message: 'Not signed in' }, { status: 401 });
@@ -482,7 +586,7 @@ export async function appleAppSession(
 ): Promise<AppSession | Response> {
   const platform = getPlatform();
   const settings = readAuthSettings(platform?.env);
-  const auth = authFor(platform);
+  const auth = await authFor(platform);
   if (auth instanceof Response) return auth;
   if (settings.status !== 'ready' || !settings.settings.apple?.appBundleId)
     return Response.json({ message: 'Not found' }, { status: 404 });
@@ -539,7 +643,7 @@ export async function appleAppSession(
 export async function appSessionContext(): Promise<
   AppSessionContext | Response
 > {
-  const auth = authFor(getPlatform());
+  const auth = await authFor(getPlatform());
   if (auth instanceof Response) return auth;
   return (await auth.$context) as unknown as AppSessionContext;
 }
@@ -552,7 +656,7 @@ export async function appSessionContext(): Promise<
 export async function browserAccount(
   event: RequestEvent,
 ): Promise<{ id: string; email: string; name: string } | null | Response> {
-  const auth = authFor(getPlatform());
+  const auth = await authFor(getPlatform());
   if (auth instanceof Response) return auth;
   if (bearerToken(event.request.headers)) return null;
   const session = await auth.api.getSession({
@@ -568,7 +672,7 @@ export async function browserAccount(
 export async function optionalAccount(
   event: RequestEvent,
 ): Promise<{ id: string; email: string; emailVerified: boolean } | null> {
-  const auth = authFor(getPlatform());
+  const auth = await authFor(getPlatform());
   if (auth instanceof Response) return null;
   try {
     const session = await auth.api.getSession({

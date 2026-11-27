@@ -137,17 +137,27 @@ describe('emailChangedNotice', () => {
     expect(notice.text).not.toContain('newname');
   });
 
-  it('turns Apple on for the website with its ID and secret, and for the app with its bundle ID', () => {
+  it('turns Apple on for the website with its ID and key, and for the app with its bundle ID', () => {
     const appleOf = (env: Record<string, string | undefined>) => {
       const result = readAuthSettings({ ...ready, ...env });
       return result.status === 'ready' ? result.settings.apple : 'not ready';
     };
     expect(appleOf({})).toBeUndefined();
+    const key = {
+      APPLE_TEAM_ID: 'TEAM',
+      APPLE_KEY_ID: 'KEY',
+      APPLE_PRIVATE_KEY: 'p8',
+    };
     expect(appleOf({ APPLE_CLIENT_ID: 'web.id' })).toBeUndefined();
+    expect(appleOf(key)).toBeUndefined();
     expect(
-      appleOf({ APPLE_CLIENT_ID: 'web.id', APPLE_CLIENT_SECRET: 'jwt' }),
-    ).toEqual({
-      web: { clientId: 'web.id', clientSecret: 'jwt' },
+      appleOf({ APPLE_CLIENT_ID: 'web.id', ...key, APPLE_KEY_ID: '' }),
+    ).toBeUndefined();
+    expect(appleOf({ APPLE_CLIENT_ID: 'web.id', ...key })).toEqual({
+      web: {
+        clientId: 'web.id',
+        key: { teamId: 'TEAM', keyId: 'KEY', privateKey: 'p8' },
+      },
       appBundleId: undefined,
     });
     expect(appleOf({ APPLE_APP_BUNDLE_ID: 'app.id' })).toEqual({
