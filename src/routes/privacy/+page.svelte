@@ -288,6 +288,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       </div>
 
+      <div class="flex flex-col gap-2">
+        <p class="text-xl font-bold">Reporting and blocking</p>
+        <p>
+          When you report a gallery page, the page, the reason you chose and
+          anything you write are kept so the developer can look at it, with your
+          email if you give one (signed out) or your account (signed in), so a
+          reply can be sent. The person who published the page isn’t told who
+          reported it. Your IP address is not stored with it; a count of recent
+          reports from each IP address is kept for about an hour to stop floods.
+          Reports are kept until they’ve been dealt with and are deleted with
+          your account. When you block someone, the page you blocked them from
+          is kept: in your account when signed in, or in this browser when
+          signed out. The person isn’t told. Unblock in
+          <a href="/preferences" class="link">Preferences</a>.
+        </p>
+      </div>
+
       {#if PUBLIC_KOFI_LINK}
         <div class="flex flex-col">
           <p class="text-xl font-bold">Supporter details</p>

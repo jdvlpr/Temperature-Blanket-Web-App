@@ -613,7 +613,11 @@ describe('publishing rules', () => {
     const { gallery, calls } = await setup(ok);
     const refused = await publishFromAccount(
       gallery,
-      payload(link, 'Shit weather'),
+      JSON.stringify({
+        project_url: link,
+        title: 'Somewhere',
+        project_name: 'Shit weather',
+      }),
     );
     expect(refused.status).toBe(400);
     expect((await refused.json()).code).toBe('NAME_NOT_ALLOWED');

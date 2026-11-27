@@ -127,7 +127,7 @@ export type ReportedPage = {
   /** Published from an account, so it can be hidden from here and its publisher stopped */
   hasPublisher: boolean;
   publishingStopped: boolean;
-  /** Already hidden (by the site's owner, or with its item in the Trash) */
+  /** Already hidden by the site's owner (not just with its item in the Trash, which a restore undoes) */
   hidden: boolean;
   newCount: number;
   lastAt: number;
@@ -147,7 +147,7 @@ type ReportRow = {
   status: ReportStatus;
   publisherId: string | null;
   title: string | null;
-  hiddenAt: number | null;
+  moderatedAt: number | null;
   postUserId: string | null;
   bannedAt: number | null;
 };
@@ -164,7 +164,7 @@ export async function listReportedPages(
 ): Promise<ReportedPage[]> {
   const { results } = await db
     .prepare(
-      `select r.*, u."email" as "accountEmail", p."title", p."hiddenAt",
+      `select r.*, u."email" as "accountEmail", p."title", p."moderatedAt",
          p."userId" as "postUserId", o."bannedAt"
        from "galleryReport" r
        left join "user" u on u."id" = r."userId"
@@ -187,7 +187,7 @@ export async function listReportedPages(
         title: row.title,
         hasPublisher: !!(row.postUserId ?? row.publisherId),
         publishingStopped: row.bannedAt !== null,
-        hidden: row.hiddenAt !== null,
+        hidden: row.moderatedAt !== null,
         newCount: 0,
         lastAt: row.createdAt,
         reports: [],

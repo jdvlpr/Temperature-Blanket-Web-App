@@ -233,8 +233,12 @@ export async function publishFromAccount(
     showOwner = existing.showOwner ?? false;
   }
 
-  for (const name of [payload.project_name, payload.title])
-    if (typeof name === 'string' && !nameAllowed(name)) return nameError();
+  // The name the person gave it (the title otherwise is its places' names)
+  if (
+    typeof payload.project_name === 'string' &&
+    !nameAllowed(payload.project_name)
+  )
+    return nameError();
   if (showOwner && !nameAllowed(gallery.name)) return displayNameError();
   if (postId === undefined) {
     const terms = await checkTerms(gallery, acceptTerms);

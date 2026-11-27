@@ -10,7 +10,13 @@ import {
   setReportsStatus,
   stopPublishing,
 } from './reports';
-import { getSettings, listPosts, postsForItem, recordPost } from './store';
+import {
+  getSettings,
+  listPosts,
+  postsForItem,
+  recordPost,
+  setPostHidden,
+} from './store';
 import { matchGalleryToItem } from './visibility';
 import type { GalleryApi } from './wordpress';
 
@@ -119,6 +125,18 @@ describe('gallery reports', () => {
       hidden: true,
       newCount: 0,
     });
+  });
+
+  it('lists a page hidden only with its item in the Trash as not hidden, and hides it for good', async () => {
+    const { d1, api } = await setup();
+    await setPostHidden(d1, 'ada', 1, 5);
+    await saveReport(d1, report(1), null);
+    expect((await listReportedPages(d1))[0].hidden).toBe(false);
+    expect(await hideReportedPage(d1, api, 1, 50)).toBe('hidden');
+    expect((await listReportedPages(d1))[0].hidden).toBe(true);
+    expect(await postsForItem(d1, 'ada', 'project', 'p1')).toEqual([
+      { postId: 1, hidden: true, moderated: true },
+    ]);
   });
 
   it('can’t hide a page published without an account from here', async () => {
