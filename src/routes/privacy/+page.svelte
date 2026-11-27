@@ -297,10 +297,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           reply can be sent. The person who published the page isn’t told who
           reported it. Your IP address is not stored with it; a count of recent
           reports from each IP address is kept for about an hour to stop floods.
-          Reports are kept until they’ve been dealt with and are deleted with
-          your account. When you block someone, the page you blocked them from
-          is kept: in your account when signed in, or in this browser when
-          signed out. The person isn’t told. Unblock in
+          Reports are kept for the developer’s records; deleting your account
+          removes your account from them. When you block someone, the page you
+          blocked them from is kept: in your account when signed in, or in this
+          browser when signed out. The person isn’t told. Unblock in
           <a href="/preferences" class="link">Preferences</a>.
         </p>
       </div>
