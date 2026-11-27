@@ -25,6 +25,8 @@ import { cleanName } from '#lib/utils/string-utils.js';
 import type { D1Database } from '@cloudflare/workers-types';
 import type { RequestEvent } from '@sveltejs/kit';
 import {
+  acceptTerms,
+  publishingStopped,
   countPalettesSince,
   postKind,
   renamePost,
@@ -40,6 +42,7 @@ import {
 } from './store';
 import { galleryApi, type GalleryApi, type PublishResponse } from './wordpress';
 import { getPlatform } from '#lib/server/cloudflare.js';
+import { NAME_NOT_ALLOWED, nameAllowed } from './words';
 
 const MAX_TITLE_LENGTH = 200;
 /** The plugin's limit too (TEMPBLANKET_PALETTE_MAX_TITLE_LENGTH) */
@@ -66,6 +69,45 @@ export const galleryError = (status: number, code: string, message: string) =>
     { code, message },
     { status, headers: { 'Cache-Control': 'no-store' } },
   );
+
+/** A publisher the site's owner stopped (Stop Publishing for This Person) */
+const stoppedError = () =>
+  galleryError(
+    403,
+    'PUBLISHING_STOPPED',
+    'Publishing to the Gallery has been stopped for this account',
+  );
+
+/** A name the gallery's word filter refuses */
+const nameError = () => galleryError(400, 'NAME_NOT_ALLOWED', NAME_NOT_ALLOWED);
+
+/** The display name shown on a page that shows its owner, when the filter refuses it */
+const displayNameError = () =>
+  galleryError(
+    400,
+    'NAME_NOT_ALLOWED',
+    'Please choose a different display name on your Account page.',
+  );
+
+/**
+ * A first page needs the Gallery terms (/terms) agreed to, once per account:
+ * recorded when `accept` is sent, else 403 TERMS_NOT_ACCEPTED.
+ */
+async function checkTerms(
+  gallery: GalleryContext,
+  accept: boolean,
+): Promise<Response | null> {
+  if ((await getSettings(gallery.db, gallery.userId)).termsAccepted)
+    return null;
+  if (!accept)
+    return galleryError(
+      403,
+      'TERMS_NOT_ACCEPTED',
+      'Agree to the Gallery terms to publish',
+    );
+  await acceptTerms(gallery.db, gallery.userId);
+  return null;
+}
 
 export type GalleryContext = {
   db: D1Database;
@@ -97,6 +139,9 @@ export async function requireGallery(
       'GALLERY_PAUSED',
       'Publishing from accounts is paused',
     );
+
+  if (publishing && (await publishingStopped(env.DB, account.user.id)))
+    return stoppedError();
 
   return {
     db: env.DB,
@@ -145,7 +190,11 @@ async function recordPublished(
 export async function publishFromAccount(
   gallery: GalleryContext,
   payloadText: string,
-  { showOwner = false, postId }: { showOwner?: boolean; postId?: number } = {},
+  {
+    showOwner = false,
+    postId,
+    acceptTerms = false,
+  }: { showOwner?: boolean; postId?: number; acceptTerms?: boolean } = {},
   now = Date.now(),
 ): Promise<Response> {
   let payload: {
@@ -182,6 +231,14 @@ export async function publishFromAccount(
     if (!existing)
       return galleryError(404, 'NOT_FOUND', 'No such gallery page');
     showOwner = existing.showOwner ?? false;
+  }
+
+  for (const name of [payload.project_name, payload.title])
+    if (typeof name === 'string' && !nameAllowed(name)) return nameError();
+  if (showOwner && !nameAllowed(gallery.name)) return displayNameError();
+  if (postId === undefined) {
+    const terms = await checkTerms(gallery, acceptTerms);
+    if (terms) return terms;
   }
 
   // Sharing palettes along with a project is no longer offered: never forward it
@@ -297,6 +354,11 @@ export async function publishPaletteFromAccount(
       'INVALID_REQUEST',
       'A palette needs a name and a Yarn Palette Creator link',
     );
+  if (!nameAllowed(title)) return nameError();
+  if (input.showOwner === true && !nameAllowed(gallery.name))
+    return displayNameError();
+  const terms = await checkTerms(gallery, input.acceptTerms === true);
+  if (terms) return terms;
 
   const paletteId =
     typeof input.paletteId === 'string' &&
@@ -347,6 +409,10 @@ export async function renamePaletteFromAccount(
   const name = cleanName(title, MAX_PALETTE_TITLE_LENGTH);
   if (!name)
     return galleryError(400, 'INVALID_REQUEST', 'A palette needs a name');
+  if (!nameAllowed(name)) return nameError();
+  // Renaming isn't a publish for requireGallery, so checked here
+  if (await publishingStopped(gallery.db, gallery.userId))
+    return stoppedError();
   // Ownership from the session, checked here before WordPress checks it again
   if ((await postKind(gallery.db, gallery.userId, postId)) !== 'palette')
     return galleryError(404, 'NOT_FOUND', 'No such gallery page');
@@ -405,6 +471,7 @@ export async function updatePaletteFromAccount(
       'INVALID_REQUEST',
       'A palette needs a name and a Yarn Palette Creator link',
     );
+  if (!nameAllowed(title)) return nameError();
   // Ownership from the session, checked here before WordPress checks it again
   if ((await postKind(gallery.db, gallery.userId, postId)) !== 'palette')
     return galleryError(404, 'NOT_FOUND', 'No such gallery page');

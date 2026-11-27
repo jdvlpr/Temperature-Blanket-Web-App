@@ -40,9 +40,10 @@ export async function matchGalleryToItem(
   now = Date.now(),
 ) {
   const posts = await postsForItem(db, userId, kind, itemId);
-  for (const { postId, hidden } of posts) {
+  for (const { postId, hidden, moderated } of posts) {
     if (state === 'live') {
-      if (!hidden) continue;
+      // Hidden by the site's owner after a report: it stays hidden
+      if (!hidden || moderated) continue;
       // Emptied from WordPress's trash meanwhile: the item comes back unpublished
       if ((await api.restore(postId, userId)) === 'gone')
         await forgetPost(db, userId, postId);

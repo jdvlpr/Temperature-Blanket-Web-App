@@ -14,7 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // Shares one of the signed-in user's palettes to the gallery (POST
-// { paletteId, title, yarnUrl }). There's no anonymous route for palettes.
+// { paletteId, title, yarnUrl, showOwner, acceptTerms }: acceptTerms the first
+// time, as for projects). There's no anonymous route for palettes.
 
 import type { RequestHandler } from './$types';
 import { lastingOrigin } from '#lib/constants/site.js';

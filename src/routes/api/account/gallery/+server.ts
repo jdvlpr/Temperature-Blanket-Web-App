@@ -16,7 +16,11 @@
 // The signed-in user's gallery pages: list them with the gallery settings and
 // whether publishing is on (GET),
 // publish one (POST, the same payload as /api/project, with ?showOwner=true to
-// include it on the owner's public gallery) or change settings (PATCH).
+// include it on the owner's public gallery, and ?acceptTerms=true the first
+// time: 403 TERMS_NOT_ACCEPTED until the account has agreed to /terms) or
+// change settings (PATCH). Publishing answers 403 PUBLISHING_STOPPED for an
+// account the site's owner stopped, and 400 NAME_NOT_ALLOWED for a name the
+// gallery's word filter refuses.
 
 import type { RequestHandler } from './$types';
 import { getPlatform } from '#lib/server/cloudflare.js';
@@ -53,8 +57,11 @@ export const POST: RequestHandler = async (event) => {
 
   // In the URL, so the payload goes to WordPress exactly as the browser sent it
   const showOwner = event.url.searchParams.get('showOwner') === 'true';
+  // Agreed to the Gallery terms in the Publish dialog (asked at the first publish)
+  const acceptTerms = event.url.searchParams.get('acceptTerms') === 'true';
   return publishFromAccount(gallery, await event.request.text(), {
     showOwner,
+    acceptTerms,
   });
 };
 

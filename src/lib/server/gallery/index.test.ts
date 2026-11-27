@@ -11,6 +11,7 @@ import {
   type GalleryContext,
 } from './index';
 import {
+  acceptTerms,
   getSettings,
   listPosts,
   PUBLIC_ID_PATTERN,
@@ -42,7 +43,10 @@ function fakeWordPress(answer: (call: Call) => Response) {
   return { api, calls };
 }
 
-async function setup(answer: (call: Call) => Response) {
+async function setup(
+  answer: (call: Call) => Response,
+  { termsAccepted = true } = {},
+) {
   const { d1, sqlite } = createTestD1();
   const now = new Date().toISOString();
   sqlite.exec(
@@ -58,9 +62,15 @@ async function setup(answer: (call: Call) => Response) {
         `insert into "project" values ('u1', ?, 1, ?, 1, 1, 1, 10, 'Saved title', null, null)`,
       )
       .run(id, deletedAt);
+  if (termsAccepted) await acceptTerms(d1, 'u1', 1);
   const wordpress = fakeWordPress(answer);
-  const gallery: GalleryContext = { db: d1, userId: 'u1', api: wordpress.api };
-  return { d1, gallery, calls: wordpress.calls };
+  const gallery: GalleryContext = {
+    db: d1,
+    userId: 'u1',
+    name: 'Ada',
+    api: wordpress.api,
+  };
+  return { d1, gallery, calls: wordpress.calls, sqlite };
 }
 
 const payload = (projectUrl: string, title = 'Somewhere from 2025 to 2026') =>
@@ -569,5 +579,66 @@ describe('palettes sent with a project', () => {
     );
     expect(JSON.parse(calls[0].body)).not.toHaveProperty('share_palettes');
     expect((await listPosts(d1, 'u1')).map((p) => p.postId)).toEqual([50]);
+  });
+});
+
+describe('publishing rules', () => {
+  const ok = () => answered({ code: 200, id: 55 });
+  const link = 'https://temperature-blanket.com/?project=p1';
+
+  it('asks for the Gallery terms at the first publish, then not again', async () => {
+    const { d1, gallery, calls } = await setup(ok, { termsAccepted: false });
+    const refused = await publishFromAccount(gallery, payload(link));
+    expect(refused.status).toBe(403);
+    expect((await refused.json()).code).toBe('TERMS_NOT_ACCEPTED');
+    expect(calls).toEqual([]);
+
+    expect(
+      (await publishFromAccount(gallery, payload(link), { acceptTerms: true }))
+        .status,
+    ).toBe(200);
+    expect((await getSettings(d1, 'u1')).termsAccepted).toBe(true);
+    const palette = await publishPaletteFromAccount(
+      gallery,
+      {
+        title: 'Autumn',
+        yarnUrl: 'https://temperature-blanket.com/yarn?s=1',
+      },
+      'https://temperature-blanket.com',
+    );
+    expect(palette.status).toBe(200);
+  });
+
+  it('refuses names the word filter catches, and a display name on a page showing it', async () => {
+    const { gallery, calls } = await setup(ok);
+    const refused = await publishFromAccount(
+      gallery,
+      payload(link, 'Shit weather'),
+    );
+    expect(refused.status).toBe(400);
+    expect((await refused.json()).code).toBe('NAME_NOT_ALLOWED');
+
+    const named = { ...gallery, name: 'Fucker' };
+    expect(
+      (await publishFromAccount(named, payload(link), { showOwner: true }))
+        .status,
+    ).toBe(400);
+    // Anonymous, the name isn't shown
+    expect((await publishFromAccount(named, payload(link))).status).toBe(200);
+    expect(calls).toHaveLength(1);
+
+    expect(
+      (await renamePaletteFromAccount(gallery, 1, 'Whore colors')).status,
+    ).toBe(400);
+  });
+
+  it('refuses renaming once publishing is stopped', async () => {
+    const { gallery, sqlite } = await setup(ok);
+    sqlite.exec(
+      `update "galleryOwner" set "bannedAt" = 9 where "userId" = 'u1'`,
+    );
+    const refused = await renamePaletteFromAccount(gallery, 1, 'Autumn');
+    expect(refused.status).toBe(403);
+    expect((await refused.json()).code).toBe('PUBLISHING_STOPPED');
   });
 });

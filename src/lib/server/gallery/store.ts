@@ -17,6 +17,7 @@
 // The pages themselves live on WordPress.
 
 import type { D1Database } from '@cloudflare/workers-types';
+import { nameAllowed } from './words';
 
 export type GalleryPostKind = 'project' | 'palette';
 
@@ -291,23 +292,32 @@ export async function projectPage(
   return row ? { postId: row.postId, showOwner: row.showOwner === 1 } : null;
 }
 
-/** A project's or palette's pages, live or hidden, for hiding or restoring them with it. */
+/**
+ * A project's or palette's pages, live or hidden, for hiding or restoring them
+ * with it. `moderated`: hidden by the site's owner after a report (migration
+ * 0018), never brought back with its item.
+ */
 export async function postsForItem(
   db: D1Database,
   userId: string,
   kind: GalleryPostKind,
   itemId: string,
-): Promise<{ postId: number; hidden: boolean }[]> {
+): Promise<{ postId: number; hidden: boolean; moderated: boolean }[]> {
   const { results } = await db
     .prepare(
-      `select "postId", "hiddenAt" from "galleryPost"
+      `select "postId", "hiddenAt", "moderatedAt" from "galleryPost"
        where "userId" = ? and "projectId" = ? and coalesce("kind", 'project') = ?`,
     )
     .bind(userId, itemId, kind)
-    .all<{ postId: number; hiddenAt: number | null }>();
+    .all<{
+      postId: number;
+      hiddenAt: number | null;
+      moderatedAt: number | null;
+    }>();
   return results.map((r) => ({
     postId: r.postId,
     hidden: r.hiddenAt !== null,
+    moderated: r.moderatedAt !== null,
   }));
 }
 
@@ -326,9 +336,15 @@ export async function setPostHidden(
     .run();
 }
 
-/** The settings, and the owner page's ID once a page has shown their name. */
+/**
+ * The settings, the owner page's ID once a page has shown their name, whether
+ * they've agreed to the Gallery terms (/terms, asked at their first publish) and
+ * whether the site's owner stopped them publishing (migration 0018).
+ */
 export type GalleryOwnerSettings = GallerySettings & {
   publicId: string | null;
+  termsAccepted: boolean;
+  publishingStopped: boolean;
 };
 
 const PUBLIC_ID_ALPHABET =
@@ -357,21 +373,31 @@ export async function getSettings(
   const row = await db
     .prepare(
       // The column kept its old name (migration 0009)
-      `select "showName" as "showOwnerDefault", "removeOnDelete", "publicId" from "galleryOwner" where "userId" = ?`,
+      `select "showName" as "showOwnerDefault", "removeOnDelete", "publicId",
+         "termsAcceptedAt", "bannedAt" from "galleryOwner" where "userId" = ?`,
     )
     .bind(userId)
     .first<{
       showOwnerDefault: number;
       removeOnDelete: number;
       publicId: string | null;
+      termsAcceptedAt: number | null;
+      bannedAt: number | null;
     }>();
   return row
     ? {
         showOwnerDefault: row.showOwnerDefault === 1,
         removeOnDelete: row.removeOnDelete === 1,
         publicId: row.publicId,
+        termsAccepted: row.termsAcceptedAt !== null,
+        publishingStopped: row.bannedAt !== null,
       }
-    : { ...DEFAULT_SETTINGS, publicId: null };
+    : {
+        ...DEFAULT_SETTINGS,
+        publicId: null,
+        termsAccepted: false,
+        publishingStopped: false,
+      };
 }
 
 /**
@@ -420,6 +446,34 @@ export async function ensurePublicId(
   return (await getSettings(db, userId)).publicId!;
 }
 
+/** Records that the account agreed to the Gallery terms (once; the first time is kept) */
+export async function acceptTerms(
+  db: D1Database,
+  userId: string,
+  now = Date.now(),
+) {
+  await db
+    .prepare(
+      `insert into "galleryOwner" ("userId", "termsAcceptedAt") values (?, ?)
+       on conflict ("userId") do update set
+         "termsAcceptedAt" = coalesce("galleryOwner"."termsAcceptedAt", excluded."termsAcceptedAt")`,
+    )
+    .bind(userId, now)
+    .run();
+}
+
+/** Whether the site's owner stopped this account publishing */
+export async function publishingStopped(
+  db: D1Database,
+  userId: string,
+): Promise<boolean> {
+  const row = await db
+    .prepare(`select "bannedAt" from "galleryOwner" where "userId" = ?`)
+    .bind(userId)
+    .first<{ bannedAt: number | null }>();
+  return row?.bannedAt != null;
+}
+
 export type GalleryOwner = { name: string; publicId: string };
 
 // Owners with an owner page and a name to show
@@ -445,7 +499,10 @@ export async function ownerForPost(
     )
     .bind(postId)
     .first<GalleryOwner>();
-  return row ? { name: row.name.trim(), publicId: row.publicId } : null;
+  // A display name the gallery's name filter refuses shows as no name
+  return row && nameAllowed(row.name)
+    ? { name: row.name.trim(), publicId: row.publicId }
+    : null;
 }
 
 /** As `ownerForPost`, for a page of gallery cards (at most 100): only those with an owner to show. */
@@ -469,10 +526,12 @@ export async function ownersForPosts(
     .bind(...ids)
     .all<GalleryOwner & { postId: number }>();
   return Object.fromEntries(
-    results.map((row) => [
-      row.postId,
-      { name: row.name.trim(), publicId: row.publicId },
-    ]),
+    results
+      .filter((row) => nameAllowed(row.name))
+      .map((row) => [
+        row.postId,
+        { name: row.name.trim(), publicId: row.publicId },
+      ]),
   );
 }
 
@@ -496,7 +555,7 @@ export async function ownerPage(
     )
     .bind(publicId)
     .first<{ userId: string; name: string }>();
-  if (!owner) return null;
+  if (!owner || !nameAllowed(owner.name)) return null;
   const posts = (await listPosts(db, owner.userId)).filter((p) => p.showOwner);
   if (!posts.length) return null;
   const ids = (kind: GalleryPostKind) =>

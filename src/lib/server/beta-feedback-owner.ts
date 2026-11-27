@@ -13,7 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The site's owner, for reading the beta's feedback: signed in with an
+// The site's owner, for reading the beta's feedback and gallery reports
+// (/gallery/reports): signed in with an
 // account whose verified email is in BETA_FEEDBACK_OWNERS.
 
 import type { RequestEvent } from '@sveltejs/kit';
@@ -37,7 +38,7 @@ export async function requireFeedbackOwner(
     );
   if (!env?.DB || !isFeedbackOwner(user, env.BETA_FEEDBACK_OWNERS))
     return Response.json(
-      { code: 'NOT_OWNER', message: 'Only the site’s owner can read feedback' },
+      { code: 'NOT_OWNER', message: 'Only the site’s owner can do this' },
       { status: 403, headers: PRIVATE },
     );
   return { db: env.DB };

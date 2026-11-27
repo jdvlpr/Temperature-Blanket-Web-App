@@ -68,6 +68,8 @@ describe('gallery store', () => {
       showOwnerDefault: false,
       removeOnDelete: false,
       publicId: null,
+      termsAccepted: false,
+      publishingStopped: false,
     });
     await updateSettings(d1, 'u1', { showOwnerDefault: true });
     expect(
@@ -77,6 +79,8 @@ describe('gallery store', () => {
       showOwnerDefault: false,
       removeOnDelete: false,
       publicId: null,
+      termsAccepted: false,
+      publishingStopped: false,
     });
   });
 
@@ -176,6 +180,8 @@ describe('gallery store', () => {
       showOwnerDefault: false,
       removeOnDelete: true,
       publicId,
+      termsAccepted: false,
+      publishingStopped: false,
     });
   });
 

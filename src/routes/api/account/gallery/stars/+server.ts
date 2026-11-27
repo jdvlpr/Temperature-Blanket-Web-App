@@ -14,7 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 // The signed-in user's stars: gallery pages they starred to find again. List
-// them with the user's own pages, which can't be starred (GET), star one (PUT { postId, kind }) or unstar it (DELETE { postId }).
+// them with the user's own pages, which can't be starred, and the pages of
+// people they blocked (GET), star one (PUT { postId, kind }) or unstar it (DELETE { postId }).
 // Private, and one D1 request each: never WordPress, never a view.
 
 import type { RequestHandler } from './$types';
@@ -36,8 +37,14 @@ export const GET: RequestHandler = async (event) => {
   const gallery = await requireGallery(event);
   if (gallery instanceof Response) return gallery;
 
-  const { stars, own } = await listStarsAndOwn(gallery.db, gallery.userId);
-  return Response.json({ stars, own }, { headers: PRIVATE });
+  const { hiddenPostIds } = await import('#lib/server/gallery/blocks.js');
+  const [{ stars, own }, blocked] = await Promise.all([
+    listStarsAndOwn(gallery.db, gallery.userId),
+    // The pages of people they blocked, so the cards that load stars leave
+    // them out without asking again
+    hiddenPostIds(gallery.db, { userId: gallery.userId }),
+  ]);
+  return Response.json({ stars, own, blocked }, { headers: PRIVATE });
 };
 
 export const PUT: RequestHandler = async (event) => {
