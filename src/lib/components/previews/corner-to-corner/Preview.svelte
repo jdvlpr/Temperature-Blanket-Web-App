@@ -122,7 +122,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         squareIndex < cornerToCornerPreview.settings.lineLength;
         squareIndex++
       ) {
-        y -= cornerToCornerPreview.STITCH_SIZE;
         section.push({
           x,
           y,
@@ -131,7 +130,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           color,
           dayIndex,
         });
-        y += cornerToCornerPreview.STITCH_SIZE;
         const props: CornerProps = { x, y, row };
         const newX = getX(props);
         const newY = getY(props);

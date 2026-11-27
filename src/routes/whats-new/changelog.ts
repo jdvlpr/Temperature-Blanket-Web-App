@@ -39,6 +39,18 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
+                instructions: `If you're partway through a Corner to Corner project, look over the top row of your preview: it now shows the last days' squares.`,
+                tag: 'fix',
+                text: `The Corner to Corner preview left out its top row, so it looked one row short and the last days were missing squares. Now every row shows.`,
+                title: 'Corner to Corner Top Row Fixed',
+              },
+            ],
+            version: '7.0.5',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.wrench,
                 instructions: `If you're partway through a Continuous Square, look over your pattern: the number of rounds and accent stitches may change. Projects using the Month Rows preview keep the same colors in the same order; only the height of the preview image changes.`,
                 tag: 'fix',
                 text: `For the Continuous Square preview, the first day was only one stitch and the second was a stitch short. Now every day has the number of stitches you chose. For the Month Rows preview, with two or more weather values the picture drew each day's rows twice, so every month looked twice as tall as it really is. Now each day is one row per value.`,
