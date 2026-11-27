@@ -36,11 +36,17 @@ async function loadAccount(event: RequestEvent) {
 
 export const load: PageServerLoad = async (event) => {
   const { account, challenge } = await loadAccount(event);
-  if (!account)
+  if (!account) {
+    // The app's Continue with Google: the sign-in page starts Google itself
+    const provider =
+      event.url.searchParams.get('provider') === 'google'
+        ? '&provider=google'
+        : '';
     redirect(
       303,
-      `/auth/sign-in?redirect=${encodeURIComponent(`/app-sign-in?challenge=${challenge}`)}`,
+      `/auth/sign-in?redirect=${encodeURIComponent(`/app-sign-in?challenge=${challenge}`)}${provider}`,
     );
+  }
   // Never cached: it shows who's signed in
   event.setHeaders({ 'Cache-Control': 'no-store' });
   return { name: account.name, email: account.email };

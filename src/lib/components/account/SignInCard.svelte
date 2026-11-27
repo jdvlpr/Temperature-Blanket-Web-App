@@ -116,10 +116,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     ready = true;
     // A failed provider sign-in returns with ?error=
-    const error = new URL(window.location.href).searchParams.get('error');
+    const params = new URL(window.location.href).searchParams;
+    const error = params.get('error');
     if (error) errorMessage = providerErrorMessage(error);
     providers = await getSignInOptions();
     providersLoaded = true;
+    // The app's Continue with Google goes straight on to Google; after a
+    // failed try (?error=) the page waits, so it never loops
+    if (
+      forApp &&
+      !error &&
+      params.get('provider') === 'google' &&
+      providers.google
+    )
+      await continueWith('google');
   });
 
   async function openEmail() {

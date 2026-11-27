@@ -506,10 +506,12 @@ export async function handleAuthRequest(
  * The signed-in user for an app route under /api/account, with the auth
  * instance for further calls. A Response (404, 503 or 401) when there's none.
  */
-export async function requireAccount(
-  event: RequestEvent,
-): Promise<
-  { auth: Auth; user: { id: string; email: string; name: string } } | Response
+export async function requireAccount(event: RequestEvent): Promise<
+  | {
+      auth: Auth;
+      user: { id: string; email: string; name: string; createdAt: Date };
+    }
+  | Response
 > {
   const auth = await authFor(getPlatform());
   if (auth instanceof Response) return auth;

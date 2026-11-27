@@ -163,8 +163,69 @@ test('signed out, the page goes to sign in and comes back', async ({
   expect(response.headers().location).toBe(
     `/auth/sign-in?redirect=${encodeURIComponent(`/app-sign-in?challenge=${challenge}`)}`,
   );
+  // The app's Continue with Google: passed on, so the page starts Google
+  const google = await visitor.get(
+    `/app-sign-in?challenge=${challenge}&provider=google`,
+    { maxRedirects: 0 },
+  );
+  expect(google.headers().location).toBe(
+    `/auth/sign-in?redirect=${encodeURIComponent(`/app-sign-in?challenge=${challenge}`)}&provider=google`,
+  );
   // Not opened by the app
   expect((await visitor.get('/app-sign-in')).status()).toBe(400);
+});
+
+test('the app renames the account and signs out everywhere', async ({
+  baseURL,
+}) => {
+  const email = uniqueEmail('app-rename');
+  const browser = await signedInBrowser(baseURL!, email);
+  const app = await playwrightRequest.newContext({ baseURL });
+  const verifier = secret();
+  const code = await codeFor(browser, challengeOf(verifier));
+  const session = await (
+    await app.post('/api/account/app-session', { data: { code, verifier } })
+  ).json();
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${session.token}`,
+  };
+
+  const me = await (
+    await app.get('/api/account/app-session', { headers })
+  ).json();
+  expect(Date.parse(me.user.createdAt)).toBeLessThanOrEqual(Date.now());
+
+  const renamed = await app.patch('/api/account/app-session', {
+    headers,
+    data: { name: '  Purl   Jam ' },
+  });
+  expect(renamed.status()).toBe(200);
+  expect((await renamed.json()).user.name).toBe('Purl Jam');
+  const tooLong = await app.patch('/api/account/app-session', {
+    headers,
+    data: { name: 'x'.repeat(81) },
+  });
+  expect(tooLong.status()).toBe(400);
+  expect((await tooLong.json()).code).toBe('NAME_TOO_LONG');
+  // Only the app's bearer session: a browser uses Better Auth's own
+  expect(
+    (
+      await browser.patch('/api/account/app-session', {
+        headers: { 'Content-Type': 'application/json' },
+        data: { name: 'Nope' },
+      })
+    ).status(),
+  ).toBe(401);
+
+  const out = await app.delete('/api/account/app-session?everywhere=1', {
+    headers,
+  });
+  expect(out.status()).toBe(204);
+  expect(
+    (await app.get('/api/account/app-session', { headers })).status(),
+  ).toBe(401);
+  expect((await browser.get('/api/sync/changes?since=0')).status()).toBe(401);
 });
 
 test('the app deletes its account, signing out everywhere', async ({
