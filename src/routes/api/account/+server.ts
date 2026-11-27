@@ -16,9 +16,14 @@
 // The iPhone app's Delete Account (the website's account page uses Better
 // Auth's /api/auth/delete-user).
 //
-//   DELETE (Bearer) → 204                              deleted, with every session
+//   DELETE (Bearer) { appleAuthorizationCode? }
+//                   → 204                              deleted, with every session
 //                   → 403 { code: 'SESSION_NOT_FRESH' } sign in again first
 //                   → 401                               not signed in
+//
+// appleAuthorizationCode: from the Sign in with Apple sheet the app shows to
+// confirm the delete, for an account that signs in with Apple. With it the
+// app is also taken off the person's Apple ID.
 
 import type { RequestHandler } from './$types';
 
@@ -28,7 +33,8 @@ const NO_STORE = { 'Cache-Control': 'no-store' };
 
 export const DELETE: RequestHandler = async (event) => {
   const { deleteAppAccount } = await import('#lib/server/auth/index.js');
-  const result = await deleteAppAccount(event);
+  const body = await event.request.json().catch(() => null);
+  const result = await deleteAppAccount(event, body?.appleAuthorizationCode);
   if (result instanceof Response) return result;
   if (result === 'not-fresh')
     return Response.json(

@@ -33,6 +33,14 @@ declare global {
         // Linking a Ravelry account (never a way to sign in); secrets in .dev.vars / the dashboard
         RAVELRY_CLIENT_ID?: string;
         RAVELRY_CLIENT_SECRET?: string;
+        // Sign in with Apple: the iPhone app's bundle ID; the website's Services ID and secret;
+        // the Team ID and Sign in with Apple key (.p8 text, a secret) that revoke it on Delete Account
+        APPLE_APP_BUNDLE_ID?: string;
+        APPLE_CLIENT_ID?: string;
+        APPLE_CLIENT_SECRET?: string;
+        APPLE_TEAM_ID?: string;
+        APPLE_KEY_ID?: string;
+        APPLE_PRIVATE_KEY?: string;
         SYNC_ENABLED?: string;
         GALLERY_PUBLISH_ENABLED?: string;
         // Checks guests' gallery submissions (/api/project); without it, they're refused

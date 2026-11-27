@@ -50,6 +50,10 @@ import {
   SIGN_UPS_PAUSED,
 } from './options';
 import { emailSignInOn, readAuthSettings } from './settings';
+import {
+  readAppleRevokeSettings,
+  revokeAppleAuthorization,
+} from './apple-revoke';
 import { hasAccount, readSignUpLimit, signUpsOpen } from './sign-up-limit';
 import { getPlatform } from '#lib/server/cloudflare.js';
 
@@ -416,6 +420,7 @@ export async function requireAccount(
  */
 export async function deleteAppAccount(
   event: RequestEvent,
+  appleAuthorizationCode?: unknown,
 ): Promise<'deleted' | 'not-fresh' | Response> {
   const platform = getPlatform();
   const auth = authFor(platform);
@@ -430,7 +435,6 @@ export async function deleteAppAccount(
         headers: withBearerSession(event.request.headers),
         body: {},
       });
-      return 'deleted' as const;
     } catch (e) {
       if (e instanceof APIError) {
         if (e.body?.code === 'SESSION_EXPIRED') return 'not-fresh' as const;
@@ -439,6 +443,21 @@ export async function deleteAppAccount(
       }
       throw e;
     }
+    // Signed in with Apple: take the app off the person's Apple ID too. The
+    // account is gone either way, so a refusal from Apple is only logged.
+    const apple = readAppleRevokeSettings(platform?.env);
+    if (
+      apple &&
+      typeof appleAuthorizationCode === 'string' &&
+      appleAuthorizationCode
+    )
+      await revokeAppleAuthorization(apple, appleAuthorizationCode).catch((e) =>
+        console.error(
+          "Couldn't revoke Sign in with Apple on Delete Account",
+          e,
+        ),
+      );
+    return 'deleted' as const;
   });
 }
 
