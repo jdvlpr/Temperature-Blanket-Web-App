@@ -146,7 +146,7 @@ describe('emailChangedNotice', () => {
     const key = {
       APPLE_TEAM_ID: 'TEAM',
       APPLE_KEY_ID: 'KEY',
-      APPLE_PRIVATE_KEY: 'p8',
+      APPLE_PRIVATE_KEY: 'cDg=',
     };
     expect(appleOf({ APPLE_CLIENT_ID: 'web.id' })).toBeUndefined();
     expect(appleOf(key)).toBeUndefined();
@@ -156,10 +156,19 @@ describe('emailChangedNotice', () => {
     expect(appleOf({ APPLE_CLIENT_ID: 'web.id', ...key })).toEqual({
       web: {
         clientId: 'web.id',
-        key: { teamId: 'TEAM', keyId: 'KEY', privateKey: 'p8' },
+        key: { teamId: 'TEAM', keyId: 'KEY', privateKey: 'cDg=' },
       },
       appBundleId: undefined,
     });
+    // A key pasted with a stray character leaves the website half off
+    expect(
+      appleOf({
+        APPLE_CLIENT_ID: 'web.id',
+        ...key,
+        APPLE_PRIVATE_KEY:
+          '-----BEGIN PRIVATE KEY-----\\ncDg=\\n-----END PRIVATE KEY-----\\n%',
+      }),
+    ).toBeUndefined();
     expect(appleOf({ APPLE_APP_BUNDLE_ID: 'app.id' })).toEqual({
       web: undefined,
       appBundleId: 'app.id',

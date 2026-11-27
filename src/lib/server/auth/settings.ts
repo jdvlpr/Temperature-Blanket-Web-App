@@ -15,6 +15,7 @@
 
 import { emailConfigProblem, type EmailEnv } from '#lib/server/email/index.js';
 import {
+  appleKeyReadable,
   readAppleKey,
   type AppleKey,
   type AppleRevokeEnv,
@@ -138,8 +139,13 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
   // its bundle ID. Without the key the website half stays off; Google still works
   const appleKey = readAppleKey(env);
   const appleClientId = env.APPLE_CLIENT_ID?.trim();
+  const appleKeyOk = !!appleKey && appleKeyReadable(appleKey.privateKey);
+  if (appleClientId && appleKey && !appleKeyOk)
+    console.warn(
+      'APPLE_PRIVATE_KEY isn’t a readable .p8 key, so Continue with Apple is off on the website',
+    );
   const appleWeb =
-    appleClientId && appleKey
+    appleClientId && appleKey && appleKeyOk
       ? { clientId: appleClientId, key: appleKey }
       : undefined;
   const appleApp = env.APPLE_APP_BUNDLE_ID || undefined;

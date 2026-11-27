@@ -42,7 +42,7 @@
     // wrangler.production.jsonc, with BETTER_AUTH_SECRET as a Worker secret.
     "ACCOUNTS_ENABLED": "true",
     "BETTER_AUTH_SECRET": "local-development-secret-do-not-use-in-production",
-    "AUTH_ALLOWED_HOSTS": "localhost:5173,localhost:4173,localhost:8788,*.ts.net:5173",
+    "AUTH_ALLOWED_HOSTS": "localhost:5173,localhost:4173,localhost:8788,*.ts.net:5173,*.ts.net",
     "AUTH_PROTOCOL": "auto",
     // ACCOUNTS_SIGNUP_LIMIT (a number, 0 = closed) would cap how many accounts there may be.
     // Project sync, for every account.

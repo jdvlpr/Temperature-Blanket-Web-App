@@ -85,6 +85,18 @@ function pkcs8(pem: string): Uint8Array<ArrayBuffer> {
 export const APPLE_SECRET_MAX_SECONDS = 15_777_000;
 
 /**
+ * Whether the key text decodes at all: catches a paste with stray characters
+ * (a shell's "%" at the end, say) before it's used to sign
+ */
+export function appleKeyReadable(privateKey: string): boolean {
+  try {
+    return pkcs8(privateKey).length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * The client secret Apple's token endpoints want: an ES256 JWT signed with the
  * Sign in with Apple key, for `lifetimeSeconds` (5 minutes unless asked).
  * WebCrypto's ECDSA signature is already the r‖s form JWTs use.
