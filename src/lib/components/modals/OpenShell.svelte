@@ -15,16 +15,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- The Project and Palette menus' Open screen, around what each lists: Mine
 | Starred (signed in), a search field, then the saved ones (`mine`, given
-the search) or the starred gallery pages, opened as copies; My Library at the
-foot. -->
+the search) or the starred gallery pages, opened as copies; at the foot, My
+Library (Mine) or the Gallery with Starred on (Starred). -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
   import { account } from '#lib/accounts/summary.svelte.js';
   import LibraryScope from '#lib/components/LibraryScope.svelte';
   import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
   import { FIELD_GROUP } from '#lib/constants/class-constants.js';
   import { LibraryFilters } from '#lib/state/library-filters.svelte.js';
+  import { withStarred } from '#lib/state/library-scope.js';
   import type { GalleryPalette } from '#lib/utils/color-utils.js';
   import { ArrowRightIcon, SearchIcon, XIcon } from '@lucide/svelte';
   import type { Snippet } from 'svelte';
@@ -61,6 +63,12 @@ foot. -->
   $effect(() => {
     if (signedIn) return galleryStars.start();
   });
+  // Starred ones are in the Gallery, under its Starred toggle
+  const starredHref = $derived(
+    withStarred(
+      kind === 'project' ? resolve('/gallery') : resolve('/gallery/palettes'),
+    ),
+  );
   const starredCount = $derived(
     signedIn && galleryStars.loaded ? galleryStars.list(kind).length : null,
   );
@@ -118,7 +126,20 @@ foot. -->
     {@render mine(filters.search)}
   {/if}
 
-  <a href={libraryHref} class="link inline-flex items-center gap-1 self-start">
-    Open My Library <ArrowRightIcon class="icon-sm" />
-  </a>
+  {#if starred}
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved above -->
+    <a
+      href={starredHref}
+      class="link inline-flex items-center gap-1 self-start"
+    >
+      Open Starred in the Gallery <ArrowRightIcon class="icon-sm" />
+    </a>
+  {:else}
+    <a
+      href={libraryHref}
+      class="link inline-flex items-center gap-1 self-start"
+    >
+      Open My Library <ArrowRightIcon class="icon-sm" />
+    </a>
+  {/if}
 </div>
