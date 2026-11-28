@@ -21,10 +21,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CollectionNav from '#lib/components/CollectionNav.svelte';
   import YarnPaletteGallery from '#lib/components/YarnPaletteGallery.svelte';
   import { gallerySection } from '#lib/storage/library-section.svelte.js';
+  import { replaceState } from '$app/navigation';
+  import { page } from '$app/state';
+  import { galleryFilters } from '#lib/state/gallery-state.svelte.js';
+  import { showsStarred, withoutStarred } from '#lib/state/library-scope.js';
   import { onMount } from 'svelte';
 
-  // The sidebar's Gallery link comes back to this side next time
-  onMount(() => (gallerySection.value = 'palettes'));
+  // Starred from the link, before the gallery asks for its first page
+  const starredLink = showsStarred(page.url);
+  if (starredLink) galleryFilters.starred = true;
+
+  onMount(() => {
+    // The sidebar's Gallery link comes back to this side next time
+    gallerySection.value = 'palettes';
+    if (starredLink) replaceState(withoutStarred(page.url), page.state);
+  });
 </script>
 
 <svelte:head>

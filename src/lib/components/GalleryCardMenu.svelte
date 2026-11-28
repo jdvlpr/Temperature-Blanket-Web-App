@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Beside a gallery card's name (in the Gallery, an owner's gallery and My
-  Library's Starred): its star, then its ⋮ menu. Someone else's page: Open a
+  Beside a gallery card's name (in the Gallery, its Starred, and an owner's
+  gallery): its star, then its ⋮ menu. Someone else's page: Open a
   Copy, More by <name> (when their name shows) and Copy Link. One of the
   account's own pages, no star: Copy Link and Edit Gallery Page…, which looks
   up the account's pages only when chosen. Own pages are known from the stars

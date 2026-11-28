@@ -19,7 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   matches (the Gallery asks the server on `onchange`, My Library filters what's
   saved here). Search always shows; Show (`statuses`), Yarn, Pattern Type and
   `filters` sit behind the Filters button, open while any are on, and show as
-  removable chips while closed. Sort, View, then Filters last, so the panel
+  removable chips while closed. With `starred` bound (the Gallery, signed
+  in), a Starred toggle comes first: only the pages starred, with its own
+  chip, apart from the filters (not counted, nor cleared). Sort, View, then Filters last, so the panel
   always opens right below the button, even when the row wraps on phones. With `showFilters` off, only View and the page's actions show, for
   short lists.
 -->
@@ -39,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     EyeIcon,
     Grid3x3,
     SearchIcon,
+    StarIcon,
     XIcon,
   } from '@lucide/svelte';
   import { untrack, type ComponentProps, type Snippet } from 'svelte';
@@ -55,6 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onlyThisYarn = $bindable(false),
     patternType = $bindable<string | undefined>(),
     status = $bindable<S | undefined>(),
+    starred = $bindable<boolean | undefined>(),
     statuses,
     sortOptions,
     sort,
@@ -83,6 +87,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onlyThisYarn?: boolean;
     /** Offers the pattern filter when bound (projects) */
     patternType?: string;
+    /** Offers the Starred toggle when bound to a boolean */
+    starred?: boolean;
     /** Offers the Show filter with these choices; the first shows all */
     status?: S;
     statuses?: readonly { value: S; label: string }[];
@@ -132,6 +138,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Open while a filter is on, e.g. arriving from a yarn link
   let open = $state(untrack(() => activeCount > 0));
   let filtersButton = $state<FiltersButton>();
+  let starButton = $state<HTMLButtonElement>();
+  /** The chip removed was Starred's: back to its toggle, not to Filters */
+  let starChipRemoved = false;
+
+  const starChip = $derived(
+    starred
+      ? [
+          {
+            label: 'Starred',
+            remove: () => {
+              starred = false;
+              starChipRemoved = true;
+            },
+          },
+        ]
+      : [],
+  );
 
   const chips = $derived([
     ...(statusOn
@@ -213,6 +236,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ]}
   >
     <div class="flex flex-wrap items-center gap-2">
+      {#if starred !== undefined}
+        <!-- One name, the state in aria-pressed; the word hides on phones -->
+        <button
+          bind:this={starButton}
+          type="button"
+          class={[
+            'btn',
+            starred ? 'preset-tonal' : 'hover:preset-tonal-surface',
+          ]}
+          aria-pressed={starred}
+          aria-label="Starred"
+          title={starred
+            ? 'Showing only your starred ones: tap to show all'
+            : 'Show only the ones you starred'}
+          {disabled}
+          onclick={() => (starred = !starred)}
+          data-testid="gallery-starred-toggle"
+        >
+          <StarIcon
+            aria-hidden="true"
+            fill={starred ? 'currentColor' : 'none'}
+            class={starred ? 'text-warning-600-400' : undefined}
+          />
+          <span class="max-sm:hidden" aria-hidden="true">Starred</span>
+        </button>
+      {/if}
       {#if showFilters}
         <SortSelectMenu
           options={sortOptions}
@@ -306,16 +355,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {@render filters?.()}
     </div>
+  {/if}
 
-    {#if !open}
-      <FilterChips
-        {chips}
-        {disabled}
-        onremove={() => {
-          onchange?.();
-          filtersButton?.focus();
-        }}
-      />
-    {/if}
+  <!-- Starred's chip shows with the panel open too: it's not in the panel -->
+  {#if starChip.length || (showFilters && hasHidden && !open)}
+    <FilterChips
+      chips={[...starChip, ...(showFilters && hasHidden && !open ? chips : [])]}
+      {disabled}
+      onremove={() => {
+        if (starChipRemoved) {
+          starChipRemoved = false;
+          starButton?.focus();
+          return;
+        }
+        onchange?.();
+        filtersButton?.focus();
+      }}
+    />
   {/if}
 </div>

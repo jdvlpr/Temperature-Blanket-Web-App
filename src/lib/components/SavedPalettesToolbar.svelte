@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
   Search, filters, sort and view for saved palettes, and "3 of 12 palettes"
-  while filtering: My Library's (Mine or Starred, whose sorts differ and
-  which has no Show filter), and Get Colors' My Palettes, which share them.
+  while filtering: My Library's, and Get Colors' My Palettes (Mine or
+  Starred, whose sorts differ and which has no Show filter), which share them.
   Search and filters show once there are a few (or one is on).
 -->
 <script lang="ts">
@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: {
     /** How many are saved (or starred), once known */
     total: number | null;
-    /** For My Library's Starred palettes */
+    /** For Get Colors' Starred palettes */
     starred?: boolean;
     /** How many match the filters */
     matching: number;

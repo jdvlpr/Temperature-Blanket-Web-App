@@ -132,8 +132,8 @@ share-to-gallery lands here. -->
   <section class="flex flex-col gap-3">
     <h2 id="star" class="text-2xl font-bold">Star Pages You Like</h2>
     <p>
-      Press the star on someone's gallery page to find it again later, under
-      <span class="font-bold">Starred</span> in My Library. Only you see your
+      Press the star on someone's gallery page to find it again later: press
+      <span class="font-bold">Starred</span> in the Gallery. Only you see your
       stars. To make it your own, press ⋮, then
       <span class="font-bold">Open a Copy</span>.
     </p>

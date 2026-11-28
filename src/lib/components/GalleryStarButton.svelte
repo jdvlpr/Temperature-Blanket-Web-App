@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Stars a gallery page to find it again in My Library (private: never a view,
+  Stars a gallery page to find it again under the Gallery's Starred (private: never a view,
   never Popular). On cards it's an icon button; with `labelled` (the page
   itself) it says Star or Starred. Signed out it's a link to sign in that comes
   back here. Not shown on the account's own pages, nor without accounts.
@@ -89,7 +89,7 @@ that then goes -->
       aria-disabled={busy || undefined}
       title={starred
         ? 'Starred: tap to unstar'
-        : 'Star to find it in My Library'}
+        : 'Star to find it again under Starred'}
       data-testid="gallery-star"
       onclick={toggle}
     >

@@ -18,6 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
   import GalleryProjectCard from '#lib/components/GalleryProjectCard.svelte';
   import GalleryCardMenu from '#lib/components/GalleryCardMenu.svelte';
+  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import { starredSortMenu } from '#lib/utils/collection-filter.js';
   import { getColorsFromInput } from '#lib/utils/color-utils.js';
   import {
     fetchProjects,
@@ -35,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { galleryBlocks } from '#lib/accounts/gallery-blocks.svelte.js';
   import {
     galleryFilters,
+    galleryStarredFilters,
     galleryState,
   } from '#lib/state/gallery-state.svelte.js';
 
@@ -47,14 +51,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** The latest request: answers to older ones (the sort or filters changed meanwhile) are dropped */
   let request = 0;
 
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
+  // Starred (signed in): the pages starred, read by ID, in place of the
+  // gallery's; the gallery isn't asked again until Starred is off
+  const starredOn = $derived(signedIn && galleryFilters.starred);
+  let starredCount = $state<{ total: number; matching: number } | null>(null);
+
+  function setStarred(on: boolean | undefined) {
+    galleryFilters.starred = !!on;
+    if (on) starredCount = null;
+    // The filters changed while Starred was on
+    if (!on && galleryState.loadedFor !== galleryFilters.key) search();
+  }
+
   // Leaves out the pages of people this person blocked
   onMount(() => void galleryBlocks.ensure());
 
   onMount(async () => {
-    // The first visit, or the filters changed on the other tab
+    // The first visit, or the filters changed on the other tab (Starred
+    // waits: the gallery's asked once it's off)
     if (
-      !galleryState.projects.length ||
-      galleryState.loadedFor !== galleryFilters.key
+      !starredOn &&
+      (!galleryState.projects.length ||
+        galleryState.loadedFor !== galleryFilters.key)
     )
       search();
     else loading = false;
@@ -154,6 +175,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function debouncedSearch() {
     clearTimeout(searchTimeout);
+    // Starred filters what it loaded; the gallery's asked when it's off
+    if (starredOn) return;
     searchTimeout = setTimeout(search, 500);
   }
 
@@ -209,7 +232,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex scroll-mt-[70px] flex-wrap items-end"
     >
       <div class="mb-2 flex w-full items-center gap-2">
-        {#if totalProjects === 0}
+        {#if starredOn}
+          <p class="text-xs" aria-live="polite">
+            {#if starredCount}
+              {starredCount.matching === starredCount.total
+                ? starredCount.total
+                : `${starredCount.matching} of ${starredCount.total}`} starred
+            {/if}
+          </p>
+        {:else if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
         {:else if totalProjects !== undefined}
           <p class="text-xs">
@@ -233,20 +264,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:yarnId={galleryState.filteredYarnId}
         bind:onlyThisYarn={galleryState.palettesContainOnlyFilteredYarn}
         bind:patternType={galleryState.filteredPatternType}
-        {...gallerySortMenu(
-          galleryState.orderBy,
-          (order) => {
-            galleryState.orderBy = order;
-            search();
-          },
-          {
-            days: galleryState.popularDays,
-            set: (days) => {
-              galleryState.popularDays = days;
-              if (galleryState.orderBy === 'POPULAR') search();
-            },
-          },
-        )}
+        bind:starred={
+          () => (signedIn ? galleryFilters.starred : undefined), setStarred
+        }
+        {...starredOn
+          ? starredSortMenu(galleryFilters)
+          : gallerySortMenu(
+              galleryState.orderBy,
+              (order) => {
+                galleryState.orderBy = order;
+                search();
+              },
+              {
+                days: galleryState.popularDays,
+                set: (days) => {
+                  galleryState.popularDays = days;
+                  if (galleryState.orderBy === 'POPULAR') search();
+                },
+              },
+            )}
         bind:layout={galleryState.layout}
         onchange={debouncedSearch}
       ></CollectionToolbar>
@@ -256,96 +292,108 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}
     >
-      <div
-        class=" my-2 w-full gap-2 {galleryState.layout === 'grid'
-          ? 'grid grid-cols-2 justify-center md:grid-cols-3 xl:grid-cols-4 '
-          : 'grid grid-cols-1 items-start md:grid-cols-2'}"
-        {@attach galleryState.layout === 'grid' ? masonry : undefined}
-      >
-        {#each galleryBlocks.without(galleryState.displayedProjects) as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
-          <GalleryProjectCard
-            href={resolve('/gallery/[id]', { id: String(databaseId) })}
-            image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
-              featuredImage?.node?.mediaItemUrl}
-            label={projectName
-              ? decodeHtmlEntities(projectName)
-              : getTitleTextFromLocationsMeta(locations)}
-            {date}
-            title={getTitleTextFromLocationsMeta(locations)}
-            author={galleryOwners.nameOf(databaseId)}
-            {views}
+      {#if starredOn}
+        <div class="my-2 w-full">
+          <StarredGalleryPages
+            kind="project"
             layout={galleryState.layout}
-          >
-            {#snippet action()}
-              <GalleryCardMenu
-                postId={databaseId}
-                kind="project"
-                name={projectName
-                  ? decodeHtmlEntities(projectName)
-                  : getTitleTextFromLocationsMeta(locations)}
-                project={{ url: projectUrl, name: projectName }}
-              />
-            {/snippet}
-          </GalleryProjectCard>
-        {/each}
-      </div>
-      {#if !galleryState.displayedProjects.length && !loading}
-        <div class="my-8 flex flex-col items-center gap-2 text-center">
-          <p>No projects match these filters.</p>
-          {#if galleryFilters.active || galleryState.filteredPatternType}
-            <button
-              type="button"
-              class="btn preset-tonal-primary border-primary-500 border"
-              onclick={clearFilters}
-            >
-              <XIcon />
-              Clear Filters
-            </button>
-          {/if}
+            filters={galleryStarredFilters}
+            oncount={(count) => (starredCount = count)}
+            onshowall={() => setStarred(false)}
+          />
         </div>
-      {/if}
-      {#if loading}
+      {:else}
         <div
-          class=" w-full gap-4 {galleryState.layout === 'grid'
-            ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
+          class=" my-2 w-full gap-2 {galleryState.layout === 'grid'
+            ? 'grid grid-cols-2 justify-center md:grid-cols-3 xl:grid-cols-4 '
             : 'grid grid-cols-1 items-start md:grid-cols-2'}"
+          {@attach galleryState.layout === 'grid' ? masonry : undefined}
         >
-          {#each Array(20)}
-            <div
-              class="placeholder card bg-surface-100 dark:bg-surface-900 rounded-container animate-pulse text-center {galleryState.layout ===
-              'grid'
-                ? 'h-[350px] w-full'
-                : 'h-[128px] w-full sm:h-[144px]'}"
-            ></div>
+          {#each galleryBlocks.without(galleryState.displayedProjects) as { databaseId, featuredImage, locations, projectName, projectUrl, date, views } (databaseId)}
+            <GalleryProjectCard
+              href={resolve('/gallery/[id]', { id: String(databaseId) })}
+              image={featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
+                featuredImage?.node?.mediaItemUrl}
+              label={projectName
+                ? decodeHtmlEntities(projectName)
+                : getTitleTextFromLocationsMeta(locations)}
+              {date}
+              title={getTitleTextFromLocationsMeta(locations)}
+              author={galleryOwners.nameOf(databaseId)}
+              {views}
+              layout={galleryState.layout}
+            >
+              {#snippet action()}
+                <GalleryCardMenu
+                  postId={databaseId}
+                  kind="project"
+                  name={projectName
+                    ? decodeHtmlEntities(projectName)
+                    : getTitleTextFromLocationsMeta(locations)}
+                  project={{ url: projectUrl, name: projectName }}
+                />
+              {/snippet}
+            </GalleryProjectCard>
           {/each}
         </div>
-      {:else if galleryState.displayedProjects.length && hasNextPage}
-        <button
-          class="btn preset-filled-primary-500 m-auto my-4 flex"
-          disabled={!hasNextPage}
-          onclick={async () => {
-            const id = ++request;
-            loading = true;
-            try {
-              let results = await fetchPage(endCursor);
-              if (id !== request) return;
-              galleryState.gallery.pageInfo = results.pageInfo;
-              galleryState.projects.push(
-                ...results.edges.flatMap((item) => item.node),
-              );
-              galleryState.projects = galleryState.projects;
-              galleryState.displayedProjects = getFilteredProjects();
-            } catch (e) {
-              if (id === request)
-                console.error('Could not load more projects', e);
-            } finally {
-              if (id === request) loading = false;
-            }
-          }}
-        >
-          <PlusIcon />
-          <span>Load More</span>
-        </button>
+        {#if !galleryState.displayedProjects.length && !loading}
+          <div class="my-8 flex flex-col items-center gap-2 text-center">
+            <p>No projects match these filters.</p>
+            {#if galleryFilters.active || galleryState.filteredPatternType}
+              <button
+                type="button"
+                class="btn preset-tonal-primary border-primary-500 border"
+                onclick={clearFilters}
+              >
+                <XIcon />
+                Clear Filters
+              </button>
+            {/if}
+          </div>
+        {/if}
+        {#if loading}
+          <div
+            class=" w-full gap-4 {galleryState.layout === 'grid'
+              ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
+              : 'grid grid-cols-1 items-start md:grid-cols-2'}"
+          >
+            {#each Array(20)}
+              <div
+                class="placeholder card bg-surface-100 dark:bg-surface-900 rounded-container animate-pulse text-center {galleryState.layout ===
+                'grid'
+                  ? 'h-[350px] w-full'
+                  : 'h-[128px] w-full sm:h-[144px]'}"
+              ></div>
+            {/each}
+          </div>
+        {:else if galleryState.displayedProjects.length && hasNextPage}
+          <button
+            class="btn preset-filled-primary-500 m-auto my-4 flex"
+            disabled={!hasNextPage}
+            onclick={async () => {
+              const id = ++request;
+              loading = true;
+              try {
+                let results = await fetchPage(endCursor);
+                if (id !== request) return;
+                galleryState.gallery.pageInfo = results.pageInfo;
+                galleryState.projects.push(
+                  ...results.edges.flatMap((item) => item.node),
+                );
+                galleryState.projects = galleryState.projects;
+                galleryState.displayedProjects = getFilteredProjects();
+              } catch (e) {
+                if (id === request)
+                  console.error('Could not load more projects', e);
+              } finally {
+                if (id === request) loading = false;
+              }
+            }}
+          >
+            <PlusIcon />
+            <span>Load More</span>
+          </button>
+        {/if}
       {/if}
     </div>
   </div>

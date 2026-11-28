@@ -65,7 +65,7 @@ export const PUT: RequestHandler = async (event) => {
     return galleryError(
       409,
       'STAR_LIMIT',
-      `You can star up to ${STAR_LIMIT} gallery pages. Unstar some in My Library first`,
+      `You can star up to ${STAR_LIMIT} gallery pages. Unstar some under the Gallery's Starred first`,
     );
   if (result === 'own-page')
     return galleryError(409, 'OWN_PAGE', 'This is your own gallery page');

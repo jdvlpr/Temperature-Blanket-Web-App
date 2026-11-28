@@ -14,11 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  My Library's Starred side: the gallery pages of one kind the account
-  starred, as the gallery's own cards (links to the pages, never copies),
-  with the page's toolbar applied: search, yarn and (projects) pattern
-  filters, and Starred's sorts (Recently starred, Newest published, Most
-  viewed). Read from the gallery once when it shows, so a star taken off here
+  The gallery pages of one kind the account starred (the Gallery's Starred,
+  and Starred in the Open and Get Colors dialogs), as the gallery's own cards
+  (links to the pages, never copies), with the toolbar's `filters` applied:
+  search, yarn and (projects) pattern filters, and Starred's sorts (Recently
+  starred, Newest published, Most viewed). Read from the gallery once when it shows, so a star taken off here
   stays until the next visit and can be put back. Pages the gallery doesn't
   return (taken down, or hidden while in their owner's Trash) aren't shown,
   but their stars are kept in case they come back. Signed out, it asks to
@@ -39,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { masonry } from '#lib/state/attachments/masonry.js';
   import { galleryOwners } from '#lib/state/gallery-owners.svelte.js';
-  import type { LibraryFilters } from '#lib/state/library-filters.svelte.js';
   import { previews } from '#lib/state/preview-state.svelte.js';
   import {
     getColorsFromInput,
@@ -50,6 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     matchesYarn,
     patternIdOf,
     sortStarred,
+    type StarredFilters,
   } from '#lib/utils/collection-filter.js';
   import {
     fetchPalettesByIds,
@@ -70,8 +70,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   interface Props {
     kind: 'project' | 'palette';
     layout?: 'grid' | 'list';
-    /** My Library's toolbar: what shows, and in what order */
-    filters?: LibraryFilters;
+    /** The toolbar's: what shows, and in what order */
+    filters?: StarredFilters;
     /** How many have loaded, once known, and how many show */
     oncount?: (count: { total: number; matching: number }) => void;
     /** Uses a palette (Get Colors) rather than opening its gallery page */
@@ -80,6 +80,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onopen?: (event: MouseEvent, href: string) => void;
     /** One column, whatever the window's width (in a side panel) */
     narrow?: boolean;
+    /** On the Gallery: shows everything again, from the empty state */
+    onshowall?: () => void;
   }
 
   let {
@@ -90,6 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onuse,
     onopen,
     narrow = false,
+    onshowall,
   }: Props = $props();
 
   const signedIn = $derived(
@@ -168,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     (date && Date.parse(date)) || 0;
   const previewIds = previews.all.map((preview) => preview.id);
 
-  const yarnOf = (filters: LibraryFilters) => ({
+  const yarnOf = (filters: StarredFilters) => ({
     brandId: filters.brandId,
     yarnId: filters.yarnId,
     only: filters.onlyThisYarn,
@@ -279,15 +282,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else if !counts.all.length}
   <div class="my-8 flex flex-col items-center gap-2 text-center">
     <p class="font-bold">No starred {noun} yet</p>
-    <p class="text-surface-700-300 text-sm">
-      Star {noun} in the
-      <a
-        class="link"
-        href={kind === 'project'
-          ? resolve('/gallery')
-          : resolve('/gallery/palettes')}>Gallery</a
-      > to find them here. Only you see your stars.
-    </p>
+    {#if onshowall}
+      <p class="text-surface-700-300 text-sm">
+        Star the {noun} you like to find them here. Only you see your stars.
+      </p>
+      <button
+        type="button"
+        class="btn preset-tonal-primary border-primary-500 border"
+        onclick={onshowall}
+      >
+        Show All {kind === 'project' ? 'Projects' : 'Palettes'}
+      </button>
+    {:else}
+      <p class="text-surface-700-300 text-sm">
+        Star {noun} in the
+        <a
+          class="link"
+          href={kind === 'project'
+            ? resolve('/gallery')
+            : resolve('/gallery/palettes')}>Gallery</a
+        > to find them here. Only you see your stars.
+      </p>
+    {/if}
   </div>
 {:else if !counts.shown.length && filters}
   <div class="my-8 flex flex-col items-center gap-2 text-center">

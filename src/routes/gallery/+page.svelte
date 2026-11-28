@@ -14,8 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import { goto, replaceState } from '$app/navigation';
   import { page } from '$app/state';
+  import { galleryFilters } from '#lib/state/gallery-state.svelte.js';
+  import { showsStarred, withoutStarred } from '#lib/state/library-scope.js';
   import { onMount } from 'svelte';
   import { resolve } from '$app/paths';
   import { PUBLIC_BASE_URL } from '$app/env/public';
@@ -25,12 +27,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gallerySection } from '#lib/storage/library-section.svelte.js';
   import Gallery from './Gallery.svelte';
 
+  // Starred from the link, before the gallery asks for its first page
+  const starredLink = showsStarred(page.url);
+  if (starredLink) galleryFilters.starred = true;
+
   // Links from before the gallery had a page for each kind
   onMount(() => {
     if (page.url.searchParams.get('view') === 'yarn-palettes')
       goto(resolve('/gallery/palettes'), { replaceState: true });
-    // The sidebar's Gallery link comes back to this side next time
-    else gallerySection.value = 'projects';
+    else {
+      // The sidebar's Gallery link comes back to this side next time
+      gallerySection.value = 'projects';
+      if (starredLink) replaceState(withoutStarred(page.url), page.state);
+    }
   });
 </script>
 

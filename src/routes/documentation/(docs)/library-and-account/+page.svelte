@@ -164,12 +164,11 @@ show only in builds with accounts. -->
   {#if __ACCOUNTS_ENABLED__}
     <h3 id="starred" class="text-lg font-bold">Starred</h3>
     <p>
-      Signed in, switch <span class="font-bold">Mine</span> to
-      <span class="font-bold">Starred</span> above the list to see the gallery
-      pages you've starred, sorted by
-      <span class="font-bold">Recently starred</span>,
-      <span class="font-bold">Newest published</span> or
-      <span class="font-bold">Most viewed</span>.
+      My Library has only what you made. Gallery pages you've starred are in the <a
+        href="/gallery"
+        class="link">Gallery</a
+      >: press
+      <span class="font-bold">Starred</span> beside Sort.
       <a
         href="/documentation/gallery-and-ravelry#star-gallery-pages"
         class="link">About stars</a

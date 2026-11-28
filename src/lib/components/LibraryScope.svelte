@@ -14,19 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- @component
-  Mine | Starred on a My Library page, under Projects | Palettes: what's
-  saved, or gallery pages starred to find again. Pill links like CollectionNav,
-  only smaller, each side a link (`?show=starred`), with a count when known.
-  Always in the page, at the top. In a dialog (Get Colors' My Palettes), with
-  `onselect` instead of addresses, each side is a button.
+  Mine | Starred in a dialog (the Open picker, Get Colors' My Palettes):
+  what's saved, or gallery pages starred to find again. Small pill buttons
+  like CollectionNav's, centered, each with a count when known. (My Library's
+  pages have no Starred: the Gallery's Starred toggle has those.)
 -->
 <script lang="ts">
   import { StarIcon, UserRoundIcon } from '@lucide/svelte';
 
   let {
     starred,
-    mineHref,
-    starredHref,
     onselect,
     mineCount,
     starredCount,
@@ -34,10 +31,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: {
     /** Starred is showing */
     starred: boolean;
-    mineHref?: string;
-    starredHref?: string;
-    /** Chooses a side, in place of the links */
-    onselect?: (starred: boolean) => void;
+    /** Chooses a side */
+    onselect: (starred: boolean) => void;
     mineCount?: number | null;
     starredCount?: number | null;
     /** Names the links for screen readers, e.g. "Projects to show" */
@@ -47,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const items = $derived([
     {
       key: 'mine',
-      href: mineHref,
       starred: false,
       icon: UserRoundIcon,
       text: 'Mine',
@@ -56,7 +50,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
     {
       key: 'starred',
-      href: starredHref,
       starred: true,
       icon: StarIcon,
       text: 'Starred',
@@ -86,36 +79,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 {/snippet}
 
-<!-- At the page's left edge; centered in a dialog -->
-<nav class={[onselect && 'px-2']} aria-label={label}>
-  <ul class={['flex flex-wrap gap-2', onselect && 'justify-center']}>
-    {#each items as { key, href, starred: side, icon, text, count, current } (key)}
-      {@const classes = [
-        'btn btn-sm gap-1',
-        current ? 'preset-filled' : 'preset-tonal',
-      ]}
+<nav class="px-2" aria-label={label}>
+  <ul class="flex flex-wrap justify-center gap-2">
+    {#each items as { key, starred: side, icon, text, count, current } (key)}
       <li class="flex">
-        {#if onselect}
-          <button
-            type="button"
-            aria-pressed={current}
-            onclick={() => onselect(side)}
-            class={classes}
-          >
-            {@render face(icon, text, count, current)}
-          </button>
-        {:else}
-          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by the page -->
-          <a
-            {href}
-            data-sveltekit-preload-data="hover"
-            data-sveltekit-noscroll
-            aria-current={current ? 'page' : undefined}
-            class={classes}
-          >
-            {@render face(icon, text, count, current)}
-          </a>
-        {/if}
+        <button
+          type="button"
+          aria-pressed={current}
+          onclick={() => onselect(side)}
+          class={[
+            'btn btn-sm gap-1',
+            current ? 'preset-filled' : 'preset-tonal',
+          ]}
+        >
+          {@render face(icon, text, count, current)}
+        </button>
       </li>
     {/each}
   </ul>

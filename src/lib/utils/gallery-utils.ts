@@ -617,10 +617,14 @@ export function gallerySortMenu(
     sortOptions: GALLERY_SORTS,
     sort: sort === 'ASC' ? ('DESC' as const) : sort,
     reversed: sort === 'ASC',
-    canReverse: (option: GallerySort) => option !== 'POPULAR',
+    // Taking any string, so a toolbar can swap in other sorts (the Gallery's
+    // Starred); only these are offered
+    canReverse: (option: string) => option !== 'POPULAR',
     // Newest again keeps Reverse on; Popular turns it off
-    onsort: (option: GallerySort) =>
-      set(option === 'DESC' && sort === 'ASC' ? 'ASC' : option),
+    onsort: (option: string) =>
+      set(
+        option === 'DESC' && sort === 'ASC' ? 'ASC' : (option as GallerySort),
+      ),
     onreverse: (reversed: boolean) => set(reversed ? 'ASC' : 'DESC'),
   };
 }

@@ -65,7 +65,7 @@ const starsOf = (userId: string) =>
     `select "postId", "kind" from "galleryStar" where "userId" = '${userId}'`,
   );
 
-test('a gallery project is starred from its card, found under Starred in My Library and unstarred there', async ({
+test("a gallery project is starred from its card, found under the Gallery's Starred and unstarred there", async ({
   page,
   request,
   context,
@@ -78,11 +78,15 @@ test('a gallery project is starred from its card, found under Starred in My Libr
   await expect(
     page.getByRole('link', { name: `Sign in to star ${NAME}` }),
   ).toHaveAttribute('href', /\/auth\/sign-in\?redirect=%2Fgallery/);
-  // And My Library's Starred asks to sign in
+  // Signed out, the Gallery has no Starred toggle, and an old My Library
+  // Starred link shows the Gallery
+  await expect(page.getByTestId('gallery-starred-toggle')).toHaveCount(0);
   await page.goto('/my-projects?show=starred');
+  await expect(page).toHaveURL(/\/gallery$/);
   await expect(
-    page.getByText('Sign in to star gallery pages and find them here'),
+    page.getByRole('link', { name: `Sign in to star ${NAME}` }),
   ).toBeVisible();
+  await expect(page.getByTestId('gallery-starred-toggle')).toHaveCount(0);
 
   const email = uniqueEmail('gallery-stars');
   await signIn(page, request, email);
@@ -100,14 +104,28 @@ test('a gallery project is starred from its card, found under Starred in My Libr
     .poll(() => starsOf(userId))
     .toEqual([{ postId, kind: 'project' }]);
 
-  // In My Library's Starred, as the gallery's card, still starred
+  // My Library has no Starred
   await page.goto('/my-projects');
-  const scope = page.getByRole('navigation', { name: 'Projects to show' });
-  await expect(scope.getByRole('link', { name: /^Starred/ })).toContainText(
-    '1',
-  );
-  await scope.getByRole('link', { name: /^Starred/ }).click();
-  await expect(page).toHaveURL(/\/my-projects\?show=starred$/);
+  await expect(
+    page.getByRole('navigation', { name: 'Projects to show' }),
+  ).toHaveCount(0);
+
+  // The Gallery's Starred, from an old link (and the address tidied), or its
+  // toggle: the gallery's card, still starred, with a Starred chip
+  await page.goto('/my-projects?show=starred');
+  await expect(page).toHaveURL(/\/gallery$/);
+  const toggle = page.getByRole('button', { name: 'Starred', exact: true });
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect(
+    page.getByRole('list', { name: 'Starred projects' }),
+  ).toHaveCount(0);
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByRole('button', { name: 'Remove filter: Starred' }),
+  ).toBeVisible();
   const starred = page.getByRole('list', { name: 'Starred projects' });
   await expect(starred.getByRole('link', { name: NAME })).toBeVisible();
   const again = starred.getByRole('button', { name: `Star ${NAME}` });
@@ -127,6 +145,11 @@ test('a gallery project is starred from its card, found under Starred in My Libr
     page.getByRole('menuitem', { name: /^Copy Link/ }),
   ).toBeVisible();
   await page.keyboard.press('Escape');
+
+  // Its chip turns Starred off, back on its toggle
+  await page.getByRole('button', { name: 'Remove filter: Starred' }).click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect(toggle).toBeFocused();
 
   // One's own page has no star
   localD1(

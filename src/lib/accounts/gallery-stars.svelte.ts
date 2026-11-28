@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// The signed-in account's stars: gallery pages starred to find again in My
-// Library. Private bookmarks, never views. Loaded when the first star or the
+// The signed-in account's stars: gallery pages starred to find again under
+// the Gallery's Starred (and in the Open and Get Colors dialogs). Private bookmarks, never views. Loaded when the first star or the
 // Starred list shows (not on every page: requests are shared by everyone on the
 // free plan), again on focus at most once a minute while one shows, and only
 // ever for the account signed in now.

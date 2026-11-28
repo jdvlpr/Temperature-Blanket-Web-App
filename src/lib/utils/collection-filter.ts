@@ -77,7 +77,7 @@ export const LIBRARY_SORTS = [
   details?: string;
 }[];
 
-/** My Library's Starred sorts: starred gallery pages, not saved things */
+/** Starred's sorts: starred gallery pages, not saved things */
 export type StarredSort = 'starred' | 'newest' | 'views';
 
 export const STARRED_SORTS = [
@@ -103,7 +103,37 @@ export type SortMenu = {
   onreverse: (reversed: boolean) => void;
 };
 
-/** My Library's sort menu: Mine's sorts, or Starred's */
+/**
+ * What a Starred list is filtered and sorted by: My Library's filters (in its
+ * dialogs), or the Gallery's (see `galleryStarredFilters`)
+ */
+export type StarredFilters = {
+  search: string;
+  brandId: string;
+  yarnId: string;
+  onlyThisYarn: boolean;
+  /** A pattern's gallery tag slug (projects) */
+  patternType: string;
+  starredSort: StarredSort;
+  starredReversed: boolean;
+  clear(): void;
+};
+
+/** Starred's sort menu (the Gallery's Starred, and the dialogs' Starred) */
+export function starredSortMenu(filters: {
+  starredSort: StarredSort;
+  starredReversed: boolean;
+}): SortMenu {
+  return {
+    sortOptions: STARRED_SORTS,
+    sort: filters.starredSort,
+    onsort: (sort) => (filters.starredSort = sort as StarredSort),
+    reversed: filters.starredReversed,
+    onreverse: (reversed) => (filters.starredReversed = reversed),
+  };
+}
+
+/** My Library's sort menu: Mine's sorts, or (its dialogs) Starred's */
 export function librarySortMenu(
   filters: {
     sort: LibrarySort;
@@ -114,13 +144,7 @@ export function librarySortMenu(
   starred: boolean,
 ): SortMenu {
   return starred
-    ? {
-        sortOptions: STARRED_SORTS,
-        sort: filters.starredSort,
-        onsort: (sort) => (filters.starredSort = sort as StarredSort),
-        reversed: filters.starredReversed,
-        onreverse: (reversed) => (filters.starredReversed = reversed),
-      }
+    ? starredSortMenu(filters)
     : {
         sortOptions: LIBRARY_SORTS,
         sort: filters.sort,

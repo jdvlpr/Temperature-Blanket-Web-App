@@ -147,10 +147,14 @@ Ravelry need accounts, so show only in builds with them. -->
     <h2 id="star-gallery-pages" class="text-2xl font-bold">Stars</h2>
     <p>
       Signed in, press the star on someone's gallery project or palette to find
-      it again later. Your starred pages are in My Library: switch
-      <span class="font-bold">Mine</span> to
-      <span class="font-bold">Starred</span>, on Projects or Yarn Palettes.
-      Starred palettes are also in
+      it again later. To see only your starred pages, press
+      <span class="font-bold">Starred</span> beside Sort in the Gallery, on
+      Projects or Yarn Palettes. Search, filters and the sorts
+      <span class="font-bold">Recently starred</span>,
+      <span class="font-bold">Newest published</span> and
+      <span class="font-bold">Most viewed</span> work there too. Press it again
+      to see everything. Starred projects and palettes are also under
+      <span class="font-bold">Open…</span>, and starred palettes in
       <span class="font-bold">Get Colors</span>, under
       <span class="font-bold">My Palettes</span>.
     </p>

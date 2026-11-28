@@ -20,6 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPaletteCard from '#lib/components/GalleryPaletteCard.svelte';
   import ToTopButton from '#lib/components/buttons/ToTopButton.svelte';
   import CollectionToolbar from '#lib/components/CollectionToolbar.svelte';
+  import StarredGalleryPages from '#lib/components/StarredGalleryPages.svelte';
+  import { account } from '#lib/accounts/summary.svelte.js';
+  import { starredSortMenu } from '#lib/utils/collection-filter.js';
   import { fetchPaletteGallery } from '#lib/utils/gallery-utils.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import {
@@ -32,12 +35,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { galleryBlocks } from '#lib/accounts/gallery-blocks.svelte.js';
   import {
     galleryFilters,
+    galleryStarredFilters,
     yarnPaletteGalleryState,
   } from '#lib/state/gallery-state.svelte.js';
 
   // On the gallery page each palette opens its page; in Get Colors' Palette Gallery
   // (`mode="use"`) choosing one uses it (`onuse`), with the same search,
-  // filters, sort and view as the gallery page
+  // filters, sort and view as the gallery page, but no Starred: Get Colors'
+  // My Palettes has the starred ones
   let {
     mode = 'page',
     onuse,
@@ -54,12 +59,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** The latest request: answers to older ones (the sort or filters changed meanwhile) are dropped */
   let request = 0;
 
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
+  const canStar = $derived(mode === 'page' && signedIn);
+  // Starred (the Gallery page, signed in): the palettes starred, read by ID,
+  // in place of the gallery's; the gallery isn't asked again until it's off
+  const starredOn = $derived(canStar && galleryFilters.starred);
+  let starredCount = $state<{ total: number; matching: number } | null>(null);
+
+  function setStarred(on: boolean | undefined) {
+    galleryFilters.starred = !!on;
+    if (on) starredCount = null;
+    // The filters changed while Starred was on
+    if (!on && yarnPaletteGalleryState.loadedFor !== galleryFilters.key)
+      search();
+  }
+
   // Leaves out the pages of people this person blocked
   onMount(() => void galleryBlocks.ensure());
 
   onMount(async () => {
-    // The first visit, or the filters changed on the other tab
-    if (
+    // The first visit, or the filters changed on the other tab (Starred
+    // waits: the gallery's asked once it's off)
+    if (starredOn) loading = false;
+    else if (
       !yarnPaletteGalleryState.projects.length ||
       yarnPaletteGalleryState.loadedFor !== galleryFilters.key
     )
@@ -155,6 +179,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let searchTimeout: ReturnType<typeof setTimeout> | undefined;
   function debouncedSearch() {
     clearTimeout(searchTimeout);
+    // Starred filters what it loaded; the gallery's asked when it's off
+    if (starredOn) return;
     searchTimeout = setTimeout(search, 500);
   }
 
@@ -203,7 +229,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         mode === 'page' && 'pb-4',
       ]}
     >
-      {#if totalPalettes !== undefined}
+      {#if starredOn}
+        <p class="text-xs" aria-live="polite">
+          {#if starredCount}
+            {starredCount.matching === starredCount.total
+              ? starredCount.total
+              : `${starredCount.matching} of ${starredCount.total}`} starred
+          {/if}
+        </p>
+      {:else if totalPalettes !== undefined}
         <p class="text-xs">{totalPalettes} total</p>
       {/if}
       <CollectionToolbar
@@ -214,72 +248,87 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:onlyThisYarn={
           yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
         }
-        {...gallerySortMenu(
-          yarnPaletteGalleryState.orderBy,
-          (order) => {
-            yarnPaletteGalleryState.orderBy = order;
-            search();
-          },
-          {
-            days: yarnPaletteGalleryState.popularDays,
-            set: (days) => {
-              yarnPaletteGalleryState.popularDays = days;
-              if (yarnPaletteGalleryState.orderBy === 'POPULAR') search();
-            },
-          },
-        )}
+        bind:starred={
+          () => (canStar ? galleryFilters.starred : undefined), setStarred
+        }
+        {...starredOn
+          ? starredSortMenu(galleryFilters)
+          : gallerySortMenu(
+              yarnPaletteGalleryState.orderBy,
+              (order) => {
+                yarnPaletteGalleryState.orderBy = order;
+                search();
+              },
+              {
+                days: yarnPaletteGalleryState.popularDays,
+                set: (days) => {
+                  yarnPaletteGalleryState.popularDays = days;
+                  if (yarnPaletteGalleryState.orderBy === 'POPULAR') search();
+                },
+              },
+            )}
         bind:layout={yarnPaletteGalleryState.layout}
         onchange={debouncedSearch}
       ></CollectionToolbar>
     </div>
-    <div class={grid ? gridClass : listClass}>
-      {#each yarnPaletteGalleryState.palettes.filter((p) => !galleryBlocks.hides(p.page.id)) as palette, i (i)}
-        <GalleryPaletteCard
-          {palette}
-          author={galleryOwners.nameOf(palette.page.id)}
-          layout={yarnPaletteGalleryState.layout}
-          {mode}
-          onclick={onuse ? () => onuse(palette) : undefined}
-        />
-      {/each}
-      {#if loading}
-        {@render placeholders(grid ? 12 : 8)}
-      {/if}
-    </div>
-    {#if !yarnPaletteGalleryState.palettes.length && !loading}
-      <div class="my-8 flex flex-col items-center gap-2 text-center">
-        <p>No palettes match these filters.</p>
-        {#if galleryFilters.active}
-          <button
-            type="button"
-            class="btn preset-tonal-primary border-primary-500 border"
-            onclick={clearFilters}
-          >
-            <XIcon />
-            Clear Filters
-          </button>
+    {#if starredOn}
+      <StarredGalleryPages
+        kind="palette"
+        layout={yarnPaletteGalleryState.layout}
+        filters={galleryStarredFilters}
+        oncount={(count) => (starredCount = count)}
+        onshowall={() => setStarred(false)}
+      />
+    {:else}
+      <div class={grid ? gridClass : listClass}>
+        {#each yarnPaletteGalleryState.palettes.filter((p) => !galleryBlocks.hides(p.page.id)) as palette, i (i)}
+          <GalleryPaletteCard
+            {palette}
+            author={galleryOwners.nameOf(palette.page.id)}
+            layout={yarnPaletteGalleryState.layout}
+            {mode}
+            onclick={onuse ? () => onuse(palette) : undefined}
+          />
+        {/each}
+        {#if loading}
+          {@render placeholders(grid ? 12 : 8)}
         {/if}
       </div>
-    {:else if !loading && yarnPaletteGalleryState.palettes.length && hasNextPage}
-      <button
-        class="btn preset-filled m-auto my-4 flex"
-        disabled={!hasNextPage}
-        onclick={async () => {
-          const id = ++request;
-          loading = true;
-          try {
-            await fetchPage(id, endCursor);
-          } catch (e) {
-            if (id === request)
-              console.error('Could not load more palettes', e);
-          } finally {
-            if (id === request) loading = false;
-          }
-        }}
-      >
-        <PlusIcon />
-        Load More
-      </button>
+      {#if !yarnPaletteGalleryState.palettes.length && !loading}
+        <div class="my-8 flex flex-col items-center gap-2 text-center">
+          <p>No palettes match these filters.</p>
+          {#if galleryFilters.active}
+            <button
+              type="button"
+              class="btn preset-tonal-primary border-primary-500 border"
+              onclick={clearFilters}
+            >
+              <XIcon />
+              Clear Filters
+            </button>
+          {/if}
+        </div>
+      {:else if !loading && yarnPaletteGalleryState.palettes.length && hasNextPage}
+        <button
+          class="btn preset-filled m-auto my-4 flex"
+          disabled={!hasNextPage}
+          onclick={async () => {
+            const id = ++request;
+            loading = true;
+            try {
+              await fetchPage(id, endCursor);
+            } catch (e) {
+              if (id === request)
+                console.error('Could not load more palettes', e);
+            } finally {
+              if (id === request) loading = false;
+            }
+          }}
+        >
+          <PlusIcon />
+          Load More
+        </button>
+      {/if}
     {/if}
   </div>
 </div>

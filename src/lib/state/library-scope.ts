@@ -13,21 +13,28 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// My Library's Mine | Starred: which one a page shows is in its address
-// (`?show=starred`), so it can be linked to and Back returns to it. The
-// pages are prerendered (as Mine), so it's read in the browser only.
+// Starred in an address (`?show=starred`): from when My Library had a Mine |
+// Starred switch, those links now open the Gallery with Starred on, and the
+// Gallery takes it in and drops it. The pages are prerendered, so it's read
+// in the browser only.
 
 import { browser } from '$app/env';
 
 const PARAM = 'show';
 const STARRED = 'starred';
 
-/** Whether this My Library address shows Starred */
+/** Whether this address asks for Starred */
 export const showsStarred = (url: {
   searchParams: { get(name: string): string | null };
 }) =>
   __ACCOUNTS_ENABLED__ && browser && url.searchParams.get(PARAM) === STARRED;
 
-/** A My Library page's address showing Mine, or Starred */
-export const withScope = (path: string, starred: boolean) =>
-  starred ? `${path}?${PARAM}=${STARRED}` : path;
+/** A Gallery page's address with Starred on */
+export const withStarred = (path: string) => `${path}?${PARAM}=${STARRED}`;
+
+/** This address without `?show=starred`, the rest kept */
+export function withoutStarred(url: { href: string }) {
+  const next = new URL(url.href);
+  next.searchParams.delete(PARAM);
+  return next.pathname + next.search + next.hash;
+}

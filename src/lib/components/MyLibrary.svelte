@@ -16,8 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <!-- @component
   My Library's frame, around its Projects page or its Yarn Palettes page: where
   things are kept, whose name gallery pages show, Sign In, Projects | Yarn
-  Palettes with how many of each, Mine | Starred (the page's own list, or
-  gallery pages starred to find again; `?show=starred`), and the Trash. Signed in, projects, palettes
+  Palettes with how many of each, and the Trash. Only what's saved here:
+  starred gallery pages are in the Gallery, under its Starred toggle (old
+  `?show=starred` links go there). Signed in, projects, palettes
   and the Trash sync to the account, and each project and palette can be
   published to the gallery as a snapshot, with the account's name or without.
 -->
@@ -32,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/env';
+  import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { backHereOnClick, signInHref } from '#lib/accounts/redirect.js';
@@ -39,11 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { account } from '#lib/accounts/summary.svelte.js';
   import { galleryPages } from '#lib/accounts/gallery-pages.svelte.js';
   import { sync } from '#lib/sync/status.svelte.js';
-  import { galleryStars } from '#lib/accounts/gallery-stars.svelte.js';
   import CollectionNav from '#lib/components/CollectionNav.svelte';
-  import LibraryScope from '#lib/components/LibraryScope.svelte';
   import Trash from '#lib/components/Trash.svelte';
-  import { showsStarred, withScope } from '#lib/state/library-scope.js';
+  import { showsStarred, withStarred } from '#lib/state/library-scope.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { librarySection } from '#lib/storage/library-section.svelte.js';
   import { savedPalettes } from '#lib/storage/palettes.svelte.js';
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     children,
   }: {
     current: 'projects' | 'palettes';
-    /** How many the list on this page has (Mine), once it knows */
+    /** How many the list on this page has, once it knows */
     currentTotal?: number | null;
     children: Snippet;
   } = $props();
@@ -99,16 +99,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const signedIn = $derived(
     __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
   );
-  const starred = $derived(showsStarred(page.url));
-  const kind = $derived(current === 'projects' ? 'project' : 'palette');
 
-  // Signed in: the stars, for Starred's count (and its list)
-  $effect(() => {
-    if (signedIn) return galleryStars.start();
+  // Links from when Starred was here: the Gallery has it now
+  onMount(() => {
+    if (!showsStarred(page.url)) return;
+    const gallery =
+      current === 'projects'
+        ? resolve('/gallery')
+        : resolve('/gallery/palettes');
+    goto(withStarred(gallery), { replaceState: true });
   });
-  const starredCount = $derived(
-    signedIn && galleryStars.loaded ? galleryStars.list(kind).length : null,
-  );
   // Signed in with sync on: projects are kept in the account
   const synced = $derived(signedIn && sync.active);
   const showGallery = $derived(signedIn && galleryPages.shown);
@@ -183,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <!-- Signed out: an account keeps them safe, and on every device -->
-  {#if browser && __ACCOUNTS_ENABLED__ && !signedIn && !starred}
+  {#if browser && __ACCOUNTS_ENABLED__ && !signedIn}
     <div
       class={[
         PAGE_TEXT,
@@ -206,8 +206,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <CollectionNav
       label="My Library"
       {current}
-      projectsHref={withScope(resolve('my-projects'), starred)}
-      palettesHref={withScope(resolve('my-palettes'), starred)}
+      projectsHref={resolve('my-projects')}
+      palettesHref={resolve('my-palettes')}
       projectsCount={current === 'projects'
         ? (currentTotal ?? projectsCount)
         : projectsCount}
@@ -215,26 +215,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? (currentTotal ?? palettesCount)
         : palettesCount}
     />
-
-    {#if __ACCOUNTS_ENABLED__}
-      <LibraryScope
-        {starred}
-        label={current === 'projects' ? 'Projects to show' : 'Palettes to show'}
-        mineHref={page.url.pathname}
-        starredHref={withScope(page.url.pathname, true)}
-        mineCount={current === 'projects'
-          ? (currentTotal ?? projectsCount)
-          : (currentTotal ?? palettesCount)}
-        {starredCount}
-      />
-    {/if}
   </div>
 
   <section class="flex flex-col gap-2" aria-labelledby="library-list">
     <h2 id="library-list" class="sr-only">
-      {starred ? 'Starred ' : ''}{current === 'projects'
-        ? 'Projects'
-        : 'Yarn Palettes'}
+      {current === 'projects' ? 'Projects' : 'Yarn Palettes'}
     </h2>
     {@render children()}
   </section>

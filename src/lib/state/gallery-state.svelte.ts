@@ -1,4 +1,8 @@
 import type { GalleryPalette } from '#lib/utils/color-utils.js';
+import type {
+  StarredFilters,
+  StarredSort,
+} from '#lib/utils/collection-filter.js';
 import {
   POPULAR_DAYS,
   type GalleryPageInfo,
@@ -19,6 +23,14 @@ class GalleryFilters {
   orderBy = $state<GallerySort>('POPULAR');
   /** Popular counts views in the last … days */
   popularDays = $state(POPULAR_DAYS);
+  /**
+   * Only the pages this account starred (signed in): read by ID, not asked
+   * of the gallery, so it's not in `key`, and Clear Filters leaves it on
+   */
+  starred = $state(false);
+  /** Starred's own sort, in place of the gallery's */
+  starredSort = $state<StarredSort>('starred');
+  starredReversed = $state(false);
 
   /** The filters and sort as one value, to tell whether a page's results are for them */
   get key() {
@@ -119,3 +131,33 @@ class YarnPaletteGalleryState extends SharedFilters {
 
 export const galleryState = new GalleryState();
 export const yarnPaletteGalleryState = new YarnPaletteGalleryState();
+
+/** The Gallery's filters and Starred's sort, as its Starred list reads them */
+export const galleryStarredFilters: StarredFilters = {
+  get search() {
+    return galleryFilters.search;
+  },
+  get brandId() {
+    return galleryFilters.filteredBrandId;
+  },
+  get yarnId() {
+    return galleryFilters.filteredYarnId;
+  },
+  get onlyThisYarn() {
+    return galleryFilters.palettesContainOnlyFilteredYarn;
+  },
+  get patternType() {
+    return galleryState.filteredPatternType;
+  },
+  get starredSort() {
+    return galleryFilters.starredSort;
+  },
+  get starredReversed() {
+    return galleryFilters.starredReversed;
+  },
+  // Leaves Starred on
+  clear() {
+    galleryFilters.clear();
+    galleryState.filteredPatternType = '';
+  },
+};
