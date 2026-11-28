@@ -111,7 +111,7 @@ test("a gallery project is starred from its card, found under the Gallery's Star
   ).toHaveCount(0);
 
   // The Gallery's Starred, from an old link (and the address tidied), or its
-  // toggle: the gallery's card, still starred, with a Starred chip
+  // toggle: the gallery's card, still starred
   await page.goto('/my-projects?show=starred');
   await expect(page).toHaveURL(/\/gallery$/);
   const toggle = page.getByRole('button', { name: 'Starred', exact: true });
@@ -123,9 +123,6 @@ test("a gallery project is starred from its card, found under the Gallery's Star
   ).toHaveCount(0);
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-  await expect(
-    page.getByRole('button', { name: 'Remove filter: Starred' }),
-  ).toBeVisible();
   const starred = page.getByRole('list', { name: 'Starred projects' });
   await expect(starred.getByRole('link', { name: NAME })).toBeVisible();
   const again = starred.getByRole('button', { name: `Star ${NAME}` });
@@ -146,10 +143,17 @@ test("a gallery project is starred from its card, found under the Gallery's Star
   ).toBeVisible();
   await page.keyboard.press('Escape');
 
-  // Its chip turns Starred off, back on its toggle
-  await page.getByRole('button', { name: 'Remove filter: Starred' }).click();
+  // Loaded straight from a Starred address (e.g. back from signing in)
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/gallery?show=starred');
+  await expect(page).toHaveURL(/\/gallery$/);
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  // (unstarred above, so none now)
+  await expect(page.getByText('No starred projects yet')).toBeVisible();
+  expect(errors).toEqual([]);
+  await page.getByRole('button', { name: 'Show All Projects' }).click();
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-  await expect(toggle).toBeFocused();
 
   // One's own page has no star
   localD1(
