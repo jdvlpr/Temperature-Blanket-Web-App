@@ -62,7 +62,7 @@ const colorEntries = colors
 const colorwaysFile = path.join(yarnPath, 'colorways.ts');
 fs.writeFileSync(
   colorwaysFile,
-  `import type { Colorway } from '$lib/types/yarn-types';
+  `import type { Colorway } from '#lib/types/yarn-types.js';
 
 const colorways: Colorway[] = [
   {
@@ -92,7 +92,7 @@ const brandId = fs
     'utf-8',
   )
   .match(/id:\s*'([^']+)'/)?.[1];
-const changelogFile = path.join(root, 'src/routes/changelog/changelog.ts');
+const changelogFile = path.join(root, 'src/routes/whats-new/changelog.ts');
 let changelog = fs.readFileSync(changelogFile, 'utf-8');
 const countPattern = new RegExp(
   `(text: \`)\\d+( colorways\`,\\s*title:\\s*'Added New Yarn: <a href="/yarn-colorway-finder\\?f=${brandId}-${yarnId}&)`,

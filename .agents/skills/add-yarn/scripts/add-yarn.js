@@ -148,7 +148,7 @@ async function main() {
 
     // Create colorways.ts — always uses 2 placeholder colorways (update manually after)
     const sourceName = extractDomain(sourceHref);
-    const colorwaysContent = `import type { Colorway } from '$lib/types/yarn-types';
+    const colorwaysContent = `import type { Colorway } from '#lib/types/yarn-types.js';
 
 const colorways: Colorway[] = [
   {
@@ -177,7 +177,7 @@ export default colorways;
     console.log(`✓ Created colorways.ts`);
 
     // Create yarn.ts
-    const yarnContent = `import type { Yarn } from '$lib/types/yarn-types';
+    const yarnContent = `import type { Yarn } from '#lib/types/yarn-types.js';
 import colorways from './colorways';
 
 export const yarn: Yarn = {
@@ -391,7 +391,10 @@ export const yarn: Yarn = {
 
     // Brand display name and ID as the app knows them (used in the changelog)
     const brandDisplayName =
-      brandYarnsContent.match(/name:\s*'([^']+)'/)?.[1] ??
+      brandYarnsContent
+        .match(/name:\s*(?:'([^']+)'|"([^"]+)")/)
+        ?.slice(1)
+        .find(Boolean) ??
       brandNameArg.charAt(0).toUpperCase() + brandNameArg.slice(1);
     const brandId =
       brandYarnsContent.match(/id:\s*'([^']+)'/)?.[1] ?? brandSnake;
@@ -417,7 +420,7 @@ export const yarn: Yarn = {
     // Update changelog.ts (newest first: year > month > item)
     const changelogFile = path.join(
       projectRoot,
-      'src/routes/changelog/changelog.ts',
+      'src/routes/whats-new/changelog.ts',
     );
     let changelogContent = fs.readFileSync(changelogFile, 'utf-8');
 
@@ -442,6 +445,7 @@ export const yarn: Yarn = {
     // The colorway count is a placeholder (2) until real colorways are added
     const newNote = `              {
                 icon: ICONS.checkCircle,
+                tag: 'yarn',
                 text: \`2 colorways\`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=${brandId}-${yarnSnake}&v=${newVersion}" class="link">${escapeQuotes(brandDisplayName)} - ${escapeQuotes(yarnName)}</a>',

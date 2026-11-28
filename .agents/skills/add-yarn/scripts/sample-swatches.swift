@@ -264,8 +264,13 @@ if let dir = yarnDir {
   let ravelry = info["ravelry"] as? [String: Any] ?? [:]
   let appWeight = detail("Weight")
   if let rw = ravelry["weight"] as? String {
-    appRows.append(("Ravelry weight", rw + (appWeight.lowercased().hasPrefix(rw.lowercased()) ? " ✓ matches the app" : " ⚠ differs from the app's \(appWeight)")))
-    if !appWeight.lowercased().hasPrefix(rw.lowercased()) { flags.append("Weight: the app has \(appWeight), Ravelry says \(rw).") }
+    // Compare the weight names only: "Fingering (f)" vs "Fingering (14 wpi)"
+    func weightName(_ s: String) -> String {
+      s.replacingOccurrences(of: "\\s*\\(.*$", with: "", options: .regularExpression).lowercased()
+    }
+    let same = weightName(appWeight) == weightName(rw)
+    appRows.append(("Ravelry weight", rw + (same ? " ✓ matches the app" : " ⚠ differs from the app's \(appWeight)")))
+    if !same { flags.append("Weight: the app has \(appWeight), Ravelry says \(rw).") }
   }
   if let d = ravelry["details"] as? String { appRows.append(("Ravelry details", d)) }
   var out = table("Yarn in the app", appRows)
@@ -273,17 +278,19 @@ if let dir = yarnDir {
 
   // Changelog entry the app will show for this yarn
   var root = URL(fileURLWithPath: dir, isDirectory: true)
-  while root.path != "/" && !FileManager.default.fileExists(atPath: root.appendingPathComponent("src/routes/changelog/changelog.ts").path) {
+  while root.path != "/" && !FileManager.default.fileExists(atPath: root.appendingPathComponent("src/routes/whats-new/changelog.ts").path) {
     root = root.deletingLastPathComponent()
   }
-  let changelog = (try? String(contentsOf: root.appendingPathComponent("src/routes/changelog/changelog.ts"), encoding: .utf8)) ?? ""
+  let changelog = (try? String(contentsOf: root.appendingPathComponent("src/routes/whats-new/changelog.ts"), encoding: .utf8)) ?? ""
   let key = "\(detail("Brand ID"))-\(detail("Yarn ID"))"
-  let pattern = "text:\\s*`([^`]*)`,\\s*title:\\s*'([^']*f=\(NSRegularExpression.escapedPattern(for: key))&v=([0-9.]+)[^']*)'"
+  // Title is a single-quoted string that may hold escaped quotes (Jamieson\'s)
+  let pattern = "text:\\s*`([^`]*)`,\\s*title:\\s*'((?:[^'\\\\]|\\\\.)*f=\(NSRegularExpression.escapedPattern(for: key))&v=([0-9.]+)(?:[^'\\\\]|\\\\.)*)'"
   if let re = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]),
     let m = re.firstMatch(in: changelog, range: NSRange(changelog.startIndex..., in: changelog)),
     let t = Range(m.range(at: 1), in: changelog), let ti = Range(m.range(at: 2), in: changelog), let v = Range(m.range(at: 3), in: changelog)
   {
     let plainTitle = changelog[ti].replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+      .replacingOccurrences(of: "\\'", with: "'")
     out += table("Changelog", [("Version", String(changelog[v])), ("Entry", "\(plainTitle) — \(changelog[t])")])
   } else {
     flags.append("No changelog entry found for \(key).")
