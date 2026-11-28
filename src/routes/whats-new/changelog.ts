@@ -38,6 +38,25 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.checkCircle,
+                tag: 'yarn',
+                text: `228 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=jamiesons_of_shetland-spindrift&v=7.1.0" class="link">Jamieson\'s of Shetland - Spindrift</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                tag: 'yarn',
+                text: `33 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=scheepjes-linen_soft&v=7.1.0" class="link">Scheepjes - Linen Soft</a>',
+              },
+            ],
+            version: '7.1.0',
+          },
+          {
+            notes: [
+              {
                 icon: ICONS.wrench,
                 instructions: `If you're partway through a Corner to Corner project, look over the top row of your preview: it now shows the last days' squares.`,
                 tag: 'fix',

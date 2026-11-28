@@ -3,6 +3,7 @@ import { yarn as cahlista } from './cahlista/yarn';
 import { yarn as catona } from './catona/yarn';
 import { yarn as chunkyMonkey } from './chunky-monkey/yarn';
 import { yarn as colourCrafter } from './colour-crafter/yarn';
+import { yarn as linenSoft } from './linen-soft/yarn';
 import { yarn as metropolis } from './metropolis/yarn';
 import { yarn as scrumptious } from './scrumptious/yarn';
 import { yarn as softfun } from './softfun/yarn';
@@ -16,6 +17,7 @@ export const brand: Brand = {
     catona,
     chunkyMonkey,
     colourCrafter,
+    linenSoft,
     metropolis,
     scrumptious,
     softfun,

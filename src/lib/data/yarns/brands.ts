@@ -34,6 +34,7 @@ import { brand as hobbyLobby } from './hobby-lobby/yarns';
 import { brand as hobbyStore } from './hobby-store/yarns';
 import { brand as holst } from './holst/yarns';
 import { brand as iceYarns } from './ice-yarns/yarns';
+import { brand as jamiesonsOfShetland } from './jamiesons-of-shetland/yarns';
 import { brand as katia } from './katia/yarns';
 import { brand as kelbourneWoolens } from './kelbourne-woolens/yarns';
 import { brand as kingCole } from './king-cole/yarns';
@@ -121,6 +122,7 @@ export const brands: Brand[] = [
   hobbyStore,
   holst,
   iceYarns,
+  jamiesonsOfShetland,
   katia,
   kelbourneWoolens,
   kingCole,
