@@ -114,14 +114,7 @@ Library (Mine) or the Gallery with Starred on (Starred). -->
   </div>
 
   {#if starred}
-    <StarredGalleryPages
-      {kind}
-      layout="list"
-      narrow
-      {filters}
-      {onuse}
-      {onopen}
-    />
+    <StarredGalleryPages {kind} layout="rows" {filters} {onuse} {onopen} />
   {:else}
     {@render mine(filters.search)}
   {/if}

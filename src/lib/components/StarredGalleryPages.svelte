@@ -25,7 +25,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   sign in. With `onuse` (Get Colors' My Palettes, the Palette menu's Open,
   palettes), choosing a palette uses it instead of opening its page; with
   `onopen` (the Project menu's Open, projects), a project's card links to a
-  copy of it, opened by `onopen`, and has no ⋮ menu.
+  copy of it, opened by `onopen`, and has no ⋮ menu. With `layout="rows"`
+  (the Open dialogs) they're compact rows, as the saved ones beside them: a
+  small picture or color strip, the name, then "By <name> · Published
+  <date>", the whole row one control, with no star or menu.
 -->
 <script lang="ts">
   import { resolve } from '$app/paths';
@@ -63,13 +66,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '#lib/utils/shared-palette-utils.js';
   import { projectCopyHref } from '#lib/utils/open-copy.js';
   import { decodeHtmlEntities } from '#lib/utils/string-utils.js';
-  import { PAGE_TEXT, PALETTE_LIST } from '#lib/constants/class-constants.js';
+  import PaletteStrip from '#lib/components/PaletteStrip.svelte';
+  import {
+    PAGE_TEXT,
+    PALETTE_LIST,
+    PANEL_LIST,
+    PANEL_ROW,
+  } from '#lib/constants/class-constants.js';
   import { LogInIcon, StarIcon, XIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
 
   interface Props {
     kind: 'project' | 'palette';
-    layout?: 'grid' | 'list';
+    /** `rows`: compact rows, as the Open dialogs list saved ones */
+    layout?: 'grid' | 'list' | 'rows';
     /** The toolbar's: what shows, and in what order */
     filters?: StarredFilters;
     /** How many have loaded, once known, and how many show */
@@ -78,8 +88,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onuse?: (palette: GalleryPalette) => void;
     /** Opens a copy of a project (its card's link) rather than its page */
     onopen?: (event: MouseEvent, href: string) => void;
-    /** One column, whatever the window's width (in a side panel) */
-    narrow?: boolean;
     /** On the Gallery: shows everything again, from the empty state */
     onshowall?: () => void;
   }
@@ -91,7 +99,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     oncount,
     onuse,
     onopen,
-    narrow = false,
     onshowall,
   }: Props = $props();
 
@@ -317,15 +324,95 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Clear Filters
     </button>
   </div>
+{:else if layout === 'rows'}
+  <ul
+    class={PANEL_LIST}
+    aria-label={kind === 'project' ? 'Starred projects' : 'Starred palettes'}
+  >
+    {#if kind === 'project' && projectCards}
+      {#each projectCards.shown as { node, label } (node.databaseId)}
+        {@const image =
+          node.featuredImage?.node?.mediaDetails.sizes?.[0]?.sourceUrl ||
+          node.featuredImage?.node?.mediaItemUrl}
+        {@const copyHref = onopen
+          ? projectCopyHref(node.projectUrl, node.projectName, node.databaseId)
+          : null}
+        <li>
+          <!-- eslint-disable svelte/no-navigation-without-resolve -- a copy's address -->
+          <a
+            href={copyHref ??
+              resolve('/gallery/[id]', { id: String(node.databaseId) })}
+            data-sveltekit-reload={copyHref ? '' : undefined}
+            class={PANEL_ROW}
+            onclick={copyHref
+              ? (event) => onopen?.(event, copyHref)
+              : undefined}
+          >
+            <!-- eslint-enable svelte/no-navigation-without-resolve -->
+            {#if image}
+              <img
+                src={image}
+                alt=""
+                loading="lazy"
+                class="h-14 w-12 shrink-0 object-contain"
+              />
+            {:else}
+              <span
+                class="bg-surface-200-800 rounded-base h-14 w-12 shrink-0"
+                aria-hidden="true"
+              ></span>
+            {/if}
+            {@render rowText(
+              label,
+              galleryOwners.nameOf(node.databaseId),
+              node.date,
+            )}
+          </a>
+        </li>
+      {/each}
+    {:else if paletteCards}
+      {#each paletteCards.shown as palette (palette.postId)}
+        {@const text = palette.page.title || 'Untitled Palette'}
+        <li>
+          {#if onuse}
+            <button
+              type="button"
+              class={PANEL_ROW}
+              onclick={() => onuse(palette)}
+            >
+              {@render paletteStrip(palette)}
+              {@render rowText(
+                text,
+                galleryOwners.nameOf(palette.postId),
+                palette.page.date,
+              )}
+            </button>
+          {:else}
+            <a
+              href={resolve('/gallery/palette/[id]', {
+                id: String(palette.postId),
+              })}
+              class={PANEL_ROW}
+            >
+              {@render paletteStrip(palette)}
+              {@render rowText(
+                text,
+                galleryOwners.nameOf(palette.postId),
+                palette.page.date,
+              )}
+            </a>
+          {/if}
+        </li>
+      {/each}
+    {/if}
+  </ul>
 {:else if kind === 'project' && projectCards}
   <ul
     class={[
       'w-full items-start gap-2',
       layout === 'grid'
         ? 'grid grid-cols-2 justify-center md:grid-cols-3 xl:grid-cols-4'
-        : narrow
-          ? 'grid grid-cols-1'
-          : 'grid grid-cols-1 md:grid-cols-2',
+        : 'grid grid-cols-1 md:grid-cols-2',
     ]}
     aria-label="Starred projects"
     {@attach layout === 'grid' ? masonry : undefined}
@@ -387,9 +474,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       'w-full items-start gap-x-4 gap-y-6',
       layout === 'grid'
         ? 'grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-        : narrow
-          ? 'flex flex-col'
-          : PALETTE_LIST,
+        : PALETTE_LIST,
     ]}
     aria-label="Starred palettes"
   >
@@ -406,3 +491,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/each}
   </ul>
 {/if}
+
+{#snippet paletteStrip(palette: GalleryPalette)}
+  <span class="w-12 shrink-0" aria-hidden="true">
+    <PaletteStrip
+      colors={palette.colors}
+      height="40px"
+      corners="small"
+      insideControl
+    />
+  </span>
+{/snippet}
+
+<!-- A row's name, then whose it is and when it was published (each only
+when known), as the saved ones' "Saved …" -->
+{#snippet rowText(
+  name: string,
+  author: string | null | undefined,
+  date: string | null | undefined,
+)}
+  {@const published =
+    date && !isNaN(new Date(date).getTime())
+      ? `Published ${new Date(date).toLocaleDateString(undefined, { dateStyle: 'medium' })}`
+      : ''}
+  <span class="flex min-w-0 flex-1 flex-col">
+    <span class="line-clamp-2 text-sm font-semibold break-words">{name}</span>
+    {#if author || published}
+      <span class="text-surface-700-300 line-clamp-1 text-xs"
+        >{[author && `By ${author}`, published]
+          .filter(Boolean)
+          .join(' · ')}</span
+      >
+    {/if}
+  </span>
+{/snippet}
