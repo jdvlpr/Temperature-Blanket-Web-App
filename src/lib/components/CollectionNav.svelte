@@ -21,7 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   It sits in the page at the top on every screen size.
 -->
 <script lang="ts">
-  import { ThermometerSunIcon, SwatchBookIcon } from '@lucide/svelte';
+  import { yarnBall } from '@lucide/lab';
+  import { Icon, ThermometerSunIcon } from '@lucide/svelte';
 
   let {
     current,
@@ -44,14 +45,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       key: 'projects',
       href: projectsHref,
-      icon: ThermometerSunIcon,
       text: 'Projects',
       count: projectsCount,
     },
     {
       key: 'palettes',
       href: palettesHref,
-      icon: SwatchBookIcon,
       text: 'Yarn Palettes',
       count: palettesCount,
     },
@@ -60,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <nav aria-label={label}>
   <ul class="flex flex-wrap gap-2">
-    {#each items as { key, href, icon: Icon, text, count } (key)}
+    {#each items as { key, href, text, count } (key)}
       {@const isCurrent = key === current}
       <li class="flex">
         <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by the page -->
@@ -70,7 +69,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-current={isCurrent ? 'page' : undefined}
           class={['btn gap-1', isCurrent ? 'preset-filled' : 'preset-tonal']}
         >
-          <Icon aria-hidden="true" />
+          {#if key === 'palettes'}
+            <!-- The yarn ball, as in Create › Palette -->
+            <Icon iconNode={yarnBall} aria-hidden="true" />
+          {:else}
+            <ThermometerSunIcon aria-hidden="true" />
+          {/if}
           <span class="flex items-center gap-1">
             <span>
               {#if key === 'palettes'}<span class="max-sm:hidden">Yarn</span>
