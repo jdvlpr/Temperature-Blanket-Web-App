@@ -72,6 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PALETTE_LIST,
     PANEL_LIST,
     PANEL_ROW,
+    PANEL_STACK_ROW,
   } from '#lib/constants/class-constants.js';
   import { LogInIcon, StarIcon, XIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
@@ -377,7 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if onuse}
             <button
               type="button"
-              class={PANEL_ROW}
+              class={PANEL_STACK_ROW}
               onclick={() => onuse(palette)}
             >
               {@render paletteStrip(palette)}
@@ -392,7 +393,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href={resolve('/gallery/palette/[id]', {
                 id: String(palette.postId),
               })}
-              class={PANEL_ROW}
+              class={PANEL_STACK_ROW}
             >
               {@render paletteStrip(palette)}
               {@render rowText(
@@ -493,7 +494,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 {#snippet paletteStrip(palette: GalleryPalette)}
-  <span class="w-12 shrink-0" aria-hidden="true">
+  <!-- The row's whole width, the name under it -->
+  <span class="w-full" aria-hidden="true">
     <PaletteStrip
       colors={palette.colors}
       height="40px"

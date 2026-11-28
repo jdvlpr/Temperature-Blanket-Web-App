@@ -25,9 +25,9 @@ first. The open one is marked, not a button. -->
   import PaletteStrip from '#lib/components/PaletteStrip.svelte';
   import OpenShell from '#lib/components/modals/OpenShell.svelte';
   import {
-    OPEN_NOW_ROW,
+    OPEN_NOW_STACK_ROW,
     PANEL_LIST,
-    PANEL_ROW,
+    PANEL_STACK_ROW,
   } from '#lib/constants/class-constants.js';
   import { ensureYarnData } from '#lib/data/yarns/colorways.svelte.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
@@ -93,7 +93,8 @@ first. The open one is marked, not a button. -->
 </script>
 
 {#snippet strip(colors: Color[])}
-  <span class="w-12 shrink-0" aria-hidden="true">
+  <!-- The row's whole width, the name under it -->
+  <span class="w-full" aria-hidden="true">
     <PaletteStrip {colors} height="40px" corners="small" insideControl />
   </span>
 {/snippet}
@@ -121,7 +122,7 @@ first. The open one is marked, not a button. -->
         <li>
           {#if item.id === paletteAutosave.id}
             <!-- The open one: nothing to open -->
-            <div class={OPEN_NOW_ROW} aria-current="true">
+            <div class={OPEN_NOW_STACK_ROW} aria-current="true">
               {@render strip(item.colors)}
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="line-clamp-2 text-sm font-semibold break-words"
@@ -133,7 +134,7 @@ first. The open one is marked, not a button. -->
           {:else}
             <button
               type="button"
-              class={PANEL_ROW}
+              class={PANEL_STACK_ROW}
               onclick={() => openSaved(item.id, item.colors)}
             >
               {@render strip(item.colors)}

@@ -46,6 +46,12 @@ export const PANEL_ROW = `hover:bg-surface-200-800 flex min-h-12 w-full items-ce
 /** A PANEL_ROW that isn't a control (the open one, on the Open screens) */
 export const OPEN_NOW_ROW =
   'flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left';
+/** A PANEL_ROW stacked: something the row's whole width (a palette's
+strip), the text under it */
+export const PANEL_STACK_ROW = `hover:bg-surface-200-800 flex w-full flex-col items-stretch gap-2 px-4 py-3 text-left transition-colors ${ROW_FOCUS}`;
+/** OPEN_NOW_ROW stacked, as PANEL_STACK_ROW */
+export const OPEN_NOW_STACK_ROW =
+  'flex w-full flex-col items-stretch gap-2 px-4 py-3 text-left';
 
 // A Skeleton field group drawn as one field: a single border around the icon,
 // input and buttons (its children drop their own), in the theme's roundness.
