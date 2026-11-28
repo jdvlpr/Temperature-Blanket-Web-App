@@ -20,13 +20,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     menuPositioning,
   } from '#lib/components/menu-styles.js';
   import { SMALL_LINK } from '#lib/constants/class-constants.js';
+  import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
   import { alignIconInk } from '#lib/state/attachments/align-icon-ink.js';
   import { dialog } from '#lib/state/page-state.svelte.js';
   import { project } from '#lib/state/project-state.svelte.js';
+  import {
+    gallerySection,
+    librarySection,
+  } from '#lib/storage/library-section.svelte.js';
+  import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { PUBLIC_GITHUB_LINK } from '$app/env/public';
   import { goto } from '$app/navigation';
-  import { page } from '$app/state';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import { yarnBall } from '@lucide/lab';
   import {
     ChevronDownIcon,
@@ -34,21 +40,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ExternalLinkIcon,
     HeartIcon,
     Icon,
-    LandmarkIcon,
+    LayoutGridIcon,
     LibraryBigIcon,
     NotebookPenIcon,
     ThermometerSunIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
-  import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
-  import {
-    gallerySection,
-    librarySection,
-  } from '#lib/storage/library-section.svelte.js';
-  import { VERSION_7_POST_HREF } from '#lib/constants/version-7-post.js';
-  import { whatsNew } from '#lib/storage/whats-new.svelte.js';
   import { onMount } from 'svelte';
+  import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
 
   const pathname = $derived(page.url.pathname);
   const library = $derived(['/my-projects', '/my-palettes'].includes(pathname));
@@ -188,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class={[LINK, gallery && CURRENT]}
     aria-current={gallery ? 'page' : undefined}
   >
-    <LandmarkIcon />
+    <LayoutGridIcon />
     Gallery
   </a>
 
